@@ -47,6 +47,11 @@ if [ -d "third_party/libero_pro" ]; then
     echo "  ✓ libero_pro"
 fi
 
+if [ -d "third_party/rdt" ]; then
+    cd third_party/rdt && pip install -r requirements.txt --quiet && cd -
+    echo "  ✓ rdt"
+fi
+
 # ── 4. Ensure dotenv is available ─────────────────────────────────────────────
 echo "[4/5] Ensuring python-dotenv is installed..."
 pip install python-dotenv --quiet

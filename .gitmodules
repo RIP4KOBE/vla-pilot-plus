@@ -10,3 +10,6 @@
 [submodule "third_party/libero_pro"]
 	path = third_party/libero_pro
 	url = git@github.com:Treeeplanter/LIBERO-PRO.git
+[submodule "third_party/rdt"]
+	path = third_party/rdt
+	url = https://github.com/thu-ml/RoboticsDiffusionTransformer.git
