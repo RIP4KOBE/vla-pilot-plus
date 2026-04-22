@@ -271,8 +271,240 @@ class RDTSteer:
         best = right_arm[0]                    # (64, 7) — particle 0
         return best[: self._action_chunk_horizon]  # (H, 7)
 
-    # ── Placeholder for Task 4 methods (added in next task) ──────────────────
+    # ── Trajectory projection (shared by diversity and guidance hooks) ────────
 
-    def _guided_denoise_loop(self, proprio, images, text_embeds, B, **kwargs) -> Tensor:
-        """Placeholder — will be fully implemented in Task 4."""
-        return self._predict_unguided(proprio, images, text_embeds, B)
+    def _rdt_sample_to_trajectory_3d(self, sample: Tensor) -> Tensor:
+        """
+        (1, 64, 14) → (1, H+1, 3) via adapter.delta_actions_to_ee_trajectory.
+        Slices right-arm, takes action_chunk_horizon steps, projects to 3D EEF.
+        """
+        action_seq = sample[0, : self._action_chunk_horizon, _RIGHT_ARM]  # (H, 7)
+        traj = self._adapter.delta_actions_to_ee_trajectory(action_seq)   # (H+1, 3)
+        return traj.unsqueeze(0)  # (1, H+1, 3)
+
+    # ── Gradient helpers ──────────────────────────────────────────────────────
+
+    def _compute_diversity_gradient(self, x_t: Tensor) -> Optional[Tensor]:
+        """
+        RBF inverse-distance potential on 3D EEF trajectories.
+        Pushes particles apart. Mirrors DiffusionPolicySteer exactly.
+        Returns gradient w.r.t. x_t (same shape), or None if B < 2.
+        """
+        B = x_t.shape[0]
+        if B < 2 or self._adapter is None:
+            return None
+
+        with torch.enable_grad():
+            x_grad = x_t.detach().requires_grad_(True)
+            trajs = torch.cat(
+                [self._rdt_sample_to_trajectory_3d(x_grad[b: b + 1]) for b in range(B)],
+                dim=0,
+            )  # (B, H+1, 3)
+            pos = trajs[:, 1:, :3]      # skip start point → (B, H, 3)
+            flat = pos.reshape(B, -1)   # (B, H*3)
+
+            sq_dist = torch.sum(
+                (flat.unsqueeze(1) - flat.unsqueeze(0)) ** 2, dim=2
+            )  # (B, B)
+            mask = ~torch.eye(B, dtype=torch.bool, device=x_t.device)
+            dist = torch.sqrt(sq_dist + 1e-6)
+            inv_dist = (1.0 / (dist + 1e-6)) * mask.float()
+            potential = inv_dist.sum()
+
+            grad = torch.autograd.grad(potential, x_grad, create_graph=False)[0]
+        return grad
+
+    def _compute_keypoint_gradient(
+        self,
+        x_t: Tensor,
+        keypoints: Tensor,
+        guidance_fns: List[Callable],
+        verbose: bool = False,
+    ) -> Tuple[Optional[Tensor], float]:
+        """
+        Keypoint-based gradient guidance.
+        1. Project x_t → 3D EEF trajectory.
+        2. Evaluate sum of guidance_fns(keypoints, trajectory).
+        3. Backprop → normalized gradient w.r.t. x_t.
+        Returns (normalized_grad, raw_reward_scalar).
+        """
+        if not guidance_fns or self._adapter is None:
+            return None, 0.0
+
+        try:
+            with torch.enable_grad():
+                x_grad = x_t.detach().requires_grad_(True)
+                trajs = torch.cat(
+                    [self._rdt_sample_to_trajectory_3d(x_grad[b: b + 1]) for b in range(x_grad.shape[0])],
+                    dim=0,
+                )  # (B, H+1, 3)
+                traj_input = trajs[:, : self._action_chunk_horizon, :3]  # (B, H, 3)
+
+                reward = sum(fn(keypoints, traj_input) for fn in guidance_fns)
+
+                if isinstance(reward, (int, float)):
+                    return None, float(reward)
+                if not hasattr(reward, "requires_grad") or not reward.requires_grad:
+                    return None, float(reward.item())
+
+                reward_scalar = float(reward.sum().item())
+                self._last_raw_reward = reward_scalar
+
+                # Update normalised reward relative to stage baseline
+                if self._stage_init_reward is not None and self._stage_init_reward < -1e-6:
+                    norm_r = 1.0 - reward_scalar / self._stage_init_reward
+                    norm_r = max(0.0, min(1.2, norm_r))
+                else:
+                    norm_r = 0.0
+                self._last_normalized_reward = norm_r
+
+                grad = torch.autograd.grad(
+                    reward.sum(), x_grad, create_graph=False, retain_graph=False
+                )[0]
+                g_norm = torch.norm(grad).item()
+                normalized = grad / (g_norm + 1e-8) if g_norm > 1e-8 else grad
+
+                if verbose:
+                    log.info(f"reward={reward_scalar:.4f}, norm_r={norm_r:.3f}")
+
+                return normalized, reward_scalar
+        except Exception as exc:
+            log.warning(f"Keypoint gradient failed: {exc}")
+            return None, 0.0
+
+    def _adaptive_scale(
+        self, reward: float, guide_scale: float, sigmoid_k: float, sigmoid_x0: float
+    ) -> float:
+        """Sigmoid-gated guidance strength * sqrt(1-alpha_t) scaling."""
+        strength = 1.0 / (1.0 + math.exp(sigmoid_k * (self._last_normalized_reward - sigmoid_x0)))
+        alpha_t = self._current_alpha_t
+        scale = guide_scale * strength * math.sqrt(max(0.0, 1.0 - float(alpha_t)))
+        self._last_scale = scale
+        return scale
+
+    # ── Guided denoising loop ─────────────────────────────────────────────────
+
+    def _guided_denoise_loop(
+        self,
+        proprio: np.ndarray,
+        images: list,
+        text_embeds: Tensor,
+        B: int,
+        guidance_fns: Optional[List[Callable]],
+        keypoints: Optional[np.ndarray],
+        guide_scale: float,
+        start_ratio: Optional[float],
+        use_diversity: bool,
+        diversity_scale: float,
+        use_fkd: bool,
+        fkd_config: Optional[dict],
+        sigmoid_k: float,
+        sigmoid_x0: float,
+        verbose: bool,
+    ) -> Tensor:  # (B, 64, 14)
+        """
+        Three-phase denoising loop:
+          D (t > start_t) : RBF diversity gradient  → noise_pred[:,:,:3]
+          A (t ≤ start_t) : Keypoint guidance grad  → noise_pred[:,:H,:3]
+          B (t ≤ start_t) : FKD resampling          → x_t after scheduler.step
+        D and A are mutually exclusive (if/elif).
+        """
+        device = self.device
+        try:
+            dtype = next(self._dit.parameters()).dtype
+        except StopIteration:
+            dtype = torch.float32
+
+        cond = self._rdt_model.encode_inputs(proprio, images, text_embeds)
+
+        x_t = torch.randn(B, 64, 14, device=device, dtype=dtype)
+
+        scheduler = self._noise_scheduler
+        scheduler.set_timesteps(self._num_inference_steps)
+        timesteps = scheduler.timesteps
+
+        start_idx = int(self._num_inference_steps * (start_ratio if start_ratio is not None else 0.7))
+        start_idx = min(start_idx, len(timesteps) - 1)
+        start_t = int(timesteps[start_idx].item())
+
+        keypoints_tensor = None
+        if keypoints is not None:
+            keypoints_tensor = torch.tensor(keypoints, device=device, dtype=dtype)
+
+        # Init FKD particle filter
+        fkd = None
+        if use_fkd and fkd_config is not None and B > 1 and guidance_fns and keypoints_tensor is not None:
+            def _fkd_reward_fn(x0: Tensor) -> Tensor:
+                rs = []
+                for b in range(B):
+                    traj = self._rdt_sample_to_trajectory_3d(x0[b: b + 1])
+                    with torch.no_grad():
+                        r = sum(
+                            float(fn(keypoints_tensor, traj[:, : self._action_chunk_horizon, :3]).sum())
+                            for fn in guidance_fns
+                        )
+                    rs.append(r)
+                return torch.tensor(rs, dtype=dtype, device=device)
+
+            fkd = FKD(
+                potential_type=fkd_config.get("potential_type", "max"),
+                lmbda=float(fkd_config.get("lmbda", 10.0)),
+                num_particles=B,
+                adaptive_resampling=bool(fkd_config.get("adaptive_resampling", True)),
+                resample_frequency=int(fkd_config.get("resample_frequency", 5)),
+                resampling_t_start=start_t,
+                resampling_t_end=int(timesteps[-1].item()),
+                timesteps=timesteps,
+                reward_fn=_fkd_reward_fn,
+                reward_min_value=float("-inf"),
+                device=device,
+            )
+
+        reward_history: list = []
+
+        for i, t in enumerate(timesteps):
+            t_val = int(t.item())
+
+            # Update alpha_t for adaptive_scale
+            if hasattr(scheduler, "alphas_cumprod"):
+                idx = min(t_val, len(scheduler.alphas_cumprod) - 1)
+                self._current_alpha_t = float(scheduler.alphas_cumprod[idx])
+
+            # Baseline noise prediction (no grad)
+            with torch.no_grad():
+                noise_pred = self._dit(x_t, t, cond)  # (B, 64, 14)
+
+            # ── HOOK D: RBF diversity (early phase: t > start_t) ─────────────
+            if use_diversity and t_val > start_t and B > 1:
+                div_grad = self._compute_diversity_gradient(x_t)
+                if div_grad is not None:
+                    noise_pred = noise_pred.clone()
+                    noise_pred[:, :, :3] = noise_pred[:, :, :3] + diversity_scale * div_grad[:, :, :3]
+
+            # ── HOOK A: Keypoint gradient guidance (late phase: t ≤ start_t) ──
+            elif guidance_fns and keypoints_tensor is not None and t_val <= start_t:
+                kp_grad, reward_val = self._compute_keypoint_gradient(
+                    x_t, keypoints_tensor, guidance_fns, verbose=verbose
+                )
+                if kp_grad is not None:
+                    scale = self._adaptive_scale(reward_val, guide_scale, sigmoid_k, sigmoid_x0)
+                    noise_pred = noise_pred.clone()
+                    noise_pred[:, : self._action_chunk_horizon, :3] = (
+                        noise_pred[:, : self._action_chunk_horizon, :3]
+                        - scale * kp_grad[:, : self._action_chunk_horizon, :3]
+                    )
+                    reward_history.append((i, reward_val, self._last_normalized_reward))
+
+            # Standard denoising step
+            x_t = scheduler.step(noise_pred, t, x_t).prev_sample
+
+            # ── HOOK B: FKD resampling (late phase only, after scheduler step) ─
+            if fkd is not None and t_val <= start_t:
+                x_t, _ = fkd.resample(sampling_idx=t_val, latents=x_t, x0_preds=x_t)
+
+        # Set stage baseline from the first chunk's final reward
+        if reward_history and self._stage_init_reward is None:
+            self._stage_init_reward = reward_history[-1][1]
+            log.info(f"Stage init_reward set: {self._stage_init_reward:.6f}")
+
+        return x_t  # (B, 64, 14)
