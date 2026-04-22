@@ -57,7 +57,7 @@ class RDTObsProcessor:
         Return a T5-XXL embedding tensor for task_str.
         Priority: (1) preloaded cache, (2) lazy T5-XXL compute+persist, (3) zero fallback.
         """
-        key = hashlib.md5(task_str.encode()).hexdigest()[:8]
+        key = hashlib.md5(task_str.encode()).hexdigest()
         if key not in self._lang_cache:
             try:
                 embed = self._compute_t5_embed(task_str)
