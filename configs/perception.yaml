@@ -15,16 +15,17 @@ keypoint_detector:
   bounds_min: [-1.0, -0.75, -0.1]
   bounds_max: [1.00, 0.75, 1.2]
   
-  # Feature extractor: dinov3_vitb16, dinov3_vitl16, dinov2_vits14, etc.
-  feature_extractor: dinov3_vitb16
+  # Feature extractor: dinov3_vitb16, dinov3_vitl16, dinov2_vits14, dinov2_vitb14, etc.
+  # dinov3 models require gated HF access; use dinov2 unless access is granted.
+  feature_extractor: dinov2_vitb14
 
 # ============================================================
 # VLM Agent (for guidance generation)
 # ============================================================
 vlm_agent:
-  base_url: null            # Set AZURE_OPENAI_BASE_URL env var (for Azure) or leave null for OpenAI
-  model: gpt-5.1           # Use gpt-4o, gpt-4, gpt-4-turbo, or gpt-3.5-turbo
-  api_key: null             # Set OPENAI_API_KEY env var (or AZURE_OPENAI_API_KEY for Azure)
+  base_url: null            # Reads OPENAI_BASE_URL env var; set in .env
+  model: gpt-4o
+  api_key: null             # Reads OPENAI_API_KEY env var; set in .env
   temperature: 1.0
   max_completion_tokens: 2000
   query_template_dir: vlm_query/
@@ -40,8 +41,8 @@ sam3:
 # ============================================================
 gemini_grounding:
   enabled: true
-  api_key: null             # Set GOOGLE_API_KEY env var
-  model: gemini-3-flash-preview
+  api_key: null             # Reads GOOGLE_API_KEY env var; set in .env
+  model: gemini-2.5-flash
   
   # Default objects to detect (overridden per task)
   default_objects:
@@ -57,6 +58,6 @@ gemini_grounding:
 # Gemini Stage Recognition (for real-time stage + guidance decisions)
 # ============================================================
 gemini:
-  api_key: null             # Set GOOGLE_API_KEY env var
-  model: gemini-3-flash-preview  # Fast model for real-time queries
+  api_key: null             # Reads GOOGLE_API_KEY env var; set in .env
+  model: gemini-2.5-flash
 

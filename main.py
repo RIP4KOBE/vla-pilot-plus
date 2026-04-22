@@ -4,16 +4,29 @@ VLS Main Entry Point - Supports multiple backends (CALVIN, LIBERO, RealWorld)
 Uses Hydra for configuration management and EnvAdapter abstraction layer.
 
 Usage:
-    python main.py                                    # Default: calvin + drawer_open
-    python main.py env=calvin task=drawer_open        # Explicit (auto-loads task/calvin/drawer_open.yaml)
-    python main.py env=libero task=goal               # Switch to LIBERO goal task
+    python main.py                                    # Default: libero backend
+    python main.py env=calvin task=drawer_open        # CALVIN + drawer_open task
+    python main.py env=calvin task=door_left          # CALVIN + other tasks
+    python main.py env=libero                         # LIBERO backend (explicit)
     python main.py main.episode_num=50                # Override parameters
-    python main.py +experiment=debug                  # Use experiment config
 """
 
 import os
+import warnings
+# Suppress pydantic v2 Field attribute warnings from third-party PI05 config classes
+warnings.filterwarnings("ignore", category=UserWarning, message=".*'repr'.*Field.*")
+warnings.filterwarnings("ignore", category=UserWarning, message=".*'frozen'.*Field.*")
+# Load .env before anything else
+try:
+    from dotenv import load_dotenv
+    load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+except ImportError:
+    pass
 # Set tokenizers parallelism to false to avoid fork warnings
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
+# Disable torch inductor/Triton compilation — PyTorch 2.7+cu118 generates invalid
+# chained broadcast_to() calls in its SDPA fallback kernel, causing CompilationError.
+os.environ.setdefault("TORCHDYNAMO_DISABLE", "1")
 
 from typing import Any, Callable, List, Optional
 import gymnasium as gym
@@ -106,6 +119,9 @@ class Main:
         
         # Add main.episode_num to env_config for adapters that need it (e.g., LiberoAdapter)
         env_config['episode_num'] = self.config.get('episode_num', 10)
+        # Pass task instruction from cfg.main (set by task config) so adapter can surface it
+        if self.config.get('instruction', ''):
+            env_config['instruction'] = self.config.get('instruction')
 
         # Create adapter
         self.adapter = create_adapter(self.backend, env_config)
@@ -785,7 +801,7 @@ def main(cfg: DictConfig) -> None:
         python main.py env=calvin task=button_on
         
         # LIBERO (uses suite_name directly, no task configs)
-        python main.py env=libero env.libero.suite_name=libero_goal
+        python main.py env=libero backend.libero.suite_name=libero_goal
         python main.py env=libero env.libero.suite_name=libero_spatial
         
         # Override parameters

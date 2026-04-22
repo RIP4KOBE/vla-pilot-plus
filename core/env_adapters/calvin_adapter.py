@@ -80,6 +80,12 @@ class CalvinAdapter(BaseEnvAdapter):
         self.scene_state_dict = None
         self.robot_state_dict = None
 
+        # CALVIN TCP positions are given in world frame; base is at origin
+        self._robot_base_pose = Pose3D(
+            position=np.zeros(3),
+            quaternion=np.array([1., 0., 0., 0.])
+        )
+
         self.behavior_dict = {k: 0 for k in BEHAVIOR_NAMES}
 
         # Target behavior filter - only count success if this specific behavior happens
@@ -249,7 +255,7 @@ class CalvinAdapter(BaseEnvAdapter):
         Get image for VLM.
         """
         image = self._env.render(mode="rgb_array", height=640, width=640)
-        return image
+        return np.ascontiguousarray(image)
     
     def get_camera_params(self, camera_name: str) -> CameraParams:
         """
@@ -616,7 +622,16 @@ class CalvinAdapter(BaseEnvAdapter):
         """
         obs = self.get_obs()
 
-        robot_obs = obs.get('robot_obs', np.zeros(15))
+        robot_obs_full = obs.get('robot_obs', np.zeros(15))
+        # pi05 was trained on LIBERO with 8-dim state: [eef_pos(3), eef_quat(4), gripper(1)]
+        # CALVIN stores orientation as euler (3D), so convert to quaternion to match the format.
+        eef_pos = robot_obs_full[:3]
+        eef_euler = robot_obs_full[3:6]
+        gripper = robot_obs_full[6:7]
+        eef_quat_wxyz = _euler_to_quaternion(eef_euler)          # (w, x, y, z)
+        eef_quat_xyzw = np.array([eef_quat_wxyz[1], eef_quat_wxyz[2], eef_quat_wxyz[3], eef_quat_wxyz[0]])
+        robot_obs = np.concatenate([eef_pos, eef_quat_xyzw, gripper])  # (8,)
+
         rgb_static = obs.get('rgb_obs', {}).get('rgb_static', np.zeros((200, 200, 3), dtype=np.uint8))
         rgb_gripper = obs.get('rgb_obs', {}).get('rgb_gripper', np.zeros((84, 84, 3), dtype=np.uint8))
 
@@ -651,14 +666,23 @@ class CalvinAdapter(BaseEnvAdapter):
         if rgb_gripper.ndim == 3:
             rgb_gripper = rgb_gripper.permute(2, 0, 1)
         
+        # pi05 was trained on LIBERO with these exact key names:
+        #   image  = agentview (third-person), image2 = wrist/gripper, empty_camera_0 = unused 3rd camera
+        empty_cam = torch.zeros(1, 3, 224, 224, dtype=torch.float32, device="cuda")
         observation = {
             "observation.state": robot_obs.cuda().unsqueeze(0),
-            "observation.images.third_person": rgb_static.cuda().unsqueeze(0),
-            "observation.images.eye_in_hand": rgb_gripper.cuda().unsqueeze(0),
+            "observation.images.image": rgb_static.cuda().unsqueeze(0),
+            "observation.images.image2": rgb_gripper.cuda().unsqueeze(0),
+            "observation.images.empty_camera_0": empty_cam,
         }
-        
+
         # Expand batch dimension
         observation = {k: v.expand(sample_num, *v.shape[1:]) for k, v in observation.items()}
+
+        # pi05 preprocessor requires a "task" key with a list of instruction strings
+        instruction = self.get_instruction()
+        observation["task"] = [instruction] * sample_num
+
         return observation
 
     # ==================== Task Success and Static Analysis ====================
@@ -844,6 +868,7 @@ class CalvinAdapter(BaseEnvAdapter):
         
         return {
             'instruction': self.get_instruction(),
+            'task_id': target or 'unknown',
             'recommended_guide_scale': self.PRECISION_GUIDE_SCALE if is_precision_task else self.DEFAULT_GUIDE_SCALE,
             'task_type': 'precision_manipulation' if is_precision_task else 'manipulation',
             'requires_precision': is_precision_task,
@@ -860,5 +885,9 @@ class CalvinAdapter(BaseEnvAdapter):
         if self.target_behavior:
             return self.BEHAVIOR_INSTRUCTIONS.get(self.target_behavior, f'perform {self.target_behavior}')
         return ''
+
+    def get_task_description(self) -> str:
+        """Alias for get_instruction() — satisfies main.py's backend-agnostic interface."""
+        return self.get_instruction()
 
 

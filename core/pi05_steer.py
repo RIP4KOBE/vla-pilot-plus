@@ -99,35 +99,39 @@ class PI05PolicySteer(PI05Policy):
     ) -> Tensor:
 
         self.eval()
-        
+
         if ACTION in batch:
             batch.pop(ACTION)
 
-        if generate_new_chunk:
-            if use_guidance and guidance_fns:
-                action_chunk = self._sample_actions_guided(
-                    batch=batch,
-                    keypoints=keypoints,
-                    guidance_fn=guidance_fns,  # Just use the functions passed in
-                    guide_scale=guide_scale,
-                    start_ratio=start_ratio,
-                    use_diversity=use_diversity,
-                    diversity_scale=diversity_scale,
-                    verbose=verbose,
-                    use_fkd=use_fkd,
-                    fkd_config=fkd_config,
-                    global_step=global_step,
-                    current_stage=current_stage,
-                    sigmoid_k=sigmoid_k,
-                    sigmoid_x0=sigmoid_x0,
-                )
+        # pi05 uses mixed precision (F32 LayerNorm, BF16 linears).  autocast
+        # transparently casts gemm inputs to BF16, keeping LN in F32 — required
+        # on CUDA 11.8 which doesn't handle the mismatch implicitly.
+        with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+            if generate_new_chunk:
+                if use_guidance and guidance_fns:
+                    action_chunk = self._sample_actions_guided(
+                        batch=batch,
+                        keypoints=keypoints,
+                        guidance_fn=guidance_fns,  # Just use the functions passed in
+                        guide_scale=guide_scale,
+                        start_ratio=start_ratio,
+                        use_diversity=use_diversity,
+                        diversity_scale=diversity_scale,
+                        verbose=verbose,
+                        use_fkd=use_fkd,
+                        fkd_config=fkd_config,
+                        global_step=global_step,
+                        current_stage=current_stage,
+                        sigmoid_k=sigmoid_k,
+                        sigmoid_x0=sigmoid_x0,
+                    )
+                else:
+                    action_chunk = self.predict_action_chunk(batch)
+
+                self._cached_action_chunk = action_chunk
             else:
-                action_chunk = self.predict_action_chunk(batch)
-            
-            self._cached_action_chunk = action_chunk
-        else:
-            action_chunk = self._cached_action_chunk
-        
+                action_chunk = self._cached_action_chunk
+
         return self._postprocessor(action_chunk) if self._postprocessor else action_chunk
 
     def _sample_actions_guided(
@@ -188,7 +192,7 @@ class PI05PolicySteer(PI05Policy):
         )
 
         # Setup guidance
-        start_time = start_ratio if start_ratio is None else 0.8
+        start_time = start_ratio if start_ratio is not None else 0.8
 
         keypoints_tensor = None
         if keypoints is not None:
@@ -334,7 +338,8 @@ class PI05PolicySteer(PI05Policy):
         batch_size = sample.shape[0]
 
         action_transition = {"action": actions}
-        action_transition = self._adapter.env_postprocessor(action_transition)
+        if hasattr(self._adapter, 'env_postprocessor'):
+            action_transition = self._adapter.env_postprocessor(action_transition)
         actions = action_transition["action"]
 
         if batch_size == 1:

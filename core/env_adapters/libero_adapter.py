@@ -92,7 +92,7 @@ try:
         PERTURBATION_AVAILABLE = True
         log.info(f"Loaded perturbation module from {_perturbation_path}")
     else:
-        log.warning(f"Perturbation module not found at {_perturbation_path}")
+        log.debug(f"Perturbation module not found at {_perturbation_path} (optional, only needed for OOD suites)")
 except Exception as e:
     log.warning(f"Could not load perturbation module: {e}")
 
@@ -159,16 +159,16 @@ def _apply_perturbations(suite_name: str) -> tuple[str, bool]:
         - should_read_language_from_bddl: True if this perturbation type changes language
     """
     
-    if not PERTURBATION_AVAILABLE:
-        log.warning(f"⚠ Perturbation module not available, using suite '{suite_name}' as-is")
-        return suite_name, False
-    
     base_suite, flags = _parse_perturbation_type(suite_name)
     log.info(f"Parsed: base_suite='{base_suite}', flags={flags}")
-    
-    # If no perturbations needed, return original
+
+    # If no perturbations needed, return original without touching the module
     if not any(flags.values()):
         log.info(f"No perturbations needed for '{suite_name}'")
+        return suite_name, False
+
+    if not PERTURBATION_AVAILABLE:
+        log.warning(f"⚠ Perturbation module not available, using suite '{suite_name}' as-is")
         return suite_name, False
     
     # Load evaluation config
@@ -1424,8 +1424,9 @@ class LiberoAdapter(BaseEnvAdapter):
         action_transition = {"action": action}
         action_transition = self.env_postprocessor(action_transition)
         action = action_transition["action"]
-        # Convert to CPU / numpy.
-        action_numpy: np.ndarray = action.to("cpu").numpy()
+        # Convert to CPU / numpy. Cast to float32 first — pi05 outputs bfloat16
+        # but LIBERO environments expect float32.
+        action_numpy: np.ndarray = action.float().to("cpu").numpy()
 
         # Convert gripper action to binary (-1 or 1)
         action[-1] = 1 if action[-1] > 0 else -1

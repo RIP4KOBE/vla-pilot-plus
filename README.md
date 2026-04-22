@@ -163,7 +163,7 @@ keypoint_detector:
 ### Basic Usage
 
 ```bash
-python main.py --config config.yaml
+python main.py
 ```
 
 ### Pipeline Overview

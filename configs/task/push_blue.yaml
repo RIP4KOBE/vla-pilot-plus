@@ -1,0 +1,13 @@
+# @package _global_
+# Task: Push Blue Block (CALVIN)
+
+task:
+  name: push_blue
+  backend: calvin
+
+main:
+  instruction: "push the blue block to the target"
+
+backend:
+  calvin:
+    target_behavior: push_blue_block

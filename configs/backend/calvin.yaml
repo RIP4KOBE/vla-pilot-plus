@@ -9,7 +9,7 @@ calvin:
   seed: ${seed}
   use_vr: false
   bullet_time_step: 240
-  show_gui: ${main.render}
+  show_gui: false
   use_egl: true
   control_freq: 30
   use_scene_info: false

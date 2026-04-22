@@ -171,17 +171,12 @@ class VLMAgent:
     def _parse_other_metadata(self, output):
         data_dict = dict()
         
-        # Find num_stages
-        num_stages_template = "num_stages = {num_stages}"
-        for line in output.split("\n"):
-            num_stages = parse.parse(num_stages_template, line)
-            if num_stages is not None:
-                break
-        if num_stages is None:
+        # Find num_stages — use regex to tolerate indentation and spacing variations
+        import re as _re
+        num_stages_match = _re.search(r'num_stages\s*=\s*(\d+)', output)
+        if num_stages_match is None:
             raise ValueError("num_stages not found in output")
-        # Remove comments from num_stages value (e.g., "1  # comment" -> "1")
-        num_stages_str = num_stages['num_stages'].split('#')[0].strip()
-        data_dict['num_stages'] = int(num_stages_str)
+        data_dict['num_stages'] = int(num_stages_match.group(1))
         
         # Find stage_names (optional, with fallback)
         stage_names_template = "stage_names = {stage_names}"

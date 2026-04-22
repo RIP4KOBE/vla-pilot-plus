@@ -11,7 +11,7 @@ type: pi05
 # Diffusion Policy (default)
 # ============================================================
 diffusion:
-  pretrained_path: /home/shuo/research/lerobot/outputs/train/2026-02-24/11-34-07_vls_maniskill_rotate/checkpoints/100000/pretrained_model
+  pretrained_path: Vision-Language-Steering/vls_calvin_base
   num_inference_steps: 100
   n_obs_steps: 2
   action_chunk_horizon: 16

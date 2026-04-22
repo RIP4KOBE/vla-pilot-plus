@@ -8,6 +8,8 @@
 
 defaults:
   - backend: libero              # Environment (calvin/libero/realworld)
+  - env: null                    # Alias: env=calvin swaps backend to calvin
+  - task: null                   # Optional task override (e.g. task=drawer_open)
   - perception               # Perception modules
   - policy                   # Policy config
   - _self_
@@ -23,21 +25,22 @@ seed: 0
 # ============================================================
 main:
   episode_num: 10  # if using libero, need to be divisible by the number of tasks in the suite(i.e. libero_goal_task has 10 tasks, so episode_num should be divisible by 10)
+  max_episode_steps: 240        # Max steps per episode (calvin.yaml references this via interpolation)
   output_dir: ${hydra:run.dir}
   cached_functions_dir: null
-  visualize_trajectory: false
-  debug_draw_trajectory: false
-  render: false
+  visualize_trajectory: true
+  debug_draw_trajectory: true
+  render: true
   
   # Steering parameters
   use_guidance: false
   use_vlm_stage_recognition: true  # Use Gemini to recognize current stage
   vlm_query_limit: 50  # Max VLM queries per episode
   use_diversity: true
-  sample_batch_size: 1
-  guide_scale: 80.0
-  diversity_scale: 20.0
-  start_ratio: None
+  sample_batch_size: 20
+  guide_scale: 40.0
+  diversity_scale: 10.0
+  start_ratio: null
   MCMC_steps: 4
 
   sigmoid_k: 25.0
