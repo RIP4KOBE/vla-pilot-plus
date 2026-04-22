@@ -1,4 +1,4 @@
-# VLS: Steering Pretrained Robot Policies via Vision–Language Models
+# VLA-Pilot++: Steering Pretrained Robot Policies via Vision–Language Models
 
 <p align="center">
   <a href="https://arxiv.org/abs/2602.03973"><img src="https://img.shields.io/badge/arXiv-2602.03973-b31b1b.svg" alt="arXiv"></a>
@@ -6,21 +6,12 @@
 </p>
 
 <p align="center">
-  <strong>Shuo Liu</strong><sup>1,2</sup> &nbsp;
-  <strong>Ishneet Sukhvinder Singh</strong><sup>3</sup> &nbsp;
-  <strong>Yiqing Xu</strong><sup>2,4</sup> &nbsp;
-  <strong>Jiafei Duan</strong><sup>1,2*</sup> &nbsp;
-  <strong>Ranjay Krishna</strong><sup>1,2*</sup>
+  <strong>Zhuo Li</strong>
 </p>
 
 <p align="center">
-  <sup>1</sup>University of Washington &nbsp;
-  <sup>2</sup>Allen Institute for AI &nbsp;
-  <sup>3</sup>University of Oxford &nbsp;
-  <sup>4</sup>National University of Singapore
+  The Chinese University of Hong Kong
 </p>
-
-<p align="center"><sup>*</sup>Co-advised</p>
 
 ## Abstract
 
@@ -164,6 +155,16 @@ keypoint_detector:
 
 ```bash
 python main.py
+```
+
+**LIBERO** (with guidance, `libero_goal` suite):
+```bash
+python main.py main.use_guidance=true env=libero backend.libero.suite_name=libero_goal
+```
+
+**CALVIN** (with guidance, `drawer_open` task):
+```bash
+python main.py main.use_guidance=true env=calvin task=drawer_open
 ```
 
 ### Pipeline Overview
