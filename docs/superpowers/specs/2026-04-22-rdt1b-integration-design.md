@@ -139,7 +139,15 @@ rdt_proprio (14,) = [0, 0, 0, 0, 0, 0, 0,   env_state[:7]]
 
 ## 5. Denoising Loop Surgery & Steering Hooks
 
-`RDTSteer._guided_denoise_loop()` replaces the internal body of `RoboticDiffusionTransformerModel.step()`, exposing two hook points.
+`RDTSteer._guided_denoise_loop()` replaces the internal body of `RoboticDiffusionTransformerModel.step()`. The loop has **three mutually-exclusive phases** that mirror the existing `DiffusionPolicySteer._guided_conditional_sample()` exactly:
+
+| Phase | When | What |
+|---|---|---|
+| **D — RBF diversity** | `t > start_step` (early, high-noise) | Push particles apart via inverse-distance potential |
+| **A — Keypoint guidance** | `t ≤ start_step` (late, low-noise) | Steer trajectories toward keypoint target |
+| **B — FKD resampling** | `t ≤ start_step`, after denoising step | Resample particles by reward weight |
+
+Both D and A inject gradients into `noise_pred` (before the scheduler step), not into `x_t` directly — matching the existing diffusion policy convention.
 
 ```python
 def _guided_denoise_loop(
@@ -162,34 +170,51 @@ def _guided_denoise_loop(
 
     for i, t in enumerate(scheduler.timesteps):
 
-        # HOOK A — gradient-based guidance (t <= start_step)
-        if guidance_fns and keypoints is not None and i >= start_step:
-            x_t = x_t.detach().requires_grad_(True)
-            noise_pred = self._rdt_model.dit(x_t, t, cond)
-            x0_pred    = _pred_to_x0(scheduler, noise_pred, x_t, t)
-            reward     = self._compute_reward(x0_pred, keypoints, guidance_fns)
-            grad       = torch.autograd.grad(reward.sum(), x_t)[0]
-            scale      = self._adaptive_scale(reward, guide_scale, sigmoid_k, sigmoid_x0)
-            x_t        = (x_t + scale * grad).detach()
-            self._last_normalized_reward = float(reward.mean())
-            self._last_scale = float(scale)
-
-        # Standard denoising step
+        # Baseline noise prediction (no grad)
         with torch.no_grad():
             noise_pred = self._rdt_model.dit(x_t, t, cond)
+
+        # HOOK D — RBF diversity (early denoising: t > start_step)
+        if use_diversity and t > start_step and B > 1:
+            div_grad = self._compute_diversity_gradient(x_t)
+            if div_grad is not None:
+                noise_pred[:, :, :3] += diversity_scale * div_grad[:, :, :3]
+
+        # HOOK A — Keypoint gradient guidance (late denoising: t <= start_step)
+        elif guidance_fns and keypoints is not None and t <= start_step:
+            kp_grad, reward = self._compute_keypoint_gradient(x_t, keypoints, guidance_fns)
+            if kp_grad is not None:
+                scale = self._adaptive_scale(reward, guide_scale, sigmoid_k, sigmoid_x0)
+                noise_pred[:, :action_chunk_horizon, :3] -= scale * kp_grad[:, :action_chunk_horizon, :3]
+
+        # Standard denoising step (uses modified noise_pred)
         x_t = scheduler.step(noise_pred, t, x_t).prev_sample
 
-        # HOOK B — FKD particle resampling
-        if fkd is not None:
-            x0_pred = _pred_to_x0(scheduler, noise_pred, x_t, t)
-            x_t     = fkd.resample(i, x_t, x0_pred)
+        # HOOK B — FKD resampling (late denoising only, after denoising step)
+        if fkd is not None and t <= start_step:
+            x_t, _ = fkd.resample(int(t.item()), x_t, x_t)
+
+    # Record init reward baseline for adaptive scaling (first chunk only)
+    if self._stage_init_reward is None and hasattr(self, '_last_raw_reward'):
+        self._stage_init_reward = self._last_raw_reward
 
     return x_t
 ```
 
-**`self._rdt_model.dit`:** The DiT score network inside `RoboticDiffusionTransformerModel`. Its exact attribute name (`dit`, `model`, `net`) is verified by inspecting the loaded checkpoint in the first implementation task; a `getattr` probe with fallbacks is used.
+### Trajectory projection helper
 
-**`_pred_to_x0`:** Converts `(noise_pred, x_t, t)` → `x0_pred` using the scheduler's internal formula (standard DDPM x0 reconstruction). Reuses the same helper used in `DiffusionPolicySteer`.
+Both hooks D and A require projecting the action tensor to 3D EEF positions (for gradient computation). `RDTSteer._rdt_sample_to_trajectory_3d(x_t)`:
+
+```
+x_t: (B, 64, 14)
+  → slice right-arm [:, :, 7:14]   (B, 64, 7)
+  → [rotation conversion if needed]
+  → adapter.delta_actions_to_ee_trajectory(action_seq)  → (B, T, 3) EEF positions
+```
+
+This reuses the same `adapter.delta_actions_to_ee_trajectory()` call that `DiffusionPolicySteer._sample_to_trajectory_3d()` uses — no new adapter API needed.
+
+**`self._rdt_model.dit`:** The DiT score network inside `RoboticDiffusionTransformerModel`. Its exact attribute name (`dit`, `model`, `net`) is verified by inspecting the loaded checkpoint in the first implementation task; a `getattr` probe with fallbacks is used.
 
 ### Action postprocessing (inside RDTSteer)
 
