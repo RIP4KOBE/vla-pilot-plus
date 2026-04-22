@@ -163,6 +163,7 @@ class RDTSteer:
         self._last_normalized_reward = 0.0
         self._last_scale = 0.0
         self._last_raw_reward = 0.0
+        self._current_alpha_t = 0.5
         if self._obs_processor is not None:
             self._obs_processor.reset()
 
