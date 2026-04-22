@@ -2,7 +2,6 @@
 CPU-only smoke tests for RDTSteer and RDTObsProcessor.
 No real checkpoint or GPU required — uses stub RDT model.
 """
-import math
 import numpy as np
 import pytest
 import torch
