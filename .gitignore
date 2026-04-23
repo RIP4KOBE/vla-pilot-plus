@@ -30,6 +30,7 @@ MANIFEST
 .venv/
 venv/
 env/
+!configs/env/
 ENV/
 .conda/
 pip-wheel-metadata/
