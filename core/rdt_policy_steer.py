@@ -29,6 +29,269 @@ log = SteerLogger("RDTSteer")
 _RIGHT_ARM = slice(7, 14)
 
 
+# ── Adapter for the real RoboticDiffusionTransformerModel ────────────────────
+
+class _RDTDiTAdapter(nn.Module):
+    """
+    Thin nn.Module that wraps an RDTRunner and exposes the same forward
+    signature that _StubDiT uses: forward(x_t, t, cond) → noise_pred.
+
+    ``cond`` is the dict returned by ``_RDTModelAdapter.encode_inputs``.
+    It carries all pre-computed conditioning tensors so we only run vision /
+    language encoders once per action chunk (not once per denoising step).
+
+    Mirrors the inner loop of RDTRunner.conditional_sample exactly.
+
+    Dimension bridging
+    ------------------
+    The guided denoising loop maintains ``x_t`` in the raw robot action space
+    (e.g. 14D for the ManiSkill two-arm setup).  The real RDT DiT operates in
+    the 128D unified action space.  This adapter handles the lift (14→128) and
+    projection (128→14) transparently:
+
+      1. Inflate ``x_t`` into a 128D tensor using the action indices stored in
+         ``cond["action_indices"]`` (set by ``_RDTModelAdapter.encode_inputs``).
+      2. Call the real DiT.
+      3. Project the 128D noise prediction back to the original action_dim.
+
+    When ``cond`` is an empty dict (stub model) or ``cond["action_indices"]``
+    is absent, the adapter is a no-op and lets ``x_t`` pass through unmodified —
+    this preserves backward compatibility with the smoke tests.
+    """
+
+    def __init__(self, runner: nn.Module) -> None:
+        super().__init__()
+        self.runner = runner  # RDTRunner (nn.Module)
+
+    def forward(self, x_t: Tensor, t: Tensor, cond: dict) -> Tensor:
+        """
+        x_t : (B, pred_horizon, raw_action_dim)
+        t   : 0-d or (1,) LongTensor
+        cond: dict (empty for stub; real keys: lang_cond, lang_attn_mask,
+              img_cond, state_traj, action_mask, ctrl_freqs, action_indices,
+              unified_action_dim)
+        """
+        # ── Stub fast-path: no conditioning means stub model ─────────────────
+        if not cond:
+            # This branch is only reached by tests using _StubRDTModel.
+            # The stub's _StubDiT.forward handles this — this adapter is only
+            # instantiated for the real model, so we should not reach here.
+            raise RuntimeError(
+                "_RDTDiTAdapter.forward called with empty cond; "
+                "this should only happen with the stub model."
+            )
+
+        B = x_t.shape[0]
+        raw_action_dim = x_t.shape[2]
+        unified_dim: int = cond["unified_action_dim"]  # e.g. 128
+        action_indices: list = cond["action_indices"]   # list of int indices into 128D
+
+        # ── Expand batch=1 conditioning tensors to batch=B ───────────────────
+        def _b(tensor: Tensor) -> Tensor:
+            if tensor.shape[0] == 1 and B > 1:
+                return tensor.expand(B, *tensor.shape[1:])
+            return tensor
+
+        lang_cond = _b(cond["lang_cond"])
+        lang_attn_mask = _b(cond["lang_attn_mask"])
+        img_cond = _b(cond["img_cond"])
+        state_traj = _b(cond["state_traj"])
+        action_mask_base = _b(cond["action_mask"])  # (B, 1, unified_dim)
+        ctrl_freqs = _b(cond["ctrl_freqs"])
+
+        # ── Inflate raw x_t (B, H, raw_dim) → unified (B, H, unified_dim) ───
+        H = x_t.shape[1]
+        x_unified = torch.zeros(B, H, unified_dim, device=x_t.device, dtype=x_t.dtype)
+        x_unified[:, :, action_indices] = x_t[:, :, :len(action_indices)]
+
+        # ── Build state-action trajectory and call the DiT ───────────────────
+        action_mask_full = action_mask_base.expand(-1, H, -1)  # (B, H, unified_dim)
+        action_traj = torch.cat([x_unified, action_mask_full], dim=2)  # (B, H, unified_dim*2)
+        action_traj = self.runner.state_adaptor(action_traj)
+        state_action_traj = torch.cat([state_traj, action_traj], dim=1)
+
+        if t.dim() == 0:
+            t = t.unsqueeze(0)
+        model_output_128 = self.runner.model(
+            state_action_traj,
+            ctrl_freqs,
+            t,
+            lang_cond,
+            img_cond,
+            lang_mask=lang_attn_mask,
+        )  # (B, H, unified_dim)
+
+        # ── Project back to raw action dim ────────────────────────────────────
+        model_output = model_output_128[:, :, action_indices][:, :, :raw_action_dim]
+        return model_output
+
+
+class _RDTModelAdapter(nn.Module):
+    """
+    Wraps ``RoboticDiffusionTransformerModel`` (a plain Python object) and gives
+    it the interface expected by ``RDTSteer._find_dit`` and the guided loop:
+
+      * ``self.dit``      – an ``_RDTDiTAdapter`` (nn.Module)
+      * ``self.noise_scheduler``  – exposed as ``noise_scheduler_sample`` on .policy
+      * ``encode_inputs`` – encodes vision/language/proprio once; returns cond dict
+      * ``step``          – passthrough to the underlying model's ``step()``
+    """
+
+    def __init__(self, real_model) -> None:
+        super().__init__()
+        # Store as a regular attribute (not registered parameter) because the
+        # real model is not an nn.Module.
+        object.__setattr__(self, "_real", real_model)
+        # Register the DiT adapter so .parameters() / .to() / .eval() work.
+        self.dit = _RDTDiTAdapter(real_model.policy)
+        # Expose a noise_scheduler attribute pointing at the inference scheduler
+        # so _noise_scheduler property on RDTSteer finds it.
+        self.noise_scheduler = real_model.policy.noise_scheduler_sample
+
+    # ── nn.Module device / dtype management ──────────────────────────────────
+
+    def to(self, *args, **kwargs):
+        # Move registered nn.Module children (i.e. self.dit)
+        super().to(*args, **kwargs)
+        real = object.__getattribute__(self, "_real")
+        # Move the non-Module sub-components of the real model
+        for attr in ("policy", "vision_model", "text_model"):
+            comp = getattr(real, attr, None)
+            if comp is not None and isinstance(comp, nn.Module):
+                comp.to(*args, **kwargs)
+        # Update device attribute on the real model if it tracks one
+        if args and isinstance(args[0], (str, torch.device)):
+            real.device = torch.device(args[0])
+        elif "device" in kwargs:
+            real.device = torch.device(kwargs["device"])
+        return self
+
+    def eval(self):
+        super().eval()
+        real = object.__getattribute__(self, "_real")
+        for attr in ("policy", "vision_model", "text_model"):
+            comp = getattr(real, attr, None)
+            if comp is not None and isinstance(comp, nn.Module):
+                comp.eval()
+        return self
+
+    def train(self, mode: bool = True):
+        super().train(mode)
+        real = object.__getattribute__(self, "_real")
+        for attr in ("policy", "vision_model", "text_model"):
+            comp = getattr(real, attr, None)
+            if comp is not None and isinstance(comp, nn.Module):
+                comp.train(mode)
+        return self
+
+    # ── Inference helpers ─────────────────────────────────────────────────────
+
+    @torch.no_grad()
+    def encode_inputs(self, proprio, images, text_embeds: Tensor) -> dict:
+        """
+        Encode vision and language once before the denoising loop.
+        Returns a conditioning dict that _RDTDiTAdapter.forward() unpacks.
+
+        Mirrors the pre-loop work in RoboticDiffusionTransformerModel.step().
+        """
+        real = object.__getattribute__(self, "_real")
+        device = real.device
+        dtype = real.dtype
+
+        # ── Image encoding ────────────────────────────────────────────────────
+        import numpy as np
+        from PIL import Image as PILImage
+        from torchvision import transforms as T
+
+        background_color = np.array(
+            [int(x * 255) for x in real.image_processor.image_mean],
+            dtype=np.uint8,
+        ).reshape(1, 1, 3)
+        background_image = np.ones(
+            (
+                real.image_processor.size["height"],
+                real.image_processor.size["width"],
+                3,
+            ),
+            dtype=np.uint8,
+        ) * background_color
+
+        image_tensor_list = []
+        for img in images:
+            if img is None:
+                img = PILImage.fromarray(background_image)
+            if real.image_size is not None:
+                img = T.Resize(real.image_size)(img)
+            if real.args["dataset"].get("image_aspect_ratio", "pad") == "pad":
+
+                def _expand2square(pil_img, bg):
+                    w, h = pil_img.size
+                    if w == h:
+                        return pil_img
+                    side = max(w, h)
+                    result = PILImage.new(pil_img.mode, (side, side), bg)
+                    result.paste(pil_img, ((side - w) // 2, (side - h) // 2))
+                    return result
+
+                img = _expand2square(
+                    img,
+                    tuple(int(x * 255) for x in real.image_processor.image_mean),
+                )
+            img = real.image_processor.preprocess(img, return_tensors="pt")[
+                "pixel_values"
+            ][0]
+            image_tensor_list.append(img)
+
+        image_tensor = torch.stack(image_tensor_list, dim=0).to(device, dtype=dtype)
+        image_embeds = real.vision_model(image_tensor).detach()
+        image_embeds = image_embeds.reshape(-1, real.vision_model.hidden_size).unsqueeze(0)
+
+        # ── Proprioception encoding ───────────────────────────────────────────
+        joints = proprio.to(device).unsqueeze(0)          # (1, 1, 14)
+        states, state_elem_mask = real._format_joint_to_state(joints)
+        states = states.to(device, dtype=dtype)
+        state_elem_mask = state_elem_mask.to(device, dtype=dtype)
+        states = states[:, -1:, :]                        # (1, 1, 128)
+        ctrl_freqs = torch.tensor([real.control_frequency], device=device)
+
+        # ── Language ─────────────────────────────────────────────────────────
+        text_embeds = text_embeds.to(device, dtype=dtype)
+        lang_attn_mask = torch.ones(
+            text_embeds.shape[:2], dtype=torch.bool, device=device
+        )
+
+        # ── Adapt to RDTRunner hidden size ────────────────────────────────────
+        state_tokens = torch.cat([states, state_elem_mask.unsqueeze(1)], dim=2)
+        lang_cond, img_cond, state_traj = real.policy.adapt_conditions(
+            text_embeds, image_embeds, state_tokens
+        )
+
+        # Recover which unified-action indices this model uses so the DiT
+        # adapter can inflate raw-action x_t to the full unified space.
+        unified_action_dim: int = real.args["model"]["state_token_dim"]
+        # action_indices are the positions in the unified vector that correspond
+        # to the raw robot joints.  They are stored on the real model as the
+        # attribute built during _format_joint_to_state/_unformat_action_to_joint.
+        # We derive them from state_elem_mask (1 where the joint is present).
+        action_indices: list = state_elem_mask[0].nonzero(as_tuple=True)[0].tolist()
+
+        return {
+            "lang_cond": lang_cond,
+            "lang_attn_mask": lang_attn_mask,
+            "img_cond": img_cond,
+            "state_traj": state_traj,
+            "action_mask": state_elem_mask.unsqueeze(1),  # (1, 1, unified_action_dim)
+            "ctrl_freqs": ctrl_freqs,
+            "action_indices": action_indices,
+            "unified_action_dim": unified_action_dim,
+        }
+
+    def step(self, proprio, images, text_embeds):
+        """Passthrough to the underlying real model's step()."""
+        real = object.__getattribute__(self, "_real")
+        return real.step(proprio, images, text_embeds)
+
+
 class RDTSteer:
     """RDT-1B with VLS steering: RBF diversity + keypoint gradient + FKD resampling."""
 
@@ -89,7 +352,21 @@ class RDTSteer:
 
     @classmethod
     def from_pretrained(cls, pretrained_path: str, num_inference_steps: int = 55) -> "RDTSteer":
-        """Load from a HuggingFace Hub repo ID or a local directory path."""
+        """Load from a HuggingFace Hub repo ID or a local directory path.
+
+        ``RoboticDiffusionTransformerModel`` is a plain Python object (not an
+        nn.Module) and has no ``from_pretrained`` classmethod.  The correct
+        loading pattern is:
+
+          1. If ``pretrained_path`` is an HF Hub repo ID, download the full
+             snapshot with ``snapshot_download`` first.
+          2. Load config from ``<checkpoint>/config.yaml``.
+          3. Call ``create_model(args, pretrained=<weight_file>)`` from
+             ``scripts/maniskill_model.py``.
+          4. Wrap the resulting plain-object model in ``_RDTModelAdapter`` so
+             that it exposes the ``encode_inputs`` / DiT adapter interface that
+             the guided denoising loop expects.
+        """
         rdt_root = os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
             "third_party", "rdt",
@@ -105,14 +382,40 @@ class RDTSteer:
         log.info(f"Loading RDT model from: {pretrained_path}")
 
         try:
-            from scripts.agilex_model import RoboticDiffusionTransformerModel
+            import yaml
+            from scripts.maniskill_model import (
+                RoboticDiffusionTransformerModel,
+                create_model,
+            )
         except ImportError:
             raise ImportError(
                 "Cannot import RoboticDiffusionTransformerModel. "
                 "Ensure third_party/rdt/ is initialized: git submodule update --init"
             )
 
-        rdt_model = RoboticDiffusionTransformerModel.from_pretrained(pretrained_path)
+        # Load the model config that ships with the checkpoint
+        config_path = os.path.join(pretrained_path, "config.yaml")
+        if not os.path.exists(config_path):
+            # Fall back to the bundled base config inside the submodule
+            config_path = os.path.join(rdt_root, "configs", "base.yaml")
+        with open(config_path, "r") as f:
+            args = yaml.safe_load(f)
+
+        # Locate the weight file (prefer .safetensors, fall back to .pt)
+        weight_file = None
+        for fname in ("model.safetensors", "pytorch_model.bin", "rdt-1b.pt"):
+            candidate = os.path.join(pretrained_path, fname)
+            if os.path.exists(candidate):
+                weight_file = candidate
+                break
+
+        # ``create_model`` constructs RoboticDiffusionTransformerModel and
+        # calls load_pretrained_weights when pretrained is not None.
+        real_model = create_model(args, pretrained=weight_file)
+
+        # Wrap in the adapter that provides encode_inputs + nn.Module interface.
+        rdt_model = _RDTModelAdapter(real_model)
+
         instance = cls(rdt_model, num_inference_steps=num_inference_steps)
 
         # Load precomputed T5-XXL embeddings shipped with checkpoint
