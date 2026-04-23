@@ -157,21 +157,29 @@ class Main:
             self.policy = DiffusionPolicySteer.from_pretrained(pretrained_path)
         elif policy_type == 'pi05':
             self.policy = PI05PolicySteer.from_pretrained(pretrained_path)
+        elif policy_type == 'rdt':
+            from core.rdt_policy_steer import RDTSteer
+            num_steps = type_config.get('num_inference_steps', 55)
+            self.policy = RDTSteer.from_pretrained(pretrained_path, num_inference_steps=num_steps)
         else:
             raise ValueError(f"Unknown policy type: {policy_type}")
-        
+
         self.device = cfg.get('device', 'cuda')
         self.policy.to(self.device)
 
-        preprocessor_overrides = {
-            "device_processor": {"device": str(self.policy.config.device)},
-        }
-
-        self.policy_preprocessor, self.policy_postprocessor = make_pre_post_processors(
-            policy_cfg=self.policy.config, 
-            pretrained_path=pretrained_path, 
-            preprocessor_overrides=preprocessor_overrides,
-        )
+        if policy_type == 'rdt':
+            # RDTSteer handles all obs/action processing internally.
+            self.policy_preprocessor = lambda x: x
+            self.policy_postprocessor = lambda x: x
+        else:
+            preprocessor_overrides = {
+                "device_processor": {"device": str(self.policy.config.device)},
+            }
+            self.policy_preprocessor, self.policy_postprocessor = make_pre_post_processors(
+                policy_cfg=self.policy.config,
+                pretrained_path=pretrained_path,
+                preprocessor_overrides=preprocessor_overrides,
+            )
 
         self.policy.post_init(
             adapter=self.adapter,

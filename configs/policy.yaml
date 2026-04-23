@@ -25,5 +25,15 @@ pi05:
   action_chunk_horizon: 10
 
 
+# ============================================================
+# RDT-1B Policy (ManiSkill single-arm checkpoint)
+# ============================================================
+rdt:
+  pretrained_path: robotics-diffusion-transformer/maniskill-model
+  num_inference_steps: 55
+  action_chunk_horizon: 8
+  lang_embed_cache_dir: data/rdt_lang_embeds/
+
+
 # Note: pretrained_path and other params are read from policy.{type} section in main.py
 
