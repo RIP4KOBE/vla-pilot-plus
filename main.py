@@ -185,7 +185,7 @@ class Main:
             adapter=self.adapter,
             postprocessor=self.policy_postprocessor,
             sample_batch_size=self.config.get('sample_batch_size', 1),
-            policy_config=policy_config[policy_type],
+            policy_config=policy_config.get(policy_type, {}),
         )
 
         self.policy.eval()
