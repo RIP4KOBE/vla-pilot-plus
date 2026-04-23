@@ -287,32 +287,39 @@ class RDTSteer:
     def _compute_diversity_gradient(self, x_t: Tensor) -> Optional[Tensor]:
         """
         RBF inverse-distance potential on 3D EEF trajectories.
-        Pushes particles apart. Mirrors DiffusionPolicySteer exactly.
-        Returns gradient w.r.t. x_t (same shape), or None if B < 2.
+        Pushes particles apart. Returns normalized gradient or None if B < 2.
         """
         B = x_t.shape[0]
         if B < 2 or self._adapter is None:
             return None
 
-        with torch.enable_grad():
-            x_grad = x_t.detach().requires_grad_(True)
-            trajs = torch.cat(
-                [self._rdt_sample_to_trajectory_3d(x_grad[b: b + 1]) for b in range(B)],
-                dim=0,
-            )  # (B, H+1, 3)
-            pos = trajs[:, 1:, :3]      # skip start point → (B, H, 3)
-            flat = pos.reshape(B, -1)   # (B, H*3)
+        try:
+            with torch.enable_grad():
+                x_grad = x_t.detach().requires_grad_(True)
+                trajs = torch.cat(
+                    [self._rdt_sample_to_trajectory_3d(x_grad[b: b + 1]) for b in range(B)],
+                    dim=0,
+                )  # (B, H+1, 3)
+                pos = trajs[:, 1:, :3]      # skip start point → (B, H, 3)
+                flat = pos.reshape(B, -1)   # (B, H*3)
 
-            sq_dist = torch.sum(
-                (flat.unsqueeze(1) - flat.unsqueeze(0)) ** 2, dim=2
-            )  # (B, B)
-            mask = ~torch.eye(B, dtype=torch.bool, device=x_t.device)
-            dist = torch.sqrt(sq_dist + 1e-6)
-            inv_dist = (1.0 / (dist + 1e-6)) * mask.float()
-            potential = inv_dist.sum()
+                sq_dist = torch.sum(
+                    (flat.unsqueeze(1) - flat.unsqueeze(0)) ** 2, dim=2
+                )  # (B, B)
+                mask = ~torch.eye(B, dtype=torch.bool, device=x_t.device)
+                dist = torch.sqrt(sq_dist + 1e-6)
+                inv_dist = (1.0 / (dist + 1e-6)) * mask.float()
+                potential = inv_dist.sum()
 
-            grad = torch.autograd.grad(potential, x_grad, create_graph=False)[0]
-        return grad
+                grads = torch.autograd.grad(potential, x_grad, create_graph=False, allow_unused=True)
+                grad = grads[0]
+                if grad is None:
+                    return None
+                g_norm = torch.norm(grad).item()
+                return grad / (g_norm + 1e-8) if g_norm > 1e-8 else grad
+        except Exception as exc:
+            log.warning(f"Diversity gradient failed: {exc}")
+            return None
 
     def _compute_keypoint_gradient(
         self,
@@ -479,7 +486,7 @@ class RDTSteer:
                 div_grad = self._compute_diversity_gradient(x_t)
                 if div_grad is not None:
                     noise_pred = noise_pred.clone()
-                    noise_pred[:, :, :3] = noise_pred[:, :, :3] + diversity_scale * div_grad[:, :, :3]
+                    noise_pred[:, :, 7:10] = noise_pred[:, :, 7:10] + diversity_scale * div_grad[:, :, 7:10]
 
             # ── HOOK A: Keypoint gradient guidance (late phase: t ≤ start_t) ──
             elif guidance_fns and keypoints_tensor is not None and t_val <= start_t:
@@ -489,9 +496,9 @@ class RDTSteer:
                 if kp_grad is not None:
                     scale = self._adaptive_scale(reward_val, guide_scale, sigmoid_k, sigmoid_x0)
                     noise_pred = noise_pred.clone()
-                    noise_pred[:, : self._action_chunk_horizon, :3] = (
-                        noise_pred[:, : self._action_chunk_horizon, :3]
-                        - scale * kp_grad[:, : self._action_chunk_horizon, :3]
+                    noise_pred[:, : self._action_chunk_horizon, 7:10] = (
+                        noise_pred[:, : self._action_chunk_horizon, 7:10]
+                        - scale * kp_grad[:, : self._action_chunk_horizon, 7:10]
                     )
                     reward_history.append((i, reward_val, self._last_normalized_reward))
 
