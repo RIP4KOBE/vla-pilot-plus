@@ -25,8 +25,8 @@ from utils.logging_utils import SteerLogger
 
 log = SteerLogger("RDTSteer")
 
-# ManiSkill checkpoint: right-arm occupies dims [7:14] of the 14D unified action.
-_RIGHT_ARM = slice(7, 14)
+# ManiSkill checkpoint outputs 8 DOF (7 right-arm joints + 1 gripper).
+_ARM_JOINTS = slice(0, 7)
 
 
 # ── Adapter for the real RoboticDiffusionTransformerModel ────────────────────
@@ -112,6 +112,7 @@ class _RDTDiTAdapter(nn.Module):
 
         if t.dim() == 0:
             t = t.unsqueeze(0)
+        t = t.to(x_t.device)
         model_output_128 = self.runner.model(
             state_action_traj,
             ctrl_freqs,
@@ -247,7 +248,7 @@ class _RDTModelAdapter(nn.Module):
         image_embeds = image_embeds.reshape(-1, real.vision_model.hidden_size).unsqueeze(0)
 
         # ── Proprioception encoding ───────────────────────────────────────────
-        joints = proprio.to(device).unsqueeze(0)          # (1, 1, 14)
+        joints = proprio.to(device).unsqueeze(0)          # (1, 1, 8)
         states, state_elem_mask = real._format_joint_to_state(joints)
         states = states.to(device, dtype=dtype)
         state_elem_mask = state_elem_mask.to(device, dtype=dtype)
@@ -290,6 +291,14 @@ class _RDTModelAdapter(nn.Module):
         """Passthrough to the underlying real model's step()."""
         real = object.__getattribute__(self, "_real")
         return real.step(proprio, images, text_embeds)
+
+    @property
+    def action_min(self) -> Tensor:
+        return object.__getattribute__(self, "_real").action_min
+
+    @property
+    def action_max(self) -> Tensor:
+        return object.__getattribute__(self, "_real").action_max
 
 
 class RDTSteer:
@@ -351,7 +360,12 @@ class RDTSteer:
         return getattr(self._rdt_model, "noise_scheduler", None)
 
     @classmethod
-    def from_pretrained(cls, pretrained_path: str, num_inference_steps: int = 55) -> "RDTSteer":
+    def from_pretrained(
+        cls,
+        pretrained_path: str,
+        num_inference_steps: int = 55,
+        vision_encoder: str = "google/siglip-so400m-patch14-384",
+    ) -> "RDTSteer":
         """Load from a HuggingFace Hub repo ID or a local directory path.
 
         ``RoboticDiffusionTransformerModel`` is a plain Python object (not an
@@ -376,8 +390,20 @@ class RDTSteer:
 
         if not os.path.isdir(pretrained_path):
             from huggingface_hub import snapshot_download
-            log.info(f"Downloading checkpoint: {pretrained_path}")
-            pretrained_path = snapshot_download(repo_id=pretrained_path)
+            # Support "namespace/repo/subdir" — split off the subdir so the
+            # repo_id stays a valid 2-segment HF identifier.
+            parts = pretrained_path.split("/", 2)
+            if len(parts) == 3:
+                repo_id, subdir = "/".join(parts[:2]), parts[2]
+                log.info(f"Downloading checkpoint: {repo_id} (subdir: {subdir})")
+                snapshot_root = snapshot_download(
+                    repo_id=repo_id,
+                    allow_patterns=[f"{subdir}/**", f"{subdir}/*"],
+                )
+                pretrained_path = os.path.join(snapshot_root, subdir)
+            else:
+                log.info(f"Downloading checkpoint: {pretrained_path}")
+                pretrained_path = snapshot_download(repo_id=pretrained_path)
 
         log.info(f"Loading RDT model from: {pretrained_path}")
 
@@ -393,9 +419,19 @@ class RDTSteer:
                 "Ensure third_party/rdt/ is initialized: git submodule update --init"
             )
 
+        # Weights are in a `rdt/` subdirectory of the HF snapshot; check both
+        # the repo root and the subfolder so local paths still work.
+        rdt_subdir = os.path.join(pretrained_path, "rdt")
+        search_dirs = [rdt_subdir, pretrained_path] if os.path.isdir(rdt_subdir) else [pretrained_path]
+
         # Load the model config that ships with the checkpoint
-        config_path = os.path.join(pretrained_path, "config.yaml")
-        if not os.path.exists(config_path):
+        config_path = None
+        for d in search_dirs:
+            candidate = os.path.join(d, "config.yaml")
+            if os.path.exists(candidate):
+                config_path = candidate
+                break
+        if config_path is None:
             # Fall back to the bundled base config inside the submodule
             config_path = os.path.join(rdt_root, "configs", "base.yaml")
         with open(config_path, "r") as f:
@@ -403,15 +439,38 @@ class RDTSteer:
 
         # Locate the weight file (prefer .safetensors, fall back to .pt)
         weight_file = None
-        for fname in ("model.safetensors", "pytorch_model.bin", "rdt-1b.pt"):
-            candidate = os.path.join(pretrained_path, fname)
-            if os.path.exists(candidate):
-                weight_file = candidate
+        for d in search_dirs:
+            for fname in ("model.safetensors", "pytorch_model.bin", "rdt-1b.pt"):
+                candidate = os.path.join(d, fname)
+                if os.path.exists(candidate):
+                    weight_file = candidate
+                    break
+            if weight_file is not None:
                 break
+
+        # ── DIAGNOSTIC: verify weight loading ────────────────────────────────
+        print(f"[DIAG] weight_file resolved to: {weight_file}")
+        print(f"[DIAG] config_path resolved to: {config_path}")
+        # ─────────────────────────────────────────────────────────────────────
 
         # ``create_model`` constructs RoboticDiffusionTransformerModel and
         # calls load_pretrained_weights when pretrained is not None.
-        real_model = create_model(args, pretrained=weight_file)
+        # Force local-cache-only for the sub-model loads (T5, SigLIP) — both
+        # are already cached and HF_ENDPOINT may point to a mirror with SSL issues.
+        _prev_offline = os.environ.get("HF_HUB_OFFLINE")
+        os.environ["HF_HUB_OFFLINE"] = "1"
+        try:
+            real_model = create_model(
+                args,
+                pretrained=weight_file,
+                pretrained_text_encoder_name_or_path="google/t5-v1_1-xxl",
+                pretrained_vision_encoder_name_or_path=vision_encoder,
+            )
+        finally:
+            if _prev_offline is None:
+                os.environ.pop("HF_HUB_OFFLINE", None)
+            else:
+                os.environ["HF_HUB_OFFLINE"] = _prev_offline
 
         # Wrap in the adapter that provides encode_inputs + nn.Module interface.
         rdt_model = _RDTModelAdapter(real_model)
@@ -448,6 +507,18 @@ class RDTSteer:
             self._obs_processor = RDTObsProcessor(
                 lang_embed_cache_dir=self._lang_embed_cache_dir
             )
+        # Reuse the T5 already loaded inside the RDT model to avoid a second T5 load.
+        # _RDTModelAdapter wraps the real model; real.encode_instruction uses real.text_model.
+        try:
+            real = object.__getattribute__(self._rdt_model, "_real")
+            if callable(getattr(real, "encode_instruction", None)):
+                # Use the device the text_model is already on; "cpu" causes a device
+                # mismatch because real.text_model is moved to CUDA during reset().
+                _enc_device = str(real.device)
+                self._obs_processor._text_encoder_fn = lambda s, _d=_enc_device: \
+                    real.encode_instruction(s, device=_d)
+        except Exception:
+            pass  # fall back to lazy T5 load if wiring fails
 
     def to(self, device) -> "RDTSteer":
         if isinstance(self._rdt_model, nn.Module):
@@ -511,6 +582,14 @@ class RDTSteer:
         if generate_new_chunk:
             images, proprio, task_str = self._obs_processor.process(batch)
             text_embed = self._obs_processor.get_lang_embed(task_str, self.device)
+            # ── DIAGNOSTIC ───────────────────────────────────────────────────
+            if isinstance(proprio, torch.Tensor):
+                _p = proprio.detach().cpu().float().numpy().ravel()
+            else:
+                _p = proprio.ravel()
+            print(f"[DIAG] proprio raw (first 8): {_p[:8].tolist()}")
+            print(f"[DIAG] lang_embed norm: {text_embed.float().norm().item():.4f}")
+            # ─────────────────────────────────────────────────────────────────
             B = self._sample_batch_size
 
             if use_guidance:
@@ -550,6 +629,10 @@ class RDTSteer:
         """
         Call RDT's step() B times, returning (B, 64, 14).
         """
+        # step() applies _unformat_action_to_joint → ManiSkill joint angles.
+        # Re-normalize back to [-1, 1] so both guided and unguided paths match.
+        a_min = self._rdt_model.action_min  # (8,) on model device
+        a_max = self._rdt_model.action_max  # (8,) on model device
         results = []
         with torch.no_grad():
             for _ in range(B):
@@ -559,20 +642,22 @@ class RDTSteer:
                     text_embeds=text_embed,
                 )
                 if out.dim() == 2:
-                    out = out.unsqueeze(0)  # ensure (1, 64, 14)
+                    out = out.unsqueeze(0)  # ensure (1, pred_horizon, 8)
+                out = (out - a_min) / (a_max - a_min) * 2 - 1
                 results.append(out)
-        return torch.cat(results, dim=0)  # (B, 64, 14)
+        return torch.cat(results, dim=0)  # (B, 64, 8)
 
     # ── Action postprocessing ─────────────────────────────────────────────────
 
     def _postprocess_actions(self, actions: Tensor) -> Tensor:
         """
-        (B, 64, 14) → (action_chunk_horizon, 7)
-        Slices right-arm, takes first H steps, uses particle 0.
+        (B, 64, 8) → (action_chunk_horizon, 7)
+        Slices arm joints (0:7), takes first H steps, uses particle 0.
         """
-        right_arm = actions[:, :, _RIGHT_ARM]  # (B, 64, 7)
-        best = right_arm[0]                    # (64, 7) — particle 0
-        return best[: self._action_chunk_horizon]  # (H, 7)
+        print(f"[DIAG] actions pre-slice stats: min={actions.float().min().item():.3f}  max={actions.float().max().item():.3f}  mean={actions.float().mean().item():.3f}")
+        arm_joints = actions[:, :, _ARM_JOINTS]  # (B, 64, 7)
+        best = arm_joints[0]                      # (64, 7) — particle 0
+        return best[: self._action_chunk_horizon].unsqueeze(0).float()  # (1, H, 7)
 
     # ── Trajectory projection (shared by diversity and guidance hooks) ────────
 
@@ -581,7 +666,7 @@ class RDTSteer:
         (1, 64, 14) → (1, H+1, 3) via adapter.delta_actions_to_ee_trajectory.
         Slices right-arm, takes action_chunk_horizon steps, projects to 3D EEF.
         """
-        action_seq = sample[0, : self._action_chunk_horizon, _RIGHT_ARM]  # (H, 7)
+        action_seq = sample[0, : self._action_chunk_horizon, _ARM_JOINTS]  # (H, 7)
         traj = self._adapter.delta_actions_to_ee_trajectory(action_seq)   # (H+1, 3)
         return traj.unsqueeze(0)  # (1, H+1, 3)
 
@@ -727,7 +812,8 @@ class RDTSteer:
 
         cond = self._rdt_model.encode_inputs(proprio, images, text_embeds)
 
-        x_t = torch.randn(B, 64, 14, device=device, dtype=dtype)
+        raw_action_dim = len(cond["action_indices"])  # 8 for MANISKILL
+        x_t = torch.randn(B, 64, raw_action_dim, device=device, dtype=dtype)
 
         scheduler = self._noise_scheduler
         scheduler.set_timesteps(self._num_inference_steps)
@@ -789,7 +875,7 @@ class RDTSteer:
                 div_grad = self._compute_diversity_gradient(x_t)
                 if div_grad is not None:
                     noise_pred = noise_pred.clone()
-                    noise_pred[:, :, 7:10] = noise_pred[:, :, 7:10] + diversity_scale * div_grad[:, :, 7:10]
+                    noise_pred[:, :, :7] = noise_pred[:, :, :7] + diversity_scale * div_grad[:, :, :7]
 
             # ── HOOK A: Keypoint gradient guidance (late phase: t ≤ start_t) ──
             elif guidance_fns and keypoints_tensor is not None and t_val <= start_t:
@@ -799,9 +885,9 @@ class RDTSteer:
                 if kp_grad is not None:
                     scale = self._adaptive_scale(reward_val, guide_scale, sigmoid_k, sigmoid_x0)
                     noise_pred = noise_pred.clone()
-                    noise_pred[:, : self._action_chunk_horizon, 7:10] = (
-                        noise_pred[:, : self._action_chunk_horizon, 7:10]
-                        - scale * kp_grad[:, : self._action_chunk_horizon, 7:10]
+                    noise_pred[:, : self._action_chunk_horizon, :7] = (
+                        noise_pred[:, : self._action_chunk_horizon, :7]
+                        - scale * kp_grad[:, : self._action_chunk_horizon, :7]
                     )
                     reward_history.append((i, reward_val, self._last_normalized_reward))
 
