@@ -184,6 +184,7 @@ robosuite==1.4.0
 rpds-py==0.30.0
 rsa==4.9.1
 safetensors==0.6.2
+sentencepiece==0.2.0
 sapien==3.0.1
 scikit-learn==1.7.2
 scipy==1.16.3

@@ -587,8 +587,19 @@ class LiberoEnv(gym.Env):
             },
         })
 
-        
-        
+        # Expose raw joint positions as top-level keys so they survive LiberoProcessorStep.
+        # RDTObsProcessor reads these to build correct joint-space proprio.
+        joint_pos = raw_obs.get("robot0_joint_pos")
+        if joint_pos is not None:
+            observation["observation.joint_pos"] = torch.from_numpy(
+                joint_pos.astype(np.float32)
+            ).unsqueeze(0)  # (1, 7)
+        gripper_qpos = raw_obs.get("robot0_gripper_qpos")
+        if gripper_qpos is not None:
+            observation["observation.gripper_qpos"] = torch.from_numpy(
+                gripper_qpos.astype(np.float32)
+            ).unsqueeze(0)  # (1, 2)
+
         return observation
 
     def reset(self, seed=None, **kwargs):

@@ -16,6 +16,8 @@ import warnings
 # Suppress pydantic v2 Field attribute warnings from third-party PI05 config classes
 warnings.filterwarnings("ignore", category=UserWarning, message=".*'repr'.*Field.*")
 warnings.filterwarnings("ignore", category=UserWarning, message=".*'frozen'.*Field.*")
+# NumPy 2.0: third_party/rdt/models/rdt/blocks.py uses __array__ without copy kwarg
+warnings.filterwarnings("ignore", category=DeprecationWarning, message=".*__array__.*copy.*")
 # Load .env before anything else
 try:
     from dotenv import load_dotenv
@@ -160,7 +162,10 @@ class Main:
         elif policy_type == 'rdt':
             from core.rdt_policy_steer import RDTSteer
             num_steps = type_config.get('num_inference_steps', 55)
-            self.policy = RDTSteer.from_pretrained(pretrained_path, num_inference_steps=num_steps)
+            vision_encoder = type_config.get('vision_encoder', 'google/siglip-so400m-patch14-384')
+            self.policy = RDTSteer.from_pretrained(
+                pretrained_path, num_inference_steps=num_steps, vision_encoder=vision_encoder
+            )
         else:
             raise ValueError(f"Unknown policy type: {policy_type}")
 
