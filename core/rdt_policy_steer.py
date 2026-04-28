@@ -437,16 +437,43 @@ class RDTSteer:
         with open(config_path, "r") as f:
             args = yaml.safe_load(f)
 
-        # Locate the weight file (prefer .safetensors, fall back to .pt)
+        # Locate the weight file (prefer .safetensors, fall back to .pt/.bin)
         weight_file = None
-        for d in search_dirs:
-            for fname in ("model.safetensors", "pytorch_model.bin", "rdt-1b.pt"):
-                candidate = os.path.join(d, fname)
+        weight_names = (
+            "model.safetensors",
+            "pytorch_model.bin",
+            "rdt-1b.pt",
+            "mp_rank_00_model_states.pt",  # DeepSpeed checkpoint format
+        )
+        for search_root in (pretrained_path, os.path.join(pretrained_path, "rdt")):
+            if not os.path.isdir(search_root):
+                continue
+            for fname in weight_names:
+                candidate = os.path.join(search_root, fname)
                 if os.path.exists(candidate):
                     weight_file = candidate
                     break
             if weight_file is not None:
                 break
+        # Walk one additional level for nested checkpoints
+        if weight_file is None and os.path.isdir(pretrained_path):
+            for entry in os.scandir(pretrained_path):
+                if entry.is_dir():
+                    for fname in weight_names:
+                        candidate = os.path.join(entry.path, fname)
+                        if os.path.exists(candidate):
+                            weight_file = candidate
+                            break
+                if weight_file is not None:
+                    break
+        if weight_file is None:
+            raise FileNotFoundError(
+                f"No weight file found under {pretrained_path}. "
+                f"Looked for: {weight_names}. "
+                f"Run: ls -R {pretrained_path}"
+            )
+        log.info(f"Using weight file: {weight_file}")
+        print(f"[FIX2] weight_file = {weight_file}")
 
         # ── DIAGNOSTIC: verify weight loading ────────────────────────────────
         print(f"[DIAG] weight_file resolved to: {weight_file}")
