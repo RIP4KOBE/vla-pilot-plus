@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import hashlib
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 import torch
@@ -23,6 +23,8 @@ _BLACK_PIL = Image.fromarray(np.zeros((RDT_IMG_SIZE, RDT_IMG_SIZE, 3), dtype=np.
 _STATIC_KEY = "observation.images.image"
 _WRIST_KEY = "observation.images.image2"
 _STATE_KEY = "observation.state"
+_JOINT_POS_KEY = "observation.joint_pos"
+_GRIPPER_QPOS_KEY = "observation.gripper_qpos"
 
 
 class RDTObsProcessor:
@@ -35,6 +37,10 @@ class RDTObsProcessor:
         # One-frame ring buffer for history slots
         self._prev_static: Optional[Image.Image] = None
         self._prev_wrist: Optional[Image.Image] = None
+        # Optional: callable(task_str) -> Tensor(1, seq_len, hidden_dim), avoids re-loading T5
+        self._text_encoder_fn: Optional[Callable[[str], torch.Tensor]] = None
+        # Optional env adapter for direct joint-angle access (bypasses EEF-pose obs.state).
+        self._adapter = None
 
     def reset(self) -> None:
         """Call at episode start to clear the frame history buffer."""
@@ -55,12 +61,15 @@ class RDTObsProcessor:
     def get_lang_embed(self, task_str: str, device: torch.device) -> torch.Tensor:
         """
         Return a T5-XXL embedding tensor for task_str.
-        Priority: (1) preloaded cache, (2) lazy T5-XXL compute+persist, (3) zero fallback.
+        Priority: (1) preloaded cache, (2) _text_encoder_fn (reuses loaded T5), (3) fresh T5 load, (4) zero fallback.
         """
         key = hashlib.md5(task_str.encode()).hexdigest()
         if key not in self._lang_cache:
             try:
-                embed = self._compute_t5_embed(task_str)
+                if self._text_encoder_fn is not None:
+                    embed = self._text_encoder_fn(task_str).cpu()
+                else:
+                    embed = self._compute_t5_embed(task_str)
                 self._lang_cache[key] = embed
                 torch.save(embed, self._cache_dir / f"{key}.pt")
             except Exception:
@@ -68,8 +77,8 @@ class RDTObsProcessor:
                 logging.getLogger("RDTObsProcessor").warning(
                     "T5-XXL unavailable — using zero embedding for: %r", task_str
                 )
-                # Shape matches T5-v1_1-xxl last_hidden_state: (1, seq_len, 512)
-                self._lang_cache[key] = torch.zeros(1, 1, 512)
+                # T5-v1_1-xxl d_model=4096; wrong dim here causes mat-mul mismatch
+                self._lang_cache[key] = torch.zeros(1, 1, 4096)
         return self._lang_cache[key].to(device)
 
     @staticmethod
@@ -123,14 +132,46 @@ class RDTObsProcessor:
         # RDT slot order: [ext_{t-1}, rw_{t-1}, lw_{t-1}, ext_t, rw_t, lw_t]
         images = [ext_prev, rw_prev, _BLACK_PIL, ext_now, rw_now, _BLACK_PIL]
 
-        # ── Proprio (14D bimanual, right-arm = env state[:7]) ───────────────
-        state = obs[_STATE_KEY][0].detach().cpu().numpy()  # (state_dim,)
-        proprio = np.zeros(14, dtype=np.float32)
-        arm_dims = min(7, state.shape[0])
-        proprio[7: 7 + arm_dims] = state[:arm_dims]
+        # ── Proprio (8D: 7 arm joints + 1 gripper) ──────────────────────────
+        # Use adapter's direct joint accessors when available (LIBERO/CALVIN),
+        # which give actual Franka joint angles that match RDT's training space.
+        # Fall back to observation.state when no adapter is wired.
+        if self._adapter is not None and hasattr(self._adapter, 'get_joint_positions'):
+            try:
+                joint_pos = self._adapter.get_joint_positions()  # (7,) Franka joints, radians
+                gripper_raw = self._adapter.get_gripper_state()  # sum of 2 finger qpos ≈ [0, 0.08]
+                # RDT DATA_STAT gripper range: [0.0, 0.04] (per-finger width).
+                # get_gripper_state() returns sum of two fingers → divide by 2.
+                gripper_val = float(gripper_raw) / 2.0
+                proprio_np = np.zeros(8, dtype=np.float32)
+                proprio_np[:7] = joint_pos[:7].astype(np.float32)
+                proprio_np[7] = np.clip(gripper_val, 0.0, 0.04)
+                print(f"[FIX4] proprio joints (first 4): {proprio_np[:4].tolist()}")
+            except Exception as exc:
+                print(f"[FIX4] WARNING: adapter joint read failed ({exc}), using obs.state fallback")
+                proprio_np = self._fallback_proprio_from_state(obs)
+        else:
+            proprio_np = self._fallback_proprio_from_state(obs)
+
+        # Return (1, 8) tensor — step() / encode_inputs() do unsqueeze(0) → (1, 1, 8)
+        proprio = torch.from_numpy(proprio_np).unsqueeze(0)
 
         # ── Task string ──────────────────────────────────────────────────────
         task_list = obs.get("task", [""])
         task_str = task_list[0] if isinstance(task_list, (list, tuple)) else str(task_list)
 
         return images, proprio, task_str
+
+    def _fallback_proprio_from_state(self, obs: dict) -> np.ndarray:
+        """Use observation.state when no adapter is available (legacy path)."""
+        state_raw = obs[_STATE_KEY][0]
+        if isinstance(state_raw, torch.Tensor):
+            state = state_raw.detach().cpu().numpy()
+        else:
+            state = np.asarray(state_raw, dtype=np.float32)
+        proprio_np = np.zeros(8, dtype=np.float32)
+        arm_dims = min(7, state.shape[0])
+        proprio_np[:arm_dims] = state[:arm_dims]
+        if state.shape[0] >= 8:
+            proprio_np[7] = state[7]
+        return proprio_np

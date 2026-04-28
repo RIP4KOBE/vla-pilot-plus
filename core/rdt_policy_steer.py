@@ -534,6 +534,8 @@ class RDTSteer:
             self._obs_processor = RDTObsProcessor(
                 lang_embed_cache_dir=self._lang_embed_cache_dir
             )
+        # Wire adapter for direct joint-angle proprio (Task 4 fix).
+        self._obs_processor._adapter = self._adapter
         # Reuse the T5 already loaded inside the RDT model to avoid a second T5 load.
         # _RDTModelAdapter wraps the real model; real.encode_instruction uses real.text_model.
         try:
