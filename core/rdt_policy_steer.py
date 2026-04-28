@@ -668,8 +668,9 @@ class RDTSteer:
         """
         # step() applies _unformat_action_to_joint → ManiSkill joint angles.
         # Re-normalize back to [-1, 1] so both guided and unguided paths match.
-        a_min = self._rdt_model.action_min  # (8,) on model device
-        a_max = self._rdt_model.action_max  # (8,) on model device
+        # Fallback for stub models that have no action_min/action_max.
+        a_min = getattr(self._rdt_model, "action_min", None)
+        a_max = getattr(self._rdt_model, "action_max", None)
         results = []
         with torch.no_grad():
             for _ in range(B):
@@ -680,7 +681,8 @@ class RDTSteer:
                 )
                 if out.dim() == 2:
                     out = out.unsqueeze(0)  # ensure (1, pred_horizon, 8)
-                out = (out - a_min) / (a_max - a_min) * 2 - 1
+                if a_min is not None and a_max is not None:
+                    out = (out - a_min) / (a_max - a_min) * 2 - 1
                 results.append(out)
         return torch.cat(results, dim=0)  # (B, 64, 8)
 
@@ -849,7 +851,12 @@ class RDTSteer:
 
         cond = self._rdt_model.encode_inputs(proprio, images, text_embeds)
 
-        raw_action_dim = len(cond["action_indices"])  # 8 for MANISKILL
+        # Stub models return {} from encode_inputs — fall back to 14 (the stub step() shape)
+        if "action_indices" in cond:
+            raw_action_dim = len(cond["action_indices"])
+        else:
+            _probe = self._rdt_model.step(proprio=proprio, images=images, text_embeds=text_embeds)
+            raw_action_dim = _probe.shape[-1]
         x_t = torch.randn(B, 64, raw_action_dim, device=device, dtype=dtype)
 
         scheduler = self._noise_scheduler

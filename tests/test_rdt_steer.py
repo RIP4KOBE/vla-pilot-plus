@@ -103,7 +103,7 @@ def test_forward_shape(stub_steer, stub_adapter, mock_batch):
         generate_new_chunk=True,
         use_guidance=False,
     )
-    assert action.shape == (H, 7), f"Expected ({H}, 7), got {action.shape}"
+    assert action.shape == (1, H, 7), f"Expected (1, {H}, 7), got {action.shape}"
     assert not torch.isnan(action).any()
 
 
