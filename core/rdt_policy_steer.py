@@ -658,45 +658,72 @@ class RDTSteer:
 
     def _predict_unguided(
         self,
-        proprio: np.ndarray,
+        proprio,
         images: list,
         text_embed: Tensor,
         B: int,
     ) -> Tensor:
         """
-        Call RDT's step() B times, returning (B, 64, 14).
+        Run the denoising loop without guidance hooks.
+
+        Returns (B, 64, raw_action_dim) in NORMALIZED space ∈ [-1, 1].
+        Does NOT apply _unformat_action_to_joint so values stay in range
+        for LIBERO's OSC controller (which expects actions ∈ [-1, 1]).
         """
-        # step() applies _unformat_action_to_joint → ManiSkill joint angles.
-        # Re-normalize back to [-1, 1] so both guided and unguided paths match.
-        # Fallback for stub models that have no action_min/action_max.
-        a_min = getattr(self._rdt_model, "action_min", None)
-        a_max = getattr(self._rdt_model, "action_max", None)
-        results = []
+        device = self.device
+        try:
+            dtype = next(self._dit.parameters()).dtype
+        except StopIteration:
+            dtype = torch.float32
+
+        cond = self._rdt_model.encode_inputs(proprio, images, text_embed)
+        if "action_indices" in cond:
+            raw_action_dim = len(cond["action_indices"])
+        else:
+            _probe = self._rdt_model.step(proprio=proprio, images=images, text_embeds=text_embed)
+            raw_action_dim = _probe.shape[-1]
+
+        x_t = torch.randn(B, 64, raw_action_dim, device=device, dtype=dtype)
+
+        scheduler = self._noise_scheduler
+        scheduler.set_timesteps(self._num_inference_steps)
+
         with torch.no_grad():
-            for _ in range(B):
-                out = self._rdt_model.step(
-                    proprio=proprio,
-                    images=images,
-                    text_embeds=text_embed,
-                )
-                if out.dim() == 2:
-                    out = out.unsqueeze(0)  # ensure (1, pred_horizon, 8)
-                if a_min is not None and a_max is not None:
-                    out = (out - a_min) / (a_max - a_min) * 2 - 1
-                results.append(out)
-        return torch.cat(results, dim=0)  # (B, 64, 8)
+            for t in scheduler.timesteps:
+                noise_pred = self._dit(x_t, t, cond)
+                x_t = scheduler.step(noise_pred, t, x_t).prev_sample
+
+        return x_t  # (B, 64, raw_action_dim) normalized ∈ [-1, 1]
 
     # ── Action postprocessing ─────────────────────────────────────────────────
 
     def _postprocess_actions(self, actions: Tensor) -> Tensor:
         """
-        (B, 64, 8) → (action_chunk_horizon, 7)
-        Slices arm joints (0:7), takes first H steps, uses particle 0.
+        (B, 64, 8) normalized → (1, H, 7) LIBERO EEF-delta using Franka FK.
+
+        If the adapter provides joint positions, uses FK-based EEF-delta conversion.
+        Falls back to the normalized-bypass approach when the adapter is unavailable
+        (e.g. in unit tests using stub models).
         """
         print(f"[DIAG] actions pre-slice stats: min={actions.float().min().item():.3f}  max={actions.float().max().item():.3f}  mean={actions.float().mean().item():.3f}")
-        arm_joints = actions[:, :, _ARM_JOINTS]  # (B, 64, 7)
-        best = arm_joints[0]                      # (64, 7) — particle 0
-        return best[: self._action_chunk_horizon].unsqueeze(0).float()  # (1, H, 7)
+        from core.rdt_action_converter import rdt_chunk_to_libero_actions
+
+        best = actions[0]  # (64, 8) — particle 0
+        chunk_np = best[: self._action_chunk_horizon].detach().cpu().float().numpy()  # (H, 8)
+
+        if self._adapter is not None and hasattr(self._adapter, 'get_joint_positions'):
+            try:
+                current_joints = self._adapter.get_joint_positions().astype(np.float64)  # (7,)
+                libero_chunk = rdt_chunk_to_libero_actions(chunk_np, current_joints)  # (H, 7)
+                result = torch.from_numpy(libero_chunk).unsqueeze(0).float()  # (1, H, 7)
+                print(f"[FIX5b] FK action: min={libero_chunk.min():.3f}  max={libero_chunk.max():.3f}")
+                return result
+            except Exception as exc:
+                print(f"[FIX5b] WARNING: FK conversion failed ({exc}), falling back to bypass")
+
+        # Fallback: normalized bypass
+        libero_action = np.concatenate([chunk_np[:, :6], chunk_np[:, 7:8]], axis=1)
+        return torch.from_numpy(libero_action).unsqueeze(0).float()  # (1, H, 7)
 
     # ── Trajectory projection (shared by diversity and guidance hooks) ────────
 
