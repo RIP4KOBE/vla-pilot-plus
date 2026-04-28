@@ -542,10 +542,18 @@ class RDTSteer:
                 # Use the device the text_model is already on; "cpu" causes a device
                 # mismatch because real.text_model is moved to CUDA during reset().
                 _enc_device = str(real.device)
-                self._obs_processor._text_encoder_fn = lambda s, _d=_enc_device: \
-                    real.encode_instruction(s, device=_d)
-        except Exception:
-            pass  # fall back to lazy T5 load if wiring fails
+                def _enc_fn(s, _d=_enc_device):
+                    emb = real.encode_instruction(s, device=_d)
+                    return emb.float().cpu()
+                self._obs_processor._text_encoder_fn = _enc_fn
+                log.info("Language encoder: reusing RDT model's T5")
+                print("[FIX3] T5 wired via real.encode_instruction")
+            else:
+                log.warning("encode_instruction not found on real model — will lazy-load T5")
+                print("[FIX3] WARNING: encode_instruction missing, falling back to lazy T5 load")
+        except Exception as exc:
+            log.warning(f"T5 wiring failed ({exc}), falling back to lazy T5 load")
+            print(f"[FIX3] WARNING: T5 wiring failed: {exc}")
 
     def to(self, device) -> "RDTSteer":
         if isinstance(self._rdt_model, nn.Module):
