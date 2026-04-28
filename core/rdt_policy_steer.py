@@ -473,12 +473,6 @@ class RDTSteer:
                 f"Run: ls -R {pretrained_path}"
             )
         log.info(f"Using weight file: {weight_file}")
-        print(f"[FIX2] weight_file = {weight_file}")
-
-        # ── DIAGNOSTIC: verify weight loading ────────────────────────────────
-        print(f"[DIAG] weight_file resolved to: {weight_file}")
-        print(f"[DIAG] config_path resolved to: {config_path}")
-        # ─────────────────────────────────────────────────────────────────────
 
         # ``create_model`` constructs RoboticDiffusionTransformerModel and
         # calls load_pretrained_weights when pretrained is not None.
@@ -549,13 +543,10 @@ class RDTSteer:
                     return emb.float().cpu()
                 self._obs_processor._text_encoder_fn = _enc_fn
                 log.info("Language encoder: reusing RDT model's T5")
-                print("[FIX3] T5 wired via real.encode_instruction")
             else:
                 log.warning("encode_instruction not found on real model — will lazy-load T5")
-                print("[FIX3] WARNING: encode_instruction missing, falling back to lazy T5 load")
         except Exception as exc:
             log.warning(f"T5 wiring failed ({exc}), falling back to lazy T5 load")
-            print(f"[FIX3] WARNING: T5 wiring failed: {exc}")
 
     def to(self, device) -> "RDTSteer":
         if isinstance(self._rdt_model, nn.Module):
@@ -619,14 +610,6 @@ class RDTSteer:
         if generate_new_chunk:
             images, proprio, task_str = self._obs_processor.process(batch)
             text_embed = self._obs_processor.get_lang_embed(task_str, self.device)
-            # ── DIAGNOSTIC ───────────────────────────────────────────────────
-            if isinstance(proprio, torch.Tensor):
-                _p = proprio.detach().cpu().float().numpy().ravel()
-            else:
-                _p = proprio.ravel()
-            print(f"[DIAG] proprio raw (first 8): {_p[:8].tolist()}")
-            print(f"[DIAG] lang_embed norm: {text_embed.float().norm().item():.4f}")
-            # ─────────────────────────────────────────────────────────────────
             B = self._sample_batch_size
 
             if use_guidance:
@@ -705,7 +688,6 @@ class RDTSteer:
         Falls back to the normalized-bypass approach when the adapter is unavailable
         (e.g. in unit tests using stub models).
         """
-        print(f"[DIAG] actions pre-slice stats: min={actions.float().min().item():.3f}  max={actions.float().max().item():.3f}  mean={actions.float().mean().item():.3f}")
         from core.rdt_action_converter import rdt_chunk_to_libero_actions
 
         best = actions[0]  # (64, 8) — particle 0
@@ -715,11 +697,9 @@ class RDTSteer:
             try:
                 current_joints = self._adapter.get_joint_positions().astype(np.float64)  # (7,)
                 libero_chunk = rdt_chunk_to_libero_actions(chunk_np, current_joints)  # (H, 7)
-                result = torch.from_numpy(libero_chunk).unsqueeze(0).float()  # (1, H, 7)
-                print(f"[FIX5b] FK action: min={libero_chunk.min():.3f}  max={libero_chunk.max():.3f}")
-                return result
+                return torch.from_numpy(libero_chunk).unsqueeze(0).float()  # (1, H, 7)
             except Exception as exc:
-                print(f"[FIX5b] WARNING: FK conversion failed ({exc}), falling back to bypass")
+                log.warning(f"FK conversion failed ({exc}), falling back to bypass")
 
         # Fallback: normalized bypass
         libero_action = np.concatenate([chunk_np[:, :6], chunk_np[:, 7:8]], axis=1)

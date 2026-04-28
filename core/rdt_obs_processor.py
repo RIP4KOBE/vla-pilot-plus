@@ -142,7 +142,6 @@ class RDTObsProcessor:
         self._prev_static = ext_now
 
         images = self._build_image_list(ext_prev, ext_now)
-        print(f"[FIX4.5] image slots: {[type(img).__name__ if img is not None else 'None' for img in images]}")
 
         # ── Proprio (8D: 7 arm joints + 1 gripper) ──────────────────────────
         # Use adapter's direct joint accessors when available (LIBERO/CALVIN),
@@ -158,9 +157,11 @@ class RDTObsProcessor:
                 proprio_np = np.zeros(8, dtype=np.float32)
                 proprio_np[:7] = joint_pos[:7].astype(np.float32)
                 proprio_np[7] = np.clip(gripper_val, 0.0, 0.04)
-                print(f"[FIX4] proprio joints (first 4): {proprio_np[:4].tolist()}")
             except Exception as exc:
-                print(f"[FIX4] WARNING: adapter joint read failed ({exc}), using obs.state fallback")
+                import logging
+                logging.getLogger("RDTObsProcessor").warning(
+                    "adapter joint read failed (%s), using obs.state fallback", exc
+                )
                 proprio_np = self._fallback_proprio_from_state(obs)
         else:
             proprio_np = self._fallback_proprio_from_state(obs)
