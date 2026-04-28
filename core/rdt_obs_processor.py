@@ -34,9 +34,8 @@ class RDTObsProcessor:
         self._cache_dir = Path(lang_embed_cache_dir)
         self._cache_dir.mkdir(parents=True, exist_ok=True)
         self._lang_cache: Dict[str, torch.Tensor] = {}
-        # One-frame ring buffer for history slots
+        # One-frame ring buffer for exterior camera history (wrist slots are always None)
         self._prev_static: Optional[Image.Image] = None
-        self._prev_wrist: Optional[Image.Image] = None
         # Optional: callable(task_str) -> Tensor(1, seq_len, hidden_dim), avoids re-loading T5
         self._text_encoder_fn: Optional[Callable[[str], torch.Tensor]] = None
         # Optional env adapter for direct joint-angle access (bypasses EEF-pose obs.state).
@@ -45,7 +44,24 @@ class RDTObsProcessor:
     def reset(self) -> None:
         """Call at episode start to clear the frame history buffer."""
         self._prev_static = None
-        self._prev_wrist = None
+
+    @staticmethod
+    def _build_image_list(
+        ext_prev: "Image.Image",
+        ext_now: "Image.Image",
+    ) -> list:
+        """
+        Build the 6-image list for RDT inference.
+
+        Slot order: [ext_{t-1}, right_wrist_{t-1}, left_wrist_{t-1},
+                     ext_t,     right_wrist_t,      left_wrist_t]
+
+        The ManiSkill checkpoint was trained with cam_high only; wrist slots
+        were always empty (np.zeros(..., 0, 0, 0)) during training.  Passing
+        None causes maniskill_model.step() to substitute the SigLIP background
+        image — the correct in-distribution input for this checkpoint.
+        """
+        return [ext_prev, None, None, ext_now, None, None]
 
     def load_embedded_tasks(self, embed_dir: str) -> None:
         """
@@ -116,21 +132,17 @@ class RDTObsProcessor:
         # ── Images ──────────────────────────────────────────────────────────
         # obs tensors are (B, C, H, W) — take batch index 0
         static_t = obs[_STATIC_KEY][0]   # (3, H, W)
-        wrist_t = obs[_WRIST_KEY][0]     # (3, H, W)
 
         ext_now = self._tensor_to_pil(static_t)
-        rw_now = self._tensor_to_pil(wrist_t)
 
         # History: duplicate current frame on first step
         ext_prev = self._prev_static if self._prev_static is not None else ext_now
-        rw_prev = self._prev_wrist if self._prev_wrist is not None else rw_now
 
-        # Update ring buffer
+        # Update ring buffer (exterior only — wrist slots are always None)
         self._prev_static = ext_now
-        self._prev_wrist = rw_now
 
-        # RDT slot order: [ext_{t-1}, rw_{t-1}, lw_{t-1}, ext_t, rw_t, lw_t]
-        images = [ext_prev, rw_prev, _BLACK_PIL, ext_now, rw_now, _BLACK_PIL]
+        images = self._build_image_list(ext_prev, ext_now)
+        print(f"[FIX4.5] image slots: {[type(img).__name__ if img is not None else 'None' for img in images]}")
 
         # ── Proprio (8D: 7 arm joints + 1 gripper) ──────────────────────────
         # Use adapter's direct joint accessors when available (LIBERO/CALVIN),
