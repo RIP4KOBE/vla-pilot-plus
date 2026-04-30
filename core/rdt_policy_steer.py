@@ -538,6 +538,9 @@ class RDTSteer:
             )
         # Wire adapter for direct joint-angle proprio (Task 4 fix).
         self._obs_processor._adapter = self._adapter
+        # LiberoProcessorStep applies a 180° flip to all frames; undo it before SigLIP encoding.
+        from core.env_adapters.libero_adapter import LiberoAdapter
+        self._obs_processor._undo_libero_flip = isinstance(self._adapter, LiberoAdapter)
         # Reuse the T5 already loaded inside the RDT model to avoid a second T5 load.
         # _RDTModelAdapter wraps the real model; real.encode_instruction uses real.text_model.
         try:

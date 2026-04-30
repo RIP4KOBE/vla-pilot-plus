@@ -40,6 +40,10 @@ class RDTObsProcessor:
         self._text_encoder_fn: Optional[Callable[[str], torch.Tensor]] = None
         # Optional env adapter for direct joint-angle access (bypasses EEF-pose obs.state).
         self._adapter = None
+        # LiberoProcessorStep._process_observation applies torch.flip(dims=[2,3]) to all frames
+        # before they reach this processor. Set True for LIBERO to undo the 180° rotation so
+        # images arrive right-side-up at the ManiSkill SigLIP encoder.
+        self._undo_libero_flip: bool = False
 
     def reset(self) -> None:
         """Call at episode start to clear the frame history buffer."""
@@ -109,9 +113,10 @@ class RDTObsProcessor:
             embed = model(**tokens).last_hidden_state  # (1, seq_len, 512)
         return embed.cpu()
 
-    @staticmethod
-    def _tensor_to_pil(img: torch.Tensor) -> Image.Image:
+    def _tensor_to_pil(self, img: torch.Tensor) -> Image.Image:
         """(C, H, W) float [0,1] → PIL Image resized to RDT_IMG_SIZE."""
+        if self._undo_libero_flip:
+            img = torch.flip(img, dims=[1, 2])
         arr = (img.detach().cpu().clamp(0.0, 1.0) * 255).byte().permute(1, 2, 0).numpy()
         return Image.fromarray(arr).resize((RDT_IMG_SIZE, RDT_IMG_SIZE), Image.BILINEAR)
 
