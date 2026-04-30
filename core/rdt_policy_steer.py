@@ -99,10 +99,17 @@ class _RDTDiTAdapter(nn.Module):
         action_mask_base = _b(cond["action_mask"])  # (B, 1, unified_dim)
         ctrl_freqs = _b(cond["ctrl_freqs"])
 
-        # ── Inflate raw x_t (B, H, raw_dim) → unified (B, H, unified_dim) ───
+        # ── Lift x_t to unified action space ─────────────────────────────────
+        # When x_t is already in the full 128D unified space (fixed denoising loop),
+        # pass it through directly — no zero-padding inflation needed.
+        # The subspace branch (raw_action_dim < unified_dim) is kept for backward
+        # compatibility with any future callers that still pass 8D x_t.
         H = x_t.shape[1]
-        x_unified = torch.zeros(B, H, unified_dim, device=x_t.device, dtype=x_t.dtype)
-        x_unified[:, :, action_indices] = x_t[:, :, :len(action_indices)]
+        if raw_action_dim == unified_dim:
+            x_unified = x_t
+        else:
+            x_unified = torch.zeros(B, H, unified_dim, device=x_t.device, dtype=x_t.dtype)
+            x_unified[:, :, action_indices] = x_t[:, :, :len(action_indices)]
 
         # ── Build state-action trajectory and call the DiT ───────────────────
         action_mask_full = action_mask_base.expand(-1, H, -1)  # (B, H, unified_dim)
@@ -122,9 +129,10 @@ class _RDTDiTAdapter(nn.Module):
             lang_mask=lang_attn_mask,
         )  # (B, H, unified_dim)
 
-        # ── Project back to raw action dim ────────────────────────────────────
-        model_output = model_output_128[:, :, action_indices][:, :, :raw_action_dim]
-        return model_output
+        # ── Return noise_pred in the same space as the incoming x_t ──────────
+        if raw_action_dim == unified_dim:
+            return model_output_128
+        return model_output_128[:, :, action_indices][:, :, :raw_action_dim]
 
 
 class _RDTModelAdapter(nn.Module):
@@ -662,11 +670,18 @@ class RDTSteer:
         cond = self._rdt_model.encode_inputs(proprio, images, text_embed)
         if "action_indices" in cond:
             raw_action_dim = len(cond["action_indices"])
+            action_indices = cond["action_indices"]
+            unified_action_dim = cond["unified_action_dim"]
         else:
             _probe = self._rdt_model.step(proprio=proprio, images=images, text_embeds=text_embed)
             raw_action_dim = _probe.shape[-1]
+            action_indices = list(range(raw_action_dim))
+            unified_action_dim = raw_action_dim
 
-        x_t = torch.randn(B, 64, raw_action_dim, device=device, dtype=dtype)
+        # Initialize noise in the full unified action space (128D), matching
+        # RDTRunner.conditional_sample which uses randn(B, pred_horizon, action_dim=128).
+        # Initializing in the 8D subspace with zero-padding biased the posterior.
+        x_t = torch.randn(B, 64, unified_action_dim, device=device, dtype=dtype)
 
         scheduler = self._noise_scheduler
         scheduler.set_timesteps(self._num_inference_steps)
@@ -676,7 +691,8 @@ class RDTSteer:
                 noise_pred = self._dit(x_t, t, cond)
                 x_t = scheduler.step(noise_pred, t, x_t).prev_sample
 
-        return x_t  # (B, 64, raw_action_dim) normalized ∈ [-1, 1]
+        # Project from unified 128D back to the raw 8D action subspace for postprocessing.
+        return x_t[:, :, action_indices][:, :, :raw_action_dim]
 
     # ── Action postprocessing ─────────────────────────────────────────────────
 
@@ -861,10 +877,14 @@ class RDTSteer:
         # Stub models return {} from encode_inputs — fall back to 14 (the stub step() shape)
         if "action_indices" in cond:
             raw_action_dim = len(cond["action_indices"])
+            action_indices = cond["action_indices"]
+            unified_action_dim = cond["unified_action_dim"]
         else:
             _probe = self._rdt_model.step(proprio=proprio, images=images, text_embeds=text_embeds)
             raw_action_dim = _probe.shape[-1]
-        x_t = torch.randn(B, 64, raw_action_dim, device=device, dtype=dtype)
+            action_indices = list(range(raw_action_dim))
+            unified_action_dim = raw_action_dim
+        x_t = torch.randn(B, 64, unified_action_dim, device=device, dtype=dtype)
 
         scheduler = self._noise_scheduler
         scheduler.set_timesteps(self._num_inference_steps)
@@ -954,4 +974,5 @@ class RDTSteer:
             self._stage_init_reward = reward_history[-1][1]
             log.info(f"Stage init_reward set: {self._stage_init_reward:.6f}")
 
-        return x_t  # (B, 64, 14)
+        # Project from unified 128D back to the raw 8D action subspace for postprocessing.
+        return x_t[:, :, action_indices][:, :, :raw_action_dim]

@@ -1,0 +1,61 @@
+=== Phase 1 Task 4 — Image Orientation Inspection ===
+
+=== LiberoProcessorStep flip analysis ===
+
+LiberoProcessorStep._process_observation source:
+----------------------------------------
+    def _process_observation(self, observation):
+        """
+        Processes both image and robot_state observations from LIBERO.
+        """
+        processed_obs = observation.copy()
+        for key in list(processed_obs.keys()):
+            if key.startswith(f"{OBS_IMAGES}."):
+                img = processed_obs[key]
+
+                # Flip both H and W
+                img = torch.flip(img, dims=[2, 3])
+
+                processed_obs[key] = img
+        # Process robot_state into a flat state vector
+        observation_robot_state_str = OBS_PREFIX + "robot_state"
+        if observation_robot_state_str in processed_obs:
+            robot_state = processed_obs.pop(observation_robot_state_str)
+
+            # Extract components
+            eef_pos = robot_state["eef"]["pos"]  # (B, 3,)
+            eef_quat = robot_state["eef"]["quat"]  # (B, 4,)
+            gripper_qpos = robot_state["gripper"]["qpos"]  # (B, 2,)
+
+            # Convert quaternion to axis-angle
+            eef_axisangle = self._quat2axisangle(eef_quat)  # (B, 3)
+            # Concatenate into a single state vector
+            state = torch.cat((eef_pos, eef_axisangle, gripper_qpos), dim=-1)
+
+            # ensure float32
+            state = state.float()
+            if state.dim() == 1:
+                state = state.unsqueeze(0)
+
+            processed_obs[OBS_STATE] = state
+        return processed_obs
+
+----------------------------------------
+
+*** CONFIRMED: torch.flip(img, dims=[2, 3]) is present.
+    Images are flipped 180° (both H and W axes) before reaching RDTSteer.
+
+flip_confirmed: True
+
+Generating synthetic flip visualization …
+Saved side-by-side flip demo → /home/hynx/VLA-Pilot++/.worktrees/feat/rdt-integration/docs/superpowers/evidence/round-1/images/flip_test_synthetic.png
+Inspect the image: if the right panel (AFTER LIBERO FLIP) shows green at bottom,
+the 180° flip IS confirmed to invert the scene orientation.
+
+──────────────────────────────────────────────────
+H3 ASSESSMENT:
+  CONFIRMED (code-level): torch.flip(dims=[2,3]) is applied in LiberoProcessorStep.
+  ALL images reaching RDTSteer are 180°-rotated relative to ManiSkill training data.
+  The ManiSkill SigLIP encoder was NOT trained on inverted SAPIEN images.
+  Impact: Image conditioning provides incorrect/misleading spatial features.
+  However: this bug ALONE would degrade performance, not cause fully random motion.
