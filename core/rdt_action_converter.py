@@ -44,6 +44,14 @@ RDT_ACTION_MAX = np.array([ 0.7655,  1.4984,  0.4679, -0.3818,  0.5517,  3.2916,
 _POS_SCALE = 0.05   # m per unit action
 _ORI_SCALE = 0.5    # rad per unit action
 
+# ── DIAGNOSTIC PROBE P6 (round-4): module-level state set by caller. ───────────
+# Caller (_postprocess_actions in rdt_policy_steer.py) sets these before invoking
+# rdt_chunk_to_libero_actions to indicate whether to emit FK-chain diagnostics.
+# Purely additive — main conversion logic is unchanged.
+_DIAG_TRIGGER = False
+_DIAG_STEP = 0
+# ──────────────────────────────────────────────────────────────────────────────
+
 
 def _dh_matrix(a: float, d: float, alpha: float, theta: float) -> np.ndarray:
     """Compute a 4x4 homogeneous DH transformation matrix."""
@@ -146,6 +154,86 @@ def rdt_chunk_to_libero_actions(
         q_sequence.append(denormalize_rdt_joints(arm_norm[i]))
 
     poses = [franka_fk_pose(q) for q in q_sequence]  # list of (pos, rot)
+
+    # ── DIAGNOSTIC PROBE P6: FK + denormalization health (revert via git revert HEAD) ──
+    # Purely additive — captures pre-clip raw delta magnitudes too. No logic changes below.
+    if _DIAG_TRIGGER:
+        try:
+            from pathlib import Path as _P
+            import logging as _logging
+            _lp = _P(__file__).resolve().parents[1] / "docs/superpowers/03_evidence/rdt_intergration/round-4/20260511_action_probes.log"
+            _lp.parent.mkdir(parents=True, exist_ok=True)
+            _q_seq_arr = np.array(q_sequence)  # (H+1, 7)
+            _pos_arr = np.array([p[0] for p in poses])  # (H+1, 3)
+            _q0_match = float(np.linalg.norm(_q_seq_arr[0] - current_joints, ord=np.inf))
+            _q_step_diff = np.linalg.norm(np.diff(_q_seq_arr, axis=0), ord=np.inf, axis=1) if _q_seq_arr.shape[0] > 1 else np.array([0.0])
+            _q_clip_count = int(np.sum(
+                (_q_seq_arr[1:] == FRANKA_Q_MIN[None, :]) | (_q_seq_arr[1:] == FRANKA_Q_MAX[None, :])
+            ))
+            _pos_step_diff = np.linalg.norm(np.diff(_pos_arr, axis=0), axis=1) if _pos_arr.shape[0] > 1 else np.array([0.0])
+            _rot0 = poses[0][1]
+            _rot0_ortho_err = float(np.linalg.norm(_rot0 @ _rot0.T - np.eye(3), ord='fro'))
+            # Pre-clip raw delta magnitudes (re-compute to avoid touching main loop)
+            _pre_clip_pos_norms = []
+            _pre_clip_ori_norms = []
+            for _i in range(H):
+                _dp = poses[_i + 1][0] - poses[_i][0]
+                _drm = poses[_i + 1][1] @ poses[_i][1].T
+                _daa = _rot_to_axisangle(_drm)
+                _pre_clip_pos_norms.append(float(np.max(np.abs(_dp / _POS_SCALE))))
+                _pre_clip_ori_norms.append(float(np.max(np.abs(_daa / _ORI_SCALE))))
+            _pre_clip_pos_max = max(_pre_clip_pos_norms) if _pre_clip_pos_norms else 0.0
+            _pre_clip_ori_max = max(_pre_clip_ori_norms) if _pre_clip_ori_norms else 0.0
+            _npy_p6_q = _lp.parent / f"20260511_P6_q_sequence_step{_DIAG_STEP}.npy"
+            _npy_p6_pos = _lp.parent / f"20260511_P6_eef_pos_step{_DIAG_STEP}.npy"
+            np.save(str(_npy_p6_q), _q_seq_arr)
+            np.save(str(_npy_p6_pos), _pos_arr)
+            # 3D trajectory PNG (Stage S3 visualization)
+            _png_p6 = _lp.parent / f"20260511_P6_eef_traj3d_step{_DIAG_STEP}.png"
+            try:
+                import matplotlib
+                matplotlib.use("Agg")
+                import matplotlib.pyplot as _plt
+                from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
+                _fig = _plt.figure(figsize=(6, 5))
+                _ax = _fig.add_subplot(111, projection='3d')
+                _ax.plot(_pos_arr[:, 0], _pos_arr[:, 1], _pos_arr[:, 2], 'b-o', markersize=3)
+                _ax.scatter([_pos_arr[0, 0]], [_pos_arr[0, 1]], [_pos_arr[0, 2]], c='g', s=80, label='start (current)')
+                _ax.scatter([_pos_arr[-1, 0]], [_pos_arr[-1, 1]], [_pos_arr[-1, 2]], c='r', s=80, label='end')
+                _ax.set_xlabel('x (m)'); _ax.set_ylabel('y (m)'); _ax.set_zlabel('z (m)')
+                _ax.set_title(f'EEF trajectory step={_DIAG_STEP} (H+1={_pos_arr.shape[0]} poses)')
+                _ax.legend()
+                _fig.tight_layout()
+                _fig.savefig(str(_png_p6), dpi=100)
+                _plt.close(_fig)
+                _png_saved = str(_png_p6)
+            except Exception as _pe:
+                _png_saved = f"FAILED:{_pe}"
+            with open(_lp, "a") as _f:
+                _f.write(
+                    f"[P6 fk_chain step={_DIAG_STEP}] "
+                    f"q_seq_shape={_q_seq_arr.shape} "
+                    f"q0_match_inf_norm={_q0_match:.2e} "
+                    f"q_step_diff_max={float(_q_step_diff.max()):.4f} "
+                    f"q_step_diff_mean={float(_q_step_diff.mean()):.4f} "
+                    f"q_clip_count={_q_clip_count} "
+                    f"pos0={[float(x) for x in _pos_arr[0]]} "
+                    f"pos_x_range=({float(_pos_arr[:, 0].min()):.3f},{float(_pos_arr[:, 0].max()):.3f}) "
+                    f"pos_y_range=({float(_pos_arr[:, 1].min()):.3f},{float(_pos_arr[:, 1].max()):.3f}) "
+                    f"pos_z_range=({float(_pos_arr[:, 2].min()):.3f},{float(_pos_arr[:, 2].max()):.3f}) "
+                    f"pos_step_diff_max={float(_pos_step_diff.max()):.4f} "
+                    f"pos_step_diff_mean={float(_pos_step_diff.mean()):.4f} "
+                    f"rot0_ortho_err={_rot0_ortho_err:.2e} "
+                    f"pre_clip_pos_max={_pre_clip_pos_max:.4f} "
+                    f"pre_clip_ori_max={_pre_clip_ori_max:.4f} "
+                    f"npy_q={str(_npy_p6_q)} "
+                    f"npy_pos={str(_npy_p6_pos)} "
+                    f"png={_png_saved}\n"
+                )
+        except Exception as _e:
+            import logging as _logging
+            _logging.getLogger("rdt_action_converter").warning(f"[P6] probe failed: {_e}")
+    # ── END P6 ─────────────────────────────────────────────────────────────────
 
     # Incremental EEF deltas.
     libero_actions = np.zeros((H, 7), dtype=np.float32)

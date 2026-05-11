@@ -734,10 +734,107 @@ class RDTSteer:
         best = actions[0]  # (64, 8) — particle 0
         chunk_np = best[: self._action_chunk_horizon].detach().cpu().float().numpy()  # (H, 8)
 
+        # ── DIAGNOSTIC PROBE P5/P7: action chain (revert via git revert HEAD) ──
+        # Multi-step trigger at steps {0, 10, 20}. Probe is purely additive — main
+        # postprocessing logic below is unchanged.
+        _diag_step = getattr(self, '_diag_action_step_count', 0)
+        self._diag_action_step_count = _diag_step + 1
+        _diag_trigger = _diag_step in (0, 10, 20)
+        if _diag_trigger:
+            try:
+                import core.rdt_action_converter as _rac
+                _rac._DIAG_TRIGGER = True
+                _rac._DIAG_STEP = _diag_step
+            except Exception:
+                pass
+        else:
+            try:
+                import core.rdt_action_converter as _rac
+                _rac._DIAG_TRIGGER = False
+            except Exception:
+                pass
+
+        if _diag_trigger:
+            try:
+                from pathlib import Path as _P
+                _lp = _P(__file__).resolve().parents[1] / "docs/superpowers/03_evidence/rdt_intergration/round-4/20260511_action_probes.log"
+                _lp.parent.mkdir(parents=True, exist_ok=True)
+                _npy_p5 = _lp.parent / f"20260511_P5_chunk_np_step{_diag_step}.npy"
+                np.save(str(_npy_p5), chunk_np)
+                _arm = chunk_np[:, :7]
+                _grip = chunk_np[:, 7]
+                _arm_diff = np.linalg.norm(np.diff(_arm, axis=0), ord=np.inf, axis=1) if _arm.shape[0] > 1 else np.array([0.0])
+                _grip_signs = np.sign(_grip)
+                _grip_changes = int(np.sum(np.diff(_grip_signs) != 0))
+                _oor = int(np.sum(np.abs(chunk_np) > 1.0))
+                with open(_lp, "a") as _f:
+                    _f.write(
+                        f"[P5 chunk_np step={_diag_step}] "
+                        f"shape={chunk_np.shape} "
+                        f"arm_min={float(_arm.min()):.4f} "
+                        f"arm_max={float(_arm.max()):.4f} "
+                        f"arm_mean={float(_arm.mean()):.4f} "
+                        f"arm_std={float(_arm.std()):.4f} "
+                        f"arm_step_diff_max={float(_arm_diff.max()):.4f} "
+                        f"arm_step_diff_mean={float(_arm_diff.mean()):.4f} "
+                        f"grip_min={float(_grip.min()):.4f} "
+                        f"grip_max={float(_grip.max()):.4f} "
+                        f"grip_mean={float(_grip.mean()):.4f} "
+                        f"grip_first={float(_grip[0]):.4f} "
+                        f"grip_last={float(_grip[-1]):.4f} "
+                        f"grip_sign_changes={_grip_changes} "
+                        f"out_of_range_count={_oor} "
+                        f"npy_saved={str(_npy_p5)}\n"
+                    )
+            except Exception as _e:
+                log.warning(f"[P5] probe failed: {_e}")
+        # ── END P5 ──────────────────────────────────────────────────────────────
+
         if self._adapter is not None and hasattr(self._adapter, 'get_joint_positions'):
             try:
                 current_joints = self._adapter.get_joint_positions().astype(np.float64)  # (7,)
                 libero_chunk = rdt_chunk_to_libero_actions(chunk_np, current_joints)  # (H, 7)
+
+                # ── DIAGNOSTIC PROBE P7: final LIBERO action health ──────────────
+                if _diag_trigger:
+                    try:
+                        from pathlib import Path as _P
+                        _lp = _P(__file__).resolve().parents[1] / "docs/superpowers/03_evidence/rdt_intergration/round-4/20260511_action_probes.log"
+                        _lp.parent.mkdir(parents=True, exist_ok=True)
+                        _npy_p7 = _lp.parent / f"20260511_P7_libero_chunk_step{_diag_step}.npy"
+                        np.save(str(_npy_p7), libero_chunk)
+                        _ap = libero_chunk[:, :3]
+                        _ao = libero_chunk[:, 3:6]
+                        _ag = libero_chunk[:, 6]
+                        _ap_sat = float(np.mean(np.abs(_ap) >= 0.99))
+                        _ao_sat = float(np.mean(np.abs(_ao) >= 0.99))
+                        _ap_z_first10_mean = float(_ap[:10, 2].mean()) if _ap.shape[0] >= 1 else 0.0
+                        _ag_signs = np.sign(_ag)
+                        _ag_changes = int(np.sum(np.diff(_ag_signs) != 0))
+                        with open(_lp, "a") as _f:
+                            _f.write(
+                                f"[P7 libero_action step={_diag_step}] "
+                                f"shape={libero_chunk.shape} "
+                                f"pos_min={float(_ap.min()):.4f} "
+                                f"pos_max={float(_ap.max()):.4f} "
+                                f"pos_mean={float(_ap.mean()):.4f} "
+                                f"pos_saturate_rate={_ap_sat:.3f} "
+                                f"ori_min={float(_ao.min()):.4f} "
+                                f"ori_max={float(_ao.max()):.4f} "
+                                f"ori_saturate_rate={_ao_sat:.3f} "
+                                f"pos_z_first10_mean={_ap_z_first10_mean:.4f} "
+                                f"grip_min={float(_ag.min()):.4f} "
+                                f"grip_max={float(_ag.max()):.4f} "
+                                f"grip_first={float(_ag[0]):.4f} "
+                                f"grip_last={float(_ag[-1]):.4f} "
+                                f"grip_sign_changes={_ag_changes} "
+                                f"first_5_steps={libero_chunk[:5].tolist()} "
+                                f"npy_saved={str(_npy_p7)}\n"
+                            )
+                    except Exception as _e:
+                        log.warning(f"[P7] probe failed: {_e}")
+                # ── END P7 ───────────────────────────────────────────────────────
+
                 return torch.from_numpy(libero_chunk).unsqueeze(0).float()  # (1, H, 7)
             except Exception as exc:
                 log.warning(f"FK conversion failed ({exc}), falling back to bypass")
