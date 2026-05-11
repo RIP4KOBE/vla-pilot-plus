@@ -621,6 +621,28 @@ class RDTSteer:
         if generate_new_chunk:
             images, proprio, task_str = self._obs_processor.process(batch)
             text_embed = self._obs_processor.get_lang_embed(task_str, self.device)
+
+            # ── DIAGNOSTIC PROBE P4: text_embed health (revert via git revert HEAD) ──
+            if not getattr(self, '_diag_p4_done', False):
+                try:
+                    from pathlib import Path as _P
+                    _lp = _P(__file__).resolve().parents[1] / "docs/superpowers/03_evidence/rdt_intergration/round-3/20260511_obs_probes.log"
+                    _lp.parent.mkdir(parents=True, exist_ok=True)
+                    _norm = float(text_embed.norm().item())
+                    _max_abs = float(text_embed.abs().max().item())
+                    _mean = float(text_embed.mean().item())
+                    with open(_lp, "a") as _f:
+                        _f.write(
+                            f"[P4 text_embed] shape={tuple(text_embed.shape)} "
+                            f"dtype={text_embed.dtype} device={text_embed.device} "
+                            f"norm={_norm:.4f} max_abs={_max_abs:.4f} mean={_mean:.6f} "
+                            f"is_zero_fallback={_max_abs < 1e-6}\n"
+                        )
+                except Exception as _e:
+                    log.warning(f"[P4] probe failed: {_e}")
+                self._diag_p4_done = True
+            # ── END P4 ─────────────────────────────────────────────────────────────
+
             B = self._sample_batch_size
 
             if use_guidance:

@@ -844,9 +844,56 @@ class LiberoAdapter(BaseEnvAdapter):
         task_desc = self._env[self.current_task_idx].task_description
         obs["task"] = [task_desc] * sample_num
 
+        # ── DIAGNOSTIC PROBE P1: raw env obs (revert via git revert HEAD) ──────
+        if not getattr(self, '_diag_p1_done', False):
+            try:
+                from pathlib import Path as _P
+                _lp = _P(__file__).resolve().parents[2] / "docs/superpowers/03_evidence/rdt_intergration/round-3/20260511_obs_probes.log"
+                _lp.parent.mkdir(parents=True, exist_ok=True)
+                _img = obs.get('observation.images.image')
+                _jp = self.get_joint_positions()
+                _gs = self.get_gripper_state()
+                with open(_lp, "a") as _f:
+                    _f.write(
+                        f"[P1 raw_env_obs] image_shape={tuple(_img.shape) if _img is not None else None} "
+                        f"image_dtype={_img.dtype if _img is not None else None} "
+                        f"image_min={float(_img.min()):.4f} image_max={float(_img.max()):.4f} "
+                        f"image_mean={float(_img.mean()):.4f} "
+                        f"joint_pos={[float(x) for x in _jp]} "
+                        f"gripper_qpos_sum={float(_gs):.6f} "
+                        f"task_idx={self.current_task_idx} "
+                        f"has_robot_state_key={'observation.robot_state' in obs}\n"
+                    )
+            except Exception as _e:
+                log.warning(f"[P1] probe failed: {_e}")
+            self._diag_p1_done = True
+        # ── END P1 ─────────────────────────────────────────────────────────────
+
         # Run preprocessor first (creates state tensor from robot_state)
         obs = self.env_preprocessor(obs)
-        
+
+        # ── DIAGNOSTIC PROBE P2: post-LiberoProcessorStep (revert via git revert HEAD) ──
+        if not getattr(self, '_diag_p2_done', False):
+            try:
+                from pathlib import Path as _P
+                _lp = _P(__file__).resolve().parents[2] / "docs/superpowers/03_evidence/rdt_intergration/round-3/20260511_obs_probes.log"
+                _lp.parent.mkdir(parents=True, exist_ok=True)
+                _img = obs.get('observation.images.image')
+                _state = obs.get('observation.state')
+                with open(_lp, "a") as _f:
+                    _f.write(
+                        f"[P2 post_preproc] image_shape={tuple(_img.shape) if _img is not None else None} "
+                        f"image_min={float(_img.min()):.4f} image_max={float(_img.max()):.4f} "
+                        f"image_mean={float(_img.mean()):.4f} "
+                        f"state_shape={tuple(_state.shape) if _state is not None else None} "
+                        f"state={[float(x) for x in _state.flatten()] if _state is not None else None} "
+                        f"has_robot_state_key_after={'observation.robot_state' in obs}\n"
+                    )
+            except Exception as _e:
+                log.warning(f"[P2] probe failed: {_e}")
+            self._diag_p2_done = True
+        # ── END P2 ─────────────────────────────────────────────────────────────
+
         # Expand batch dimension for multi-sample inference if needed
         # This must happen AFTER env_preprocessor since it creates new tensors
         if sample_num > 1:

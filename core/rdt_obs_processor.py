@@ -178,6 +178,43 @@ class RDTObsProcessor:
         task_list = obs.get("task", [""])
         task_str = task_list[0] if isinstance(task_list, (list, tuple)) else str(task_list)
 
+        # ── DIAGNOSTIC PROBE P3: RDTObsProcessor.process output (revert via git revert HEAD) ──
+        if not getattr(self, '_diag_p3_done', False):
+            try:
+                from pathlib import Path as _P
+                _lp = _P(__file__).resolve().parents[1] / "docs/superpowers/03_evidence/rdt_intergration/round-3/20260511_obs_probes.log"
+                _lp.parent.mkdir(parents=True, exist_ok=True)
+                _save_now = _lp.parent / "20260511_ext_now_step0.png"
+                _save_prev = _lp.parent / "20260511_ext_prev_step0.png"
+                if images[3] is not None:
+                    images[3].save(str(_save_now))
+                if images[0] is not None:
+                    images[0].save(str(_save_prev))
+                _source = "adapter" if (self._adapter is not None and
+                                        hasattr(self._adapter, 'get_joint_positions')) else "fallback"
+                _slot_pattern = [type(im).__name__ if im is not None else 'None' for im in images]
+                with open(_lp, "a") as _f:
+                    _f.write(
+                        f"[P3 process_output] len_images={len(images)} "
+                        f"slot_pattern={_slot_pattern} "
+                        f"ext_now_size={images[3].size if images[3] is not None else None} "
+                        f"ext_now_mode={images[3].mode if images[3] is not None else None} "
+                        f"ext_prev_is_ext_now={images[0] is images[3]} "
+                        f"proprio_shape={tuple(proprio.shape)} "
+                        f"proprio={[float(x) for x in proprio.flatten()]} "
+                        f"proprio_source={_source} "
+                        f"undo_libero_flip={self._undo_libero_flip} "
+                        f"task_str_len={len(task_str)} "
+                        f"task_str={task_str!r} "
+                        f"ext_now_saved={str(_save_now)} "
+                        f"ext_prev_saved={str(_save_prev)}\n"
+                    )
+            except Exception as _e:
+                import logging
+                logging.getLogger("RDTObsProcessor").warning(f"[P3] probe failed: {_e}")
+            self._diag_p3_done = True
+        # ── END P3 ─────────────────────────────────────────────────────────────
+
         return images, proprio, task_str
 
     def _fallback_proprio_from_state(self, obs: dict) -> np.ndarray:
