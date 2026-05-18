@@ -45,9 +45,9 @@ class _RDTDiTAdapter(nn.Module):
     Dimension bridging
     ------------------
     The guided denoising loop maintains ``x_t`` in the raw robot action space
-    (e.g. 14D for the ManiSkill two-arm setup).  The real RDT DiT operates in
-    the 128D unified action space.  This adapter handles the lift (14→128) and
-    projection (128→14) transparently:
+    (e.g. 8D for the ManiSkill single-arm setup).  The real RDT DiT operates in
+    the 128D unified action space.  This adapter handles the lift (8→128) and
+    projection (128→8) transparently:
 
       1. Inflate ``x_t`` into a 128D tensor using the action indices stored in
          ``cond["action_indices"]`` (set by ``_RDTModelAdapter.encode_inputs``).
@@ -339,16 +339,19 @@ class RDTSteer:
     @staticmethod
     def _find_dit(model) -> nn.Module:
         """Return the inner DiT score network (handles both real and stub models)."""
+        log.info(f"[_find_dit] input model type: {type(model).__name__}")
         # Real RoboticDiffusionTransformerModel: .policy = RDTRunner, .policy.model = RDT DiT
         policy = getattr(model, "policy", None)
         if policy is not None and isinstance(policy, nn.Module):
             inner = getattr(policy, "model", None)
             if isinstance(inner, nn.Module):
+                log.info(f"[_find_dit] branch 1 hit (model.policy.model): returning {type(inner).__name__}")
                 return inner
         # Stub model or flat structure: probe common names
         for attr in ("dit", "model", "net", "backbone", "denoiser"):
             candidate = getattr(model, attr, None)
             if isinstance(candidate, nn.Module):
+                log.info(f"[_find_dit] branch 2 hit (model.{attr}): returning {type(candidate).__name__}")
                 return candidate
         raise AttributeError(
             f"Cannot locate DiT score network in RDT model. "
@@ -442,6 +445,9 @@ class RDTSteer:
         if config_path is None:
             # Fall back to the bundled base config inside the submodule
             config_path = os.path.join(rdt_root, "configs", "base.yaml")
+            log.warning(f"[FALLBACK] checkpoint has no config.yaml — using bundled: {config_path}")
+        else:
+            log.info(f"Using config: {config_path}")
         with open(config_path, "r") as f:
             args = yaml.safe_load(f)
 
@@ -486,8 +492,57 @@ class RDTSteer:
         # calls load_pretrained_weights when pretrained is not None.
         # Force local-cache-only for the sub-model loads (T5, SigLIP) — both
         # are already cached and HF_ENDPOINT may point to a mirror with SSL issues.
-        _prev_offline = os.environ.get("HF_HUB_OFFLINE")
-        os.environ["HF_HUB_OFFLINE"] = "1"
+        #
+        # NOTE: setting `HF_HUB_OFFLINE=1` here is NOT sufficient — huggingface_hub
+        # snapshots the env var at module-import time, and `refs/main` may have
+        # advanced upstream (e.g. T5-v1_1-xxl's main commit added safetensors),
+        # so transformers will re-resolve the ref and try to download the new
+        # weights even if a complete older snapshot exists locally. We instead
+        # monkey-patch each `from_pretrained` to force `local_files_only=True`
+        # for the duration of the create_model call.
+        import functools as _functools
+        _patch_targets = []
+        from transformers import T5EncoderModel as _T5E, AutoTokenizer as _AT, AutoConfig as _AC
+        _patch_targets.extend([_T5E, _AT, _AC])
+        try:
+            from transformers import SiglipImageProcessor as _SIP
+            _patch_targets.append(_SIP)
+        except ImportError:
+            pass
+        try:
+            from transformers import SiglipVisionModel as _SVM
+            _patch_targets.append(_SVM)
+        except ImportError:
+            pass
+
+        _originals = {}
+        for _cls in _patch_targets:
+            _orig = _cls.from_pretrained
+            _originals[_cls] = _orig
+
+            @_functools.wraps(_orig)
+            def _wrapped(*args, _orig=_orig, **kwargs):
+                kwargs.setdefault("local_files_only", True)
+                return _orig(*args, **kwargs)
+            _cls.from_pretrained = _wrapped
+        log.info(
+            f"Forcing local_files_only=True for {len(_patch_targets)} from_pretrained call sites "
+            f"({[c.__name__ for c in _patch_targets]})"
+        )
+
+        # Also disable transformers' background "auto safetensors conversion".
+        # When loading a .bin checkpoint, transformers spawns a daemon thread
+        # that scans the hub for community-submitted refs/pr/* containing a
+        # .safetensors port and downloads it for future fast-loading. For
+        # large models (T5-v1_1-xxl: 44 GB) this saturates the network and
+        # competes with online API calls (Gemini / OpenAI VLM) during the
+        # episode. The flag is checked via os.getenv() at call time, so
+        # setting it here is sufficient.
+        # Source: transformers/modeling_utils.py:607-613 `can_auto_convert`.
+        _prev_disable_conv = os.environ.get("DISABLE_SAFETENSORS_CONVERSION")
+        os.environ["DISABLE_SAFETENSORS_CONVERSION"] = "1"
+        log.info("DISABLE_SAFETENSORS_CONVERSION=1 (suppresses background PR-safetensors prefetch)")
+
         try:
             real_model = create_model(
                 args,
@@ -496,13 +551,27 @@ class RDTSteer:
                 pretrained_vision_encoder_name_or_path=vision_encoder,
             )
         finally:
-            if _prev_offline is None:
-                os.environ.pop("HF_HUB_OFFLINE", None)
+            for _cls, _orig in _originals.items():
+                _cls.from_pretrained = _orig
+            if _prev_disable_conv is None:
+                os.environ.pop("DISABLE_SAFETENSORS_CONVERSION", None)
             else:
-                os.environ["HF_HUB_OFFLINE"] = _prev_offline
+                os.environ["DISABLE_SAFETENSORS_CONVERSION"] = _prev_disable_conv
 
         # Wrap in the adapter that provides encode_inputs + nn.Module interface.
         rdt_model = _RDTModelAdapter(real_model)
+
+        # ── Sub-model load report ───────────────────────────────────────────
+        def _summarize(m):
+            try:
+                p = next(m.parameters())
+                return f"device={p.device}, dtype={p.dtype}, params={sum(x.numel() for x in m.parameters())/1e6:.1f}M"
+            except StopIteration:
+                return "no parameters"
+        log.info(f"  text_model (T5):     {_summarize(real_model.text_model)}")
+        log.info(f"  vision_model (SigLIP): {_summarize(real_model.vision_model)}, image_size={real_model.image_processor.size}")
+        log.info(f"  policy (RDTRunner):  {_summarize(real_model.policy)}, weight_file={os.path.basename(weight_file)}")
+        log.info(f"  state_min/max device={real_model.state_min.device} (must match policy device after .to)")
 
         instance = cls(rdt_model, num_inference_steps=num_inference_steps)
 
@@ -541,6 +610,12 @@ class RDTSteer:
         # LiberoProcessorStep applies a 180° flip to all frames; undo it before SigLIP encoding.
         from core.env_adapters.libero_adapter import LiberoAdapter
         self._obs_processor._undo_libero_flip = isinstance(self._adapter, LiberoAdapter)
+        log.info(
+            f"post_init wired: adapter={type(self._adapter).__name__}, "
+            f"undo_libero_flip={self._obs_processor._undo_libero_flip}, "
+            f"sample_batch_size={self._sample_batch_size}, "
+            f"action_chunk_horizon={self._action_chunk_horizon}"
+        )
         # Reuse the T5 already loaded inside the RDT model to avoid a second T5 load.
         # _RDTModelAdapter wraps the real model; real.encode_instruction uses real.text_model.
         try:
@@ -618,6 +693,9 @@ class RDTSteer:
         global_step: int = 0,
         current_stage: int = 1,
     ) -> Tensor:
+        if self._obs_processor is not None:
+            self._obs_processor.update_image_history(batch)
+
         if generate_new_chunk:
             images, proprio, task_str = self._obs_processor.process(batch)
             text_embed = self._obs_processor.get_lang_embed(task_str, self.device)

@@ -41,7 +41,7 @@ RDT_ACTION_MAX = np.array([ 0.7655,  1.4984,  0.4679, -0.3818,  0.5517,  3.2916,
 # OSC maps action ∈ [-1, 1] to:
 #   position delta: ±0.05 m  per unit (kp ≈ 150, action_scale ≈ 0.05)
 #   orientation delta: ±0.5 rad per unit
-_POS_SCALE = 0.05   # m per unit action
+_POS_SCALE = 0.05   # m per unit action  (0.05 saturated at 9.5 cm/step; P6 evidence)
 _ORI_SCALE = 0.5    # rad per unit action
 
 # ── DIAGNOSTIC PROBE P6 (round-4): module-level state set by caller. ───────────
