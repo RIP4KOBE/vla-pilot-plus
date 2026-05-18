@@ -1,0 +1,239 @@
+[94m[1mDEBUG[0m [LiberoAdapter] [94mPerturbation module not found at /home/hynx/VLA-Pilot++/.worktrees/feat/rdt-integration/third_party/libero_pro/perturbation.py (optional, only needed for OOD suites)[0m
+[92m[1mINFO[0m [Main] [92mWorking directory: /home/hynx/VLA-Pilot++/.worktrees/feat/rdt-integration[0m
+[92m[1mINFO[0m [Main] [92mOutput directory: /home/hynx/VLA-Pilot++/.worktrees/feat/rdt-integration/outputs/libero/2026-04-30_06-34-01[0m
+[92m[1mINFO[0m [Main] [92mUsing environment: libero[0m
+[92m[1mINFO[0m [Main] [92mSuite: libero_object[0m
+[92m[1mINFO[0m [Main] [92mConfiguration:
+backend:
+  backend: libero
+  libero:
+    suite_name: libero_object
+    task_id: 0
+    camera_name: agentview_image, robot0_eye_in_hand_image
+    obs_type: pixels_agent_pos
+    render_mode: rgb_array
+    observation_width: 256
+    observation_height: 256
+    visualization_width: 640
+    visualization_height: 640
+    init_states: true
+    num_steps_wait: 10
+    vlm_camera: agentview
+    auto_apply_perturbations: true
+    task_ids_filter: null
+perception:
+  keypoint_detector:
+    num_candidates_per...[0m
+[92m[1mINFO[0m [Main] [92mUsing backend: libero[0m
+[92m[1mINFO[0m [LiberoAdapter] [92mCreating LIBERO-PRO envs | suite=libero_object[0m
+[92m[1mINFO[0m [LiberoAdapter] [92mParsed: base_suite='libero', flags={'use_environment': False, 'use_swap': False, 'use_object': True, 'use_language': False, 'use_task': False}[0m
+[93m[1mWARNING[0m [LiberoAdapter] [93m⚠ Perturbation module not available, using suite 'libero_object' as-is[0m
+[info] using task orders [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+Local assets not found. Downloading from HuggingFace Hub...
+Assets already downloaded at /home/hynx/.cache/libero/assets
+Built env | suite=libero_object | task_id=0
+Built env | suite=libero_object | task_id=1
+Built env | suite=libero_object | task_id=2
+Built env | suite=libero_object | task_id=3
+Built env | suite=libero_object | task_id=4
+Built env | suite=libero_object | task_id=5
+Built env | suite=libero_object | task_id=6
+Built env | suite=libero_object | task_id=7
+Built env | suite=libero_object | task_id=8
+Built env | suite=libero_object | task_id=9
+[92m[1mINFO[0m [Main] [92mTask 'pick up the alphabet soup and place it in the basket' uses custom guide_scale=80.0 (base: 40.0)[0m
+[92m[1mINFO[0m [Main] [92mPolicy config type: rdt[0m
+[92m[1mINFO[0m [Main] [92mLoading rdt from: robotics-diffusion-transformer/maniskill-model/rdt[0m
+[92m[1mINFO[0m [RDTSteer] [92mDownloading checkpoint: robotics-diffusion-transformer/maniskill-model (subdir: rdt)[0m
+[2026-04-30 06:34:18,680][httpx][INFO] - HTTP Request: GET https://hf-mirror.com/api/models/robotics-diffusion-transformer/maniskill-model/revision/main "HTTP/1.1 200 OK"
+[92m[1mINFO[0m [RDTSteer] [92mLoading RDT model from: /mnt/data/hf_cache/hub/models--robotics-diffusion-transformer--maniskill-model/snapshots/9622afab2b7ce2312a6cf1febc526928589b77eb/rdt[0m
+[92m[1mINFO[0m [RDTSteer] [92mUsing weight file: /mnt/data/hf_cache/hub/models--robotics-diffusion-transformer--maniskill-model/snapshots/9622afab2b7ce2312a6cf1febc526928589b77eb/rdt/mp_rank_00_model_states.pt[0m
+[2026-04-30 06:34:19,745][httpx][INFO] - HTTP Request: HEAD https://hf-mirror.com/google/t5-v1_1-xxl/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+[2026-04-30 06:34:19,906][httpx][INFO] - HTTP Request: HEAD https://hf-mirror.com/api/resolve-cache/models/google/t5-v1_1-xxl/3db67ab1af984cf10548a73467f0e5bca2aaaeb2/config.json "HTTP/1.1 200 OK"
+[2026-04-30 06:34:20,212][httpx][INFO] - HTTP Request: HEAD https://hf-mirror.com/google/t5-v1_1-xxl/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+[2026-04-30 06:34:20,518][httpx][INFO] - HTTP Request: HEAD https://hf-mirror.com/api/resolve-cache/models/google/t5-v1_1-xxl/3db67ab1af984cf10548a73467f0e5bca2aaaeb2/tokenizer_config.json "HTTP/1.1 200 OK"
+[2026-04-30 06:34:20,870][httpx][INFO] - HTTP Request: GET https://hf-mirror.com/api/models/google/t5-v1_1-xxl/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+[2026-04-30 06:34:21,220][httpx][INFO] - HTTP Request: GET https://hf-mirror.com/api/models/google/t5-v1_1-xxl/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+[2026-04-30 06:34:21,586][httpx][INFO] - HTTP Request: HEAD https://hf-mirror.com/google/t5-v1_1-xxl/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+[2026-04-30 06:34:21,696][httpx][INFO] - HTTP Request: HEAD https://hf-mirror.com/api/resolve-cache/models/google/t5-v1_1-xxl/3db67ab1af984cf10548a73467f0e5bca2aaaeb2/config.json "HTTP/1.1 200 OK"
+[2026-04-30 06:34:22,018][httpx][INFO] - HTTP Request: HEAD https://hf-mirror.com/google/t5-v1_1-xxl/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+[2026-04-30 06:34:22,336][httpx][INFO] - HTTP Request: HEAD https://hf-mirror.com/google/t5-v1_1-xxl/resolve/main/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+[2026-04-30 06:34:22,642][httpx][INFO] - HTTP Request: HEAD https://hf-mirror.com/google/t5-v1_1-xxl/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+[2026-04-30 06:34:22,982][httpx][INFO] - HTTP Request: HEAD https://hf-mirror.com/google/t5-v1_1-xxl/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+[2026-04-30 06:34:23,315][httpx][INFO] - HTTP Request: GET https://hf-mirror.com/api/models/google/t5-v1_1-xxl "HTTP/1.1 200 OK"
+[2026-04-30 06:34:23,625][httpx][INFO] - HTTP Request: GET https://hf-mirror.com/api/models/google/t5-v1_1-xxl/commits/main "HTTP/1.1 200 OK"
+[2026-04-30 06:34:23,931][httpx][INFO] - HTTP Request: GET https://hf-mirror.com/api/models/google/t5-v1_1-xxl/discussions?p=0 "HTTP/1.1 200 OK"
+[2026-04-30 06:34:24,272][httpx][INFO] - HTTP Request: GET https://hf-mirror.com/api/models/google/t5-v1_1-xxl/commits/refs%2Fpr%2F2 "HTTP/1.1 200 OK"
+[2026-04-30 06:34:24,538][httpx][INFO] - HTTP Request: HEAD https://hf-mirror.com/google/t5-v1_1-xxl/resolve/refs%2Fpr%2F2/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+[2026-04-30 06:34:24,830][httpx][INFO] - HTTP Request: HEAD https://hf-mirror.com/google/t5-v1_1-xxl/resolve/refs%2Fpr%2F2/model.safetensors "HTTP/1.1 302 Found"
+[2026-04-30 06:34:27,764][httpx][INFO] - HTTP Request: HEAD https://hf-mirror.com/google/siglip-so400m-patch14-384/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+[2026-04-30 06:34:28,065][httpx][INFO] - HTTP Request: HEAD https://hf-mirror.com/google/siglip-so400m-patch14-384/resolve/main/preprocessor_config.json "HTTP/1.1 307 Temporary Redirect"
+[2026-04-30 06:34:28,183][httpx][INFO] - HTTP Request: HEAD https://hf-mirror.com/api/resolve-cache/models/google/siglip-so400m-patch14-384/9fdffc58afc957d1a03a25b10dba0329ab15c2a3/preprocessor_config.json "HTTP/1.1 200 OK"
+[2026-04-30 06:34:28,478][httpx][INFO] - HTTP Request: HEAD https://hf-mirror.com/google/siglip-so400m-patch14-384/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+[2026-04-30 06:34:28,647][httpx][INFO] - HTTP Request: HEAD https://hf-mirror.com/api/resolve-cache/models/google/siglip-so400m-patch14-384/9fdffc58afc957d1a03a25b10dba0329ab15c2a3/config.json "HTTP/1.1 200 OK"
+[2026-04-30 06:34:28,938][httpx][INFO] - HTTP Request: HEAD https://hf-mirror.com/google/siglip-so400m-patch14-384/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+Diffusion params: 1.228320e+09
+Loading weights from /mnt/data/hf_cache/hub/models--robotics-diffusion-transformer--maniskill-model/snapshots/9622afab2b7ce2312a6cf1febc526928589b77eb/rdt/mp_rank_00_model_states.pt
+[92m[1mINFO[0m [RDTSteer] [92mRDT-1B loaded successfully[0m
+[92m[1mINFO[0m [RDTSteer] [92mLanguage encoder: reusing RDT model's T5[0m
+[92m[1mINFO[0m [Main] [92mLoaded rdt policy from robotics-diffusion-transformer/maniskill-model/rdt[0m
+[92m[1mINFO[0m [KeypointDetector] [92mLoading DINOv2 model: dinov2_vitb14[0m
+[2026-04-30 06:34:42,195][dinov2][INFO] - using MLP layer as FFN
+[92m[1mINFO[0m [KeypointDetector] [92mDINOv2 model loaded: dinov2_vitb14[0m
+[92m[1mINFO[0m [KeypointDetector] [92mKeypointDetector initialized on device: cuda[0m
+[92m[1mINFO[0m [Main] [92mInitializing Gemini grounder for visual grounding[0m
+[92m[1mINFO[0m [GeminiGrounder] [92mGeminiGrounder initialized with model: gemini-2.5-flash[0m
+[92m[1mINFO[0m [VLMAgent] [92mUsing standard OpenAI endpoint[0m
+[92m[1mINFO[0m [VLMAgent] [92mInitialized combined prompt template using guidance_template_libero.txt as task-specific notes[0m
+[92m[1mINFO[0m [GeminiGrounder] [92mGeminiStageRecognizer initialized with model: gemini-2.5-flash[0m
+[92m[1mINFO[0m [Main] [92mGemini stage recognizer initialized[0m
+[92m[1mINFO[0m [Main] [92mTask 0: guide_scale=80.0[0m
+[92m[1mINFO[0m [Main] [92mTask description: pick up the alphabet soup and place it in the basket[0m
+[92m[1mINFO[0m [Main] [92mInitial guidance: stage=1, use_guidance=False, num_fns=0[0m
+[92m[1mINFO[0m [VisUtils] [92mSaved trajectory video to outputs/libero/2026-04-30_06-34-01/episode_1/episode_1_fail_agentview.mp4 (280 frames)[0m
+[92m[1mINFO[0m [Main] [92mEpisode 1 finished, success: False, steps: 280[0m
+[92m[1mINFO[0m [LiberoAdapter] [92mSwitching to task 1 (episode 1)[0m
+[92m[1mINFO[0m [Main] [92mTask 1: guide_scale=80.0[0m
+[92m[1mINFO[0m [Main] [92mTask description: pick up the cream cheese and place it in the basket[0m
+[92m[1mINFO[0m [Main] [92mInitial guidance: stage=1, use_guidance=False, num_fns=0[0m
+[92m[1mINFO[0m [VisUtils] [92mSaved trajectory video to outputs/libero/2026-04-30_06-34-01/episode_2/episode_2_fail_agentview.mp4 (280 frames)[0m
+[92m[1mINFO[0m [Main] [92mEpisode 2 finished, success: False, steps: 280[0m
+[92m[1mINFO[0m [LiberoAdapter] [92mSwitching to task 2 (episode 2)[0m
+[92m[1mINFO[0m [Main] [92mTask 2: guide_scale=80.0[0m
+[92m[1mINFO[0m [Main] [92mTask description: pick up the salad dressing and place it in the basket[0m
+[92m[1mINFO[0m [Main] [92mInitial guidance: stage=1, use_guidance=False, num_fns=0[0m
+[92m[1mINFO[0m [VisUtils] [92mSaved trajectory video to outputs/libero/2026-04-30_06-34-01/episode_3/episode_3_fail_agentview.mp4 (280 frames)[0m
+[92m[1mINFO[0m [Main] [92mEpisode 3 finished, success: False, steps: 280[0m
+[92m[1mINFO[0m [LiberoAdapter] [92mSwitching to task 3 (episode 3)[0m
+[92m[1mINFO[0m [Main] [92mTask 3: guide_scale=80.0[0m
+[92m[1mINFO[0m [Main] [92mTask description: pick up the bbq sauce and place it in the basket[0m
+[92m[1mINFO[0m [Main] [92mInitial guidance: stage=1, use_guidance=False, num_fns=0[0m
+[92m[1mINFO[0m [VisUtils] [92mSaved trajectory video to outputs/libero/2026-04-30_06-34-01/episode_4/episode_4_fail_agentview.mp4 (280 frames)[0m
+[92m[1mINFO[0m [Main] [92mEpisode 4 finished, success: False, steps: 280[0m
+[92m[1mINFO[0m [LiberoAdapter] [92mSwitching to task 4 (episode 4)[0m
+[92m[1mINFO[0m [Main] [92mTask 4: guide_scale=80.0[0m
+[92m[1mINFO[0m [Main] [92mTask description: pick up the ketchup and place it in the basket[0m
+[92m[1mINFO[0m [Main] [92mInitial guidance: stage=1, use_guidance=False, num_fns=0[0m
+[92m[1mINFO[0m [VisUtils] [92mSaved trajectory video to outputs/libero/2026-04-30_06-34-01/episode_5/episode_5_fail_agentview.mp4 (280 frames)[0m
+[92m[1mINFO[0m [Main] [92mEpisode 5 finished, success: False, steps: 280[0m
+[92m[1mINFO[0m [LiberoAdapter] [92mSwitching to task 5 (episode 5)[0m
+[92m[1mINFO[0m [Main] [92mTask 5: guide_scale=80.0[0m
+[92m[1mINFO[0m [Main] [92mTask description: pick up the tomato sauce and place it in the basket[0m
+[92m[1mINFO[0m [Main] [92mInitial guidance: stage=1, use_guidance=False, num_fns=0[0m
+[92m[1mINFO[0m [VisUtils] [92mSaved trajectory video to outputs/libero/2026-04-30_06-34-01/episode_6/episode_6_fail_agentview.mp4 (280 frames)[0m
+[92m[1mINFO[0m [Main] [92mEpisode 6 finished, success: False, steps: 280[0m
+[92m[1mINFO[0m [LiberoAdapter] [92mSwitching to task 6 (episode 6)[0m
+[92m[1mINFO[0m [Main] [92mTask 6: guide_scale=80.0[0m
+[92m[1mINFO[0m [Main] [92mTask description: pick up the butter and place it in the basket[0m
+[92m[1mINFO[0m [Main] [92mInitial guidance: stage=1, use_guidance=False, num_fns=0[0m
+[92m[1mINFO[0m [VisUtils] [92mSaved trajectory video to outputs/libero/2026-04-30_06-34-01/episode_7/episode_7_fail_agentview.mp4 (280 frames)[0m
+[92m[1mINFO[0m [Main] [92mEpisode 7 finished, success: False, steps: 280[0m
+[92m[1mINFO[0m [LiberoAdapter] [92mSwitching to task 7 (episode 7)[0m
+[92m[1mINFO[0m [Main] [92mTask 7: guide_scale=80.0[0m
+[92m[1mINFO[0m [Main] [92mTask description: pick up the milk and place it in the basket[0m
+[92m[1mINFO[0m [Main] [92mInitial guidance: stage=1, use_guidance=False, num_fns=0[0m
+[92m[1mINFO[0m [VisUtils] [92mSaved trajectory video to outputs/libero/2026-04-30_06-34-01/episode_8/episode_8_fail_agentview.mp4 (280 frames)[0m
+[92m[1mINFO[0m [Main] [92mEpisode 8 finished, success: False, steps: 280[0m
+[92m[1mINFO[0m [LiberoAdapter] [92mSwitching to task 8 (episode 8)[0m
+[92m[1mINFO[0m [Main] [92mTask 8: guide_scale=80.0[0m
+[92m[1mINFO[0m [Main] [92mTask description: pick up the chocolate pudding and place it in the basket[0m
+[92m[1mINFO[0m [Main] [92mInitial guidance: stage=1, use_guidance=False, num_fns=0[0m
+[92m[1mINFO[0m [VisUtils] [92mSaved trajectory video to outputs/libero/2026-04-30_06-34-01/episode_9/episode_9_fail_agentview.mp4 (280 frames)[0m
+[92m[1mINFO[0m [Main] [92mEpisode 9 finished, success: False, steps: 280[0m
+[92m[1mINFO[0m [LiberoAdapter] [92mSwitching to task 9 (episode 9)[0m
+[92m[1mINFO[0m [Main] [92mTask 9: guide_scale=80.0[0m
+[92m[1mINFO[0m [Main] [92mTask description: pick up the orange juice and place it in the basket[0m
+[92m[1mINFO[0m [Main] [92mInitial guidance: stage=1, use_guidance=False, num_fns=0[0m
+[92m[1mINFO[0m [VisUtils] [92mSaved trajectory video to outputs/libero/2026-04-30_06-34-01/episode_10/episode_10_fail_agentview.mp4 (280 frames)[0m
+[92m[1mINFO[0m [Main] [92mEpisode 10 finished, success: False, steps: 280[0m
+[92m[1mINFO[0m [Main] [92mTested 10 episodes, success rate: 0.00%[0m
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+Users of this version of Gym should be able to simply replace 'import gym' with 'import gymnasium as gym' in the vast majority of cases.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+pybullet build time: Apr 19 2026 05:27:40
+[robosuite WARNING] No private macro file found! (__init__.py:7)
+WARNING:robosuite_logs:No private macro file found!
+[robosuite WARNING] It is recommended to use a private macro file (__init__.py:8)
+WARNING:robosuite_logs:It is recommended to use a private macro file
+[robosuite WARNING] To setup, run: python /home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/scripts/setup_macros.py (__init__.py:9)
+WARNING:robosuite_logs:To setup, run: python /home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/scripts/setup_macros.py
+
+Fetching 1 files:   0%|          | 0/1 [00:00<?, ?it/s]
+Fetching 1 files: 100%|██████████| 1/1 [00:00<00:00, 8355.19it/s]
+
+Loading weights:   0%|          | 0/220 [00:00<?, ?it/s]
+Loading weights:   3%|▎         | 7/220 [00:00<00:03, 56.76it/s]
+Loading weights:   7%|▋         | 16/220 [00:00<00:03, 64.59it/s]
+Loading weights:  11%|█▏        | 25/220 [00:00<00:03, 63.74it/s]
+Loading weights:  15%|█▌        | 34/220 [00:00<00:02, 68.64it/s]
+Loading weights:  20%|█▉        | 43/220 [00:00<00:02, 63.49it/s]
+Loading weights:  24%|██▎       | 52/220 [00:00<00:02, 68.77it/s]
+Loading weights:  28%|██▊       | 61/220 [00:00<00:02, 70.88it/s]
+Loading weights:  32%|███▏      | 70/220 [00:01<00:02, 65.95it/s]
+Loading weights:  36%|███▌      | 79/220 [00:01<00:01, 71.11it/s]
+Loading weights:  40%|████      | 88/220 [00:01<00:02, 65.66it/s]
+Loading weights:  44%|████▍     | 97/220 [00:01<00:01, 68.56it/s]
+Loading weights:  48%|████▊     | 106/220 [00:01<00:01, 60.86it/s]
+Loading weights:  52%|█████▏    | 115/220 [00:01<00:01, 65.69it/s]
+Loading weights:  56%|█████▋    | 124/220 [00:01<00:01, 60.69it/s]
+Loading weights:  60%|██████    | 133/220 [00:02<00:01, 66.30it/s]
+Loading weights:  65%|██████▍   | 142/220 [00:02<00:01, 64.69it/s]
+Loading weights:  69%|██████▊   | 151/220 [00:02<00:01, 64.67it/s]
+Loading weights:  73%|███████▎  | 160/220 [00:02<00:00, 66.26it/s]
+Loading weights:  77%|███████▋  | 169/220 [00:02<00:00, 62.23it/s]
+Loading weights:  81%|████████  | 178/220 [00:02<00:00, 65.97it/s]
+Loading weights:  84%|████████▍ | 185/220 [00:02<00:00, 65.73it/s]
+Loading weights:  87%|████████▋ | 192/220 [00:02<00:00, 62.97it/s]
+Loading weights:  90%|█████████ | 199/220 [00:03<00:00, 63.04it/s]
+Loading weights:  94%|█████████▎| 206/220 [00:03<00:00, 60.91it/s]
+Loading weights:  97%|█████████▋| 214/220 [00:03<00:00, 60.85it/s]
+Loading weights: 100%|██████████| 220/220 [00:03<00:00, 64.86it/s]
+The tied weights mapping and config for this model specifies to tie shared.weight to encoder.embed_tokens.weight, but both are present in the checkpoints, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning
+[1mT5EncoderModel LOAD REPORT[0m from: google/t5-v1_1-xxl
+Key            | Status     |  | 
+---------------+------------+--+-
+lm_head.weight | UNEXPECTED |  | 
+
+[3mNotes:
+- UNEXPECTED[3m	:can be ignored when loading from different task/architecture; not ok if you expect identical arch.[0m
+
+Loading weights:   0%|          | 0/448 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 448/448 [00:00<00:00, 7155.96it/s]
+[1mSiglipVisionModel LOAD REPORT[0m from: google/siglip-so400m-patch14-384
+Key                                                          | Status     |  | 
+-------------------------------------------------------------+------------+--+-
+text_model.encoder.layers.{0...26}.layer_norm2.weight        | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.self_attn.k_proj.bias     | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.mlp.fc2.bias              | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.self_attn.out_proj.weight | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.self_attn.v_proj.bias     | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.mlp.fc1.bias              | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.self_attn.out_proj.bias   | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.layer_norm2.bias          | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.layer_norm1.weight        | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.layer_norm1.bias          | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.self_attn.q_proj.bias     | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.self_attn.k_proj.weight   | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.self_attn.q_proj.weight   | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.mlp.fc1.weight            | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.self_attn.v_proj.weight   | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.mlp.fc2.weight            | UNEXPECTED |  | 
+text_model.head.weight                                       | UNEXPECTED |  | 
+text_model.embeddings.token_embedding.weight                 | UNEXPECTED |  | 
+logit_bias                                                   | UNEXPECTED |  | 
+text_model.final_layer_norm.bias                             | UNEXPECTED |  | 
+text_model.final_layer_norm.weight                           | UNEXPECTED |  | 
+logit_scale                                                  | UNEXPECTED |  | 
+text_model.head.bias                                         | UNEXPECTED |  | 
+text_model.embeddings.position_embedding.weight              | UNEXPECTED |  | 
+
+[3mNotes:
+- UNEXPECTED[3m	:can be ignored when loading from different task/architecture; not ok if you expect identical arch.[0m
+/home/hynx/VLA-Pilot++/.worktrees/feat/rdt-integration/third_party/rdt/models/rdt/blocks.py:221: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments. To learn more, see the migration guide https://numpy.org/devdocs/numpy_2_0_migration_guide.html#adapting-to-changes-in-the-copy-keyword
+  pos = np.array(pos, dtype=np.float64)
+Using cache found in /home/hynx/.cache/torch/hub/facebookresearch_dinov2_main
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/diffusers/schedulers/scheduling_dpmsolver_multistep.py:402: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments. To learn more, see the migration guide https://numpy.org/devdocs/numpy_2_0_migration_guide.html#adapting-to-changes-in-the-copy-keyword
+  sigmas = np.array(((1 - self.alphas_cumprod) / self.alphas_cumprod) ** 0.5)
+
+

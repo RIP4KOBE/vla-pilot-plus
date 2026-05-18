@@ -1,0 +1,215 @@
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2264: UnsupportedFieldAttributeWarning: The 'repr' attribute with value False was provided to the `Field()` function, which has no effect in the context it was used. 'repr' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2264: UnsupportedFieldAttributeWarning: The 'frozen' attribute with value True was provided to the `Field()` function, which has no effect in the context it was used. 'frozen' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+
+Loading weights:   0%|          | 0/220 [00:00<?, ?it/s]
+Loading weights:   3%|▎         | 7/220 [00:00<00:04, 53.24it/s]
+Loading weights:   7%|▋         | 16/220 [00:00<00:02, 68.05it/s]
+Loading weights:  11%|█▏        | 25/220 [00:00<00:03, 63.86it/s]
+Loading weights:  15%|█▌        | 34/220 [00:00<00:02, 71.71it/s]
+Loading weights:  20%|█▉        | 43/220 [00:00<00:02, 66.72it/s]
+Loading weights:  24%|██▎       | 52/220 [00:00<00:02, 71.26it/s]
+Loading weights:  28%|██▊       | 61/220 [00:00<00:02, 68.53it/s]
+Loading weights:  32%|███▏      | 70/220 [00:01<00:02, 69.69it/s]
+Loading weights:  36%|███▌      | 79/220 [00:01<00:02, 66.00it/s]
+Loading weights:  40%|████      | 88/220 [00:01<00:01, 71.45it/s]
+Loading weights:  44%|████▍     | 97/220 [00:01<00:01, 67.05it/s]
+Loading weights:  48%|████▊     | 106/220 [00:01<00:01, 69.88it/s]
+Loading weights:  52%|█████▏    | 115/220 [00:01<00:01, 70.37it/s]
+Loading weights:  56%|█████▋    | 124/220 [00:01<00:01, 66.05it/s]
+Loading weights:  60%|██████    | 133/220 [00:01<00:01, 70.13it/s]
+Loading weights:  64%|██████▍   | 141/220 [00:02<00:01, 71.69it/s]
+Loading weights:  68%|██████▊   | 149/220 [00:02<00:01, 69.33it/s]
+Loading weights:  71%|███████▏  | 157/220 [00:02<00:00, 69.65it/s]
+Loading weights:  75%|███████▌  | 165/220 [00:02<00:00, 61.89it/s]
+Loading weights:  78%|███████▊  | 172/220 [00:02<00:00, 60.84it/s]
+Loading weights:  81%|████████▏ | 179/220 [00:02<00:00, 59.62it/s]
+Loading weights:  85%|████████▌ | 187/220 [00:02<00:00, 64.13it/s]
+Loading weights:  89%|████████▉ | 196/220 [00:02<00:00, 61.14it/s]
+Loading weights:  93%|█████████▎| 205/220 [00:03<00:00, 65.64it/s]
+Loading weights:  97%|█████████▋| 214/220 [00:03<00:00, 57.94it/s]
+Loading weights: 100%|██████████| 220/220 [00:03<00:00, 66.18it/s]
+The tied weights mapping and config for this model specifies to tie shared.weight to encoder.embed_tokens.weight, but both are present in the checkpoints, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning
+[1mT5EncoderModel LOAD REPORT[0m from: google/t5-v1_1-xxl
+Key            | Status     |  | 
+---------------+------------+--+-
+lm_head.weight | UNEXPECTED |  | 
+
+[3mNotes:
+- UNEXPECTED[3m	:can be ignored when loading from different task/architecture; not ok if you expect identical arch.[0m
+
+Loading weights:   0%|          | 0/448 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 448/448 [00:00<00:00, 6970.00it/s]
+[1mSiglipVisionModel LOAD REPORT[0m from: google/siglip-so400m-patch14-384
+Key                                                          | Status     |  | 
+-------------------------------------------------------------+------------+--+-
+text_model.encoder.layers.{0...26}.self_attn.out_proj.bias   | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.self_attn.out_proj.weight | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.self_attn.q_proj.weight   | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.layer_norm1.weight        | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.mlp.fc2.bias              | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.self_attn.k_proj.bias     | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.self_attn.v_proj.bias     | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.self_attn.q_proj.bias     | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.self_attn.k_proj.weight   | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.mlp.fc1.weight            | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.layer_norm2.weight        | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.layer_norm2.bias          | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.layer_norm1.bias          | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.self_attn.v_proj.weight   | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.mlp.fc1.bias              | UNEXPECTED |  | 
+text_model.encoder.layers.{0...26}.mlp.fc2.weight            | UNEXPECTED |  | 
+logit_bias                                                   | UNEXPECTED |  | 
+text_model.embeddings.position_embedding.weight              | UNEXPECTED |  | 
+logit_scale                                                  | UNEXPECTED |  | 
+text_model.final_layer_norm.bias                             | UNEXPECTED |  | 
+text_model.head.bias                                         | UNEXPECTED |  | 
+text_model.head.weight                                       | UNEXPECTED |  | 
+text_model.embeddings.token_embedding.weight                 | UNEXPECTED |  | 
+text_model.final_layer_norm.weight                           | UNEXPECTED |  | 
+
+[3mNotes:
+- UNEXPECTED[3m	:can be ignored when loading from different task/architecture; not ok if you expect identical arch.[0m
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+Users of this version of Gym should be able to simply replace 'import gym' with 'import gymnasium as gym' in the vast majority of cases.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+pybullet build time: Apr 19 2026 05:27:40
+[robosuite WARNING] No private macro file found! (__init__.py:7)
+WARNING:robosuite_logs:No private macro file found!
+[robosuite WARNING] It is recommended to use a private macro file (__init__.py:8)
+WARNING:robosuite_logs:It is recommended to use a private macro file
+[robosuite WARNING] To setup, run: python /home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/scripts/setup_macros.py (__init__.py:9)
+WARNING:robosuite_logs:To setup, run: python /home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/scripts/setup_macros.py
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/diffusers/schedulers/scheduling_dpmsolver_multistep.py:402: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments. To learn more, see the migration guide https://numpy.org/devdocs/numpy_2_0_migration_guide.html#adapting-to-changes-in-the-copy-keyword
+  sigmas = np.array(((1 - self.alphas_cumprod) / self.alphas_cumprod) ** 0.5)
+
+======================================================================
+RDT Loop Comparison — Phase 1 Evidence Collection
+======================================================================
+Checkpoint:  /mnt/data/hf_cache/hub/models--robotics-diffusion-transformer--maniskill-model/snapshots/9622afab2b7ce2312a6cf1febc526928589b77eb/rdt/mp_rank_00_model_states.pt
+Config:      /home/hynx/VLA-Pilot++/.worktrees/feat/rdt-integration/third_party/rdt/configs/base.yaml
+
+Loading RDT model …
+Diffusion params: 1.228320e+09
+Loading weights from /mnt/data/hf_cache/hub/models--robotics-diffusion-transformer--maniskill-model/snapshots/9622afab2b7ce2312a6cf1febc526928589b77eb/rdt/mp_rank_00_model_states.pt
+Model loaded in 21.7s  device=cuda
+
+──────────────────────────────────────────────────
+TASK 2 — Language Embedding Evidence
+──────────────────────────────────────────────────
+Task string:  'open the top drawer of the cabinet'
+MD5 key:      43b885011c226fd0134d4078331102fa
+Cache hit (checkpoint lang_embeds): False
+Cache hit (data/rdt_lang_embeds):   False
+Computing embedding via real_model.encode_instruction …
+text_embed shape: (1, 8, 4096)
+text_embed norm:  16.9762
+text_embed max:   2.4375
+text_embed IS ZERO: False
+
+Second task:  'push the plate to the left'
+  norm:       15.3653
+  first-token diff from task1: 7.4527  (>1 = distinct embeddings)
+
+──────────────────────────────────────────────────
+TASK 5 — Proprio Input Evidence (synthetic Franka home config)
+──────────────────────────────────────────────────
+proprio shape:  (1, 8)
+proprio values: [0.0, -0.7850000262260437, 0.0, -2.3559999465942383, 0.0, 1.5709999799728394, 0.7850000262260437, 0.0]
+Expected range for joint angles: [-3.14, 3.14] (most joints)
+Values in joint-angle range: True
+
+──────────────────────────────────────────────────
+TASK 3 — Official step() path
+──────────────────────────────────────────────────
+Running real_model.step() …
+  Elapsed: 0.26s
+  Output shape: (1, 64, 8)
+  Path:       official_step()
+  Shape:      [64, 8]
+  mean|x|:    0.98263
+  std:        1.32407
+  range:      [-2.3427, 2.5889]
+  NaN/Inf:    False/False
+  lag-1 autocorr: 0.9472  (>0.5 = smooth, <0.1 = noisy)
+  per_dim_mean: ['-0.384', '0.225', '-0.097', '-2.331', '0.057', '2.548', '-1.232', '-0.988']
+  per_dim_std:  ['0.011', '0.025', '0.003', '0.006', '0.007', '0.022', '0.016', '0.005']
+
+──────────────────────────────────────────────────
+TASK 3 — Custom _predict_unguided() path
+──────────────────────────────────────────────────
+[94m[1mDEBUG[0m [LiberoAdapter] [94mPerturbation module not found at /home/hynx/VLA-Pilot++/.worktrees/feat/rdt-integration/third_party/libero_pro/perturbation.py (optional, only needed for OOD suites)[0m
+  cond keys: ['lang_cond', 'lang_attn_mask', 'img_cond', 'state_traj', 'action_mask', 'ctrl_freqs', 'action_indices', 'unified_action_dim']
+  action_indices: [0, 1, 2, 3, 4, 5, 6, 10]
+  unified_action_dim: 128
+  raw_action_dim (len(action_indices)): 8
+
+  [H1 TEST] x_t initialization:
+    custom loop: x_t = randn(B=1, 64, raw_action_dim=8)
+    official:    noisy_action = randn(B=1, 64, unified_action_dim=128)
+    are these equivalent? False
+
+  [H1 TEST] x_unified inflation in _RDTDiTAdapter.forward:
+    x_unified = zeros(B, H, 128)
+    x_unified[:, :, action_indices] = x_t[:, :, :8]
+    → 120 of 128 dims are ZERO throughout denoising
+
+  Running _predict_unguided() …
+  Elapsed: 1.15s
+  Output shape: (1, 64, 8)
+  Path:       custom _predict_unguided()
+  Shape:      [64, 8]
+  mean|x|:    0.51056
+  std:        0.40007
+  range:      [-0.9805, 0.1309]
+  NaN/Inf:    False/False
+  lag-1 autocorr: 0.9786  (>0.5 = smooth, <0.1 = noisy)
+  per_dim_mean: ['-0.720', '-0.702', '-0.019', '-0.780', '0.104', '-0.022', '-0.756', '-0.970']
+  per_dim_std:  ['0.024', '0.046', '0.008', '0.016', '0.022', '0.034', '0.010', '0.007']
+
+──────────────────────────────────────────────────
+COMPARISON: official step() vs custom _predict_unguided()
+──────────────────────────────────────────────────
+  official (re-normalized arm, first 3 steps):
+    step 0: ['-0.500', '-0.660', '-0.164', '-0.723', '0.102', '-0.063', '-0.574']
+    step 1: ['-0.492', '-0.656', '-0.160', '-0.719', '0.102', '-0.063', '-0.570']
+    step 2: ['-0.492', '-0.664', '-0.160', '-0.723', '0.102', '-0.070', '-0.570']
+  custom (normalized arm, first 3 steps):
+    step 0: ['-0.715', '-0.746', '-0.008', '-0.789', '0.127', '-0.076', '-0.742']
+    step 1: ['-0.719', '-0.750', '-0.010', '-0.789', '0.131', '-0.072', '-0.746']
+    step 2: ['-0.719', '-0.754', '-0.012', '-0.793', '0.131', '-0.073', '-0.742']
+
+  Mean abs diff (official_norm vs custom): 0.10362
+  Official arm autocorr:  0.9522
+  Custom arm autocorr:    0.9834
+
+  Interpretation:
+  H1 LIKELY REJECTED: both paths produce temporally structured output.
+  Denoising loop dimensionality may not be the primary cause.
+
+──────────────────────────────────────────────────
+TASK 6 — Raw action output inspection
+──────────────────────────────────────────────────
+  libero_actions shape: (8, 7)
+  pos_delta (first 3 steps):
+    step 0: pos=['-1.0000', '1.0000', '-1.0000']  ori=['1.0000', '1.0000', '0.9924']  grip=0.9727
+    step 1: pos=['0.0664', '0.0090', '0.0122']  ori=['0.0039', '0.0197', '-0.0072']  grip=0.9766
+    step 2: pos=['0.0937', '0.0200', '-0.0266']  ori=['-0.0067', '-0.0193', '-0.0151']  grip=0.9805
+  pos abs mean: 0.15277
+  pos abs max:  1.00000
+  pos dims saturated (>0.99): 3/24
+  H4 not detected: position deltas within reasonable range
+
+======================================================================
+EVIDENCE SUMMARY
+======================================================================
+H1 (denoising loop): official autocorr=0.9522, custom autocorr=0.9834
+H2 (lang embed zero): norm=16.976, is_zero=False
+H3 (image flip): not testable without live LIBERO env — see image_check.py
+H4 (action scale): pos_max=1.00000, sat_frac=3/24
+
+Tensor trajectories saved → /home/hynx/VLA-Pilot++/.worktrees/feat/rdt-integration/docs/superpowers/evidence/round-1/stats/loop_comparison_trajectories.pt
+Text output saved → /home/hynx/VLA-Pilot++/.worktrees/feat/rdt-integration/docs/superpowers/evidence/round-1/stats/loop_comparison_output.txt
+
