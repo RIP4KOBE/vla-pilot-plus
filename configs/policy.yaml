@@ -29,10 +29,14 @@ pi05:
 # RDT-1B Policy (ManiSkill single-arm checkpoint)
 # ============================================================
 rdt:
-  pretrained_path: robotics-diffusion-transformer/maniskill-model
+  # pretrained_path: robotics-diffusion-transformer/maniskill-model
+  pretrained_path: /mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object/ema
   num_inference_steps: 55
   action_chunk_horizon: 8
   lang_embed_cache_dir: data/rdt_lang_embeds/
+  # Use LIBERO EEF indices [30-35,10] instead of ManiSkill joint indices [0-6,10].
+  # Required for any checkpoint fine-tuned on LIBERO (EEF-space actions).
+  libero_mode: true
 
 
 # Note: pretrained_path and other params are read from policy.{type} section in main.py

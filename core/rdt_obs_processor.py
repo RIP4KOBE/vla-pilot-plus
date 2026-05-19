@@ -45,6 +45,9 @@ class RDTObsProcessor:
         # before they reach this processor. Set True for LIBERO to undo the 180° rotation so
         # images arrive right-side-up at the ManiSkill SigLIP encoder.
         self._undo_libero_flip: bool = False
+        # When True: build 7D EEF proprio [pos(3), rot_col0(3), gripper(1)] instead of
+        # 8D ManiSkill joint proprio. Required for LIBERO-finetuned checkpoints.
+        self._libero_eef_mode: bool = False
         self._gripper_branch_probe_seen: set[str] = set()
 
     def reset(self) -> None:
@@ -175,6 +178,27 @@ class RDTObsProcessor:
         ext_prev = self._prev_static
         images = self._build_image_list(ext_prev, ext_now)
 
+        # ── Proprio ──────────────────────────────────────────────────────────
+        # LIBERO EEF mode: build 7D EEF proprio for LIBERO-finetuned checkpoints.
+        # Uses adapter.get_ee_pose() → [norm_pos(3), rot_col0(3), gripper(1)].
+        # The 7 dims are placed at LIBERO_EEF_INDICES in encode_inputs.
+        if self._libero_eef_mode and self._adapter is not None and hasattr(self._adapter, 'get_ee_pose'):
+            try:
+                proprio = self._build_libero_eef_proprio()
+            except Exception as exc:
+                import logging
+                logging.getLogger("RDTObsProcessor").warning(
+                    "LIBERO EEF proprio build failed (%s), falling back to joint proprio", exc
+                )
+                proprio = None
+            if proprio is not None:
+                # ── Task string ────────────────────────────────────────────────
+                task_list = obs.get("task", [""])
+                task_str = task_list[0] if isinstance(task_list, (list, tuple)) else str(task_list)
+                if not task_str.strip():
+                    raise RuntimeError("RDT task instruction is empty")
+                return images, proprio, task_str
+
         # ── Proprio (8D: 7 arm joints + 1 gripper) ──────────────────────────
         # Use adapter's direct joint accessors when available (LIBERO/CALVIN),
         # which give actual Franka joint angles that match RDT's training space.
@@ -304,3 +328,67 @@ class RDTObsProcessor:
         if state.shape[0] >= 8:
             proprio_np[7] = state[7]
         return proprio_np
+
+    def _build_libero_eef_proprio(self) -> torch.Tensor:
+        """
+        Build 7D EEF proprio for LIBERO-finetuned RDT checkpoints.
+
+        Returns (1, 7) tensor:
+          [norm_pos_x, norm_pos_y, norm_pos_z,  ← EEF position normalized to ~[-1,1]
+           rot_c0, rot_c1, rot_c2,               ← first column of rotation matrix (natural [-1,1])
+           gripper_norm]                         ← finger-0 qpos normalized to [0,1]
+
+        These 7 values are placed at LIBERO_EEF_INDICES [30,31,32,33,34,35,10]
+        in the 128D unified state by _RDTModelAdapter.encode_inputs().
+        """
+        import logging
+        _log = logging.getLogger("RDTObsProcessor")
+
+        # EEF position + orientation from adapter.
+        pose = self._adapter.get_ee_pose()   # Pose3D(position=(3,), quaternion=(4,) wxyz)
+        pos = np.asarray(pose.position, dtype=np.float64)  # (3,) meters, robot base frame
+
+        # Normalize position using approximate LIBERO tabletop workspace bounds.
+        # Bounds derived from FK trajectory evidence; generous to avoid hard clipping.
+        _POS_MIN = np.array([-0.55, -0.05, 0.08], dtype=np.float64)
+        _POS_MAX = np.array([ 0.15,  0.70, 0.60], dtype=np.float64)
+        _POS_CTR = (_POS_MIN + _POS_MAX) / 2.0
+        _POS_HALF = (_POS_MAX - _POS_MIN) / 2.0
+        norm_pos = np.clip((pos - _POS_CTR) / _POS_HALF, -1.5, 1.5)
+
+        # Rotation: first column of rotation matrix from quaternion (wxyz → R).
+        # The first column of R is naturally a unit vector ∈ [-1, 1] per component.
+        quat_wxyz = np.asarray(pose.quaternion, dtype=np.float64)  # (4,) wxyz
+        w, x, y, z = quat_wxyz
+        rot_col0 = np.array([
+            1 - 2*(y*y + z*z),
+            2*(x*y + w*z),
+            2*(x*z - w*y),
+        ], dtype=np.float64)  # (3,) — first column of rotation matrix
+
+        # Gripper: read finger-0 qpos from sim and normalize to [0, 1].
+        # abs(finger0) / 0.04 maps closed=0 → 0.0 and open=0.04 → 1.0.
+        gripper_norm = 0.0
+        if hasattr(self._adapter, '_get_current_robosuite_env'):
+            try:
+                _renv = self._adapter._get_current_robosuite_env()
+                _robot = _renv.robots[0]
+                _jid0 = _renv.sim.model.joint_name2id(_robot.gripper.joints[0])
+                _qpos_addr0 = int(_renv.sim.model.jnt_qposadr[_jid0])
+                _finger0 = float(_renv.sim.data.qpos[_qpos_addr0])
+                gripper_norm = float(np.clip(abs(_finger0) / 0.04, 0.0, 1.0))
+            except Exception:
+                pass
+
+        proprio_7d = np.array([*norm_pos, *rot_col0, gripper_norm], dtype=np.float32)
+
+        if not getattr(self, "_eef_probe_logged", False):
+            self._eef_probe_logged = True
+            _log.warning(
+                "[LIBERO_EEF_PROPRIO] pos=%.3f,%.3f,%.3f → norm=%.3f,%.3f,%.3f "
+                "rot_col0=%.3f,%.3f,%.3f gripper=%.4f",
+                pos[0], pos[1], pos[2], norm_pos[0], norm_pos[1], norm_pos[2],
+                rot_col0[0], rot_col0[1], rot_col0[2], gripper_norm,
+            )
+
+        return torch.from_numpy(proprio_7d).unsqueeze(0)  # (1, 7)

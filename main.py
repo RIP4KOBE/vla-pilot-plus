@@ -160,7 +160,10 @@ class Main:
         elif policy_type == 'rdt':
             from core.rdt_policy_steer import RDTSteer
             num_steps = type_config.get('num_inference_steps', 55)
-            self.policy = RDTSteer.from_pretrained(pretrained_path, num_inference_steps=num_steps)
+            libero_mode = bool(type_config.get('libero_mode', False))
+            self.policy = RDTSteer.from_pretrained(
+                pretrained_path, num_inference_steps=num_steps, libero_mode=libero_mode
+            )
         else:
             raise ValueError(f"Unknown policy type: {policy_type}")
 

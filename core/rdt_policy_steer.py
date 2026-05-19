@@ -7,6 +7,7 @@ Duck-typed to match DiffusionPolicySteer / PI05PolicySteer:
 """
 from __future__ import annotations
 
+import json
 import math
 import os
 import sys
@@ -27,6 +28,57 @@ log = SteerLogger("RDTSteer")
 
 # ManiSkill checkpoint outputs 8 DOF (7 right-arm joints + 1 gripper).
 _ARM_JOINTS = slice(0, 7)
+
+# LIBERO-finetuned checkpoints output EEF-space actions.
+# Indices in the 128D unified state: right_eef_pos_{x,y,z} + right_eef_angle_{0,1,2} + right_gripper_open
+LIBERO_EEF_INDICES = [30, 31, 32, 33, 34, 35, 10]
+
+# Approximate LIBERO tabletop workspace bounds (robot base frame, meters).
+# Used to normalize EEF position to ~[-1, 1] for the LIBERO-finetuned RDT model.
+# Derived from FK trajectory evidence (round-4 probes) and LIBERO task configs.
+_LIBERO_EEF_POS_MIN = np.array([-0.55, -0.05, 0.08])
+_LIBERO_EEF_POS_MAX = np.array([ 0.15,  0.70, 0.60])
+
+
+def _rdt_flat_config_to_args(flat: dict) -> dict:
+    """Convert an RDTRunner-style config.json into scripts/*_model.py args."""
+    img_pos = flat.get("img_pos_embed_config", [["image", [2, 3, -729]]])
+    try:
+        img_history_size = int(img_pos[0][1][0])
+        num_cameras = int(img_pos[0][1][1])
+    except Exception:
+        img_history_size = 2
+        num_cameras = 3
+
+    return {
+        "common": {
+            "img_history_size": img_history_size,
+            "action_chunk_size": int(flat["pred_horizon"]),
+            "num_cameras": num_cameras,
+            "state_dim": int(flat["action_dim"]),
+        },
+        "dataset": {
+            "image_aspect_ratio": "pad",
+            "tokenizer_max_length": int(flat["max_lang_cond_len"]),
+        },
+        "model": {
+            "lang_adaptor": flat["lang_adaptor"],
+            "img_adaptor": flat["img_adaptor"],
+            "state_adaptor": flat["state_adaptor"],
+            "lang_token_dim": int(flat["lang_token_dim"]),
+            "img_token_dim": int(flat["img_token_dim"]),
+            "state_token_dim": int(flat["state_token_dim"]),
+            "rdt": flat["rdt"],
+            "noise_scheduler": flat["noise_scheduler"],
+            "ema": flat.get("ema", {}),
+        },
+        "_source_config": {
+            "format": "hf_config_json",
+            "img_cond_len": flat.get("img_cond_len"),
+            "img_pos_embed_config": flat.get("img_pos_embed_config"),
+            "lang_pos_embed_config": flat.get("lang_pos_embed_config"),
+        },
+    }
 
 
 # ── Adapter for the real RoboticDiffusionTransformerModel ────────────────────
@@ -146,11 +198,12 @@ class _RDTModelAdapter(nn.Module):
       * ``step``          – passthrough to the underlying model's ``step()``
     """
 
-    def __init__(self, real_model) -> None:
+    def __init__(self, real_model, libero_eef_mode: bool = False) -> None:
         super().__init__()
         # Store as a regular attribute (not registered parameter) because the
         # real model is not an nn.Module.
         object.__setattr__(self, "_real", real_model)
+        object.__setattr__(self, "_libero_eef_mode", libero_eef_mode)
         # Register the DiT adapter so .parameters() / .to() / .eval() work.
         self.dit = _RDTDiTAdapter(real_model.policy)
         # Expose a noise_scheduler attribute pointing at the inference scheduler
@@ -256,11 +309,27 @@ class _RDTModelAdapter(nn.Module):
         image_embeds = image_embeds.reshape(-1, real.vision_model.hidden_size).unsqueeze(0)
 
         # ── Proprioception encoding ───────────────────────────────────────────
-        joints = proprio.to(device).unsqueeze(0)          # (1, 1, 8)
-        states, state_elem_mask = real._format_joint_to_state(joints)
-        states = states.to(device, dtype=dtype)
-        state_elem_mask = state_elem_mask.to(device, dtype=dtype)
-        states = states[:, -1:, :]                        # (1, 1, 128)
+        unified_action_dim: int = real.args["model"]["state_token_dim"]
+        libero_eef_mode = object.__getattribute__(self, "_libero_eef_mode")
+
+        if libero_eef_mode:
+            # LIBERO EEF path: proprio is (1, 7) [eef_x, eef_y, eef_z, rot0, rot1, rot2, grip]
+            # Build 128D state manually at LIBERO_EEF_INDICES (30,31,32,33,34,35,10).
+            proprio_7d = proprio.to(device=device, dtype=dtype)  # (1, 7)
+            states = torch.zeros(1, 1, unified_action_dim, device=device, dtype=dtype)
+            state_elem_mask = torch.zeros(1, unified_action_dim, device=device, dtype=dtype)
+            for i, idx in enumerate(LIBERO_EEF_INDICES):
+                states[:, 0, idx] = proprio_7d[:, i]
+                state_elem_mask[:, idx] = 1.0
+            action_indices: list = LIBERO_EEF_INDICES
+        else:
+            joints = proprio.to(device).unsqueeze(0)          # (1, 1, 8)
+            states, state_elem_mask = real._format_joint_to_state(joints)
+            states = states.to(device, dtype=dtype)
+            state_elem_mask = state_elem_mask.to(device, dtype=dtype)
+            states = states[:, -1:, :]                        # (1, 1, 128)
+            action_indices: list = state_elem_mask[0].nonzero(as_tuple=True)[0].tolist()
+
         ctrl_freqs = torch.tensor([real.control_frequency], device=device)
 
         # ── Language ─────────────────────────────────────────────────────────
@@ -275,14 +344,21 @@ class _RDTModelAdapter(nn.Module):
             text_embeds, image_embeds, state_tokens
         )
 
-        # Recover which unified-action indices this model uses so the DiT
-        # adapter can inflate raw-action x_t to the full unified space.
-        unified_action_dim: int = real.args["model"]["state_token_dim"]
-        # action_indices are the positions in the unified vector that correspond
-        # to the raw robot joints.  They are stored on the real model as the
-        # attribute built during _format_joint_to_state/_unformat_action_to_joint.
-        # We derive them from state_elem_mask (1 where the joint is present).
-        action_indices: list = state_elem_mask[0].nonzero(as_tuple=True)[0].tolist()
+        if not getattr(self, "_io_probe_logged", False):
+            self._io_probe_logged = True
+            log.warning(
+                f"[RDT_IO_PROBE] images={len(images)} "
+                f"proprio_shape={tuple(proprio.shape) if hasattr(proprio, 'shape') else None} "
+                f"text_shape={tuple(text_embeds.shape)} "
+                f"image_embeds={tuple(image_embeds.shape)} "
+                f"state_tokens={tuple(state_tokens.shape)} "
+                f"lang_cond={tuple(lang_cond.shape)} "
+                f"img_cond={tuple(img_cond.shape)} "
+                f"state_traj={tuple(state_traj.shape)} "
+                f"action_mask={tuple(state_elem_mask.unsqueeze(1).shape)} "
+                f"ctrl_freqs={tuple(ctrl_freqs.shape)} "
+                f"action_indices={action_indices}"
+            )
 
         return {
             "lang_cond": lang_cond,
@@ -314,9 +390,11 @@ class RDTSteer:
 
     name = "rdt_steer"
 
-    def __init__(self, rdt_model, num_inference_steps: int = 55) -> None:
+    def __init__(self, rdt_model, num_inference_steps: int = 55, libero_mode: bool = False) -> None:
         self._rdt_model = rdt_model
         self._num_inference_steps = num_inference_steps
+        # When True: use LIBERO EEF indices for proprio/action instead of ManiSkill joint indices.
+        self._libero_mode: bool = libero_mode
 
         self._adapter: Optional[BaseEnvAdapter] = None
         self._obs_processor: Optional[RDTObsProcessor] = None
@@ -376,6 +454,7 @@ class RDTSteer:
         pretrained_path: str,
         num_inference_steps: int = 55,
         vision_encoder: str = "google/siglip-so400m-patch14-384",
+        libero_mode: bool = False,
     ) -> "RDTSteer":
         """Load from a HuggingFace Hub repo ID or a local directory path.
 
@@ -421,6 +500,8 @@ class RDTSteer:
         try:
             import yaml
             from scripts.maniskill_model import (
+                DATA_STAT,
+                MANISKILL_INDICES,
                 RoboticDiffusionTransformerModel,
                 create_model,
             )
@@ -435,21 +516,92 @@ class RDTSteer:
         rdt_subdir = os.path.join(pretrained_path, "rdt")
         search_dirs = [rdt_subdir, pretrained_path] if os.path.isdir(rdt_subdir) else [pretrained_path]
 
-        # Load the model config that ships with the checkpoint
+        # Load the model config that ships with the checkpoint. Some HF repos
+        # place RDTRunner-style config.json at the repo root while the actual
+        # weights live in an `ema/` subdirectory; include parent dirs too.
         config_path = None
+        config_kind = None
+        config_search_dirs = []
         for d in search_dirs:
+            config_search_dirs.append(d)
+            parent = os.path.dirname(d)
+            if parent and parent not in config_search_dirs:
+                config_search_dirs.append(parent)
+        for d in config_search_dirs:
             candidate = os.path.join(d, "config.yaml")
             if os.path.exists(candidate):
                 config_path = candidate
+                config_kind = "yaml"
+                break
+            candidate = os.path.join(d, "config.json")
+            if os.path.exists(candidate):
+                config_path = candidate
+                config_kind = "json"
                 break
         if config_path is None:
             # Fall back to the bundled base config inside the submodule
             config_path = os.path.join(rdt_root, "configs", "base.yaml")
+            config_kind = "yaml"
             log.warning(f"[FALLBACK] checkpoint has no config.yaml — using bundled: {config_path}")
         else:
             log.info(f"Using config: {config_path}")
         with open(config_path, "r") as f:
-            args = yaml.safe_load(f)
+            if config_kind == "json":
+                flat_config = json.load(f)
+                args = _rdt_flat_config_to_args(flat_config)
+            else:
+                args = yaml.safe_load(f)
+                flat_config = None
+        args.setdefault("_source_config", {})
+        args["_source_config"].update({
+            "path": config_path,
+            "kind": config_kind,
+            "pretrained_path": pretrained_path,
+        })
+
+        assert args["common"]["state_dim"] == args["model"]["state_token_dim"], (
+            "RDT config mismatch: common.state_dim must equal model.state_token_dim"
+        )
+        assert args["model"]["state_token_dim"] == 128, (
+            "Current RDT integration assumes the 128D unified RDT state/action space"
+        )
+        assert args["common"]["img_history_size"] == 2, (
+            "Current RDT observation processor builds exactly 2 image history frames"
+        )
+        assert args["common"]["num_cameras"] == 3, (
+            "Current RDT observation processor builds 3 camera slots per history frame"
+        )
+        assert args["dataset"]["tokenizer_max_length"] == args["model"].get(
+            "max_lang_cond_len", args["dataset"]["tokenizer_max_length"]
+        )
+        log.warning(
+            f"[RDT_CKPT_CONFIG] source={config_path} kind={config_kind} "
+            f"state_dim={args['common']['state_dim']} "
+            f"pred_horizon={args['common']['action_chunk_size']} "
+            f"img_history={args['common']['img_history_size']} "
+            f"num_cameras={args['common']['num_cameras']} "
+            f"tokenizer_max_length={args['dataset']['tokenizer_max_length']} "
+            f"lang_token_dim={args['model']['lang_token_dim']} "
+            f"img_token_dim={args['model']['img_token_dim']} "
+            f"state_token_dim={args['model']['state_token_dim']} "
+            f"scheduler={args['model']['noise_scheduler']}"
+        )
+        log.warning(
+            f"[RDT_WRAPPER_SEMANTICS] wrapper=scripts.maniskill_model "
+            f"raw_proprio_dim={len(DATA_STAT['state_min'])} "
+            f"raw_action_dim={len(DATA_STAT['action_min'])} "
+            f"unified_indices={MANISKILL_INDICES} "
+            f"state_min={DATA_STAT['state_min']} "
+            f"state_max={DATA_STAT['state_max']} "
+            f"action_min={DATA_STAT['action_min']} "
+            f"action_max={DATA_STAT['action_max']}"
+        )
+        log.warning(
+            "[RDT_WRAPPER_ASSUMPTION] current integration still feeds ManiSkill-style "
+            "8D proprio/action: 7 Franka joint qpos + single-finger gripper. "
+            "If this LIBERO checkpoint was trained with EEF/OSC actions or LIBERO "
+            "normalization stats, the checkpoint can load but policy semantics are mismatched."
+        )
 
         # Locate the weight file (prefer .safetensors, fall back to .pt/.bin)
         weight_file = None
@@ -558,8 +710,19 @@ class RDTSteer:
             else:
                 os.environ["DISABLE_SAFETENSORS_CONVERSION"] = _prev_disable_conv
 
+        # Auto-detect libero_mode from checkpoint path if not explicitly set.
+        if not libero_mode:
+            _ckpt_name = os.path.basename(pretrained_path.rstrip("/")).lower()
+            _parent_name = os.path.basename(os.path.dirname(pretrained_path)).lower()
+            libero_mode = "libero" in _ckpt_name or "libero" in _parent_name
+            if libero_mode:
+                log.warning(
+                    "[AUTO_DETECT] LIBERO checkpoint detected from path — enabling libero_mode "
+                    "(EEF indices [30,31,32,33,34,35,10] instead of ManiSkill joint indices)"
+                )
+
         # Wrap in the adapter that provides encode_inputs + nn.Module interface.
-        rdt_model = _RDTModelAdapter(real_model)
+        rdt_model = _RDTModelAdapter(real_model, libero_eef_mode=libero_mode)
 
         # ── Sub-model load report ───────────────────────────────────────────
         def _summarize(m):
@@ -573,7 +736,7 @@ class RDTSteer:
         log.info(f"  policy (RDTRunner):  {_summarize(real_model.policy)}, weight_file={os.path.basename(weight_file)}")
         log.info(f"  state_min/max device={real_model.state_min.device} (must match policy device after .to)")
 
-        instance = cls(rdt_model, num_inference_steps=num_inference_steps)
+        instance = cls(rdt_model, num_inference_steps=num_inference_steps, libero_mode=libero_mode)
 
         # Load precomputed T5-XXL embeddings shipped with checkpoint
         lang_dir = Path(pretrained_path) / "lang_embeds"
@@ -610,9 +773,12 @@ class RDTSteer:
         # LiberoProcessorStep applies a 180° flip to all frames; undo it before SigLIP encoding.
         from core.env_adapters.libero_adapter import LiberoAdapter
         self._obs_processor._undo_libero_flip = isinstance(self._adapter, LiberoAdapter)
+        # Wire libero_eef_mode to obs processor so it builds EEF-space proprio.
+        self._obs_processor._libero_eef_mode = self._libero_mode
         log.info(
             f"post_init wired: adapter={type(self._adapter).__name__}, "
             f"undo_libero_flip={self._obs_processor._undo_libero_flip}, "
+            f"libero_eef_mode={self._libero_mode}, "
             f"sample_batch_size={self._sample_batch_size}, "
             f"action_chunk_horizon={self._action_chunk_horizon}"
         )
@@ -867,6 +1033,22 @@ class RDTSteer:
             except Exception as _e:
                 log.warning(f"[P5] probe failed: {_e}")
         # ── END P5 ──────────────────────────────────────────────────────────────
+
+        # ── LIBERO EEF path: output is already delta EEF in [-1,1] ─────────────
+        # When libero_mode=True, encode_inputs extracted LIBERO_EEF_INDICES [30,31,32,33,34,35,10]
+        # from the 128D output, so chunk_np is (H, 7): [pos_x, pos_y, pos_z, angle0-2, gripper].
+        # The model outputs these in normalized [-1,1] space which IS the LIBERO action space.
+        # Only fix needed: negate gripper (RDT right_gripper_open: high=open; LIBERO: 1=close).
+        if self._libero_mode:
+            libero_direct = chunk_np.copy()
+            libero_direct[:, 6] = -chunk_np[:, 6]  # flip gripper convention
+            log.warning(
+                f"[LIBERO_EEF_PATH] step={_diag_step} chunk shape={chunk_np.shape} "
+                f"pos_range=[{chunk_np[:,:3].min():.3f},{chunk_np[:,:3].max():.3f}] "
+                f"ori_range=[{chunk_np[:,3:6].min():.3f},{chunk_np[:,3:6].max():.3f}] "
+                f"grip_raw={chunk_np[0,6]:.3f} grip_libero={libero_direct[0,6]:.3f}"
+            )
+            return torch.from_numpy(libero_direct).unsqueeze(0).float()  # (1, H, 7)
 
         if self._adapter is not None and hasattr(self._adapter, 'get_joint_positions'):
             try:
