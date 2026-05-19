@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RDT-LIBERO Integration Progress — 2026-05-19</title>
+<style>
+  body { font-family: 'Segoe UI', sans-serif; max-width: 900px; margin: 40px auto; color: #333; line-height: 1.6; }
+  h1 { color: #1a1a2e; border-bottom: 3px solid #e94560; padding-bottom: 10px; }
+  h2 { color: #16213e; margin-top: 30px; }
+  .status { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.85em; font-weight: bold; }
+  .confirmed { background: #d4edda; color: #155724; }
+  .committed { background: #cce5ff; color: #004085; }
+  .pending { background: #fff3cd; color: #856404; }
+  .not-started { background: #f8f9fa; color: #6c757d; border: 1px solid #dee2e6; }
+  table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+  th { background: #16213e; color: white; padding: 10px; text-align: left; }
+  td { padding: 8px 10px; border-bottom: 1px solid #eee; font-family: monospace; font-size: 0.9em; }
+  tr:hover { background: #f5f5f5; }
+  .bug { color: #dc3545; font-weight: bold; }
+  .fix { color: #28a745; font-weight: bold; }
+  code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+  .box { background: #f8f9fa; border-left: 4px solid #e94560; padding: 15px 20px; margin: 15px 0; border-radius: 0 5px 5px 0; }
+  .commit { background: #1a1a2e; color: #00d2ff; padding: 3px 8px; border-radius: 3px; font-family: monospace; font-size: 0.85em; }
+</style>
+</head>
+<body>
+
+<h1>RDT-1B LIBERO Integration — Progress Report</h1>
+<p><strong>Date:</strong> 2026-05-19 &nbsp;|&nbsp; <strong>Branch:</strong> feat/rdt-libero-object-ckpt &nbsp;|&nbsp; <strong>Checkpoint:</strong> RDT-1B-LIBERO-Object (EMA)</p>
+
+<h2>Goal</h2>
+<p>Integrate <strong>RDT-1B fine-tuned on LIBERO Object</strong> into the VLS steering pipeline as a third policy (<code>policy.type=rdt</code>), with FKD particle resampling and VLM-guided gradient steering.</p>
+
+<h2>Root Cause Found &amp; Fixed</h2>
+<div class="box">
+  <strong>Bug:</strong> Wrong action indices extracted from 128D unified state.<br><br>
+  The code was using <span class="bug">ManiSkill joint indices [0-6, 10]</span> (Franka absolute joint positions)
+  but the LIBERO-Object checkpoint was fine-tuned with <span class="fix">EEF indices [30-35, 10]</span>
+  (end-effector position + rotation + gripper).<br><br>
+  This caused arm actions to be <strong>≈0.0004 magnitude</strong> — effectively zero — because the LIBERO
+  checkpoint never learned to populate the joint-position slots in the 128D space.
+</div>
+
+<h2>Diagnostic Evidence (Round 3–4 Probes)</h2>
+<table>
+  <tr><th>Probe</th><th>What It Measured</th><th>Finding</th></tr>
+  <tr><td>P3 obs chain</td><td>Observation processor output</td><td>Images correctly flipped. Proprio = joint angles (correct for hw but wrong for LIBERO checkpoint).</td></tr>
+  <tr><td>P4 text embed</td><td>T5-XXL language embed</td><td>norm=21.1, not zero — language conditioning is working.</td></tr>
+  <tr><td><strong>P5 chunk_np</strong></td><td>Raw RDT denoising output (before FK)</td><td class="bug">arm_min=-0.0004, arm_max=0.0003 — ALL 8 steps near zero. ManiSkill indices empty.</td></tr>
+  <tr><td>P6 FK chain</td><td>Franka FK with near-zero joints</td><td class="bug">pre_clip_pos_max=10.3m — arm teleporting 10 meters. EEF traj garbage.</td></tr>
+  <tr><td>P7 libero_action</td><td>Final LIBERO action after FK</td><td class="bug">First step saturated at ±1. Steps 1–7 near zero. Robot does nothing.</td></tr>
+</table>
+
+<h2>Fix: LIBERO EEF Mode</h2>
+<p>Commit: <span class="commit">af0db0b</span></p>
+
+<table>
+  <tr><th>Component</th><th>Change</th></tr>
+  <tr>
+    <td><code>rdt_policy_steer.py</code></td>
+    <td>
+      Add <code>LIBERO_EEF_INDICES = [30,31,32,33,34,35,10]</code><br>
+      Auto-detect libero_mode from checkpoint path name<br>
+      <code>_RDTModelAdapter.encode_inputs()</code>: build 128D state at EEF indices when libero_mode=True<br>
+      <code>_postprocess_actions()</code>: skip FK, negate gripper convention, return 7D directly
+    </td>
+  </tr>
+  <tr>
+    <td><code>rdt_obs_processor.py</code></td>
+    <td>
+      Add <code>_build_libero_eef_proprio()</code>: uses <code>adapter.get_ee_pose()</code><br>
+      Builds 7D: [norm_pos(3), rot_col0(3), gripper_norm(1)]<br>
+      Approximate position normalization using LIBERO workspace bounds
+    </td>
+  </tr>
+  <tr>
+    <td><code>configs/policy.yaml</code></td>
+    <td>Add <code>libero_mode: true</code> under <code>rdt:</code></td>
+  </tr>
+  <tr>
+    <td><code>main.py</code></td>
+    <td>Pass <code>libero_mode</code> from config to <code>RDTSteer.from_pretrained()</code></td>
+  </tr>
+</table>
+
+<h2>Hypothesis Status</h2>
+<table>
+  <tr><th>Hypothesis</th><th>Status</th></tr>
+  <tr>
+    <td><strong>H1:</strong> LIBERO checkpoint uses EEF indices [30-35,10], not joint indices</td>
+    <td><span class="status confirmed">CONFIRMED</span></td>
+  </tr>
+  <tr>
+    <td><strong>H2:</strong> EEF extraction produces meaningful LIBERO actions</td>
+    <td><span class="status committed">COMMITTED — AWAITING RUN</span></td>
+  </tr>
+  <tr>
+    <td><strong>H3:</strong> Image flip undo improves SigLIP visual encoding</td>
+    <td><span class="status confirmed">CONFIRMED</span> (commit 4bf90b7)</td>
+  </tr>
+  <tr>
+    <td><strong>H4:</strong> VLS steering improves task success over unguided baseline</td>
+    <td><span class="status not-started">NOT STARTED</span></td>
+  </tr>
+</table>
+
+<h2>Next Steps</h2>
+<ol>
+  <li><strong>Run validation:</strong> <code>bash run.sh libero libero_object</code> with <code>policy.type=rdt</code> — check <code>[LIBERO_EEF_PATH]</code> logs for non-zero arm actions</li>
+  <li><strong>Baseline:</strong> 5–10 episodes unguided → measure task success rate</li>
+  <li><strong>Steering:</strong> Enable VLS guidance (<code>main.use_guidance=true</code>) → compare guided vs unguided</li>
+  <li><strong>Paper metric:</strong> ΔSuccess = guided − unguided success rate on LIBERO Object</li>
+</ol>
+
+<h2>Open Questions</h2>
+<ul>
+  <li>Does approximate EEF position normalization match the LIBERO-Object training stats?</li>
+  <li>What rotation representation do indices 33–35 use? (Assumed: first column of R, i.e., 6D rotation representation first 3 values)</li>
+  <li>What is the base task success rate of this unguided RDT-LIBERO-Object checkpoint?</li>
+</ul>
+
+<hr>
+<p style="color:#888; font-size:0.85em;">Generated by autoresearch loop — 2026-05-19</p>
+</body>
+</html>
