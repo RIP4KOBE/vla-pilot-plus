@@ -1,0 +1,56 @@
+project: VLA-Pilot++ RDT-1B LIBERO Integration
+question: "Can RDT-1B (LIBERO-Object finetuned) be steered with VLS at inference time on LIBERO benchmark tasks?"
+status: in_progress
+phase: hypothesis_testing
+last_updated: 2026-05-19
+
+# ── Hypotheses ──────────────────────────────────────────────────────────────
+hypotheses:
+  H1_eef_indices:
+    title: "LIBERO checkpoint outputs EEF actions at indices [30-35,10], not joint positions at [0-6,10]"
+    status: CONFIRMED
+    evidence:
+      - "Round-3/4 probes: arm outputs near-zero when using ManiSkill indices [0-6,10]"
+      - "P5 probe: arm_min=-0.0004, arm_max=0.0003 — all 8 steps near zero"
+      - "P7 probe: first LIBERO action step saturated at ±1 (FK with wrong near-zero joints)"
+      - "State vector mapping: right_eef_pos_{x,y,z}=[30,31,32], right_eef_angle_{0,1,2}=[33,34,35]"
+    fix_committed: "af0db0b — libero_eef_mode extracts [30,31,32,33,34,35,10]"
+
+  H2_eef_actions_work:
+    title: "Extracting EEF indices and bypassing FK produces meaningful LIBERO actions"
+    status: PENDING_VALIDATION
+    prediction: "arm_range should be non-trivial (>0.1 span), gripper varies, EEF traj coherent"
+    next_experiment: "Run 1-3 LIBERO episodes with libero_mode=true, inspect [LIBERO_EEF_PATH] logs"
+
+  H3_image_flip:
+    title: "LiberoProcessorStep applies 180° flip; undoing it before SigLIP improves visual encoding"
+    status: CONFIRMED
+    evidence: "commit 4bf90b7 — undo_libero_flip flag added"
+    fix_committed: "4bf90b7"
+
+  H4_steering_improves_success:
+    title: "VLS guidance (gradient + FKD) improves task success over unguided RDT baseline"
+    status: NOT_STARTED
+    depends_on: [H2_eef_actions_work]
+
+# ── Experiments ──────────────────────────────────────────────────────────────
+experiments:
+  round_1: "Initial RDT-LIBERO wiring (checkpoint loading, obs processor, action chain)"
+  round_2: "Fix FK chain — proper denoising in 128D unified space"
+  round_3: "P1-P4 obs chain probes — confirmed image flip, gripper bug, proprio format"
+  round_4: "P5-P7 action chain probes — confirmed near-zero arm = ManiSkill index mismatch"
+  round_5:
+    title: "LIBERO EEF mode — use EEF indices [30-35,10] for LIBERO-finetuned checkpoint"
+    commit: af0db0b
+    status: COMMITTED_NOT_RUN
+    key_changes:
+      - "_RDTModelAdapter.encode_inputs(): LIBERO EEF path builds 128D at EEF indices"
+      - "RDTObsProcessor._build_libero_eef_proprio(): EEF pos+rot+gripper from get_ee_pose()"
+      - "_postprocess_actions(): skip FK, negate gripper, return 7D directly"
+
+# ── Next Steps ───────────────────────────────────────────────────────────────
+next:
+  - "Run LIBERO episode with libero_mode=true — check [LIBERO_EEF_PATH] logs for non-zero actions"
+  - "If actions look reasonable: run 3-episode batch to measure base success rate (no guidance)"
+  - "Enable VLS guidance: compare guided vs unguided task success rate"
+  - "Key metric: task success rate on libero_object benchmark"
