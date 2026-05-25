@@ -1,5 +1,8 @@
 import subprocess
 import sys
+from pathlib import Path
+
+import yaml
 
 
 def _run_python(script):
@@ -284,6 +287,143 @@ assert kwargs["max_episode_steps"] == 600
     result = _run_python(script)
 
     assert result.returncode == 0, result.stderr
+
+
+def test_libero_adapter_init_wires_env_config_into_create_libero_envs():
+    script = r'''
+import builtins
+import sys
+import types
+
+libero = types.ModuleType("libero")
+libero_libero = types.ModuleType("libero.libero")
+libero_envs = types.ModuleType("libero.libero.envs")
+libero_libero.benchmark = object()
+libero_libero.get_libero_path = lambda name: "/tmp"
+libero_envs.OffScreenRenderEnv = object
+sys.modules["libero"] = libero
+sys.modules["libero.libero"] = libero_libero
+sys.modules["libero.libero.envs"] = libero_envs
+
+original_import = builtins.__import__
+
+def guarded_import(name, *args, **kwargs):
+    if name == "lerobot" or name.startswith("lerobot."):
+        raise ModuleNotFoundError("No module named 'lerobot'", name="lerobot")
+    return original_import(name, *args, **kwargs)
+
+builtins.__import__ = guarded_import
+
+import core.env_adapters.libero_adapter as adapter
+
+captured = {}
+
+class FakeCurrentEnv:
+    task_id = 0
+    task_description = "fake task"
+    task = "fake"
+
+def fake_create_libero_envs(*args, **kwargs):
+    captured["args"] = args
+    captured["kwargs"] = kwargs
+    return [FakeCurrentEnv()]
+
+adapter.create_libero_envs = fake_create_libero_envs
+
+env_config = {
+    "suite_name": "libero_object",
+    "camera_name": "agentview_image, robot0_eye_in_hand_image",
+    "auto_apply_perturbations": False,
+    "task_ids_filter": [2],
+    "observation_width": 128,
+    "observation_height": 129,
+    "visualization_width": 640,
+    "visualization_height": 641,
+    "num_steps_wait": 5,
+    "max_episode_steps": 600,
+}
+
+libero_adapter = adapter.LiberoAdapter(None, env_config, device="cpu")
+
+assert libero_adapter.task_num == 1
+assert captured["args"] == (
+    "libero_object",
+    "agentview_image, robot0_eye_in_hand_image",
+    False,
+    [2],
+)
+assert captured["kwargs"] == {
+    "observation_width": 128,
+    "observation_height": 129,
+    "visualization_width": 640,
+    "visualization_height": 641,
+    "num_steps_wait": 5,
+    "max_episode_steps": 600,
+}
+'''
+    result = _run_python(script)
+
+    assert result.returncode == 0, result.stderr
+
+
+def test_libero_env_max_episode_steps_override_and_num_steps_wait_are_exact():
+    script = r'''
+import builtins
+import sys
+import types
+
+libero = types.ModuleType("libero")
+libero_libero = types.ModuleType("libero.libero")
+libero_envs = types.ModuleType("libero.libero.envs")
+libero_libero.benchmark = object()
+libero_libero.get_libero_path = lambda name: "/tmp"
+libero_envs.OffScreenRenderEnv = object
+sys.modules["libero"] = libero
+sys.modules["libero.libero"] = libero_libero
+sys.modules["libero.libero.envs"] = libero_envs
+
+original_import = builtins.__import__
+
+def guarded_import(name, *args, **kwargs):
+    if name == "lerobot" or name.startswith("lerobot."):
+        raise ModuleNotFoundError("No module named 'lerobot'", name="lerobot")
+    return original_import(name, *args, **kwargs)
+
+builtins.__import__ = guarded_import
+
+import core.env_adapters.libero_adapter as adapter
+
+adapter.LiberoEnv._make_envs_task = lambda self, task_suite, task_id: object()
+
+env = adapter.LiberoEnv(
+    task_suite=object(),
+    task_id=0,
+    task_suite_name="libero_10",
+    init_states=False,
+    num_steps_wait=5,
+    max_episode_steps=600,
+)
+
+assert env.num_steps_wait == 5
+assert env._max_episode_steps == 600
+'''
+    result = _run_python(script)
+
+    assert result.returncode == 0, result.stderr
+
+
+def test_libero_backend_config_defaults_match_eval_parity():
+    config_path = Path(__file__).resolve().parents[1] / "configs" / "backend" / "libero.yaml"
+
+    config = yaml.safe_load(config_path.read_text())
+    libero_config = config["libero"]
+
+    assert libero_config["observation_width"] == 128
+    assert libero_config["observation_height"] == 128
+    assert libero_config["num_steps_wait"] == 5
+    assert libero_config["max_episode_steps"] == 600
+    assert libero_config["visualization_width"] == 640
+    assert libero_config["visualization_height"] == 640
 
 
 def test_libero_adapter_step_binarizes_gripper_before_sending_numpy_action():

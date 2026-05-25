@@ -507,12 +507,7 @@ class LiberoEnv(gym.Env):
             }
         self.camera_name_mapping = camera_name_mapping
         
-        # libero_10 tasks need more stabilization steps due to more complex scenes
-        if "libero_10" in task_suite_name.lower():
-            self.num_steps_wait = max(num_steps_wait, 20)  # At least 20 steps for libero_10
-            log.info(f"Using {self.num_steps_wait} stabilization steps for libero_10 suite")
-        else:
-            self.num_steps_wait = num_steps_wait
+        self.num_steps_wait = num_steps_wait
         
         self.episode_index = episode_index
         self.read_language_from_bddl = read_language_from_bddl
