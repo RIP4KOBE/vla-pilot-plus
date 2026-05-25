@@ -16,16 +16,15 @@ libero:
   camera_name: agentview_image, robot0_eye_in_hand_image
   obs_type: pixels_agent_pos
   render_mode: rgb_array
-  observation_width: 256  # Resolution for policy observation (low-res for speed)
-  observation_height: 256
+  observation_width: 128  # Resolution for policy observation (low-res for speed)
+  observation_height: 128
   visualization_width: 640  # Resolution for VLM/video (high-res for quality)
   visualization_height: 640
   init_states: true
-  num_steps_wait: 10
+  num_steps_wait: 5
+  max_episode_steps: 600
   vlm_camera: agentview
   
   # Perturbation settings for OOD evaluation
   auto_apply_perturbations: true
   task_ids_filter:  null #[2, 6, 8] #[0, 2, 3, 4, 8] #= all tasks, or list like [0, 1, 2], we do not need this
-  
- 

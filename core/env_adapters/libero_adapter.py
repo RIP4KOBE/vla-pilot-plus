@@ -408,7 +408,7 @@ def get_task_init_states(task_suite: Any, i: int) -> np.ndarray:
 
 def get_libero_dummy_action():
     """Get dummy/no-op action, used to roll out the simulation while the robot does nothing."""
-    return [0, 0, 0, 0, 0, 0, -1]
+    return [0, 0, 0, 0, 0, 0, 0]
 
 
 OBS_STATE_DIM = 8
@@ -479,6 +479,7 @@ class LiberoEnv(gym.Env):
         camera_name_mapping: dict[str, str] | None = None,
         num_steps_wait: int = 10,
         read_language_from_bddl: bool = False,
+        max_episode_steps: int | None = None,
     ):
         super().__init__()
         self.task_id = task_id
@@ -521,7 +522,11 @@ class LiberoEnv(gym.Env):
 
         self._env = self._make_envs_task(task_suite, self.task_id)
         default_steps = 500
-        self._max_episode_steps = TASK_SUITE_MAX_STEPS.get(task_suite_name, default_steps)
+        self._max_episode_steps = (
+            int(max_episode_steps)
+            if max_episode_steps is not None
+            else TASK_SUITE_MAX_STEPS.get(task_suite_name, default_steps)
+        )
 
         images = {}
         for cam in self.camera_name:
@@ -725,6 +730,12 @@ def create_libero_envs(
     camera_name: str | Sequence[str] = "agentview_image,robot0_eye_in_hand_image",
     auto_apply_perturbations: bool = True,
     task_ids_filter: list[int] | None = None,
+    observation_width: int = 256,
+    observation_height: int = 256,
+    visualization_width: int = 640,
+    visualization_height: int = 480,
+    num_steps_wait: int = 10,
+    max_episode_steps: int | None = None,
 ) -> List["LiberoEnv"]:
     """
     Create vectorized LIBERO-PRO environments with a consistent return shape.
@@ -791,9 +802,15 @@ def create_libero_envs(
             task_id=tid,
             task_suite_name=actual_suite_name,
             camera_name=camera_names,
+            observation_width=observation_width,
+            observation_height=observation_height,
+            visualization_width=visualization_width,
+            visualization_height=visualization_height,
             init_states=True,
             episode_index=0,
+            num_steps_wait=num_steps_wait,
             read_language_from_bddl=read_language_from_bddl,
+            max_episode_steps=max_episode_steps,
         )
         out.append(env)
         print(f"Built env | suite={actual_suite_name} | task_id={tid}")
@@ -810,6 +827,12 @@ class LiberoAdapter(BaseEnvAdapter):
             env_config["camera_name"],
             env_config["auto_apply_perturbations"],
             env_config["task_ids_filter"],
+            observation_width=env_config.get("observation_width", 256),
+            observation_height=env_config.get("observation_height", 256),
+            visualization_width=env_config.get("visualization_width", 640),
+            visualization_height=env_config.get("visualization_height", 480),
+            num_steps_wait=env_config.get("num_steps_wait", 10),
+            max_episode_steps=env_config.get("max_episode_steps"),
         )
 
         # LIBERO-PRO related attributes
@@ -1550,12 +1573,12 @@ class LiberoAdapter(BaseEnvAdapter):
         action_transition = {"action": action}
         action_transition = self.env_postprocessor(action_transition)
         action = action_transition["action"]
+        # Convert gripper action to binary (-1 or 1) before exporting to NumPy.
+        action = action.clone()
+        action[-1] = 1 if action[-1] > 0 else -1
         # Convert to CPU / numpy. Cast to float32 first — pi05 outputs bfloat16
         # but LIBERO environments expect float32.
         action_numpy: np.ndarray = action.float().to("cpu").numpy()
-
-        # Convert gripper action to binary (-1 or 1)
-        action[-1] = 1 if action[-1] > 0 else -1
 
         current_env = self._env[self.current_task_idx]
         observation, reward, terminated, truncated, info = current_env.step(action_numpy)
