@@ -1,18 +1,26 @@
+import importlib.util
+from pathlib import Path
+
 import numpy as np
 import pytest
 import torch
 
-from core.rdt_libero_action_converter import (
-    ACTIVE_INDICES_SORTED,
-    LIBERO_RDT_INDICES,
-    decode_rdt_libero_action_chunk,
-    libero_raw_to_rdt_action,
-    map_libero_gripper_action_to_open,
-    map_open_to_libero_gripper,
-    ortho6d_to_rotvec,
-    rdt_action_to_libero_raw,
-    rotvec_to_ortho6d,
-)
+_MODULE_PATH = Path(__file__).resolve().parents[1] / "core" / "rdt_libero_action_converter.py"
+_SPEC = importlib.util.spec_from_file_location("rdt_libero_action_converter", _MODULE_PATH)
+if _SPEC is None or _SPEC.loader is None:
+    raise ImportError(f"Cannot load RDT LIBERO action converter from {_MODULE_PATH}")
+_converter = importlib.util.module_from_spec(_SPEC)
+_SPEC.loader.exec_module(_converter)
+
+LIBERO_RDT_INDICES = _converter.LIBERO_RDT_INDICES
+ACTIVE_INDICES_SORTED = _converter.ACTIVE_INDICES_SORTED
+decode_rdt_libero_action_chunk = _converter.decode_rdt_libero_action_chunk
+libero_raw_to_rdt_action = _converter.libero_raw_to_rdt_action
+map_libero_gripper_action_to_open = _converter.map_libero_gripper_action_to_open
+map_open_to_libero_gripper = _converter.map_open_to_libero_gripper
+ortho6d_to_rotvec = _converter.ortho6d_to_rotvec
+rdt_action_to_libero_raw = _converter.rdt_action_to_libero_raw
+rotvec_to_ortho6d = _converter.rotvec_to_ortho6d
 
 
 def test_active_indices_match_finetuning_contract():
