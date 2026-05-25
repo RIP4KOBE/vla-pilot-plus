@@ -9,14 +9,18 @@ CHECKPOINT = Path(
 )
 T5 = Path("/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl")
 SIGLIP = Path("/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384")
+EXPECTED_IMG_HISTORY_AND_CAMERAS = [2, 3]
 
 
 def test_target_checkpoint_and_encoder_paths_exist():
-    assert CHECKPOINT.is_dir()
-    assert (CHECKPOINT / "config.json").is_file()
-    assert (CHECKPOINT / "ema" / "model.safetensors").is_file()
-    assert T5.is_dir()
-    assert SIGLIP.is_dir()
+    config_json = CHECKPOINT / "config.json"
+    ema_weights = CHECKPOINT / "ema" / "model.safetensors"
+
+    assert CHECKPOINT.is_dir(), f"Missing RDT checkpoint dir: {CHECKPOINT}"
+    assert config_json.is_file(), f"Missing RDT checkpoint config: {config_json}"
+    assert ema_weights.is_file(), f"Missing RDT EMA weights: {ema_weights}"
+    assert T5.is_dir(), f"Missing local T5 encoder dir: {T5}"
+    assert SIGLIP.is_dir(), f"Missing local SigLIP encoder dir: {SIGLIP}"
 
 
 def test_checkpoint_config_matches_rdt_libero_contract():
@@ -24,7 +28,9 @@ def test_checkpoint_config_matches_rdt_libero_contract():
     assert cfg["pred_horizon"] == 64
     assert cfg["action_dim"] == 128
     assert cfg["state_token_dim"] == 128
-    assert cfg["img_pos_embed_config"][0][1][:2] == [2, 3]
+    assert cfg["img_pos_embed_config"][0][1][:2] == EXPECTED_IMG_HISTORY_AND_CAMERAS, (
+        "RDT LIBERO checkpoint must use 2-frame history x 3 camera slots"
+    )
     assert cfg["lang_token_dim"] == 4096
     assert cfg["img_token_dim"] == 1152
 
