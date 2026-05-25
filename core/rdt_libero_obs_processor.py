@@ -101,10 +101,10 @@ class RDTLiberoObsProcessor:
         state = obs[STATE_KEY]
         if not torch.is_tensor(state):
             state = torch.as_tensor(state)
-        if state.ndim != 2 or state.shape[1] < 8:
-            raise ValueError("Expected observation.state with shape (B, >=8)")
+        if state.ndim != 2 or state.shape[1] != 8:
+            raise ValueError("Expected observation.state with shape (B, 8)")
 
-        state_head = state[0, :8].detach().cpu().to(dtype=torch.float32)
+        state_head = state[0].detach().cpu().to(dtype=torch.float32)
         eef_pos = state_head[:3]
         axis_angle = state_head[3:6].numpy()
         gripper_qpos = state_head[6:8].numpy()

@@ -153,3 +153,12 @@ def test_bad_state_shape_raises_value_error():
 
     with pytest.raises(ValueError, match="8"):
         processor.process(obs)
+
+
+def test_extra_state_dimension_raises_value_error():
+    processor = RDTLiberoObsProcessor()
+    obs = _obs()
+    obs["observation.state"] = torch.zeros((1, 9), dtype=torch.float32)
+
+    with pytest.raises(ValueError, match="8"):
+        processor.process(obs)
