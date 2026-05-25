@@ -79,6 +79,14 @@ def test_process_preserves_task_string():
     assert converted.task == "open the drawer"
 
 
+def test_debug_first_step_alias_controls_debug_flag():
+    processor = RDTLiberoObsProcessor(debug_first_step=True)
+
+    assert processor.debug is True
+    assert RDTLiberoObsProcessor(debug=True).debug is True
+    assert RDTLiberoObsProcessor(debug=True, debug_first_step=False).debug is False
+
+
 def test_first_frame_history_duplicates_current_frame():
     processor = RDTLiberoObsProcessor()
     obs = _obs()

@@ -46,9 +46,14 @@ class RDTLiberoObservation:
 
 
 class RDTLiberoObsProcessor:
-    def __init__(self, undo_preprocessor_flip: bool = False, debug: bool = False) -> None:
+    def __init__(
+        self,
+        undo_preprocessor_flip: bool = False,
+        debug: bool = False,
+        debug_first_step: bool | None = None,
+    ) -> None:
         self.undo_preprocessor_flip = undo_preprocessor_flip
-        self.debug = debug
+        self.debug = debug if debug_first_step is None else debug_first_step
         self._agent_prev: Image.Image | None = None
         self._wrist_prev: Image.Image | None = None
         self._step = 0
