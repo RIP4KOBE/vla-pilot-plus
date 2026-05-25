@@ -441,6 +441,7 @@ class RDTSteer:
         self._obs_processor: Optional[RDTLiberoObsProcessor] = None
         self._sample_batch_size: int = 1
         self._action_chunk_horizon: int = 8
+        self._fail_on_zero_language_embedding = False
 
         self._cached_action_chunk: Optional[Tensor] = None
         self._last_normalized_reward: float = 0.0
@@ -758,6 +759,9 @@ class RDTSteer:
         self._adapter = adapter
         self._sample_batch_size = sample_batch_size
         self._action_chunk_horizon = policy_config.get("action_chunk_horizon", 8)
+        self._fail_on_zero_language_embedding = bool(
+            policy_config.get("fail_on_zero_language_embedding", False)
+        )
         if self._obs_processor is None:
             undo_flip = bool(policy_config.get("undo_libero_preprocessor_flip", True))
             debug_first_step = bool(policy_config.get("debug_first_step", False))
@@ -775,7 +779,8 @@ class RDTSteer:
             f"post_init wired: adapter={type(self._adapter).__name__}, "
             f"undo_libero_flip={self._obs_processor.undo_preprocessor_flip}, "
             f"sample_batch_size={self._sample_batch_size}, "
-            f"action_chunk_horizon={self._action_chunk_horizon}"
+            f"action_chunk_horizon={self._action_chunk_horizon}, "
+            f"fail_on_zero_language_embedding={self._fail_on_zero_language_embedding}"
         )
 
     def _get_lang_embed(self, task: str) -> Tensor:
@@ -786,8 +791,20 @@ class RDTSteer:
             real = None
         if real is not None and callable(getattr(real, "encode_instruction", None)):
             embed = real.encode_instruction(task, device=str(self.device))
-            return embed.float().to(self.device)
-        return torch.zeros(1, 1, 4096, device=self.device)
+            embed = embed.float().to(self.device)
+        else:
+            embed = torch.zeros(1, 1, 4096, device=self.device)
+
+        if self._fail_on_zero_language_embedding:
+            finite = torch.isfinite(embed).all()
+            max_abs = embed.detach().abs().max()
+            if not bool(finite.item()) or float(max_abs.item()) <= 1e-8:
+                raise RuntimeError(
+                    f"RDT zero language embedding for task {task!r}; "
+                    "check text encoder loading or disable fail_on_zero_language_embedding."
+                )
+
+        return embed
 
     def to(self, device) -> "RDTSteer":
         self._device = torch.device(device)

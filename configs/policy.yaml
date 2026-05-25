@@ -9,7 +9,7 @@
 type: rdt
 
 # ============================================================
-# Diffusion Policy (default)
+# Diffusion Policy
 # ============================================================
 diffusion:
   pretrained_path: Vision-Language-Steering/vls_calvin_base

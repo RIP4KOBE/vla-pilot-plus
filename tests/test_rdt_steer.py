@@ -174,6 +174,18 @@ def test_forward_shape(stub_steer, stub_adapter, mock_batch):
     assert not torch.isnan(action).any()
 
 
+def test_lang_embed_fail_fast_rejects_stub_zero_fallback(stub_steer, stub_adapter):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=2,
+        policy_config={"fail_on_zero_language_embedding": True},
+    )
+
+    with pytest.raises(RuntimeError, match="zero language embedding"):
+        stub_steer._get_lang_embed("pick up the red block")
+
+
 def test_unguided_uses_full_128d_libero_mask(stub_steer, stub_adapter, mock_batch):
     stub_steer.post_init(
         adapter=stub_adapter,
