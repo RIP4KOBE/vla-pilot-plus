@@ -1,5 +1,5 @@
 """
-CPU-only smoke tests for RDTSteer and RDTObsProcessor.
+CPU-only smoke tests for RDTSteer and RDTLiberoObsProcessor.
 No real checkpoint or GPU required — uses stub RDT model.
 """
 import sys
@@ -122,7 +122,7 @@ def stub_adapter():
 
 @pytest.fixture
 def mock_batch():
-    B = 4
+    B = 1
     return {
         "observation.images.image": torch.zeros(B, 3, 16, 16),
         "observation.images.image2": torch.zeros(B, 3, 16, 16),
@@ -153,7 +153,7 @@ def test_forward_shape(stub_steer, stub_adapter, mock_batch):
         adapter=stub_adapter,
         postprocessor=lambda x: x,
         sample_batch_size=2,
-        policy_config={"action_chunk_horizon": H, "lang_embed_cache_dir": "/tmp/rdt_lang"},
+        policy_config={"action_chunk_horizon": H},
     )
     action = stub_steer.select_action(
         mock_batch,

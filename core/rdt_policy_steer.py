@@ -12,7 +12,6 @@ import math
 import os
 import sys
 from collections.abc import Callable
-from pathlib import Path
 from typing import List, Optional, Tuple
 
 import numpy as np
@@ -21,23 +20,15 @@ from torch import Tensor, nn
 
 from core.env_adapters import BaseEnvAdapter
 from core.fkd_class import FKD
-from core.rdt_obs_processor import RDTObsProcessor
+from core.rdt_libero_action_converter import (
+    ACTIVE_INDICES_SORTED,
+    LIBERO_RDT_INDICES,
+    decode_rdt_libero_action_chunk,
+)
+from core.rdt_libero_obs_processor import RDTLiberoObsProcessor
 from utils.logging_utils import SteerLogger
 
 log = SteerLogger("RDTSteer")
-
-# ManiSkill checkpoint outputs 8 DOF (7 right-arm joints + 1 gripper).
-_ARM_JOINTS = slice(0, 7)
-
-# LIBERO-finetuned checkpoints output EEF-space actions.
-# Indices in the 128D unified state: right_eef_pos_{x,y,z} + right_eef_angle_{0,1,2} + right_gripper_open
-LIBERO_EEF_INDICES = [30, 31, 32, 33, 34, 35, 10]
-
-# Approximate LIBERO tabletop workspace bounds (robot base frame, meters).
-# Used to normalize EEF position to ~[-1, 1] for the LIBERO-finetuned RDT model.
-# Derived from FK trajectory evidence (round-4 probes) and LIBERO task configs.
-_LIBERO_EEF_POS_MIN = np.array([-0.55, -0.05, 0.08])
-_LIBERO_EEF_POS_MAX = np.array([ 0.15,  0.70, 0.60])
 
 
 def _rdt_flat_config_to_args(flat: dict) -> dict:
@@ -198,12 +189,11 @@ class _RDTModelAdapter(nn.Module):
       * ``step``          – passthrough to the underlying model's ``step()``
     """
 
-    def __init__(self, real_model, libero_eef_mode: bool = False) -> None:
+    def __init__(self, real_model) -> None:
         super().__init__()
         # Store as a regular attribute (not registered parameter) because the
         # real model is not an nn.Module.
         object.__setattr__(self, "_real", real_model)
-        object.__setattr__(self, "_libero_eef_mode", libero_eef_mode)
         # Register the DiT adapter so .parameters() / .to() / .eval() work.
         self.dit = _RDTDiTAdapter(real_model.policy)
         # Expose a noise_scheduler attribute pointing at the inference scheduler
@@ -249,7 +239,7 @@ class _RDTModelAdapter(nn.Module):
     # ── Inference helpers ─────────────────────────────────────────────────────
 
     @torch.no_grad()
-    def encode_inputs(self, proprio, images, text_embeds: Tensor) -> dict:
+    def encode_inputs(self, state_128: Tensor, state_mask_128: Tensor, images: list, text_embeds: Tensor) -> dict:
         """
         Encode vision and language once before the denoising loop.
         Returns a conditioning dict that _RDTDiTAdapter.forward() unpacks.
@@ -308,28 +298,23 @@ class _RDTModelAdapter(nn.Module):
         image_embeds = real.vision_model(image_tensor).detach()
         image_embeds = image_embeds.reshape(-1, real.vision_model.hidden_size).unsqueeze(0)
 
-        # ── Proprioception encoding ───────────────────────────────────────────
-        unified_action_dim: int = real.args["model"]["state_token_dim"]
-        libero_eef_mode = object.__getattribute__(self, "_libero_eef_mode")
+        # ── LIBERO 128D state encoding ────────────────────────────────────────
+        unified_action_dim = int(real.args["model"]["state_token_dim"])
+        if unified_action_dim != 128:
+            raise ValueError(f"Expected RDT state_token_dim=128, got {unified_action_dim}")
 
-        if libero_eef_mode:
-            # LIBERO EEF path: proprio is (1, 7) [eef_x, eef_y, eef_z, rot0, rot1, rot2, grip]
-            # Build 128D state manually at LIBERO_EEF_INDICES (30,31,32,33,34,35,10).
-            proprio_7d = proprio.to(device=device, dtype=dtype)  # (1, 7)
-            states = torch.zeros(1, 1, unified_action_dim, device=device, dtype=dtype)
-            state_elem_mask = torch.zeros(1, unified_action_dim, device=device, dtype=dtype)
-            for i, idx in enumerate(LIBERO_EEF_INDICES):
-                states[:, 0, idx] = proprio_7d[:, i]
-                state_elem_mask[:, idx] = 1.0
-            action_indices: list = LIBERO_EEF_INDICES
-        else:
-            joints = proprio.to(device).unsqueeze(0)          # (1, 1, 8)
-            states, state_elem_mask = real._format_joint_to_state(joints)
-            states = states.to(device, dtype=dtype)
-            state_elem_mask = state_elem_mask.to(device, dtype=dtype)
-            states = states[:, -1:, :]                        # (1, 1, 128)
-            action_indices: list = state_elem_mask[0].nonzero(as_tuple=True)[0].tolist()
+        states = state_128.to(device=device, dtype=dtype)
+        state_elem_mask = state_mask_128.to(device=device, dtype=dtype)
+        if states.shape != (1, unified_action_dim):
+            raise ValueError(f"state_128 must have shape (1, 128), got {tuple(states.shape)}")
+        if state_elem_mask.shape != (1, unified_action_dim):
+            raise ValueError(f"state_mask_128 must have shape (1, 128), got {tuple(state_elem_mask.shape)}")
+        active = torch.where(state_elem_mask[0] > 0)[0].detach().cpu().tolist()
+        if active != ACTIVE_INDICES_SORTED:
+            raise ValueError(f"LIBERO active mask mismatch: expected {ACTIVE_INDICES_SORTED}, got {active}")
 
+        states = states.unsqueeze(1)
+        action_indices = LIBERO_RDT_INDICES
         ctrl_freqs = torch.tensor([real.control_frequency], device=device)
 
         # ── Language ─────────────────────────────────────────────────────────
@@ -348,7 +333,7 @@ class _RDTModelAdapter(nn.Module):
             self._io_probe_logged = True
             log.warning(
                 f"[RDT_IO_PROBE] images={len(images)} "
-                f"proprio_shape={tuple(proprio.shape) if hasattr(proprio, 'shape') else None} "
+                f"state_128_shape={tuple(state_128.shape)} "
                 f"text_shape={tuple(text_embeds.shape)} "
                 f"image_embeds={tuple(image_embeds.shape)} "
                 f"state_tokens={tuple(state_tokens.shape)} "
@@ -390,17 +375,14 @@ class RDTSteer:
 
     name = "rdt_steer"
 
-    def __init__(self, rdt_model, num_inference_steps: int = 55, libero_mode: bool = False) -> None:
+    def __init__(self, rdt_model, num_inference_steps: int = 5) -> None:
         self._rdt_model = rdt_model
         self._num_inference_steps = num_inference_steps
-        # When True: use LIBERO EEF indices for proprio/action instead of ManiSkill joint indices.
-        self._libero_mode: bool = libero_mode
 
         self._adapter: Optional[BaseEnvAdapter] = None
-        self._obs_processor: Optional[RDTObsProcessor] = None
+        self._obs_processor: Optional[RDTLiberoObsProcessor] = None
         self._sample_batch_size: int = 1
         self._action_chunk_horizon: int = 8
-        self._lang_embed_cache_dir: str = "data/rdt_lang_embeds/"
 
         self._cached_action_chunk: Optional[Tensor] = None
         self._last_normalized_reward: float = 0.0
@@ -452,9 +434,11 @@ class RDTSteer:
     def from_pretrained(
         cls,
         pretrained_path: str,
-        num_inference_steps: int = 55,
-        vision_encoder: str = "google/siglip-so400m-patch14-384",
-        libero_mode: bool = False,
+        num_inference_steps: Optional[int] = None,
+        vision_encoder: str = "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384",
+        text_encoder: str = "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl",
+        weight_variant: str = "ema",
+        control_frequency: int = 20,
     ) -> "RDTSteer":
         """Load from a HuggingFace Hub repo ID or a local directory path.
 
@@ -499,22 +483,41 @@ class RDTSteer:
 
         try:
             import yaml
-            from scripts.maniskill_model import (
-                DATA_STAT,
-                MANISKILL_INDICES,
-                RoboticDiffusionTransformerModel,
-                create_model,
-            )
+            from scripts.maniskill_model import create_model
         except ImportError:
             raise ImportError(
                 "Cannot import RoboticDiffusionTransformerModel. "
                 "Ensure third_party/rdt/ is initialized: git submodule update --init"
             )
 
-        # Weights are in a `rdt/` subdirectory of the HF snapshot; check both
-        # the repo root and the subfolder so local paths still work.
-        rdt_subdir = os.path.join(pretrained_path, "rdt")
-        search_dirs = [rdt_subdir, pretrained_path] if os.path.isdir(rdt_subdir) else [pretrained_path]
+        weight_names = (
+            "model.safetensors",
+            "pytorch_model.bin",
+            "mp_rank_00_model_states.pt",
+            "rdt-1b.pt",
+        )
+        weight_search_dirs = [
+            os.path.join(pretrained_path, weight_variant),
+            pretrained_path,
+            os.path.join(pretrained_path, "rdt"),
+        ]
+        weight_file = None
+        for search_root in weight_search_dirs:
+            if not os.path.isdir(search_root):
+                continue
+            for fname in weight_names:
+                candidate = os.path.join(search_root, fname)
+                if os.path.exists(candidate):
+                    weight_file = candidate
+                    break
+            if weight_file is not None:
+                break
+        if weight_file is None:
+            raise FileNotFoundError(
+                f"No RDT weight file found for variant '{weight_variant}' under {pretrained_path}. "
+                f"Searched: {weight_search_dirs}. Looked for: {weight_names}."
+            )
+        log.info(f"Using weight file: {weight_file}")
 
         # Load the model config that ships with the checkpoint. Some HF repos
         # place RDTRunner-style config.json at the repo root while the actual
@@ -522,7 +525,7 @@ class RDTSteer:
         config_path = None
         config_kind = None
         config_search_dirs = []
-        for d in search_dirs:
+        for d in weight_search_dirs:
             config_search_dirs.append(d)
             parent = os.path.dirname(d)
             if parent and parent not in config_search_dirs:
@@ -586,59 +589,14 @@ class RDTSteer:
             f"state_token_dim={args['model']['state_token_dim']} "
             f"scheduler={args['model']['noise_scheduler']}"
         )
+        if num_inference_steps is None:
+            num_inference_steps = int(args["model"]["noise_scheduler"].get("num_inference_timesteps", 5))
         log.warning(
-            f"[RDT_WRAPPER_SEMANTICS] wrapper=scripts.maniskill_model "
-            f"raw_proprio_dim={len(DATA_STAT['state_min'])} "
-            f"raw_action_dim={len(DATA_STAT['action_min'])} "
-            f"unified_indices={MANISKILL_INDICES} "
-            f"state_min={DATA_STAT['state_min']} "
-            f"state_max={DATA_STAT['state_max']} "
-            f"action_min={DATA_STAT['action_min']} "
-            f"action_max={DATA_STAT['action_max']}"
+            f"[RDT_LIBERO_CONFIG] checkpoint={pretrained_path} "
+            f"variant={weight_variant} weight_file={weight_file} "
+            f"steps={num_inference_steps} control_frequency={control_frequency} "
+            f"active_indices={ACTIVE_INDICES_SORTED}"
         )
-        log.warning(
-            "[RDT_WRAPPER_ASSUMPTION] current integration still feeds ManiSkill-style "
-            "8D proprio/action: 7 Franka joint qpos + single-finger gripper. "
-            "If this LIBERO checkpoint was trained with EEF/OSC actions or LIBERO "
-            "normalization stats, the checkpoint can load but policy semantics are mismatched."
-        )
-
-        # Locate the weight file (prefer .safetensors, fall back to .pt/.bin)
-        weight_file = None
-        weight_names = (
-            "model.safetensors",
-            "pytorch_model.bin",
-            "rdt-1b.pt",
-            "mp_rank_00_model_states.pt",  # DeepSpeed checkpoint format
-        )
-        for search_root in (pretrained_path, os.path.join(pretrained_path, "rdt")):
-            if not os.path.isdir(search_root):
-                continue
-            for fname in weight_names:
-                candidate = os.path.join(search_root, fname)
-                if os.path.exists(candidate):
-                    weight_file = candidate
-                    break
-            if weight_file is not None:
-                break
-        # Walk one additional level for nested checkpoints
-        if weight_file is None and os.path.isdir(pretrained_path):
-            for entry in os.scandir(pretrained_path):
-                if entry.is_dir():
-                    for fname in weight_names:
-                        candidate = os.path.join(entry.path, fname)
-                        if os.path.exists(candidate):
-                            weight_file = candidate
-                            break
-                if weight_file is not None:
-                    break
-        if weight_file is None:
-            raise FileNotFoundError(
-                f"No weight file found under {pretrained_path}. "
-                f"Looked for: {weight_names}. "
-                f"Run: ls -R {pretrained_path}"
-            )
-        log.info(f"Using weight file: {weight_file}")
 
         # ``create_model`` constructs RoboticDiffusionTransformerModel and
         # calls load_pretrained_weights when pretrained is not None.
@@ -699,8 +657,9 @@ class RDTSteer:
             real_model = create_model(
                 args,
                 pretrained=weight_file,
-                pretrained_text_encoder_name_or_path="google/t5-v1_1-xxl",
+                pretrained_text_encoder_name_or_path=text_encoder,
                 pretrained_vision_encoder_name_or_path=vision_encoder,
+                control_frequency=control_frequency,
             )
         finally:
             for _cls, _orig in _originals.items():
@@ -710,19 +669,8 @@ class RDTSteer:
             else:
                 os.environ["DISABLE_SAFETENSORS_CONVERSION"] = _prev_disable_conv
 
-        # Auto-detect libero_mode from checkpoint path if not explicitly set.
-        if not libero_mode:
-            _ckpt_name = os.path.basename(pretrained_path.rstrip("/")).lower()
-            _parent_name = os.path.basename(os.path.dirname(pretrained_path)).lower()
-            libero_mode = "libero" in _ckpt_name or "libero" in _parent_name
-            if libero_mode:
-                log.warning(
-                    "[AUTO_DETECT] LIBERO checkpoint detected from path — enabling libero_mode "
-                    "(EEF indices [30,31,32,33,34,35,10] instead of ManiSkill joint indices)"
-                )
-
         # Wrap in the adapter that provides encode_inputs + nn.Module interface.
-        rdt_model = _RDTModelAdapter(real_model, libero_eef_mode=libero_mode)
+        rdt_model = _RDTModelAdapter(real_model)
 
         # ── Sub-model load report ───────────────────────────────────────────
         def _summarize(m):
@@ -736,15 +684,7 @@ class RDTSteer:
         log.info(f"  policy (RDTRunner):  {_summarize(real_model.policy)}, weight_file={os.path.basename(weight_file)}")
         log.info(f"  state_min/max device={real_model.state_min.device} (must match policy device after .to)")
 
-        instance = cls(rdt_model, num_inference_steps=num_inference_steps, libero_mode=libero_mode)
-
-        # Load precomputed T5-XXL embeddings shipped with checkpoint
-        lang_dir = Path(pretrained_path) / "lang_embeds"
-        if lang_dir.exists():
-            obs_proc = RDTObsProcessor(lang_embed_cache_dir=str(lang_dir))
-            obs_proc.load_embedded_tasks(str(lang_dir))
-            instance._obs_processor = obs_proc
-            log.info(f"Loaded {len(obs_proc._lang_cache)} precomputed lang embeds")
+        instance = cls(rdt_model, num_inference_steps=num_inference_steps)
 
         log.info("RDT-1B loaded successfully")
         return instance
@@ -761,44 +701,36 @@ class RDTSteer:
         self._adapter = adapter
         self._sample_batch_size = sample_batch_size
         self._action_chunk_horizon = policy_config.get("action_chunk_horizon", 8)
-        self._lang_embed_cache_dir = policy_config.get(
-            "lang_embed_cache_dir", "data/rdt_lang_embeds/"
-        )
         if self._obs_processor is None:
-            self._obs_processor = RDTObsProcessor(
-                lang_embed_cache_dir=self._lang_embed_cache_dir
-            )
-        # Wire adapter for direct joint-angle proprio (Task 4 fix).
-        self._obs_processor._adapter = self._adapter
-        # LiberoProcessorStep applies a 180° flip to all frames; undo it before SigLIP encoding.
-        from core.env_adapters.libero_adapter import LiberoAdapter
-        self._obs_processor._undo_libero_flip = isinstance(self._adapter, LiberoAdapter)
-        # Wire libero_eef_mode to obs processor so it builds EEF-space proprio.
-        self._obs_processor._libero_eef_mode = self._libero_mode
+            undo_flip = bool(policy_config.get("undo_libero_preprocessor_flip", True))
+            debug_first_step = bool(policy_config.get("debug_first_step", False))
+            try:
+                self._obs_processor = RDTLiberoObsProcessor(
+                    undo_preprocessor_flip=undo_flip,
+                    debug_first_step=debug_first_step,
+                )
+            except TypeError:
+                self._obs_processor = RDTLiberoObsProcessor(
+                    undo_preprocessor_flip=undo_flip,
+                    debug=debug_first_step,
+                )
         log.info(
             f"post_init wired: adapter={type(self._adapter).__name__}, "
-            f"undo_libero_flip={self._obs_processor._undo_libero_flip}, "
-            f"libero_eef_mode={self._libero_mode}, "
+            f"undo_libero_flip={self._obs_processor.undo_preprocessor_flip}, "
             f"sample_batch_size={self._sample_batch_size}, "
             f"action_chunk_horizon={self._action_chunk_horizon}"
         )
-        # Reuse the T5 already loaded inside the RDT model to avoid a second T5 load.
-        # _RDTModelAdapter wraps the real model; real.encode_instruction uses real.text_model.
+
+    def _get_lang_embed(self, task: str) -> Tensor:
+        real = None
         try:
             real = object.__getattribute__(self._rdt_model, "_real")
-            if callable(getattr(real, "encode_instruction", None)):
-                # Use the device the text_model is already on; "cpu" causes a device
-                # mismatch because real.text_model is moved to CUDA during reset().
-                _enc_device = str(real.device)
-                def _enc_fn(s, _d=_enc_device):
-                    emb = real.encode_instruction(s, device=_d)
-                    return emb.float().cpu()
-                self._obs_processor._text_encoder_fn = _enc_fn
-                log.info("Language encoder: reusing RDT model's T5")
-            else:
-                log.warning("encode_instruction not found on real model — will lazy-load T5")
-        except Exception as exc:
-            log.warning(f"T5 wiring failed ({exc}), falling back to lazy T5 load")
+        except Exception:
+            real = None
+        if real is not None and callable(getattr(real, "encode_instruction", None)):
+            embed = real.encode_instruction(task, device=str(self.device))
+            return embed.float().to(self.device)
+        return torch.zeros(1, 1, 4096, device=self.device)
 
     def to(self, device) -> "RDTSteer":
         if isinstance(self._rdt_model, nn.Module):
@@ -859,56 +791,25 @@ class RDTSteer:
         global_step: int = 0,
         current_stage: int = 1,
     ) -> Tensor:
-        if self._obs_processor is not None:
-            self._obs_processor.update_image_history(batch)
-
         if generate_new_chunk:
-            images, proprio, task_str = self._obs_processor.process(batch)
-            text_embed = self._obs_processor.get_lang_embed(task_str, self.device)
-
-            # ── DIAGNOSTIC PROBE P4: text_embed health (revert via git revert HEAD) ──
-            if not getattr(self, '_diag_p4_done', False):
-                try:
-                    from pathlib import Path as _P
-                    _lp = _P(__file__).resolve().parents[1] / "docs/superpowers/03_evidence/rdt_intergration/round-3/20260511_obs_probes.log"
-                    _lp.parent.mkdir(parents=True, exist_ok=True)
-                    _norm = float(text_embed.norm().item())
-                    _max_abs = float(text_embed.abs().max().item())
-                    _mean = float(text_embed.mean().item())
-                    with open(_lp, "a") as _f:
-                        _f.write(
-                            f"[P4 text_embed] shape={tuple(text_embed.shape)} "
-                            f"dtype={text_embed.dtype} device={text_embed.device} "
-                            f"norm={_norm:.4f} max_abs={_max_abs:.4f} mean={_mean:.6f} "
-                            f"is_zero_fallback={_max_abs < 1e-6}\n"
-                        )
-                except Exception as _e:
-                    log.warning(f"[P4] probe failed: {_e}")
-                self._diag_p4_done = True
-            # ── END P4 ─────────────────────────────────────────────────────────────
-
+            if self._obs_processor is None:
+                raise RuntimeError("RDTSteer.post_init must be called before select_action")
+            converted = self._obs_processor.process(batch)
+            text_embed = self._get_lang_embed(converted.task)
             B = self._sample_batch_size
 
             if use_guidance:
-                raw = self._guided_denoise_loop(
-                    proprio=proprio,
-                    images=images,
-                    text_embeds=text_embed,
-                    B=B,
-                    guidance_fns=guidance_fns,
-                    keypoints=keypoints,
-                    guide_scale=guide_scale,
-                    start_ratio=start_ratio,
-                    use_diversity=use_diversity,
-                    diversity_scale=diversity_scale,
-                    use_fkd=use_fkd,
-                    fkd_config=fkd_config,
-                    sigmoid_k=sigmoid_k,
-                    sigmoid_x0=sigmoid_x0,
-                    verbose=verbose,
+                raise NotImplementedError(
+                    "RDT LIBERO VLS steering is deferred until unguided LIBERO semantics pass."
                 )
             else:
-                raw = self._predict_unguided(proprio, images, text_embed, B)
+                raw = self._predict_unguided(
+                    converted.state_128,
+                    converted.state_mask_128,
+                    converted.images,
+                    text_embed,
+                    B,
+                )
 
             self._cached_action_chunk = self._postprocess_actions(raw)
 
@@ -918,17 +819,14 @@ class RDTSteer:
 
     def _predict_unguided(
         self,
-        proprio,
+        state_128: Tensor,
+        state_mask_128: Tensor,
         images: list,
         text_embed: Tensor,
         B: int,
     ) -> Tensor:
         """
-        Run the denoising loop without guidance hooks.
-
-        Returns (B, 64, raw_action_dim) in NORMALIZED space ∈ [-1, 1].
-        Does NOT apply _unformat_action_to_joint so values stay in range
-        for LIBERO's OSC controller (which expects actions ∈ [-1, 1]).
+        Run the denoising loop without guidance hooks in the full LIBERO 128D space.
         """
         device = self.device
         try:
@@ -936,21 +834,12 @@ class RDTSteer:
         except StopIteration:
             dtype = torch.float32
 
-        cond = self._rdt_model.encode_inputs(proprio, images, text_embed)
-        if "action_indices" in cond:
-            raw_action_dim = len(cond["action_indices"])
-            action_indices = cond["action_indices"]
-            unified_action_dim = cond["unified_action_dim"]
-        else:
-            _probe = self._rdt_model.step(proprio=proprio, images=images, text_embeds=text_embed)
-            raw_action_dim = _probe.shape[-1]
-            action_indices = list(range(raw_action_dim))
-            unified_action_dim = raw_action_dim
-
-        # Initialize noise in the full unified action space (128D), matching
-        # RDTRunner.conditional_sample which uses randn(B, pred_horizon, action_dim=128).
-        # Initializing in the 8D subspace with zero-padding biased the posterior.
-        x_t = torch.randn(B, 64, unified_action_dim, device=device, dtype=dtype)
+        cond = self._rdt_model.encode_inputs(state_128, state_mask_128, images, text_embed)
+        unified_action_dim = int(cond["unified_action_dim"])
+        if unified_action_dim != 128:
+            raise ValueError(f"Expected unified action dim 128, got {unified_action_dim}")
+        pred_horizon = 64
+        x_t = torch.randn(B, pred_horizon, unified_action_dim, device=device, dtype=dtype)
 
         scheduler = self._noise_scheduler
         scheduler.set_timesteps(self._num_inference_steps)
@@ -959,160 +848,45 @@ class RDTSteer:
             for t in scheduler.timesteps:
                 noise_pred = self._dit(x_t, t, cond)
                 x_t = scheduler.step(noise_pred, t, x_t).prev_sample
+                x_t = x_t.to(dtype=dtype)
 
-        # Project from unified 128D back to the raw 8D action subspace for postprocessing.
-        return x_t[:, :, action_indices][:, :, :raw_action_dim]
+        action_mask = cond["action_mask"].expand(B, pred_horizon, unified_action_dim).to(device=device, dtype=dtype)
+        return (x_t * action_mask).float()
 
     # ── Action postprocessing ─────────────────────────────────────────────────
 
     def _postprocess_actions(self, actions: Tensor) -> Tensor:
         """
-        (B, 64, 8) normalized → (1, H, 7) LIBERO EEF-delta using Franka FK.
-
-        If the adapter provides joint positions, uses FK-based EEF-delta conversion.
-        Falls back to the normalized-bypass approach when the adapter is unavailable
-        (e.g. in unit tests using stub models).
+        (B, 64, 128) LIBERO RDT action space -> (1, H, 7) LIBERO raw actions.
         """
-        from core.rdt_action_converter import rdt_chunk_to_libero_actions
-
-        best = actions[0]  # (64, 8) — particle 0
-        chunk_np = best[: self._action_chunk_horizon].detach().cpu().float().numpy()  # (H, 8)
-
-        # ── DIAGNOSTIC PROBE P5/P7: action chain (revert via git revert HEAD) ──
-        # Multi-step trigger at steps {0, 10, 20}. Probe is purely additive — main
-        # postprocessing logic below is unchanged.
-        _diag_step = getattr(self, '_diag_action_step_count', 0)
-        self._diag_action_step_count = _diag_step + 1
-        _diag_trigger = _diag_step in (0, 10, 20)
-        if _diag_trigger:
-            try:
-                import core.rdt_action_converter as _rac
-                _rac._DIAG_TRIGGER = True
-                _rac._DIAG_STEP = _diag_step
-            except Exception:
-                pass
-        else:
-            try:
-                import core.rdt_action_converter as _rac
-                _rac._DIAG_TRIGGER = False
-            except Exception:
-                pass
-
-        if _diag_trigger:
-            try:
-                from pathlib import Path as _P
-                _lp = _P(__file__).resolve().parents[1] / "docs/superpowers/03_evidence/rdt_intergration/round-4/20260511_action_probes.log"
-                _lp.parent.mkdir(parents=True, exist_ok=True)
-                _npy_p5 = _lp.parent / f"20260511_P5_chunk_np_step{_diag_step}.npy"
-                np.save(str(_npy_p5), chunk_np)
-                _arm = chunk_np[:, :7]
-                _grip = chunk_np[:, 7]
-                _arm_diff = np.linalg.norm(np.diff(_arm, axis=0), ord=np.inf, axis=1) if _arm.shape[0] > 1 else np.array([0.0])
-                _grip_signs = np.sign(_grip)
-                _grip_changes = int(np.sum(np.diff(_grip_signs) != 0))
-                _oor = int(np.sum(np.abs(chunk_np) > 1.0))
-                with open(_lp, "a") as _f:
-                    _f.write(
-                        f"[P5 chunk_np step={_diag_step}] "
-                        f"shape={chunk_np.shape} "
-                        f"arm_min={float(_arm.min()):.4f} "
-                        f"arm_max={float(_arm.max()):.4f} "
-                        f"arm_mean={float(_arm.mean()):.4f} "
-                        f"arm_std={float(_arm.std()):.4f} "
-                        f"arm_step_diff_max={float(_arm_diff.max()):.4f} "
-                        f"arm_step_diff_mean={float(_arm_diff.mean()):.4f} "
-                        f"grip_min={float(_grip.min()):.4f} "
-                        f"grip_max={float(_grip.max()):.4f} "
-                        f"grip_mean={float(_grip.mean()):.4f} "
-                        f"grip_first={float(_grip[0]):.4f} "
-                        f"grip_last={float(_grip[-1]):.4f} "
-                        f"grip_sign_changes={_grip_changes} "
-                        f"out_of_range_count={_oor} "
-                        f"npy_saved={str(_npy_p5)}\n"
-                    )
-            except Exception as _e:
-                log.warning(f"[P5] probe failed: {_e}")
-        # ── END P5 ──────────────────────────────────────────────────────────────
-
-        # ── LIBERO EEF path: output is already delta EEF in [-1,1] ─────────────
-        # When libero_mode=True, encode_inputs extracted LIBERO_EEF_INDICES [30,31,32,33,34,35,10]
-        # from the 128D output, so chunk_np is (H, 7): [pos_x, pos_y, pos_z, angle0-2, gripper].
-        # The model outputs these in normalized [-1,1] space which IS the LIBERO action space.
-        # Only fix needed: negate gripper (RDT right_gripper_open: high=open; LIBERO: 1=close).
-        if self._libero_mode:
-            libero_direct = chunk_np.copy()
-            libero_direct[:, 6] = -chunk_np[:, 6]  # flip gripper convention
-            log.warning(
-                f"[LIBERO_EEF_PATH] step={_diag_step} chunk shape={chunk_np.shape} "
-                f"pos_range=[{chunk_np[:,:3].min():.3f},{chunk_np[:,:3].max():.3f}] "
-                f"ori_range=[{chunk_np[:,3:6].min():.3f},{chunk_np[:,3:6].max():.3f}] "
-                f"grip_raw={chunk_np[0,6]:.3f} grip_libero={libero_direct[0,6]:.3f}"
-            )
-            return torch.from_numpy(libero_direct).unsqueeze(0).float()  # (1, H, 7)
-
-        if self._adapter is not None and hasattr(self._adapter, 'get_joint_positions'):
-            try:
-                current_joints = self._adapter.get_joint_positions().astype(np.float64)  # (7,)
-                libero_chunk = rdt_chunk_to_libero_actions(chunk_np, current_joints)  # (H, 7)
-
-                # ── DIAGNOSTIC PROBE P7: final LIBERO action health ──────────────
-                if _diag_trigger:
-                    try:
-                        from pathlib import Path as _P
-                        _lp = _P(__file__).resolve().parents[1] / "docs/superpowers/03_evidence/rdt_intergration/round-4/20260511_action_probes.log"
-                        _lp.parent.mkdir(parents=True, exist_ok=True)
-                        _npy_p7 = _lp.parent / f"20260511_P7_libero_chunk_step{_diag_step}.npy"
-                        np.save(str(_npy_p7), libero_chunk)
-                        _ap = libero_chunk[:, :3]
-                        _ao = libero_chunk[:, 3:6]
-                        _ag = libero_chunk[:, 6]
-                        _ap_sat = float(np.mean(np.abs(_ap) >= 0.99))
-                        _ao_sat = float(np.mean(np.abs(_ao) >= 0.99))
-                        _ap_z_first10_mean = float(_ap[:10, 2].mean()) if _ap.shape[0] >= 1 else 0.0
-                        _ag_signs = np.sign(_ag)
-                        _ag_changes = int(np.sum(np.diff(_ag_signs) != 0))
-                        with open(_lp, "a") as _f:
-                            _f.write(
-                                f"[P7 libero_action step={_diag_step}] "
-                                f"shape={libero_chunk.shape} "
-                                f"pos_min={float(_ap.min()):.4f} "
-                                f"pos_max={float(_ap.max()):.4f} "
-                                f"pos_mean={float(_ap.mean()):.4f} "
-                                f"pos_saturate_rate={_ap_sat:.3f} "
-                                f"ori_min={float(_ao.min()):.4f} "
-                                f"ori_max={float(_ao.max()):.4f} "
-                                f"ori_saturate_rate={_ao_sat:.3f} "
-                                f"pos_z_first10_mean={_ap_z_first10_mean:.4f} "
-                                f"grip_min={float(_ag.min()):.4f} "
-                                f"grip_max={float(_ag.max()):.4f} "
-                                f"grip_first={float(_ag[0]):.4f} "
-                                f"grip_last={float(_ag[-1]):.4f} "
-                                f"grip_sign_changes={_ag_changes} "
-                                f"first_5_steps={libero_chunk[:5].tolist()} "
-                                f"npy_saved={str(_npy_p7)}\n"
-                            )
-                    except Exception as _e:
-                        log.warning(f"[P7] probe failed: {_e}")
-                # ── END P7 ───────────────────────────────────────────────────────
-
-                return torch.from_numpy(libero_chunk).unsqueeze(0).float()  # (1, H, 7)
-            except Exception as exc:
-                log.warning(f"FK conversion failed ({exc}), falling back to bypass")
-
-        # Fallback: normalized bypass
-        libero_action = np.concatenate([chunk_np[:, :6], chunk_np[:, 7:8]], axis=1)
-        return torch.from_numpy(libero_action).unsqueeze(0).float()  # (1, H, 7)
+        if actions.ndim != 3 or tuple(actions.shape[1:]) != (64, 128):
+            raise ValueError(f"Expected actions with shape (B, 64, 128), got {tuple(actions.shape)}")
+        decoded = decode_rdt_libero_action_chunk(actions, self._action_chunk_horizon)
+        if not torch.isfinite(decoded).all():
+            raise ValueError("Decoded LIBERO action chunk contains non-finite values")
+        log.info(
+            f"Decoded LIBERO action chunk: shape={tuple(decoded.shape)} "
+            f"min={float(decoded.min().item()):.4f} max={float(decoded.max().item()):.4f}"
+        )
+        return decoded
 
     # ── Trajectory projection (shared by diversity and guidance hooks) ────────
 
     def _rdt_sample_to_trajectory_3d(self, sample: Tensor) -> Tensor:
         """
-        (1, 64, 14) → (1, H+1, 3) via adapter.delta_actions_to_ee_trajectory.
-        Slices right-arm, takes action_chunk_horizon steps, projects to 3D EEF.
+        (1, 64, 128) -> (1, H+1, 3) via adapter.delta_actions_to_ee_trajectory.
         """
-        action_seq = sample[0, : self._action_chunk_horizon, _ARM_JOINTS]  # (H, 7)
-        traj = self._adapter.delta_actions_to_ee_trajectory(action_seq)   # (H+1, 3)
-        return traj.unsqueeze(0)  # (1, H+1, 3)
+        libero_actions = decode_rdt_libero_action_chunk(sample, self._action_chunk_horizon)[0]
+        if self._adapter is None:
+            return torch.zeros(
+                1,
+                self._action_chunk_horizon + 1,
+                3,
+                device=sample.device,
+                dtype=sample.dtype,
+            )
+        traj = self._adapter.delta_actions_to_ee_trajectory(libero_actions.to(sample.device))
+        return traj.unsqueeze(0)
 
     # ── Gradient helpers ──────────────────────────────────────────────────────
 
