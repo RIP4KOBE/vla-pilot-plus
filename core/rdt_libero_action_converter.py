@@ -97,7 +97,11 @@ def rdt_action_to_libero_raw(action_128d):
 def decode_rdt_libero_action_chunk(pred_actions_128, action_chunk_horizon):
     if not torch.is_tensor(pred_actions_128):
         raise TypeError("Expected pred_actions_128 to be a torch tensor")
-    if pred_actions_128.ndim != 3 or pred_actions_128.shape[-1] != 128:
+    if (
+        pred_actions_128.ndim != 3
+        or pred_actions_128.shape[1] != 64
+        or pred_actions_128.shape[2] != 128
+    ):
         raise ValueError("Expected pred_actions_128 with shape (B, 64, 128)")
     if action_chunk_horizon < 1 or action_chunk_horizon > pred_actions_128.shape[1]:
         raise ValueError("action_chunk_horizon must fit within the action chunk")

@@ -84,3 +84,6 @@ def test_decode_chunk_returns_torch_1_h_7_and_clips_controller_range():
 def test_decode_rejects_wrong_action_shape():
     with pytest.raises(ValueError, match="128"):
         decode_rdt_libero_action_chunk(torch.zeros(1, 64, 7), action_chunk_horizon=8)
+
+    with pytest.raises(ValueError, match="64|128"):
+        decode_rdt_libero_action_chunk(torch.zeros(1, 63, 128), action_chunk_horizon=8)
