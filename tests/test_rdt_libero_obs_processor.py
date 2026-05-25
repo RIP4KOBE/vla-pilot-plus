@@ -1,14 +1,17 @@
 import importlib.util
+import sys
 from pathlib import Path
 
 import pytest
 import torch
 
+# Load by file path to bypass core/__init__.py optional dependency side effects.
 _MODULE_PATH = Path(__file__).resolve().parents[1] / "core" / "rdt_libero_obs_processor.py"
 _SPEC = importlib.util.spec_from_file_location("rdt_libero_obs_processor", _MODULE_PATH)
 if _SPEC is None or _SPEC.loader is None:
     raise ImportError(f"Cannot load RDT LIBERO observation processor from {_MODULE_PATH}")
 _processor_module = importlib.util.module_from_spec(_SPEC)
+sys.modules[_SPEC.name] = _processor_module
 _SPEC.loader.exec_module(_processor_module)
 
 RDTLiberoObsProcessor = _processor_module.RDTLiberoObsProcessor
@@ -32,6 +35,13 @@ def _obs(task="pick up the mug"):
         ),
         "task": task,
     }
+
+
+def _assert_pil_color(image, expected_rgb):
+    from PIL import Image
+
+    assert isinstance(image, Image.Image)
+    assert image.getpixel((0, 0)) == expected_rgb
 
 
 def test_process_builds_state_and_mask_contract():
@@ -78,10 +88,10 @@ def test_first_frame_history_duplicates_current_frame():
     assert len(converted.images) == 6
     assert converted.images[2] is None
     assert converted.images[5] is None
-    torch.testing.assert_close(converted.images[0], obs["observation.images.image"])
-    torch.testing.assert_close(converted.images[1], obs["observation.images.image2"])
-    torch.testing.assert_close(converted.images[3], obs["observation.images.image"])
-    torch.testing.assert_close(converted.images[4], obs["observation.images.image2"])
+    _assert_pil_color(converted.images[0], (255, 0, 0))
+    _assert_pil_color(converted.images[1], (0, 255, 0))
+    _assert_pil_color(converted.images[3], (255, 0, 0))
+    _assert_pil_color(converted.images[4], (0, 255, 0))
 
 
 def test_second_call_uses_previous_and_current_frames():
@@ -95,11 +105,11 @@ def test_second_call_uses_previous_and_current_frames():
     converted = processor.process(second_obs)
 
     assert len(converted.images) == 6
-    torch.testing.assert_close(converted.images[0], first_obs["observation.images.image"])
-    torch.testing.assert_close(converted.images[1], first_obs["observation.images.image2"])
+    _assert_pil_color(converted.images[0], (255, 0, 0))
+    _assert_pil_color(converted.images[1], (0, 255, 0))
     assert converted.images[2] is None
-    torch.testing.assert_close(converted.images[3], second_obs["observation.images.image"])
-    torch.testing.assert_close(converted.images[4], second_obs["observation.images.image2"])
+    _assert_pil_color(converted.images[3], (0, 0, 255))
+    _assert_pil_color(converted.images[4], (255, 255, 0))
     assert converted.images[5] is None
 
 
@@ -114,10 +124,10 @@ def test_reset_clears_image_history():
     processor.reset()
     converted = processor.process(second_obs)
 
-    torch.testing.assert_close(converted.images[0], second_obs["observation.images.image"])
-    torch.testing.assert_close(converted.images[1], second_obs["observation.images.image2"])
-    torch.testing.assert_close(converted.images[3], second_obs["observation.images.image"])
-    torch.testing.assert_close(converted.images[4], second_obs["observation.images.image2"])
+    _assert_pil_color(converted.images[0], (0, 0, 255))
+    _assert_pil_color(converted.images[1], (255, 255, 0))
+    _assert_pil_color(converted.images[3], (0, 0, 255))
+    _assert_pil_color(converted.images[4], (255, 255, 0))
 
 
 def test_missing_wrist_image_raises_key_error():
