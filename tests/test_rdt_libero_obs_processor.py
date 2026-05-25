@@ -146,12 +146,56 @@ def test_empty_language_raises_value_error():
         processor.process(_obs(task=""))
 
 
+def test_non_string_task_raises_value_error():
+    processor = RDTLiberoObsProcessor()
+
+    with pytest.raises(ValueError, match="task|string"):
+        processor.process(_obs(task=None))
+
+
+def test_bad_image_channel_shape_raises_value_error():
+    processor = RDTLiberoObsProcessor()
+    obs = _obs()
+    obs["observation.images.image"] = torch.zeros((1, 1, 8, 8), dtype=torch.float32)
+
+    with pytest.raises(ValueError, match=r"\(B, 3, H, W\)|3"):
+        processor.process(obs)
+
+
+def test_non_finite_image_raises_value_error():
+    processor = RDTLiberoObsProcessor()
+    obs = _obs()
+    obs["observation.images.image"][0, 0, 0, 0] = torch.nan
+
+    with pytest.raises(ValueError, match="finite"):
+        processor.process(obs)
+
+
+def test_image_outside_unit_range_raises_value_error():
+    processor = RDTLiberoObsProcessor()
+    obs = _obs()
+    obs["observation.images.image"] = torch.full((1, 3, 8, 8), 255.0, dtype=torch.float32)
+
+    with pytest.raises(ValueError, match=r"\[0, 1\]|range"):
+        processor.process(obs)
+
+
 def test_bad_state_shape_raises_value_error():
     processor = RDTLiberoObsProcessor()
     obs = _obs()
     obs["observation.state"] = torch.zeros((1, 7), dtype=torch.float32)
 
     with pytest.raises(ValueError, match="8"):
+        processor.process(obs)
+
+
+@pytest.mark.parametrize("batch_size", [0, 2])
+def test_bad_state_batch_shape_raises_value_error(batch_size):
+    processor = RDTLiberoObsProcessor()
+    obs = _obs()
+    obs["observation.state"] = torch.zeros((batch_size, 8), dtype=torch.float32)
+
+    with pytest.raises(ValueError, match=r"\(1, 8\)|batch"):
         processor.process(obs)
 
 

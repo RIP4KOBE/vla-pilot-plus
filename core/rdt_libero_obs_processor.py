@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import logging
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -25,6 +26,7 @@ def _load_action_converter():
     if spec is None or spec.loader is None:
         raise ImportError(f"Cannot load RDT LIBERO action converter from {module_path}")
     module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
 
@@ -91,9 +93,15 @@ class RDTLiberoObsProcessor:
         image = obs[key]
         if not torch.is_tensor(image):
             image = torch.as_tensor(image)
+        if image.ndim != 4 or image.shape[0] != 1 or image.shape[1] != 3:
+            raise ValueError(f"Expected {key} image tensor with shape (B, 3, H, W)")
+        if not torch.isfinite(image).all():
+            raise ValueError(f"Expected {key} image tensor to contain only finite values")
+        if torch.any((image < 0.0) | (image > 1.0)):
+            raise ValueError(f"Expected {key} image tensor values in range [0, 1]")
         if self.undo_preprocessor_flip:
             image = torch.flip(image, dims=(-2, -1))
-        image = image[0].detach().cpu().to(dtype=torch.float32).clamp(0.0, 1.0)
+        image = image[0].detach().cpu().to(dtype=torch.float32)
         image_np = (image.permute(1, 2, 0).numpy() * 255.0).round().astype(np.uint8)
         return Image.fromarray(image_np)
 
@@ -101,8 +109,8 @@ class RDTLiberoObsProcessor:
         state = obs[STATE_KEY]
         if not torch.is_tensor(state):
             state = torch.as_tensor(state)
-        if state.ndim != 2 or state.shape[1] != 8:
-            raise ValueError("Expected observation.state with shape (B, 8)")
+        if state.ndim != 2 or tuple(state.shape) != (1, 8):
+            raise ValueError("Expected observation.state with shape (1, 8) for online batch")
 
         state_head = state[0].detach().cpu().to(dtype=torch.float32)
         eef_pos = state_head[:3]
@@ -118,7 +126,13 @@ class RDTLiberoObsProcessor:
         return state_128, state_mask_128
 
     def _task(self, obs: dict[str, Any]) -> str:
-        task = str(obs[TASK_KEY]).strip()
+        task_value = obs[TASK_KEY]
+        if isinstance(task_value, (list, tuple)) and len(task_value) == 1:
+            task_value = task_value[0]
+        if not isinstance(task_value, str):
+            raise ValueError("Expected task to be a string")
+
+        task = task_value.strip()
         if not task:
             raise ValueError("Task string is empty")
         return task
