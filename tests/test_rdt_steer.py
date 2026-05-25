@@ -2,11 +2,40 @@
 CPU-only smoke tests for RDTSteer and RDTObsProcessor.
 No real checkpoint or GPU required — uses stub RDT model.
 """
+import sys
+from pathlib import Path
+from types import ModuleType
+from unittest.mock import MagicMock
+
 import numpy as np
 import pytest
 import torch
 from torch import nn
-from unittest.mock import MagicMock
+
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+_core_pkg = ModuleType("core")
+_core_pkg.__path__ = [str(Path(__file__).resolve().parents[1] / "core")]
+sys.modules.setdefault("core", _core_pkg)
+
+_env_adapters = ModuleType("core.env_adapters")
+
+
+class _BaseEnvAdapter:
+    pass
+
+
+class _LiberoAdapter(_BaseEnvAdapter):
+    pass
+
+
+_env_adapters.BaseEnvAdapter = _BaseEnvAdapter
+sys.modules.setdefault("core.env_adapters", _env_adapters)
+
+_libero_adapter = ModuleType("core.env_adapters.libero_adapter")
+_libero_adapter.LiberoAdapter = _LiberoAdapter
+sys.modules.setdefault("core.env_adapters.libero_adapter", _libero_adapter)
 
 
 # ── Stub RDT model (replaces the real 1.2B-param checkpoint) ────────────────
@@ -14,22 +43,21 @@ from unittest.mock import MagicMock
 class _StubDiT(nn.Module):
     """Minimal DiT stand-in: returns zeros with the correct shape."""
     def forward(self, x, t, cond):
-        return torch.zeros_like(x)  # (B, 64, 14)
+        return torch.zeros_like(x)
 
 
 class _StubScheduler:
     """Minimal noise scheduler compatible with DPMSolverMultistepScheduler API."""
 
-    def __init__(self, n=10):
+    def __init__(self, n=5):
         self.timesteps = torch.arange(n - 1, -1, -1, dtype=torch.long)
-        self.alphas_cumprod = torch.linspace(0.99, 0.01, 1000)
 
     def set_timesteps(self, n):
         self.timesteps = torch.arange(n - 1, -1, -1, dtype=torch.long)
 
     def step(self, noise_pred, t, x_t):
         out = MagicMock()
-        out.prev_sample = x_t * 0.9  # trivial shrink
+        out.prev_sample = x_t * 0.0
         return out
 
 
@@ -41,11 +69,17 @@ class _StubRDTModel(nn.Module):
         self.dit = _StubDiT()
         self.noise_scheduler = _StubScheduler()
 
-    def encode_inputs(self, proprio, images, text_embeds):
-        return {}  # conditioning dict (opaque to the loop)
-
-    def step(self, proprio, images, text_embeds):
-        return torch.zeros(1, 64, 14)
+    def encode_inputs(self, state_128, state_mask_128, images, text_embeds):
+        return {
+            "lang_cond": torch.zeros(1, 1, 4),
+            "lang_attn_mask": torch.ones(1, 1, dtype=torch.bool),
+            "img_cond": torch.zeros(1, 1, 4),
+            "state_traj": torch.zeros(1, 1, 4),
+            "action_mask": state_mask_128.float().unsqueeze(1),
+            "ctrl_freqs": torch.tensor([20]),
+            "action_indices": [30, 31, 32, 33, 34, 35, 36, 37, 38, 10],
+            "unified_action_dim": 128,
+        }
 
 
 # ── Fixtures ─────────────────────────────────────────────────────────────────
@@ -53,7 +87,7 @@ class _StubRDTModel(nn.Module):
 @pytest.fixture
 def stub_steer():
     from core.rdt_policy_steer import RDTSteer
-    return RDTSteer(rdt_model=_StubRDTModel(), num_inference_steps=10)
+    return RDTSteer(rdt_model=_StubRDTModel(), num_inference_steps=5)
 
 
 @pytest.fixture
@@ -70,9 +104,12 @@ def stub_adapter():
 def mock_batch():
     B = 4
     return {
-        "observation.images.image": torch.zeros(B, 3, 256, 256),
-        "observation.images.image2": torch.zeros(B, 3, 256, 256),
-        "observation.state": torch.zeros(B, 8),
+        "observation.images.image": torch.zeros(B, 3, 16, 16),
+        "observation.images.image2": torch.zeros(B, 3, 16, 16),
+        "observation.state": torch.tensor(
+            [[0.10, -0.20, 0.80, 0.0, 0.0, 0.0, 0.04, -0.04]] * B,
+            dtype=torch.float32,
+        ),
         "task": ["pick up the red block"] * B,
     }
 
@@ -107,59 +144,42 @@ def test_forward_shape(stub_steer, stub_adapter, mock_batch):
     assert not torch.isnan(action).any()
 
 
-def test_fkd_rollout(stub_steer, stub_adapter, mock_batch):
-    """3-step rollout with use_fkd=True completes without error."""
-    stub_steer.post_init(
-        adapter=stub_adapter,
-        postprocessor=lambda x: x,
-        sample_batch_size=4,
-        policy_config={"action_chunk_horizon": 8, "lang_embed_cache_dir": "/tmp/rdt_lang"},
-    )
-    guidance_fn = lambda kp, traj: traj.sum()
-    kp = torch.zeros(3, 3)
-
-    for step in range(3):
-        action = stub_steer.select_action(
-            mock_batch,
-            generate_new_chunk=(step == 0),
-            use_guidance=True,
-            use_fkd=True,
-            fkd_config={
-                "potential_type": "max",
-                "lmbda": 1.0,
-                "adaptive_resampling": False,
-                "resample_frequency": 2,
-            },
-            guidance_fns=[guidance_fn],
-            keypoints=kp.numpy(),
-        )
-    assert isinstance(stub_steer.get_normalized_reward(), float)
-
-
-def test_gradient_steering(stub_steer, stub_adapter, mock_batch):
-    """Gradient guidance runs without error and updates normalized reward."""
+def test_unguided_uses_full_128d_libero_mask(stub_steer, stub_adapter, mock_batch):
     stub_steer.post_init(
         adapter=stub_adapter,
         postprocessor=lambda x: x,
         sample_batch_size=2,
-        policy_config={"action_chunk_horizon": 8, "lang_embed_cache_dir": "/tmp/rdt_lang"},
+        policy_config={"action_chunk_horizon": 8, "debug_first_step": True},
+    )
+    converted = stub_steer._obs_processor.process(mock_batch)
+    assert converted.state_128.shape == (1, 128)
+    assert converted.state_mask_128.shape == (1, 128)
+    assert torch.where(converted.state_mask_128[0] > 0)[0].tolist() == [10, 30, 31, 32, 33, 34, 35, 36, 37, 38]
+    assert converted.task == "pick up the red block"
+
+    raw = stub_steer._predict_unguided(
+        converted.state_128,
+        converted.state_mask_128,
+        converted.images,
+        torch.zeros(1, 1, 4096),
+        B=2,
+    )
+    assert raw.shape == (2, 64, 128)
+
+
+def test_guided_rdt_libero_path_is_explicitly_deferred(stub_steer, stub_adapter, mock_batch):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=2,
+        policy_config={"action_chunk_horizon": 8, "debug_first_step": True},
     )
 
-    def reward_fn(keypoints, traj):
-        # Simple differentiable reward: sum of trajectory positions
-        return traj.sum()
-
-    kp = np.zeros((3, 3), dtype=np.float32)
-    stub_steer.select_action(
-        mock_batch,
-        generate_new_chunk=True,
-        use_guidance=True,
-        use_fkd=False,
-        guidance_fns=[reward_fn],
-        keypoints=kp,
-        guide_scale=1.0,
-        start_ratio=0.0,   # guidance from the very first step
-    )
-    # After one guided denoising, reward should have been computed
-    # (even if zero from stub — the method must not crash and must update state)
-    assert isinstance(stub_steer.get_normalized_reward(), float)
+    with pytest.raises(NotImplementedError, match="RDT LIBERO VLS steering"):
+        stub_steer.select_action(
+            mock_batch,
+            generate_new_chunk=True,
+            use_guidance=True,
+            guidance_fns=[lambda keypoints, traj: traj.sum()],
+            keypoints=np.zeros((3, 3), dtype=np.float32),
+        )
