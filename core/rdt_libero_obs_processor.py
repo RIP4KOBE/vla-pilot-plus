@@ -69,8 +69,8 @@ class RDTLiberoObsProcessor:
         state_128, state_mask_128 = self._build_state(obs)
         task = self._task(obs)
 
-        agent_prev = self._agent_prev if self._agent_prev is not None else agent_now
-        wrist_prev = self._wrist_prev if self._wrist_prev is not None else wrist_now
+        agent_prev = self._agent_prev
+        wrist_prev = self._wrist_prev
         images = [agent_prev, wrist_prev, None, agent_now, wrist_now, None]
 
         self._agent_prev = agent_now

@@ -87,17 +87,17 @@ def test_debug_first_step_alias_controls_debug_flag():
     assert RDTLiberoObsProcessor(debug=True, debug_first_step=False).debug is False
 
 
-def test_first_frame_history_duplicates_current_frame():
+def test_first_frame_history_uses_missing_previous_slots():
     processor = RDTLiberoObsProcessor()
     obs = _obs()
 
     converted = processor.process(obs)
 
     assert len(converted.images) == 6
+    assert converted.images[0] is None
+    assert converted.images[1] is None
     assert converted.images[2] is None
     assert converted.images[5] is None
-    _assert_pil_color(converted.images[0], (255, 0, 0))
-    _assert_pil_color(converted.images[1], (0, 255, 0))
     _assert_pil_color(converted.images[3], (255, 0, 0))
     _assert_pil_color(converted.images[4], (0, 255, 0))
 
@@ -132,10 +132,12 @@ def test_reset_clears_image_history():
     processor.reset()
     converted = processor.process(second_obs)
 
-    _assert_pil_color(converted.images[0], (0, 0, 255))
-    _assert_pil_color(converted.images[1], (255, 255, 0))
+    assert converted.images[0] is None
+    assert converted.images[1] is None
+    assert converted.images[2] is None
     _assert_pil_color(converted.images[3], (0, 0, 255))
     _assert_pil_color(converted.images[4], (255, 255, 0))
+    assert converted.images[5] is None
 
 
 def test_missing_wrist_image_raises_key_error():
