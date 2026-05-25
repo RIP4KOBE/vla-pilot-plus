@@ -47,7 +47,13 @@ try:
     from lerobot.processor.pipeline import PolicyProcessorPipeline, ProcessorStep
     from lerobot.processor.env_processor import LiberoProcessorStep
     from lerobot.utils.constants import OBS_ENV_STATE, OBS_IMAGE, OBS_IMAGES, OBS_STATE, OBS_STR
-except ModuleNotFoundError:
+except ModuleNotFoundError as exc:
+    missing = exc.name or ""
+    if missing != "lerobot" and not missing.startswith("lerobot."):
+        raise
+
+    logging.getLogger(__name__).warning("LeRobot unavailable; using local LIBERO processor fallback")
+
     OBS_STR = "observation"
     OBS_ENV_STATE = OBS_STR + ".environment_state"
     OBS_STATE = OBS_STR + ".state"
