@@ -31,7 +31,7 @@ def test_checkpoint_config_matches_rdt_libero_contract():
 
 def test_policy_yaml_keeps_rdt_route_and_libero_checkpoint():
     cfg = OmegaConf.load("configs/policy.yaml")
-    assert cfg.type in {"pi05", "rdt", "diffusion"}
+    assert cfg.type == "rdt"
     assert cfg.rdt.pretrained_path == str(CHECKPOINT)
     assert cfg.rdt.weight_variant == "ema"
     assert cfg.rdt.text_encoder == str(T5)
