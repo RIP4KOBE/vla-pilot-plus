@@ -64,3 +64,40 @@ import core.env_adapters.libero_adapter
 
     assert result.returncode != 0
     assert "accelerate" in result.stderr
+
+
+def test_libero_adapter_uses_fallback_when_lerobot_unavailable():
+    script = r'''
+import builtins
+import sys
+import types
+
+libero = types.ModuleType("libero")
+libero_libero = types.ModuleType("libero.libero")
+libero_envs = types.ModuleType("libero.libero.envs")
+libero_libero.benchmark = object()
+libero_libero.get_libero_path = lambda name: "/tmp"
+libero_envs.OffScreenRenderEnv = object
+sys.modules["libero"] = libero
+sys.modules["libero.libero"] = libero_libero
+sys.modules["libero.libero.envs"] = libero_envs
+
+original_import = builtins.__import__
+
+def guarded_import(name, *args, **kwargs):
+    if name == "lerobot" or name.startswith("lerobot."):
+        raise ModuleNotFoundError("No module named 'lerobot'", name="lerobot")
+    return original_import(name, *args, **kwargs)
+
+builtins.__import__ = guarded_import
+
+import core.env_adapters.libero_adapter as adapter
+
+assert adapter.OBS_IMAGES == "observation.images"
+assert adapter.OBS_STATE == "observation.state"
+assert adapter.LiberoProcessorStep is not None
+assert adapter.PolicyProcessorPipeline is not None
+'''
+    result = _run_python(script)
+
+    assert result.returncode == 0, result.stderr
