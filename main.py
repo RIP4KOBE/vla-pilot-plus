@@ -159,10 +159,22 @@ class Main:
             self.policy = PI05PolicySteer.from_pretrained(pretrained_path)
         elif policy_type == 'rdt':
             from core.rdt_policy_steer import RDTSteer
-            num_steps = type_config.get('num_inference_steps', 55)
-            libero_mode = bool(type_config.get('libero_mode', False))
+
+            raw_num_steps = type_config.get('num_inference_steps', None)
+            num_steps = None if raw_num_steps is None else int(raw_num_steps)
             self.policy = RDTSteer.from_pretrained(
-                pretrained_path, num_inference_steps=num_steps, libero_mode=libero_mode
+                pretrained_path,
+                num_inference_steps=num_steps,
+                vision_encoder=type_config.get(
+                    'vision_encoder',
+                    '/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384',
+                ),
+                text_encoder=type_config.get(
+                    'text_encoder',
+                    '/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl',
+                ),
+                weight_variant=type_config.get('weight_variant', 'ema'),
+                control_frequency=int(type_config.get('control_frequency', 20)),
             )
         else:
             raise ValueError(f"Unknown policy type: {policy_type}")

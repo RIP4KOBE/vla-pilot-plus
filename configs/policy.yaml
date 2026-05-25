@@ -3,9 +3,10 @@
 #
 # Switch between policies by overriding:
 #   python main.py policy.type=pi05
+#   python main.py policy.type=rdt
 
-# Current policy type: diffusion or pi05
-type: pi05
+# Current policy type: diffusion, pi05, or rdt
+type: rdt
 
 # ============================================================
 # Diffusion Policy (default)
@@ -26,18 +27,20 @@ pi05:
 
 
 # ============================================================
-# RDT-1B Policy (ManiSkill single-arm checkpoint)
+# RDT-1B Policy (LIBERO-finetuned checkpoint)
 # ============================================================
 rdt:
-  # pretrained_path: robotics-diffusion-transformer/maniskill-model
-  pretrained_path: /mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object/ema
-  num_inference_steps: 55
+  pretrained_path: /mnt/data/rdt_checkpoints/rdt-libero-full-formal-20260523-140903/checkpoint-60000
+  weight_variant: ema
+  text_encoder: /mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl
+  vision_encoder: /mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384
+  num_inference_steps: null
   action_chunk_horizon: 8
-  lang_embed_cache_dir: data/rdt_lang_embeds/
-  # Use LIBERO EEF indices [30-35,10] instead of ManiSkill joint indices [0-6,10].
-  # Required for any checkpoint fine-tuned on LIBERO (EEF-space actions).
-  libero_mode: true
+  control_frequency: 20
+  debug_first_step: true
+  undo_libero_preprocessor_flip: true
+  fail_on_zero_language_embedding: true
+  semantics: libero_finetuned
 
 
 # Note: pretrained_path and other params are read from policy.{type} section in main.py
-
