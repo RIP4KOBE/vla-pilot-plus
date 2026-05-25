@@ -78,6 +78,7 @@ from utils.vis_utils import TrajectoryVideoRecorder, add_text_to_image
 
 from core.diffusion_policy_steer import DiffusionPolicySteer
 from core.pi05_steer import PI05PolicySteer
+from core.policy_observation_sampling import policy_observation_sample_num
 from lerobot.policies.diffusion.modeling_diffusion import DiffusionPolicy
 from lerobot.datasets.lerobot_dataset import LeRobotDatasetMetadata
 from lerobot.policies.factory import make_pre_post_processors
@@ -146,6 +147,7 @@ class Main:
         # Initialize policy
         policy_config = cfg.get('policy', {})
         policy_type = policy_config.get('type', 'diffusion')
+        self.policy_type = policy_type
         log.info(f"Policy config type: {policy_type}")
         
         # Get pretrained_path from the specific policy type config
@@ -291,7 +293,10 @@ class Main:
 
     def _get_policy_observation(self) -> dict:
         """Get observation in policy expected format (backend-agnostic)."""
-        sample_num = self.config.get('sample_batch_size', 20)
+        sample_num = policy_observation_sample_num(
+            self.policy_type,
+            self.config.get('sample_batch_size', None),
+        )
         observation = self.adapter.get_policy_observation(sample_num=sample_num)
         
         processed_observation = self.policy_preprocessor(observation)
