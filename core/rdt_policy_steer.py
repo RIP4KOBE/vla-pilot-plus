@@ -12,6 +12,7 @@ import math
 import os
 import sys
 from collections.abc import Callable
+from pathlib import Path
 from typing import List, Optional, Tuple
 
 import numpy as np
@@ -19,7 +20,6 @@ import torch
 from torch import Tensor, nn
 
 from core.env_adapters import BaseEnvAdapter
-from core.fkd_class import FKD
 from core.rdt_libero_action_converter import (
     ACTIVE_INDICES_SORTED,
     LIBERO_RDT_INDICES,
@@ -70,6 +70,63 @@ def _rdt_flat_config_to_args(flat: dict) -> dict:
             "lang_pos_embed_config": flat.get("lang_pos_embed_config"),
         },
     }
+
+
+def _dedupe_ordered(paths: list[str]) -> list[str]:
+    seen = set()
+    deduped = []
+    for path in paths:
+        if path in seen:
+            continue
+        seen.add(path)
+        deduped.append(path)
+    return deduped
+
+
+def _rdt_weight_search_dirs(pretrained_path: str, weight_variant: Optional[str]) -> list[str]:
+    dirs = []
+    if weight_variant:
+        dirs.extend(
+            [
+                os.path.join(pretrained_path, weight_variant),
+                os.path.join(pretrained_path, "rdt", weight_variant),
+            ]
+        )
+    dirs.extend([pretrained_path, os.path.join(pretrained_path, "rdt")])
+    return _dedupe_ordered(dirs)
+
+
+def _normalize_text_encoder_path(text_encoder: str) -> str:
+    if Path(text_encoder).name == "models--google--t5-v1_1-xxl":
+        return "google/t5-v1_1-xxl"
+    return text_encoder
+
+
+def _resolve_vision_encoder_path(vision_encoder: str) -> str:
+    if Path(vision_encoder).name != "models--google--siglip-so400m-patch14-384":
+        return vision_encoder
+
+    root = Path(vision_encoder)
+    snapshots_dir = root / "snapshots"
+    if not snapshots_dir.is_dir():
+        raise FileNotFoundError(
+            f"Cannot resolve SigLIP cache root {vision_encoder}: missing snapshots directory"
+        )
+
+    valid_snapshots = []
+    for snapshot in snapshots_dir.iterdir():
+        if not snapshot.is_dir():
+            continue
+        if (snapshot / "preprocessor_config.json").is_file() and (snapshot / "config.json").is_file():
+            valid_snapshots.append(snapshot)
+    if not valid_snapshots:
+        raise FileNotFoundError(
+            f"Cannot resolve SigLIP cache root {vision_encoder}: no snapshot contains "
+            "preprocessor_config.json and config.json"
+        )
+
+    valid_snapshots.sort(key=lambda path: (path.stat().st_mtime, path.name), reverse=True)
+    return str(valid_snapshots[0])
 
 
 # ── Adapter for the real RoboticDiffusionTransformerModel ────────────────────
@@ -371,13 +428,14 @@ class _RDTModelAdapter(nn.Module):
 
 
 class RDTSteer:
-    """RDT-1B with VLS steering: RBF diversity + keypoint gradient + FKD resampling."""
+    """RDT-1B LIBERO policy wrapper with unguided action chunk inference."""
 
     name = "rdt_steer"
 
     def __init__(self, rdt_model, num_inference_steps: int = 5) -> None:
         self._rdt_model = rdt_model
         self._num_inference_steps = num_inference_steps
+        self._device = torch.device("cpu")
 
         self._adapter: Optional[BaseEnvAdapter] = None
         self._obs_processor: Optional[RDTLiberoObsProcessor] = None
@@ -435,8 +493,8 @@ class RDTSteer:
         cls,
         pretrained_path: str,
         num_inference_steps: Optional[int] = None,
-        vision_encoder: str = "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384",
-        text_encoder: str = "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl",
+        vision_encoder: str = "google/siglip-so400m-patch14-384",
+        text_encoder: str = "google/t5-v1_1-xxl",
         weight_variant: str = "ema",
         control_frequency: int = 20,
     ) -> "RDTSteer":
@@ -496,11 +554,7 @@ class RDTSteer:
             "mp_rank_00_model_states.pt",
             "rdt-1b.pt",
         )
-        weight_search_dirs = [
-            os.path.join(pretrained_path, weight_variant),
-            pretrained_path,
-            os.path.join(pretrained_path, "rdt"),
-        ]
+        weight_search_dirs = _rdt_weight_search_dirs(pretrained_path, weight_variant)
         weight_file = None
         for search_root in weight_search_dirs:
             if not os.path.isdir(search_root):
@@ -597,6 +651,9 @@ class RDTSteer:
             f"steps={num_inference_steps} control_frequency={control_frequency} "
             f"active_indices={ACTIVE_INDICES_SORTED}"
         )
+
+        text_encoder = _normalize_text_encoder_path(text_encoder)
+        vision_encoder = _resolve_vision_encoder_path(vision_encoder)
 
         # ``create_model`` constructs RoboticDiffusionTransformerModel and
         # calls load_pretrained_weights when pretrained is not None.
@@ -733,6 +790,7 @@ class RDTSteer:
         return torch.zeros(1, 1, 4096, device=self.device)
 
     def to(self, device) -> "RDTSteer":
+        self._device = torch.device(device)
         if isinstance(self._rdt_model, nn.Module):
             self._rdt_model = self._rdt_model.to(device)
         self._dit = self._find_dit(self._rdt_model)
@@ -767,7 +825,7 @@ class RDTSteer:
         try:
             return next(self._dit.parameters()).device
         except StopIteration:
-            return torch.device("cpu")
+            return self._device
 
     # ── Inference entry point ─────────────────────────────────────────────────
 
@@ -997,138 +1055,7 @@ class RDTSteer:
 
     # ── Guided denoising loop ─────────────────────────────────────────────────
 
-    def _guided_denoise_loop(
-        self,
-        proprio: np.ndarray,
-        images: list,
-        text_embeds: Tensor,
-        B: int,
-        guidance_fns: Optional[List[Callable]],
-        keypoints: Optional[np.ndarray],
-        guide_scale: float,
-        start_ratio: Optional[float],
-        use_diversity: bool,
-        diversity_scale: float,
-        use_fkd: bool,
-        fkd_config: Optional[dict],
-        sigmoid_k: float,
-        sigmoid_x0: float,
-        verbose: bool,
-    ) -> Tensor:  # (B, 64, 14)
-        """
-        Three-phase denoising loop:
-          D (t > start_t) : RBF diversity gradient  → noise_pred[:,:,:3]
-          A (t ≤ start_t) : Keypoint guidance grad  → noise_pred[:,:H,:3]
-          B (t ≤ start_t) : FKD resampling          → x_t after scheduler.step
-        D and A are mutually exclusive (if/elif).
-        """
-        device = self.device
-        try:
-            dtype = next(self._dit.parameters()).dtype
-        except StopIteration:
-            dtype = torch.float32
-
-        cond = self._rdt_model.encode_inputs(proprio, images, text_embeds)
-
-        # Stub models return {} from encode_inputs — fall back to 14 (the stub step() shape)
-        if "action_indices" in cond:
-            raw_action_dim = len(cond["action_indices"])
-            action_indices = cond["action_indices"]
-            unified_action_dim = cond["unified_action_dim"]
-        else:
-            _probe = self._rdt_model.step(proprio=proprio, images=images, text_embeds=text_embeds)
-            raw_action_dim = _probe.shape[-1]
-            action_indices = list(range(raw_action_dim))
-            unified_action_dim = raw_action_dim
-        x_t = torch.randn(B, 64, unified_action_dim, device=device, dtype=dtype)
-
-        scheduler = self._noise_scheduler
-        scheduler.set_timesteps(self._num_inference_steps)
-        timesteps = scheduler.timesteps
-
-        start_idx = int(self._num_inference_steps * (start_ratio if start_ratio is not None else 0.7))
-        start_idx = min(start_idx, len(timesteps) - 1)
-        start_t = int(timesteps[start_idx].item())
-
-        keypoints_tensor = None
-        if keypoints is not None:
-            keypoints_tensor = torch.tensor(keypoints, device=device, dtype=dtype)
-
-        # Init FKD particle filter
-        fkd = None
-        if use_fkd and fkd_config is not None and B > 1 and guidance_fns and keypoints_tensor is not None:
-            def _fkd_reward_fn(x0: Tensor) -> Tensor:
-                rs = []
-                for b in range(B):
-                    traj = self._rdt_sample_to_trajectory_3d(x0[b: b + 1])
-                    with torch.no_grad():
-                        r = sum(
-                            float(fn(keypoints_tensor, traj[:, : self._action_chunk_horizon, :3]).sum())
-                            for fn in guidance_fns
-                        )
-                    rs.append(r)
-                return torch.tensor(rs, dtype=dtype, device=device)
-
-            fkd = FKD(
-                potential_type=fkd_config.get("potential_type", "max"),
-                lmbda=float(fkd_config.get("lmbda", 10.0)),
-                num_particles=B,
-                adaptive_resampling=bool(fkd_config.get("adaptive_resampling", True)),
-                resample_frequency=int(fkd_config.get("resample_frequency", 5)),
-                resampling_t_start=start_t,
-                resampling_t_end=int(timesteps[-1].item()),
-                timesteps=timesteps,
-                reward_fn=_fkd_reward_fn,
-                reward_min_value=float("-inf"),
-                device=device,
-            )
-
-        reward_history: list = []
-
-        for i, t in enumerate(timesteps):
-            t_val = int(t.item())
-
-            # Update alpha_t for adaptive_scale
-            if hasattr(scheduler, "alphas_cumprod"):
-                idx = min(t_val, len(scheduler.alphas_cumprod) - 1)
-                self._current_alpha_t = float(scheduler.alphas_cumprod[idx])
-
-            # Baseline noise prediction (no grad)
-            with torch.no_grad():
-                noise_pred = self._dit(x_t, t, cond)  # (B, 64, 14)
-
-            # ── HOOK D: RBF diversity (early phase: t > start_t) ─────────────
-            if use_diversity and t_val > start_t and B > 1:
-                div_grad = self._compute_diversity_gradient(x_t)
-                if div_grad is not None:
-                    noise_pred = noise_pred.clone()
-                    noise_pred[:, :, :7] = noise_pred[:, :, :7] + diversity_scale * div_grad[:, :, :7]
-
-            # ── HOOK A: Keypoint gradient guidance (late phase: t ≤ start_t) ──
-            elif guidance_fns and keypoints_tensor is not None and t_val <= start_t:
-                kp_grad, reward_val = self._compute_keypoint_gradient(
-                    x_t, keypoints_tensor, guidance_fns, verbose=verbose
-                )
-                if kp_grad is not None:
-                    scale = self._adaptive_scale(reward_val, guide_scale, sigmoid_k, sigmoid_x0)
-                    noise_pred = noise_pred.clone()
-                    noise_pred[:, : self._action_chunk_horizon, :7] = (
-                        noise_pred[:, : self._action_chunk_horizon, :7]
-                        - scale * kp_grad[:, : self._action_chunk_horizon, :7]
-                    )
-                    reward_history.append((i, reward_val, self._last_normalized_reward))
-
-            # Standard denoising step
-            x_t = scheduler.step(noise_pred, t, x_t).prev_sample
-
-            # ── HOOK B: FKD resampling (late phase only, after scheduler step) ─
-            if fkd is not None and t_val <= start_t:
-                x_t, _ = fkd.resample(sampling_idx=t_val, latents=x_t, x0_preds=x_t)
-
-        # Set stage baseline from the first chunk's final reward
-        if reward_history and self._stage_init_reward is None:
-            self._stage_init_reward = reward_history[-1][1]
-            log.info(f"Stage init_reward set: {self._stage_init_reward:.6f}")
-
-        # Project from unified 128D back to the raw 8D action subspace for postprocessing.
-        return x_t[:, :, action_indices][:, :, :raw_action_dim]
+    def _guided_denoise_loop(self, *args, **kwargs) -> Tensor:
+        raise NotImplementedError(
+            "RDT LIBERO VLS steering is deferred until unguided LIBERO semantics pass."
+        )

@@ -2,6 +2,7 @@
 CPU-only smoke tests for RDTSteer and RDTLiberoObsProcessor.
 No real checkpoint or GPU required — uses stub RDT model.
 """
+import inspect
 import sys
 from pathlib import Path
 from types import ModuleType
@@ -146,6 +147,15 @@ def test_instantiation(stub_steer):
     stub_steer.reset_stage()    # must not raise
 
 
+def test_from_pretrained_defaults_use_model_ids():
+    from core.rdt_policy_steer import RDTSteer
+
+    signature = inspect.signature(RDTSteer.from_pretrained)
+
+    assert signature.parameters["text_encoder"].default == "google/t5-v1_1-xxl"
+    assert signature.parameters["vision_encoder"].default == "google/siglip-so400m-patch14-384"
+
+
 def test_forward_shape(stub_steer, stub_adapter, mock_batch):
     """select_action with use_guidance=False returns tensor of shape (H, 7)."""
     H = 8
@@ -207,3 +217,60 @@ def test_guided_rdt_libero_path_is_explicitly_deferred(stub_steer, stub_adapter,
             guidance_fns=[lambda keypoints, traj: traj.sum()],
             keypoints=np.zeros((3, 3), dtype=np.float32),
         )
+
+
+def test_private_guided_loop_is_explicitly_deferred(stub_steer):
+    with pytest.raises(NotImplementedError, match="RDT LIBERO VLS steering"):
+        stub_steer._guided_denoise_loop()
+
+
+def test_parameterless_stub_tracks_requested_device(stub_steer):
+    assert stub_steer.device == torch.device("cpu")
+
+    stub_steer.to("meta")
+
+    assert stub_steer.device == torch.device("meta")
+
+
+def test_weight_search_dirs_include_nested_variant_and_are_deduped(tmp_path):
+    from core.rdt_policy_steer import _rdt_weight_search_dirs
+
+    dirs = _rdt_weight_search_dirs(str(tmp_path), "ema")
+
+    assert dirs == [
+        str(tmp_path / "ema"),
+        str(tmp_path / "rdt" / "ema"),
+        str(tmp_path),
+        str(tmp_path / "rdt"),
+    ]
+    assert len(dirs) == len(set(dirs))
+
+
+def test_text_encoder_cache_root_normalizes_to_model_id():
+    from core.rdt_policy_steer import _normalize_text_encoder_path
+
+    assert _normalize_text_encoder_path("/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl") == "google/t5-v1_1-xxl"
+    assert _normalize_text_encoder_path("google/t5-v1_1-xxl") == "google/t5-v1_1-xxl"
+
+
+def test_vision_encoder_cache_root_resolves_snapshot(tmp_path):
+    from core.rdt_policy_steer import _resolve_vision_encoder_path
+
+    cache_root = tmp_path / "models--google--siglip-so400m-patch14-384"
+    valid_snapshot = cache_root / "snapshots" / "abc123"
+    valid_snapshot.mkdir(parents=True)
+    (valid_snapshot / "config.json").write_text("{}", encoding="utf-8")
+    (valid_snapshot / "preprocessor_config.json").write_text("{}", encoding="utf-8")
+
+    assert _resolve_vision_encoder_path(str(cache_root)) == str(valid_snapshot)
+    assert _resolve_vision_encoder_path("google/siglip-so400m-patch14-384") == "google/siglip-so400m-patch14-384"
+
+
+def test_vision_encoder_cache_root_fails_fast_when_snapshot_missing(tmp_path):
+    from core.rdt_policy_steer import _resolve_vision_encoder_path
+
+    cache_root = tmp_path / "models--google--siglip-so400m-patch14-384"
+    (cache_root / "snapshots" / "abc123").mkdir(parents=True)
+
+    with pytest.raises(FileNotFoundError, match="preprocessor_config.json.*config.json"):
+        _resolve_vision_encoder_path(str(cache_root))
