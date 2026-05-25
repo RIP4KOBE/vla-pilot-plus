@@ -13,36 +13,61 @@ import torch
 from torch import nn
 
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-
-_core_pkg = ModuleType("core")
-_core_pkg.__path__ = [str(Path(__file__).resolve().parents[1] / "core")]
-sys.modules.setdefault("core", _core_pkg)
-
-_env_adapters = ModuleType("core.env_adapters")
-
-
 class _BaseEnvAdapter:
     pass
 
 
 class _LiberoAdapter(_BaseEnvAdapter):
-    pass
+    def delta_actions_to_ee_trajectory(self, seq):
+        return torch.zeros(seq.shape[0] + 1, 3, requires_grad=True)
 
 
-_env_adapters.BaseEnvAdapter = _BaseEnvAdapter
-sys.modules.setdefault("core.env_adapters", _env_adapters)
+@pytest.fixture(autouse=True)
+def _patch_core_imports(monkeypatch):
+    root = Path(__file__).resolve().parents[1]
+    saved_core_modules = {
+        name: module
+        for name, module in sys.modules.items()
+        if name == "core" or name.startswith("core.")
+    }
 
-_libero_adapter = ModuleType("core.env_adapters.libero_adapter")
-_libero_adapter.LiberoAdapter = _LiberoAdapter
-sys.modules.setdefault("core.env_adapters.libero_adapter", _libero_adapter)
+    monkeypatch.syspath_prepend(str(root))
+    for name in list(saved_core_modules):
+        monkeypatch.delitem(sys.modules, name, raising=False)
+
+    core_pkg = ModuleType("core")
+    core_pkg.__path__ = [str(root / "core")]
+    monkeypatch.setitem(sys.modules, "core", core_pkg)
+
+    env_adapters = ModuleType("core.env_adapters")
+    env_adapters.BaseEnvAdapter = _BaseEnvAdapter
+    monkeypatch.setitem(sys.modules, "core.env_adapters", env_adapters)
+
+    libero_adapter = ModuleType("core.env_adapters.libero_adapter")
+    libero_adapter.LiberoAdapter = _LiberoAdapter
+    monkeypatch.setitem(sys.modules, "core.env_adapters.libero_adapter", libero_adapter)
+
+    yield
+
+    for name in list(sys.modules):
+        if (name == "core" or name.startswith("core.")) and name not in saved_core_modules:
+            sys.modules.pop(name, None)
 
 
 # ── Stub RDT model (replaces the real 1.2B-param checkpoint) ────────────────
 
 class _StubDiT(nn.Module):
     """Minimal DiT stand-in: returns zeros with the correct shape."""
+
+    def __init__(self):
+        super().__init__()
+        self.calls = []
+
     def forward(self, x, t, cond):
+        action_mask = cond["action_mask"]
+        self.calls.append((tuple(x.shape), tuple(action_mask.shape)))
+        assert x.shape[-1] == 128
+        assert action_mask.shape[-1] == 128
         return torch.zeros_like(x)
 
 
@@ -92,12 +117,7 @@ def stub_steer():
 
 @pytest.fixture
 def stub_adapter():
-    adapter = MagicMock()
-    # (T, 7) action_seq → (T+1, 3) EEF trajectory
-    adapter.delta_actions_to_ee_trajectory.side_effect = (
-        lambda seq: torch.zeros(seq.shape[0] + 1, 3, requires_grad=True)
-    )
-    return adapter
+    return _LiberoAdapter()
 
 
 @pytest.fixture
@@ -165,6 +185,10 @@ def test_unguided_uses_full_128d_libero_mask(stub_steer, stub_adapter, mock_batc
         B=2,
     )
     assert raw.shape == (2, 64, 128)
+    assert stub_steer._rdt_model.dit.calls
+    for latent_shape, mask_shape in stub_steer._rdt_model.dit.calls:
+        assert latent_shape == (2, 64, 128)
+        assert mask_shape[-1] == 128
 
 
 def test_guided_rdt_libero_path_is_explicitly_deferred(stub_steer, stub_adapter, mock_batch):
