@@ -26,22 +26,94 @@ from functools import partial
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any, Union
 
-import gymnasium as gym
 import numpy as np
 import torch
-from gymnasium import spaces
+try:
+    import gymnasium as gym
+    from gymnasium import spaces
+except ModuleNotFoundError:
+    import gym
+    from gym import spaces
 
 
-# import lerobot 
-from lerobot.processor.pipeline import PolicyProcessorPipeline, ProcessorStep
-from lerobot.processor.env_processor import LiberoProcessorStep
-from lerobot.utils.constants import OBS_ENV_STATE, OBS_IMAGE, OBS_IMAGES, OBS_STATE, OBS_STR
+# __file__ is in core/env_adapters/, so need .parent.parent.parent to get project root
+LEROBOT_PATH = Path(__file__).parent.parent.parent / "third_party" / "lerobot" / "src"
+if LEROBOT_PATH.exists() and str(LEROBOT_PATH) not in sys.path:
+    sys.path.insert(0, str(LEROBOT_PATH))
+
+
+# import lerobot
+try:
+    from lerobot.processor.pipeline import PolicyProcessorPipeline, ProcessorStep
+    from lerobot.processor.env_processor import LiberoProcessorStep
+    from lerobot.utils.constants import OBS_ENV_STATE, OBS_IMAGE, OBS_IMAGES, OBS_STATE, OBS_STR
+except ModuleNotFoundError:
+    OBS_STR = "observation"
+    OBS_ENV_STATE = OBS_STR + ".environment_state"
+    OBS_STATE = OBS_STR + ".state"
+    OBS_IMAGE = OBS_STR + ".image"
+    OBS_IMAGES = OBS_IMAGE + "s"
+
+    class ProcessorStep:
+        pass
+
+    class PolicyProcessorPipeline:
+        def __init__(self, steps):
+            self.steps = steps
+
+        def __call__(self, transition):
+            for step in self.steps:
+                transition = step(transition)
+            return transition
+
+    class LiberoProcessorStep(ProcessorStep):
+        def __call__(self, observation):
+            return self.observation(observation)
+
+        def observation(self, observation):
+            processed_obs = observation.copy()
+            for key in list(processed_obs.keys()):
+                if key.startswith(f"{OBS_IMAGES}."):
+                    processed_obs[key] = torch.flip(processed_obs[key], dims=[2, 3])
+
+            if "observation.robot_state" in processed_obs:
+                robot_state = processed_obs.pop("observation.robot_state")
+                eef_pos = robot_state["eef"]["pos"]
+                eef_quat = robot_state["eef"]["quat"]
+                gripper_qpos = robot_state["gripper"]["qpos"]
+                eef_axisangle = self._quat2axisangle(eef_quat)
+                state = torch.cat((eef_pos, eef_axisangle, gripper_qpos), dim=-1).float()
+                if state.dim() == 1:
+                    state = state.unsqueeze(0)
+                processed_obs[OBS_STATE] = state
+            return processed_obs
+
+        def _quat2axisangle(self, quat):
+            if not isinstance(quat, torch.Tensor):
+                raise TypeError(f"_quat2axisangle expected a torch.Tensor, got {type(quat)}")
+            if quat.ndim != 2 or quat.shape[1] != 4:
+                raise ValueError(f"_quat2axisangle expected shape (B, 4), got {tuple(quat.shape)}")
+
+            quat = quat.to(dtype=torch.float32)
+            device = quat.device
+            batch_size = quat.shape[0]
+            w = quat[:, 3].clamp(-1.0, 1.0)
+            den = torch.sqrt(torch.clamp(1.0 - w * w, min=0.0))
+            result = torch.zeros((batch_size, 3), device=device)
+            mask = den > 1e-10
+            if mask.any():
+                angle = 2.0 * torch.acos(w[mask])
+                axis = quat[mask, :3] / den[mask].unsqueeze(1)
+                result[mask] = axis * angle.unsqueeze(1)
+            return result
 
 # Import LIBERO-PRO benchmark
-# __file__ is in core/env_adapters/, so need .parent.parent.parent to get project root
 LIBERO_PRO_PATH = Path(__file__).parent.parent.parent / "third_party" / "libero_pro"
 if str(LIBERO_PRO_PATH) not in sys.path:
     sys.path.insert(0, str(LIBERO_PRO_PATH))
+LIBERO_PATH = Path(__file__).parent.parent.parent / "third_party" / "libero"
+if LIBERO_PATH.exists() and str(LIBERO_PATH) not in sys.path:
+    sys.path.insert(0, str(LIBERO_PATH))
 from libero.libero import benchmark, get_libero_path
 from libero.libero.envs import OffScreenRenderEnv
 
@@ -1581,8 +1653,3 @@ class LiberoAdapter(BaseEnvAdapter):
 
 
         
-
-
-
-
-

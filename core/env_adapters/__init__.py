@@ -20,8 +20,6 @@ Usage:
 """
 
 from .base_adapter import BaseEnvAdapter, Pose3D, CameraParams, TrackedObject, InteractableObject
-from .calvin_adapter import CalvinAdapter
-from .libero_adapter import LiberoAdapter
 
 
 def create_calvin_env(env_config: dict):
@@ -64,13 +62,29 @@ def create_adapter(backend: str, env_config: dict, **kwargs) -> BaseEnvAdapter:
     backend = backend.lower()
 
     if backend == "calvin":
+        from .calvin_adapter import CalvinAdapter
+
         env = create_calvin_env(env_config)
         return CalvinAdapter(env, env_config, **kwargs)
     elif backend == "libero":
+        from .libero_adapter import LiberoAdapter
+
         # LiberoAdapter creates environments internally
         return LiberoAdapter(None, env_config, **kwargs)
     else:
         raise ValueError(f"Unknown backend: {backend}. Supported: calvin, libero")
+
+
+def __getattr__(name: str):
+    if name == "CalvinAdapter":
+        from .calvin_adapter import CalvinAdapter
+
+        return CalvinAdapter
+    if name == "LiberoAdapter":
+        from .libero_adapter import LiberoAdapter
+
+        return LiberoAdapter
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 __all__ = [
@@ -83,4 +97,3 @@ __all__ = [
     "LiberoAdapter",
     "create_adapter",
 ]
-
