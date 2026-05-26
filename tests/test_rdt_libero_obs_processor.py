@@ -98,6 +98,18 @@ def test_debug_first_step_logs_observation_summary_once(caplog):
     assert "gripper_norm=[0.0, 1.0]" in message
 
 
+def test_debug_first_step_logs_observation_summary_from_observe_path(caplog):
+    processor = RDTLiberoObsProcessor(debug_first_step=True)
+
+    with caplog.at_level("WARNING"):
+        processor.observe(_obs(task="pick up the mug"))
+        processor.observe(_obs(task="open the drawer"))
+
+    messages = [record.getMessage() for record in caplog.records if "[RDT_LIBERO_OBS]" in record.getMessage()]
+    assert len(messages) == 1
+    assert "task='pick up the mug'" in messages[0]
+
+
 def test_first_frame_history_duplicates_initial_raw_frames():
     processor = RDTLiberoObsProcessor()
 

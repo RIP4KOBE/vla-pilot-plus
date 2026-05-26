@@ -61,7 +61,7 @@ class RDTLiberoObsProcessor:
         self._state_128: torch.Tensor | None = None
         self._state_mask_128: torch.Tensor | None = None
         self._task: str | None = None
-        self._step = 0
+        self._debug_summary_logged = False
 
     def reset(self) -> None:
         self._agent_history.clear()
@@ -69,7 +69,7 @@ class RDTLiberoObsProcessor:
         self._state_128 = None
         self._state_mask_128 = None
         self._task = None
-        self._step = 0
+        self._debug_summary_logged = False
 
     def observe(self, obs: dict[str, Any]) -> None:
         agent_now = self._image_to_pil(obs, AGENTVIEW_KEY)
@@ -87,28 +87,11 @@ class RDTLiberoObsProcessor:
         self._state_128 = state_128
         self._state_mask_128 = state_mask_128
         self._task = task
+        self._log_first_observation_summary()
 
     def process(self, obs: dict[str, Any]) -> RDTLiberoObservation:
         self.observe(obs)
-        converted = self.current()
-
-        if self.debug and self._step == 0:
-            active = torch.where(converted.state_mask_128[0] > 0)[0].tolist()
-            image_sizes = [img.size if img is not None else None for img in converted.images]
-            joints = converted.state_128[0, LIBERO_STATE_INDICES[:7]]
-            gripper_norm = converted.state_128[0, LIBERO_STATE_INDICES[7:]].tolist()
-            _LOGGER.warning(
-                "[RDT_LIBERO_OBS] task=%r image_sizes=%s state_active=%s "
-                "joint_min=%.4f joint_max=%.4f gripper_norm=%s",
-                converted.task,
-                image_sizes,
-                active,
-                float(joints.min().item()),
-                float(joints.max().item()),
-                gripper_norm,
-            )
-        self._step += 1
-        return converted
+        return self.current()
 
     def current(self) -> RDTLiberoObservation:
         if self._state_128 is None or self._state_mask_128 is None or self._task is None:
@@ -187,3 +170,24 @@ class RDTLiberoObsProcessor:
         if not task:
             raise ValueError("Task string is empty")
         return task
+
+    def _log_first_observation_summary(self) -> None:
+        if not self.debug or self._debug_summary_logged:
+            return
+
+        converted = self.current()
+        active = torch.where(converted.state_mask_128[0] > 0)[0].tolist()
+        image_sizes = [img.size if img is not None else None for img in converted.images]
+        joints = converted.state_128[0, LIBERO_STATE_INDICES[:7]]
+        gripper_norm = converted.state_128[0, LIBERO_STATE_INDICES[7:]].tolist()
+        _LOGGER.warning(
+            "[RDT_LIBERO_OBS] task=%r image_sizes=%s state_active=%s "
+            "joint_min=%.4f joint_max=%.4f gripper_norm=%s",
+            converted.task,
+            image_sizes,
+            active,
+            float(joints.min().item()),
+            float(joints.max().item()),
+            gripper_norm,
+        )
+        self._debug_summary_logged = True
