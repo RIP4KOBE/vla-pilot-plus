@@ -208,10 +208,46 @@ def test_bad_joint_shape_raises_value_error():
         processor.process(obs)
 
 
+def test_nan_joint_pos_raises_value_error():
+    processor = RDTLiberoObsProcessor()
+    obs = _obs()
+    obs["robot0_joint_pos"][0] = np.nan
+
+    with pytest.raises(ValueError, match="robot0_joint_pos"):
+        processor.process(obs)
+
+
+def test_inf_joint_pos_raises_value_error():
+    processor = RDTLiberoObsProcessor()
+    obs = _obs()
+    obs["robot0_joint_pos"][0] = np.inf
+
+    with pytest.raises(ValueError, match="robot0_joint_pos"):
+        processor.process(obs)
+
+
 def test_bad_gripper_shape_raises_value_error():
     processor = RDTLiberoObsProcessor()
     obs = _obs()
     obs["robot0_gripper_qpos"] = np.zeros((1,), dtype=np.float32)
+
+    with pytest.raises(ValueError, match="robot0_gripper_qpos"):
+        processor.process(obs)
+
+
+def test_nan_gripper_qpos_raises_value_error():
+    processor = RDTLiberoObsProcessor()
+    obs = _obs()
+    obs["robot0_gripper_qpos"][0] = np.nan
+
+    with pytest.raises(ValueError, match="robot0_gripper_qpos"):
+        processor.process(obs)
+
+
+def test_out_of_range_gripper_qpos_raises_value_error():
+    processor = RDTLiberoObsProcessor()
+    obs = _obs()
+    obs["robot0_gripper_qpos"] = np.array([-1.0, 1.0], dtype=np.float32)
 
     with pytest.raises(ValueError, match="robot0_gripper_qpos"):
         processor.process(obs)

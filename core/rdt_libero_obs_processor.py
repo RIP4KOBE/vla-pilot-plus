@@ -34,6 +34,7 @@ GRIPPER_QPOS_KEY = "robot0_gripper_qpos"
 TASK_KEY = "task"
 GRIPPER_MIN = -0.04245
 GRIPPER_MAX = 0.05185
+GRIPPER_QPOS_TOLERANCE = 1e-3
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -143,6 +144,17 @@ class RDTLiberoObsProcessor:
             raise ValueError(f"Expected robot0_joint_pos shape (7,), got {joints.shape}")
         if gripper.shape != (2,):
             raise ValueError(f"Expected robot0_gripper_qpos shape (2,), got {gripper.shape}")
+        if not np.isfinite(joints).all():
+            raise ValueError("Expected robot0_joint_pos values to be finite")
+        if not np.isfinite(gripper).all():
+            raise ValueError("Expected robot0_gripper_qpos values to be finite")
+        gripper_low = GRIPPER_MIN - GRIPPER_QPOS_TOLERANCE
+        gripper_high = GRIPPER_MAX + GRIPPER_QPOS_TOLERANCE
+        if np.any((gripper < gripper_low) | (gripper > gripper_high)):
+            raise ValueError(
+                "Expected robot0_gripper_qpos values within raw qpos range "
+                f"[{GRIPPER_MIN}, {GRIPPER_MAX}]"
+            )
 
         gripper_norm = (gripper - GRIPPER_MIN) / (GRIPPER_MAX - GRIPPER_MIN)
         proprio = np.concatenate([joints, gripper_norm], axis=0)
