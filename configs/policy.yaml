@@ -5,13 +5,13 @@
 #   python main.py policy.type=pi05
 
 # Current policy type: diffusion or pi05
-type: pi05
+type: diffusion
 
 # ============================================================
 # Diffusion Policy (default)
 # ============================================================
 diffusion:
-  pretrained_path: /home/shuo/research/lerobot/outputs/train/2026-02-24/11-34-07_vls_maniskill_rotate/checkpoints/100000/pretrained_model
+  pretrained_path: lerobot/diffusion_pusht
   num_inference_steps: 100
   n_obs_steps: 2
   action_chunk_horizon: 16

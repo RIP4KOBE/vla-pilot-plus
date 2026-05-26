@@ -63,7 +63,7 @@ class DiffusionPolicySteer(DiffusionPolicy):
         self._postprocessor = postprocessor
         self._sample_batch_size = sample_batch_size
         if policy_config is not None:
-            action_horizon = policy_config.get('action_horizon', 8)
+            action_horizon = policy_config.get('action_chunk_horizon', policy_config.get('action_horizon', 8))
         else:
             action_horizon = 8
         self.config.n_action_steps = action_horizon
