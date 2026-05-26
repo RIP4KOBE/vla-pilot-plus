@@ -3,7 +3,7 @@
 	url = https://github.com/Treeeplanter/lerobot.git
 [submodule "third_party/calvin"]
 	path = third_party/calvin
-	url = https://github.com/Treeeplanter/calvin.git
+	url = https://github.com/RIP4KOBE/calvin.git
 [submodule "sam3"]
 	path = sam3
 	url = https://github.com/facebookresearch/sam3.git

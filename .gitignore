@@ -61,6 +61,7 @@ coverage.xml
 .vscode/
 *.code-workspace
 .cursor/
+.claude/settings.json
 
 # OS files
 .DS_Store
@@ -80,6 +81,7 @@ tensorboard/
 tb_logs/
 experiments/
 artifacts/
+data/rdt_lang_embeds/
 
 # Caches (DL/ML tools)
 .huggingface/
@@ -99,3 +101,7 @@ results/
 # Output directory
 output/
 .worktrees/
+
+# Local third-party checkouts used for experiments
+third_party/libero/
+third_party/Libero_RDT/
