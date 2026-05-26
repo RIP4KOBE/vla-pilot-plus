@@ -55,7 +55,7 @@ sys.modules["libero.libero.envs"] = libero_envs
 original_import = builtins.__import__
 
 def guarded_import(name, *args, **kwargs):
-    if name == "accelerate":
+    if name == "lerobot.processor.pipeline":
         raise ModuleNotFoundError("No module named 'accelerate'", name="accelerate")
     return original_import(name, *args, **kwargs)
 
