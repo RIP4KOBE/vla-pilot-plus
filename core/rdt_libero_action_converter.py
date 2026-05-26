@@ -20,6 +20,14 @@ def _as_tensor(action_128d) -> torch.Tensor:
     return torch.as_tensor(action_128d, dtype=torch.float32)
 
 
+def rotvec_to_ortho6d(*args, **kwargs):
+    raise RuntimeError("rotvec_to_ortho6d is not part of the GT LIBERO RDT rollout path")
+
+
+def map_libero_gripper_state(*args, **kwargs):
+    raise RuntimeError("map_libero_gripper_state is not part of the GT LIBERO RDT rollout path")
+
+
 def rdt_action_to_libero_raw(action_128d) -> torch.Tensor:
     action = _as_tensor(action_128d)
     if action.shape[-1] != 128:

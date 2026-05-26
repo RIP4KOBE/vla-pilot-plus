@@ -1,4 +1,5 @@
 import importlib.util
+import sys
 from pathlib import Path
 
 import pytest
@@ -96,3 +97,15 @@ def test_decode_rejects_wrong_action_shape():
 
     with pytest.raises(ValueError, match="horizon"):
         decode_rdt_libero_action_chunk(torch.zeros(1, 64, 128), action_chunk_horizon=0)
+
+
+def test_converter_keeps_runtime_import_path_available_until_obs_processor_rewrite():
+    repo_root = str(_MODULE_PATH.parents[1])
+    if repo_root not in sys.path:
+        sys.path.insert(0, repo_root)
+
+    import core.rdt_libero_obs_processor
+    import core.rdt_policy_steer
+
+    assert core.rdt_libero_obs_processor is not None
+    assert core.rdt_policy_steer is not None
