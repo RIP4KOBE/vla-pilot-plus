@@ -637,6 +637,19 @@ class LiberoEnv(gym.Env):
     def _format_raw_obs(self, raw_obs: dict[str, Any]) -> dict[str, Any]:
         """Convert raw LIBERO observation to policy-compatible format."""
         observation = {}
+
+        for key in (
+            "agentview_image",
+            "robot0_eye_in_hand_image",
+            "robot0_joint_pos",
+            "robot0_gripper_qpos",
+        ):
+            if key in raw_obs:
+                observation[key] = raw_obs[key]
+
+        task_description = getattr(self, "task_description", None)
+        if task_description:
+            observation["task"] = task_description
         
         # Process images: camera_name -> mapped_name, convert to (B, C, H, W) float32 [0,1]
         for cam_name in self.camera_name:
@@ -940,6 +953,17 @@ class LiberoAdapter(BaseEnvAdapter):
         # Task description needs to be replicated for each sample in batch
         task_desc = self._env[self.current_task_idx].task_description
         obs["task"] = [task_desc] * sample_num
+        rdt_raw_obs = {
+            key: obs[key]
+            for key in (
+                "agentview_image",
+                "robot0_eye_in_hand_image",
+                "robot0_joint_pos",
+                "robot0_gripper_qpos",
+                "task",
+            )
+            if key in obs
+        }
 
         # ── DIAGNOSTIC PROBE P1: raw env obs (revert via git revert HEAD) ──────
         if not getattr(self, '_diag_p1_done', False):
@@ -968,6 +992,7 @@ class LiberoAdapter(BaseEnvAdapter):
 
         # Run preprocessor first (creates state tensor from robot_state)
         obs = self.env_preprocessor(obs)
+        obs.update(rdt_raw_obs)
 
         # ── DIAGNOSTIC PROBE P2: post-LiberoProcessorStep (revert via git revert HEAD) ──
         if not getattr(self, '_diag_p2_done', False):

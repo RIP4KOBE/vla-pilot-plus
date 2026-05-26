@@ -223,6 +223,150 @@ assert info == {"is_success": False}
     assert result.returncode == 0, result.stderr
 
 
+def test_libero_env_format_raw_obs_preserves_rdt_raw_keys_unflipped():
+    script = r'''
+import builtins
+import sys
+import types
+
+libero = types.ModuleType("libero")
+libero_libero = types.ModuleType("libero.libero")
+libero_envs = types.ModuleType("libero.libero.envs")
+libero_libero.benchmark = object()
+libero_libero.get_libero_path = lambda name: "/tmp"
+libero_envs.OffScreenRenderEnv = object
+sys.modules["libero"] = libero
+sys.modules["libero.libero"] = libero_libero
+sys.modules["libero.libero.envs"] = libero_envs
+
+original_import = builtins.__import__
+
+def guarded_import(name, *args, **kwargs):
+    if name == "lerobot" or name.startswith("lerobot."):
+        raise ModuleNotFoundError("No module named 'lerobot'", name="lerobot")
+    return original_import(name, *args, **kwargs)
+
+builtins.__import__ = guarded_import
+
+import numpy as np
+import core.env_adapters.libero_adapter as adapter
+
+class FakeController:
+    ee_ori_mat = np.eye(3)
+
+class FakeRobot:
+    controller = FakeController()
+
+class FakeRobosuiteEnv:
+    robots = [FakeRobot()]
+
+env = adapter.LiberoEnv.__new__(adapter.LiberoEnv)
+env.camera_name = ["agentview_image", "robot0_eye_in_hand_image"]
+env.camera_name_mapping = {
+    "agentview_image": "image",
+    "robot0_eye_in_hand_image": "image2",
+}
+env.task_description = "pick up the bowl"
+env._env = FakeRobosuiteEnv()
+
+agent_image = np.arange(12, dtype=np.uint8).reshape(2, 2, 3)
+wrist_image = np.arange(12, 24, dtype=np.uint8).reshape(2, 2, 3)
+joint_pos = np.linspace(0.0, 0.6, 7)
+gripper_qpos = np.array([0.01, 0.02])
+
+obs = env._format_raw_obs({
+    "agentview_image": agent_image,
+    "robot0_eye_in_hand_image": wrist_image,
+    "robot0_joint_pos": joint_pos,
+    "robot0_joint_vel": np.zeros(7),
+    "robot0_gripper_qpos": gripper_qpos,
+    "robot0_gripper_qvel": np.zeros(2),
+    "robot0_eef_pos": np.zeros(3),
+    "robot0_eef_quat": np.array([0.0, 0.0, 0.0, 1.0]),
+})
+
+np.testing.assert_array_equal(obs["agentview_image"], agent_image)
+np.testing.assert_array_equal(obs["robot0_eye_in_hand_image"], wrist_image)
+np.testing.assert_array_equal(obs["robot0_joint_pos"], joint_pos)
+np.testing.assert_array_equal(obs["robot0_gripper_qpos"], gripper_qpos)
+assert obs["task"] == "pick up the bowl"
+assert "observation.images.image" in obs
+assert "observation.robot_state" in obs
+'''
+    result = _run_python(script)
+
+    assert result.returncode == 0, result.stderr
+
+
+def test_libero_adapter_policy_observation_preserves_rdt_raw_keys_after_preprocessor():
+    script = r'''
+import builtins
+import sys
+import types
+
+libero = types.ModuleType("libero")
+libero_libero = types.ModuleType("libero.libero")
+libero_envs = types.ModuleType("libero.libero.envs")
+libero_libero.benchmark = object()
+libero_libero.get_libero_path = lambda name: "/tmp"
+libero_envs.OffScreenRenderEnv = object
+sys.modules["libero"] = libero
+sys.modules["libero.libero"] = libero_libero
+sys.modules["libero.libero.envs"] = libero_envs
+
+original_import = builtins.__import__
+
+def guarded_import(name, *args, **kwargs):
+    if name == "lerobot" or name.startswith("lerobot."):
+        raise ModuleNotFoundError("No module named 'lerobot'", name="lerobot")
+    return original_import(name, *args, **kwargs)
+
+builtins.__import__ = guarded_import
+
+import numpy as np
+import torch
+import core.env_adapters.libero_adapter as adapter
+
+class DroppingPreprocessor:
+    def __call__(self, obs):
+        return {"observation.state": torch.ones(1, 9)}
+
+class FakeCurrentEnv:
+    task_description = "place the mug"
+
+libero_adapter = adapter.LiberoAdapter.__new__(adapter.LiberoAdapter)
+libero_adapter._env = [FakeCurrentEnv()]
+libero_adapter.current_task_idx = 0
+libero_adapter.env_preprocessor = DroppingPreprocessor()
+libero_adapter._diag_p1_done = True
+libero_adapter._diag_p2_done = True
+
+agent_image = np.arange(12, dtype=np.uint8).reshape(2, 2, 3)
+wrist_image = np.arange(12, 24, dtype=np.uint8).reshape(2, 2, 3)
+joint_pos = np.linspace(0.0, 0.6, 7)
+gripper_qpos = np.array([0.01, 0.02])
+libero_adapter._last_obs = {
+    "agentview_image": agent_image,
+    "robot0_eye_in_hand_image": wrist_image,
+    "robot0_joint_pos": joint_pos,
+    "robot0_gripper_qpos": gripper_qpos,
+    "observation.images.image": torch.zeros(1, 3, 2, 2),
+}
+
+obs = libero_adapter.get_policy_observation(sample_num=1)
+
+np.testing.assert_array_equal(obs["agentview_image"], agent_image)
+np.testing.assert_array_equal(obs["robot0_eye_in_hand_image"], wrist_image)
+np.testing.assert_array_equal(obs["robot0_joint_pos"], joint_pos)
+np.testing.assert_array_equal(obs["robot0_gripper_qpos"], gripper_qpos)
+assert obs["task"] == ["place the mug"]
+assert "observation.state" in obs
+'''
+    result = _run_python(script)
+
+    assert result.returncode == 0, result.stderr
+
+
 def test_create_libero_envs_forwards_libero_env_configuration():
     script = r'''
 import builtins
@@ -421,7 +565,7 @@ def test_libero_backend_config_defaults_match_eval_parity():
     assert libero_config["observation_width"] == 128
     assert libero_config["observation_height"] == 128
     assert libero_config["num_steps_wait"] == 5
-    assert libero_config["max_episode_steps"] == 600
+    assert libero_config["max_episode_steps"] == 720
     assert libero_config["visualization_width"] == 640
     assert libero_config["visualization_height"] == 640
 
