@@ -29,8 +29,9 @@ pi05:
 # RDT-1B Policy (ManiSkill single-arm checkpoint)
 # ============================================================
 rdt:
-  pretrained_path: robotics-diffusion-transformer/maniskill-model
-  num_inference_steps: 55
+  pretrained_path: robotics-diffusion-transformer/maniskill-model/rdt
+  # pretrained_path: /mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object/ema
+  num_inference_steps: 100
   action_chunk_horizon: 8
   lang_embed_cache_dir: data/rdt_lang_embeds/
 
