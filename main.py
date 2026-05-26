@@ -76,13 +76,7 @@ from core.gemini_grounder import create_gemini_grounder, create_gemini_stage_rec
 from vlm_query.vlm_agent import VLMAgent
 from utils.vis_utils import TrajectoryVideoRecorder, add_text_to_image
 
-from core.diffusion_policy_steer import DiffusionPolicySteer
-from core.pi05_steer import PI05PolicySteer
 from core.policy_observation_sampling import policy_observation_sample_num
-from lerobot.policies.diffusion.modeling_diffusion import DiffusionPolicy
-from lerobot.datasets.lerobot_dataset import LeRobotDatasetMetadata
-from lerobot.policies.factory import make_pre_post_processors
-from lerobot.envs.factory import make_env_pre_post_processors
 
 # Import logging utility
 from utils.logging_utils import SteerLogger
@@ -156,8 +150,12 @@ class Main:
         log.info(f"Loading {policy_type} from: {pretrained_path}")
         
         if policy_type == 'diffusion':
+            from core.diffusion_policy_steer import DiffusionPolicySteer
+
             self.policy = DiffusionPolicySteer.from_pretrained(pretrained_path)
         elif policy_type == 'pi05':
+            from core.pi05_steer import PI05PolicySteer
+
             self.policy = PI05PolicySteer.from_pretrained(pretrained_path)
         elif policy_type == 'rdt':
             from core.rdt_policy_steer import RDTSteer
@@ -189,6 +187,8 @@ class Main:
             self.policy_preprocessor = lambda x: x
             self.policy_postprocessor = lambda x: x
         else:
+            from lerobot.policies.factory import make_pre_post_processors
+
             preprocessor_overrides = {
                 "device_processor": {"device": str(self.policy.config.device)},
             }
@@ -224,6 +224,20 @@ class Main:
     
     def _init_components(self, cfg: DictConfig):
         """Initialize components."""
+        if not self.config.get("use_guidance", True):
+            self.keypoint_detector = None
+            self.sam3_segmenter = None
+            self.use_sam3 = False
+            self.gemini_grounder = None
+            self.gemini_default_objects = []
+            self.use_gemini = False
+            self.keypoint_tracker = None
+            self.vlm_agent = None
+            self.gemini_stage_recognizer = None
+            self.video_recorder = TrajectoryVideoRecorder(output_dir=self.output_dir)
+            self.cached_functions_dir = self.config.get('cached_functions_dir', None)
+            return
+
         # Get perception config (loaded from perception.yaml with @package perception)
         perception_cfg = cfg.get('perception', {})
 

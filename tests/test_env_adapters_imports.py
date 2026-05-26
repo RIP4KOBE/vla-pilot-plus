@@ -36,6 +36,28 @@ assert callable(create_adapter)
     assert result.returncode == 0, result.stderr
 
 
+def test_main_import_does_not_require_lerobot_policy_dependencies():
+    script = r'''
+import builtins
+
+original_import = builtins.__import__
+
+def guarded_import(name, *args, **kwargs):
+    if name == "lerobot" or name.startswith("lerobot."):
+        raise ModuleNotFoundError("No module named 'lerobot'", name="lerobot")
+    return original_import(name, *args, **kwargs)
+
+builtins.__import__ = guarded_import
+
+import main
+
+assert main.Main is not None
+'''
+    result = _run_python(script)
+
+    assert result.returncode == 0, result.stderr
+
+
 def test_libero_adapter_reraises_missing_lerobot_transitive_dependency():
     script = r'''
 import builtins
