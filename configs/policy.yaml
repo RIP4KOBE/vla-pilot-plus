@@ -30,7 +30,7 @@ pi05:
 # RDT-1B Policy (LIBERO-finetuned checkpoint)
 # ============================================================
 rdt:
-  pretrained_path: /mnt/data/rdt_checkpoints/rdt-libero-full-formal-20260523-140903/checkpoint-60000
+  pretrained_path: /mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object
   weight_variant: ema
   text_encoder: /mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl
   vision_encoder: /mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384
@@ -38,9 +38,8 @@ rdt:
   action_chunk_horizon: 8
   control_frequency: 20
   debug_first_step: true
-  undo_libero_preprocessor_flip: true
   fail_on_zero_language_embedding: true
-  semantics: libero_finetuned
+  semantics: libero_gt_rollout
 
 
 # Note: pretrained_path and other params are read from policy.{type} section in main.py

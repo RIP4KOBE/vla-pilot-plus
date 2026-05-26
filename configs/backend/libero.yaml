@@ -22,9 +22,9 @@ libero:
   visualization_height: 640
   init_states: true
   num_steps_wait: 5
-  max_episode_steps: 600
+  max_episode_steps: 720
   vlm_camera: agentview
   
   # Perturbation settings for OOD evaluation
   auto_apply_perturbations: true
-  task_ids_filter:  null #[2, 6, 8] #[0, 2, 3, 4, 8] #= all tasks, or list like [0, 1, 2], we do not need this
+  task_ids_filter: null #[2, 6, 8] #[0, 2, 3, 4, 8] #= all tasks, or list like [0, 1, 2], we do not need this
