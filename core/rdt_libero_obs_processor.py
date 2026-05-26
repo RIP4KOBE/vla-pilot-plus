@@ -1,7 +1,5 @@
-from __future__ import annotations
-
-import logging
 import importlib.util
+import logging
 import sys
 from collections import deque
 from dataclasses import dataclass
@@ -12,21 +10,21 @@ import numpy as np
 import torch
 from PIL import Image
 
-try:
-    from core.rdt_libero_action_converter import (
-        ACTIVE_STATE_INDICES_SORTED,
-        LIBERO_STATE_INDICES,
-    )
-except ModuleNotFoundError:
-    _CONVERTER_PATH = Path(__file__).with_name("rdt_libero_action_converter.py")
-    _SPEC = importlib.util.spec_from_file_location("_rdt_libero_action_converter", _CONVERTER_PATH)
-    if _SPEC is None or _SPEC.loader is None:
-        raise ImportError(f"Cannot load RDT LIBERO action converter from {_CONVERTER_PATH}")
-    _CONVERTER_MODULE = importlib.util.module_from_spec(_SPEC)
-    sys.modules[_SPEC.name] = _CONVERTER_MODULE
-    _SPEC.loader.exec_module(_CONVERTER_MODULE)
-    ACTIVE_STATE_INDICES_SORTED = _CONVERTER_MODULE.ACTIVE_STATE_INDICES_SORTED
-    LIBERO_STATE_INDICES = _CONVERTER_MODULE.LIBERO_STATE_INDICES
+
+def _load_action_converter():
+    module_path = Path(__file__).with_name("rdt_libero_action_converter.py")
+    spec = importlib.util.spec_from_file_location("_rdt_libero_action_converter", module_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot load RDT LIBERO action converter from {module_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+_ACTION_CONVERTER = _load_action_converter()
+ACTIVE_STATE_INDICES_SORTED = _ACTION_CONVERTER.ACTIVE_STATE_INDICES_SORTED
+LIBERO_STATE_INDICES = _ACTION_CONVERTER.LIBERO_STATE_INDICES
 
 
 AGENTVIEW_KEY = "agentview_image"
@@ -75,6 +73,9 @@ class RDTLiberoObsProcessor:
     def observe(self, obs: dict[str, Any]) -> None:
         agent_now = self._image_to_pil(obs, AGENTVIEW_KEY)
         wrist_now = self._image_to_pil(obs, WRIST_KEY)
+        state_128, state_mask_128 = self._build_state(obs)
+        task = self._task_from_obs(obs)
+
         if not self._agent_history:
             self._agent_history.extend([agent_now, agent_now])
             self._wrist_history.extend([wrist_now, wrist_now])
@@ -82,8 +83,9 @@ class RDTLiberoObsProcessor:
             self._agent_history.append(agent_now)
             self._wrist_history.append(wrist_now)
 
-        self._state_128, self._state_mask_128 = self._build_state(obs)
-        self._task = self._task_from_obs(obs)
+        self._state_128 = state_128
+        self._state_mask_128 = state_mask_128
+        self._task = task
 
     def process(self, obs: dict[str, Any]) -> RDTLiberoObservation:
         self.observe(obs)
@@ -107,15 +109,15 @@ class RDTLiberoObsProcessor:
 
         return RDTLiberoObservation(
             images=[
-                self._agent_history[0],
-                self._wrist_history[0],
+                self._agent_history[0].copy(),
+                self._wrist_history[0].copy(),
                 None,
-                self._agent_history[1],
-                self._wrist_history[1],
+                self._agent_history[1].copy(),
+                self._wrist_history[1].copy(),
                 None,
             ],
-            state_128=self._state_128,
-            state_mask_128=self._state_mask_128,
+            state_128=self._state_128.clone(),
+            state_mask_128=self._state_mask_128.clone(),
             task=self._task,
         )
 

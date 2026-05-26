@@ -132,6 +132,39 @@ def test_observe_updates_history_without_rebuilding_chunk():
     _assert_pil_color(converted.images[4], (40, 50, 60))
 
 
+def test_failed_observe_does_not_mutate_history():
+    processor = RDTLiberoObsProcessor()
+    first = _obs()
+    processor.process(first)
+
+    bad = _obs()
+    bad["agentview_image"] = _image(0, 0, 255)
+    bad["robot0_eye_in_hand_image"] = _image(255, 255, 0)
+    bad["robot0_joint_pos"] = np.zeros((8,), dtype=np.float32)
+
+    with pytest.raises(ValueError, match="robot0_joint_pos"):
+        processor.observe(bad)
+
+    current = processor.current()
+    _assert_pil_color(current.images[0], (255, 0, 0))
+    _assert_pil_color(current.images[3], (255, 0, 0))
+
+
+def test_current_returns_copies_not_internal_references():
+    processor = RDTLiberoObsProcessor()
+    processor.process(_obs())
+
+    converted = processor.current()
+    converted.state_128[0, 0] = 999.0
+    converted.state_mask_128[0, 0] = 0.0
+    converted.images[0].putpixel((0, 0), (1, 2, 3))
+
+    fresh = processor.current()
+    assert fresh.state_128[0, 0].item() != pytest.approx(999.0)
+    assert fresh.state_mask_128[0, 0].item() == pytest.approx(1.0)
+    _assert_pil_color(fresh.images[0], (255, 0, 0))
+
+
 def test_reset_clears_history_and_duplicates_new_initial_frame():
     processor = RDTLiberoObsProcessor()
     processor.process(_obs())
