@@ -434,6 +434,21 @@ def test_resolve_rdt_weight_file_prefers_root_variant_safetensors(tmp_path):
     assert checkpoint_root == str(root)
 
 
+def test_resolve_rdt_checkpoint_paths_returns_root_then_weight(tmp_path):
+    from core.rdt_policy_steer import _resolve_rdt_checkpoint_paths
+
+    root = tmp_path / "RDT-1B-LIBERO-Object"
+    ema = root / "ema"
+    ema.mkdir(parents=True)
+    weight = ema / "model.safetensors"
+    weight.write_bytes(b"stub")
+
+    checkpoint_root, resolved = _resolve_rdt_checkpoint_paths(str(root), "ema")
+
+    assert checkpoint_root == str(root)
+    assert resolved == str(weight)
+
+
 def test_resolve_rdt_weight_file_accepts_direct_safetensors(tmp_path):
     from core.rdt_policy_steer import _resolve_rdt_weight_file
 

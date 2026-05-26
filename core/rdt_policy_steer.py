@@ -131,6 +131,12 @@ def _resolve_rdt_weight_file(pretrained_path: str, weight_variant: Optional[str]
     )
 
 
+def _resolve_rdt_checkpoint_paths(pretrained_path: str, weight_variant: Optional[str]) -> tuple[str, str]:
+    """Return ``(checkpoint_root, weight_file)`` for smoke checks and callers."""
+    weight_file, checkpoint_root = _resolve_rdt_weight_file(pretrained_path, weight_variant)
+    return checkpoint_root, weight_file
+
+
 def _looks_like_local_path(path: str) -> bool:
     return path.startswith(("/", "./", "../", "~"))
 
