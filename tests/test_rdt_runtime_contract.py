@@ -38,12 +38,13 @@ def test_policy_yaml_keeps_rdt_route_and_gt_checkpoint():
     cfg = OmegaConf.load("configs/policy.yaml")
 
     assert cfg.type == "rdt"
-    assert cfg.rdt.pretrained_path in {str(GT_ROOT), str(GT_WEIGHT)}
+    assert cfg.rdt.pretrained_path == str(GT_ROOT)
     assert cfg.rdt.weight_variant == "ema"
     assert cfg.rdt.text_encoder == str(T5)
     assert cfg.rdt.vision_encoder == str(SIGLIP)
     assert cfg.rdt.action_chunk_horizon == 8
     assert cfg.rdt.control_frequency == 20
+    assert cfg.rdt.undo_libero_preprocessor_flip is False
     assert cfg.rdt.semantics == "libero_gt_rollout"
 
 
