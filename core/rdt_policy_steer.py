@@ -147,8 +147,32 @@ def _normalize_local_path(label: str, path: str) -> str:
 def _normalize_text_encoder_path(text_encoder: str) -> str:
     text_encoder = _normalize_local_path("text encoder", text_encoder)
     if Path(text_encoder).name == "models--google--t5-v1_1-xxl":
-        return "google/t5-v1_1-xxl"
+        return _resolve_hf_cache_snapshot(
+            "T5 cache root",
+            text_encoder,
+            required_files=("config.json",),
+        )
     return text_encoder
+
+
+def _resolve_hf_cache_snapshot(label: str, cache_root: str, required_files: tuple[str, ...]) -> str:
+    root = Path(cache_root)
+    snapshots_dir = root / "snapshots"
+    if not snapshots_dir.is_dir():
+        raise FileNotFoundError(f"Cannot resolve {label} {cache_root}: missing snapshots directory")
+
+    valid_snapshots = []
+    for snapshot in snapshots_dir.iterdir():
+        if not snapshot.is_dir():
+            continue
+        if all((snapshot / required_file).is_file() for required_file in required_files):
+            valid_snapshots.append(snapshot)
+    if not valid_snapshots:
+        required = " and ".join(required_files)
+        raise FileNotFoundError(f"Cannot resolve {label} {cache_root}: no snapshot contains {required}")
+
+    valid_snapshots.sort(key=lambda path: (path.stat().st_mtime, path.name), reverse=True)
+    return str(valid_snapshots[0])
 
 
 def _resolve_vision_encoder_path(vision_encoder: str) -> str:
@@ -156,27 +180,11 @@ def _resolve_vision_encoder_path(vision_encoder: str) -> str:
     if Path(vision_encoder).name != "models--google--siglip-so400m-patch14-384":
         return vision_encoder
 
-    root = Path(vision_encoder)
-    snapshots_dir = root / "snapshots"
-    if not snapshots_dir.is_dir():
-        raise FileNotFoundError(
-            f"Cannot resolve SigLIP cache root {vision_encoder}: missing snapshots directory"
-        )
-
-    valid_snapshots = []
-    for snapshot in snapshots_dir.iterdir():
-        if not snapshot.is_dir():
-            continue
-        if (snapshot / "preprocessor_config.json").is_file() and (snapshot / "config.json").is_file():
-            valid_snapshots.append(snapshot)
-    if not valid_snapshots:
-        raise FileNotFoundError(
-            f"Cannot resolve SigLIP cache root {vision_encoder}: no snapshot contains "
-            "preprocessor_config.json and config.json"
-        )
-
-    valid_snapshots.sort(key=lambda path: (path.stat().st_mtime, path.name), reverse=True)
-    return str(valid_snapshots[0])
+    return _resolve_hf_cache_snapshot(
+        "SigLIP cache root",
+        vision_encoder,
+        required_files=("preprocessor_config.json", "config.json"),
+    )
 
 
 # ── Adapter for the real RoboticDiffusionTransformerModel ────────────────────
@@ -921,17 +929,21 @@ class RDTSteer:
             raise RuntimeError("RDTSteer.post_init must be called before select_action")
 
         self._obs_processor.observe(batch)
-        should_sample = self._cached_action_chunk is None or self._cached_action_steps_remaining <= 0
+        should_sample = (
+            generate_new_chunk
+            or self._cached_action_chunk is None
+            or self._cached_action_steps_remaining <= 0
+        )
 
         if should_sample:
             converted = self._obs_processor.current()
-            text_embed = self._get_lang_embed(converted.task)
 
             if use_guidance:
                 raise NotImplementedError(
                     "RDT LIBERO VLS steering is deferred until unguided LIBERO semantics pass."
                 )
             else:
+                text_embed = self._get_lang_embed(converted.task)
                 raw = self._predict_unguided(
                     converted.state_128,
                     converted.state_mask_128,

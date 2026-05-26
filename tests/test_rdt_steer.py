@@ -281,6 +281,57 @@ def test_select_action_observes_every_step_but_samples_only_when_buffer_empty(st
     assert current.images[3].getpixel((0, 0)) == (10, 20, 30)
 
 
+def test_select_action_generate_new_chunk_forces_refresh_with_cached_actions(stub_steer, stub_adapter):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=4,
+        policy_config={"action_chunk_horizon": 8},
+    )
+
+    first_chunk = stub_steer.select_action(
+        _raw_obs(agent_rgb=(255, 0, 0), task="first"),
+        generate_new_chunk=True,
+        use_guidance=False,
+    )
+    assert stub_steer._rdt_model.encode_calls == 1
+    assert stub_steer._cached_action_steps_remaining == 7
+
+    refreshed_chunk = stub_steer.select_action(
+        _raw_obs(agent_rgb=(0, 0, 255), task="second"),
+        generate_new_chunk=True,
+        use_guidance=False,
+    )
+
+    assert refreshed_chunk is not first_chunk
+    assert stub_steer._rdt_model.encode_calls == 2
+    assert stub_steer._cached_action_steps_remaining == 7
+    assert stub_steer._obs_processor.current().task == "second"
+
+
+def test_select_action_generate_new_chunk_with_guidance_does_not_return_cached_actions(stub_steer, stub_adapter):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=4,
+        policy_config={"action_chunk_horizon": 8},
+    )
+    stub_steer.select_action(_raw_obs(task="first"), generate_new_chunk=True, use_guidance=False)
+    assert stub_steer._cached_action_steps_remaining == 7
+
+    with pytest.raises(NotImplementedError, match="RDT LIBERO VLS steering"):
+        stub_steer.select_action(
+            _raw_obs(task="guided"),
+            generate_new_chunk=True,
+            use_guidance=True,
+            guidance_fns=[lambda keypoints, traj: traj.sum()],
+            keypoints=np.zeros((3, 3), dtype=np.float32),
+        )
+
+    assert stub_steer._rdt_model.encode_calls == 1
+    assert stub_steer._obs_processor.current().task == "guided"
+
+
 def test_reset_clears_action_buffer_and_observation_history(stub_steer, stub_adapter, mock_batch):
     stub_steer.post_init(
         adapter=stub_adapter,
@@ -458,8 +509,30 @@ def test_model_adapter_encode_inputs_appends_gt_action_mask_tokens():
 def test_text_encoder_cache_root_normalizes_to_model_id():
     from core.rdt_policy_steer import _normalize_text_encoder_path
 
-    assert _normalize_text_encoder_path("/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl") == "google/t5-v1_1-xxl"
     assert _normalize_text_encoder_path("google/t5-v1_1-xxl") == "google/t5-v1_1-xxl"
+
+
+def test_text_encoder_cache_root_resolves_snapshot(tmp_path):
+    from core.rdt_policy_steer import _normalize_text_encoder_path
+
+    cache_root = tmp_path / "models--google--t5-v1_1-xxl"
+    valid_snapshot = cache_root / "snapshots" / "abc123"
+    valid_snapshot.mkdir(parents=True)
+    (valid_snapshot / "config.json").write_text("{}", encoding="utf-8")
+
+    assert _normalize_text_encoder_path(str(cache_root)) == str(valid_snapshot)
+
+
+def test_text_encoder_tilde_cache_root_expands_before_snapshot_resolution(monkeypatch, tmp_path):
+    from core.rdt_policy_steer import _normalize_text_encoder_path
+
+    monkeypatch.setenv("HOME", str(tmp_path))
+    cache_root = tmp_path / "models--google--t5-v1_1-xxl"
+    valid_snapshot = cache_root / "snapshots" / "abc123"
+    valid_snapshot.mkdir(parents=True)
+    (valid_snapshot / "config.json").write_text("{}", encoding="utf-8")
+
+    assert _normalize_text_encoder_path("~/models--google--t5-v1_1-xxl") == str(valid_snapshot)
 
 
 def test_text_encoder_local_tilde_path_expands_before_return(monkeypatch, tmp_path):
