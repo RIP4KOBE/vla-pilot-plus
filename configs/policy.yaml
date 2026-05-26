@@ -30,7 +30,7 @@ pi05:
 # RDT-1B Policy (LIBERO-finetuned checkpoint)
 # ============================================================
 rdt:
-  pretrained_path: /mnt/data/rdt_checkpoints/rdt-libero-full-formal-20260523-140903/checkpoint-60000
+  pretrained_path: /mnt/data/rdt_checkpoints/rdt-libero-full-formal-20260523-140903/checkpoint-98000
   weight_variant: ema
   text_encoder: /mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl
   vision_encoder: /mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384
