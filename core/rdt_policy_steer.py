@@ -579,7 +579,12 @@ class RDTSteer:
         if rdt_root not in sys.path:
             sys.path.insert(0, rdt_root)
 
-        path_obj = Path(pretrained_path)
+        is_local_checkpoint_path = _looks_like_local_path(pretrained_path)
+        path_obj = Path(pretrained_path).expanduser() if is_local_checkpoint_path else Path(pretrained_path)
+        if is_local_checkpoint_path:
+            if not path_obj.exists():
+                raise FileNotFoundError(f"Missing RDT checkpoint path: {pretrained_path}")
+            pretrained_path = str(path_obj)
         if path_obj.suffix in {".safetensors", ".bin", ".pt"} and not path_obj.is_file():
             raise FileNotFoundError(f"Missing RDT checkpoint file: {pretrained_path}")
 

@@ -371,6 +371,26 @@ def test_resolve_rdt_weight_file_accepts_direct_safetensors(tmp_path):
     assert checkpoint_root == str(tmp_path)
 
 
+def test_from_pretrained_missing_absolute_path_fails_without_snapshot_download(monkeypatch, tmp_path):
+    from core.rdt_policy_steer import RDTSteer
+
+    calls = []
+    hub_module = ModuleType("huggingface_hub")
+
+    def _snapshot_download(*args, **kwargs):
+        calls.append((args, kwargs))
+        raise AssertionError("snapshot_download should not be called for missing local paths")
+
+    hub_module.snapshot_download = _snapshot_download
+    monkeypatch.setitem(sys.modules, "huggingface_hub", hub_module)
+
+    missing_root = tmp_path / "missing_rdt_root"
+    with pytest.raises(FileNotFoundError, match="Missing RDT checkpoint path"):
+        RDTSteer.from_pretrained(str(missing_root), weight_variant="ema")
+
+    assert calls == []
+
+
 def test_model_adapter_encode_inputs_appends_gt_action_mask_tokens():
     from core.rdt_policy_steer import _RDTModelAdapter
 
