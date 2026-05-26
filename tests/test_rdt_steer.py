@@ -11,6 +11,7 @@ from unittest.mock import MagicMock
 import numpy as np
 import pytest
 import torch
+from PIL import Image
 from torch import nn
 
 
@@ -94,16 +95,20 @@ class _StubRDTModel(nn.Module):
         super().__init__()
         self.dit = _StubDiT()
         self.noise_scheduler = _StubScheduler()
+        self.encode_calls = 0
 
     def encode_inputs(self, state_128, state_mask_128, images, text_embeds):
+        self.encode_calls += 1
+        action_mask = torch.zeros_like(state_mask_128, dtype=torch.float32)
+        action_mask[0, [39, 40, 41, 42, 43, 44, 10]] = 1.0
         return {
             "lang_cond": torch.zeros(1, 1, 4),
             "lang_attn_mask": torch.ones(1, 1, dtype=torch.bool),
             "img_cond": torch.zeros(1, 1, 4),
             "state_traj": torch.zeros(1, 1, 4),
-            "action_mask": state_mask_128.float().unsqueeze(1),
+            "action_mask": action_mask.unsqueeze(1),
             "ctrl_freqs": torch.tensor([20]),
-            "action_indices": [30, 31, 32, 33, 34, 35, 36, 37, 38, 10],
+            "action_indices": [39, 40, 41, 42, 43, 44, 10],
             "unified_action_dim": 128,
         }
 
@@ -123,15 +128,30 @@ def stub_adapter():
 
 @pytest.fixture
 def mock_batch():
-    B = 1
     return {
-        "observation.images.image": torch.zeros(B, 3, 16, 16),
-        "observation.images.image2": torch.zeros(B, 3, 16, 16),
-        "observation.state": torch.tensor(
-            [[0.10, -0.20, 0.80, 0.0, 0.0, 0.0, 0.04, -0.04]] * B,
-            dtype=torch.float32,
-        ),
-        "task": ["pick up the red block"] * B,
+        "agentview_image": _image(255, 0, 0),
+        "robot0_eye_in_hand_image": _image(0, 255, 0),
+        "robot0_joint_pos": np.array([0.10, -0.20, 0.80, 0.0, 0.0, 0.0, 0.04], dtype=np.float32),
+        "robot0_gripper_qpos": np.array([-0.04245, 0.05185], dtype=np.float32),
+        "task": "pick up the red block",
+    }
+
+
+def _image(red, green, blue):
+    image = np.zeros((8, 8, 3), dtype=np.uint8)
+    image[..., 0] = red
+    image[..., 1] = green
+    image[..., 2] = blue
+    return image
+
+
+def _raw_obs(agent_rgb=(255, 0, 0), wrist_rgb=(0, 255, 0), task="pick up the red block"):
+    return {
+        "agentview_image": _image(*agent_rgb),
+        "robot0_eye_in_hand_image": _image(*wrist_rgb),
+        "robot0_joint_pos": np.array([0.10, -0.20, 0.80, 0.0, 0.0, 0.0, 0.04], dtype=np.float32),
+        "robot0_gripper_qpos": np.array([-0.04245, 0.05185], dtype=np.float32),
+        "task": task,
     }
 
 
@@ -172,6 +192,7 @@ def test_forward_shape(stub_steer, stub_adapter, mock_batch):
     )
     assert action.shape == (1, H, 7), f"Expected (1, {H}, 7), got {action.shape}"
     assert not torch.isnan(action).any()
+    assert stub_steer._rdt_model.encode_calls == 1
 
 
 def test_lang_embed_fail_fast_rejects_stub_zero_fallback(stub_steer, stub_adapter):
@@ -196,7 +217,7 @@ def test_unguided_uses_full_128d_libero_mask(stub_steer, stub_adapter, mock_batc
     converted = stub_steer._obs_processor.process(mock_batch)
     assert converted.state_128.shape == (1, 128)
     assert converted.state_mask_128.shape == (1, 128)
-    assert torch.where(converted.state_mask_128[0] > 0)[0].tolist() == [10, 30, 31, 32, 33, 34, 35, 36, 37, 38]
+    assert torch.where(converted.state_mask_128[0] > 0)[0].tolist() == [0, 1, 2, 3, 4, 5, 6, 10, 11]
     assert converted.task == "pick up the red block"
 
     raw = stub_steer._predict_unguided(
@@ -204,13 +225,78 @@ def test_unguided_uses_full_128d_libero_mask(stub_steer, stub_adapter, mock_batc
         converted.state_mask_128,
         converted.images,
         torch.zeros(1, 1, 4096),
-        B=2,
+        B=1,
     )
-    assert raw.shape == (2, 64, 128)
+    assert raw.shape == (1, 64, 128)
     assert stub_steer._rdt_model.dit.calls
     for latent_shape, mask_shape in stub_steer._rdt_model.dit.calls:
-        assert latent_shape == (2, 64, 128)
+        assert latent_shape == (1, 64, 128)
         assert mask_shape[-1] == 128
+
+
+def test_unguided_select_action_uses_single_gt_batch_not_sample_particles(stub_steer, stub_adapter, mock_batch):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=4,
+        policy_config={"action_chunk_horizon": 8},
+    )
+
+    stub_steer.select_action(mock_batch, generate_new_chunk=True, use_guidance=False)
+
+    assert stub_steer._rdt_model.dit.calls
+    for latent_shape, _ in stub_steer._rdt_model.dit.calls:
+        assert latent_shape[0] == 1
+
+
+def test_select_action_observes_every_step_but_samples_only_when_buffer_empty(stub_steer, stub_adapter):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=4,
+        policy_config={"action_chunk_horizon": 2},
+    )
+
+    first = _raw_obs(agent_rgb=(255, 0, 0), wrist_rgb=(0, 255, 0), task="first")
+    second = _raw_obs(agent_rgb=(0, 0, 255), wrist_rgb=(255, 255, 0), task="second")
+    third = _raw_obs(agent_rgb=(10, 20, 30), wrist_rgb=(40, 50, 60), task="third")
+
+    first_chunk = stub_steer.select_action(first, generate_new_chunk=True, use_guidance=False)
+    assert stub_steer._rdt_model.encode_calls == 1
+
+    reused_chunk = stub_steer.select_action(second, generate_new_chunk=False, use_guidance=False)
+    assert reused_chunk is first_chunk
+    assert stub_steer._rdt_model.encode_calls == 1
+    current = stub_steer._obs_processor.current()
+    assert current.task == "second"
+    assert current.images[0].getpixel((0, 0)) == (255, 0, 0)
+    assert current.images[3].getpixel((0, 0)) == (0, 0, 255)
+
+    new_chunk = stub_steer.select_action(third, generate_new_chunk=True, use_guidance=False)
+    assert new_chunk is not first_chunk
+    assert stub_steer._rdt_model.encode_calls == 2
+    current = stub_steer._obs_processor.current()
+    assert current.task == "third"
+    assert current.images[0].getpixel((0, 0)) == (0, 0, 255)
+    assert current.images[3].getpixel((0, 0)) == (10, 20, 30)
+
+
+def test_reset_clears_action_buffer_and_observation_history(stub_steer, stub_adapter, mock_batch):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=1,
+        policy_config={"action_chunk_horizon": 8},
+    )
+    stub_steer.select_action(mock_batch, generate_new_chunk=True, use_guidance=False)
+    assert stub_steer._cached_action_chunk is not None
+
+    stub_steer.reset()
+
+    assert stub_steer._cached_action_chunk is None
+    assert stub_steer._cached_action_steps_remaining == 0
+    with pytest.raises(RuntimeError, match="before observe"):
+        stub_steer._obs_processor.current()
 
 
 def test_guided_rdt_libero_path_is_explicitly_deferred(stub_steer, stub_adapter, mock_batch):
@@ -256,6 +342,97 @@ def test_weight_search_dirs_include_nested_variant_and_are_deduped(tmp_path):
         str(tmp_path / "rdt"),
     ]
     assert len(dirs) == len(set(dirs))
+
+
+def test_resolve_rdt_weight_file_prefers_root_variant_safetensors(tmp_path):
+    from core.rdt_policy_steer import _resolve_rdt_weight_file
+
+    root = tmp_path / "RDT-1B-LIBERO-Object"
+    ema = root / "ema"
+    ema.mkdir(parents=True)
+    weight = ema / "model.safetensors"
+    weight.write_bytes(b"stub")
+
+    resolved, checkpoint_root = _resolve_rdt_weight_file(str(root), "ema")
+
+    assert resolved == str(weight)
+    assert checkpoint_root == str(root)
+
+
+def test_resolve_rdt_weight_file_accepts_direct_safetensors(tmp_path):
+    from core.rdt_policy_steer import _resolve_rdt_weight_file
+
+    weight = tmp_path / "model.safetensors"
+    weight.write_bytes(b"stub")
+
+    resolved, checkpoint_root = _resolve_rdt_weight_file(str(weight), "ema")
+
+    assert resolved == str(weight)
+    assert checkpoint_root == str(tmp_path)
+
+
+def test_model_adapter_encode_inputs_appends_gt_action_mask_tokens():
+    from core.rdt_policy_steer import _RDTModelAdapter
+
+    class _FakeImageProcessor:
+        image_mean = [0.5, 0.5, 0.5]
+        size = {"height": 8, "width": 8}
+
+        def preprocess(self, img, return_tensors):
+            assert return_tensors == "pt"
+            return {"pixel_values": torch.zeros(1, 3, 8, 8)}
+
+    class _FakeVision(nn.Module):
+        hidden_size = 1152
+
+        def forward(self, image_tensor):
+            return torch.zeros(image_tensor.shape[0], 1, self.hidden_size)
+
+    class _FakePolicy(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.noise_scheduler_sample = _StubScheduler()
+            self.captured_state_tokens = None
+
+        def adapt_conditions(self, text_embeds, image_embeds, state_tokens):
+            self.captured_state_tokens = state_tokens.detach().clone()
+            return (
+                torch.zeros(1, 1, 4),
+                torch.zeros(1, 1, 4),
+                torch.zeros(1, 1, 4),
+            )
+
+    class _FakeReal:
+        def __init__(self):
+            self.device = torch.device("cpu")
+            self.dtype = torch.float32
+            self.image_processor = _FakeImageProcessor()
+            self.image_size = None
+            self.args = {
+                "dataset": {"image_aspect_ratio": "pad"},
+                "model": {"state_token_dim": 128},
+            }
+            self.vision_model = _FakeVision()
+            self.text_model = nn.Identity()
+            self.policy = _FakePolicy()
+            self.control_frequency = 20
+
+    real = _FakeReal()
+    adapter = _RDTModelAdapter(real)
+    state_128 = torch.zeros(1, 128)
+    state_mask_128 = torch.zeros(1, 128)
+    state_mask_128[0, [0, 1, 2, 3, 4, 5, 6, 10, 11]] = 1.0
+    images = [Image.fromarray(_image(1, 2, 3)) for _ in range(6)]
+
+    cond = adapter.encode_inputs(state_128, state_mask_128, images, torch.ones(1, 1, 4096))
+
+    captured = real.policy.captured_state_tokens
+    assert captured is not None
+    assert tuple(captured.shape) == (1, 1, 256)
+    appended_mask = captured[0, 0, 128:]
+    assert torch.where(appended_mask > 0)[0].tolist() == [10, 39, 40, 41, 42, 43, 44]
+    assert cond["action_indices"] == [39, 40, 41, 42, 43, 44, 10]
+    assert torch.where(cond["action_mask"][0, 0] > 0)[0].tolist() == [10, 39, 40, 41, 42, 43, 44]
 
 
 def test_text_encoder_cache_root_normalizes_to_model_id():

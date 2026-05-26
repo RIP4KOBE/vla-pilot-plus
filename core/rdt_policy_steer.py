@@ -21,6 +21,7 @@ from torch import Tensor, nn
 
 from core.env_adapters import BaseEnvAdapter
 from core.rdt_libero_action_converter import (
+    ACTIVE_ACTION_INDICES_SORTED,
     ACTIVE_INDICES_SORTED,
     LIBERO_RDT_INDICES,
     decode_rdt_libero_action_chunk,
@@ -96,13 +97,58 @@ def _rdt_weight_search_dirs(pretrained_path: str, weight_variant: Optional[str])
     return _dedupe_ordered(dirs)
 
 
+def _resolve_rdt_weight_file(pretrained_path: str, weight_variant: Optional[str]) -> tuple[str, str]:
+    """Return ``(weight_file, checkpoint_root)`` for a local RDT checkpoint."""
+    path = Path(pretrained_path)
+    weight_names = (
+        "model.safetensors",
+        "pytorch_model.bin",
+        "mp_rank_00_model_states.pt",
+        "rdt-1b.pt",
+    )
+
+    if path.is_file():
+        if path.name not in weight_names and path.suffix not in {".safetensors", ".bin", ".pt"}:
+            raise FileNotFoundError(f"Unsupported RDT checkpoint file: {pretrained_path}")
+        checkpoint_root = path.parent
+        if weight_variant and checkpoint_root.name == weight_variant:
+            checkpoint_root = checkpoint_root.parent
+        return str(path), str(checkpoint_root)
+
+    weight_search_dirs = _rdt_weight_search_dirs(str(path), weight_variant)
+    for search_root in weight_search_dirs:
+        search_path = Path(search_root)
+        if not search_path.is_dir():
+            continue
+        for fname in weight_names:
+            candidate = search_path / fname
+            if candidate.is_file():
+                return str(candidate), str(path)
+
+    raise FileNotFoundError(
+        f"No RDT weight file found for variant '{weight_variant}' under {pretrained_path}. "
+        f"Searched: {weight_search_dirs}. Looked for: {weight_names}."
+    )
+
+
+def _looks_like_local_path(path: str) -> bool:
+    return path.startswith(("/", "./", "../", "~"))
+
+
+def _fail_if_missing_local_path(label: str, path: str) -> None:
+    if _looks_like_local_path(path) and not Path(path).expanduser().exists():
+        raise FileNotFoundError(f"Missing RDT {label} path: {path}")
+
+
 def _normalize_text_encoder_path(text_encoder: str) -> str:
+    _fail_if_missing_local_path("text encoder", text_encoder)
     if Path(text_encoder).name == "models--google--t5-v1_1-xxl":
         return "google/t5-v1_1-xxl"
     return text_encoder
 
 
 def _resolve_vision_encoder_path(vision_encoder: str) -> str:
+    _fail_if_missing_local_path("vision encoder", vision_encoder)
     if Path(vision_encoder).name != "models--google--siglip-so400m-patch14-384":
         return vision_encoder
 
@@ -372,6 +418,17 @@ class _RDTModelAdapter(nn.Module):
 
         states = states.unsqueeze(1)
         action_indices = LIBERO_RDT_INDICES
+        action_mask = torch.zeros(
+            (1, unified_action_dim),
+            device=device,
+            dtype=dtype,
+        )
+        action_mask[0, action_indices] = 1.0
+        action_active = torch.where(action_mask[0] > 0)[0].detach().cpu().tolist()
+        if action_active != ACTIVE_ACTION_INDICES_SORTED:
+            raise ValueError(
+                f"LIBERO action mask mismatch: expected {ACTIVE_ACTION_INDICES_SORTED}, got {action_active}"
+            )
         ctrl_freqs = torch.tensor([real.control_frequency], device=device)
 
         # ── Language ─────────────────────────────────────────────────────────
@@ -381,7 +438,7 @@ class _RDTModelAdapter(nn.Module):
         )
 
         # ── Adapt to RDTRunner hidden size ────────────────────────────────────
-        state_tokens = torch.cat([states, state_elem_mask.unsqueeze(1)], dim=2)
+        state_tokens = torch.cat([states, action_mask.unsqueeze(1)], dim=2)
         lang_cond, img_cond, state_traj = real.policy.adapt_conditions(
             text_embeds, image_embeds, state_tokens
         )
@@ -397,7 +454,7 @@ class _RDTModelAdapter(nn.Module):
                 f"lang_cond={tuple(lang_cond.shape)} "
                 f"img_cond={tuple(img_cond.shape)} "
                 f"state_traj={tuple(state_traj.shape)} "
-                f"action_mask={tuple(state_elem_mask.unsqueeze(1).shape)} "
+                f"action_mask={tuple(action_mask.unsqueeze(1).shape)} "
                 f"ctrl_freqs={tuple(ctrl_freqs.shape)} "
                 f"action_indices={action_indices}"
             )
@@ -407,7 +464,7 @@ class _RDTModelAdapter(nn.Module):
             "lang_attn_mask": lang_attn_mask,
             "img_cond": img_cond,
             "state_traj": state_traj,
-            "action_mask": state_elem_mask.unsqueeze(1),  # (1, 1, unified_action_dim)
+            "action_mask": action_mask.unsqueeze(1),  # (1, 1, unified_action_dim)
             "ctrl_freqs": ctrl_freqs,
             "action_indices": action_indices,
             "unified_action_dim": unified_action_dim,
@@ -449,6 +506,7 @@ class RDTSteer:
         self._stage_init_reward: Optional[float] = None
         self._last_raw_reward: float = 0.0
         self._current_alpha_t: float = 0.5
+        self._cached_action_steps_remaining: int = 0
 
         # Probe inner DiT score network once at construction.
         self._dit: nn.Module = self._find_dit(rdt_model)
@@ -521,7 +579,11 @@ class RDTSteer:
         if rdt_root not in sys.path:
             sys.path.insert(0, rdt_root)
 
-        if not os.path.isdir(pretrained_path):
+        path_obj = Path(pretrained_path)
+        if path_obj.suffix in {".safetensors", ".bin", ".pt"} and not path_obj.is_file():
+            raise FileNotFoundError(f"Missing RDT checkpoint file: {pretrained_path}")
+
+        if not os.path.isdir(pretrained_path) and not path_obj.is_file():
             from huggingface_hub import snapshot_download
             # Support "namespace/repo/subdir" — split off the subdir so the
             # repo_id stays a valid 2-segment HF identifier.
@@ -549,29 +611,8 @@ class RDTSteer:
                 "Ensure third_party/rdt/ is initialized: git submodule update --init"
             )
 
-        weight_names = (
-            "model.safetensors",
-            "pytorch_model.bin",
-            "mp_rank_00_model_states.pt",
-            "rdt-1b.pt",
-        )
-        weight_search_dirs = _rdt_weight_search_dirs(pretrained_path, weight_variant)
-        weight_file = None
-        for search_root in weight_search_dirs:
-            if not os.path.isdir(search_root):
-                continue
-            for fname in weight_names:
-                candidate = os.path.join(search_root, fname)
-                if os.path.exists(candidate):
-                    weight_file = candidate
-                    break
-            if weight_file is not None:
-                break
-        if weight_file is None:
-            raise FileNotFoundError(
-                f"No RDT weight file found for variant '{weight_variant}' under {pretrained_path}. "
-                f"Searched: {weight_search_dirs}. Looked for: {weight_names}."
-            )
+        weight_file, checkpoint_root = _resolve_rdt_weight_file(pretrained_path, weight_variant)
+        weight_search_dirs = _rdt_weight_search_dirs(checkpoint_root, weight_variant)
         log.info(f"Using weight file: {weight_file}")
 
         # Load the model config that ships with the checkpoint. Some HF repos
@@ -614,7 +655,7 @@ class RDTSteer:
         args["_source_config"].update({
             "path": config_path,
             "kind": config_kind,
-            "pretrained_path": pretrained_path,
+            "pretrained_path": checkpoint_root,
         })
 
         assert args["common"]["state_dim"] == args["model"]["state_token_dim"], (
@@ -820,6 +861,7 @@ class RDTSteer:
 
     def reset(self) -> None:
         self._cached_action_chunk = None
+        self._cached_action_steps_remaining = 0
         self._stage_init_reward = None
         self._last_normalized_reward = 0.0
         self._last_scale = 0.0
@@ -866,12 +908,15 @@ class RDTSteer:
         global_step: int = 0,
         current_stage: int = 1,
     ) -> Tensor:
-        if generate_new_chunk:
-            if self._obs_processor is None:
-                raise RuntimeError("RDTSteer.post_init must be called before select_action")
-            converted = self._obs_processor.process(batch)
+        if self._obs_processor is None:
+            raise RuntimeError("RDTSteer.post_init must be called before select_action")
+
+        self._obs_processor.observe(batch)
+        should_sample = self._cached_action_chunk is None or self._cached_action_steps_remaining <= 0
+
+        if should_sample:
+            converted = self._obs_processor.current()
             text_embed = self._get_lang_embed(converted.task)
-            B = self._sample_batch_size
 
             if use_guidance:
                 raise NotImplementedError(
@@ -883,11 +928,13 @@ class RDTSteer:
                     converted.state_mask_128,
                     converted.images,
                     text_embed,
-                    B,
+                    B=1,
                 )
 
             self._cached_action_chunk = self._postprocess_actions(raw)
+            self._cached_action_steps_remaining = self._cached_action_chunk.shape[1]
 
+        self._cached_action_steps_remaining = max(0, self._cached_action_steps_remaining - 1)
         return self._cached_action_chunk
 
     # ── Unguided path ─────────────────────────────────────────────────────────
