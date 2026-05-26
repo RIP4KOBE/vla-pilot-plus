@@ -462,6 +462,16 @@ def test_text_encoder_cache_root_normalizes_to_model_id():
     assert _normalize_text_encoder_path("google/t5-v1_1-xxl") == "google/t5-v1_1-xxl"
 
 
+def test_text_encoder_local_tilde_path_expands_before_return(monkeypatch, tmp_path):
+    from core.rdt_policy_steer import _normalize_text_encoder_path
+
+    monkeypatch.setenv("HOME", str(tmp_path))
+    local_encoder = tmp_path / "encoders" / "custom-t5"
+    local_encoder.mkdir(parents=True)
+
+    assert _normalize_text_encoder_path("~/encoders/custom-t5") == str(local_encoder)
+
+
 def test_vision_encoder_cache_root_resolves_snapshot(tmp_path):
     from core.rdt_policy_steer import _resolve_vision_encoder_path
 
@@ -473,6 +483,29 @@ def test_vision_encoder_cache_root_resolves_snapshot(tmp_path):
 
     assert _resolve_vision_encoder_path(str(cache_root)) == str(valid_snapshot)
     assert _resolve_vision_encoder_path("google/siglip-so400m-patch14-384") == "google/siglip-so400m-patch14-384"
+
+
+def test_vision_encoder_tilde_cache_root_expands_before_snapshot_resolution(monkeypatch, tmp_path):
+    from core.rdt_policy_steer import _resolve_vision_encoder_path
+
+    monkeypatch.setenv("HOME", str(tmp_path))
+    cache_root = tmp_path / "models--google--siglip-so400m-patch14-384"
+    valid_snapshot = cache_root / "snapshots" / "abc123"
+    valid_snapshot.mkdir(parents=True)
+    (valid_snapshot / "config.json").write_text("{}", encoding="utf-8")
+    (valid_snapshot / "preprocessor_config.json").write_text("{}", encoding="utf-8")
+
+    assert _resolve_vision_encoder_path("~/models--google--siglip-so400m-patch14-384") == str(valid_snapshot)
+
+
+def test_vision_encoder_local_tilde_path_expands_before_return(monkeypatch, tmp_path):
+    from core.rdt_policy_steer import _resolve_vision_encoder_path
+
+    monkeypatch.setenv("HOME", str(tmp_path))
+    local_encoder = tmp_path / "encoders" / "custom-siglip"
+    local_encoder.mkdir(parents=True)
+
+    assert _resolve_vision_encoder_path("~/encoders/custom-siglip") == str(local_encoder)
 
 
 def test_vision_encoder_cache_root_fails_fast_when_snapshot_missing(tmp_path):

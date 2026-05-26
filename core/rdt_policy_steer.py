@@ -135,20 +135,24 @@ def _looks_like_local_path(path: str) -> bool:
     return path.startswith(("/", "./", "../", "~"))
 
 
-def _fail_if_missing_local_path(label: str, path: str) -> None:
-    if _looks_like_local_path(path) and not Path(path).expanduser().exists():
+def _normalize_local_path(label: str, path: str) -> str:
+    if not _looks_like_local_path(path):
+        return path
+    expanded = Path(path).expanduser()
+    if not expanded.exists():
         raise FileNotFoundError(f"Missing RDT {label} path: {path}")
+    return str(expanded)
 
 
 def _normalize_text_encoder_path(text_encoder: str) -> str:
-    _fail_if_missing_local_path("text encoder", text_encoder)
+    text_encoder = _normalize_local_path("text encoder", text_encoder)
     if Path(text_encoder).name == "models--google--t5-v1_1-xxl":
         return "google/t5-v1_1-xxl"
     return text_encoder
 
 
 def _resolve_vision_encoder_path(vision_encoder: str) -> str:
-    _fail_if_missing_local_path("vision encoder", vision_encoder)
+    vision_encoder = _normalize_local_path("vision encoder", vision_encoder)
     if Path(vision_encoder).name != "models--google--siglip-so400m-patch14-384":
         return vision_encoder
 
