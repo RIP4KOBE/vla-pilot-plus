@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-import importlib.util
 import logging
+import importlib.util
 import sys
+from collections import deque
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -11,30 +12,32 @@ import numpy as np
 import torch
 from PIL import Image
 
+try:
+    from core.rdt_libero_action_converter import (
+        ACTIVE_STATE_INDICES_SORTED,
+        LIBERO_STATE_INDICES,
+    )
+except ModuleNotFoundError:
+    _CONVERTER_PATH = Path(__file__).with_name("rdt_libero_action_converter.py")
+    _SPEC = importlib.util.spec_from_file_location("_rdt_libero_action_converter", _CONVERTER_PATH)
+    if _SPEC is None or _SPEC.loader is None:
+        raise ImportError(f"Cannot load RDT LIBERO action converter from {_CONVERTER_PATH}")
+    _CONVERTER_MODULE = importlib.util.module_from_spec(_SPEC)
+    sys.modules[_SPEC.name] = _CONVERTER_MODULE
+    _SPEC.loader.exec_module(_CONVERTER_MODULE)
+    ACTIVE_STATE_INDICES_SORTED = _CONVERTER_MODULE.ACTIVE_STATE_INDICES_SORTED
+    LIBERO_STATE_INDICES = _CONVERTER_MODULE.LIBERO_STATE_INDICES
 
-AGENTVIEW_KEY = "observation.images.image"
-WRIST_KEY = "observation.images.image2"
-STATE_KEY = "observation.state"
+
+AGENTVIEW_KEY = "agentview_image"
+WRIST_KEY = "robot0_eye_in_hand_image"
+JOINT_POS_KEY = "robot0_joint_pos"
+GRIPPER_QPOS_KEY = "robot0_gripper_qpos"
 TASK_KEY = "task"
+GRIPPER_MIN = -0.04245
+GRIPPER_MAX = 0.05185
 
 _LOGGER = logging.getLogger(__name__)
-
-
-def _load_action_converter():
-    module_path = Path(__file__).with_name("rdt_libero_action_converter.py")
-    spec = importlib.util.spec_from_file_location("_rdt_libero_action_converter", module_path)
-    if spec is None or spec.loader is None:
-        raise ImportError(f"Cannot load RDT LIBERO action converter from {module_path}")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
-    return module
-
-
-_ACTION_CONVERTER = _load_action_converter()
-ACTIVE_INDICES_SORTED = _ACTION_CONVERTER.ACTIVE_INDICES_SORTED
-rotvec_to_ortho6d = _ACTION_CONVERTER.rotvec_to_ortho6d
-map_libero_gripper_state = _ACTION_CONVERTER.map_libero_gripper_state
 
 
 @dataclass
@@ -54,89 +57,110 @@ class RDTLiberoObsProcessor:
     ) -> None:
         self.undo_preprocessor_flip = undo_preprocessor_flip
         self.debug = debug if debug_first_step is None else debug_first_step
-        self._agent_prev: Image.Image | None = None
-        self._wrist_prev: Image.Image | None = None
+        self._agent_history: deque[Image.Image] = deque(maxlen=2)
+        self._wrist_history: deque[Image.Image] = deque(maxlen=2)
+        self._state_128: torch.Tensor | None = None
+        self._state_mask_128: torch.Tensor | None = None
+        self._task: str | None = None
         self._step = 0
 
     def reset(self) -> None:
-        self._agent_prev = None
-        self._wrist_prev = None
+        self._agent_history.clear()
+        self._wrist_history.clear()
+        self._state_128 = None
+        self._state_mask_128 = None
+        self._task = None
         self._step = 0
 
-    def process(self, obs: dict[str, Any]) -> RDTLiberoObservation:
+    def observe(self, obs: dict[str, Any]) -> None:
         agent_now = self._image_to_pil(obs, AGENTVIEW_KEY)
         wrist_now = self._image_to_pil(obs, WRIST_KEY)
-        state_128, state_mask_128 = self._build_state(obs)
-        task = self._task(obs)
+        if not self._agent_history:
+            self._agent_history.extend([agent_now, agent_now])
+            self._wrist_history.extend([wrist_now, wrist_now])
+        else:
+            self._agent_history.append(agent_now)
+            self._wrist_history.append(wrist_now)
 
-        agent_prev = self._agent_prev
-        wrist_prev = self._wrist_prev
-        images = [agent_prev, wrist_prev, None, agent_now, wrist_now, None]
+        self._state_128, self._state_mask_128 = self._build_state(obs)
+        self._task = self._task_from_obs(obs)
 
-        self._agent_prev = agent_now
-        self._wrist_prev = wrist_now
+    def process(self, obs: dict[str, Any]) -> RDTLiberoObservation:
+        self.observe(obs)
+        converted = self.current()
 
         if self.debug and self._step == 0:
-            _LOGGER.debug(
-                "Processed first LIBERO observation: task=%r, state_shape=%s",
-                task,
-                tuple(state_128.shape),
+            _LOGGER.warning(
+                "[RDT_LIBERO_OBS] task=%r state_active=%s image_modes=%s",
+                converted.task,
+                torch.where(converted.state_mask_128[0] > 0)[0].tolist(),
+                [img.mode if img is not None else None for img in converted.images],
             )
         self._step += 1
+        return converted
+
+    def current(self) -> RDTLiberoObservation:
+        if self._state_128 is None or self._state_mask_128 is None or self._task is None:
+            raise RuntimeError("RDTLiberoObsProcessor.current() called before observe()")
+        if len(self._agent_history) != 2 or len(self._wrist_history) != 2:
+            raise RuntimeError("RDT image history must contain exactly two frames")
 
         return RDTLiberoObservation(
-            images=images,
-            state_128=state_128,
-            state_mask_128=state_mask_128,
-            task=task,
+            images=[
+                self._agent_history[0],
+                self._wrist_history[0],
+                None,
+                self._agent_history[1],
+                self._wrist_history[1],
+                None,
+            ],
+            state_128=self._state_128,
+            state_mask_128=self._state_mask_128,
+            task=self._task,
         )
 
     def _image_to_pil(self, obs: dict[str, Any], key: str) -> Image.Image:
         if key not in obs:
             raise KeyError(key)
-
         image = obs[key]
-        if not torch.is_tensor(image):
-            image = torch.as_tensor(image)
-        if image.ndim != 4 or image.shape[0] != 1 or image.shape[1] != 3:
-            raise ValueError(f"Expected {key} image tensor with shape (B, 3, H, W)")
-        if not torch.isfinite(image).all():
-            raise ValueError(f"Expected {key} image tensor to contain only finite values")
-        if torch.any((image < 0.0) | (image > 1.0)):
-            raise ValueError(f"Expected {key} image tensor values in range [0, 1]")
+        if torch.is_tensor(image):
+            image = image.detach().cpu().numpy()
+        image = np.asarray(image)
+        if image.ndim != 3 or image.shape[-1] != 3:
+            raise ValueError(f"Expected {key} image with shape (H, W, 3), got {image.shape}")
+        if image.dtype != np.uint8:
+            raise ValueError(f"Expected {key} image dtype uint8, got {image.dtype}")
         if self.undo_preprocessor_flip:
-            image = torch.flip(image, dims=(-2, -1))
-        image = image[0].detach().cpu().to(dtype=torch.float32)
-        image_np = (image.permute(1, 2, 0).numpy() * 255.0).round().astype(np.uint8)
-        return Image.fromarray(image_np)
+            image = np.flip(image, axis=(0, 1)).copy()
+        return Image.fromarray(image)
 
     def _build_state(self, obs: dict[str, Any]) -> tuple[torch.Tensor, torch.Tensor]:
-        state = obs[STATE_KEY]
-        if not torch.is_tensor(state):
-            state = torch.as_tensor(state)
-        if state.ndim != 2 or tuple(state.shape) != (1, 8):
-            raise ValueError("Expected observation.state with shape (1, 8) for online batch")
+        joints = np.asarray(obs[JOINT_POS_KEY], dtype=np.float32)
+        gripper = np.asarray(obs[GRIPPER_QPOS_KEY], dtype=np.float32)
+        if joints.shape != (7,):
+            raise ValueError(f"Expected robot0_joint_pos shape (7,), got {joints.shape}")
+        if gripper.shape != (2,):
+            raise ValueError(f"Expected robot0_gripper_qpos shape (2,), got {gripper.shape}")
 
-        state_head = state[0].detach().cpu().to(dtype=torch.float32)
-        eef_pos = state_head[:3]
-        axis_angle = state_head[3:6].numpy()
-        gripper_qpos = state_head[6:8].numpy()
+        gripper_norm = (gripper - GRIPPER_MIN) / (GRIPPER_MAX - GRIPPER_MIN)
+        proprio = np.concatenate([joints, gripper_norm], axis=0)
 
         state_128 = torch.zeros((1, 128), dtype=torch.float32)
         state_mask_128 = torch.zeros((1, 128), dtype=torch.float32)
-        state_128[0, 30:33] = eef_pos
-        state_128[0, 33:39] = torch.as_tensor(rotvec_to_ortho6d(axis_angle), dtype=torch.float32)
-        state_128[0, 10] = float(map_libero_gripper_state(gripper_qpos))
-        state_mask_128[0, ACTIVE_INDICES_SORTED] = 1.0
+        state_128[0, LIBERO_STATE_INDICES] = torch.as_tensor(proprio, dtype=torch.float32)
+        state_mask_128[0, LIBERO_STATE_INDICES] = 1.0
+
+        active = torch.where(state_mask_128[0] > 0)[0].tolist()
+        if active != ACTIVE_STATE_INDICES_SORTED:
+            raise ValueError(f"Unexpected RDT LIBERO state active indices: {active}")
         return state_128, state_mask_128
 
-    def _task(self, obs: dict[str, Any]) -> str:
+    def _task_from_obs(self, obs: dict[str, Any]) -> str:
         task_value = obs[TASK_KEY]
         if isinstance(task_value, (list, tuple)) and len(task_value) == 1:
             task_value = task_value[0]
         if not isinstance(task_value, str):
             raise ValueError("Expected task to be a string")
-
         task = task_value.strip()
         if not task:
             raise ValueError("Task string is empty")
