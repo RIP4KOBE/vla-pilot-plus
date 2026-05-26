@@ -332,6 +332,30 @@ def test_select_action_generate_new_chunk_with_guidance_does_not_return_cached_a
     assert stub_steer._obs_processor.current().task == "guided"
 
 
+def test_select_action_guidance_request_rejects_before_cached_action_reuse(stub_steer, stub_adapter):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=4,
+        policy_config={"action_chunk_horizon": 8},
+    )
+    cached_chunk = stub_steer.select_action(_raw_obs(task="first"), generate_new_chunk=True, use_guidance=False)
+    assert stub_steer._cached_action_steps_remaining == 7
+
+    with pytest.raises(NotImplementedError, match="RDT LIBERO VLS steering"):
+        stub_steer.select_action(
+            _raw_obs(task="guided"),
+            generate_new_chunk=False,
+            use_guidance=True,
+            guidance_fns=[lambda keypoints, traj: traj.sum()],
+            keypoints=np.zeros((3, 3), dtype=np.float32),
+        )
+
+    assert stub_steer._cached_action_chunk is cached_chunk
+    assert stub_steer._rdt_model.encode_calls == 1
+    assert stub_steer._obs_processor.current().task == "guided"
+
+
 def test_reset_clears_action_buffer_and_observation_history(stub_steer, stub_adapter, mock_batch):
     stub_steer.post_init(
         adapter=stub_adapter,

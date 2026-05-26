@@ -931,6 +931,7 @@ class RDTSteer:
         self._obs_processor.observe(batch)
         should_sample = (
             generate_new_chunk
+            or use_guidance
             or self._cached_action_chunk is None
             or self._cached_action_steps_remaining <= 0
         )
