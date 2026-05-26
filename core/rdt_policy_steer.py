@@ -161,6 +161,18 @@ def _normalize_text_encoder_path(text_encoder: str) -> str:
     return text_encoder
 
 
+def _rdt_text_encoder_arg_and_load_path(text_encoder: str) -> tuple[str, Optional[str]]:
+    """Return ``(rdt_model_arg, hf_loader_path)`` for the T5 encoder.
+
+    RDT's T5Embedder asserts the symbolic model id, while Transformers can be
+    redirected to a local snapshot through the temporary from_pretrained patch.
+    """
+    resolved = _normalize_text_encoder_path(text_encoder)
+    if _looks_like_local_path(resolved):
+        return "google/t5-v1_1-xxl", resolved
+    return resolved, None
+
+
 def _resolve_hf_cache_snapshot(label: str, cache_root: str, required_files: tuple[str, ...]) -> str:
     root = Path(cache_root)
     snapshots_dir = root / "snapshots"
@@ -715,7 +727,7 @@ class RDTSteer:
             f"active_indices={ACTIVE_INDICES_SORTED}"
         )
 
-        text_encoder = _normalize_text_encoder_path(text_encoder)
+        text_encoder, text_encoder_load_path = _rdt_text_encoder_arg_and_load_path(text_encoder)
         vision_encoder = _resolve_vision_encoder_path(vision_encoder)
 
         # ``create_model`` constructs RoboticDiffusionTransformerModel and
@@ -752,6 +764,13 @@ class RDTSteer:
 
             @_functools.wraps(_orig)
             def _wrapped(*args, _orig=_orig, **kwargs):
+                if (
+                    text_encoder_load_path is not None
+                    and args
+                    and args[0] == "google/t5-v1_1-xxl"
+                    and getattr(_orig, "__self__", None) in {_T5E, _AT}
+                ):
+                    args = (text_encoder_load_path, *args[1:])
                 kwargs.setdefault("local_files_only", True)
                 return _orig(*args, **kwargs)
             _cls.from_pretrained = _wrapped

@@ -681,6 +681,20 @@ def test_text_encoder_cache_root_resolves_snapshot(tmp_path):
     assert _normalize_text_encoder_path(str(cache_root)) == str(valid_snapshot)
 
 
+def test_rdt_text_encoder_arg_preserves_gt_model_id_with_local_snapshot(tmp_path):
+    from core.rdt_policy_steer import _rdt_text_encoder_arg_and_load_path
+
+    cache_root = tmp_path / "models--google--t5-v1_1-xxl"
+    valid_snapshot = cache_root / "snapshots" / "abc123"
+    valid_snapshot.mkdir(parents=True)
+    (valid_snapshot / "config.json").write_text("{}", encoding="utf-8")
+
+    model_arg, load_path = _rdt_text_encoder_arg_and_load_path(str(cache_root))
+
+    assert model_arg == "google/t5-v1_1-xxl"
+    assert load_path == str(valid_snapshot)
+
+
 def test_text_encoder_tilde_cache_root_expands_before_snapshot_resolution(monkeypatch, tmp_path):
     from core.rdt_policy_steer import _normalize_text_encoder_path
 
