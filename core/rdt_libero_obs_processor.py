@@ -93,11 +93,19 @@ class RDTLiberoObsProcessor:
         converted = self.current()
 
         if self.debug and self._step == 0:
+            active = torch.where(converted.state_mask_128[0] > 0)[0].tolist()
+            image_sizes = [img.size if img is not None else None for img in converted.images]
+            joints = converted.state_128[0, LIBERO_STATE_INDICES[:7]]
+            gripper_norm = converted.state_128[0, LIBERO_STATE_INDICES[7:]].tolist()
             _LOGGER.warning(
-                "[RDT_LIBERO_OBS] task=%r state_active=%s image_modes=%s",
+                "[RDT_LIBERO_OBS] task=%r image_sizes=%s state_active=%s "
+                "joint_min=%.4f joint_max=%.4f gripper_norm=%s",
                 converted.task,
-                torch.where(converted.state_mask_128[0] > 0)[0].tolist(),
-                [img.mode if img is not None else None for img in converted.images],
+                image_sizes,
+                active,
+                float(joints.min().item()),
+                float(joints.max().item()),
+                gripper_norm,
             )
         self._step += 1
         return converted

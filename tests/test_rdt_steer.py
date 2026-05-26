@@ -446,6 +446,38 @@ def test_resolve_rdt_weight_file_accepts_direct_safetensors(tmp_path):
     assert checkpoint_root == str(tmp_path)
 
 
+def test_from_pretrained_logs_resolved_checkpoint_before_model_import(monkeypatch, tmp_path):
+    import core.rdt_policy_steer as rdt_policy_steer
+
+    RDTSteer = rdt_policy_steer.RDTSteer
+    warning_messages = []
+    monkeypatch.setattr(rdt_policy_steer.log, "warning", warning_messages.append)
+
+    root = tmp_path / "RDT-1B-LIBERO-Object"
+    ema = root / "ema"
+    ema.mkdir(parents=True)
+    weight = ema / "model.safetensors"
+    weight.write_bytes(b"stub")
+
+    real_import = __import__
+
+    def _fail_yaml_import(name, *args, **kwargs):
+        if name == "yaml":
+            raise ImportError("stop before heavyweight model import")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr("builtins.__import__", _fail_yaml_import)
+
+    with pytest.raises(ImportError, match="RoboticDiffusionTransformerModel"):
+        RDTSteer.from_pretrained(str(root), weight_variant="ema")
+
+    output = "\n".join(warning_messages)
+    assert "[RDT_GT_CKPT]" in output
+    assert f"model_root={root}" in output
+    assert f"weight_file={weight}" in output
+    assert "variant=ema" in output
+
+
 def test_from_pretrained_missing_absolute_path_fails_without_snapshot_download(monkeypatch, tmp_path):
     from core.rdt_policy_steer import RDTSteer
 
@@ -528,6 +560,93 @@ def test_model_adapter_encode_inputs_appends_gt_action_mask_tokens():
     assert torch.where(appended_mask > 0)[0].tolist() == [10, 39, 40, 41, 42, 43, 44]
     assert cond["action_indices"] == [39, 40, 41, 42, 43, 44, 10]
     assert torch.where(cond["action_mask"][0, 0] > 0)[0].tolist() == [10, 39, 40, 41, 42, 43, 44]
+
+
+def test_model_adapter_encode_inputs_logs_gt_io_summary_once(monkeypatch):
+    import core.rdt_policy_steer as rdt_policy_steer
+
+    _RDTModelAdapter = rdt_policy_steer._RDTModelAdapter
+    warning_messages = []
+    monkeypatch.setattr(rdt_policy_steer.log, "warning", warning_messages.append)
+
+    class _FakeImageProcessor:
+        image_mean = [0.5, 0.5, 0.5]
+        size = {"height": 8, "width": 8}
+
+        def preprocess(self, img, return_tensors):
+            assert return_tensors == "pt"
+            return {"pixel_values": torch.zeros(1, 3, 8, 8)}
+
+    class _FakeVision(nn.Module):
+        hidden_size = 1152
+
+        def forward(self, image_tensor):
+            return torch.zeros(image_tensor.shape[0], 1, self.hidden_size)
+
+    class _FakePolicy(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.noise_scheduler_sample = _StubScheduler()
+
+        def adapt_conditions(self, text_embeds, image_embeds, state_tokens):
+            return (
+                torch.zeros(1, 1, 4),
+                torch.zeros(1, 1, 4),
+                torch.zeros(1, 1, 4),
+            )
+
+    class _FakeReal:
+        def __init__(self):
+            self.device = torch.device("cpu")
+            self.dtype = torch.float32
+            self.image_processor = _FakeImageProcessor()
+            self.image_size = None
+            self.args = {
+                "dataset": {"image_aspect_ratio": "pad"},
+                "model": {"state_token_dim": 128},
+            }
+            self.vision_model = _FakeVision()
+            self.text_model = nn.Identity()
+            self.policy = _FakePolicy()
+            self.control_frequency = 20
+
+    adapter = _RDTModelAdapter(_FakeReal())
+    state_128 = torch.zeros(1, 128)
+    state_mask_128 = torch.zeros(1, 128)
+    state_mask_128[0, [0, 1, 2, 3, 4, 5, 6, 10, 11]] = 1.0
+    images = [Image.fromarray(_image(1, 2, 3)) for _ in range(6)]
+
+    adapter.encode_inputs(state_128, state_mask_128, images, torch.ones(1, 1, 4096))
+    adapter.encode_inputs(state_128, state_mask_128, images, torch.ones(1, 1, 4096))
+
+    output = "\n".join(warning_messages)
+    assert output.count("[RDT_GT_IO]") == 1
+    assert "state_active=[0, 1, 2, 3, 4, 5, 6, 10, 11]" in output
+    assert "action_indices=[39, 40, 41, 42, 43, 44, 10]" in output
+    assert "image_count=6" in output
+    assert "text_shape=(1, 1, 4096)" in output
+    assert "image_embed_shape=(1, 6, 1152)" in output
+
+
+def test_postprocess_actions_logs_numeric_summary_with_first_action(stub_steer, monkeypatch):
+    import core.rdt_policy_steer as rdt_policy_steer
+
+    info_messages = []
+    monkeypatch.setattr(rdt_policy_steer.log, "info", info_messages.append)
+    stub_steer._action_chunk_horizon = 2
+    actions = torch.zeros(1, 64, 128)
+    actions[0, :, [39, 40, 41, 42, 43, 44, 10]] = torch.tensor(
+        [0.1, -0.2, 0.3, -0.4, 0.5, -0.6, 1.0]
+    )
+
+    decoded = stub_steer._postprocess_actions(actions)
+
+    output = "\n".join(info_messages)
+    assert "[RDT_GT_ACTION]" in output
+    assert "shape=(1, 2, 7)" in output
+    assert "min=" in output
+    assert "max=" in output
+    assert f"first_decoded_action={decoded[0, 0].detach().cpu().tolist()}" in output
 
 
 def test_text_encoder_cache_root_normalizes_to_model_id():

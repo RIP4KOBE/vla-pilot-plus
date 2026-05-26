@@ -458,17 +458,11 @@ class _RDTModelAdapter(nn.Module):
         if not getattr(self, "_io_probe_logged", False):
             self._io_probe_logged = True
             log.warning(
-                f"[RDT_IO_PROBE] images={len(images)} "
-                f"state_128_shape={tuple(state_128.shape)} "
+                f"[RDT_GT_IO] state_active={active} "
+                f"action_indices={action_indices} "
+                f"image_count={len(images)} "
                 f"text_shape={tuple(text_embeds.shape)} "
-                f"image_embeds={tuple(image_embeds.shape)} "
-                f"state_tokens={tuple(state_tokens.shape)} "
-                f"lang_cond={tuple(lang_cond.shape)} "
-                f"img_cond={tuple(img_cond.shape)} "
-                f"state_traj={tuple(state_traj.shape)} "
-                f"action_mask={tuple(action_mask.unsqueeze(1).shape)} "
-                f"ctrl_freqs={tuple(ctrl_freqs.shape)} "
-                f"action_indices={action_indices}"
+                f"image_embed_shape={tuple(image_embeds.shape)}"
             )
 
         return {
@@ -619,6 +613,14 @@ class RDTSteer:
 
         log.info(f"Loading RDT model from: {pretrained_path}")
 
+        weight_file, checkpoint_root = _resolve_rdt_weight_file(pretrained_path, weight_variant)
+        weight_search_dirs = _rdt_weight_search_dirs(checkpoint_root, weight_variant)
+        log.warning(
+            f"[RDT_GT_CKPT] model_root={checkpoint_root} "
+            f"weight_file={weight_file} variant={weight_variant}"
+        )
+        log.info(f"Using weight file: {weight_file}")
+
         try:
             import yaml
             from scripts.maniskill_model import create_model
@@ -627,10 +629,6 @@ class RDTSteer:
                 "Cannot import RoboticDiffusionTransformerModel. "
                 "Ensure third_party/rdt/ is initialized: git submodule update --init"
             )
-
-        weight_file, checkpoint_root = _resolve_rdt_weight_file(pretrained_path, weight_variant)
-        weight_search_dirs = _rdt_weight_search_dirs(checkpoint_root, weight_variant)
-        log.info(f"Using weight file: {weight_file}")
 
         # Load the model config that ships with the checkpoint. Some HF repos
         # place RDTRunner-style config.json at the repo root while the actual
@@ -1009,8 +1007,10 @@ class RDTSteer:
         if not torch.isfinite(decoded).all():
             raise ValueError("Decoded LIBERO action chunk contains non-finite values")
         log.info(
-            f"Decoded LIBERO action chunk: shape={tuple(decoded.shape)} "
-            f"min={float(decoded.min().item()):.4f} max={float(decoded.max().item()):.4f}"
+            f"[RDT_GT_ACTION] shape={tuple(decoded.shape)} "
+            f"min={float(decoded.min().item()):.4f} "
+            f"max={float(decoded.max().item()):.4f} "
+            f"first_decoded_action={decoded[0, 0].detach().cpu().tolist()}"
         )
         return decoded
 

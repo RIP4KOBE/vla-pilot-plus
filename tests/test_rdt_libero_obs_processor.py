@@ -80,6 +80,24 @@ def test_process_preserves_task_string():
     assert converted.task == "open the drawer"
 
 
+def test_debug_first_step_logs_observation_summary_once(caplog):
+    processor = RDTLiberoObsProcessor(debug_first_step=True)
+
+    with caplog.at_level("WARNING"):
+        processor.process(_obs(task="pick up the mug"))
+        processor.process(_obs(task="open the drawer"))
+
+    messages = [record.getMessage() for record in caplog.records if "[RDT_LIBERO_OBS]" in record.getMessage()]
+    assert len(messages) == 1
+    message = messages[0]
+    assert "task='pick up the mug'" in message
+    assert "image_sizes=[(8, 8), (8, 8), None, (8, 8), (8, 8), None]" in message
+    assert "state_active=[0, 1, 2, 3, 4, 5, 6, 10, 11]" in message
+    assert "joint_min=-0.3000" in message
+    assert "joint_max=0.3000" in message
+    assert "gripper_norm=[0.0, 1.0]" in message
+
+
 def test_first_frame_history_duplicates_initial_raw_frames():
     processor = RDTLiberoObsProcessor()
 
