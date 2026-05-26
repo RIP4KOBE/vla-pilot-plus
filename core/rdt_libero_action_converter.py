@@ -45,6 +45,8 @@ def decode_rdt_libero_action_chunk(pred_actions_128, action_chunk_horizon: int) 
         raise ValueError(
             f"Expected pred_actions_128 with shape (B, 64, 128), got {tuple(pred_actions_128.shape)}"
         )
+    if pred_actions_128.shape[0] < 1:
+        raise ValueError("pred_actions_128 must contain at least one batch/particle")
     if action_chunk_horizon < 1 or action_chunk_horizon > pred_actions_128.shape[1]:
         raise ValueError("action_chunk_horizon must fit within the action chunk horizon")
 

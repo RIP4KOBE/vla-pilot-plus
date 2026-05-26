@@ -91,5 +91,8 @@ def test_decode_rejects_wrong_action_shape():
     with pytest.raises(ValueError, match="64|128"):
         decode_rdt_libero_action_chunk(torch.zeros(1, 63, 128), action_chunk_horizon=8)
 
+    with pytest.raises(ValueError, match="batch|particle|empty"):
+        decode_rdt_libero_action_chunk(torch.zeros(0, 64, 128), action_chunk_horizon=8)
+
     with pytest.raises(ValueError, match="horizon"):
         decode_rdt_libero_action_chunk(torch.zeros(1, 64, 128), action_chunk_horizon=0)
