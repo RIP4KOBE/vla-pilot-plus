@@ -161,6 +161,22 @@ def _raw_obs(agent_rgb=(255, 0, 0), wrist_rgb=(0, 255, 0), task="pick up the red
     }
 
 
+def _deterministic_diversity_sample():
+    sample = torch.zeros(3, 64, 128, dtype=torch.float32)
+    sample[0, :4, 39] = 0.05
+    sample[1, :4, 39] = -0.10
+    sample[1, :4, 40] = 0.05
+    sample[2, :4, 39] = 0.20
+    sample[2, :4, 40] = -0.15
+    return sample
+
+
+def _trajectory_spread(steer, sample):
+    traj = steer._rdt_sample_to_trajectory_3d(sample)[:, 1:, :3]
+    flat = traj.reshape(traj.shape[0], -1)
+    return torch.pdist(flat).mean()
+
+
 # ── Tests ─────────────────────────────────────────────────────────────────────
 
 def test_instantiation(stub_steer):
@@ -396,6 +412,51 @@ def test_guided_select_action_uses_latent_particle_batch(stub_steer, stub_adapte
     assert any(latent_shape[0] == 4 for latent_shape, _ in stub_steer._rdt_model.dit.calls)
 
 
+def test_guided_loop_applies_diversity_before_keypoint_phase(stub_steer, stub_adapter, mock_batch, monkeypatch):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    initial_sample = _deterministic_diversity_sample()
+    expected_grad = stub_steer._mask_guidance_gradient(
+        stub_steer._compute_diversity_gradient(initial_sample)
+    )
+
+    def deterministic_randn(*shape, **kwargs):
+        assert shape == (3, 64, 128)
+        return initial_sample.to(
+            device=kwargs.get("device", initial_sample.device),
+            dtype=kwargs.get("dtype", initial_sample.dtype),
+        ).clone()
+
+    monkeypatch.setattr(torch, "randn", deterministic_randn)
+
+    action = stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        keypoints=np.zeros((3, 3), dtype=np.float32),
+        use_diversity=True,
+        diversity_scale=1.0,
+    )
+
+    assert tuple(action.shape) == (1, 4, 7)
+    assert stub_steer._rdt_model.dit.calls
+    first_model_output, first_t = stub_steer._rdt_model.noise_scheduler.last_step_args[0]
+    assert first_t == 4
+    assert first_model_output[:, :4, [39, 40, 41]].abs().sum() > 0
+    inactive = first_model_output.clone()
+    inactive[:, :, [39, 40, 41]] = 0
+    assert inactive.abs().sum() == 0
+    torch.testing.assert_close(
+        first_model_output[:, :4, [39, 40, 41]],
+        -expected_grad[:, :4, [39, 40, 41]],
+    )
+
+
 def test_rdt_guidance_trajectory_preserves_particle_batch(stub_steer, stub_adapter):
     stub_steer.post_init(
         adapter=stub_adapter,
@@ -483,6 +544,33 @@ def test_keypoint_gradient_uses_diffusion_policy_slice_and_masks_slots(stub_stee
     assert masked[:, :4, 40].abs().sum() == 0
     assert masked[:, :4, 42].abs().sum() == 0
     assert masked[:, :4, 10].abs().sum() == 0
+
+
+def test_diversity_gradient_preserves_shape_and_translation_mask(stub_steer, stub_adapter):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    sample = _deterministic_diversity_sample()
+
+    grad = stub_steer._compute_diversity_gradient(sample)
+    assert grad is not None
+    assert tuple(grad.shape) == (3, 64, 128)
+
+    masked = stub_steer._mask_guidance_gradient(grad)
+    assert masked[:, :4, [39, 40, 41]].abs().sum() > 0
+    outside = masked.clone()
+    outside[:, :, [39, 40, 41]] = 0
+    assert outside.abs().sum() == 0
+
+    step_size = 0.05
+    base_spread = _trajectory_spread(stub_steer, sample)
+    negative_step_spread = _trajectory_spread(stub_steer, sample - step_size * masked)
+    positive_step_spread = _trajectory_spread(stub_steer, sample + step_size * masked)
+    assert negative_step_spread > base_spread
+    assert negative_step_spread > positive_step_spread
 
 
 def test_parameterless_stub_tracks_requested_device(stub_steer):

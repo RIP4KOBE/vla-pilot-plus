@@ -35,6 +35,7 @@ log = SteerLogger("RDTSteer")
 RDT_GUIDED_TRANSLATION_INDICES = [39, 40, 41]
 RDT_GUIDED_ACTION_INDICES = [39, 40, 41, 42, 43, 44, 10]
 RDT_GUIDANCE_SIGN = 1.0
+RDT_DIVERSITY_SIGN = -1.0
 
 
 def _rdt_flat_config_to_args(flat: dict) -> dict:
@@ -1137,7 +1138,16 @@ class RDTSteer:
             with torch.no_grad():
                 model_output = self._dit(x_t, t, cond)
 
-            if use_keypoint_guidance and int(t.item()) <= start_step:
+            if use_diversity and int(t.item()) > start_step and x_t.shape[0] > 1:
+                div_grad = self._compute_diversity_gradient(x_t)
+                if div_grad is not None:
+                    masked_div = self._mask_guidance_gradient(div_grad).to(device=model_output.device, dtype=model_output.dtype)
+                    model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += (
+                        RDT_DIVERSITY_SIGN
+                        * float(diversity_scale)
+                        * masked_div[:, :, RDT_GUIDED_TRANSLATION_INDICES]
+                    )
+            elif use_keypoint_guidance and int(t.item()) <= start_step:
                 kp_grad, reward_value = self._compute_keypoint_gradient(
                     x_t,
                     keypoints,
