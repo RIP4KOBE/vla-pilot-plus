@@ -413,6 +413,64 @@ def test_guided_select_action_uses_latent_particle_batch(stub_steer, stub_adapte
     assert any(latent_shape[0] == 4 for latent_shape, _ in stub_steer._rdt_model.dit.calls)
 
 
+def test_integrated_guided_select_action_with_diversity_fkd_and_selection(
+    stub_steer,
+    stub_adapter,
+    mock_batch,
+    monkeypatch,
+):
+    diversity_calls = []
+    fkd_inits = []
+    selection_shapes = []
+    original_diversity = stub_steer._compute_diversity_gradient
+    original_init_fkd = stub_steer._init_fkd
+    original_select = stub_steer._select_particle_for_execution
+
+    def spy_diversity(x_t):
+        diversity_calls.append(tuple(x_t.shape))
+        return original_diversity(x_t)
+
+    def spy_init_fkd(**kwargs):
+        fkd = original_init_fkd(**kwargs)
+        fkd_inits.append((kwargs["B"], fkd is not None))
+        return fkd
+
+    def spy_select(samples, *, keypoints, guidance_fns, fkd):
+        selected = original_select(samples, keypoints=keypoints, guidance_fns=guidance_fns, fkd=fkd)
+        selection_shapes.append((tuple(samples.shape), tuple(selected.shape), fkd is not None))
+        return selected
+
+    monkeypatch.setattr(stub_steer, "_compute_diversity_gradient", spy_diversity)
+    monkeypatch.setattr(stub_steer, "_init_fkd", spy_init_fkd)
+    monkeypatch.setattr(stub_steer, "_select_particle_for_execution", spy_select)
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=4,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    action = stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        keypoints=np.zeros((3, 3), dtype=np.float32),
+        guide_scale=1.0,
+        use_diversity=True,
+        diversity_scale=1.0,
+        use_fkd=True,
+        fkd_config={"potential_type": "max", "lmbda": 1.0, "adaptive_resampling": False, "resample_frequency": 1},
+    )
+
+    assert tuple(action.shape) == (1, 4, 7)
+    assert torch.isfinite(action).all()
+    assert stub_steer.get_last_scale() >= 0.0
+    assert diversity_calls
+    assert diversity_calls[-1] == (4, 64, 128)
+    assert fkd_inits and fkd_inits[-1] == (4, True)
+    assert selection_shapes and selection_shapes[-1] == ((4, 64, 128), (1, 64, 128), True)
+
+
 def test_guided_loop_applies_diversity_before_keypoint_phase(stub_steer, stub_adapter, mock_batch, monkeypatch):
     stub_steer.post_init(
         adapter=stub_adapter,
@@ -456,6 +514,40 @@ def test_guided_loop_applies_diversity_before_keypoint_phase(stub_steer, stub_ad
         first_model_output[:, :4, [39, 40, 41]],
         -expected_grad[:, :4, [39, 40, 41]],
     )
+
+
+def test_guided_denoise_loop_raises_on_nonfinite_latent_before_selection(
+    stub_steer,
+    stub_adapter,
+    mock_batch,
+    monkeypatch,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=1,
+        policy_config={"action_chunk_horizon": 4},
+    )
+
+    def inf_step(model_output, t, x_t):
+        out = MagicMock()
+        out.prev_sample = torch.full_like(x_t, float("inf"))
+        out.pred_original_sample = None
+        return out
+
+    def fail_select(*args, **kwargs):
+        raise AssertionError("selection should not run with a non-finite guided latent")
+
+    monkeypatch.setattr(stub_steer._noise_scheduler, "step", inf_step)
+    monkeypatch.setattr(stub_steer, "_select_particle_for_execution", fail_select)
+
+    with pytest.raises(ValueError, match="Guided RDT latent contains non-finite values"):
+        stub_steer.select_action(
+            mock_batch,
+            generate_new_chunk=True,
+            use_guidance=True,
+            use_diversity=False,
+        )
 
 
 def test_guided_loop_calls_fkd_resample_when_enabled(stub_steer, stub_adapter, mock_batch, monkeypatch):
@@ -721,6 +813,34 @@ def test_keypoint_gradient_uses_diffusion_policy_slice_and_masks_slots(stub_stee
     assert masked[:, :4, 40].abs().sum() == 0
     assert masked[:, :4, 42].abs().sum() == 0
     assert masked[:, :4, 10].abs().sum() == 0
+
+
+def test_nonfinite_keypoint_gradient_warns_and_returns_none(stub_steer, stub_adapter, monkeypatch):
+    warnings = []
+    monkeypatch.setattr(
+        "core.rdt_policy_steer.log.warning",
+        lambda msg, *args, **kwargs: warnings.append(str(msg)),
+    )
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=1,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    sample = torch.zeros(1, 64, 128)
+
+    def reward_fn(keypoints, traj):
+        return traj[..., 0].sum() / traj.new_tensor(0.0)
+
+    grad, reward = stub_steer._compute_keypoint_gradient(
+        sample,
+        torch.zeros(3, 3),
+        [reward_fn],
+    )
+
+    assert grad is None
+    assert not np.isfinite(reward)
+    assert any("non-finite" in msg.lower() and "reward=" in msg.lower() for msg in warnings)
 
 
 def test_diversity_gradient_preserves_shape_and_translation_mask(stub_steer, stub_adapter):

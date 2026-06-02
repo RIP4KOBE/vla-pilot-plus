@@ -1079,6 +1079,14 @@ class RDTSteer:
             raise ValueError(f"Expected unified action dim 128, got {unified_action_dim}")
 
         B = max(1, int(self._sample_batch_size))
+        if verbose:
+            log.info(
+                f"[RDT_GUIDE] enabled=true B={B} H={self._action_chunk_horizon} "
+                f"pred_horizon=64 guided_slots={RDT_GUIDED_TRANSLATION_INDICES} "
+                f"action_slots={RDT_GUIDED_ACTION_INDICES} "
+                f"guidance_sign={RDT_GUIDANCE_SIGN} prediction_type=sample "
+                f"use_diversity={use_diversity} use_fkd={use_fkd}"
+            )
         pred_horizon = 64
         x_t = torch.randn(B, pred_horizon, unified_action_dim, device=device, dtype=dtype)
 
@@ -1276,6 +1284,9 @@ class RDTSteer:
         if reward_history and self._stage_init_reward is None:
             self._stage_init_reward = reward_history[-1][1]
 
+        if not torch.isfinite(x_t).all():
+            raise ValueError("Guided RDT latent contains non-finite values")
+
         return self._select_particle_for_execution(
             x_t,
             keypoints=keypoints,
@@ -1450,6 +1461,11 @@ class RDTSteer:
                 grad = torch.autograd.grad(
                     reward.sum(), x_grad, create_graph=False, retain_graph=False
                 )[0]
+                if not torch.isfinite(grad).all():
+                    log.warning(
+                        f"Keypoint gradient contained non-finite values; skipping guidance for reward={reward_scalar:.6f}"
+                    )
+                    return None, reward_scalar
                 g_norm = torch.norm(grad).item()
                 normalized = grad / (g_norm + 1e-8) if g_norm > 1e-8 else grad
 
