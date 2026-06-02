@@ -396,6 +396,47 @@ def test_guided_select_action_uses_latent_particle_batch(stub_steer, stub_adapte
     assert any(latent_shape[0] == 4 for latent_shape, _ in stub_steer._rdt_model.dit.calls)
 
 
+def test_rdt_guidance_trajectory_preserves_particle_batch(stub_steer, stub_adapter):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    sample = torch.zeros(3, 64, 128, dtype=torch.float32)
+    sample[0, :4, 39] = 1.0
+    sample[1, :4, 40] = 2.0
+    sample[2, :4, 41] = 3.0
+
+    traj = stub_steer._rdt_sample_to_trajectory_3d(sample)
+
+    assert tuple(traj.shape) == (3, 5, 3)
+    torch.testing.assert_close(traj[0, -1], torch.tensor([4.0, 0.0, 0.0]))
+    torch.testing.assert_close(traj[1, -1], torch.tensor([0.0, 8.0, 0.0]))
+    torch.testing.assert_close(traj[2, -1], torch.tensor([0.0, 0.0, 12.0]))
+
+
+def test_rdt_guidance_trajectory_gradients_flow_to_translation_slots(stub_steer, stub_adapter):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=2,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    sample = torch.zeros(2, 64, 128, dtype=torch.float32, requires_grad=True)
+
+    traj = stub_steer._rdt_sample_to_trajectory_3d(sample)
+    reward = traj[:, :, 0].sum()
+    grad = torch.autograd.grad(reward, sample)[0]
+
+    assert grad[:, :4, 39].abs().sum() > 0
+    assert grad[:, :4, 40].abs().sum() == 0
+    assert grad[:, :4, 41].abs().sum() == 0
+    inactive = grad.clone()
+    inactive[:, :, [39, 40, 41]] = 0
+    assert inactive.abs().sum() == 0
+
+
 def test_parameterless_stub_tracks_requested_device(stub_steer):
     assert stub_steer.device == torch.device("cpu")
 

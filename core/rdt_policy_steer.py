@@ -1160,21 +1160,29 @@ class RDTSteer:
 
     # ── Trajectory projection (shared by diversity and guidance hooks) ────────
 
+    def _decode_rdt_actions_for_guidance(self, sample: Tensor) -> Tensor:
+        if sample.ndim != 3 or sample.shape[1] != 64 or sample.shape[2] != 128:
+            raise ValueError(f"Expected RDT sample with shape (B, 64, 128), got {tuple(sample.shape)}")
+        H = self._action_chunk_horizon
+        return sample[:, :H, RDT_GUIDED_ACTION_INDICES].to(dtype=sample.dtype)
+
     def _rdt_sample_to_trajectory_3d(self, sample: Tensor) -> Tensor:
-        """
-        (1, 64, 128) -> (1, H+1, 3) via adapter.delta_actions_to_ee_trajectory.
-        """
-        libero_actions = decode_rdt_libero_action_chunk(sample, self._action_chunk_horizon)[0]
+        actions = self._decode_rdt_actions_for_guidance(sample)
+        B = actions.shape[0]
         if self._adapter is None:
             return torch.zeros(
-                1,
+                B,
                 self._action_chunk_horizon + 1,
                 3,
                 device=sample.device,
                 dtype=sample.dtype,
             )
-        traj = self._adapter.delta_actions_to_ee_trajectory(libero_actions.to(sample.device))
-        return traj.unsqueeze(0)
+
+        trajs = []
+        for b in range(B):
+            traj = self._adapter.delta_actions_to_ee_trajectory(actions[b]).to(device=sample.device, dtype=sample.dtype)
+            trajs.append(traj)
+        return torch.stack(trajs, dim=0)
 
     # ── Gradient helpers ──────────────────────────────────────────────────────
 
