@@ -21,7 +21,9 @@ class _BaseEnvAdapter:
 
 class _LiberoAdapter(_BaseEnvAdapter):
     def delta_actions_to_ee_trajectory(self, seq):
-        return torch.zeros(seq.shape[0] + 1, 3, requires_grad=True)
+        start = torch.zeros(1, 3, device=seq.device, dtype=seq.dtype)
+        deltas = torch.cumsum(seq[:, :3], dim=0)
+        return torch.cat([start, deltas], dim=0)
 
 
 @pytest.fixture(autouse=True)
@@ -78,13 +80,17 @@ class _StubScheduler:
 
     def __init__(self, n=5):
         self.timesteps = torch.arange(n - 1, -1, -1, dtype=torch.long)
+        self.alphas_cumprod = torch.linspace(0.9, 0.1, n)
+        self.last_step_args = []
 
     def set_timesteps(self, n):
         self.timesteps = torch.arange(n - 1, -1, -1, dtype=torch.long)
+        self.alphas_cumprod = torch.linspace(0.9, 0.1, n)
 
-    def step(self, noise_pred, t, x_t):
+    def step(self, model_output, t, x_t):
+        self.last_step_args.append((model_output.detach().clone(), int(t.item()) if torch.is_tensor(t) else int(t)))
         out = MagicMock()
-        out.prev_sample = x_t * 0.0
+        out.prev_sample = model_output.clone()
         return out
 
 
