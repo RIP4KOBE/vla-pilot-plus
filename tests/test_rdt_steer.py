@@ -91,6 +91,7 @@ class _StubScheduler:
         self.last_step_args.append((model_output.detach().clone(), int(t.item()) if torch.is_tensor(t) else int(t)))
         out = MagicMock()
         out.prev_sample = model_output.clone()
+        out.pred_original_sample = None
         return out
 
 
@@ -455,6 +456,182 @@ def test_guided_loop_applies_diversity_before_keypoint_phase(stub_steer, stub_ad
         first_model_output[:, :4, [39, 40, 41]],
         -expected_grad[:, :4, [39, 40, 41]],
     )
+
+
+def test_guided_loop_calls_fkd_resample_when_enabled(stub_steer, stub_adapter, mock_batch, monkeypatch):
+    init_kwargs = []
+    calls = []
+
+    class _SpyFKD:
+        def __init__(self, **kwargs):
+            self.kwargs = kwargs
+            self.reached_terminal = False
+            init_kwargs.append(kwargs)
+
+        def resample(self, *, sampling_idx, latents, x0_preds):
+            calls.append({
+                "sampling_idx": sampling_idx,
+                "latents_shape": tuple(latents.shape),
+                "x0_shape": tuple(x0_preds.shape),
+                "latents_dtype": latents.dtype,
+                "x0_dtype": x0_preds.dtype,
+            })
+            return latents, None
+
+    monkeypatch.setattr("core.rdt_policy_steer.FKD", _SpyFKD)
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+
+    action = stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        keypoints=np.zeros((3, 3), dtype=np.float32),
+        use_diversity=False,
+        use_fkd=True,
+        fkd_config={
+            "potential_type": "max",
+            "lmbda": 1.0,
+            "adaptive_resampling": False,
+            "resample_frequency": 1,
+        },
+    )
+
+    assert tuple(action.shape) == (1, 4, 7)
+    assert len(init_kwargs) == 1
+    assert init_kwargs[0]["num_particles"] == 3
+    assert init_kwargs[0]["resampling_t_start"] == 3
+    terminal_t = int(stub_steer._noise_scheduler.timesteps[-1].item())
+    assert init_kwargs[0]["resampling_t_end"] == terminal_t
+    assert calls
+    assert all(call["sampling_idx"] <= 3 for call in calls)
+    assert all(call["sampling_idx"] != terminal_t for call in calls)
+    assert all(call["latents_shape"] == (3, 64, 128) for call in calls)
+    assert all(call["x0_shape"] == (3, 64, 128) for call in calls)
+    assert all(call["latents_dtype"] == torch.float32 for call in calls)
+    assert all(call["x0_dtype"] == torch.float32 for call in calls)
+
+
+def test_guided_loop_real_fkd_resample_resets_scheduler_history(stub_steer, stub_adapter, mock_batch, monkeypatch):
+    reset_calls = []
+    original_reset = stub_steer._reset_scheduler_particle_history_after_resample
+
+    def spy_reset(scheduler):
+        if getattr(scheduler, "last_step_args", None):
+            reset_calls.append(scheduler.last_step_args[-1][1])
+        elif hasattr(scheduler, "timesteps"):
+            step_index = getattr(scheduler, "_step_index", 0)
+            reset_calls.append(int(scheduler.timesteps[step_index].item()))
+        else:
+            reset_calls.append(None)
+        original_reset(scheduler)
+
+    monkeypatch.setattr(stub_steer, "_reset_scheduler_particle_history_after_resample", spy_reset)
+    torch.manual_seed(0)
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    scheduler = stub_steer._noise_scheduler
+    scheduler.model_outputs = [torch.ones(3, 64, 128), torch.ones(3, 64, 128) * 2]
+    scheduler.lower_order_nums = 2
+
+    action = stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        keypoints=np.zeros((3, 3), dtype=np.float32),
+        use_diversity=False,
+        use_fkd=True,
+        fkd_config={
+            "potential_type": "max",
+            "lmbda": 1.0,
+            "adaptive_resampling": False,
+            "resample_frequency": 1,
+        },
+    )
+
+    terminal_t = int(stub_steer._noise_scheduler.timesteps[-1].item())
+    assert tuple(action.shape) == (1, 4, 7)
+    assert reset_calls
+    assert terminal_t not in reset_calls
+    assert scheduler.model_outputs == [None, None]
+    assert scheduler.lower_order_nums == 0
+
+
+def test_guided_loop_does_not_reset_scheduler_history_when_fkd_noops(
+    stub_steer,
+    stub_adapter,
+    mock_batch,
+    monkeypatch,
+):
+    calls = []
+
+    class _NoopFKD:
+        def __init__(self, **kwargs):
+            self.reached_terminal = False
+
+        def resample(self, *, sampling_idx, latents, x0_preds):
+            calls.append(sampling_idx)
+            return latents, None
+
+    monkeypatch.setattr("core.rdt_policy_steer.FKD", _NoopFKD)
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    scheduler = stub_steer._noise_scheduler
+    scheduler.model_outputs = [torch.ones(3, 64, 128), torch.ones(3, 64, 128) * 2]
+    scheduler.lower_order_nums = 2
+    scheduler._step_index = 99
+
+    stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        keypoints=np.zeros((3, 3), dtype=np.float32),
+        use_diversity=False,
+        use_fkd=True,
+        fkd_config={
+            "potential_type": "max",
+            "lmbda": 1.0,
+            "adaptive_resampling": False,
+            "resample_frequency": 1,
+        },
+    )
+
+    assert calls
+    assert scheduler.model_outputs[0] is not None
+    assert scheduler.model_outputs[1] is not None
+    assert scheduler.lower_order_nums == 2
+    assert scheduler._step_index == 99
+
+
+def test_fkd_resample_resets_multistep_scheduler_history(stub_steer):
+    class _StatefulScheduler:
+        def __init__(self):
+            self.model_outputs = [torch.ones(2, 64, 128), torch.ones(2, 64, 128) * 2]
+            self.lower_order_nums = 2
+            self._step_index = 3
+
+    scheduler = _StatefulScheduler()
+
+    stub_steer._reset_scheduler_particle_history_after_resample(scheduler)
+
+    assert scheduler.model_outputs == [None, None]
+    assert scheduler.lower_order_nums == 0
+    assert scheduler._step_index == 3
 
 
 def test_rdt_guidance_trajectory_preserves_particle_batch(stub_steer, stub_adapter):
@@ -937,3 +1114,40 @@ def test_vision_encoder_cache_root_fails_fast_when_snapshot_missing(tmp_path):
 
     with pytest.raises(FileNotFoundError, match="preprocessor_config.json.*config.json"):
         _resolve_vision_encoder_path(str(cache_root))
+
+
+def test_fkd_x0_source_prefers_model_output_for_sample_prediction(stub_steer):
+    model_output = torch.ones(2, 64, 128)
+    x_t = torch.zeros(2, 64, 128)
+
+    chosen, source = stub_steer._select_fkd_x0_source(model_output=model_output, step_output=None, x_t=x_t)
+
+    assert source == "model_output"
+    torch.testing.assert_close(chosen, model_output)
+
+
+def test_fkd_reward_scores_all_particles_with_diffusion_policy_slice(stub_steer, stub_adapter):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    x0_preds = torch.zeros(3, 64, 128)
+    x0_preds[0, :4, 39] = 1.0
+    x0_preds[1, :4, 39] = 2.0
+    x0_preds[2, :4, 39] = 3.0
+
+    def reward_fn(keypoints, traj):
+        assert tuple(traj.shape) == (1, 3, 3)
+        return traj[..., 0].sum()
+
+    rewards = stub_steer._score_particles(
+        x0_preds,
+        torch.zeros(3, 3),
+        [reward_fn],
+        slice_kind="fkd",
+    )
+
+    assert tuple(rewards.shape) == (3,)
+    assert rewards[2] > rewards[1] > rewards[0]

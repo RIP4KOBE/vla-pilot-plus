@@ -1107,6 +1107,83 @@ class RDTSteer:
         action_mask = cond["action_mask"].expand(guided.shape[0], pred_horizon, unified_action_dim).to(device=device, dtype=dtype)
         return (guided * action_mask).float()
 
+    def _select_fkd_x0_source(self, *, model_output: Tensor, step_output, x_t: Tensor) -> tuple[Tensor, str]:
+        if step_output is not None:
+            pred_original = getattr(step_output, "pred_original_sample", None)
+            if pred_original is not None:
+                return pred_original, "scheduler_pred_original"
+        return model_output, "model_output"
+
+    def _reset_scheduler_particle_history_after_resample(self, scheduler) -> None:
+        model_outputs = getattr(scheduler, "model_outputs", None)
+        if isinstance(model_outputs, list):
+            scheduler.model_outputs = [None] * len(model_outputs)
+        if hasattr(scheduler, "lower_order_nums"):
+            scheduler.lower_order_nums = 0
+
+    def _fkd_resample_changed_particles(self, before: Tensor, after: Tensor) -> bool:
+        return after is not before
+
+    def _trajectory_reward_slice(self, trajs: Tensor, slice_kind: str) -> Tensor:
+        if slice_kind == "keypoint":
+            return trajs[:, : self._action_chunk_horizon, :3]
+        if slice_kind == "fkd":
+            return trajs[:, 1 : self._action_chunk_horizon, :3]
+        if slice_kind == "diversity":
+            return trajs[:, 1:, :3]
+        raise ValueError(f"Unknown trajectory reward slice kind: {slice_kind}")
+
+    def _score_particles(
+        self,
+        samples: Tensor,
+        keypoints: Optional[Tensor],
+        guidance_fns: Optional[List[Callable]],
+        *,
+        slice_kind: str,
+    ) -> Tensor:
+        if keypoints is None or not guidance_fns:
+            return torch.zeros(samples.shape[0], device=samples.device, dtype=samples.dtype)
+        trajs = self._trajectory_reward_slice(self._rdt_sample_to_trajectory_3d(samples), slice_kind)
+        rewards = []
+        for b in range(trajs.shape[0]):
+            reward = sum(fn(keypoints, trajs[b : b + 1]) for fn in guidance_fns)
+            if torch.is_tensor(reward):
+                rewards.append(reward.detach().to(device=samples.device, dtype=samples.dtype).reshape(()))
+            else:
+                rewards.append(torch.tensor(float(reward), device=samples.device, dtype=samples.dtype))
+        return torch.stack(rewards)
+
+    def _init_fkd(
+        self,
+        *,
+        B: int,
+        timesteps: Tensor,
+        start_step: int,
+        keypoints: Optional[Tensor],
+        guidance_fns: Optional[List[Callable]],
+        fkd_config: Optional[dict],
+        device: torch.device,
+    ) -> Optional[FKD]:
+        if fkd_config is None or B <= 1 or keypoints is None or not guidance_fns:
+            return None
+
+        def reward_fn(x0_preds: Tensor) -> Tensor:
+            return self._score_particles(x0_preds, keypoints, guidance_fns, slice_kind="fkd")
+
+        return FKD(
+            potential_type=fkd_config.get("potential_type", "max"),
+            lmbda=fkd_config.get("lmbda", 10.0),
+            num_particles=B,
+            adaptive_resampling=fkd_config.get("adaptive_resampling", True),
+            resample_frequency=fkd_config.get("resample_frequency", 5),
+            resampling_t_start=int(start_step),
+            resampling_t_end=int(timesteps[-1].item()),
+            timesteps=timesteps,
+            reward_fn=reward_fn,
+            reward_min_value=float("-inf"),
+            device=device,
+        )
+
     def _guided_denoise_loop(
         self,
         *,
@@ -1133,6 +1210,16 @@ class RDTSteer:
         use_keypoint_guidance = guidance_fns is not None and len(guidance_fns) > 0 and keypoints is not None
         reward_history = []
         start_step = self._resolve_start_step(scheduler.timesteps, start_ratio)
+        terminal_t = int(scheduler.timesteps[-1].item())
+        fkd = self._init_fkd(
+            B=x_t.shape[0],
+            timesteps=scheduler.timesteps,
+            start_step=start_step,
+            keypoints=keypoints,
+            guidance_fns=guidance_fns,
+            fkd_config=fkd_config if use_fkd else None,
+            device=x_t.device,
+        )
 
         for i, t in enumerate(scheduler.timesteps):
             with torch.no_grad():
@@ -1169,7 +1256,22 @@ class RDTSteer:
                     model_output = self._apply_keypoint_guidance(model_output, kp_grad, scale)
 
             step_output = scheduler.step(model_output, t, x_t)
+            x0_for_reward, _ = self._select_fkd_x0_source(
+                model_output=model_output,
+                step_output=step_output,
+                x_t=x_t,
+            )
             x_t = step_output.prev_sample.to(dtype=model_output.dtype)
+
+            if fkd is not None and int(t.item()) <= start_step and int(t.item()) != terminal_t:
+                before_resample = x_t
+                x_t, _ = fkd.resample(
+                    sampling_idx=int(t.item()),
+                    latents=x_t,
+                    x0_preds=x0_for_reward,
+                )
+                if self._fkd_resample_changed_particles(before_resample, x_t):
+                    self._reset_scheduler_particle_history_after_resample(scheduler)
 
         if reward_history and self._stage_init_reward is None:
             self._stage_init_reward = reward_history[-1][1]
