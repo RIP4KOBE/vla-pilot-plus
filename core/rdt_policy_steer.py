@@ -1276,9 +1276,28 @@ class RDTSteer:
         if reward_history and self._stage_init_reward is None:
             self._stage_init_reward = reward_history[-1][1]
 
-        if x_t.shape[0] > 1:
-            x_t = x_t[0:1]
-        return x_t
+        return self._select_particle_for_execution(
+            x_t,
+            keypoints=keypoints,
+            guidance_fns=guidance_fns,
+            fkd=fkd,
+        )
+
+    def _select_particle_for_execution(
+        self,
+        samples: Tensor,
+        *,
+        keypoints: Optional[Tensor],
+        guidance_fns: Optional[List[Callable]],
+        fkd: Optional[FKD],
+    ) -> Tensor:
+        if samples.shape[0] == 1:
+            return samples
+        if fkd is not None and fkd.reached_terminal:
+            return samples[0:1]
+        rewards = self._score_particles(samples, keypoints, guidance_fns, slice_kind="fkd")
+        best_idx = int(torch.argmax(rewards).item())
+        return samples[best_idx : best_idx + 1]
 
     # ── Action postprocessing ─────────────────────────────────────────────────
 

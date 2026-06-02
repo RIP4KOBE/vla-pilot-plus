@@ -1151,3 +1151,46 @@ def test_fkd_reward_scores_all_particles_with_diffusion_policy_slice(stub_steer,
 
     assert tuple(rewards.shape) == (3,)
     assert rewards[2] > rewards[1] > rewards[0]
+
+
+def test_select_particle_uses_best_reward_when_fkd_not_terminal(stub_steer, stub_adapter):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    samples = torch.zeros(3, 64, 128)
+    samples[0, :4, 39] = 1.0
+    samples[1, :4, 39] = 3.0
+    samples[2, :4, 39] = 2.0
+
+    selected = stub_steer._select_particle_for_execution(
+        samples,
+        keypoints=torch.zeros(3, 3),
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        fkd=None,
+    )
+
+    assert tuple(selected.shape) == (1, 64, 128)
+    torch.testing.assert_close(selected[0, :4, 39], torch.full((4,), 3.0))
+
+
+def test_select_particle_keeps_first_when_single_particle(stub_steer, stub_adapter):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=1,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    samples = torch.zeros(1, 64, 128)
+    samples[0, :4, 39] = 5.0
+
+    selected = stub_steer._select_particle_for_execution(
+        samples,
+        keypoints=torch.zeros(3, 3),
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        fkd=None,
+    )
+
+    torch.testing.assert_close(selected, samples)
