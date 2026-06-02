@@ -20,6 +20,7 @@ import torch
 from torch import Tensor, nn
 
 from core.env_adapters import BaseEnvAdapter
+from core.fkd_class import FKD
 from core.rdt_libero_action_converter import (
     ACTIVE_ACTION_INDICES_SORTED,
     ACTIVE_INDICES_SORTED,
@@ -30,6 +31,10 @@ from core.rdt_libero_obs_processor import RDTLiberoObsProcessor
 from utils.logging_utils import SteerLogger
 
 log = SteerLogger("RDTSteer")
+
+RDT_GUIDED_TRANSLATION_INDICES = [39, 40, 41]
+RDT_GUIDED_ACTION_INDICES = [39, 40, 41, 42, 43, 44, 10]
+RDT_GUIDANCE_SIGN = 1.0
 
 
 def _rdt_flat_config_to_args(flat: dict) -> dict:
@@ -954,7 +959,6 @@ class RDTSteer:
         self._obs_processor.observe(batch)
         should_sample = (
             generate_new_chunk
-            or use_guidance
             or self._cached_action_chunk is None
             or self._cached_action_steps_remaining <= 0
         )
@@ -963,8 +967,26 @@ class RDTSteer:
             converted = self._obs_processor.current()
 
             if use_guidance:
-                raise NotImplementedError(
-                    "RDT LIBERO VLS steering is deferred until unguided LIBERO semantics pass."
+                text_embed = self._get_lang_embed(converted.task)
+                raw = self._predict_guided(
+                    converted.state_128,
+                    converted.state_mask_128,
+                    converted.images,
+                    text_embed,
+                    keypoints=keypoints,
+                    guidance_fns=guidance_fns,
+                    guide_scale=guide_scale,
+                    sigmoid_k=sigmoid_k,
+                    sigmoid_x0=sigmoid_x0,
+                    start_ratio=start_ratio,
+                    use_diversity=use_diversity,
+                    diversity_scale=diversity_scale,
+                    MCMC_steps=MCMC_steps,
+                    verbose=verbose,
+                    use_fkd=use_fkd,
+                    fkd_config=fkd_config,
+                    global_step=global_step,
+                    current_stage=current_stage,
                 )
             else:
                 text_embed = self._get_lang_embed(converted.task)
@@ -1019,6 +1041,103 @@ class RDTSteer:
 
         action_mask = cond["action_mask"].expand(B, pred_horizon, unified_action_dim).to(device=device, dtype=dtype)
         return (x_t * action_mask).float()
+
+    # ── Guided path ──────────────────────────────────────────────────────────
+
+    def _predict_guided(
+        self,
+        state_128: Tensor,
+        state_mask_128: Tensor,
+        images: list,
+        text_embed: Tensor,
+        *,
+        keypoints: Optional[np.ndarray],
+        guidance_fns: Optional[List[Callable]],
+        guide_scale: float,
+        sigmoid_k: float,
+        sigmoid_x0: float,
+        start_ratio: Optional[float],
+        use_diversity: bool,
+        diversity_scale: float,
+        MCMC_steps: int,
+        verbose: bool,
+        use_fkd: bool,
+        fkd_config: Optional[dict],
+        global_step: int,
+        current_stage: int,
+    ) -> Tensor:
+        device = self.device
+        try:
+            dtype = next(self._dit.parameters()).dtype
+        except StopIteration:
+            dtype = torch.float32
+
+        cond = self._rdt_model.encode_inputs(state_128, state_mask_128, images, text_embed)
+        unified_action_dim = int(cond["unified_action_dim"])
+        if unified_action_dim != 128:
+            raise ValueError(f"Expected unified action dim 128, got {unified_action_dim}")
+
+        B = max(1, int(self._sample_batch_size))
+        pred_horizon = 64
+        x_t = torch.randn(B, pred_horizon, unified_action_dim, device=device, dtype=dtype)
+
+        keypoints_tensor = None
+        if keypoints is not None:
+            keypoints_tensor = torch.tensor(keypoints, device=device, dtype=dtype)
+
+        guided = self._guided_denoise_loop(
+            x_t=x_t,
+            cond=cond,
+            keypoints=keypoints_tensor,
+            guidance_fns=guidance_fns,
+            guide_scale=guide_scale,
+            sigmoid_k=sigmoid_k,
+            sigmoid_x0=sigmoid_x0,
+            start_ratio=start_ratio,
+            use_diversity=use_diversity,
+            diversity_scale=diversity_scale,
+            MCMC_steps=MCMC_steps,
+            verbose=verbose,
+            use_fkd=use_fkd,
+            fkd_config=fkd_config,
+            global_step=global_step,
+            current_stage=current_stage,
+        )
+        action_mask = cond["action_mask"].expand(guided.shape[0], pred_horizon, unified_action_dim).to(device=device, dtype=dtype)
+        return (guided * action_mask).float()
+
+    def _guided_denoise_loop(
+        self,
+        *,
+        x_t: Tensor,
+        cond: dict,
+        keypoints: Optional[Tensor],
+        guidance_fns: Optional[List[Callable]],
+        guide_scale: float,
+        sigmoid_k: float,
+        sigmoid_x0: float,
+        start_ratio: Optional[float],
+        use_diversity: bool,
+        diversity_scale: float,
+        MCMC_steps: int,
+        verbose: bool,
+        use_fkd: bool,
+        fkd_config: Optional[dict],
+        global_step: int,
+        current_stage: int,
+    ) -> Tensor:
+        scheduler = self._noise_scheduler
+        scheduler.set_timesteps(self._num_inference_steps)
+
+        with torch.no_grad():
+            for t in scheduler.timesteps:
+                model_output = self._dit(x_t, t, cond)
+                x_t = scheduler.step(model_output, t, x_t).prev_sample
+                x_t = x_t.to(dtype=model_output.dtype)
+
+        if x_t.shape[0] > 1:
+            x_t = x_t[0:1]
+        return x_t
 
     # ── Action postprocessing ─────────────────────────────────────────────────
 
@@ -1163,10 +1282,3 @@ class RDTSteer:
         scale = guide_scale * strength * math.sqrt(max(0.0, 1.0 - float(alpha_t)))
         self._last_scale = scale
         return scale
-
-    # ── Guided denoising loop ─────────────────────────────────────────────────
-
-    def _guided_denoise_loop(self, *args, **kwargs) -> Tensor:
-        raise NotImplementedError(
-            "RDT LIBERO VLS steering is deferred until unguided LIBERO semantics pass."
-        )

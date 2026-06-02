@@ -315,51 +315,47 @@ def test_select_action_generate_new_chunk_forces_refresh_with_cached_actions(stu
     assert stub_steer._obs_processor.current().task == "second"
 
 
-def test_select_action_generate_new_chunk_with_guidance_does_not_return_cached_actions(stub_steer, stub_adapter):
+def test_guided_select_action_samples_only_on_chunk_boundaries(stub_steer, stub_adapter):
     stub_steer.post_init(
         adapter=stub_adapter,
         postprocessor=lambda x: x,
         sample_batch_size=4,
-        policy_config={"action_chunk_horizon": 8},
+        policy_config={"action_chunk_horizon": 2},
     )
-    stub_steer.select_action(_raw_obs(task="first"), generate_new_chunk=True, use_guidance=False)
-    assert stub_steer._cached_action_steps_remaining == 7
+    guidance = [lambda keypoints, traj: traj[..., 0].sum()]
+    keypoints = np.zeros((3, 3), dtype=np.float32)
 
-    with pytest.raises(NotImplementedError, match="RDT LIBERO VLS steering"):
-        stub_steer.select_action(
-            _raw_obs(task="guided"),
-            generate_new_chunk=True,
-            use_guidance=True,
-            guidance_fns=[lambda keypoints, traj: traj.sum()],
-            keypoints=np.zeros((3, 3), dtype=np.float32),
-        )
-
-    assert stub_steer._rdt_model.encode_calls == 1
-    assert stub_steer._obs_processor.current().task == "guided"
-
-
-def test_select_action_guidance_request_rejects_before_cached_action_reuse(stub_steer, stub_adapter):
-    stub_steer.post_init(
-        adapter=stub_adapter,
-        postprocessor=lambda x: x,
-        sample_batch_size=4,
-        policy_config={"action_chunk_horizon": 8},
+    first = stub_steer.select_action(
+        _raw_obs(task="guided-first"),
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_fns=guidance,
+        keypoints=keypoints,
     )
-    cached_chunk = stub_steer.select_action(_raw_obs(task="first"), generate_new_chunk=True, use_guidance=False)
-    assert stub_steer._cached_action_steps_remaining == 7
-
-    with pytest.raises(NotImplementedError, match="RDT LIBERO VLS steering"):
-        stub_steer.select_action(
-            _raw_obs(task="guided"),
-            generate_new_chunk=False,
-            use_guidance=True,
-            guidance_fns=[lambda keypoints, traj: traj.sum()],
-            keypoints=np.zeros((3, 3), dtype=np.float32),
-        )
-
-    assert stub_steer._cached_action_chunk is cached_chunk
     assert stub_steer._rdt_model.encode_calls == 1
-    assert stub_steer._obs_processor.current().task == "guided"
+    assert stub_steer._cached_action_steps_remaining == 1
+
+    reused = stub_steer.select_action(
+        _raw_obs(task="guided-second"),
+        generate_new_chunk=False,
+        use_guidance=True,
+        guidance_fns=guidance,
+        keypoints=keypoints,
+    )
+    assert reused is first
+    assert stub_steer._rdt_model.encode_calls == 1
+    assert stub_steer._cached_action_steps_remaining == 0
+    assert stub_steer._obs_processor.current().task == "guided-second"
+
+    refreshed = stub_steer.select_action(
+        _raw_obs(task="guided-third"),
+        generate_new_chunk=False,
+        use_guidance=True,
+        guidance_fns=guidance,
+        keypoints=keypoints,
+    )
+    assert refreshed is not first
+    assert stub_steer._rdt_model.encode_calls == 2
 
 
 def test_reset_clears_action_buffer_and_observation_history(stub_steer, stub_adapter, mock_batch):
@@ -380,27 +376,24 @@ def test_reset_clears_action_buffer_and_observation_history(stub_steer, stub_ada
         stub_steer._obs_processor.current()
 
 
-def test_guided_rdt_libero_path_is_explicitly_deferred(stub_steer, stub_adapter, mock_batch):
+def test_guided_select_action_uses_latent_particle_batch(stub_steer, stub_adapter, mock_batch):
     stub_steer.post_init(
         adapter=stub_adapter,
         postprocessor=lambda x: x,
-        sample_batch_size=2,
-        policy_config={"action_chunk_horizon": 8, "debug_first_step": True},
+        sample_batch_size=4,
+        policy_config={"action_chunk_horizon": 8},
+    )
+    action = stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        keypoints=np.zeros((3, 3), dtype=np.float32),
     )
 
-    with pytest.raises(NotImplementedError, match="RDT LIBERO VLS steering"):
-        stub_steer.select_action(
-            mock_batch,
-            generate_new_chunk=True,
-            use_guidance=True,
-            guidance_fns=[lambda keypoints, traj: traj.sum()],
-            keypoints=np.zeros((3, 3), dtype=np.float32),
-        )
-
-
-def test_private_guided_loop_is_explicitly_deferred(stub_steer):
-    with pytest.raises(NotImplementedError, match="RDT LIBERO VLS steering"):
-        stub_steer._guided_denoise_loop()
+    assert tuple(action.shape) == (1, 8, 7)
+    assert stub_steer._rdt_model.dit.calls
+    assert any(latent_shape[0] == 4 for latent_shape, _ in stub_steer._rdt_model.dit.calls)
 
 
 def test_parameterless_stub_tracks_requested_device(stub_steer):
