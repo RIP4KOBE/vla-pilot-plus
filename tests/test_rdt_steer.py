@@ -437,6 +437,54 @@ def test_rdt_guidance_trajectory_gradients_flow_to_translation_slots(stub_steer,
     assert inactive.abs().sum() == 0
 
 
+def test_rdt_guidance_sign_moves_positive_x_reward_up(stub_steer, stub_adapter):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=1,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    model_output = torch.zeros(1, 64, 128)
+    grad = torch.zeros_like(model_output)
+    grad[:, :4, 39] = 1.0
+
+    guided = stub_steer._apply_keypoint_guidance(model_output, grad, scale=torch.tensor(0.5))
+
+    assert guided[:, :4, 39].sum() > model_output[:, :4, 39].sum()
+    assert guided[:, :4, 40].abs().sum() == 0
+    assert guided[:, :4, 42].abs().sum() == 0
+    assert guided[:, :4, 10].abs().sum() == 0
+
+
+def test_keypoint_gradient_uses_diffusion_policy_slice_and_masks_slots(stub_steer, stub_adapter):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=2,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    sample = torch.zeros(2, 64, 128)
+
+    def reward_fn(keypoints, traj):
+        assert tuple(traj.shape) == (2, 4, 3)
+        return traj[..., 0].sum()
+
+    grad, reward = stub_steer._compute_keypoint_gradient(
+        sample,
+        torch.zeros(3, 3),
+        [reward_fn],
+    )
+
+    assert reward == 0.0
+    assert grad is not None
+    assert grad[:, :4, 39].abs().sum() > 0
+    masked = stub_steer._mask_guidance_gradient(grad)
+    assert masked[:, :4, 39].abs().sum() > 0
+    assert masked[:, :4, 40].abs().sum() == 0
+    assert masked[:, :4, 42].abs().sum() == 0
+    assert masked[:, :4, 10].abs().sum() == 0
+
+
 def test_parameterless_stub_tracks_requested_device(stub_steer):
     assert stub_steer.device == torch.device("cpu")
 

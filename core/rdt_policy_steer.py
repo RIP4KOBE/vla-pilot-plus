@@ -1129,11 +1129,40 @@ class RDTSteer:
         scheduler = self._noise_scheduler
         scheduler.set_timesteps(self._num_inference_steps)
 
-        with torch.no_grad():
-            for t in scheduler.timesteps:
+        use_keypoint_guidance = guidance_fns is not None and len(guidance_fns) > 0 and keypoints is not None
+        reward_history = []
+        start_step = self._resolve_start_step(scheduler.timesteps, start_ratio)
+
+        for i, t in enumerate(scheduler.timesteps):
+            with torch.no_grad():
                 model_output = self._dit(x_t, t, cond)
-                x_t = scheduler.step(model_output, t, x_t).prev_sample
-                x_t = x_t.to(dtype=model_output.dtype)
+
+            if use_keypoint_guidance and int(t.item()) <= start_step:
+                kp_grad, reward_value = self._compute_keypoint_gradient(
+                    x_t,
+                    keypoints,
+                    guidance_fns,
+                    verbose=(verbose and i == int(len(scheduler.timesteps) * 0.8)),
+                )
+                if kp_grad is not None:
+                    normalized_reward = self._normalized_reward_from_value(reward_value)
+                    reward_history.append((i, reward_value, normalized_reward))
+                    scale = self._adaptive_scale_for_scheduler_t(
+                        scheduler,
+                        t,
+                        guide_scale,
+                        sigmoid_k,
+                        sigmoid_x0,
+                        model_output.device,
+                        model_output.dtype,
+                    )
+                    model_output = self._apply_keypoint_guidance(model_output, kp_grad, scale)
+
+            step_output = scheduler.step(model_output, t, x_t)
+            x_t = step_output.prev_sample.to(dtype=model_output.dtype)
+
+        if reward_history and self._stage_init_reward is None:
+            self._stage_init_reward = reward_history[-1][1]
 
         if x_t.shape[0] > 1:
             x_t = x_t[0:1]
@@ -1185,6 +1214,25 @@ class RDTSteer:
         return torch.stack(trajs, dim=0)
 
     # ── Gradient helpers ──────────────────────────────────────────────────────
+
+    def _mask_guidance_gradient(self, grad: Tensor) -> Tensor:
+        masked = torch.zeros_like(grad)
+        masked[:, : self._action_chunk_horizon, RDT_GUIDED_TRANSLATION_INDICES] = grad[
+            :, : self._action_chunk_horizon, RDT_GUIDED_TRANSLATION_INDICES
+        ]
+        return masked
+
+    def _apply_keypoint_guidance(self, model_output: Tensor, kp_grad: Tensor, scale: Tensor | float) -> Tensor:
+        guided = model_output.clone()
+        if not torch.is_tensor(scale):
+            scale = torch.tensor(scale, device=model_output.device, dtype=model_output.dtype)
+        masked_grad = self._mask_guidance_gradient(kp_grad).to(device=model_output.device, dtype=model_output.dtype)
+        guided[:, : self._action_chunk_horizon, RDT_GUIDED_TRANSLATION_INDICES] += (
+            RDT_GUIDANCE_SIGN
+            * scale
+            * masked_grad[:, : self._action_chunk_horizon, RDT_GUIDED_TRANSLATION_INDICES]
+        )
+        return guided
 
     def _compute_diversity_gradient(self, x_t: Tensor) -> Optional[Tensor]:
         """
@@ -1247,6 +1295,7 @@ class RDTSteer:
                     [self._rdt_sample_to_trajectory_3d(x_grad[b: b + 1]) for b in range(x_grad.shape[0])],
                     dim=0,
                 )  # (B, H+1, 3)
+                # Mirrors core/diffusion_policy_steer.py keypoint gradient slice.
                 traj_input = trajs[:, : self._action_chunk_horizon, :3]  # (B, H, 3)
 
                 reward = sum(fn(keypoints, traj_input) for fn in guidance_fns)
@@ -1280,6 +1329,43 @@ class RDTSteer:
         except Exception as exc:
             log.warning(f"Keypoint gradient failed: {exc}")
             return None, 0.0
+
+    def _normalized_reward_from_value(self, reward_value: float) -> float:
+        if self._stage_init_reward is not None and self._stage_init_reward < -1e-6:
+            normalized_reward = 1.0 - (reward_value / self._stage_init_reward)
+            normalized_reward = max(0.0, min(1.2, normalized_reward))
+        else:
+            normalized_reward = 0.0
+        self._last_normalized_reward = normalized_reward
+        return normalized_reward
+
+    def _resolve_start_step(self, timesteps: Tensor, start_ratio: Optional[float]) -> int:
+        if start_ratio is None:
+            return int(timesteps[len(timesteps) // 3].item())
+        idx = int(len(timesteps) * float(start_ratio))
+        idx = max(0, min(len(timesteps) - 1, idx))
+        return int(timesteps[idx].item())
+
+    def _adaptive_scale_for_scheduler_t(
+        self,
+        scheduler,
+        t: Tensor,
+        guide_scale: float,
+        sigmoid_k: float,
+        sigmoid_x0: float,
+        device: torch.device,
+        dtype: torch.dtype,
+    ) -> Tensor:
+        strength = 1.0 / (1.0 + math.exp(sigmoid_k * (self._last_normalized_reward - sigmoid_x0)))
+        if hasattr(scheduler, "alphas_cumprod"):
+            alpha_t = scheduler.alphas_cumprod[int(t.item())].to(device=device, dtype=dtype)
+        else:
+            alpha_t = torch.tensor(self._current_alpha_t, device=device, dtype=dtype)
+        scale = torch.tensor(float(guide_scale) * strength, device=device, dtype=dtype) * torch.sqrt(
+            torch.clamp(1.0 - alpha_t, min=0.0)
+        )
+        self._last_scale = float(scale.detach().cpu().item())
+        return scale
 
     def _adaptive_scale(
         self, reward: float, guide_scale: float, sigmoid_k: float, sigmoid_x0: float
