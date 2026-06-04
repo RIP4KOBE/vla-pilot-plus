@@ -413,6 +413,39 @@ def test_guided_select_action_uses_latent_particle_batch(stub_steer, stub_adapte
     assert any(latent_shape[0] == 4 for latent_shape, _ in stub_steer._rdt_model.dit.calls)
 
 
+def test_guided_select_action_exposes_visualization_candidates_without_changing_execution_output(
+    stub_steer,
+    stub_adapter,
+    mock_batch,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=4,
+        policy_config={"action_chunk_horizon": 4},
+    )
+
+    action = stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        keypoints=np.zeros((3, 3), dtype=np.float32),
+        use_diversity=False,
+        use_fkd=False,
+    )
+
+    candidates = stub_steer.get_last_visualization_action_candidates()
+
+    assert tuple(action.shape) == (1, 4, 7)
+    assert tuple(candidates.shape) == (4, 4, 7)
+    torch.testing.assert_close(candidates[0:1], action)
+
+    stub_steer.reset()
+
+    assert stub_steer.get_last_visualization_action_candidates() is None
+
+
 def test_integrated_guided_select_action_with_diversity_fkd_and_selection(
     stub_steer,
     stub_adapter,
@@ -607,6 +640,52 @@ def test_guided_loop_calls_fkd_resample_when_enabled(stub_steer, stub_adapter, m
     assert all(call["x0_shape"] == (3, 64, 128) for call in calls)
     assert all(call["latents_dtype"] == torch.float32 for call in calls)
     assert all(call["x0_dtype"] == torch.float32 for call in calls)
+
+
+def test_guided_loop_explicit_start_step_overrides_start_ratio_for_fkd(
+    stub_steer,
+    stub_adapter,
+    mock_batch,
+    monkeypatch,
+):
+    init_kwargs = []
+
+    class _SpyFKD:
+        def __init__(self, **kwargs):
+            self.reached_terminal = False
+            init_kwargs.append(kwargs)
+
+        def resample(self, *, sampling_idx, latents, x0_preds):
+            return latents, None
+
+    monkeypatch.setattr("core.rdt_policy_steer.FKD", _SpyFKD)
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+
+    stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        keypoints=np.zeros((3, 3), dtype=np.float32),
+        start_ratio=0.0,
+        start_step=2,
+        use_diversity=False,
+        use_fkd=True,
+        fkd_config={
+            "potential_type": "max",
+            "lmbda": 1.0,
+            "adaptive_resampling": False,
+            "resample_frequency": 1,
+        },
+    )
+
+    assert len(init_kwargs) == 1
+    assert init_kwargs[0]["resampling_t_start"] == 2
 
 
 def test_guided_loop_real_fkd_resample_resets_scheduler_history(stub_steer, stub_adapter, mock_batch, monkeypatch):

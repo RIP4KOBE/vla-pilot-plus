@@ -41,6 +41,7 @@ main:
   guide_scale: 40.0
   diversity_scale: 10.0
   start_ratio: null
+  start_step: null
   MCMC_steps: 4
 
   sigmoid_k: 25.0

@@ -46,6 +46,7 @@ import time
 import sys
 import json
 import warnings
+import inspect
 
 # Hydra imports
 import hydra
@@ -83,6 +84,21 @@ from utils.logging_utils import SteerLogger
 
 # Create logger instance
 log = SteerLogger("Main")
+
+
+def _get_visualization_action_chunk(policy: Any, adapter: Any, action_chunk: torch.Tensor) -> torch.Tensor:
+    get_candidates = getattr(policy, "get_last_visualization_action_candidates", None)
+    if not callable(get_candidates):
+        return action_chunk
+
+    candidates = get_candidates()
+    if candidates is None:
+        return action_chunk
+
+    if hasattr(adapter, "env_postprocessor"):
+        transition = adapter.env_postprocessor({"action": candidates})
+        return transition["action"]
+    return candidates
 
 
 class Main:
@@ -657,25 +673,33 @@ class Main:
             sigmoid_k = self.config.get("sigmoid_k", 12.0)
             sigmoid_x0 = self.config.get("sigmoid_x0", 0.7)
             
-            action_chunk = self.policy.select_action(
-                observation,
-                generate_new_chunk=generate_new_chunk,
-                use_guidance=use_guidance,
-                keypoints=keypoints,
-                guidance_fns=current_guidance_fns,
-                guide_scale=guide_scale,
-                sigmoid_k=sigmoid_k,
-                sigmoid_x0=sigmoid_x0,
-                start_ratio=self.config.get("start_ratio", None),
-                use_diversity=self.config.get("use_diversity", True),
-                diversity_scale=self.config.get("diversity_scale", 10.0),
-                MCMC_steps=self.config.get("MCMC_steps", 4),
-                verbose=True,
-                use_fkd=self.config.get("use_fkd", False),
-                fkd_config=OmegaConf.to_container(self.config.get("fkd", {}), resolve=True) if self.config.get("fkd") else None,
-                global_step=global_steps,
-                current_stage=current_stage,
-            )
+            select_action_kwargs = {
+                "generate_new_chunk": generate_new_chunk,
+                "use_guidance": use_guidance,
+                "keypoints": keypoints,
+                "guidance_fns": current_guidance_fns,
+                "guide_scale": guide_scale,
+                "sigmoid_k": sigmoid_k,
+                "sigmoid_x0": sigmoid_x0,
+                "start_ratio": self.config.get("start_ratio", None),
+                "use_diversity": self.config.get("use_diversity", True),
+                "diversity_scale": self.config.get("diversity_scale", 10.0),
+                "MCMC_steps": self.config.get("MCMC_steps", 4),
+                "verbose": True,
+                "use_fkd": self.config.get("use_fkd", False),
+                "fkd_config": OmegaConf.to_container(self.config.get("fkd", {}), resolve=True) if self.config.get("fkd") else None,
+                "global_step": global_steps,
+                "current_stage": current_stage,
+            }
+            start_step = self.config.get("start_step", None)
+            if start_step is not None:
+                select_action_params = inspect.signature(self.policy.select_action).parameters
+                if "start_step" in select_action_params:
+                    select_action_kwargs["start_step"] = start_step
+                else:
+                    log.warning(f"Configured start_step={start_step}, but current policy does not support start_step override")
+
+            action_chunk = self.policy.select_action(observation, **select_action_kwargs)
 
             if hasattr(self.adapter, 'env_postprocessor'):
                 action_transition = {"action": action_chunk}
@@ -685,9 +709,14 @@ class Main:
             # Get image and add status overlay
             if self.config.get("debug_draw_trajectory", False):
                 from utils.vis_utils import draw_action_trajectory_on_vlm_image
+                visualization_action_chunk = _get_visualization_action_chunk(
+                    self.policy,
+                    self.adapter,
+                    action_chunk,
+                )
                 image = draw_action_trajectory_on_vlm_image(
                     adapter=self.adapter,
-                    action_chunk=action_chunk[:, action_executed:],
+                    action_chunk=visualization_action_chunk[:, action_executed:],
                     num_steps=action_horizon,
                     global_step=global_steps,
                     action_executed=action_executed,

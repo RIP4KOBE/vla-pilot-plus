@@ -118,11 +118,115 @@ except ModuleNotFoundError as exc:
 LIBERO_PRO_PATH = Path(__file__).parent.parent.parent / "third_party" / "libero_pro"
 if str(LIBERO_PRO_PATH) not in sys.path:
     sys.path.insert(0, str(LIBERO_PRO_PATH))
-LIBERO_PATH = Path(__file__).parent.parent.parent / "third_party" / "libero"
-if LIBERO_PATH.exists() and str(LIBERO_PATH) not in sys.path:
-    sys.path.insert(0, str(LIBERO_PATH))
-from libero.libero import benchmark, get_libero_path
+
+
+def _libero_config_dirs(config_dir: str | None = None) -> list[Path]:
+    raw_dirs = [config_dir] if config_dir is not None else [
+        os.environ.get("LIBERO_CONFIG_PATH"),
+        "~/.libero",
+    ]
+    dirs: list[Path] = []
+    seen: set[str] = set()
+    for raw_dir in raw_dirs:
+        if not raw_dir:
+            continue
+        path = Path(raw_dir).expanduser()
+        key = str(path)
+        if key not in seen:
+            dirs.append(path)
+            seen.add(key)
+    return dirs
+
+
+def _read_libero_config(config_dir: Path) -> dict[str, Any]:
+    config_file = Path(config_dir).expanduser() / "config.yaml"
+    if not config_file.exists():
+        return {}
+    with config_file.open("r") as f:
+        return yaml.safe_load(f) or {}
+
+
+def _libero_config_value_is_usable(key: str, value: Any) -> bool:
+    if value is None:
+        return False
+    path = Path(str(value)).expanduser()
+    if key == "assets":
+        return (path / "scenes" / "libero_floor_base_style.xml").is_file()
+    if key in {"benchmark_root", "bddl_files", "init_states"}:
+        return path.exists()
+    return True
+
+
+def _select_libero_config(config_dir: str | None = None) -> dict[str, Any]:
+    required = ("benchmark_root", "bddl_files", "init_states", "assets")
+    fallback: dict[str, Any] = {}
+    for candidate_dir in _libero_config_dirs(config_dir):
+        config = _read_libero_config(candidate_dir)
+        if not config:
+            continue
+        if not fallback:
+            fallback = config
+        if all(_libero_config_value_is_usable(key, config.get(key)) for key in required):
+            return config
+    return fallback
+
+
+def _libero_source_from_config(config_dir: str | None = None) -> Optional[Path]:
+    config = _select_libero_config(config_dir)
+    benchmark_root = config.get("benchmark_root")
+    if not benchmark_root:
+        return None
+    root = Path(benchmark_root).expanduser()
+    for source_root in (root.parent.parent, root.parent, root):
+        if (source_root / "libero" / "libero" / "__init__.py").is_file():
+            return source_root
+    return None
+
+
+def _insert_libero_source_path() -> None:
+    project_libero_path = Path(__file__).parent.parent.parent / "third_party" / "libero"
+    candidates = [
+        os.environ.get("LIBERO_SOURCE_PATH"),
+        project_libero_path,
+        _libero_source_from_config(),
+    ]
+    for candidate in candidates:
+        if candidate is None:
+            continue
+        path = Path(candidate).expanduser()
+        if path.exists() and str(path) not in sys.path:
+            sys.path.insert(0, str(path))
+            return
+
+
+_insert_libero_source_path()
+import libero.libero as _libero_module
+from libero.libero import get_libero_path as _libero_get_libero_path
+
+
+def get_libero_path(query_key: str) -> str:
+    config = _select_libero_config()
+    if query_key in config:
+        return str(Path(str(config[query_key])).expanduser())
+    return _libero_get_libero_path(query_key)
+
+
+def _configured_libero_assets_path() -> str:
+    return get_libero_path("assets")
+
+
+if hasattr(_libero_module, "get_assets_path"):
+    _libero_module.get_assets_path = _configured_libero_assets_path
+
+from libero.libero import benchmark
 from libero.libero.envs import OffScreenRenderEnv
+
+try:
+    import libero.libero.envs.bddl_base_domain as _bddl_base_domain
+
+    _bddl_base_domain.get_assets_path = _configured_libero_assets_path
+except ModuleNotFoundError:
+    pass
 
 
 # vls

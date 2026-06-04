@@ -26,6 +26,7 @@ from core.rdt_libero_action_converter import (
     ACTIVE_INDICES_SORTED,
     LIBERO_RDT_INDICES,
     decode_rdt_libero_action_chunk,
+    rdt_action_to_libero_raw,
 )
 from core.rdt_libero_obs_processor import RDTLiberoObsProcessor
 from utils.logging_utils import SteerLogger
@@ -537,6 +538,7 @@ class RDTSteer:
         self._last_raw_reward: float = 0.0
         self._current_alpha_t: float = 0.5
         self._cached_action_steps_remaining: int = 0
+        self._last_visualization_action_candidates: Optional[Tensor] = None
 
         # Probe inner DiT score network once at construction.
         self._dit: nn.Module = self._find_dit(rdt_model)
@@ -913,6 +915,7 @@ class RDTSteer:
         self._last_scale = 0.0
         self._last_raw_reward = 0.0
         self._current_alpha_t = 0.5
+        self._last_visualization_action_candidates = None
         if self._obs_processor is not None:
             self._obs_processor.reset()
 
@@ -924,6 +927,11 @@ class RDTSteer:
 
     def get_last_scale(self) -> float:
         return self._last_scale
+
+    def get_last_visualization_action_candidates(self) -> Optional[Tensor]:
+        if self._last_visualization_action_candidates is None:
+            return None
+        return self._last_visualization_action_candidates.clone()
 
     @property
     def device(self) -> torch.device:
@@ -945,6 +953,7 @@ class RDTSteer:
         sigmoid_k: float = 12.0,
         sigmoid_x0: float = 0.7,
         start_ratio: Optional[float] = None,
+        start_step: Optional[int] = None,
         use_diversity: bool = True,
         diversity_scale: float = 1.0,
         MCMC_steps: int = 4,
@@ -965,6 +974,7 @@ class RDTSteer:
         )
 
         if should_sample:
+            self._last_visualization_action_candidates = None
             converted = self._obs_processor.current()
 
             if use_guidance:
@@ -980,6 +990,7 @@ class RDTSteer:
                     sigmoid_k=sigmoid_k,
                     sigmoid_x0=sigmoid_x0,
                     start_ratio=start_ratio,
+                    start_step=start_step,
                     use_diversity=use_diversity,
                     diversity_scale=diversity_scale,
                     MCMC_steps=MCMC_steps,
@@ -1058,6 +1069,7 @@ class RDTSteer:
         sigmoid_k: float,
         sigmoid_x0: float,
         start_ratio: Optional[float],
+        start_step: Optional[int],
         use_diversity: bool,
         diversity_scale: float,
         MCMC_steps: int,
@@ -1103,6 +1115,7 @@ class RDTSteer:
             sigmoid_k=sigmoid_k,
             sigmoid_x0=sigmoid_x0,
             start_ratio=start_ratio,
+            start_step=start_step,
             use_diversity=use_diversity,
             diversity_scale=diversity_scale,
             MCMC_steps=MCMC_steps,
@@ -1203,6 +1216,7 @@ class RDTSteer:
         sigmoid_k: float,
         sigmoid_x0: float,
         start_ratio: Optional[float],
+        start_step: Optional[int],
         use_diversity: bool,
         diversity_scale: float,
         MCMC_steps: int,
@@ -1217,7 +1231,12 @@ class RDTSteer:
 
         use_keypoint_guidance = guidance_fns is not None and len(guidance_fns) > 0 and keypoints is not None
         reward_history = []
-        start_step = self._resolve_start_step(scheduler.timesteps, start_ratio)
+        start_step = self._resolve_start_step(scheduler.timesteps, start_ratio, start_step)
+        if verbose:
+            log.info(
+                f"[RDT_GUIDE] start_step={start_step} start_ratio={start_ratio} "
+                f"use_diversity={use_diversity} use_fkd={use_fkd}"
+            )
         terminal_t = int(scheduler.timesteps[-1].item())
         fkd = self._init_fkd(
             B=x_t.shape[0],
@@ -1287,12 +1306,22 @@ class RDTSteer:
         if not torch.isfinite(x_t).all():
             raise ValueError("Guided RDT latent contains non-finite values")
 
-        return self._select_particle_for_execution(
+        selected = self._select_particle_for_execution(
             x_t,
             keypoints=keypoints,
             guidance_fns=guidance_fns,
             fkd=fkd,
         )
+        ordered_candidates = self._order_particles_for_visualization(
+            x_t,
+            keypoints=keypoints,
+            guidance_fns=guidance_fns,
+            fkd=fkd,
+        )
+        self._last_visualization_action_candidates = self._decode_visualization_action_candidates(
+            ordered_candidates
+        )
+        return selected
 
     def _select_particle_for_execution(
         self,
@@ -1309,6 +1338,36 @@ class RDTSteer:
         rewards = self._score_particles(samples, keypoints, guidance_fns, slice_kind="fkd")
         best_idx = int(torch.argmax(rewards).item())
         return samples[best_idx : best_idx + 1]
+
+    def _order_particles_for_visualization(
+        self,
+        samples: Tensor,
+        *,
+        keypoints: Optional[Tensor],
+        guidance_fns: Optional[List[Callable]],
+        fkd: Optional[FKD],
+    ) -> Tensor:
+        if samples.shape[0] <= 1:
+            return samples.detach()
+        if fkd is not None and fkd.reached_terminal:
+            return samples.detach()
+
+        rewards = self._score_particles(samples, keypoints, guidance_fns, slice_kind="fkd")
+        best_idx = int(torch.argmax(rewards).item())
+        if best_idx == 0:
+            return samples.detach()
+
+        remaining = [idx for idx in range(samples.shape[0]) if idx != best_idx]
+        order = torch.tensor([best_idx, *remaining], device=samples.device, dtype=torch.long)
+        return samples.index_select(0, order).detach()
+
+    def _decode_visualization_action_candidates(self, actions: Tensor) -> Tensor:
+        if actions.ndim != 3 or tuple(actions.shape[1:]) != (64, 128):
+            raise ValueError(f"Expected actions with shape (B, 64, 128), got {tuple(actions.shape)}")
+        decoded = rdt_action_to_libero_raw(actions[:, : self._action_chunk_horizon, :])
+        if not torch.isfinite(decoded).all():
+            raise ValueError("Decoded RDT visualization candidates contain non-finite values")
+        return decoded.detach()
 
     # ── Action postprocessing ─────────────────────────────────────────────────
 
@@ -1486,7 +1545,14 @@ class RDTSteer:
         self._last_normalized_reward = normalized_reward
         return normalized_reward
 
-    def _resolve_start_step(self, timesteps: Tensor, start_ratio: Optional[float]) -> int:
+    def _resolve_start_step(
+        self,
+        timesteps: Tensor,
+        start_ratio: Optional[float],
+        start_step: Optional[int] = None,
+    ) -> int:
+        if start_step is not None:
+            return int(start_step)
         if start_ratio is None:
             return int(timesteps[len(timesteps) // 3].item())
         idx = int(len(timesteps) * float(start_ratio))
