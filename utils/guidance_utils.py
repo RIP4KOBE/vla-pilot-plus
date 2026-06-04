@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+import numbers
 
 
 def get_device_from_parameters(model):
@@ -235,6 +236,8 @@ def wrap_guidance_function_with_device_fix(func):
             
             try:
                 result = func(keypoints, trajectory_3d)
+                if isinstance(result, numbers.Real):
+                    result = torch.tensor(result, device=device, dtype=dtype)
                 
                 # Ensure result is on correct device
                 if result is not None and hasattr(result, 'device') and result.device != device:
@@ -246,7 +249,10 @@ def wrap_guidance_function_with_device_fix(func):
                 func.__globals__['torch'] = original_torch
         else:
             # Fallback: just call the function
-            return func(keypoints, trajectory_3d)
+            result = func(keypoints, trajectory_3d)
+            if isinstance(result, numbers.Real):
+                result = torch.tensor(result, device=device, dtype=dtype)
+            return result
     
     return wrapped
 
