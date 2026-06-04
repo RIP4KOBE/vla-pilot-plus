@@ -12,8 +12,6 @@ from .env_adapters import (
     Pose3D,
     CameraParams,
     TrackedObject,
-    CalvinAdapter,
-    LiberoAdapter,
     create_adapter,
 )
 from .keypoint_tracker import KeypointTracker
@@ -30,11 +28,24 @@ def get_vlm_sam_pipeline(*args, **kwargs):
     from .sam_segmenter import VLMSAMPipeline
     return VLMSAMPipeline(*args, **kwargs)
 
+
+def __getattr__(name: str):
+    if name == "CalvinAdapter":
+        from .env_adapters.calvin_adapter import CalvinAdapter
+
+        return CalvinAdapter
+    if name == "LiberoAdapter":
+        from .env_adapters.libero_adapter import LiberoAdapter
+
+        return LiberoAdapter
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
 __all__ = [
     # Adapters
     "BaseEnvAdapter",
     "Pose3D",
-    "CameraParams", 
+    "CameraParams",
     "TrackedObject",
     "CalvinAdapter",
     "LiberoAdapter",
@@ -45,4 +56,3 @@ __all__ = [
     "get_sam_segmenter",
     "get_vlm_sam_pipeline",
 ]
-

@@ -76,12 +76,7 @@ from core.gemini_grounder import create_gemini_grounder, create_gemini_stage_rec
 from vlm_query.vlm_agent import VLMAgent
 from utils.vis_utils import TrajectoryVideoRecorder, add_text_to_image
 
-from core.diffusion_policy_steer import DiffusionPolicySteer
-from core.pi05_steer import PI05PolicySteer
-from lerobot.policies.diffusion.modeling_diffusion import DiffusionPolicy
-from lerobot.datasets.lerobot_dataset import LeRobotDatasetMetadata
-from lerobot.policies.factory import make_pre_post_processors
-from lerobot.envs.factory import make_env_pre_post_processors
+from core.policy_observation_sampling import policy_observation_sample_num
 
 # Import logging utility
 from utils.logging_utils import SteerLogger
@@ -90,17 +85,32 @@ from utils.logging_utils import SteerLogger
 log = SteerLogger("Main")
 
 
+def _get_visualization_action_chunk(policy: Any, adapter: Any, action_chunk: torch.Tensor) -> torch.Tensor:
+    get_candidates = getattr(policy, "get_last_visualization_action_candidates", None)
+    if not callable(get_candidates):
+        return action_chunk
+
+    candidates = get_candidates()
+    if candidates is None:
+        return action_chunk
+
+    if hasattr(adapter, "env_postprocessor"):
+        transition = adapter.env_postprocessor({"action": candidates})
+        return transition["action"]
+    return candidates
+
+
 class Main:
     def __init__(self, cfg: DictConfig):
         """
         Initialize with Hydra DictConfig.
-        
+
         Args:
             cfg: Hydra configuration (OmegaConf DictConfig)
         """
         self.cfg = cfg
         self.config = cfg.main  # Shortcut to main config section
-        
+
         # Log the resolved configuration
         log.info(f"Configuration:\n{OmegaConf.to_yaml(cfg, resolve=True)[:500]}...")
 
@@ -109,14 +119,14 @@ class Main:
         np.random.seed(seed)
         torch.manual_seed(seed)
         torch.cuda.manual_seed(seed)
-        
+
         # Get backend from config
         self.backend = cfg.backend.get('backend', 'calvin')
         log.info(f"Using backend: {self.backend}")
-        
+
         # Get backend-specific config
         env_config = OmegaConf.to_container(cfg.backend.get(self.backend, {}), resolve=True)
-        
+
         # Add main.episode_num to env_config for adapters that need it (e.g., LiberoAdapter)
         env_config['episode_num'] = self.config.get('episode_num', 10)
         # Pass task instruction from cfg.main (set by task config) so adapter can surface it
@@ -125,13 +135,13 @@ class Main:
 
         # Create adapter
         self.adapter = create_adapter(self.backend, env_config)
-        
+
         # Get task info from adapter for guidance adjustment
         task_info = self.adapter.get_task_info()
         instruction = task_info.get('instruction', '')
         recommended_scale = task_info.get('recommended_guide_scale')
         base_guide_scale = self.config.get('guide_scale', 80.0)
-        
+
         # Override with recommended scale if available
         if recommended_scale is not None:
             self.current_guide_scale = recommended_scale
@@ -142,63 +152,107 @@ class Main:
         else:
             self.current_guide_scale = base_guide_scale
             log.info(f"Using default guide_scale: {base_guide_scale}")
-        
+
         # Initialize policy
         policy_config = cfg.get('policy', {})
         policy_type = policy_config.get('type', 'diffusion')
+        self.policy_type = policy_type
         log.info(f"Policy config type: {policy_type}")
-        
+
         # Get pretrained_path from the specific policy type config
         type_config = policy_config.get(policy_type, {})
         pretrained_path = type_config.get('pretrained_path', 'Vision-Language-Steering/vls_calvin_base')
         log.info(f"Loading {policy_type} from: {pretrained_path}")
-        
+
         if policy_type == 'diffusion':
+            from core.diffusion_policy_steer import DiffusionPolicySteer
+
             self.policy = DiffusionPolicySteer.from_pretrained(pretrained_path)
         elif policy_type == 'pi05':
+            from core.pi05_steer import PI05PolicySteer
+
             self.policy = PI05PolicySteer.from_pretrained(pretrained_path)
+        elif policy_type == 'rdt':
+            from core.rdt_policy_steer import RDTSteer
+
+            raw_num_steps = type_config.get('num_inference_steps', None)
+            num_steps = None if raw_num_steps is None else int(raw_num_steps)
+            self.policy = RDTSteer.from_pretrained(
+                pretrained_path,
+                num_inference_steps=num_steps,
+                vision_encoder=type_config.get(
+                    'vision_encoder',
+                    '/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384',
+                ),
+                text_encoder=type_config.get(
+                    'text_encoder',
+                    '/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl',
+                ),
+                weight_variant=type_config.get('weight_variant', 'ema'),
+                control_frequency=int(type_config.get('control_frequency', 20)),
+            )
         else:
             raise ValueError(f"Unknown policy type: {policy_type}")
-        
+
         self.device = cfg.get('device', 'cuda')
         self.policy.to(self.device)
 
-        preprocessor_overrides = {
-            "device_processor": {"device": str(self.policy.config.device)},
-        }
+        if policy_type == 'rdt':
+            # RDTSteer handles all obs/action processing internally.
+            self.policy_preprocessor = lambda x: x
+            self.policy_postprocessor = lambda x: x
+        else:
+            from lerobot.policies.factory import make_pre_post_processors
 
-        self.policy_preprocessor, self.policy_postprocessor = make_pre_post_processors(
-            policy_cfg=self.policy.config, 
-            pretrained_path=pretrained_path, 
-            preprocessor_overrides=preprocessor_overrides,
-        )
+            preprocessor_overrides = {
+                "device_processor": {"device": str(self.policy.config.device)},
+            }
+            self.policy_preprocessor, self.policy_postprocessor = make_pre_post_processors(
+                policy_cfg=self.policy.config,
+                pretrained_path=pretrained_path,
+                preprocessor_overrides=preprocessor_overrides,
+            )
 
         self.policy.post_init(
             adapter=self.adapter,
             postprocessor=self.policy_postprocessor,
             sample_batch_size=self.config.get('sample_batch_size', 1),
-            policy_config=policy_config[policy_type],
+            policy_config=policy_config.get(policy_type, {}),
         )
 
         self.policy.eval()
         log.info(f"Loaded {policy_type} policy from {pretrained_path}")
-        
+
         # Output directory (use Hydra's output directory directly)
         self.output_dir = self.config.get('output_dir', 'results/')
         # Ensure it ends with /
         if not self.output_dir.endswith('/'):
             self.output_dir += '/'
         os.makedirs(self.output_dir, exist_ok=True)
-        
+
         # Initialize components
         self._init_components(cfg)
-        
+
         # Reset environment and policy
         # self.adapter.reset()
         self.policy.reset()
-    
+
     def _init_components(self, cfg: DictConfig):
         """Initialize components."""
+        if not self.config.get("use_guidance", True):
+            self.keypoint_detector = None
+            self.sam3_segmenter = None
+            self.use_sam3 = False
+            self.gemini_grounder = None
+            self.gemini_default_objects = []
+            self.use_gemini = False
+            self.keypoint_tracker = None
+            self.vlm_agent = None
+            self.gemini_stage_recognizer = None
+            self.video_recorder = TrajectoryVideoRecorder(output_dir=self.output_dir)
+            self.cached_functions_dir = self.config.get('cached_functions_dir', None)
+            return
+
         # Get perception config (loaded from perception.yaml with @package perception)
         perception_cfg = cfg.get('perception', {})
 
@@ -248,7 +302,7 @@ class Main:
             base_dir=self.output_dir,
             env_type=self.backend,
         )
-        
+
         # Initialize Gemini stage recognizer (for real-time stage recognition)
         gemini_config = OmegaConf.to_container(perception_cfg.get('gemini', {}), resolve=True)
         if self.config.get("use_vlm_stage_recognition", True):
@@ -268,19 +322,22 @@ class Main:
 
     def _get_policy_observation(self) -> dict:
         """Get observation in policy expected format (backend-agnostic)."""
-        sample_num = self.config.get('sample_batch_size', 20)
+        sample_num = policy_observation_sample_num(
+            self.policy_type,
+            self.config.get('sample_batch_size', None),
+        )
         observation = self.adapter.get_policy_observation(sample_num=sample_num)
-        
+
         processed_observation = self.policy_preprocessor(observation)
         return processed_observation
-    
+
     def perform_task_for_episode(self, episode_dir: str):
         """Prepare for each episode (keypoint detection, guidance generation, etc.)"""
         from utils.guidance_utils import load_functions_from_txt
 
         # Get keypoint detection inputs from adapter (includes segmentation if available)
         rgb, depth, points, segmentation, segment_id_to_name = self.adapter.get_keypoint_detection_inputs()
-        
+
         # Get instruction from adapter (backend-specific)
         instruction = self.adapter.get_instruction()
         log.info(f"Task instruction: {instruction}")
@@ -289,21 +346,21 @@ class Main:
 
         # Check if adapter provided valid segmentation
         has_valid_segmentation = (
-            segmentation is not None and 
-            segment_id_to_name is not None and 
+            segmentation is not None and
+            segment_id_to_name is not None and
             len(segment_id_to_name) > 0
         )
-        
+
         if has_valid_segmentation:
             log.info(f"Using adapter-provided segmentation with {len(segment_id_to_name)} objects: {list(segment_id_to_name.values())}")
         else:
             log.warning("No valid segmentation from adapter, will use Gemini/SAM3")
-            
+
             # Get interactable objects from adapter for grounding
             interactable_objects = self.adapter.get_interactable_objects()
             object_names = [obj.name for obj in interactable_objects]
             log.info(f"Interactable objects from adapter: {object_names}")
-            
+
             # Use Gemini grounding for segmentation (preferred)
             if self.use_gemini and self.gemini_grounder is not None and len(object_names) > 0:
                 log.info("Using Gemini for visual grounding")
@@ -315,7 +372,7 @@ class Main:
             # Fallback to SAM3
             elif self.use_sam3 and self.sam3_segmenter is not None:
                 log.info("Using SAM3 for text-prompted segmentation")
-                
+
                 # Use VLM to plan which objects to segment based on instruction
                 planned_objects = self.vlm_agent.plan_segmentation(rgb, instruction)
 
@@ -341,21 +398,21 @@ class Main:
             segmentation=segmentation,
             segment_id_to_name=segment_id_to_name
         )
-        
+
         # Register keypoints
         key_points_objects_map = self.keypoint_tracker.register_keypoints(
             key_points,
             mask_ids=mask_ids,
             segment_id_to_name=segment_id_to_name
         )
-        
+
         # Save for stage recognition (used by Gemini)
         self.init_img_with_keypoints = projected_img  # Initial image with keypoint annotations
         self.keypoint_id_to_object = key_points_objects_map  # Keypoint ID -> object name mapping
-        
-        self.vlm_agent.task_dir = os.path.join(episode_dir, 'vlm_agent')     
+
+        self.vlm_agent.task_dir = os.path.join(episode_dir, 'vlm_agent')
         os.makedirs(self.vlm_agent.task_dir, exist_ok=True)
-        
+
         # Load or generate guidance functions
         if self.cached_functions_dir is not None:
             guidance_functions_dir = self.cached_functions_dir
@@ -365,39 +422,39 @@ class Main:
         else:
             # Use instruction from adapter (already retrieved above)
             metadata = {
-                'init_keypoint_positions': key_points, 
-                'num_keypoints': len(key_points), 
+                'init_keypoint_positions': key_points,
+                'num_keypoints': len(key_points),
                 'key_points_objects_map': key_points_objects_map
             }
             guidance_functions_dir = self.vlm_agent.generate_guidance(
                 projected_img, instruction, metadata
             )
-        
+
         # Load guidance functions
         with open(os.path.join(guidance_functions_dir, 'metadata.json'), 'r') as f:
             self.program_info = json.load(f)
-        
+
         self.guidance_fns = dict()
         for stage in range(1, self.program_info['num_stages'] + 1):
             load_path = os.path.join(guidance_functions_dir, f'stage{stage}_guidance.txt')
             self.guidance_fns[stage] = load_functions_from_txt(load_path) if os.path.exists(load_path) else []
-        
+
         output_raw_path = os.path.join(guidance_functions_dir, 'output_raw.txt')
         self.stage_descriptions = self.vlm_agent._extract_stage_descriptions_from_output(output_raw_path)
-        
+
         for stage, fns in self.guidance_fns.items():
             log.info(f"Stage {stage}: {len(fns)} guidance functions loaded")
         log.info(f"Loaded {len(self.guidance_fns)} stages total")
         log.debug(f"Stage descriptions:\n{self.stage_descriptions}")
-    
+
     def _get_gripper_value(self, action_chunk, action_idx: int) -> Optional[float]:
         """Extract gripper value from action chunk."""
         if action_chunk is None:
             return None
         val = action_chunk[0][action_idx][-1]
         return val.item() if hasattr(val, 'item') else val
-    
-    def _update_stage(self, state: dict, gripper_val: Optional[float], 
+
+    def _update_stage(self, state: dict, gripper_val: Optional[float],
                       upper_th: float, lower_th: float) -> dict:
         """
         Update stage recognition state based on reward and gripper triggers.
@@ -406,20 +463,20 @@ class Main:
         curr_reward = self.policy.get_normalized_reward()
         prev_reward = state['prev_norm_reward']
         prev_gripper = state['prev_gripper_open']
-        
+
         # Detect gripper change (action < 0 = OPEN, action > 0 = CLOSE)
         curr_gripper_open = (gripper_val < 0) if gripper_val is not None else None
-        gripper_changed = (prev_gripper is not None and curr_gripper_open is not None 
+        gripper_changed = (prev_gripper is not None and curr_gripper_open is not None
                           and curr_gripper_open != prev_gripper)
-        
+
         # Detect gripper state changes
         gripper_just_closed = gripper_changed and not curr_gripper_open
         gripper_just_opened = gripper_changed and curr_gripper_open
-        
+
         # Schmitt trigger on reward (only relevant when guidance is active)
         reward_rising = state['use_guidance'] and (prev_reward < upper_th and curr_reward >= upper_th)
         reward_falling = state['use_guidance'] and (prev_reward > lower_th and curr_reward <= lower_th)
-        
+
         # Build trigger reason (priority: gripper > reward > chunk interval > periodic)
         trigger_reason = None
         if gripper_just_closed:
@@ -430,14 +487,14 @@ class Main:
             trigger_reason = f"reward rose above {upper_th:.0%}"
         elif reward_falling:
             trigger_reason = f"reward dropped below {lower_th:.0%}"
-        
+
         # Query VLM if triggered (with limit check)
         vlm_query_limit = self.config.get("vlm_query_limit", 10)
         vlm_query_count = state.get('vlm_query_count', 0)
-        
+
         if trigger_reason and self.gemini_stage_recognizer is not None and vlm_query_count < vlm_query_limit:
             log.info(f"[Trigger] {trigger_reason} (query {vlm_query_count + 1}/{vlm_query_limit})")
-            
+
             new_stage, need_guidance = self.gemini_stage_recognizer.identify_stage_and_guidance(
                 current_rgb=np.array(self.adapter.get_vlm_image()),
                 instruction=self.adapter.get_task_description(),
@@ -447,50 +504,50 @@ class Main:
                 num_stages=len(self.guidance_fns),
                 trigger_reason=trigger_reason,
             )
-            
+
             state['vlm_query_count'] = vlm_query_count + 1
-            
+
             if new_stage != state['current_stage'] or need_guidance != state['use_guidance']:
                 log.info(f"[VLM] Stage: {state['current_stage']} → {new_stage}, Guidance: {state['use_guidance']} → {need_guidance}")
                 if new_stage != state['current_stage']:
                     self.policy.reset_stage()
                     curr_reward = 0.0  # Reset for new stage
-            
+
             state.update({
                 'current_stage': new_stage,
                 'use_guidance': need_guidance,
             })
         elif trigger_reason and vlm_query_count >= vlm_query_limit:
             log.debug(f"[Trigger] {trigger_reason} (skipped, limit {vlm_query_limit} reached)")
-        
+
         # Update tracking state
         state['prev_norm_reward'] = curr_reward
         state['prev_gripper_open'] = curr_gripper_open
         return state
-    
+
     def run(self):
         """Main running loop."""
         self.success_count = 0
         base_output_dir = self.output_dir
         episode_num = self.config.get('episode_num', 10)
-        
+
         for episode in range(episode_num):
             episode_seed = torch.randint(0, 1000, (1,)).item()
             self.policy.reset()
             self.video_recorder.clear()
             episode_dir = os.path.join(base_output_dir, f'episode_{episode+1}')
             os.makedirs(episode_dir, exist_ok=True)
-            
+
             # Reset environment
             self.adapter.reset(seed=episode_seed)
-            
+
             # Update guide_scale for current task (may change when switching tasks)
             task_info = self.adapter.get_task_info()
             recommended_scale = task_info.get('recommended_guide_scale')
             if recommended_scale is not None:
                 self.current_guide_scale = recommended_scale
             log.info(f"Task {task_info.get('task_id', '?')}: guide_scale={self.current_guide_scale}")
-            
+
             # Perform task preparation with error handling
             episode_error = False
             if self.config.get("use_guidance", True):
@@ -505,7 +562,7 @@ class Main:
                         import traceback
                         f.write(f"Error during episode preparation:\n{traceback.format_exc()}")
                 # Reset stage manager
-            
+
             # Skip this episode if preparation failed
             if episode_error:
                 log.warning(f"Skipping episode {episode+1} due to preparation error")
@@ -514,7 +571,7 @@ class Main:
                 with open(fail_marker, 'w') as f:
                     f.write("Episode failed due to guidance function error\n")
                 continue
-            
+
             # Wrap entire episode execution in try-except
             try:
                 self._run_episode(episode, episode_dir)
@@ -530,11 +587,11 @@ class Main:
                     f.write(f"Episode failed due to execution error: {e}\n")
                 log.warning(f"Skipping episode {episode+1} due to execution error")
                 continue
-        
+
         # Final statistics
         success_rate = self.success_count / episode_num * 100
         log.info(f"Tested {episode_num} episodes, success rate: {success_rate:.2f}%")
-        
+
         # Save results
         log_file = os.path.join(self.output_dir, 'results.txt')
         with open(log_file, 'a') as f:
@@ -545,7 +602,7 @@ class Main:
     def _run_episode(self, episode: int, episode_dir: str):
         """Run a single episode with the current configuration."""
         observation = self._get_policy_observation()
-        
+
         # Evaluation loop
         done = False
         global_steps = 0
@@ -557,26 +614,26 @@ class Main:
         action_horizon = self.policy._action_chunk_horizon
         current_stage = 1
         current_guidance_fns = None
-        
+
         # Stage recognition thresholds
         UPPER_THRESHOLD = self.config.get("schmitt_upper", 0.8)
         LOWER_THRESHOLD = self.config.get("schmitt_lower", 0.6)
         action_chunk = None
-        
+
         log.info(f"Task description: {self.adapter.get_task_description()}")
-        
+
         # Default: start with stage 1 and guidance ON
         current_stage = 1
         use_guidance = self.config.get("use_guidance", True) and hasattr(self, 'guidance_fns')
         current_guidance_fns = self.guidance_fns.get(current_stage, []) if use_guidance else None
-        
+
         # Check if guidance functions are available
         if use_guidance and not current_guidance_fns:
             log.warning(f"No guidance functions for initial stage {current_stage}")
         else:
             log.info(f"Initial guidance: stage={current_stage}, use_guidance={use_guidance}, "
                     f"num_fns={len(current_guidance_fns) if current_guidance_fns else 0}")
-        
+
         # Stage recognition state
         stage_state = {
             'prev_norm_reward': 0.0,
@@ -585,22 +642,22 @@ class Main:
             'use_guidance': use_guidance,
             'vlm_query_count': 0,
         }
-        
+
         while not done:
             generate_new_chunk = (action_executed == 0)
 
             if generate_new_chunk and self.config.get("use_guidance", True) and hasattr(self, 'guidance_fns'):
                 keypoints = self.keypoint_tracker.get_keypoint_positions()
                 mask_ids = self.keypoint_tracker.get_mask_ids()
-                
+
                 # Update stage recognition
                 gripper_val = self._get_gripper_value(action_chunk, action_executed)
                 stage_state = self._update_stage(stage_state, gripper_val, UPPER_THRESHOLD, LOWER_THRESHOLD)
-                
+
                 current_stage = stage_state['current_stage']
                 use_guidance = stage_state['use_guidance']
                 current_guidance_fns = self.guidance_fns.get(current_stage, []) if use_guidance else None
-                
+
                 if use_guidance and not current_guidance_fns:
                     log.warning(f"No guidance functions for stage {current_stage}, disabling")
                     use_guidance = False
@@ -609,12 +666,12 @@ class Main:
                 use_guidance = False
                 keypoints = None
                 current_guidance_fns = None
-                
+
             # Get parameters from config
             guide_scale = getattr(self, 'current_guide_scale', self.config.get("guide_scale", 80.0))
             sigmoid_k = self.config.get("sigmoid_k", 12.0)
             sigmoid_x0 = self.config.get("sigmoid_x0", 0.7)
-            
+
             action_chunk = self.policy.select_action(
                 observation,
                 generate_new_chunk=generate_new_chunk,
@@ -643,16 +700,21 @@ class Main:
             # Get image and add status overlay
             if self.config.get("debug_draw_trajectory", False):
                 from utils.vis_utils import draw_action_trajectory_on_vlm_image
+                visualization_action_chunk = _get_visualization_action_chunk(
+                    self.policy,
+                    self.adapter,
+                    action_chunk,
+                )
                 image = draw_action_trajectory_on_vlm_image(
                     adapter=self.adapter,
-                    action_chunk=action_chunk[:, action_executed:],
+                    action_chunk=visualization_action_chunk[:, action_executed:],
                     num_steps=action_horizon,
                     global_step=global_steps,
                     action_executed=action_executed,
                 )
             else:
                 image = np.array(self.adapter.get_vlm_image())
-            
+
             # Draw keypoints on image for debugging (disabled by default)
             if self.config.get("debug_draw_keypoints", False) and keypoints is not None:
                 from utils.vis_utils import draw_keypoints_on_image
@@ -662,26 +724,26 @@ class Main:
                     keypoints=keypoints,
                     mask_ids=mask_ids
                 )
-            
+
             # Add guidance status overlay
             gripper_val = self._get_gripper_value(action_chunk, action_executed)
             gripper_str = f"Grip:{'O' if gripper_val and gripper_val < 0 else 'C'}({gripper_val:.2f})" if gripper_val else "Grip:-"
-            
+
             status_text = [
                 f"Step:{global_steps} Stage:{current_stage}",
                 f"Guide:{'ON' if use_guidance else 'OFF'} {gripper_str}",
             ]
-            
+
             # Add reward-based guidance info
             if hasattr(self.policy, 'get_normalized_reward') and use_guidance:
                 norm_r = self.policy.get_normalized_reward()
                 scale = self.policy.get_last_scale()
-                
+
                 # Use config values for consistent display
                 k = self.config.get("sigmoid_k", 12.0)
                 x0 = self.config.get("sigmoid_x0", 0.8)
                 sig_strength = 1.0 / (1.0 + np.exp(k * (norm_r - x0)))
-                
+
                 # Show scale as "-" if not yet computed (first chunk before guidance runs)
                 scale_str = f"{scale:.1f}" if scale > 0 else "-"
                 status_text.extend([
@@ -689,7 +751,7 @@ class Main:
                     f"Sig_Str: {sig_strength:.1%}",
                     f"Scale: {scale_str}",
                 ])
-            
+
             image_with_status = add_text_to_image(image, status_text)
             self.video_recorder.add_frame(self.adapter.vlm_camera, image_with_status)
             obs, reward, terminated, truncated, info = self.adapter.step(action_chunk[0][action_executed])
@@ -697,32 +759,32 @@ class Main:
             action_executed += 1
             if action_executed == action_horizon:
                 action_executed = 0
-            
+
             observation = self._get_policy_observation()
             global_steps += 1
-            
+
             if terminated or truncated:
                 is_success = info.get('success', False)
                 if is_success:
                     done = True
                     self.success_count += 1
-                
+
                 behavior_name = info.get("behavior_name", "unknown")
                 video_path = os.path.join(episode_dir, f'episode_{episode+1}_{"success" if is_success else "fail"}')
                 self.video_recorder.save_video(save_path=video_path, success=is_success, behavior_name=behavior_name)
                 break
-        
+
         log.info(f"Episode {episode+1} finished, success: {info.get('success', False)}, steps: {global_steps}")
-    
+
     def _plot_behavior_stats(self):
         """Draw behavior statistics plot."""
         behavior_data = self.adapter.get_behavior_static()
         labels = list(behavior_data.keys())
         values = list(behavior_data.values())
-        
+
         fig, ax = plt.subplots(figsize=(12, 6))
         bars = ax.bar(labels, values, color='steelblue', edgecolor='black')
-        
+
         for bar, val in zip(bars, values):
             height = bar.get_height()
             ax.annotate(f'{val}',
@@ -731,24 +793,24 @@ class Main:
                        textcoords="offset points",
                        ha='center', va='bottom',
                        fontsize=10, fontweight='bold')
-        
+
         ax.set_ylabel('Count', fontsize=12)
         ax.set_title('Behavior Statistics', fontsize=14)
         plt.xticks(rotation=45, ha='right')
         plt.tight_layout()
         plt.savefig(os.path.join(self.output_dir, 'behavior_static.png'), dpi=150)
         plt.close()
-    
+
     def run_test(self):
         """Test segmentation and keypoint detection."""
         self.adapter.reset()
         rgb, depth, points, segmentation, segment_id_to_name = self.adapter.get_keypoint_detection_inputs()
-        
+
         # Save images
         rgb_path = os.path.join(self.output_dir, 'rgb_static.png')
         cv2.imwrite(rgb_path, cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR))
         log.debug(f"Saved RGB image to: {rgb_path}")
-        
+
         # Visualize segmentation
         unique_ids = np.unique(segmentation)
         seg_colored = np.zeros((*segmentation.shape, 3), dtype=np.uint8)
@@ -758,18 +820,18 @@ class Main:
                 continue
             color = np.random.randint(50, 255, 3).tolist()
             seg_colored[segmentation == seg_idx] = color
-        
+
         seg_path = os.path.join(self.output_dir, 'segmentation.png')
         cv2.imwrite(seg_path, seg_colored)
         log.debug(f"Saved segmentation image to: {seg_path}")
-        
+
         log.info("Interactable objects:")
         for seg_idx, name in segment_id_to_name.items():
             if seg_idx > 0:
                 pixel_count = np.sum(segmentation == seg_idx)
                 if pixel_count > 0:
                     log.debug(f"  [{seg_idx}] {name}: {pixel_count} pixels")
-        
+
         # Detect keypoints
         log.info("Detecting keypoints...")
         keypoints, projected_img, mask_ids, dino_vis = self.keypoint_detector.get_keypoints_with_visualization(
@@ -779,11 +841,11 @@ class Main:
             segment_id_to_name=segment_id_to_name,
             save_dir=self.output_dir
         )
-        
+
         projected_path = os.path.join(self.output_dir, 'keypoints_projected.png')
         cv2.imwrite(projected_path, cv2.cvtColor(projected_img, cv2.COLOR_RGB2BGR))
         log.info(f"Saved keypoint projection to: {projected_path}")
-        
+
         log.info(f"Detected {len(keypoints)} keypoints:")
         for i, (kp, mid) in enumerate(zip(keypoints, mask_ids)):
             obj_name = segment_id_to_name.get(mid, f"unknown_{mid}")
@@ -794,33 +856,33 @@ class Main:
 def main(cfg: DictConfig) -> None:
     """
     Main entry point with Hydra configuration.
-    
+
     Usage:
         # CALVIN (uses task configs)
         python main.py env=calvin task=drawer_open
         python main.py env=calvin task=button_on
-        
+
         # LIBERO (uses suite_name directly, no task configs)
         python main.py env=libero backend.libero.suite_name=libero_goal
         python main.py env=libero env.libero.suite_name=libero_spatial
-        
+
         # Override parameters
         python main.py main.episode_num=50 main.guide_scale=120
     """
     # Print resolved config
     log.info(f"Working directory: {os.getcwd()}")
     log.info(f"Output directory: {hydra.core.hydra_config.HydraConfig.get().runtime.output_dir}")
-    
+
     env_backend = cfg.backend.backend
     log.info(f"Using environment: {env_backend}")
-    
+
     # Backend-specific logging
     if env_backend == "calvin":
         target_behavior = cfg.backend.calvin.get("target_behavior")
         log.info(f"Target behavior: {target_behavior or 'any'}")
     elif env_backend == "libero":
         log.info(f"Suite: {cfg.backend.libero.suite_name}")
-    
+
     # Initialize and run
     runner = Main(cfg)
     runner.run()
