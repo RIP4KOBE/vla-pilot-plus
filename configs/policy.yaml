@@ -3,12 +3,13 @@
 #
 # Switch between policies by overriding:
 #   python main.py policy.type=pi05
+#   python main.py policy.type=rdt
 
-# Current policy type: diffusion or pi05
+# Current policy type: diffusion, pi05, or rdt
 type: pi05
 
 # ============================================================
-# Diffusion Policy (default)
+# Diffusion Policy
 # ============================================================
 diffusion:
   pretrained_path: Vision-Language-Steering/vls_calvin_base
@@ -25,5 +26,21 @@ pi05:
   action_chunk_horizon: 10
 
 
-# Note: pretrained_path and other params are read from policy.{type} section in main.py
+# ============================================================
+# RDT-1B Policy (LIBERO-finetuned checkpoint)
+# ============================================================
+rdt:
+  pretrained_path: /mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object
+  weight_variant: ema
+  text_encoder: /mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl
+  vision_encoder: /mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384
+  num_inference_steps: null
+  action_chunk_horizon: 8
+  control_frequency: 20
+  debug_first_step: false
+  undo_libero_preprocessor_flip: false
+  fail_on_zero_language_embedding: true
+  semantics: libero_gt_rollout
 
+
+# Note: pretrained_path and other params are read from policy.{type} section in main.py
