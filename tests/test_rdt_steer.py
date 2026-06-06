@@ -619,6 +619,30 @@ def test_eds_config_rejects_invalid_cem_elites(stub_steer):
         )
 
 
+def test_eds_config_bool_string_false_resolves_false(stub_steer):
+    cfg = stub_steer._resolve_eds_config_with_reference_defaults({"use_cem": "false"})
+
+    assert cfg.use_cem is False
+
+
+def test_eds_config_rejects_invalid_bool_string(stub_steer):
+    with pytest.raises(ValueError, match="use_cem"):
+        stub_steer._resolve_eds_config_with_reference_defaults({"use_cem": "sometimes"})
+
+
+@pytest.mark.parametrize("temperature", [float("nan"), float("inf")])
+def test_eds_config_rejects_non_finite_temperature(stub_steer, temperature):
+    with pytest.raises(ValueError, match="temperature"):
+        stub_steer._resolve_eds_config_with_reference_defaults({"temperature": temperature})
+
+
+def test_eds_config_rejects_nonpositive_cem_elites(stub_steer):
+    with pytest.raises(ValueError, match="num_elites"):
+        stub_steer._resolve_eds_config_with_reference_defaults(
+            {"population_size": 4, "use_cem": True, "num_elites": 0}
+        )
+
+
 def test_trajectory_reward_slice_accepts_eds(stub_steer):
     stub_steer._action_chunk_horizon = 5
     trajs = torch.zeros(2, 5, 3)
