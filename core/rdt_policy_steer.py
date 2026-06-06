@@ -1455,6 +1455,29 @@ class RDTSteer:
         )
         return x_t, costs, info
 
+    def _eds_order_candidates_by_cost(self, samples: Tensor, costs: Tensor) -> Tensor:
+        if samples.shape[0] <= 1:
+            return samples.detach()
+        order = torch.argsort(costs.detach())
+        return samples.index_select(0, order.to(device=samples.device)).detach()
+
+    def _eds_update_guidance_metadata_from_cost(self, best_cost: Tensor | float, costs: Tensor) -> None:
+        if torch.is_tensor(best_cost):
+            best_cost_value = float(best_cost.detach().cpu().item())
+        else:
+            best_cost_value = float(best_cost)
+        best_reward = -best_cost_value
+        self._last_raw_reward = best_reward
+        if self._stage_init_reward is None:
+            self._stage_init_reward = best_reward
+        self._normalized_reward_from_value(best_reward)
+        if torch.is_tensor(costs) and costs.numel() > 0:
+            rewards = -costs.detach()
+            spread = rewards.max() - rewards.mean()
+            self._last_scale = float(torch.clamp(spread, min=0.0).cpu().item())
+        else:
+            self._last_scale = 0.0
+
     def _eds_guided_denoise_loop(
         self,
         *,
@@ -1467,7 +1490,70 @@ class RDTSteer:
         global_step: int,
         current_stage: int,
     ) -> Tensor:
-        return x_t[0:1]
+        cfg = eds_config
+        action_mask = cond["action_mask"]
+
+        population = self._eds_initial_population(x_t=x_t, cond=cond, cfg=cfg)
+        population = self._apply_action_mask(population, cond)
+
+        population_scores, population_info = self._eds_score_population_as_cost(
+            population,
+            keypoints=keypoints,
+            guidance_fns=guidance_fns,
+        )
+        population_scores = population_scores.detach()
+
+        trunc_step_schedule = np.linspace(5, 1, cfg.cem_iters).astype(int)
+
+        for i in range(cfg.cem_iters):
+            n_trunc_steps = int(trunc_step_schedule[i])
+            if cfg.use_cem:
+                elites = torch.argsort(population_scores)[: cfg.num_elites]
+                indices = torch.randint(
+                    0,
+                    cfg.num_elites,
+                    (cfg.population_size,),
+                    device=population.device,
+                )
+                population = population[elites[indices]]
+            else:
+                reward_probs = torch.exp(float(cfg.temperature) * -population_scores)
+                reward_probs = reward_probs / torch.clamp(reward_probs.sum(), min=1e-8)
+                indices = torch.multinomial(
+                    reward_probs,
+                    cfg.population_size,
+                    replacement=True,
+                )
+                population = population[indices]
+
+            population = self._eds_renoise_reference(population, n_trunc_steps)
+            self._reset_scheduler_particle_history_after_resample(self._noise_scheduler)
+            population, population_scores, population_info = self._eds_rollout_reference(
+                cond=cond,
+                action_mask=action_mask,
+                noisy_action=population,
+                keypoints=keypoints,
+                guidance_fns=guidance_fns,
+                n_trunc_steps=n_trunc_steps,
+            )
+            population_scores = population_scores.detach()
+
+        if not torch.isfinite(population).all():
+            raise ValueError("EDS-guided RDT latent contains non-finite values")
+        if not torch.isfinite(population_scores).all():
+            raise ValueError("EDS-guided RDT scores contain non-finite values")
+
+        best_idx = int(torch.argmin(population_scores).item())
+        selected = population[best_idx : best_idx + 1]
+        self._eds_update_guidance_metadata_from_cost(
+            population_scores[best_idx],
+            population_scores,
+        )
+        ordered_candidates = self._eds_order_candidates_by_cost(population, population_scores)
+        self._last_visualization_action_candidates = self._decode_visualization_action_candidates(
+            ordered_candidates
+        )
+        return selected
 
     def _select_particle_for_execution(
         self,

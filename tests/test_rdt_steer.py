@@ -785,6 +785,114 @@ def test_eds_rollout_reference_scores_clean_denoised_population(
     torch.testing.assert_close(info["rewards"], torch.tensor([1.0, 2.0]))
 
 
+def test_eds_loop_uses_cond_once_and_action_population_batch(
+    stub_steer,
+    stub_adapter,
+    mock_batch,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=2,
+        policy_config={"action_chunk_horizon": 4},
+    )
+
+    action = stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_type="eds",
+        eds_config={"population_size": 3, "cem_iters": 1, "temperature": 0.1},
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        keypoints=np.zeros((3, 3), dtype=np.float32),
+    )
+
+    assert tuple(action.shape) == (1, 4, 7)
+    assert stub_steer._rdt_model.encode_calls == 1
+    assert stub_steer._rdt_model.dit.calls
+    assert any(latent_shape[0] == 3 for latent_shape, _ in stub_steer._rdt_model.dit.calls)
+    assert all(mask_shape[0] == 1 for _, mask_shape in stub_steer._rdt_model.dit.calls)
+
+
+def test_eds_loop_calls_rollout_after_renoise_each_iteration(
+    stub_steer,
+    stub_adapter,
+    mock_batch,
+    monkeypatch,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=2,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    calls = []
+
+    def fake_renoise(population, n_trunc_steps):
+        calls.append(("renoise", n_trunc_steps, tuple(population.shape)))
+        return population
+
+    def fake_rollout(**kwargs):
+        calls.append(("rollout", kwargs["n_trunc_steps"], tuple(kwargs["noisy_action"].shape)))
+        noisy = kwargs["noisy_action"]
+        costs = torch.arange(noisy.shape[0], device=noisy.device, dtype=noisy.dtype)
+        return noisy, costs, {"rewards": -costs}
+
+    monkeypatch.setattr(stub_steer, "_eds_renoise_reference", fake_renoise)
+    monkeypatch.setattr(stub_steer, "_eds_rollout_reference", fake_rollout)
+
+    stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_type="eds",
+        eds_config={"population_size": 3, "cem_iters": 2, "temperature": 0.1},
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        keypoints=np.zeros((3, 3), dtype=np.float32),
+    )
+
+    assert calls[0][0] == "renoise"
+    assert calls[1][0] == "rollout"
+    assert calls[2][0] == "renoise"
+    assert calls[3][0] == "rollout"
+    assert calls[0][1] == calls[1][1]
+    assert calls[2][1] == calls[3][1]
+
+
+def test_eds_loop_caches_visualization_candidates_best_first(
+    stub_steer,
+    stub_adapter,
+    mock_batch,
+    monkeypatch,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=2,
+        policy_config={"action_chunk_horizon": 4},
+    )
+
+    def fake_score(samples, keypoints, guidance_fns, slice_kind):
+        return torch.tensor([1.0, 3.0, 2.0], device=samples.device, dtype=samples.dtype)
+
+    monkeypatch.setattr(stub_steer, "_score_particles", fake_score)
+
+    action = stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_type="eds",
+        eds_config={"population_size": 3, "cem_iters": 1, "temperature": 0.1},
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        keypoints=np.zeros((3, 3), dtype=np.float32),
+    )
+    candidates = stub_steer.get_last_visualization_action_candidates()
+
+    assert tuple(action.shape) == (1, 4, 7)
+    assert candidates is not None
+    assert tuple(candidates.shape) == (3, 4, 7)
+
+
 def test_rdt_guidance_type_invalid_raises_clear_error(stub_steer, stub_adapter, mock_batch):
     stub_steer.post_init(
         adapter=stub_adapter,
