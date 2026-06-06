@@ -667,30 +667,61 @@ class Main:
                 keypoints = None
                 current_guidance_fns = None
 
-            # Get parameters from config
-            guide_scale = getattr(self, 'current_guide_scale', self.config.get("guide_scale", 80.0))
-            sigmoid_k = self.config.get("sigmoid_k", 12.0)
-            sigmoid_x0 = self.config.get("sigmoid_x0", 0.7)
+            guidance_type = str(self.config.get("guidance_type", "vls")).lower()
+            if guidance_type not in {"vls", "eds"}:
+                raise ValueError(
+                    f"Unsupported main.guidance_type={guidance_type!r}; "
+                    "expected one of {'vls', 'eds'}"
+                )
 
-            action_chunk = self.policy.select_action(
-                observation,
-                generate_new_chunk=generate_new_chunk,
-                use_guidance=use_guidance,
-                keypoints=keypoints,
-                guidance_fns=current_guidance_fns,
-                guide_scale=guide_scale,
-                sigmoid_k=sigmoid_k,
-                sigmoid_x0=sigmoid_x0,
-                start_ratio=self.config.get("start_ratio", None),
-                use_diversity=self.config.get("use_diversity", True),
-                diversity_scale=self.config.get("diversity_scale", 10.0),
-                MCMC_steps=self.config.get("MCMC_steps", 4),
-                verbose=True,
-                use_fkd=self.config.get("use_fkd", False),
-                fkd_config=OmegaConf.to_container(self.config.get("fkd", {}), resolve=True) if self.config.get("fkd") else None,
-                global_step=global_steps,
-                current_stage=current_stage,
+            vls_config = OmegaConf.to_container(
+                self.config.get("vls_config", {}),
+                resolve=True,
             )
+            eds_config = OmegaConf.to_container(
+                self.config.get("eds_config", {}),
+                resolve=True,
+            )
+
+            select_kwargs = {
+                "batch": observation,
+                "generate_new_chunk": generate_new_chunk,
+                "use_guidance": use_guidance,
+                "keypoints": keypoints,
+                "guidance_fns": current_guidance_fns,
+                "verbose": True,
+                "global_step": global_steps,
+                "current_stage": current_stage,
+            }
+
+            if self.policy_type == "rdt":
+                select_kwargs.update(
+                    {
+                        "guidance_type": guidance_type,
+                        "vls_config": vls_config,
+                        "eds_config": eds_config,
+                    }
+                )
+            else:
+                if guidance_type == "eds" and use_guidance:
+                    raise ValueError(
+                        "main.guidance_type=eds is currently implemented only for policy.type=rdt"
+                    )
+                select_kwargs.update(
+                    {
+                        "guide_scale": vls_config.get("guide_scale", 80.0),
+                        "sigmoid_k": vls_config.get("sigmoid_k", 12.0),
+                        "sigmoid_x0": vls_config.get("sigmoid_x0", 0.7),
+                        "start_ratio": vls_config.get("start_ratio", None),
+                        "use_diversity": vls_config.get("use_diversity", True),
+                        "diversity_scale": vls_config.get("diversity_scale", 10.0),
+                        "MCMC_steps": vls_config.get("MCMC_steps", 4),
+                        "use_fkd": vls_config.get("use_fkd", False),
+                        "fkd_config": vls_config.get("fkd", None),
+                    }
+                )
+
+            action_chunk = self.policy.select_action(**select_kwargs)
 
             if hasattr(self.adapter, 'env_postprocessor'):
                 action_transition = {"action": action_chunk}
