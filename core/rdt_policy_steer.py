@@ -54,6 +54,20 @@ class _EDSConfig:
     save_ed_cache: bool = False
 
 
+def _parse_eds_bool(value, field_name: str) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"true", "1", "yes"}:
+            return True
+        if normalized in {"false", "0", "no"}:
+            return False
+    raise ValueError(
+        f"EDS {field_name} must be a bool or one of true/false, 1/0, yes/no"
+    )
+
+
 def _resolve_vls_config(vls_config: Optional[dict], *, default_sample_batch_size: int) -> dict:
     cfg = dict(vls_config or {})
     cfg.setdefault("sample_batch_size", default_sample_batch_size)
@@ -1361,7 +1375,7 @@ class RDTSteer:
         cond: dict,
         keypoints: Optional[Tensor],
         guidance_fns: Optional[List[Callable]],
-        eds_config,
+        eds_config: _EDSConfig,
         verbose: bool,
         global_step: int,
         current_stage: int,
@@ -1603,22 +1617,26 @@ class RDTSteer:
         cfg = dict(eds_config or {})
         resolved = _EDSConfig(
             population_size=int(cfg.get("population_size", 16)),
-            use_cem=bool(cfg.get("use_cem", False)),
+            use_cem=_parse_eds_bool(cfg.get("use_cem", False), "use_cem"),
             cem_iters=int(cfg.get("cem_iters", 20)),
             num_elites=int(cfg.get("num_elites", 32)),
             temperature=float(cfg.get("temperature", 0.1)),
             initial_population_cache=cfg.get("initial_population_cache", None),
             ed_population_cache=cfg.get("ed_population_cache", None),
-            use_initial_cache=bool(cfg.get("use_initial_cache", False)),
-            save_initial_cache=bool(cfg.get("save_initial_cache", False)),
-            save_ed_cache=bool(cfg.get("save_ed_cache", False)),
+            use_initial_cache=_parse_eds_bool(
+                cfg.get("use_initial_cache", False), "use_initial_cache"
+            ),
+            save_initial_cache=_parse_eds_bool(
+                cfg.get("save_initial_cache", False), "save_initial_cache"
+            ),
+            save_ed_cache=_parse_eds_bool(cfg.get("save_ed_cache", False), "save_ed_cache"),
         )
         if resolved.population_size <= 0:
             raise ValueError("EDS population_size must be positive")
         if resolved.cem_iters <= 0:
             raise ValueError("EDS cem_iters must be positive")
-        if resolved.temperature <= 0:
-            raise ValueError("EDS temperature must be positive")
+        if not math.isfinite(resolved.temperature) or resolved.temperature <= 0:
+            raise ValueError("EDS temperature must be finite and positive")
         if resolved.use_cem and resolved.num_elites > resolved.population_size:
             raise ValueError(
                 "EDS num_elites must be <= population_size when use_cem=true"
