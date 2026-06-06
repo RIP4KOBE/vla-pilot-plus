@@ -23,6 +23,8 @@ duplicate_sources:
 **Backend:** LIBERO (`libero_object` suite, pi05 policy)
 **Result:** 0/10 episodes succeeded (0.00% success rate)
 
+Note: this archived analysis preserves historical pre-grouping config paths from the analyzed run. Current VLS CLI overrides use grouped paths, for example `main.vls_config.guide_scale=80` and `main.vls_config.sample_batch_size=1`.
+
 ---
 
 ## Executive Summary

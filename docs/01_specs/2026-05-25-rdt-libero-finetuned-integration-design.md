@@ -1560,7 +1560,7 @@ debug_first_step: true
 Command convention:
 
 ```text
-python main.py policy.type=rdt main.use_guidance=false main.use_fkd=false
+python main.py policy.type=rdt main.use_guidance=false main.vls_config.use_fkd=false
 ```
 
 Logs to capture:
@@ -1607,7 +1607,7 @@ python main.py policy.type=rdt
 Recommended initial unguided-debug overrides, if needed:
 
 ```text
-python main.py policy.type=rdt main.use_guidance=false main.use_fkd=false
+python main.py policy.type=rdt main.use_guidance=false main.vls_config.use_fkd=false
 ```
 
 Expected behavior:

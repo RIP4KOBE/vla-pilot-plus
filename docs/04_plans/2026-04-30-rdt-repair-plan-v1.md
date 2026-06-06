@@ -277,7 +277,7 @@ Save output to: `evidence/round-2/step2_loop_comparison_output.txt`
 Run 1 LIBERO episode (no guidance, `sample_batch_size=1`) and inspect behavior:
 
 ```bash
-python main.py env=libero policy.type=rdt main.episode_num=1 main.use_guidance=false main.sample_batch_size=1
+python main.py env=libero policy.type=rdt main.episode_num=1 main.use_guidance=false main.vls_config.sample_batch_size=1
 ```
 
 **Expected improvement:**

@@ -1390,7 +1390,7 @@ git commit -m "fix: load libero finetuned rdt checkpoint"
 Run:
 
 ```bash
-python main.py policy.type=rdt main.episode_num=1 main.max_episode_steps=50 main.use_guidance=false main.use_fkd=false main.use_diversity=false
+python main.py policy.type=rdt main.episode_num=1 main.max_episode_steps=50 main.use_guidance=false main.vls_config.use_fkd=false main.vls_config.use_diversity=false
 ```
 
 Expected:

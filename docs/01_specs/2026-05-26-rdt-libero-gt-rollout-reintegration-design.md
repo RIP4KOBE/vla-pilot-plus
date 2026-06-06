@@ -526,7 +526,7 @@ single-env current runtime, the effective RDT sample batch should be:
 B = 1
 ```
 
-The current `main.sample_batch_size=20` is a VLS steering setting. It should not
+The current `main.vls_config.sample_batch_size=20` is a VLS steering setting. It should not
 affect unguided GT parity. Future VLS steering can re-enable particle sampling
 after the unguided path succeeds.
 

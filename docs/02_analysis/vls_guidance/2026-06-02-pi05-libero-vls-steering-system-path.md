@@ -165,7 +165,7 @@ Source: `core/env_adapters/libero_adapter.py:637-684`.
 
 `LiberoProcessorStep` flips every `observation.images.*` tensor with `torch.flip(..., dims=[2,3])`, i.e. both image height and width, and converts nested `observation.robot_state` to flat `observation.state = [eef_pos(3), eef_axisangle(3), gripper_qpos(2)]` (`core/env_adapters/libero_adapter.py:76-96`). If LeRobot is importable, the external `LiberoProcessorStep` is intended to provide the same behavior; the worktree fallback is shown directly in this file.
 
-After env preprocessing, `get_policy_observation()` expands every tensor with leading batch `1` to `sample_num` if `sample_num > 1` (`core/env_adapters/libero_adapter.py:1019-1025`). For PI0.5, `policy_observation_sample_num()` returns `main.sample_batch_size` if configured (`core/policy_observation_sampling.py:1-4`), so the default command uses `B=20` particles from `configs/config.yaml:39-44`.
+After env preprocessing, `get_policy_observation()` expands every tensor with leading batch `1` to `sample_num` if `sample_num > 1` (`core/env_adapters/libero_adapter.py:1019-1025`). For PI0.5, `policy_observation_sample_num()` returns `main.vls_config.sample_batch_size` if configured (`core/policy_observation_sampling.py:1-4`), so the default command uses `B=20` particles from `configs/config.yaml:39-44`.
 
 `Main._get_policy_observation()` then applies the LeRobot policy preprocessor (`main.py:308-317`). The cached PI0.5 preprocessor normalizes state and action stats using MEAN_STD, prepares the state into a PaliGemma prompt, tokenizes the task using `google/paligemma-3b-pt-224`, and moves tensors to CUDA (`policy_preprocessor.json:15-85`, `processor_pi05.py:48-89`, `processor_pi05.py:132-151`).
 
@@ -410,7 +410,7 @@ Adaptive scale inside `_sample_actions_guided()` depends on stage-local reward b
 - Later chunks: if baseline is negative, `normalized_reward = 1 - reward_value / stage_init_reward`, clipped to `[0,1.2]` (`core/pi05_steer.py:247-250`).
 - `guidance_strength = 1 / (1 + exp(sigmoid_k * (normalized_reward - sigmoid_x0)))`; with higher normalized reward, the scale drops (`core/pi05_steer.py:258-266`).
 
-The run default `main.guide_scale` is `40.0` (`configs/config.yaml:40-42`), but `LiberoAdapter.get_task_info()` returns default recommended guide scale `80.0` when no task-specific list is configured (`core/env_adapters/libero_adapter.py:1672-1695`). `Main.__init__()` and per-episode reset use this recommended scale when present (`main.py:124-139`, `main.py:529-534`).
+The run default `main.vls_config.guide_scale` is `40.0` (`configs/config.yaml:40-42`), but `LiberoAdapter.get_task_info()` returns default recommended guide scale `80.0` when no task-specific list is configured (`core/env_adapters/libero_adapter.py:1672-1695`). `Main.__init__()` and per-episode reset use this recommended scale when present (`main.py:124-139`, `main.py:529-534`).
 
 ## 14. Video, logging, success, and result recording path
 

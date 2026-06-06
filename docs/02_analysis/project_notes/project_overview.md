@@ -559,13 +559,13 @@ cd third_party/libero_pro && pip install -e . && cd ..
 python main.py
 
 # LIBERO with guidance enabled
-python main.py main.use_guidance=true main.guide_scale=80
+python main.py main.use_guidance=true main.vls_config.guide_scale=80
 
 # CALVIN task
 python main.py backend=calvin backend.calvin.target_behavior=drawer_open policy=diffusion
 
 # More episodes, custom steering
-python main.py main.episode_num=50 main.guide_scale=120 main.diversity_scale=30 main.use_fkd=true
+python main.py main.episode_num=50 main.vls_config.guide_scale=120 main.vls_config.diversity_scale=30 main.vls_config.use_fkd=true
 
 # Debug/test mode
 python main.py main.mode=test

@@ -208,7 +208,7 @@ seed: 0
 main.episode_num: 10
 main.output_dir: ${hydra:run.dir}
 main.use_guidance: false
-main.sample_batch_size: 20
+main.vls_config.sample_batch_size: 20
 main.debug_draw_trajectory: true
 hydra.run.dir: outputs/${experiment.name}/${now:%Y-%m-%d_%H-%M-%S}
 ```
@@ -551,7 +551,7 @@ observation.robot_state.joints.vel
 policy_observation_sample_num("rdt", configured_sample_batch_size, default=20) -> 1
 ```
 
-So RDT receives `sample_num=1` regardless of `main.sample_batch_size: 20`.
+So RDT receives `sample_num=1` regardless of `main.vls_config.sample_batch_size: 20`.
 
 `LiberoAdapter.get_policy_observation(sample_num=1)`:
 
@@ -1297,7 +1297,7 @@ and compare runtime/log behavior against the default.
 
 ### 13.5 RDT sample batch size is effectively ignored in unguided rollout
 
-`configs/config.yaml` sets `main.sample_batch_size: 20`, but `policy_observation_sample_num("rdt", ...)` returns `1`, and `RDTSteer._predict_unguided(..., B=1)` is hard-coded by the unguided path.
+`configs/config.yaml` sets `main.vls_config.sample_batch_size: 20`, but `policy_observation_sample_num("rdt", ...)` returns `1`, and `RDTSteer._predict_unguided(..., B=1)` is hard-coded by the unguided path.
 
 This is consistent with the current original/unguided RDT goal, but it is worth remembering if future VLS/FKD/diversity steering is re-enabled.
 

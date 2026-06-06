@@ -561,11 +561,11 @@ CUDA_VISIBLE_DEVICES=0 /home/hynx/miniconda3/envs/vla-pilot/bin/python main.py \
   policy.type=rdt \
   policy.rdt.action_chunk_horizon=64 \
   main.episode_num=1 \
-  main.sample_batch_size=1 \
+  main.vls_config.sample_batch_size=1 \
   main.debug_draw_trajectory=false \
   main.use_guidance=false \
-  main.use_fkd=false \
-  main.use_diversity=false \
+  main.vls_config.use_fkd=false \
+  main.vls_config.use_diversity=false \
   'backend.libero.task_ids_filter=[0]'
 ```
 
@@ -587,9 +587,9 @@ CUDA_VISIBLE_DEVICES=0 /home/hynx/miniconda3/envs/vla-pilot/bin/python main.py \
   main.episode_num=1 \
   main.debug_draw_trajectory=false \
   main.use_guidance=false \
-  main.use_fkd=false \
-  main.use_diversity=false \
-  main.sample_batch_size=1 \
+  main.vls_config.use_fkd=false \
+  main.vls_config.use_diversity=false \
+  main.vls_config.sample_batch_size=1 \
   'backend.libero.task_ids_filter=[0]'
 ```
 
@@ -622,9 +622,9 @@ CUDA_VISIBLE_DEVICES=0 /home/hynx/miniconda3/envs/vla-pilot/bin/python main.py \
   main.episode_num=1 \
   main.debug_draw_trajectory=false \
   main.use_guidance=false \
-  main.use_fkd=false \
-  main.use_diversity=false \
-  main.sample_batch_size=1 \
+  main.vls_config.use_fkd=false \
+  main.vls_config.use_diversity=false \
+  main.vls_config.sample_batch_size=1 \
   'backend.libero.task_ids_filter=[0]'
 ```
 
@@ -647,9 +647,9 @@ CUDA_VISIBLE_DEVICES=0 /home/hynx/miniconda3/envs/vla-pilot/bin/python main.py \
   main.episode_num=1 \
   main.debug_draw_trajectory=false \
   main.use_guidance=false \
-  main.use_fkd=false \
-  main.use_diversity=false \
-  main.sample_batch_size=1 \
+  main.vls_config.use_fkd=false \
+  main.vls_config.use_diversity=false \
+  main.vls_config.sample_batch_size=1 \
   'backend.libero.task_ids_filter=[0]'
 ```
 
