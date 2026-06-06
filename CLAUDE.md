@@ -105,9 +105,9 @@ Monkey-patches for third-party library compatibility live in `patches/`.
 
 | Parameter | Default | Effect |
 |---|---|---|
-| `main.vls_config.guide_scale` | 80.0 | Gradient guidance strength |
-| `main.vls_config.diversity_scale` | 20.0 | RBF particle diversity weight |
+| `main.vls_config.guide_scale` | 40.0 | Gradient guidance strength |
+| `main.vls_config.diversity_scale` | 10.0 | RBF particle diversity weight |
 | `main.vls_config.sample_batch_size` | 20 | Number of FK particles |
 | `main.vls_config.MCMC_steps` | 4 | MCMC refinement steps per denoising step |
 | `main.vls_config.start_ratio` | null | Action-chunk ratio at which to begin guidance |
-| `main.use_guidance` | true | Enable/disable steering entirely |
+| `main.use_guidance` | false | Enable/disable steering entirely |
