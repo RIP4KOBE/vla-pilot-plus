@@ -95,12 +95,14 @@ main:
   episode_num: 1                    # Number of episodes to run
   instruction: "close the drawer"   # Task instruction
   use_guidance: true                # Enable steering
-  guide_scale: 40.0                 # Guidance strength
-  diversity_scale: 10.0             # Diversity weight for particle sampling
-  sample_batch_size: 20             # Number of particles for FK steering
+  guidance_type: vls                # Guidance mode: vls or eds
   action_horizon: 14                # Action sequence length
-  start_step: 70                    # When to start guidance (diffusion step)
-  MCMC_steps: 4                     # MCMC steps for each denoising step
+  vls_config:
+    guide_scale: 40.0               # Guidance strength
+    diversity_scale: 10.0           # Diversity weight for particle sampling
+    sample_batch_size: 20           # Number of particles for FK steering
+    start_ratio: null               # When to start guidance as action ratio
+    MCMC_steps: 4                   # MCMC steps for each denoising step
 ```
 
 ### Environment Backend
@@ -250,17 +252,17 @@ Make sure your policy checkpoint matches the observation space and action space:
 
 ### Guidance Parameters Tuning
 
-- `guide_scale`: Higher = stronger guidance, but may reduce diversity
-- `diversity_scale`: Controls particle diversity during resampling
-- `sample_batch_size`: More particles = better coverage but slower
-- `start_step`: When to apply guidance in diffusion steps (0-100)
-- `MCMC_steps`: More steps = better refinement but slower
+- `main.vls_config.guide_scale`: Higher = stronger guidance, but may reduce diversity
+- `main.vls_config.diversity_scale`: Controls particle diversity during resampling
+- `main.vls_config.sample_batch_size`: More particles = better coverage but slower
+- `main.vls_config.start_ratio`: When to apply guidance within the action chunk
+- `main.vls_config.MCMC_steps`: More steps = better refinement but slower
 
 Typical ranges:
-- `guide_scale`: 10-100
-- `diversity_scale`: 1-20
-- `sample_batch_size`: 10-50
-- `start_step`: 50-80
+- `main.vls_config.guide_scale`: 10-100
+- `main.vls_config.diversity_scale`: 1-20
+- `main.vls_config.sample_batch_size`: 10-50
+- `main.vls_config.start_ratio`: 0.5-0.8
 
 ### Output Directory Structure
 
@@ -318,8 +320,8 @@ tail -f results/TIMESTAMP/run.log
 - Try without guidance first (`use_guidance: false`)
 
 **Issue: Slow execution**
-- Reduce `sample_batch_size`
-- Reduce `MCMC_steps`
+- Reduce `main.vls_config.sample_batch_size`
+- Reduce `main.vls_config.MCMC_steps`
 - Set `visualize_trajectory: false`
 - Use smaller image sizes in env config
 
