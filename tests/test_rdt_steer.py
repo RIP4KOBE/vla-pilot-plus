@@ -650,6 +650,85 @@ def test_trajectory_reward_slice_accepts_eds(stub_steer):
     assert tuple(sliced.shape) == (2, stub_steer._action_chunk_horizon - 1, 3)
 
 
+def test_eds_direct_vls_reward_scoring_converts_to_cost_when_needed(
+    stub_steer,
+    stub_adapter,
+    monkeypatch,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    samples = torch.zeros(3, 64, 128)
+    monkeypatch.setattr(
+        stub_steer,
+        "_score_particles",
+        lambda samples, keypoints, guidance_fns, slice_kind: torch.tensor([1.0, 3.0, 2.0]),
+    )
+
+    costs, info = stub_steer._eds_score_population_as_cost(
+        samples,
+        keypoints=torch.zeros(3, 3),
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+    )
+
+    torch.testing.assert_close(costs, torch.tensor([-1.0, -3.0, -2.0]))
+    torch.testing.assert_close(info["rewards"], torch.tensor([1.0, 3.0, 2.0]))
+
+
+def test_eds_renoise_reference_uses_scheduler_add_noise(stub_steer):
+    population = torch.zeros(2, 64, 128)
+    torch.manual_seed(0)
+    renoised = stub_steer._eds_renoise_reference(population, 2)
+
+    assert tuple(renoised.shape) == (2, 64, 128)
+    assert not torch.equal(renoised, population)
+
+
+def test_eds_rollout_reference_scores_clean_denoised_population(
+    stub_steer,
+    stub_adapter,
+    monkeypatch,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=2,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    cond = stub_steer._rdt_model.encode_inputs(
+        torch.zeros(1, 128),
+        torch.zeros(1, 128).scatter(1, torch.tensor([[0]]), 1.0),
+        [],
+        torch.zeros(1, 1, 4),
+    )
+    cond["action_mask"][0, 0, [39, 40, 41, 42, 43, 44, 10]] = 1.0
+    noisy = torch.randn(2, 64, 128)
+    score_calls = []
+
+    def fake_score(samples, keypoints, guidance_fns, slice_kind):
+        score_calls.append((tuple(samples.shape), slice_kind))
+        return torch.tensor([1.0, 2.0], device=samples.device, dtype=samples.dtype)
+
+    monkeypatch.setattr(stub_steer, "_score_particles", fake_score)
+
+    denoised, costs, info = stub_steer._eds_rollout_reference(
+        cond=cond,
+        action_mask=cond["action_mask"],
+        noisy_action=noisy,
+        keypoints=torch.zeros(3, 3),
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        n_trunc_steps=2,
+    )
+
+    assert tuple(denoised.shape) == (2, 64, 128)
+    assert score_calls[-1] == ((2, 64, 128), "eds")
+    torch.testing.assert_close(costs, torch.tensor([-1.0, -2.0]))
+    torch.testing.assert_close(info["rewards"], torch.tensor([1.0, 2.0]))
+
+
 def test_rdt_guidance_type_invalid_raises_clear_error(stub_steer, stub_adapter, mock_batch):
     stub_steer.post_init(
         adapter=stub_adapter,
