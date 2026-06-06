@@ -597,7 +597,7 @@ python main.py backend=libero backend.libero.suite_name="libero_goal"
 python main.py backend=libero \
     backend.libero.suite_name="libero_spatial" \
     main.episode_num=50 \
-    main.guide_scale=120
+    main.vls_config.guide_scale=120
 
 # Filter specific task IDs (list syntax)
 python main.py backend.libero.task_ids_filter=[0,2,4,8]
@@ -619,7 +619,7 @@ python main.py main.use_guidance=false
 python main.py policy.type=diffusion
 
 # Full run with task + guidance enabled
-python main.py backend=calvin task=door_left main.use_guidance=true main.guide_scale=80
+python main.py backend=calvin task=door_left main.use_guidance=true main.vls_config.guide_scale=80
 ```
 
 ### 7.3 Config Group vs. Parameter Override
@@ -725,7 +725,7 @@ These configs are loaded via `OmegaConf.load()` directly (not through `@hydra.ma
 python main.py backend=libero backend.libero.suite_name=libero_goal main.episode_num=50
 
 # Run with CALVIN, drawer task, guidance enabled
-python main.py backend=calvin task=drawer_open main.use_guidance=true main.guide_scale=80
+python main.py backend=calvin task=drawer_open main.use_guidance=true main.vls_config.guide_scale=80
 
 # Multirun sweep over suites
 python main.py --multirun backend.libero.suite_name=libero_goal,libero_spatial,libero_object
@@ -734,7 +734,7 @@ python main.py --multirun backend.libero.suite_name=libero_goal,libero_spatial,l
 python main.py policy.type=diffusion policy.diffusion.num_inference_steps=50
 
 # Disable FKD for ablation
-python main.py main.use_fkd=false
+python main.py main.vls_config.use_fkd=false
 ```
 
 ### Python Config Access Cheatsheet
@@ -743,7 +743,7 @@ python main.py main.use_fkd=false
 # Nested read
 cfg.backend.backend          # "libero" or "calvin"
 cfg.policy.type              # "pi05" or "diffusion"
-cfg.main.guide_scale         # 80.0
+cfg.main.vls_config.guide_scale         # 80.0
 
 # Safe read with default
 cfg.get('seed', 0)

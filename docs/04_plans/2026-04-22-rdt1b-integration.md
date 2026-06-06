@@ -1282,7 +1282,7 @@ python main.py \
   policy.type=rdt \
   main.use_guidance=false \
   main.episode_num=1 \
-  main.sample_batch_size=1 \
+  main.vls_config.sample_batch_size=1 \
   main.render=false
 ```
 
@@ -1321,7 +1321,7 @@ python main.py \
   policy.type=rdt \
   main.use_guidance=false \
   main.episode_num=1 \
-  main.sample_batch_size=1 \
+  main.vls_config.sample_batch_size=1 \
   main.render=false
 ```
 
@@ -1343,9 +1343,9 @@ python main.py \
   task=drawer_open \
   policy.type=rdt \
   main.use_guidance=true \
-  main.use_fkd=true \
+  main.vls_config.use_fkd=true \
   main.episode_num=1 \
-  main.sample_batch_size=4 \
+  main.vls_config.sample_batch_size=4 \
   main.render=false
 ```
 

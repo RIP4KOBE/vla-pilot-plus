@@ -1482,10 +1482,10 @@ true
 Use Hydra overrides rather than code changes for first tuning pass:
 
 ```bash
-python main.py policy.type=rdt main.use_guidance=true main.guide_scale=20.0
-python main.py policy.type=rdt main.use_guidance=true main.guide_scale=40.0
-python main.py policy.type=rdt main.use_guidance=true main.diversity_scale=5.0
-python main.py policy.type=rdt main.use_guidance=true main.use_fkd=false
+python main.py policy.type=rdt main.use_guidance=true main.vls_config.guide_scale=20.0
+python main.py policy.type=rdt main.use_guidance=true main.vls_config.guide_scale=40.0
+python main.py policy.type=rdt main.use_guidance=true main.vls_config.diversity_scale=5.0
+python main.py policy.type=rdt main.use_guidance=true main.vls_config.use_fkd=false
 ```
 
 Expected:

@@ -59,7 +59,7 @@ Receives a Hydra `DictConfig` and proceeds in this order:
 | Seed | `np.random.seed`, `torch.manual_seed`, `torch.cuda.manual_seed` |
 | Backend selection | Reads `cfg.backend.backend` (e.g., `"calvin"`) |
 | Adapter creation | `create_adapter(backend, env_config)` — returns a `BaseEnvAdapter` |
-| Task info + guide scale | Queries adapter for task instruction and optional `recommended_guide_scale`; falls back to `cfg.main.guide_scale` (default `80.0`) |
+| Task info + guide scale | Queries adapter for task instruction and optional `recommended_guide_scale`; falls back to `cfg.main.vls_config.guide_scale` (default `80.0`) |
 | Policy loading | Conditionally loads `DiffusionPolicySteer` or `PI05PolicySteer` from pretrained checkpoint |
 | Pre/post processors | `make_pre_post_processors()` for observation normalization and action denormalization |
 | `policy.post_init()` | Binds adapter, postprocessor, batch size, and policy-specific config |
@@ -258,7 +258,7 @@ Entry point decorated with `@hydra.main(config_path="configs", config_name="conf
 ```bash
 python main.py                                      # CALVIN drawer_open
 python main.py env=libero env.libero.suite_name=libero_goal
-python main.py main.episode_num=50 main.guide_scale=120
+python main.py main.episode_num=50 main.vls_config.guide_scale=120
 python main.py +experiment=debug
 ```
 

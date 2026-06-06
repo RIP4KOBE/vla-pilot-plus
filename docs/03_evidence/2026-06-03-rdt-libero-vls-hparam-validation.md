@@ -16,6 +16,8 @@ Scope: this document records only hyperparameter validation runs for RDT LIBERO 
 
 `guided_success_rate >= unguided_success_rate`
 
+Note: the run tables below preserve historical pre-grouping config paths exactly as recorded. For current commands, use grouped VLS paths such as `main.vls_config.guide_scale`, `main.vls_config.sample_batch_size`, `main.vls_config.use_diversity`, `main.vls_config.diversity_scale`, and `main.vls_config.use_fkd`.
+
 ## Baseline
 
 | Run | Guidance | Key Parameters | Output Directory | Success | Notes |
@@ -88,7 +90,7 @@ Fixed parameters unless noted: `main.guide_scale=20.0`; `backend.libero.task_gui
 
 ## Current Best
 
-Best guided full-suite setting in this evidence file remains `rdt_full_divs1_gs20_temp0`: `main.guide_scale=20.0`, `main.sample_batch_size=20`, `main.use_diversity=true`, `main.diversity_scale=1.0`, `main.use_fkd=true`, `main.use_vlm_stage_recognition=false`, with `7/10 = 70.00%`.
+Best guided full-suite setting in this evidence file remains `rdt_full_divs1_gs20_temp0`. Current equivalent grouped settings: `main.vls_config.guide_scale=20.0`, `main.vls_config.sample_batch_size=20`, `main.vls_config.use_diversity=true`, `main.vls_config.diversity_scale=1.0`, `main.vls_config.use_fkd=true`, `main.use_vlm_stage_recognition=false`, with `7/10 = 70.00%`.
 
 None of the completed guided ablations currently meets the implementation gate of `guided_success_rate >= unguided_success_rate` because the unguided RDT baseline is `9/10 = 90.00%`.
 

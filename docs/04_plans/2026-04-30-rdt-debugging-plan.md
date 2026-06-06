@@ -182,7 +182,7 @@ duplicate_sources:
 **Concrete tasks:**
 
 1. Confirm the exact command used to produce the 0/10 result (backend, suite, episode_num, guidance settings). Record it.
-2. Set `main.episode_num=1` and `main.use_guidance=false` and `main.sample_batch_size=1` for all diagnostic runs. This minimizes noise and speeds up iteration.
+2. Set `main.episode_num=1` and `main.use_guidance=false` and `main.vls_config.sample_batch_size=1` for all diagnostic runs. This minimizes noise and speeds up iteration.
 3. Confirm the conda environment is activated and the checkpoint downloads correctly (or is already cached locally). Log the exact checkpoint path.
 4. Run one episode with current code and confirm the failure reproduces. Record: does the robot move at all? Does it move but ignore the task? Does it stay frozen?
 

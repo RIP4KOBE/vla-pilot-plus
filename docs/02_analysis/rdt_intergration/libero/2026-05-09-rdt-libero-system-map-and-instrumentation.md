@@ -256,12 +256,12 @@ Strict separation between **FACT-supported** suspicions (an evidence artifact in
 | L4 | `core/rdt_policy_steer.py:719` | end of `_predict_unguided`, just before return | `x_t.shape`, `x_t.abs().max().item()`, per-arm-dim mean of the first 3 timesteps after slice (`out[0, :3, :7].mean(0).tolist()`), `out[0, :3, 7].tolist()` (gripper dim) | H-E (compares with official trajectory shapes); H-F (gripper trace) |
 | L5 | `core/rdt_action_converter.py:168` | end of `rdt_chunk_to_libero_actions`, before return; one-shot guard via a module-level `_diag_done` | for `i in range(min(H, 3))`: `delta_pos.tolist()` (metres), `delta_axisangle.tolist()` (rad), `action_pos` pre-clip (`delta_pos / _POS_SCALE`), `action_pos` post-clip, `action_gripper`, `q_curr` (denormalized), `q_prev` (current_joints if i==0) | F-1, F-2, H-A |
 | L6 | `core/env_adapters/libero_adapter.py:1432` | inside `step`, just before `current_env.step(action_numpy)` | one-shot: `action_numpy.tolist()`, episode_step, `self.episode_step` | F-2 (validates LIBERO sees what the converter produced post-binarisation), H-F |
-| L7 | `core/rdt_policy_steer.py:189` | end of `_init_policy` block (or end of `Main.__init__` stage), one-shot | `cfg.policy`, `cfg.main.use_guidance`, `cfg.main.sample_batch_size`, `cfg.main.episode_num`, commit hash from `git rev-parse HEAD`, list of `outputs/.../episode_1` directory contents at end of run | F-3 (rollout repro context); also fills the gap that current `main.log` lacks config |
+| L7 | `core/rdt_policy_steer.py:189` | end of `_init_policy` block (or end of `Main.__init__` stage), one-shot | `cfg.policy`, `cfg.main.use_guidance`, `cfg.main.vls_config.sample_batch_size`, `cfg.main.episode_num`, commit hash from `git rev-parse HEAD`, list of `outputs/.../episode_1` directory contents at end of run | F-3 (rollout repro context); also fills the gap that current `main.log` lacks config |
 
 ### E.2 Capture protocol
 
 1. Apply L1–L7 in a single diagnostic-only commit. **No other code change.**
-2. Set `main.episode_num=1`, `main.use_guidance=false`, `main.sample_batch_size=1`, `backend.libero.suite_name=libero_object`, `backend.libero.task_id=0` (matches the failing reference).
+2. Set `main.episode_num=1`, `main.use_guidance=false`, `main.vls_config.sample_batch_size=1`, `backend.libero.suite_name=libero_object`, `backend.libero.task_id=0` (matches the failing reference).
 3. Run one episode. Save `console_output.txt`, copy `/tmp/rdt_live_ext_*.png` into `evidence/round-3/`, copy `outputs/libero/<latest>/episode_1/episode_1_fail_agentview.mp4`.
 4. Revert the diagnostic commit (`git revert HEAD`) before any subsequent fix attempt so the codebase is clean for a single-fix repair iteration.
 

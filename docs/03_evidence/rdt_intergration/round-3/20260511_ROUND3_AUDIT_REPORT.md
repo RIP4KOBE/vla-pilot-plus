@@ -19,6 +19,8 @@ duplicate_sources:
 
 ---
 
+Note: this archived evidence report preserves historical pre-grouping config paths in recorded commands. Current VLS overrides use grouped paths such as `main.vls_config.sample_batch_size=1`.
+
 ## Executive Summary
 
 RDT-1B/LIBERO integration fails 0/10 on `libero_object` task_id=0. A 4-probe instrumentation campaign isolated the first unhealthy boundary to **P3 (RDTObsProcessor.process)**, specifically `proprio[7]` (gripper state).
