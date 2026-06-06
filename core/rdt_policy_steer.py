@@ -1096,15 +1096,21 @@ class RDTSteer:
             B = max(1, population_size)
 
         if verbose:
-            log.info(
+            log_message = (
                 f"[RDT_GUIDE] enabled=true guidance_type={guidance_type} "
                 f"B={B} H={self._action_chunk_horizon} "
                 f"pred_horizon=64 guided_slots={RDT_GUIDED_TRANSLATION_INDICES} "
                 f"action_slots={RDT_GUIDED_ACTION_INDICES} "
                 f"guidance_sign={RDT_GUIDANCE_SIGN} prediction_type=sample "
-                f"use_diversity={resolved_vls_config['use_diversity']} "
-                f"use_fkd={resolved_vls_config['use_fkd']}"
             )
+            if guidance_type == "vls":
+                log.info(
+                    log_message
+                    + f"use_diversity={resolved_vls_config['use_diversity']} "
+                    + f"use_fkd={resolved_vls_config['use_fkd']}"
+                )
+            else:
+                log.info(log_message + f"eds_population_size={B} eds_stub=true")
         pred_horizon = 64
         x_t = torch.randn(B, pred_horizon, unified_action_dim, device=device, dtype=dtype)
 
