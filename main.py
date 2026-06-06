@@ -50,12 +50,28 @@ import warnings
 
 # Hydra imports
 import hydra
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig, ListConfig, OmegaConf
 
 warnings.filterwarnings('ignore', category=FutureWarning, message='.*pynvml.*')
 warnings.filterwarnings('ignore', category=UserWarning, message='.*pkg_resources.*')
 warnings.filterwarnings('ignore', category=UserWarning, message='.*xFormers.*')
 warnings.filterwarnings('ignore', category=UserWarning, message='.*env.get_obs.*')
+
+
+def _config_section_to_dict(section: Any, section_name: str) -> dict:
+    """Return a fresh plain dict for optional grouped config sections."""
+    if section is None:
+        return {}
+    if isinstance(section, dict):
+        return dict(section)
+    if isinstance(section, (DictConfig, ListConfig)):
+        section = OmegaConf.to_container(section, resolve=True)
+        if section is None:
+            return {}
+        if isinstance(section, dict):
+            return dict(section)
+        raise TypeError(f"{section_name} must be a mapping, got {type(section).__name__}")
+    raise TypeError(f"{section_name} must be a mapping, got {type(section).__name__}")
 
 # Add project root to path (for local modules like steer_utils, utils, etc.)
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -141,7 +157,7 @@ class Main:
         task_info = self.adapter.get_task_info()
         instruction = task_info.get('instruction', '')
         recommended_scale = task_info.get('recommended_guide_scale')
-        vls_config = self.config.get('vls_config', {})
+        vls_config = _config_section_to_dict(self.config.get('vls_config'), "main.vls_config")
         base_guide_scale = vls_config.get('guide_scale', 80.0)
 
         # Override with recommended scale if available
@@ -218,7 +234,10 @@ class Main:
         self.policy.post_init(
             adapter=self.adapter,
             postprocessor=self.policy_postprocessor,
-            sample_batch_size=self.config.get('vls_config', {}).get('sample_batch_size', 1),
+            sample_batch_size=_config_section_to_dict(
+                self.config.get('vls_config'),
+                "main.vls_config",
+            ).get('sample_batch_size', 1),
             policy_config=policy_config.get(policy_type, {}),
         )
 
@@ -326,7 +345,10 @@ class Main:
         """Get observation in policy expected format (backend-agnostic)."""
         sample_num = policy_observation_sample_num(
             self.policy_type,
-            self.config.get('vls_config', {}).get('sample_batch_size', None),
+            _config_section_to_dict(
+                self.config.get('vls_config'),
+                "main.vls_config",
+            ).get('sample_batch_size', None),
         )
         observation = self.adapter.get_policy_observation(sample_num=sample_num)
 
@@ -676,14 +698,8 @@ class Main:
                     "expected one of {'vls', 'eds'}"
                 )
 
-            vls_config = OmegaConf.to_container(
-                self.config.get("vls_config", {}),
-                resolve=True,
-            )
-            eds_config = OmegaConf.to_container(
-                self.config.get("eds_config", {}),
-                resolve=True,
-            )
+            vls_config = _config_section_to_dict(self.config.get("vls_config"), "main.vls_config")
+            eds_config = _config_section_to_dict(self.config.get("eds_config"), "main.eds_config")
             vls_config["guide_scale"] = getattr(
                 self,
                 "current_guide_scale",
@@ -712,7 +728,11 @@ class Main:
                 "diversity_scale": vls_config.get("diversity_scale", 10.0),
                 "MCMC_steps": vls_config.get("MCMC_steps", 4),
                 "use_fkd": vls_config.get("use_fkd", False),
-                "fkd_config": vls_config.get("fkd", None),
+                "fkd_config": (
+                    _config_section_to_dict(vls_config.get("fkd"), "main.vls_config.fkd")
+                    if vls_config.get("fkd") is not None
+                    else None
+                ),
             }
 
             if self.policy_type == "rdt" and supports_grouped_guidance:
@@ -781,7 +801,10 @@ class Main:
                 scale = self.policy.get_last_scale()
 
                 # Use config values for consistent display
-                vls_config = self.config.get("vls_config", {})
+                vls_config = _config_section_to_dict(
+                    self.config.get("vls_config"),
+                    "main.vls_config",
+                )
                 k = vls_config.get("sigmoid_k", 12.0)
                 x0 = vls_config.get("sigmoid_x0", 0.8)
                 sig_strength = 1.0 / (1.0 + np.exp(k * (norm_r - x0)))
