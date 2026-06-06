@@ -41,7 +41,7 @@ bash run.sh calvin drawer_open
 
 # Hydra CLI overrides
 python main.py backend=calvin main.episode_num=5 main.use_guidance=true
-python main.py main.guide_scale=80.0 main.sample_batch_size=20 main.MCMC_steps=4
+python main.py main.vls_config.guide_scale=80.0 main.vls_config.sample_batch_size=20 main.vls_config.MCMC_steps=4
 ```
 
 There is no test suite — validation is done by running episodes and inspecting logged outputs in `outputs/`.
@@ -105,9 +105,9 @@ Monkey-patches for third-party library compatibility live in `patches/`.
 
 | Parameter | Default | Effect |
 |---|---|---|
-| `main.guide_scale` | 80.0 | Gradient guidance strength |
-| `main.diversity_scale` | 20.0 | RBF particle diversity weight |
-| `main.sample_batch_size` | 20 | Number of FK particles |
-| `main.MCMC_steps` | 4 | MCMC refinement steps per denoising step |
-| `main.start_step` | 70 | Diffusion step at which to begin guidance |
+| `main.vls_config.guide_scale` | 80.0 | Gradient guidance strength |
+| `main.vls_config.diversity_scale` | 20.0 | RBF particle diversity weight |
+| `main.vls_config.sample_batch_size` | 20 | Number of FK particles |
+| `main.vls_config.MCMC_steps` | 4 | MCMC refinement steps per denoising step |
+| `main.vls_config.start_ratio` | null | Action-chunk ratio at which to begin guidance |
 | `main.use_guidance` | true | Enable/disable steering entirely |
