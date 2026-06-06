@@ -1368,6 +1368,92 @@ class RDTSteer:
         )
         return selected
 
+    def _expand_action_mask_for_population(self, action_mask: Tensor, population: Tensor) -> Tensor:
+        return action_mask.expand(population.shape[0], population.shape[1], population.shape[2]).to(
+            device=population.device,
+            dtype=population.dtype,
+        )
+
+    def _apply_action_mask(self, actions: Tensor, cond: dict) -> Tensor:
+        action_mask = self._expand_action_mask_for_population(cond["action_mask"], actions)
+        return actions * action_mask
+
+    def _eds_score_population_as_cost(
+        self,
+        samples: Tensor,
+        *,
+        keypoints: Optional[Tensor],
+        guidance_fns: Optional[List[Callable]],
+    ) -> tuple[Tensor, dict]:
+        rewards = self._score_particles(samples, keypoints, guidance_fns, slice_kind="eds")
+        costs = -rewards
+        return costs.detach(), {"rewards": rewards.detach()}
+
+    def _eds_initial_population(self, *, x_t: Tensor, cond: dict, cfg: _EDSConfig) -> Tensor:
+        if cfg.use_initial_cache:
+            if cfg.initial_population_cache is None:
+                raise ValueError("EDS use_initial_cache=true requires initial_population_cache")
+            cache_path = Path(cfg.initial_population_cache)
+            cached = torch.load(cache_path, map_location=x_t.device)
+            if isinstance(cached, dict) and "initial_population" in cached:
+                cached = cached["initial_population"]
+            if not torch.is_tensor(cached):
+                raise TypeError("Cached EDS initial_population must be a torch.Tensor")
+            expected = (cfg.population_size, x_t.shape[1], x_t.shape[2])
+            if tuple(cached.shape) != expected:
+                raise ValueError(
+                    f"Cached EDS initial_population shape {tuple(cached.shape)} != {expected}"
+                )
+            return cached.to(device=x_t.device, dtype=x_t.dtype)
+
+        population = x_t
+        scheduler = self._noise_scheduler
+        scheduler.set_timesteps(self._num_inference_steps)
+        with torch.no_grad():
+            for t in scheduler.timesteps:
+                model_output = self._dit(population, t, cond)
+                population = scheduler.step(model_output, t, population).prev_sample.to(dtype=x_t.dtype)
+        return self._apply_action_mask(population, cond)
+
+    def _eds_renoise_reference(self, population_trajectories: Tensor, t: int) -> Tensor:
+        scheduler = self._noise_scheduler
+        if not hasattr(scheduler, "add_noise"):
+            raise RuntimeError("EDS requires a scheduler with add_noise()")
+        if not hasattr(scheduler, "timesteps") or len(scheduler.timesteps) == 0:
+            scheduler.set_timesteps(self._num_inference_steps)
+        t = int(max(1, min(t, len(scheduler.timesteps))))
+        noise = torch.randn_like(population_trajectories)
+        return scheduler.add_noise(population_trajectories, noise, scheduler.timesteps[-t])
+
+    def _eds_rollout_reference(
+        self,
+        *,
+        cond: dict,
+        action_mask: Tensor,
+        noisy_action: Tensor,
+        keypoints: Optional[Tensor],
+        guidance_fns: Optional[List[Callable]],
+        n_trunc_steps: int,
+    ) -> tuple[Tensor, Tensor, dict]:
+        scheduler = self._noise_scheduler
+        scheduler.set_timesteps(self._num_inference_steps)
+        n_trunc_steps = int(max(1, min(n_trunc_steps, len(scheduler.timesteps))))
+        x_t = noisy_action
+        mask = self._expand_action_mask_for_population(action_mask, x_t)
+
+        with torch.no_grad():
+            for t in scheduler.timesteps[-n_trunc_steps:]:
+                model_output = self._dit(x_t, t, cond)
+                x_t = scheduler.step(model_output, t, x_t).prev_sample.to(dtype=noisy_action.dtype)
+
+        x_t = x_t * mask
+        costs, info = self._eds_score_population_as_cost(
+            x_t,
+            keypoints=keypoints,
+            guidance_fns=guidance_fns,
+        )
+        return x_t, costs, info
+
     def _eds_guided_denoise_loop(
         self,
         *,
