@@ -12,6 +12,7 @@ Usage:
 """
 
 import os
+import inspect
 import warnings
 # Suppress pydantic v2 Field attribute warnings from third-party PI05 config classes
 warnings.filterwarnings("ignore", category=UserWarning, message=".*'repr'.*Field.*")
@@ -140,7 +141,8 @@ class Main:
         task_info = self.adapter.get_task_info()
         instruction = task_info.get('instruction', '')
         recommended_scale = task_info.get('recommended_guide_scale')
-        base_guide_scale = self.config.get('guide_scale', 80.0)
+        vls_config = self.config.get('vls_config', {})
+        base_guide_scale = vls_config.get('guide_scale', 80.0)
 
         # Override with recommended scale if available
         if recommended_scale is not None:
@@ -216,7 +218,7 @@ class Main:
         self.policy.post_init(
             adapter=self.adapter,
             postprocessor=self.policy_postprocessor,
-            sample_batch_size=self.config.get('sample_batch_size', 1),
+            sample_batch_size=self.config.get('vls_config', {}).get('sample_batch_size', 1),
             policy_config=policy_config.get(policy_type, {}),
         )
 
@@ -324,7 +326,7 @@ class Main:
         """Get observation in policy expected format (backend-agnostic)."""
         sample_num = policy_observation_sample_num(
             self.policy_type,
-            self.config.get('sample_batch_size', None),
+            self.config.get('vls_config', {}).get('sample_batch_size', None),
         )
         observation = self.adapter.get_policy_observation(sample_num=sample_num)
 
@@ -682,6 +684,8 @@ class Main:
                 self.config.get("eds_config", {}),
                 resolve=True,
             )
+            select_params = inspect.signature(self.policy.select_action).parameters
+            supports_grouped_guidance = "guidance_type" in select_params
 
             select_kwargs = {
                 "batch": observation,
@@ -694,7 +698,23 @@ class Main:
                 "current_stage": current_stage,
             }
 
-            if self.policy_type == "rdt":
+            legacy_vls_kwargs = {
+                "guide_scale": getattr(
+                    self,
+                    "current_guide_scale",
+                    vls_config.get("guide_scale", 80.0),
+                ),
+                "sigmoid_k": vls_config.get("sigmoid_k", 12.0),
+                "sigmoid_x0": vls_config.get("sigmoid_x0", 0.7),
+                "start_ratio": vls_config.get("start_ratio", None),
+                "use_diversity": vls_config.get("use_diversity", True),
+                "diversity_scale": vls_config.get("diversity_scale", 10.0),
+                "MCMC_steps": vls_config.get("MCMC_steps", 4),
+                "use_fkd": vls_config.get("use_fkd", False),
+                "fkd_config": vls_config.get("fkd", None),
+            }
+
+            if self.policy_type == "rdt" and supports_grouped_guidance:
                 select_kwargs.update(
                     {
                         "guidance_type": guidance_type,
@@ -705,21 +725,10 @@ class Main:
             else:
                 if guidance_type == "eds" and use_guidance:
                     raise ValueError(
-                        "main.guidance_type=eds is currently implemented only for policy.type=rdt"
+                        "main.guidance_type=eds is currently implemented only for an RDT policy "
+                        "that supports grouped EDS guidance"
                     )
-                select_kwargs.update(
-                    {
-                        "guide_scale": vls_config.get("guide_scale", 80.0),
-                        "sigmoid_k": vls_config.get("sigmoid_k", 12.0),
-                        "sigmoid_x0": vls_config.get("sigmoid_x0", 0.7),
-                        "start_ratio": vls_config.get("start_ratio", None),
-                        "use_diversity": vls_config.get("use_diversity", True),
-                        "diversity_scale": vls_config.get("diversity_scale", 10.0),
-                        "MCMC_steps": vls_config.get("MCMC_steps", 4),
-                        "use_fkd": vls_config.get("use_fkd", False),
-                        "fkd_config": vls_config.get("fkd", None),
-                    }
-                )
+                select_kwargs.update(legacy_vls_kwargs)
 
             action_chunk = self.policy.select_action(**select_kwargs)
 
@@ -771,8 +780,9 @@ class Main:
                 scale = self.policy.get_last_scale()
 
                 # Use config values for consistent display
-                k = self.config.get("sigmoid_k", 12.0)
-                x0 = self.config.get("sigmoid_x0", 0.8)
+                vls_config = self.config.get("vls_config", {})
+                k = vls_config.get("sigmoid_k", 12.0)
+                x0 = vls_config.get("sigmoid_x0", 0.8)
                 sig_strength = 1.0 / (1.0 + np.exp(k * (norm_r - x0)))
 
                 # Show scale as "-" if not yet computed (first chunk before guidance runs)
@@ -898,7 +908,7 @@ def main(cfg: DictConfig) -> None:
         python main.py env=libero env.libero.suite_name=libero_spatial
 
         # Override parameters
-        python main.py main.episode_num=50 main.guide_scale=120
+        python main.py main.episode_num=50 main.vls_config.guide_scale=120
     """
     # Print resolved config
     log.info(f"Working directory: {os.getcwd()}")
