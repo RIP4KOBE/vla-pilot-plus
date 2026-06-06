@@ -687,6 +687,62 @@ def test_eds_renoise_reference_uses_scheduler_add_noise(stub_steer):
     assert not torch.equal(renoised, population)
 
 
+def test_eds_renoise_reference_passes_batch_timesteps_and_refreshes_scheduler(stub_steer):
+    class StrictAddNoiseScheduler:
+        def __init__(self):
+            self.timesteps = torch.tensor([99], dtype=torch.long)
+            self.set_calls = 0
+            self.recorded_timestep_shape = None
+            self.recorded_timestep_device = None
+
+        def set_timesteps(self, n):
+            self.set_calls += 1
+            self.timesteps = torch.arange(n - 1, -1, -1, dtype=torch.long)
+
+        def add_noise(self, original_samples, noise, timesteps):
+            if timesteps.ndim == 0:
+                raise AssertionError("add_noise requires batch timesteps, not a scalar")
+            self.recorded_timestep_shape = tuple(timesteps.shape)
+            self.recorded_timestep_device = timesteps.device
+            return original_samples + noise
+
+    scheduler = StrictAddNoiseScheduler()
+    stub_steer._rdt_model.noise_scheduler = scheduler
+    population = torch.zeros(3, 64, 128)
+
+    renoised = stub_steer._eds_renoise_reference(population, 2)
+
+    assert scheduler.set_calls == 1
+    assert scheduler.recorded_timestep_shape == (3,)
+    assert scheduler.recorded_timestep_device == population.device
+    assert tuple(renoised.shape) == (3, 64, 128)
+
+
+def test_eds_initial_population_masks_cached_population(stub_steer, tmp_path):
+    from core.rdt_policy_steer import _EDSConfig
+
+    population = torch.ones(2, 64, 128)
+    cache_path = tmp_path / "eds_initial.pt"
+    torch.save({"initial_population": population}, cache_path)
+    x_t = torch.zeros(2, 64, 128)
+    action_mask = torch.zeros(1, 1, 128)
+    action_mask[0, 0, [39, 40, 41, 42, 43, 44, 10]] = 1.0
+    cond = {"action_mask": action_mask}
+
+    cached = stub_steer._eds_initial_population(
+        x_t=x_t,
+        cond=cond,
+        cfg=_EDSConfig(
+            population_size=2,
+            use_initial_cache=True,
+            initial_population_cache=str(cache_path),
+        ),
+    )
+
+    assert torch.count_nonzero(cached[:, :, 0]) == 0
+    assert torch.count_nonzero(cached[:, :, 39]) == cached.shape[0] * cached.shape[1]
+
+
 def test_eds_rollout_reference_scores_clean_denoised_population(
     stub_steer,
     stub_adapter,
