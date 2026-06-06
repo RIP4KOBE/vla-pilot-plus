@@ -34,25 +34,37 @@ main:
   
   # Steering parameters
   use_guidance: false
+  guidance_type: vls  # valid: vls, eds
   use_vlm_stage_recognition: true  # Use Gemini to recognize current stage
   vlm_query_limit: 50  # Max VLM queries per episode
-  use_diversity: true
-  sample_batch_size: 20
-  guide_scale: 40.0
-  diversity_scale: 10.0
-  start_ratio: null
-  MCMC_steps: 4
 
-  sigmoid_k: 25.0
-  sigmoid_x0: 0.75
-  
-  # FKD (Feynman-Kac Diffusion)
-  use_fkd: true
-  fkd:
-    potential_type: max
-    lmbda: 10.0
-    adaptive_resampling: true
-    resample_frequency: 5
+  vls_config:
+    use_diversity: true
+    sample_batch_size: 20
+    guide_scale: 40.0
+    diversity_scale: 10.0
+    start_ratio: null
+    MCMC_steps: 4
+    sigmoid_k: 25.0
+    sigmoid_x0: 0.75
+    use_fkd: true
+    fkd:
+      potential_type: max
+      lmbda: 10.0
+      adaptive_resampling: true
+      resample_frequency: 5
+
+  eds_config:
+    population_size: 16
+    use_cem: false
+    cem_iters: 20
+    num_elites: 32
+    temperature: 0.1
+    initial_population_cache: null
+    ed_population_cache: null
+    use_initial_cache: false
+    save_initial_cache: false
+    save_ed_cache: false
 
 # ============================================================
 # Experiment Tracking
