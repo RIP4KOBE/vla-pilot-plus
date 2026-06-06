@@ -1404,7 +1404,7 @@ class RDTSteer:
                 raise ValueError(
                     f"Cached EDS initial_population shape {tuple(cached.shape)} != {expected}"
                 )
-            return cached.to(device=x_t.device, dtype=x_t.dtype)
+            return self._apply_action_mask(cached.to(device=x_t.device, dtype=x_t.dtype), cond)
 
         population = x_t
         scheduler = self._noise_scheduler
@@ -1419,11 +1419,12 @@ class RDTSteer:
         scheduler = self._noise_scheduler
         if not hasattr(scheduler, "add_noise"):
             raise RuntimeError("EDS requires a scheduler with add_noise()")
-        if not hasattr(scheduler, "timesteps") or len(scheduler.timesteps) == 0:
-            scheduler.set_timesteps(self._num_inference_steps)
+        scheduler.set_timesteps(self._num_inference_steps)
         t = int(max(1, min(t, len(scheduler.timesteps))))
         noise = torch.randn_like(population_trajectories)
-        return scheduler.add_noise(population_trajectories, noise, scheduler.timesteps[-t])
+        selected_timestep = scheduler.timesteps[-t].to(device=population_trajectories.device)
+        timesteps = selected_timestep.reshape(1).expand(population_trajectories.shape[0])
+        return scheduler.add_noise(population_trajectories, noise, timesteps)
 
     def _eds_rollout_reference(
         self,
