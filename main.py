@@ -723,7 +723,7 @@ class Main:
                     }
                 )
             else:
-                if guidance_type == "eds" and use_guidance:
+                if guidance_type == "eds":
                     raise ValueError(
                         "main.guidance_type=eds is currently implemented only for an RDT policy "
                         "that supports grouped EDS guidance"
