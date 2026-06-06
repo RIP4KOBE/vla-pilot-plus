@@ -13,6 +13,7 @@ import os
 import sys
 from collections.abc import Callable
 from pathlib import Path
+from types import SimpleNamespace
 from typing import List, Optional, Tuple
 
 import numpy as np
@@ -37,6 +38,21 @@ RDT_GUIDED_TRANSLATION_INDICES = [39, 40, 41]
 RDT_GUIDED_ACTION_INDICES = [39, 40, 41, 42, 43, 44, 10]
 RDT_GUIDANCE_SIGN = 1.0
 RDT_DIVERSITY_SIGN = -1.0
+
+
+def _resolve_vls_config(vls_config: Optional[dict], *, default_sample_batch_size: int) -> dict:
+    cfg = dict(vls_config or {})
+    cfg.setdefault("sample_batch_size", default_sample_batch_size)
+    cfg.setdefault("guide_scale", 1.0)
+    cfg.setdefault("sigmoid_k", 12.0)
+    cfg.setdefault("sigmoid_x0", 0.7)
+    cfg.setdefault("start_ratio", None)
+    cfg.setdefault("use_diversity", True)
+    cfg.setdefault("diversity_scale", 1.0)
+    cfg.setdefault("MCMC_steps", 4)
+    cfg.setdefault("use_fkd", False)
+    cfg.setdefault("fkd", None)
+    return cfg
 
 
 def _rdt_flat_config_to_args(flat: dict) -> dict:
@@ -944,16 +960,10 @@ class RDTSteer:
         use_guidance: bool = False,
         keypoints: Optional[np.ndarray] = None,
         guidance_fns: Optional[List[Callable]] = None,
-        guide_scale: float = 1.0,
-        sigmoid_k: float = 12.0,
-        sigmoid_x0: float = 0.7,
-        start_ratio: Optional[float] = None,
-        use_diversity: bool = True,
-        diversity_scale: float = 1.0,
-        MCMC_steps: int = 4,
+        guidance_type: str = "vls",
+        vls_config: Optional[dict] = None,
+        eds_config: Optional[dict] = None,
         verbose: bool = False,
-        use_fkd: bool = False,
-        fkd_config: Optional[dict] = None,
         global_step: int = 0,
         current_stage: int = 1,
     ) -> Tensor:
@@ -980,16 +990,10 @@ class RDTSteer:
                     text_embed,
                     keypoints=keypoints,
                     guidance_fns=guidance_fns,
-                    guide_scale=guide_scale,
-                    sigmoid_k=sigmoid_k,
-                    sigmoid_x0=sigmoid_x0,
-                    start_ratio=start_ratio,
-                    use_diversity=use_diversity,
-                    diversity_scale=diversity_scale,
-                    MCMC_steps=MCMC_steps,
+                    guidance_type=guidance_type,
+                    vls_config=vls_config,
+                    eds_config=eds_config,
                     verbose=verbose,
-                    use_fkd=use_fkd,
-                    fkd_config=fkd_config,
                     global_step=global_step,
                     current_stage=current_stage,
                 )
@@ -1058,16 +1062,10 @@ class RDTSteer:
         *,
         keypoints: Optional[np.ndarray],
         guidance_fns: Optional[List[Callable]],
-        guide_scale: float,
-        sigmoid_k: float,
-        sigmoid_x0: float,
-        start_ratio: Optional[float],
-        use_diversity: bool,
-        diversity_scale: float,
-        MCMC_steps: int,
+        guidance_type: str,
+        vls_config: Optional[dict],
+        eds_config: Optional[dict],
         verbose: bool,
-        use_fkd: bool,
-        fkd_config: Optional[dict],
         global_step: int,
         current_stage: int,
     ) -> Tensor:
@@ -1082,14 +1080,31 @@ class RDTSteer:
         if unified_action_dim != 128:
             raise ValueError(f"Expected unified action dim 128, got {unified_action_dim}")
 
-        B = max(1, int(self._sample_batch_size))
+        guidance_type = str(guidance_type or "vls").lower()
+        if guidance_type not in {"vls", "eds"}:
+            raise ValueError(
+                f"Unsupported RDT guidance_type={guidance_type!r}; expected 'vls' or 'eds'"
+            )
+
+        resolved_vls_config = _resolve_vls_config(
+            vls_config,
+            default_sample_batch_size=self._sample_batch_size,
+        )
+        resolved_eds_config = self._resolve_eds_config_with_reference_defaults(eds_config)
+        if guidance_type == "vls":
+            B = max(1, int(resolved_vls_config["sample_batch_size"]))
+        else:
+            B = max(1, int(resolved_eds_config.population_size))
+
         if verbose:
             log.info(
-                f"[RDT_GUIDE] enabled=true B={B} H={self._action_chunk_horizon} "
+                f"[RDT_GUIDE] enabled=true guidance_type={guidance_type} "
+                f"B={B} H={self._action_chunk_horizon} "
                 f"pred_horizon=64 guided_slots={RDT_GUIDED_TRANSLATION_INDICES} "
                 f"action_slots={RDT_GUIDED_ACTION_INDICES} "
                 f"guidance_sign={RDT_GUIDANCE_SIGN} prediction_type=sample "
-                f"use_diversity={use_diversity} use_fkd={use_fkd}"
+                f"use_diversity={resolved_vls_config['use_diversity']} "
+                f"use_fkd={resolved_vls_config['use_fkd']}"
             )
         pred_horizon = 64
         x_t = torch.randn(B, pred_horizon, unified_action_dim, device=device, dtype=dtype)
@@ -1098,26 +1113,40 @@ class RDTSteer:
         if keypoints is not None:
             keypoints_tensor = torch.tensor(keypoints, device=device, dtype=dtype)
 
-        guided = self._guided_denoise_loop(
-            x_t=x_t,
-            cond=cond,
-            keypoints=keypoints_tensor,
-            guidance_fns=guidance_fns,
-            guide_scale=guide_scale,
-            sigmoid_k=sigmoid_k,
-            sigmoid_x0=sigmoid_x0,
-            start_ratio=start_ratio,
-            use_diversity=use_diversity,
-            diversity_scale=diversity_scale,
-            MCMC_steps=MCMC_steps,
-            verbose=verbose,
-            use_fkd=use_fkd,
-            fkd_config=fkd_config,
-            global_step=global_step,
-            current_stage=current_stage,
-        )
+        if guidance_type == "vls":
+            guided = self._vls_guided_denoise_loop(
+                x_t=x_t,
+                cond=cond,
+                keypoints=keypoints_tensor,
+                guidance_fns=guidance_fns,
+                vls_config=resolved_vls_config,
+                verbose=verbose,
+                global_step=global_step,
+                current_stage=current_stage,
+            )
+        else:
+            guided = self._eds_guided_denoise_loop(
+                x_t=x_t,
+                cond=cond,
+                keypoints=keypoints_tensor,
+                guidance_fns=guidance_fns,
+                eds_config=resolved_eds_config,
+                verbose=verbose,
+                global_step=global_step,
+                current_stage=current_stage,
+            )
         action_mask = cond["action_mask"].expand(guided.shape[0], pred_horizon, unified_action_dim).to(device=device, dtype=dtype)
         return (guided * action_mask).float()
+
+    def _resolve_eds_config_with_reference_defaults(self, eds_config: Optional[dict]):
+        # Temporary compatibility shim; Task 3 owns the full EDS config resolver.
+        if eds_config is not None and not isinstance(eds_config, dict):
+            if hasattr(eds_config, "population_size"):
+                return eds_config
+            return SimpleNamespace(population_size=self._sample_batch_size)
+        cfg = dict(eds_config or {})
+        cfg.setdefault("population_size", self._sample_batch_size)
+        return SimpleNamespace(**cfg)
 
     def _select_fkd_x0_source(self, *, model_output: Tensor, step_output, x_t: Tensor) -> tuple[Tensor, str]:
         if step_output is not None:
@@ -1196,26 +1225,27 @@ class RDTSteer:
             device=device,
         )
 
-    def _guided_denoise_loop(
+    def _vls_guided_denoise_loop(
         self,
         *,
         x_t: Tensor,
         cond: dict,
         keypoints: Optional[Tensor],
         guidance_fns: Optional[List[Callable]],
-        guide_scale: float,
-        sigmoid_k: float,
-        sigmoid_x0: float,
-        start_ratio: Optional[float],
-        use_diversity: bool,
-        diversity_scale: float,
-        MCMC_steps: int,
+        vls_config: dict,
         verbose: bool,
-        use_fkd: bool,
-        fkd_config: Optional[dict],
         global_step: int,
         current_stage: int,
     ) -> Tensor:
+        guide_scale = float(vls_config.get("guide_scale", 1.0))
+        sigmoid_k = float(vls_config.get("sigmoid_k", 12.0))
+        sigmoid_x0 = float(vls_config.get("sigmoid_x0", 0.7))
+        start_ratio = vls_config.get("start_ratio", None)
+        use_diversity = bool(vls_config.get("use_diversity", True))
+        diversity_scale = float(vls_config.get("diversity_scale", 1.0))
+        MCMC_steps = int(vls_config.get("MCMC_steps", 4))
+        use_fkd = bool(vls_config.get("use_fkd", False))
+        fkd_config = vls_config.get("fkd", None)
         scheduler = self._noise_scheduler
         scheduler.set_timesteps(self._num_inference_steps)
 
@@ -1307,6 +1337,20 @@ class RDTSteer:
             ordered_candidates
         )
         return selected
+
+    def _eds_guided_denoise_loop(
+        self,
+        *,
+        x_t: Tensor,
+        cond: dict,
+        keypoints: Optional[Tensor],
+        guidance_fns: Optional[List[Callable]],
+        eds_config,
+        verbose: bool,
+        global_step: int,
+        current_stage: int,
+    ) -> Tensor:
+        return x_t[0:1]
 
     def _select_particle_for_execution(
         self,

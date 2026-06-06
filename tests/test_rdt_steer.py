@@ -346,6 +346,8 @@ def test_guided_select_action_samples_only_on_chunk_boundaries(stub_steer, stub_
         _raw_obs(task="guided-first"),
         generate_new_chunk=True,
         use_guidance=True,
+        guidance_type="vls",
+        vls_config={"sample_batch_size": 4},
         guidance_fns=guidance,
         keypoints=keypoints,
     )
@@ -356,6 +358,8 @@ def test_guided_select_action_samples_only_on_chunk_boundaries(stub_steer, stub_
         _raw_obs(task="guided-second"),
         generate_new_chunk=False,
         use_guidance=True,
+        guidance_type="vls",
+        vls_config={"sample_batch_size": 4},
         guidance_fns=guidance,
         keypoints=keypoints,
     )
@@ -368,6 +372,8 @@ def test_guided_select_action_samples_only_on_chunk_boundaries(stub_steer, stub_
         _raw_obs(task="guided-third"),
         generate_new_chunk=False,
         use_guidance=True,
+        guidance_type="vls",
+        vls_config={"sample_batch_size": 4},
         guidance_fns=guidance,
         keypoints=keypoints,
     )
@@ -404,6 +410,8 @@ def test_guided_select_action_uses_latent_particle_batch(stub_steer, stub_adapte
         mock_batch,
         generate_new_chunk=True,
         use_guidance=True,
+        guidance_type="vls",
+        vls_config={"sample_batch_size": 4},
         guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
         keypoints=np.zeros((3, 3), dtype=np.float32),
     )
@@ -411,6 +419,103 @@ def test_guided_select_action_uses_latent_particle_batch(stub_steer, stub_adapte
     assert tuple(action.shape) == (1, 8, 7)
     assert stub_steer._rdt_model.dit.calls
     assert any(latent_shape[0] == 4 for latent_shape, _ in stub_steer._rdt_model.dit.calls)
+
+
+def test_rdt_guidance_type_vls_routes_to_vls_guided_denoise_loop(
+    stub_steer,
+    stub_adapter,
+    mock_batch,
+    monkeypatch,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=4,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    calls = {"vls": 0, "eds": 0}
+
+    def fake_vls(**kwargs):
+        calls["vls"] += 1
+        return torch.zeros(1, 64, 128)
+
+    def fake_eds(**kwargs):
+        calls["eds"] += 1
+        return torch.zeros(1, 64, 128)
+
+    monkeypatch.setattr(stub_steer, "_vls_guided_denoise_loop", fake_vls)
+    monkeypatch.setattr(stub_steer, "_eds_guided_denoise_loop", fake_eds)
+
+    action = stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_type="vls",
+        vls_config={"sample_batch_size": 4},
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        keypoints=np.zeros((3, 3), dtype=np.float32),
+    )
+
+    assert tuple(action.shape) == (1, 4, 7)
+    assert calls == {"vls": 1, "eds": 0}
+
+
+def test_rdt_guidance_type_eds_routes_to_eds_loop(
+    stub_steer,
+    stub_adapter,
+    mock_batch,
+    monkeypatch,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=4,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    calls = {"vls": 0, "eds": 0}
+
+    def fake_vls(**kwargs):
+        calls["vls"] += 1
+        return torch.zeros(1, 64, 128)
+
+    def fake_eds(**kwargs):
+        calls["eds"] += 1
+        return torch.zeros(1, 64, 128)
+
+    monkeypatch.setattr(stub_steer, "_vls_guided_denoise_loop", fake_vls)
+    monkeypatch.setattr(stub_steer, "_eds_guided_denoise_loop", fake_eds)
+
+    action = stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_type="eds",
+        eds_config={"population_size": 4, "cem_iters": 1},
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        keypoints=np.zeros((3, 3), dtype=np.float32),
+    )
+
+    assert tuple(action.shape) == (1, 4, 7)
+    assert calls == {"vls": 0, "eds": 1}
+
+
+def test_rdt_guidance_type_invalid_raises_clear_error(stub_steer, stub_adapter, mock_batch):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=2,
+        policy_config={"action_chunk_horizon": 4},
+    )
+
+    with pytest.raises(ValueError, match="Unsupported RDT guidance_type"):
+        stub_steer.select_action(
+            mock_batch,
+            generate_new_chunk=True,
+            use_guidance=True,
+            guidance_type="bad",
+            guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+            keypoints=np.zeros((3, 3), dtype=np.float32),
+        )
 
 
 def test_integrated_guided_select_action_with_diversity_fkd_and_selection(
@@ -453,13 +558,22 @@ def test_integrated_guided_select_action_with_diversity_fkd_and_selection(
         mock_batch,
         generate_new_chunk=True,
         use_guidance=True,
+        guidance_type="vls",
+        vls_config={
+            "sample_batch_size": 4,
+            "guide_scale": 1.0,
+            "use_diversity": True,
+            "diversity_scale": 1.0,
+            "use_fkd": True,
+            "fkd": {
+                "potential_type": "max",
+                "lmbda": 1.0,
+                "adaptive_resampling": False,
+                "resample_frequency": 1,
+            },
+        },
         guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
         keypoints=np.zeros((3, 3), dtype=np.float32),
-        guide_scale=1.0,
-        use_diversity=True,
-        diversity_scale=1.0,
-        use_fkd=True,
-        fkd_config={"potential_type": "max", "lmbda": 1.0, "adaptive_resampling": False, "resample_frequency": 1},
     )
 
     assert tuple(action.shape) == (1, 4, 7)
@@ -496,10 +610,14 @@ def test_guided_loop_applies_diversity_before_keypoint_phase(stub_steer, stub_ad
         mock_batch,
         generate_new_chunk=True,
         use_guidance=True,
+        guidance_type="vls",
+        vls_config={
+            "sample_batch_size": 3,
+            "use_diversity": True,
+            "diversity_scale": 1.0,
+        },
         guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
         keypoints=np.zeros((3, 3), dtype=np.float32),
-        use_diversity=True,
-        diversity_scale=1.0,
     )
 
     assert tuple(action.shape) == (1, 4, 7)
@@ -546,7 +664,8 @@ def test_guided_denoise_loop_raises_on_nonfinite_latent_before_selection(
             mock_batch,
             generate_new_chunk=True,
             use_guidance=True,
-            use_diversity=False,
+            guidance_type="vls",
+            vls_config={"sample_batch_size": 1, "use_diversity": False},
         )
 
 
@@ -582,16 +701,20 @@ def test_guided_loop_calls_fkd_resample_when_enabled(stub_steer, stub_adapter, m
         mock_batch,
         generate_new_chunk=True,
         use_guidance=True,
+        guidance_type="vls",
+        vls_config={
+            "sample_batch_size": 3,
+            "use_diversity": False,
+            "use_fkd": True,
+            "fkd": {
+                "potential_type": "max",
+                "lmbda": 1.0,
+                "adaptive_resampling": False,
+                "resample_frequency": 1,
+            },
+        },
         guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
         keypoints=np.zeros((3, 3), dtype=np.float32),
-        use_diversity=False,
-        use_fkd=True,
-        fkd_config={
-            "potential_type": "max",
-            "lmbda": 1.0,
-            "adaptive_resampling": False,
-            "resample_frequency": 1,
-        },
     )
 
     assert tuple(action.shape) == (1, 4, 7)
@@ -621,10 +744,10 @@ def test_guided_loop_caches_visualization_candidates(stub_steer, stub_adapter, m
         mock_batch,
         generate_new_chunk=True,
         use_guidance=True,
+        guidance_type="vls",
+        vls_config={"sample_batch_size": 3, "use_diversity": False, "use_fkd": False},
         guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
         keypoints=np.zeros((3, 3), dtype=np.float32),
-        use_diversity=False,
-        use_fkd=False,
     )
 
     candidates = stub_steer.get_last_visualization_action_candidates()
@@ -698,16 +821,20 @@ def test_guided_loop_real_fkd_resample_resets_scheduler_history(stub_steer, stub
         mock_batch,
         generate_new_chunk=True,
         use_guidance=True,
+        guidance_type="vls",
+        vls_config={
+            "sample_batch_size": 3,
+            "use_diversity": False,
+            "use_fkd": True,
+            "fkd": {
+                "potential_type": "max",
+                "lmbda": 1.0,
+                "adaptive_resampling": False,
+                "resample_frequency": 1,
+            },
+        },
         guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
         keypoints=np.zeros((3, 3), dtype=np.float32),
-        use_diversity=False,
-        use_fkd=True,
-        fkd_config={
-            "potential_type": "max",
-            "lmbda": 1.0,
-            "adaptive_resampling": False,
-            "resample_frequency": 1,
-        },
     )
 
     terminal_t = int(stub_steer._noise_scheduler.timesteps[-1].item())
@@ -750,16 +877,20 @@ def test_guided_loop_does_not_reset_scheduler_history_when_fkd_noops(
         mock_batch,
         generate_new_chunk=True,
         use_guidance=True,
+        guidance_type="vls",
+        vls_config={
+            "sample_batch_size": 3,
+            "use_diversity": False,
+            "use_fkd": True,
+            "fkd": {
+                "potential_type": "max",
+                "lmbda": 1.0,
+                "adaptive_resampling": False,
+                "resample_frequency": 1,
+            },
+        },
         guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
         keypoints=np.zeros((3, 3), dtype=np.float32),
-        use_diversity=False,
-        use_fkd=True,
-        fkd_config={
-            "potential_type": "max",
-            "lmbda": 1.0,
-            "adaptive_resampling": False,
-            "resample_frequency": 1,
-        },
     )
 
     assert calls
