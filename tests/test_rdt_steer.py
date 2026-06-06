@@ -859,6 +859,137 @@ def test_eds_loop_calls_rollout_after_renoise_each_iteration(
     assert calls[2][1] == calls[3][1]
 
 
+@pytest.mark.parametrize("bad_score", [float("nan"), float("inf")])
+def test_eds_loop_rejects_nonfinite_initial_scores_before_resampling(
+    stub_steer,
+    stub_adapter,
+    mock_batch,
+    monkeypatch,
+    bad_score,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=2,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    resample_calls = []
+
+    def fake_score_population_as_cost(samples, *, keypoints, guidance_fns):
+        scores = torch.tensor([0.0, bad_score, 1.0], device=samples.device, dtype=samples.dtype)
+        return scores, {"rewards": -scores}
+
+    def fail_renoise(population, n_trunc_steps):
+        resample_calls.append(tuple(population.shape))
+        raise AssertionError("EDS should reject invalid scores before resampling")
+
+    monkeypatch.setattr(stub_steer, "_eds_score_population_as_cost", fake_score_population_as_cost)
+    monkeypatch.setattr(stub_steer, "_eds_renoise_reference", fail_renoise)
+
+    with pytest.raises(ValueError, match="EDS population scores.*finite"):
+        stub_steer.select_action(
+            mock_batch,
+            generate_new_chunk=True,
+            use_guidance=True,
+            guidance_type="eds",
+            eds_config={"population_size": 3, "cem_iters": 1, "temperature": 0.1},
+            guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+            keypoints=np.zeros((3, 3), dtype=np.float32),
+        )
+
+    assert resample_calls == []
+
+
+def test_eds_sampling_probabilities_from_cost_handles_extreme_finite_costs(stub_steer):
+    costs = torch.tensor([1.0e20, -1.0e20, 0.0], dtype=torch.float32)
+
+    probabilities = stub_steer._eds_sampling_probabilities_from_cost(costs, temperature=100.0)
+
+    assert tuple(probabilities.shape) == (3,)
+    assert torch.isfinite(probabilities).all()
+    assert float(probabilities.sum().item()) > 0.0
+    assert int(torch.argmax(probabilities).item()) == 1
+
+
+@pytest.mark.parametrize(
+    ("scores", "match"),
+    [
+        ([0.0, 1.0, 2.0], "torch.Tensor"),
+        (torch.zeros(3, 1), "1-D"),
+        (torch.zeros(2), "length"),
+    ],
+)
+def test_eds_validate_population_scores_rejects_invalid_shape_or_length(
+    stub_steer,
+    scores,
+    match,
+):
+    with pytest.raises(ValueError, match=match):
+        stub_steer._eds_validate_population_scores(scores, expected_size=3)
+
+
+def test_eds_loop_cem_resamples_elites_then_renoises_and_rolls_out(
+    stub_steer,
+    stub_adapter,
+    mock_batch,
+    monkeypatch,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=2,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    calls = []
+
+    def fake_initial_population(*, x_t, cond, cfg):
+        population = torch.zeros_like(x_t)
+        markers = torch.arange(population.shape[0], device=population.device, dtype=population.dtype)
+        population[:, :, 39] = markers[:, None]
+        return population
+
+    def fake_score_population_as_cost(samples, *, keypoints, guidance_fns):
+        costs = torch.tensor([3.0, 0.0, 1.0, 2.0], device=samples.device, dtype=samples.dtype)
+        return costs, {"rewards": -costs}
+
+    def fake_renoise(population, n_trunc_steps):
+        markers = set(population[:, 0, 39].detach().cpu().tolist())
+        calls.append(("renoise", n_trunc_steps, tuple(population.shape), markers))
+        assert markers <= {1.0, 2.0}
+        return population
+
+    def fake_rollout(**kwargs):
+        noisy = kwargs["noisy_action"]
+        calls.append(("rollout", kwargs["n_trunc_steps"], tuple(noisy.shape)))
+        costs = torch.arange(noisy.shape[0], device=noisy.device, dtype=noisy.dtype)
+        return noisy, costs, {"rewards": -costs}
+
+    monkeypatch.setattr(stub_steer, "_eds_initial_population", fake_initial_population)
+    monkeypatch.setattr(stub_steer, "_eds_score_population_as_cost", fake_score_population_as_cost)
+    monkeypatch.setattr(stub_steer, "_eds_renoise_reference", fake_renoise)
+    monkeypatch.setattr(stub_steer, "_eds_rollout_reference", fake_rollout)
+
+    action = stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_type="eds",
+        eds_config={
+            "population_size": 4,
+            "cem_iters": 1,
+            "use_cem": True,
+            "num_elites": 2,
+        },
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        keypoints=np.zeros((3, 3), dtype=np.float32),
+    )
+
+    assert tuple(action.shape) == (1, 4, 7)
+    assert calls[0][0] == "renoise"
+    assert calls[1][0] == "rollout"
+    assert calls[0][1] == calls[1][1]
+
+
 def test_eds_loop_caches_visualization_candidates_best_first(
     stub_steer,
     stub_adapter,
@@ -878,7 +1009,7 @@ def test_eds_loop_caches_visualization_candidates_best_first(
     def fake_rollout(**kwargs):
         noisy = kwargs["noisy_action"]
         population = torch.zeros_like(noisy)
-        population[:, 0, 39] = torch.tensor([10.0, 20.0, 30.0], device=noisy.device, dtype=noisy.dtype)
+        population[:, :, 39] = torch.tensor([10.0, 20.0, 30.0], device=noisy.device, dtype=noisy.dtype)[:, None]
         costs = -fake_score(population, kwargs["keypoints"], kwargs["guidance_fns"], "eds")
         return population, costs, {"rewards": -costs}
 
@@ -912,6 +1043,7 @@ def test_eds_loop_caches_visualization_candidates_best_first(
     assert candidates is not None
     assert tuple(candidates.shape) == (3, 4, 7)
     torch.testing.assert_close(candidates[:, 0, 0], torch.tensor([20.0, 30.0, 10.0]))
+    torch.testing.assert_close(action[0, :, 0], candidates[0, :, 0])
 
 
 def test_rdt_guidance_type_invalid_raises_clear_error(stub_steer, stub_adapter, mock_batch):

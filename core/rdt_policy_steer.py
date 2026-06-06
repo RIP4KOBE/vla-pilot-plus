@@ -1389,6 +1389,44 @@ class RDTSteer:
         costs = -rewards
         return costs.detach(), {"rewards": rewards.detach()}
 
+    def _eds_validate_population_scores(self, scores: Tensor, expected_size: int) -> Tensor:
+        if not torch.is_tensor(scores):
+            raise ValueError("EDS population scores must be a torch.Tensor")
+        if scores.ndim != 1:
+            raise ValueError(
+                f"EDS population scores must be 1-D with length {expected_size}, got shape {tuple(scores.shape)}"
+            )
+        if scores.shape[0] != int(expected_size):
+            raise ValueError(
+                f"EDS population scores length {scores.shape[0]} != expected {int(expected_size)}"
+            )
+        if not torch.isfinite(scores).all():
+            raise ValueError("EDS population scores must be finite")
+        return scores.detach()
+
+    def _eds_sampling_probabilities_from_cost(self, costs: Tensor, temperature: float) -> Tensor:
+        if not torch.is_tensor(costs):
+            raise ValueError("EDS sampling costs must be a torch.Tensor")
+        if costs.ndim != 1:
+            raise ValueError(f"EDS sampling costs must be 1-D, got shape {tuple(costs.shape)}")
+        if costs.numel() == 0:
+            raise ValueError("EDS sampling costs must be non-empty")
+        if not torch.isfinite(costs).all():
+            raise ValueError("EDS sampling costs must be finite")
+        if not math.isfinite(float(temperature)) or float(temperature) <= 0.0:
+            raise ValueError("EDS sampling temperature must be finite and positive")
+
+        logits = (-costs.detach()).to(dtype=torch.float64) * float(temperature)
+        probabilities = torch.softmax(logits, dim=0).to(device=costs.device, dtype=torch.float32)
+        probability_mass = probabilities.sum()
+        if (
+            not torch.isfinite(probabilities).all()
+            or not torch.isfinite(probability_mass)
+            or float(probability_mass.detach().cpu().item()) <= 0.0
+        ):
+            raise ValueError("EDS sampling probabilities must be finite with positive mass")
+        return probabilities / probability_mass
+
     def _eds_initial_population(self, *, x_t: Tensor, cond: dict, cfg: _EDSConfig) -> Tensor:
         if cfg.use_initial_cache:
             if cfg.initial_population_cache is None:
@@ -1501,7 +1539,10 @@ class RDTSteer:
             keypoints=keypoints,
             guidance_fns=guidance_fns,
         )
-        population_scores = population_scores.detach()
+        population_scores = self._eds_validate_population_scores(
+            population_scores,
+            cfg.population_size,
+        )
 
         trunc_step_schedule = np.linspace(5, 1, cfg.cem_iters).astype(int)
 
@@ -1517,8 +1558,10 @@ class RDTSteer:
                 )
                 population = population[elites[indices]]
             else:
-                reward_probs = torch.exp(float(cfg.temperature) * -population_scores)
-                reward_probs = reward_probs / torch.clamp(reward_probs.sum(), min=1e-8)
+                reward_probs = self._eds_sampling_probabilities_from_cost(
+                    population_scores,
+                    cfg.temperature,
+                )
                 indices = torch.multinomial(
                     reward_probs,
                     cfg.population_size,
@@ -1536,12 +1579,13 @@ class RDTSteer:
                 guidance_fns=guidance_fns,
                 n_trunc_steps=n_trunc_steps,
             )
-            population_scores = population_scores.detach()
+            population_scores = self._eds_validate_population_scores(
+                population_scores,
+                cfg.population_size,
+            )
 
         if not torch.isfinite(population).all():
             raise ValueError("EDS-guided RDT latent contains non-finite values")
-        if not torch.isfinite(population_scores).all():
-            raise ValueError("EDS-guided RDT scores contain non-finite values")
 
         best_idx = int(torch.argmin(population_scores).item())
         selected = population[best_idx : best_idx + 1]
