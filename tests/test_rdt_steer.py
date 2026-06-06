@@ -875,7 +875,27 @@ def test_eds_loop_caches_visualization_candidates_best_first(
     def fake_score(samples, keypoints, guidance_fns, slice_kind):
         return torch.tensor([1.0, 3.0, 2.0], device=samples.device, dtype=samples.dtype)
 
+    def fake_rollout(**kwargs):
+        noisy = kwargs["noisy_action"]
+        population = torch.zeros_like(noisy)
+        population[:, 0, 39] = torch.tensor([10.0, 20.0, 30.0], device=noisy.device, dtype=noisy.dtype)
+        costs = -fake_score(population, kwargs["keypoints"], kwargs["guidance_fns"], "eds")
+        return population, costs, {"rewards": -costs}
+
+    def fake_decode(actions):
+        candidates = torch.zeros(
+            actions.shape[0],
+            stub_steer._action_chunk_horizon,
+            7,
+            device=actions.device,
+            dtype=actions.dtype,
+        )
+        candidates[:, :, 0] = actions[:, 0:1, 39]
+        return candidates.detach()
+
     monkeypatch.setattr(stub_steer, "_score_particles", fake_score)
+    monkeypatch.setattr(stub_steer, "_eds_rollout_reference", fake_rollout)
+    monkeypatch.setattr(stub_steer, "_decode_visualization_action_candidates", fake_decode)
 
     action = stub_steer.select_action(
         mock_batch,
@@ -891,6 +911,7 @@ def test_eds_loop_caches_visualization_candidates_best_first(
     assert tuple(action.shape) == (1, 4, 7)
     assert candidates is not None
     assert tuple(candidates.shape) == (3, 4, 7)
+    torch.testing.assert_close(candidates[:, 0, 0], torch.tensor([20.0, 30.0, 10.0]))
 
 
 def test_rdt_guidance_type_invalid_raises_clear_error(stub_steer, stub_adapter, mock_batch):
