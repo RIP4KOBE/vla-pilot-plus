@@ -12,6 +12,7 @@ import math
 import os
 import sys
 from collections.abc import Callable
+from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional, Tuple
 
@@ -37,6 +38,20 @@ RDT_GUIDED_TRANSLATION_INDICES = [39, 40, 41]
 RDT_GUIDED_ACTION_INDICES = [39, 40, 41, 42, 43, 44, 10]
 RDT_GUIDANCE_SIGN = 1.0
 RDT_DIVERSITY_SIGN = -1.0
+
+
+@dataclass(frozen=True)
+class _EDSConfig:
+    population_size: int = 16
+    use_cem: bool = False
+    cem_iters: int = 20
+    num_elites: int = 32
+    temperature: float = 0.1
+    initial_population_cache: Optional[str] = None
+    ed_population_cache: Optional[str] = None
+    use_initial_cache: bool = False
+    save_initial_cache: bool = False
+    save_ed_cache: bool = False
 
 
 def _resolve_vls_config(vls_config: Optional[dict], *, default_sample_batch_size: int) -> dict:
@@ -1089,11 +1104,12 @@ class RDTSteer:
             vls_config,
             default_sample_batch_size=self._sample_batch_size,
         )
+        resolved_eds_config = None
         if guidance_type == "vls":
             B = max(1, int(resolved_vls_config["sample_batch_size"]))
         else:
-            population_size = int((eds_config or {}).get("population_size", self._sample_batch_size))
-            B = max(1, population_size)
+            resolved_eds_config = self._resolve_eds_config_with_reference_defaults(eds_config)
+            B = max(1, int(resolved_eds_config.population_size))
 
         if verbose:
             log_message = (
@@ -1110,7 +1126,10 @@ class RDTSteer:
                     + f"use_fkd={resolved_vls_config['use_fkd']}"
                 )
             else:
-                log.info(log_message + f"eds_population_size={B} eds_stub=true")
+                log.info(
+                    log_message
+                    + f"eds_population_size={resolved_eds_config.population_size} eds_stub=true"
+                )
         pred_horizon = 64
         x_t = torch.randn(B, pred_horizon, unified_action_dim, device=device, dtype=dtype)
 
@@ -1135,7 +1154,7 @@ class RDTSteer:
                 cond=cond,
                 keypoints=keypoints_tensor,
                 guidance_fns=guidance_fns,
-                eds_config=eds_config or {},
+                eds_config=resolved_eds_config,
                 verbose=verbose,
                 global_step=global_step,
                 current_stage=current_stage,
@@ -1164,6 +1183,8 @@ class RDTSteer:
         if slice_kind == "keypoint":
             return trajs[:, : self._action_chunk_horizon, :3]
         if slice_kind == "fkd":
+            return trajs[:, 1 : self._action_chunk_horizon, :3]
+        if slice_kind == "eds":
             return trajs[:, 1 : self._action_chunk_horizon, :3]
         if slice_kind == "diversity":
             return trajs[:, 1:, :3]
@@ -1577,6 +1598,34 @@ class RDTSteer:
         idx = int(len(timesteps) * float(start_ratio))
         idx = max(0, min(len(timesteps) - 1, idx))
         return int(timesteps[idx].item())
+
+    def _resolve_eds_config_with_reference_defaults(self, eds_config: Optional[dict]) -> _EDSConfig:
+        cfg = dict(eds_config or {})
+        resolved = _EDSConfig(
+            population_size=int(cfg.get("population_size", 16)),
+            use_cem=bool(cfg.get("use_cem", False)),
+            cem_iters=int(cfg.get("cem_iters", 20)),
+            num_elites=int(cfg.get("num_elites", 32)),
+            temperature=float(cfg.get("temperature", 0.1)),
+            initial_population_cache=cfg.get("initial_population_cache", None),
+            ed_population_cache=cfg.get("ed_population_cache", None),
+            use_initial_cache=bool(cfg.get("use_initial_cache", False)),
+            save_initial_cache=bool(cfg.get("save_initial_cache", False)),
+            save_ed_cache=bool(cfg.get("save_ed_cache", False)),
+        )
+        if resolved.population_size <= 0:
+            raise ValueError("EDS population_size must be positive")
+        if resolved.cem_iters <= 0:
+            raise ValueError("EDS cem_iters must be positive")
+        if resolved.temperature <= 0:
+            raise ValueError("EDS temperature must be positive")
+        if resolved.use_cem and resolved.num_elites > resolved.population_size:
+            raise ValueError(
+                "EDS num_elites must be <= population_size when use_cem=true"
+            )
+        if resolved.use_cem and resolved.num_elites <= 0:
+            raise ValueError("EDS num_elites must be positive when use_cem=true")
+        return resolved
 
     def _adaptive_scale_for_scheduler_t(
         self,

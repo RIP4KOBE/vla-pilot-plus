@@ -94,6 +94,16 @@ class _StubScheduler:
         out.pred_original_sample = None
         return out
 
+    def add_noise(self, original_samples, noise, timesteps):
+        if torch.is_tensor(timesteps):
+            scale = timesteps.to(device=original_samples.device, dtype=original_samples.dtype)
+            while scale.ndim < original_samples.ndim:
+                scale = scale.unsqueeze(-1)
+            scale = scale / max(len(self.timesteps), 1)
+        else:
+            scale = float(timesteps) / max(len(self.timesteps), 1)
+        return original_samples + noise * scale
+
 
 class _StubRDTModel(nn.Module):
     """Minimal stand-in for RoboticDiffusionTransformerModel."""
@@ -587,6 +597,33 @@ def test_rdt_guidance_type_eds_verbose_log_uses_eds_fields(
     assert "eds_stub=true" in guide_messages[0]
     assert "use_diversity" not in guide_messages[0]
     assert "use_fkd" not in guide_messages[0]
+
+
+def test_eds_config_defaults_match_reference_signature(stub_steer):
+    cfg = stub_steer._resolve_eds_config_with_reference_defaults({})
+
+    assert cfg.population_size == 16
+    assert cfg.use_cem is False
+    assert cfg.cem_iters == 20
+    assert cfg.num_elites == 32
+    assert cfg.temperature == 0.1
+    assert cfg.use_initial_cache is False
+    assert cfg.save_initial_cache is False
+    assert cfg.save_ed_cache is False
+
+
+def test_eds_config_rejects_invalid_cem_elites(stub_steer):
+    with pytest.raises(ValueError, match="num_elites"):
+        stub_steer._resolve_eds_config_with_reference_defaults(
+            {"population_size": 4, "use_cem": True, "num_elites": 8}
+        )
+
+
+def test_trajectory_reward_slice_accepts_eds(stub_steer):
+    stub_steer._action_chunk_horizon = 5
+    trajs = torch.zeros(2, 5, 3)
+    sliced = stub_steer._trajectory_reward_slice(trajs, "eds")
+    assert tuple(sliced.shape) == (2, stub_steer._action_chunk_horizon - 1, 3)
 
 
 def test_rdt_guidance_type_invalid_raises_clear_error(stub_steer, stub_adapter, mock_batch):
