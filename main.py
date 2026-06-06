@@ -684,6 +684,11 @@ class Main:
                 self.config.get("eds_config", {}),
                 resolve=True,
             )
+            vls_config["guide_scale"] = getattr(
+                self,
+                "current_guide_scale",
+                vls_config.get("guide_scale", 80.0),
+            )
             select_params = inspect.signature(self.policy.select_action).parameters
             supports_grouped_guidance = "guidance_type" in select_params
 
@@ -699,11 +704,7 @@ class Main:
             }
 
             legacy_vls_kwargs = {
-                "guide_scale": getattr(
-                    self,
-                    "current_guide_scale",
-                    vls_config.get("guide_scale", 80.0),
-                ),
+                "guide_scale": vls_config.get("guide_scale", 80.0),
                 "sigmoid_k": vls_config.get("sigmoid_k", 12.0),
                 "sigmoid_x0": vls_config.get("sigmoid_x0", 0.7),
                 "start_ratio": vls_config.get("start_ratio", None),
