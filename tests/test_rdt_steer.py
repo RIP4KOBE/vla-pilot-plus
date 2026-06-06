@@ -421,6 +421,57 @@ def test_guided_select_action_uses_latent_particle_batch(stub_steer, stub_adapte
     assert any(latent_shape[0] == 4 for latent_shape, _ in stub_steer._rdt_model.dit.calls)
 
 
+def test_rdt_vls_config_sample_batch_size_overrides_post_init(
+    stub_steer,
+    stub_adapter,
+    mock_batch,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=1,
+        policy_config={"action_chunk_horizon": 4},
+    )
+
+    action = stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_type="vls",
+        vls_config={"sample_batch_size": 4},
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        keypoints=np.zeros((3, 3), dtype=np.float32),
+    )
+
+    assert tuple(action.shape) == (1, 4, 7)
+    assert any(latent_shape[0] == 4 for latent_shape, _ in stub_steer._rdt_model.dit.calls)
+
+
+def test_rdt_vls_omitted_config_falls_back_to_post_init_sample_batch_size(
+    stub_steer,
+    stub_adapter,
+    mock_batch,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+
+    action = stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_type="vls",
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        keypoints=np.zeros((3, 3), dtype=np.float32),
+    )
+
+    assert tuple(action.shape) == (1, 4, 7)
+    assert any(latent_shape[0] == 3 for latent_shape, _ in stub_steer._rdt_model.dit.calls)
+
+
 def test_rdt_guidance_type_vls_routes_to_vls_guided_denoise_loop(
     stub_steer,
     stub_adapter,
@@ -497,6 +548,45 @@ def test_rdt_guidance_type_eds_routes_to_eds_loop(
 
     assert tuple(action.shape) == (1, 4, 7)
     assert calls == {"vls": 0, "eds": 1}
+
+
+def test_rdt_guidance_type_eds_verbose_log_uses_eds_fields(
+    stub_steer,
+    stub_adapter,
+    mock_batch,
+    monkeypatch,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=2,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    messages = []
+    monkeypatch.setattr(
+        "core.rdt_policy_steer.log.info",
+        lambda msg, *args, **kwargs: messages.append(str(msg)),
+    )
+
+    action = stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_type="eds",
+        eds_config={"population_size": 4, "cem_iters": 1},
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        keypoints=np.zeros((3, 3), dtype=np.float32),
+        verbose=True,
+    )
+
+    guide_messages = [msg for msg in messages if "[RDT_GUIDE]" in msg]
+    assert tuple(action.shape) == (1, 4, 7)
+    assert len(guide_messages) == 1
+    assert "guidance_type=eds" in guide_messages[0]
+    assert "eds_population_size=4" in guide_messages[0]
+    assert "eds_stub=true" in guide_messages[0]
+    assert "use_diversity" not in guide_messages[0]
+    assert "use_fkd" not in guide_messages[0]
 
 
 def test_rdt_guidance_type_invalid_raises_clear_error(stub_steer, stub_adapter, mock_batch):
