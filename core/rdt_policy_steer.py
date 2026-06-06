@@ -13,7 +13,6 @@ import os
 import sys
 from collections.abc import Callable
 from pathlib import Path
-from types import SimpleNamespace
 from typing import List, Optional, Tuple
 
 import numpy as np
@@ -1090,11 +1089,11 @@ class RDTSteer:
             vls_config,
             default_sample_batch_size=self._sample_batch_size,
         )
-        resolved_eds_config = self._resolve_eds_config_with_reference_defaults(eds_config)
         if guidance_type == "vls":
             B = max(1, int(resolved_vls_config["sample_batch_size"]))
         else:
-            B = max(1, int(resolved_eds_config.population_size))
+            population_size = int((eds_config or {}).get("population_size", self._sample_batch_size))
+            B = max(1, population_size)
 
         if verbose:
             log.info(
@@ -1130,23 +1129,13 @@ class RDTSteer:
                 cond=cond,
                 keypoints=keypoints_tensor,
                 guidance_fns=guidance_fns,
-                eds_config=resolved_eds_config,
+                eds_config=eds_config or {},
                 verbose=verbose,
                 global_step=global_step,
                 current_stage=current_stage,
             )
         action_mask = cond["action_mask"].expand(guided.shape[0], pred_horizon, unified_action_dim).to(device=device, dtype=dtype)
         return (guided * action_mask).float()
-
-    def _resolve_eds_config_with_reference_defaults(self, eds_config: Optional[dict]):
-        # Temporary compatibility shim; Task 3 owns the full EDS config resolver.
-        if eds_config is not None and not isinstance(eds_config, dict):
-            if hasattr(eds_config, "population_size"):
-                return eds_config
-            return SimpleNamespace(population_size=self._sample_batch_size)
-        cfg = dict(eds_config or {})
-        cfg.setdefault("population_size", self._sample_batch_size)
-        return SimpleNamespace(**cfg)
 
     def _select_fkd_x0_source(self, *, model_output: Tensor, step_output, x_t: Tensor) -> tuple[Tensor, str]:
         if step_output is not None:
