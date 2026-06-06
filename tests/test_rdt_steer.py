@@ -594,7 +594,7 @@ def test_rdt_guidance_type_eds_verbose_log_uses_eds_fields(
     assert len(guide_messages) == 1
     assert "guidance_type=eds" in guide_messages[0]
     assert "eds_population_size=4" in guide_messages[0]
-    assert "eds_stub=true" in guide_messages[0]
+    assert "eds_loop=true" in guide_messages[0]
     assert "use_diversity" not in guide_messages[0]
     assert "use_fkd" not in guide_messages[0]
 
@@ -736,11 +736,14 @@ def test_eds_initial_population_masks_cached_population(stub_steer, tmp_path):
             population_size=2,
             use_initial_cache=True,
             initial_population_cache=str(cache_path),
+            save_initial_cache=True,
         ),
     )
 
     assert torch.count_nonzero(cached[:, :, 0]) == 0
     assert torch.count_nonzero(cached[:, :, 39]) == cached.shape[0] * cached.shape[1]
+    saved = torch.load(cache_path)
+    torch.testing.assert_close(saved["initial_population"], cached)
 
 
 def test_eds_rollout_reference_scores_clean_denoised_population(
@@ -995,6 +998,7 @@ def test_eds_loop_caches_visualization_candidates_best_first(
     stub_adapter,
     mock_batch,
     monkeypatch,
+    tmp_path,
 ):
     stub_steer.post_init(
         adapter=stub_adapter,
@@ -1027,13 +1031,20 @@ def test_eds_loop_caches_visualization_candidates_best_first(
     monkeypatch.setattr(stub_steer, "_score_particles", fake_score)
     monkeypatch.setattr(stub_steer, "_eds_rollout_reference", fake_rollout)
     monkeypatch.setattr(stub_steer, "_decode_visualization_action_candidates", fake_decode)
+    ed_cache_path = tmp_path / "eds_population.pt"
 
     action = stub_steer.select_action(
         mock_batch,
         generate_new_chunk=True,
         use_guidance=True,
         guidance_type="eds",
-        eds_config={"population_size": 3, "cem_iters": 1, "temperature": 0.1},
+        eds_config={
+            "population_size": 3,
+            "cem_iters": 1,
+            "temperature": 0.1,
+            "save_ed_cache": True,
+            "ed_population_cache": str(ed_cache_path),
+        },
         guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
         keypoints=np.zeros((3, 3), dtype=np.float32),
     )
@@ -1044,6 +1055,12 @@ def test_eds_loop_caches_visualization_candidates_best_first(
     assert tuple(candidates.shape) == (3, 4, 7)
     torch.testing.assert_close(candidates[:, 0, 0], torch.tensor([20.0, 30.0, 10.0]))
     torch.testing.assert_close(action[0, :, 0], candidates[0, :, 0])
+    saved = torch.load(ed_cache_path)
+    assert tuple(saved["ed_population"].shape) == (3, 64, 128)
+    torch.testing.assert_close(
+        torch.sort(saved["ed_population"][:, 0, 39]).values,
+        torch.tensor([10.0, 20.0, 30.0]),
+    )
 
 
 def test_rdt_guidance_type_invalid_raises_clear_error(stub_steer, stub_adapter, mock_batch):

@@ -1142,7 +1142,7 @@ class RDTSteer:
             else:
                 log.info(
                     log_message
-                    + f"eds_population_size={resolved_eds_config.population_size} eds_stub=true"
+                    + f"eds_population_size={resolved_eds_config.population_size} eds_loop=true"
                 )
         pred_horizon = 64
         x_t = torch.randn(B, pred_horizon, unified_action_dim, device=device, dtype=dtype)
@@ -1389,6 +1389,13 @@ class RDTSteer:
         costs = -rewards
         return costs.detach(), {"rewards": rewards.detach()}
 
+    def _save_eds_population_cache(self, population: Tensor, cache_path: Optional[str], *, label: str) -> None:
+        if cache_path is None:
+            raise ValueError(f"EDS {label} save requires a cache path")
+        path = Path(cache_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        torch.save({label: population.detach().cpu()}, path)
+
     def _eds_validate_population_scores(self, scores: Tensor, expected_size: int) -> Tensor:
         if not torch.is_tensor(scores):
             raise ValueError("EDS population scores must be a torch.Tensor")
@@ -1442,7 +1449,14 @@ class RDTSteer:
                 raise ValueError(
                     f"Cached EDS initial_population shape {tuple(cached.shape)} != {expected}"
                 )
-            return self._apply_action_mask(cached.to(device=x_t.device, dtype=x_t.dtype), cond)
+            population = self._apply_action_mask(cached.to(device=x_t.device, dtype=x_t.dtype), cond)
+            if cfg.save_initial_cache:
+                self._save_eds_population_cache(
+                    population,
+                    cfg.initial_population_cache,
+                    label="initial_population",
+                )
+            return population
 
         population = x_t
         scheduler = self._noise_scheduler
@@ -1451,7 +1465,14 @@ class RDTSteer:
             for t in scheduler.timesteps:
                 model_output = self._dit(population, t, cond)
                 population = scheduler.step(model_output, t, population).prev_sample.to(dtype=x_t.dtype)
-        return self._apply_action_mask(population, cond)
+        population = self._apply_action_mask(population, cond)
+        if cfg.save_initial_cache:
+            self._save_eds_population_cache(
+                population,
+                cfg.initial_population_cache,
+                label="initial_population",
+            )
+        return population
 
     def _eds_renoise_reference(self, population_trajectories: Tensor, t: int) -> Tensor:
         scheduler = self._noise_scheduler
@@ -1597,6 +1618,12 @@ class RDTSteer:
         self._last_visualization_action_candidates = self._decode_visualization_action_candidates(
             ordered_candidates
         )
+        if cfg.save_ed_cache:
+            self._save_eds_population_cache(
+                population,
+                cfg.ed_population_cache,
+                label="ed_population",
+            )
         return selected
 
     def _select_particle_for_execution(
