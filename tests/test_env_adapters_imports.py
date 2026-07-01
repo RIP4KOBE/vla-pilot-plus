@@ -594,6 +594,7 @@ env_config = {
     "suite_name": "libero_object",
     "camera_name": "agentview_image, robot0_eye_in_hand_image",
     "auto_apply_perturbations": False,
+    "strict_perturbations": False,
     "task_ids_filter": [2],
     "observation_width": 128,
     "observation_height": 129,
@@ -619,6 +620,7 @@ assert captured["kwargs"] == {
     "visualization_height": 641,
     "num_steps_wait": 5,
     "max_episode_steps": 600,
+    "strict_perturbations": False,
 }
 '''
     result = _run_python(script)
@@ -684,6 +686,7 @@ def test_libero_backend_config_defaults_match_eval_parity():
     assert libero_config["max_episode_steps"] == 720
     assert libero_config["visualization_width"] == 640
     assert libero_config["visualization_height"] == 640
+    assert libero_config["strict_perturbations"] is False
 
 
 def test_libero_adapter_step_binarizes_gripper_before_sending_numpy_action():

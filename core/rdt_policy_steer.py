@@ -10,7 +10,9 @@ from __future__ import annotations
 import json
 import math
 import os
+import re
 import sys
+import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
@@ -20,6 +22,8 @@ import numpy as np
 import torch
 from torch import Tensor, nn
 
+from core.eds_eval_metrics import EDSChunkMetrics, EDSIterMetrics
+from core.eds_mechanism_trace import EDSMechanismTrace, EDSParticleStage
 from core.env_adapters import BaseEnvAdapter
 from core.fkd_class import FKD
 from core.rdt_libero_action_converter import (
@@ -47,11 +51,16 @@ class _EDSConfig:
     cem_iters: int = 20
     num_elites: int = 32
     temperature: float = 0.1
+    renoise_t_max: int = 5
+    renoise_t_min: int = 1
     initial_population_cache: Optional[str] = None
     ed_population_cache: Optional[str] = None
     use_initial_cache: bool = False
     save_initial_cache: bool = False
     save_ed_cache: bool = False
+    reward_mode: str = "normal"
+    shuffle_seed: int = 0
+    mechanism_pretest: Optional[dict] = None
 
 
 def _parse_eds_bool(value, field_name: str) -> bool:
@@ -575,6 +584,9 @@ class RDTSteer:
         self._debug_first_step = False
         self._action_summary_logged = False
         self._last_visualization_action_candidates: Optional[Tensor] = None
+        self._last_eds_metrics: Optional[dict] = None
+        self._last_eds_artifacts: Optional[dict] = None
+        self._last_eds_mechanism_trace: Optional[EDSMechanismTrace] = None
 
         # Locate the inner DiT score network once at construction.
         self._dit: nn.Module = self._find_dit(rdt_model)
@@ -955,6 +967,9 @@ class RDTSteer:
         self._current_alpha_t = 0.5
         self._action_summary_logged = False
         self._last_visualization_action_candidates = None
+        self._last_eds_metrics = None
+        self._last_eds_artifacts = None
+        self._last_eds_mechanism_trace = None
         if self._obs_processor is not None:
             self._obs_processor.reset()
 
@@ -971,6 +986,19 @@ class RDTSteer:
         if self._last_visualization_action_candidates is None:
             return None
         return self._last_visualization_action_candidates.clone()
+
+    def get_last_eds_metrics(self) -> Optional[dict]:
+        if self._last_eds_metrics is None:
+            return None
+        return dict(self._last_eds_metrics)
+
+    def get_last_eds_artifacts(self) -> Optional[dict]:
+        if self._last_eds_artifacts is None:
+            return None
+        return dict(self._last_eds_artifacts)
+
+    def get_last_eds_mechanism_trace(self) -> Optional[EDSMechanismTrace]:
+        return self._last_eds_mechanism_trace
 
     @property
     def device(self) -> torch.device:
@@ -1007,6 +1035,9 @@ class RDTSteer:
 
         if should_sample:
             self._last_visualization_action_candidates = None
+            self._last_eds_metrics = None
+            self._last_eds_artifacts = None
+            self._last_eds_mechanism_trace = None
             converted = self._obs_processor.current()
 
             if use_guidance:
@@ -1384,8 +1415,39 @@ class RDTSteer:
         *,
         keypoints: Optional[Tensor],
         guidance_fns: Optional[List[Callable]],
+        reward_mode: str = "normal",
+        shuffle_seed: int = 0,
     ) -> tuple[Tensor, dict]:
-        rewards = self._score_particles(samples, keypoints, guidance_fns, slice_kind="eds")
+        reward_mode = str(reward_mode or "normal")
+        valid_modes = {"normal", "zero", "shuffled_keypoints", "inverted"}
+        if reward_mode not in valid_modes:
+            raise ValueError(f"Unsupported EDS reward_mode={reward_mode!r}")
+
+        scoring_keypoints = keypoints
+        if (
+            reward_mode == "shuffled_keypoints"
+            and keypoints is not None
+            and keypoints.shape[0] > 1
+        ):
+            generator = torch.Generator(device=keypoints.device)
+            generator.manual_seed(int(shuffle_seed))
+            perm = torch.randperm(
+                keypoints.shape[0],
+                generator=generator,
+                device=keypoints.device,
+            )
+            scoring_keypoints = keypoints.index_select(0, perm)
+
+        rewards = self._score_particles(
+            samples,
+            scoring_keypoints,
+            guidance_fns,
+            slice_kind="eds",
+        )
+        if reward_mode == "zero":
+            rewards = torch.zeros_like(rewards)
+        elif reward_mode == "inverted":
+            rewards = -rewards
         costs = -rewards
         return costs.detach(), {"rewards": rewards.detach()}
 
@@ -1494,6 +1556,8 @@ class RDTSteer:
         keypoints: Optional[Tensor],
         guidance_fns: Optional[List[Callable]],
         n_trunc_steps: int,
+        reward_mode: str = "normal",
+        shuffle_seed: int = 0,
     ) -> tuple[Tensor, Tensor, dict]:
         scheduler = self._noise_scheduler
         scheduler.set_timesteps(self._num_inference_steps)
@@ -1511,6 +1575,8 @@ class RDTSteer:
             x_t,
             keypoints=keypoints,
             guidance_fns=guidance_fns,
+            reward_mode=reward_mode,
+            shuffle_seed=shuffle_seed,
         )
         return x_t, costs, info
 
@@ -1537,6 +1603,144 @@ class RDTSteer:
         else:
             self._last_scale = 0.0
 
+    def _eds_population_diversity(self, population: Tensor) -> float:
+        if population.shape[0] <= 1:
+            return 0.0
+        flat = population.detach().reshape(population.shape[0], -1).float()
+        distances = torch.pdist(flat, p=2)
+        if distances.numel() == 0:
+            return 0.0
+        return float(distances.mean().detach().cpu().item())
+
+    def _eds_score_entropy(self, costs: Tensor, temperature: float) -> float:
+        probabilities = self._eds_sampling_probabilities_from_cost(costs, temperature)
+        entropy = -(probabilities * torch.log(probabilities.clamp_min(1e-12))).sum()
+        return float(entropy.detach().cpu().item())
+
+    def _eds_target_distance(self, samples: Tensor, keypoints: Optional[Tensor], idx: int) -> Optional[float]:
+        if keypoints is None or keypoints.numel() == 0 or keypoints.shape[-1] < 3:
+            return None
+        trajs = self._trajectory_reward_slice(
+            self._rdt_sample_to_trajectory_3d(samples),
+            "eds",
+        )
+        if trajs.shape[1] == 0:
+            return None
+        selected_final = trajs[int(idx), -1, :3]
+        target = keypoints.reshape(-1, keypoints.shape[-1])[0, :3].to(
+            device=selected_final.device,
+            dtype=selected_final.dtype,
+        )
+        distance = torch.linalg.norm(selected_final - target)
+        return float(distance.detach().cpu().item())
+
+    def _eds_action_mask_violation(self, population: Tensor, cond: dict) -> float:
+        mask = self._expand_action_mask_for_population(cond["action_mask"], population)
+        violation = torch.abs(population * (1.0 - mask)).max()
+        return float(violation.detach().cpu().item())
+
+    def _eds_rewards_from_info(self, costs: Tensor, info: dict) -> Tensor:
+        rewards = info.get("rewards") if isinstance(info, dict) else None
+        if not torch.is_tensor(rewards) or rewards.shape != costs.shape:
+            rewards = -costs
+        return rewards.detach().to(device=costs.device, dtype=costs.dtype)
+
+    def _eds_pretest_enabled(self, cfg: _EDSConfig, global_step: int) -> bool:
+        pretest = cfg.mechanism_pretest
+        if not isinstance(pretest, dict) or not bool(pretest.get("enabled", False)):
+            return False
+        if bool(pretest.get("first_chunk_only", True)) and int(global_step) != 0:
+            return False
+        return True
+
+    def _eds_population_to_reward_trajectories(self, population: Tensor) -> Tensor:
+        return self._trajectory_reward_slice(
+            self._rdt_sample_to_trajectory_3d(population),
+            "eds",
+        )
+
+    def _eds_infer_scoring_keypoint_indices(
+        self,
+        guidance_fns: Optional[List[Callable]],
+        keypoints: Optional[Tensor],
+    ) -> list[int] | None:
+        if keypoints is None or keypoints.ndim == 0:
+            return None
+        keypoint_count = int(keypoints.reshape(-1, keypoints.shape[-1]).shape[0])
+        if keypoint_count <= 0:
+            return None
+
+        indices: list[int] = []
+        for fn in guidance_fns or []:
+            source = getattr(fn, "_guidance_source_text", None)
+            if not isinstance(source, str):
+                original = getattr(fn, "_guidance_original_func", None)
+                source = getattr(original, "_guidance_source_text", None)
+            if not isinstance(source, str):
+                continue
+
+            for pattern in (
+                r"target_idx\s*=\s*torch\.tensor\(\s*\[\s*(\d+)\s*\]",
+                r"target_idx\s*=\s*(\d+)",
+                r"keypoints\s*\[\s*torch\.tensor\(\s*\[\s*(\d+)\s*\]",
+                r"keypoints\s*\[\s*(\d+)\s*\]",
+            ):
+                for match in re.finditer(pattern, source):
+                    idx = int(match.group(1))
+                    if 0 <= idx < keypoint_count and idx not in indices:
+                        indices.append(idx)
+
+        if indices:
+            return indices
+        return [0] if keypoint_count > 0 else None
+
+    def _eds_make_trace_stage(
+        self,
+        *,
+        stage: str,
+        iter_idx: int,
+        population: Tensor,
+        costs: Tensor,
+        info: dict,
+        parent_indices: Optional[Tensor] = None,
+        parent_ranks: Optional[Tensor] = None,
+        reward_before_rollout: Optional[Tensor] = None,
+        reward_after_rollout: Optional[Tensor] = None,
+        renoise_delta_norm: Optional[Tensor] = None,
+        rollout_delta_norm: Optional[Tensor] = None,
+    ) -> EDSParticleStage:
+        rewards = self._eds_rewards_from_info(costs, info)
+        return EDSParticleStage(
+            stage=stage,
+            iter_idx=int(iter_idx),
+            actions=population.detach().cpu(),
+            trajectories=self._eds_population_to_reward_trajectories(population).detach().cpu(),
+            rewards=rewards.detach().cpu(),
+            costs=costs.detach().cpu(),
+            parent_indices=parent_indices.detach().cpu() if parent_indices is not None else None,
+            parent_ranks=parent_ranks.detach().cpu() if parent_ranks is not None else None,
+            reward_before_rollout=(
+                reward_before_rollout.detach().cpu()
+                if reward_before_rollout is not None
+                else None
+            ),
+            reward_after_rollout=(
+                reward_after_rollout.detach().cpu()
+                if reward_after_rollout is not None
+                else None
+            ),
+            renoise_delta_norm=(
+                renoise_delta_norm.detach().cpu()
+                if renoise_delta_norm is not None
+                else None
+            ),
+            rollout_delta_norm=(
+                rollout_delta_norm.detach().cpu()
+                if rollout_delta_norm is not None
+                else None
+            ),
+        )
+
     def _eds_guided_denoise_loop(
         self,
         *,
@@ -1550,7 +1754,20 @@ class RDTSteer:
         current_stage: int,
     ) -> Tensor:
         cfg = eds_config
+        loop_start = time.perf_counter()
+        metrics = EDSChunkMetrics(
+            guidance_type="eds",
+            reward_mode=cfg.reward_mode,
+            population_size=cfg.population_size,
+            cem_iters=cfg.cem_iters,
+            use_cem=cfg.use_cem,
+            temperature=cfg.temperature,
+            eds_enter_count=1,
+        )
+        artifact_iters: list[dict] = []
         action_mask = cond["action_mask"]
+        trace_enabled = self._eds_pretest_enabled(cfg, global_step)
+        trace_stages: list[EDSParticleStage] = []
 
         population = self._eds_initial_population(x_t=x_t, cond=cond, cfg=cfg)
         population = self._apply_action_mask(population, cond)
@@ -1559,16 +1776,64 @@ class RDTSteer:
             population,
             keypoints=keypoints,
             guidance_fns=guidance_fns,
+            reward_mode=cfg.reward_mode,
+            shuffle_seed=cfg.shuffle_seed,
         )
         population_scores = self._eds_validate_population_scores(
             population_scores,
             cfg.population_size,
         )
+        population_rewards = self._eds_rewards_from_info(population_scores, population_info)
+        initial_best_idx = int(torch.argmin(population_scores).item())
+        max_action_mask_violation = self._eds_action_mask_violation(population, cond)
 
-        trunc_step_schedule = np.linspace(5, 1, cfg.cem_iters).astype(int)
+        metrics.score_call_count = 1
+        metrics.population_size_observed = int(population.shape[0])
+        metrics.population_shape = list(population.shape)
+        metrics.score_shape = list(population_scores.shape)
+        metrics.initial_best_reward = float(
+            population_rewards[initial_best_idx].detach().cpu().item()
+        )
+        metrics.initial_mean_reward = float(population_rewards.mean().detach().cpu().item())
+        metrics.population_diversity_initial = self._eds_population_diversity(population)
+        metrics.target_distance_before = self._eds_target_distance(
+            population,
+            keypoints,
+            initial_best_idx,
+        )
+        initial_action_candidates = self._decode_visualization_action_candidates(
+            population
+        ).detach().cpu()
+        if trace_enabled:
+            trace_stages.append(
+                self._eds_make_trace_stage(
+                    stage="initial",
+                    iter_idx=0,
+                    population=population,
+                    costs=population_scores,
+                    info=population_info,
+                )
+            )
+            trace_stages.append(
+                self._eds_make_trace_stage(
+                    stage="scored",
+                    iter_idx=0,
+                    population=population,
+                    costs=population_scores,
+                    info=population_info,
+                )
+            )
+
+        trunc_step_schedule = np.linspace(
+            cfg.renoise_t_max,
+            cfg.renoise_t_min,
+            cfg.cem_iters,
+        ).astype(int)
 
         for i in range(cfg.cem_iters):
             n_trunc_steps = int(trunc_step_schedule[i])
+            parent_source_scores = population_scores
+            parent_source_rewards = population_rewards
             if cfg.use_cem:
                 elites = torch.argsort(population_scores)[: cfg.num_elites]
                 indices = torch.randint(
@@ -1577,7 +1842,9 @@ class RDTSteer:
                     (cfg.population_size,),
                     device=population.device,
                 )
-                population = population[elites[indices]]
+                parent_indices = elites[indices]
+                population = population[parent_indices]
+                unique_parent_ratio = float(parent_indices.unique().numel()) / float(cfg.population_size)
             else:
                 reward_probs = self._eds_sampling_probabilities_from_cost(
                     population_scores,
@@ -1588,10 +1855,70 @@ class RDTSteer:
                     cfg.population_size,
                     replacement=True,
                 )
-                population = population[indices]
+                parent_indices = indices
+                population = population[parent_indices]
+                unique_parent_ratio = float(indices.unique().numel()) / float(cfg.population_size)
+            metrics.resample_count += 1
+            parent_indices_for_scores = parent_indices.to(device=parent_source_scores.device)
+            parent_rewards = parent_source_rewards.index_select(
+                0,
+                parent_indices_for_scores.to(device=parent_source_rewards.device),
+            )
+            parent_costs = parent_source_scores.index_select(0, parent_indices_for_scores)
+            parent_rank_order = torch.argsort(parent_source_rewards, descending=True)
+            parent_source_ranks = torch.empty_like(parent_rank_order)
+            parent_source_ranks[parent_rank_order] = torch.arange(
+                1,
+                parent_rank_order.numel() + 1,
+                device=parent_source_ranks.device,
+                dtype=parent_source_ranks.dtype,
+            )
+            parent_ranks = parent_source_ranks.index_select(
+                0,
+                parent_indices_for_scores.to(device=parent_source_ranks.device),
+            )
+            if trace_enabled and i == 0:
+                trace_stages.append(
+                    self._eds_make_trace_stage(
+                        stage="resampled",
+                        iter_idx=i,
+                        population=population,
+                        costs=parent_costs,
+                        info={"rewards": parent_rewards},
+                        parent_indices=parent_indices,
+                        parent_ranks=parent_ranks,
+                    )
+            )
 
+            population_before_renoise = population
             population = self._eds_renoise_reference(population, n_trunc_steps)
+            renoise_delta_norm = (
+                population - population_before_renoise
+            ).reshape(population.shape[0], -1).norm(dim=1)
+            if trace_enabled and i == 0:
+                renoise_costs, renoise_info = self._eds_score_population_as_cost(
+                    population,
+                    keypoints=keypoints,
+                    guidance_fns=guidance_fns,
+                    reward_mode=cfg.reward_mode,
+                    shuffle_seed=cfg.shuffle_seed,
+                )
+                trace_stages.append(
+                    self._eds_make_trace_stage(
+                        stage="renoised",
+                        iter_idx=i,
+                        population=population,
+                        costs=renoise_costs,
+                        info=renoise_info,
+                        parent_indices=parent_indices,
+                        parent_ranks=parent_ranks,
+                        reward_before_rollout=parent_rewards,
+                        renoise_delta_norm=renoise_delta_norm,
+                    )
+                )
+            metrics.renoise_count += 1
             self._reset_scheduler_particle_history_after_resample(self._noise_scheduler)
+            population_before_rollout = population
             population, population_scores, population_info = self._eds_rollout_reference(
                 cond=cond,
                 action_mask=action_mask,
@@ -1599,17 +1926,135 @@ class RDTSteer:
                 keypoints=keypoints,
                 guidance_fns=guidance_fns,
                 n_trunc_steps=n_trunc_steps,
+                reward_mode=cfg.reward_mode,
+                shuffle_seed=cfg.shuffle_seed,
             )
+            metrics.rollout_count += 1
+            rollout_delta_norm = (
+                population - population_before_rollout
+            ).reshape(population.shape[0], -1).norm(dim=1)
             population_scores = self._eds_validate_population_scores(
                 population_scores,
                 cfg.population_size,
             )
+            metrics.score_call_count += 1
+            population_rewards = self._eds_rewards_from_info(population_scores, population_info)
+            if trace_enabled:
+                if i == 0:
+                    trace_stages.append(
+                        self._eds_make_trace_stage(
+                            stage="after_rollout",
+                            iter_idx=i,
+                            population=population,
+                            costs=population_scores,
+                            info=population_info,
+                            parent_indices=parent_indices,
+                            parent_ranks=parent_ranks,
+                            reward_before_rollout=parent_rewards,
+                            reward_after_rollout=population_rewards,
+                            renoise_delta_norm=renoise_delta_norm,
+                            rollout_delta_norm=rollout_delta_norm,
+                        )
+                    )
+                if bool(cfg.mechanism_pretest.get("save_full_process", True)):
+                    max_full_process_iters = int(
+                        cfg.mechanism_pretest.get("max_full_process_iters", cfg.cem_iters)
+                    )
+                    if i < max_full_process_iters:
+                        trace_stages.append(
+                            self._eds_make_trace_stage(
+                                stage="full_process_after_rollout",
+                                iter_idx=i,
+                                population=population,
+                                costs=population_scores,
+                                info=population_info,
+                            )
+                        )
+            iter_best_idx = int(torch.argmin(population_scores).item())
+            iter_reward_spread = population_rewards.max() - population_rewards.mean()
+            metrics.per_iter.append(
+                EDSIterMetrics(
+                    iter_idx=i,
+                    n_trunc_steps=n_trunc_steps,
+                    best_idx=iter_best_idx,
+                    best_cost=float(population_scores[iter_best_idx].detach().cpu().item()),
+                    best_reward=float(population_rewards[iter_best_idx].detach().cpu().item()),
+                    mean_reward=float(population_rewards.mean().detach().cpu().item()),
+                    reward_spread=float(iter_reward_spread.detach().cpu().item()),
+                    score_entropy=self._eds_score_entropy(population_scores, cfg.temperature),
+                    unique_parent_ratio=unique_parent_ratio,
+                    population_diversity=self._eds_population_diversity(population),
+                )
+            )
+            max_action_mask_violation = max(
+                max_action_mask_violation,
+                self._eds_action_mask_violation(population, cond),
+            )
+            artifact_iters.append(
+                {
+                    "iter_idx": i,
+                    "actions": self._decode_visualization_action_candidates(population).detach().cpu(),
+                    "scores": population_scores.detach().cpu(),
+                }
+            )
 
+        metrics.nonfinite_count = int(
+            (~torch.isfinite(population)).sum().detach().cpu().item()
+        )
         if not torch.isfinite(population).all():
             raise ValueError("EDS-guided RDT latent contains non-finite values")
 
         best_idx = int(torch.argmin(population_scores).item())
         selected = population[best_idx : best_idx + 1]
+        final_rewards = self._eds_rewards_from_info(population_scores, population_info)
+        final_reward_spread = final_rewards.max() - final_rewards.mean()
+        metrics.final_best_reward = float(final_rewards[best_idx].detach().cpu().item())
+        metrics.final_mean_reward = float(final_rewards.mean().detach().cpu().item())
+        metrics.reward_spread = float(final_reward_spread.detach().cpu().item())
+        metrics.selected_idx = best_idx
+        metrics.selected_cost = float(population_scores[best_idx].detach().cpu().item())
+        metrics.selected_reward = float(final_rewards[best_idx].detach().cpu().item())
+        metrics.population_diversity_final = self._eds_population_diversity(population)
+        metrics.target_distance_after = self._eds_target_distance(population, keypoints, best_idx)
+        metrics.action_mask_violation_max = max_action_mask_violation
+        metrics.eds_loop_latency_s = float(time.perf_counter() - loop_start)
+        if metrics.per_iter:
+            metrics.score_entropy = metrics.per_iter[-1].score_entropy
+            metrics.unique_parent_ratio_mean = float(
+                sum(item.unique_parent_ratio for item in metrics.per_iter)
+                / len(metrics.per_iter)
+            )
+        else:
+            metrics.score_entropy = self._eds_score_entropy(population_scores, cfg.temperature)
+
+        self._last_eds_metrics = metrics.to_jsonable()
+        self._last_eds_artifacts = {
+            "initial_actions": initial_action_candidates,
+            "final_actions": self._decode_visualization_action_candidates(population).detach().cpu(),
+            "final_scores": population_scores.detach().cpu(),
+            "selected_idx": best_idx,
+            "per_iter": artifact_iters,
+        }
+        if trace_enabled:
+            self._last_eds_mechanism_trace = EDSMechanismTrace(
+                suite=None,
+                task_id=None,
+                episode=None,
+                global_step=int(global_step),
+                reward_mode=cfg.reward_mode,
+                population_size=cfg.population_size,
+                cem_iters=cfg.cem_iters,
+                use_cem=cfg.use_cem,
+                keypoints=keypoints.detach().cpu() if keypoints is not None else None,
+                scoring_keypoint_indices=self._eds_infer_scoring_keypoint_indices(
+                    guidance_fns,
+                    keypoints,
+                ),
+                stages=trace_stages,
+                selected_idx=best_idx,
+            )
+        else:
+            self._last_eds_mechanism_trace = None
         self._eds_update_guidance_metadata_from_cost(
             population_scores[best_idx],
             population_scores,
@@ -1865,6 +2310,8 @@ class RDTSteer:
             cem_iters=int(cfg.get("cem_iters", 20)),
             num_elites=int(cfg.get("num_elites", 32)),
             temperature=float(cfg.get("temperature", 0.1)),
+            renoise_t_max=int(cfg.get("renoise_t_max", 5)),
+            renoise_t_min=int(cfg.get("renoise_t_min", 1)),
             initial_population_cache=cfg.get("initial_population_cache", None),
             ed_population_cache=cfg.get("ed_population_cache", None),
             use_initial_cache=_parse_eds_bool(
@@ -1874,6 +2321,9 @@ class RDTSteer:
                 cfg.get("save_initial_cache", False), "save_initial_cache"
             ),
             save_ed_cache=_parse_eds_bool(cfg.get("save_ed_cache", False), "save_ed_cache"),
+            reward_mode=str(cfg.get("reward_mode", "normal")),
+            shuffle_seed=int(cfg.get("shuffle_seed", 0)),
+            mechanism_pretest=cfg.get("mechanism_pretest", None),
         )
         if resolved.population_size <= 0:
             raise ValueError("EDS population_size must be positive")
@@ -1881,6 +2331,14 @@ class RDTSteer:
             raise ValueError("EDS cem_iters must be positive")
         if not math.isfinite(resolved.temperature) or resolved.temperature <= 0:
             raise ValueError("EDS temperature must be finite and positive")
+        if resolved.renoise_t_max <= 0 or resolved.renoise_t_min <= 0:
+            raise ValueError("EDS renoise_t_max and renoise_t_min must be positive")
+        if resolved.renoise_t_min > resolved.renoise_t_max:
+            raise ValueError("EDS renoise_t_min must be <= renoise_t_max")
+        if resolved.reward_mode not in {"normal", "zero", "shuffled_keypoints", "inverted"}:
+            raise ValueError(
+                "EDS reward_mode must be one of normal, zero, shuffled_keypoints, inverted"
+            )
         if resolved.use_cem and resolved.num_elites > resolved.population_size:
             raise ValueError(
                 "EDS num_elites must be <= population_size when use_cem=true"

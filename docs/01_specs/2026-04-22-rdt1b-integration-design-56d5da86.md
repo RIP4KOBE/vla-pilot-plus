@@ -1,4 +1,5 @@
 ---
+date: 2026-04-22
 archived_on: 2026-06-03
 source_worktree: main-worktree
 source_branch: chore/integrate-rdt-libero-vls

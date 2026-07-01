@@ -4,6 +4,7 @@ No real checkpoint or GPU required — uses stub RDT model.
 """
 import inspect
 import sys
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from types import ModuleType
 from unittest.mock import MagicMock
@@ -50,6 +51,69 @@ def _patch_core_imports(monkeypatch):
     libero_adapter = ModuleType("core.env_adapters.libero_adapter")
     libero_adapter.LiberoAdapter = _LiberoAdapter
     monkeypatch.setitem(sys.modules, "core.env_adapters.libero_adapter", libero_adapter)
+
+    if not (root / "core" / "eds_eval_metrics.py").exists():
+        eds_eval_metrics = ModuleType("core.eds_eval_metrics")
+
+        @dataclass
+        class EDSIterMetrics:
+            iter_idx: int
+            n_trunc_steps: int
+            best_idx: int
+            best_cost: float
+            best_reward: float
+            mean_reward: float
+            reward_spread: float
+            score_entropy: float
+            unique_parent_ratio: float
+            population_diversity: float
+
+        @dataclass
+        class EDSChunkMetrics:
+            episode: int | None = None
+            global_step: int | None = None
+            task_id: int | None = None
+            suite: str | None = None
+            guidance_type: str = "eds"
+            reward_mode: str = "normal"
+            population_size: int = 0
+            cem_iters: int = 0
+            use_cem: bool = False
+            temperature: float = 0.0
+            eds_enter_count: int = 0
+            score_call_count: int = 0
+            resample_count: int = 0
+            renoise_count: int = 0
+            rollout_count: int = 0
+            population_size_observed: int = 0
+            population_shape: list[int] = field(default_factory=list)
+            score_shape: list[int] = field(default_factory=list)
+            initial_best_reward: float | None = None
+            final_best_reward: float | None = None
+            initial_mean_reward: float | None = None
+            final_mean_reward: float | None = None
+            reward_spread: float | None = None
+            selected_reward: float | None = None
+            selected_cost: float | None = None
+            selected_idx: int | None = None
+            score_entropy: float | None = None
+            unique_parent_ratio_mean: float | None = None
+            population_diversity_initial: float | None = None
+            population_diversity_final: float | None = None
+            target_distance_before: float | None = None
+            target_distance_after: float | None = None
+            action_mask_violation_max: float = 0.0
+            nonfinite_count: int = 0
+            select_action_latency_s: float | None = None
+            eds_loop_latency_s: float | None = None
+            per_iter: list[EDSIterMetrics] = field(default_factory=list)
+
+            def to_jsonable(self):
+                return asdict(self)
+
+        eds_eval_metrics.EDSIterMetrics = EDSIterMetrics
+        eds_eval_metrics.EDSChunkMetrics = EDSChunkMetrics
+        monkeypatch.setitem(sys.modules, "core.eds_eval_metrics", eds_eval_metrics)
 
     yield
 
@@ -607,6 +671,8 @@ def test_eds_config_defaults_match_reference_signature(stub_steer):
     assert cfg.cem_iters == 20
     assert cfg.num_elites == 32
     assert cfg.temperature == 0.1
+    assert cfg.renoise_t_max == 5
+    assert cfg.renoise_t_min == 1
     assert cfg.use_initial_cache is False
     assert cfg.save_initial_cache is False
     assert cfg.save_ed_cache is False
@@ -630,6 +696,11 @@ def test_eds_config_rejects_invalid_bool_string(stub_steer):
         stub_steer._resolve_eds_config_with_reference_defaults({"use_cem": "sometimes"})
 
 
+def test_eds_config_rejects_invalid_reward_mode(stub_steer):
+    with pytest.raises(ValueError, match="reward_mode"):
+        stub_steer._resolve_eds_config_with_reference_defaults({"reward_mode": "sparse"})
+
+
 @pytest.mark.parametrize("temperature", [float("nan"), float("inf")])
 def test_eds_config_rejects_non_finite_temperature(stub_steer, temperature):
     with pytest.raises(ValueError, match="temperature"):
@@ -640,6 +711,13 @@ def test_eds_config_rejects_nonpositive_cem_elites(stub_steer):
     with pytest.raises(ValueError, match="num_elites"):
         stub_steer._resolve_eds_config_with_reference_defaults(
             {"population_size": 4, "use_cem": True, "num_elites": 0}
+        )
+
+
+def test_eds_config_rejects_invalid_renoise_schedule(stub_steer):
+    with pytest.raises(ValueError, match="renoise_t_min"):
+        stub_steer._resolve_eds_config_with_reference_defaults(
+            {"renoise_t_max": 1, "renoise_t_min": 3}
         )
 
 
@@ -849,7 +927,13 @@ def test_eds_loop_calls_rollout_after_renoise_each_iteration(
         generate_new_chunk=True,
         use_guidance=True,
         guidance_type="eds",
-        eds_config={"population_size": 3, "cem_iters": 2, "temperature": 0.1},
+        eds_config={
+            "population_size": 3,
+            "cem_iters": 2,
+            "temperature": 0.1,
+            "renoise_t_max": 3,
+            "renoise_t_min": 1,
+        },
         guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
         keypoints=np.zeros((3, 3), dtype=np.float32),
     )
@@ -860,6 +944,8 @@ def test_eds_loop_calls_rollout_after_renoise_each_iteration(
     assert calls[3][0] == "rollout"
     assert calls[0][1] == calls[1][1]
     assert calls[2][1] == calls[3][1]
+    assert calls[0][1] == 3
+    assert calls[2][1] == 1
 
 
 @pytest.mark.parametrize("bad_score", [float("nan"), float("inf")])
@@ -878,7 +964,14 @@ def test_eds_loop_rejects_nonfinite_initial_scores_before_resampling(
     )
     resample_calls = []
 
-    def fake_score_population_as_cost(samples, *, keypoints, guidance_fns):
+    def fake_score_population_as_cost(
+        samples,
+        *,
+        keypoints,
+        guidance_fns,
+        reward_mode="normal",
+        shuffle_seed=0,
+    ):
         scores = torch.tensor([0.0, bad_score, 1.0], device=samples.device, dtype=samples.dtype)
         return scores, {"rewards": -scores}
 
@@ -951,7 +1044,14 @@ def test_eds_loop_cem_resamples_elites_then_renoises_and_rolls_out(
         population[:, :, 39] = markers[:, None]
         return population
 
-    def fake_score_population_as_cost(samples, *, keypoints, guidance_fns):
+    def fake_score_population_as_cost(
+        samples,
+        *,
+        keypoints,
+        guidance_fns,
+        reward_mode="normal",
+        shuffle_seed=0,
+    ):
         costs = torch.tensor([3.0, 0.0, 1.0, 2.0], device=samples.device, dtype=samples.dtype)
         return costs, {"rewards": -costs}
 
@@ -1061,6 +1161,209 @@ def test_eds_loop_caches_visualization_candidates_best_first(
         torch.sort(saved["ed_population"][:, 0, 39]).values,
         torch.tensor([10.0, 20.0, 30.0]),
     )
+
+
+def test_eds_loop_records_deployment_counters(stub_steer, stub_adapter, mock_batch):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+
+    stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_type="eds",
+        eds_config={"population_size": 3, "cem_iters": 2, "temperature": 0.1},
+        guidance_fns=[lambda keypoints, traj: torch.sum(traj[:, -1, 0])],
+        keypoints=np.array([[0.0, 0.0, 0.0]], dtype=np.float32),
+    )
+
+    metrics = stub_steer.get_last_eds_metrics()
+    artifacts = stub_steer.get_last_eds_artifacts()
+
+    assert metrics is not None
+    assert metrics["eds_enter_count"] == 1
+    assert metrics["score_call_count"] == 3
+    assert metrics["resample_count"] == 2
+    assert metrics["renoise_count"] == 2
+    assert metrics["rollout_count"] == 2
+    assert metrics["population_shape"] == [3, 64, 128]
+    assert metrics["score_shape"] == [3]
+    assert metrics["population_size_observed"] == 3
+    assert metrics["nonfinite_count"] == 0
+    assert metrics["selected_idx"] == int(torch.argmin(artifacts["final_scores"]).item())
+
+
+def test_eds_zero_reward_records_no_reward_spread(stub_steer, stub_adapter, mock_batch):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+
+    stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_type="eds",
+        eds_config={
+            "population_size": 3,
+            "cem_iters": 1,
+            "temperature": 0.1,
+            "reward_mode": "zero",
+        },
+        guidance_fns=[lambda keypoints, traj: torch.sum(traj[:, -1, 0])],
+        keypoints=np.array([[0.0, 0.0, 0.0]], dtype=np.float32),
+    )
+
+    metrics = stub_steer.get_last_eds_metrics()
+
+    assert metrics is not None
+    assert metrics["reward_mode"] == "zero"
+    assert metrics["initial_best_reward"] == 0.0
+    assert metrics["final_best_reward"] == 0.0
+    assert metrics["reward_spread"] == 0.0
+
+
+def test_eds_artifacts_are_decoded_action_candidates(stub_steer, stub_adapter, mock_batch):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+
+    stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_type="eds",
+        eds_config={"population_size": 3, "cem_iters": 1, "temperature": 0.1},
+        guidance_fns=[lambda keypoints, traj: torch.sum(traj[:, -1, 0])],
+        keypoints=np.array([[0.0, 0.0, 0.0]], dtype=np.float32),
+    )
+
+    artifacts = stub_steer.get_last_eds_artifacts()
+
+    assert artifacts is not None
+    assert tuple(artifacts["initial_actions"].shape) == (3, 4, 7)
+    assert tuple(artifacts["final_actions"].shape) == (3, 4, 7)
+    assert tuple(artifacts["final_scores"].shape) == (3,)
+    assert artifacts["initial_actions"].shape[-1] == 7
+    assert artifacts["final_actions"].shape[-1] != 128
+    assert len(artifacts["per_iter"]) == 1
+    assert tuple(artifacts["per_iter"][0]["actions"].shape) == (3, 4, 7)
+    assert tuple(artifacts["per_iter"][0]["scores"].shape) == (3,)
+
+
+def test_eds_mechanism_pretest_trace_records_single_step_stages(
+    stub_steer, stub_adapter, mock_batch
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 8},
+    )
+
+    stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_type="eds",
+        keypoints=np.zeros((1, 3), dtype=np.float32),
+        guidance_fns=[
+            lambda keypoints, traj: -torch.linalg.norm(
+                traj[:, -1, :3] - keypoints[0, :3],
+                dim=-1,
+            ).sum()
+        ],
+        eds_config={
+            "population_size": 3,
+            "cem_iters": 2,
+            "temperature": 0.1,
+            "mechanism_pretest": {
+                "enabled": True,
+                "first_chunk_only": True,
+                "save_single_step": True,
+                "save_full_process": True,
+                "save_tensors": True,
+                "plot_3d": False,
+                "max_full_process_iters": 2,
+            },
+        },
+        global_step=0,
+    )
+
+    trace = stub_steer.get_last_eds_mechanism_trace()
+
+    assert trace is not None
+    assert trace.global_step == 0
+    assert trace.population_size == 3
+    assert trace.reward_mode == "normal"
+    assert {stage.stage for stage in trace.stages} >= {
+        "initial",
+        "scored",
+        "resampled",
+        "renoised",
+        "after_rollout",
+    }
+    resampled = next(stage for stage in trace.stages if stage.stage == "resampled")
+    assert resampled.parent_indices is not None
+    assert resampled.parent_ranks is not None
+    assert tuple(resampled.parent_ranks.shape) == (3,)
+
+
+def test_eds_mechanism_pretest_first_chunk_only_skips_later_chunks(
+    stub_steer, stub_adapter, mock_batch
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 8},
+    )
+
+    stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_type="eds",
+        keypoints=np.zeros((1, 3), dtype=np.float32),
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        eds_config={
+            "population_size": 3,
+            "cem_iters": 1,
+            "temperature": 0.1,
+            "mechanism_pretest": {"enabled": True, "first_chunk_only": True},
+        },
+        global_step=8,
+    )
+
+    assert stub_steer.get_last_eds_mechanism_trace() is None
+
+
+def test_eds_infers_scoring_keypoint_index_from_guidance_source(stub_steer):
+    def guidance(keypoints, trajectory):
+        return trajectory[..., 0].sum()
+
+    guidance._guidance_source_text = """
+def stage1_guidance(keypoints, action_sequence):
+    target_idx = torch.tensor([2], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    return -torch.norm(action_sequence - target_pos, dim=-1).mean()
+"""
+
+    indices = stub_steer._eds_infer_scoring_keypoint_indices(
+        [guidance],
+        torch.zeros(4, 3),
+    )
+
+    assert indices == [2]
 
 
 def test_rdt_guidance_type_invalid_raises_clear_error(stub_steer, stub_adapter, mock_batch):
