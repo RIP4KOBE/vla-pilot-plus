@@ -28,6 +28,9 @@ vlm_agent:
   api_key: null             # Reads OPENAI_API_KEY env var; set in .env
   temperature: 1.0
   max_completion_tokens: 2000
+  api_max_retries: 3
+  api_retry_backoff_seconds: 2.0
+  api_retry_max_backoff_seconds: 30.0
   query_template_dir: vlm_query/
 
 # ============================================================
@@ -60,4 +63,3 @@ gemini_grounding:
 gemini:
   api_key: null             # Reads GOOGLE_API_KEY env var; set in .env
   model: gemini-2.5-flash
-

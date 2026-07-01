@@ -27,4 +27,5 @@ libero:
 
   # Perturbation settings for OOD evaluation
   auto_apply_perturbations: true
+  strict_perturbations: false
   task_ids_filter: null #[2, 6, 8] #[0, 2, 3, 4, 8] #= all tasks, or list like [0, 1, 2], we do not need this

@@ -60,11 +60,40 @@ main:
     cem_iters: 20
     num_elites: 32
     temperature: 0.1
+    renoise_t_max: 5
+    renoise_t_min: 1
     initial_population_cache: null
     ed_population_cache: null
     use_initial_cache: false
     save_initial_cache: false
     save_ed_cache: false
+
+  eds_eval:
+    enabled: false
+    write_metrics: true
+    save_qualitative: false
+    output_dir: ${main.output_dir}/eds_eval
+    report_dir: docs/03_evidence/eds_steering
+    method_label: null
+    job_id: null
+    reward_mode: normal  # valid: normal, zero, shuffled_keypoints, inverted
+    shuffle_seed: 0
+    max_visual_chunks_per_episode: 2
+    save_population_cloud: true
+    save_per_iter_best: true
+    save_initial_vs_final: true
+
+  eds_mechanism_pretest:
+    enabled: false
+    first_chunk_only: true
+    save_single_step: true
+    save_full_process: true
+    save_tensors: true
+    plot_3d: true
+    output_dir: outputs/rdt_eds_mechanism_pretest
+    run_id: null
+    max_chunks: 1
+    max_full_process_iters: 10
 
 # ============================================================
 # Experiment Tracking

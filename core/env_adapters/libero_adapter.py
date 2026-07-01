@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import logging
 import os
+import shutil
 import sys
 import yaml
 import einops
@@ -116,8 +117,13 @@ except ModuleNotFoundError as exc:
 
 # Import LIBERO-PRO benchmark
 LIBERO_PRO_PATH = Path(__file__).parent.parent.parent / "third_party" / "libero_pro"
+LOCAL_LIBERO_CONFIG_PATH = Path(__file__).parent.parent.parent / ".libero_config"
+os.environ.setdefault("LIBERO_CONFIG_PATH", str(LOCAL_LIBERO_CONFIG_PATH))
 if str(LIBERO_PRO_PATH) not in sys.path:
     sys.path.insert(0, str(LIBERO_PRO_PATH))
+_pythonpath_parts = [part for part in os.environ.get("PYTHONPATH", "").split(os.pathsep) if part]
+if str(LIBERO_PRO_PATH) not in _pythonpath_parts:
+    os.environ["PYTHONPATH"] = os.pathsep.join([str(LIBERO_PRO_PATH), *_pythonpath_parts])
 LIBERO_PATH = Path(__file__).parent.parent.parent / "third_party" / "libero"
 if LIBERO_PATH.exists() and str(LIBERO_PATH) not in sys.path:
     sys.path.insert(0, str(LIBERO_PATH))
@@ -238,6 +244,20 @@ def _parse_perturbation_type(suite_name: str) -> tuple[str, dict[str, bool]]:
     return base_suite, flags
 
 
+def _suite_requests_perturbation(suite_name: str) -> bool:
+    _base_suite, flags = _parse_perturbation_type(suite_name)
+    return any(bool(value) for value in flags.values())
+
+
+_PERTURBATION_FLAG_KEYS = [
+    "use_environment",
+    "use_swap",
+    "use_object",
+    "use_language",
+    "use_task",
+]
+
+
 def _apply_perturbations(suite_name: str) -> tuple[str, bool]:
     """
     Apply OOD perturbations to create perturbed BDDL and init files if needed.
@@ -268,19 +288,24 @@ def _apply_perturbations(suite_name: str) -> tuple[str, bool]:
     evaluation_config_path = str(LIBERO_PRO_PATH / "evaluation_config.yaml")
     if not Path(evaluation_config_path).exists():
         log.warning(f"Warning: evaluation_config.yaml not found at {evaluation_config_path}")
-        return suite_name
+        return suite_name, False
 
     with open(evaluation_config_path, "r") as f:
         configs = yaml.safe_load(f)
 
-    # Update configs with perturbation flags
-    configs.update(flags)
+    # Single-perturbation suites override evaluation_config.yaml. Temp suites use
+    # the flags from evaluation_config.yaml, so do not overwrite them with the
+    # parser's default False values.
+    if not flags.get("is_temp"):
+        configs.update(flags)
 
     # Set paths relative to base suite
     bddl_base = Path(get_libero_path("bddl_files"))
     configs["bddl_files_path"] = str(bddl_base / base_suite)
     configs["task_suite_name"] = base_suite
     configs["init_file_dir"] = get_libero_path("init_states")
+    configs["script_path"] = str(LIBERO_PRO_PATH / "notebooks" / "generate_init_states.py")
+    configs.setdefault("seed", 28)
 
     # Resolve ood config paths relative to LIBERO-PRO directory
     if "ood_task_configs" in configs:
@@ -290,9 +315,15 @@ def _apply_perturbations(suite_name: str) -> tuple[str, bool]:
     # Handle temp (combined) perturbations
     if flags.get("is_temp"):
         # For temp suites, read actual flags from config
-        for flag_key in ["use_environment", "use_swap", "use_object", "use_language", "use_task"]:
-            if flag_key in configs:
-                flags[flag_key] = configs[flag_key]
+        for flag_key in _PERTURBATION_FLAG_KEYS:
+            flags[flag_key] = bool(configs.get(flag_key, False))
+            configs[flag_key] = flags[flag_key]
+
+        if not any(flags[flag_key] for flag_key in _PERTURBATION_FLAG_KEYS):
+            raise ValueError(
+                f"Temp suite '{suite_name}' requested but evaluation_config.yaml "
+                "does not enable any LIBERO-PRO perturbation flags."
+            )
 
         # Check if environment needs to be created
         temp_bddl_path = bddl_base / f"{base_suite}_temp"
@@ -336,7 +367,7 @@ def _apply_perturbations(suite_name: str) -> tuple[str, bool]:
     else:
         # Determine perturbation suffix
         perturbation_key = None
-        for key in ["use_swap", "use_object", "use_language", "use_task", "use_environment"]:
+        for key in _PERTURBATION_FLAG_KEYS:
             if flags.get(key):
                 perturbation_key = key
                 break
@@ -361,9 +392,22 @@ def _apply_perturbations(suite_name: str) -> tuple[str, bool]:
             log.info(f"   BDDL path: {perturbed_bddl_path} (exists: {perturbed_bddl_path.exists()})")
             log.info(f"   Init path: {perturbed_init_path} (exists: {perturbed_init_path.exists()})")
 
-            if not perturbed_init_path.exists():
+            if not perturbed_bddl_path.exists() or not perturbed_init_path.exists():
                 log.info(f"Generating perturbed environment: {perturbed_suite_name}")
                 perturbation_module.create_env(configs=configs)
+                temp_bddl_path = bddl_base / f"{base_suite}_temp"
+                temp_init_path = Path(get_libero_path("init_states")) / f"{base_suite}_temp"
+                if not temp_bddl_path.exists() or not temp_init_path.exists():
+                    raise FileNotFoundError(
+                        f"LIBERO-PRO generation did not produce expected temp suite "
+                        f"{temp_bddl_path} and {temp_init_path}"
+                    )
+                if perturbed_suite_name != f"{base_suite}_temp":
+                    shutil.copytree(temp_bddl_path, perturbed_bddl_path, dirs_exist_ok=True)
+                    shutil.copytree(temp_init_path, perturbed_init_path, dirs_exist_ok=True)
+                    log.info(
+                        f"Copied generated temp suite to requested suite: {perturbed_suite_name}"
+                    )
             else:
                 log.info(f"Perturbed environment already exists: {perturbed_suite_name}")
 
@@ -805,6 +849,7 @@ def create_libero_envs(
     visualization_height: int = 480,
     num_steps_wait: int = 10,
     max_episode_steps: int | None = None,
+    strict_perturbations: bool = False,
 ) -> List["LiberoEnv"]:
     """
     Create vectorized LIBERO-PRO environments with a consistent return shape.
@@ -821,6 +866,8 @@ def create_libero_envs(
         task: Suite name(s) (single or comma-separated)
         camera_name: Camera name(s) to use
         auto_apply_perturbations: Automatically generate perturbed environments if needed
+        strict_perturbations: Raise instead of falling back when a requested OOD suite
+            cannot be generated or loaded.
 
     Returns:
         dict[suite_name][task_id] -> vec_env (env_cls([...]) with exactly n_envs factories)
@@ -847,14 +894,28 @@ def create_libero_envs(
     # Apply OOD perturbations if needed
     actual_suite_name = suite_name_str
     read_language_from_bddl = False
+    perturbation_requested = _suite_requests_perturbation(suite_name_str)
 
     if auto_apply_perturbations:
+        if strict_perturbations and perturbation_requested:
+            if not PERTURBATION_AVAILABLE:
+                raise RuntimeError(
+                    f"LIBERO-PRO perturbation module is required for {suite_name_str}"
+                )
+            if not (LIBERO_PRO_PATH / "evaluation_config.yaml").exists():
+                raise RuntimeError(
+                    f"LIBERO-PRO evaluation_config.yaml is required for {suite_name_str}"
+                )
         try:
             actual_suite_name, read_language_from_bddl = _apply_perturbations(suite_name_str)
             if actual_suite_name != suite_name_str:
                 log.info(f"Applied perturbations: {suite_name_str} -> {actual_suite_name}")
                 log.info(f"Read language from BDDL: {read_language_from_bddl}")
         except Exception as e:
+            if strict_perturbations and perturbation_requested:
+                raise RuntimeError(
+                    f"Failed to apply required LIBERO-PRO perturbations for {suite_name_str}"
+                ) from e
             log.warning(f"Failed to apply perturbations for {suite_name_str}: {e}")
             actual_suite_name = suite_name_str
             read_language_from_bddl = False
@@ -902,6 +963,7 @@ class LiberoAdapter(BaseEnvAdapter):
             visualization_height=env_config.get("visualization_height", 480),
             num_steps_wait=env_config.get("num_steps_wait", 10),
             max_episode_steps=env_config.get("max_episode_steps"),
+            strict_perturbations=env_config.get("strict_perturbations", False),
         )
 
         # LIBERO-PRO related attributes

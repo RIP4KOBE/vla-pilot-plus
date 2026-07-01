@@ -14,6 +14,7 @@ Usage:
 import os
 import inspect
 import warnings
+from pathlib import Path
 # Suppress pydantic v2 Field attribute warnings from third-party PI05 config classes
 warnings.filterwarnings("ignore", category=UserWarning, message=".*'repr'.*Field.*")
 warnings.filterwarnings("ignore", category=UserWarning, message=".*'frozen'.*Field.*")
@@ -73,6 +74,34 @@ def _config_section_to_dict(section: Any, section_name: str) -> dict:
         raise TypeError(f"{section_name} must be a mapping, got {type(section).__name__}")
     raise TypeError(f"{section_name} must be a mapping, got {type(section).__name__}")
 
+
+def _adapter_actual_task_id(adapter: Any) -> int | None:
+    """Return the dataset task id, preserving filtered LIBERO task ids."""
+    current_task_idx = getattr(adapter, "current_task_idx", None)
+    envs = getattr(adapter, "_env", None)
+    if current_task_idx is not None and envs is not None:
+        try:
+            current_env = envs[int(current_task_idx)]
+            task_id = getattr(current_env, "task_id", None)
+            if task_id is not None:
+                return int(task_id)
+        except (IndexError, KeyError, TypeError, ValueError):
+            pass
+
+    task_id = getattr(adapter, "task_id", None)
+    if task_id is not None:
+        try:
+            return int(task_id)
+        except (TypeError, ValueError):
+            pass
+
+    if current_task_idx is not None:
+        try:
+            return int(current_task_idx)
+        except (TypeError, ValueError):
+            return None
+    return None
+
 # Add project root to path (for local modules like steer_utils, utils, etc.)
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 if PROJECT_ROOT not in sys.path:
@@ -92,8 +121,12 @@ from core.sam3_segmenter import create_segmenter as create_sam3_segmenter
 from core.gemini_grounder import create_gemini_grounder, create_gemini_stage_recognizer
 from vlm_query.vlm_agent import VLMAgent
 from utils.vis_utils import TrajectoryVideoRecorder, add_text_to_image
+from utils.eds_eval_vis import save_eds_qualitative_artifacts
+from utils.eds_mechanism_pretest_vis import save_eds_mechanism_pretest_artifacts
 
 from core.policy_observation_sampling import policy_observation_sample_num
+from core.eds_eval_metrics import append_jsonl
+from core.eds_mechanism_trace import build_run_id, save_mechanism_trace
 
 # Import logging utility
 from utils.logging_utils import SteerLogger
@@ -643,6 +676,8 @@ class Main:
         UPPER_THRESHOLD = self.config.get("schmitt_upper", 0.8)
         LOWER_THRESHOLD = self.config.get("schmitt_lower", 0.6)
         action_chunk = None
+        qualitative_chunks_saved = 0
+        pretest_chunks_saved = 0
 
         log.info(f"Task description: {self.adapter.get_task_description()}")
 
@@ -700,6 +735,22 @@ class Main:
 
             vls_config = _config_section_to_dict(self.config.get("vls_config"), "main.vls_config")
             eds_config = _config_section_to_dict(self.config.get("eds_config"), "main.eds_config")
+            eds_eval_config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
+            eds_pretest_config = _config_section_to_dict(
+                self.config.get("eds_mechanism_pretest"),
+                "main.eds_mechanism_pretest",
+            )
+            if eds_eval_config:
+                eds_config["reward_mode"] = eds_eval_config.get(
+                    "reward_mode",
+                    eds_config.get("reward_mode", "normal"),
+                )
+                eds_config["shuffle_seed"] = eds_eval_config.get(
+                    "shuffle_seed",
+                    eds_config.get("shuffle_seed", 0),
+                )
+            if eds_pretest_config:
+                eds_config["mechanism_pretest"] = eds_pretest_config
             vls_config["guide_scale"] = getattr(
                 self,
                 "current_guide_scale",
@@ -751,7 +802,116 @@ class Main:
                     )
                 select_kwargs.update(legacy_vls_kwargs)
 
+            select_action_start_s = time.perf_counter()
             action_chunk = self.policy.select_action(**select_kwargs)
+            select_action_latency_s = float(time.perf_counter() - select_action_start_s)
+            actual_task_id = _adapter_actual_task_id(self.adapter)
+
+            if (
+                generate_new_chunk
+                and use_guidance
+                and guidance_type == "eds"
+                and eds_eval_config.get("enabled", False)
+                and eds_eval_config.get("write_metrics", True)
+                and hasattr(self.policy, "get_last_eds_metrics")
+            ):
+                eds_metrics = self.policy.get_last_eds_metrics()
+                if eds_metrics is not None:
+                    eds_metrics.update(
+                        {
+                            "episode": int(episode),
+                            "global_step": int(global_steps),
+                            "suite": getattr(self.adapter, "suite_name", None),
+                            "task_id": actual_task_id,
+                            "method_label": eds_eval_config.get("method_label"),
+                            "job_id": eds_eval_config.get("job_id"),
+                            "num_elites": eds_config.get("num_elites"),
+                            "renoise_t_max": eds_config.get("renoise_t_max"),
+                            "renoise_t_min": eds_config.get("renoise_t_min"),
+                            "select_action_latency_s": select_action_latency_s,
+                        }
+                    )
+                    if (
+                        eds_eval_config.get("save_qualitative", False)
+                        and qualitative_chunks_saved
+                        < int(eds_eval_config.get("max_visual_chunks_per_episode", 2))
+                        and hasattr(self.policy, "get_last_eds_artifacts")
+                    ):
+                        artifacts = self.policy.get_last_eds_artifacts()
+                        if artifacts is not None:
+                            visual_root = Path(
+                                eds_eval_config.get("output_dir", self.output_dir)
+                            ) / "qualitative"
+                            saved_artifacts = save_eds_qualitative_artifacts(
+                                output_dir=visual_root,
+                                adapter=self.adapter,
+                                keypoints=keypoints,
+                                mask_ids=mask_ids,
+                                artifacts=artifacts,
+                                episode=int(episode),
+                                global_step=int(global_steps),
+                                max_iters=int(
+                                    eds_config.get("cem_iters", 10)
+                                    if eds_eval_config.get("save_per_iter_best", True)
+                                    else 0
+                                ),
+                            )
+                            if saved_artifacts:
+                                eds_metrics["qualitative_artifacts"] = saved_artifacts
+                                qualitative_chunks_saved += 1
+                    metrics_path = (
+                        Path(eds_eval_config.get("output_dir", self.output_dir))
+                        / "eds_metrics.jsonl"
+                    )
+                    append_jsonl(metrics_path, eds_metrics)
+
+            if (
+                generate_new_chunk
+                and use_guidance
+                and guidance_type == "eds"
+                and eds_pretest_config.get("enabled", False)
+                and pretest_chunks_saved < int(eds_pretest_config.get("max_chunks", 1))
+                and hasattr(self.policy, "get_last_eds_mechanism_trace")
+            ):
+                trace = self.policy.get_last_eds_mechanism_trace()
+                if trace is not None:
+                    trace.suite = getattr(self.adapter, "suite_name", None)
+                    trace.task_id = actual_task_id
+                    trace.episode = int(episode)
+                    seed = int(eds_pretest_config.get("seed", 0))
+                    run_id = eds_pretest_config.get("run_id") or build_run_id(
+                        suite=str(trace.suite or "unknown_suite"),
+                        task_id=int(trace.task_id if trace.task_id is not None else -1),
+                        seed=seed,
+                        reward_mode=str(trace.reward_mode),
+                        population_size=int(trace.population_size),
+                        cem_iters=int(trace.cem_iters),
+                    )
+                    pretest_root = (
+                        Path(
+                            eds_pretest_config.get(
+                                "output_dir",
+                                "outputs/rdt_eds_mechanism_pretest",
+                            )
+                        )
+                        / run_id
+                    )
+                    saved_trace_paths = save_mechanism_trace(
+                        pretest_root,
+                        trace,
+                        save_tensors=bool(eds_pretest_config.get("save_tensors", True)),
+                    )
+                    saved_plot_paths = []
+                    if bool(eds_pretest_config.get("plot_3d", True)):
+                        saved_plot_paths = save_eds_mechanism_pretest_artifacts(
+                            pretest_root,
+                            trace,
+                        )
+                    log.info(
+                        f"[EDS_PRETEST] saved {len(saved_trace_paths)} trace artifacts "
+                        f"and {len(saved_plot_paths)} plot artifacts to {pretest_root}"
+                    )
+                    pretest_chunks_saved += 1
 
             if hasattr(self.adapter, 'env_postprocessor'):
                 action_transition = {"action": action_chunk}

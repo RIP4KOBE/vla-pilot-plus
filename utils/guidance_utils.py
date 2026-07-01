@@ -108,7 +108,11 @@ def load_functions_from_txt(txt_path, validate=True):
     wrapped_functions = []
     for name, func in lvars_dict.items():
         if callable(func):
-            wrapped_functions.append(wrap_guidance_function_with_device_fix(func))
+            wrapped = wrap_guidance_function_with_device_fix(func)
+            wrapped._guidance_source_text = functions_text
+            wrapped._guidance_source_path = str(txt_path)
+            wrapped._guidance_original_func = func
+            wrapped_functions.append(wrapped)
     
     # Validate functions with dummy inputs
     if validate and wrapped_functions:
