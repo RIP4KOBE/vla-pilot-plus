@@ -1,5 +1,5 @@
-assets: /home/hynx/VLA-Pilot++/.worktrees/feat/rdt_ed_steering_integration/third_party/libero_pro/libero/libero/assets
-bddl_files: /home/hynx/VLA-Pilot++/.worktrees/feat/rdt_ed_steering_integration/third_party/libero_pro/libero/libero/bddl_files
-benchmark_root: /home/hynx/VLA-Pilot++/.worktrees/feat/rdt_ed_steering_integration/third_party/libero_pro/libero/libero
-datasets: /home/hynx/VLA-Pilot++/.worktrees/feat/rdt_ed_steering_integration/third_party/libero_pro/libero/datasets
-init_states: /home/hynx/VLA-Pilot++/.worktrees/feat/rdt_ed_steering_integration/third_party/libero_pro/libero/libero/init_files
+assets: /home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-pg-diverse-sampling/third_party/libero_pro/libero/libero/assets
+bddl_files: /home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-pg-diverse-sampling/third_party/libero_pro/libero/libero/bddl_files
+benchmark_root: /home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-pg-diverse-sampling/third_party/libero_pro/libero/libero
+datasets: /home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-pg-diverse-sampling/third_party/libero_pro/libero/datasets
+init_states: /home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-pg-diverse-sampling/third_party/libero_pro/libero/libero/init_files
