@@ -1680,6 +1680,47 @@ def test_eds_loop_records_deployment_counters(stub_steer, stub_adapter, mock_bat
     assert metrics["selected_idx"] == int(torch.argmin(artifacts["final_scores"]).item())
 
 
+def test_eds_loop_records_initial_sampler_metrics(
+    stub_steer, stub_adapter, mock_batch, monkeypatch
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+
+    def fake_diversity(x_t):
+        grad = torch.zeros_like(x_t)
+        grad[:, :4, 39] = torch.tensor([0.0, 1.0, -1.0]).view(3, 1)
+        return grad
+
+    monkeypatch.setattr(stub_steer, "_compute_diversity_gradient", fake_diversity)
+
+    stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_type="eds",
+        eds_config={
+            "population_size": 3,
+            "cem_iters": 1,
+            "temperature": 0.1,
+            "initial_sampling_mode": "rbf_diverse_denoise",
+            "initial_diversity_scale": 1.0,
+        },
+        guidance_fns=[lambda keypoints, traj: torch.sum(traj[:, -1, 0])],
+        keypoints=np.array([[0.0, 0.0, 0.0]], dtype=np.float32),
+    )
+
+    metrics = stub_steer.get_last_eds_metrics()
+
+    assert metrics["initial_sampling_mode"] == "rbf_diverse_denoise"
+    assert metrics["initial_diversity_steps"] > 0
+    assert metrics["initial_diversity_fallback_used"] is False
+    assert metrics["initial_sampler_latency_s"] is not None
+
+
 def test_eds_zero_reward_records_no_reward_spread(stub_steer, stub_adapter, mock_batch):
     stub_steer.post_init(
         adapter=stub_adapter,
