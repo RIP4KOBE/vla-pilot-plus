@@ -1629,6 +1629,112 @@ class RDTSteer:
                 ).prev_sample.to(dtype=x_t.dtype)
         return population, {"initial_diversity_steps": 0}
 
+    def _eds_initial_fallback_to_iid(
+        self,
+        *,
+        x_t: Tensor,
+        cond: dict,
+        cfg: _EDSConfig,
+        reason: str,
+    ) -> tuple[Tensor, dict]:
+        log.warning(
+            "EDS initial sampler fallback to iid: "
+            f"initial_sampling_mode={cfg.initial_sampling_mode} reason={reason} "
+            f"population_shape={tuple(x_t.shape)}"
+        )
+        population, info = self._eds_initial_denoise_iid(x_t=x_t, cond=cond, cfg=cfg)
+        info = {**self._eds_empty_initial_sampler_info(cfg), **info}
+        info["initial_diversity_fallback_used"] = True
+        info["initial_diversity_fallback_reason"] = reason
+        return population, info
+
+    def _eds_initial_denoise_rbf_diverse(
+        self,
+        *,
+        x_t: Tensor,
+        cond: dict,
+        cfg: _EDSConfig,
+    ) -> tuple[Tensor, dict]:
+        if x_t.shape[0] <= 1:
+            return self._eds_initial_fallback_to_iid(
+                x_t=x_t,
+                cond=cond,
+                cfg=cfg,
+                reason="population_size<=1",
+            )
+
+        population = x_t
+        scheduler = self._noise_scheduler
+        scheduler.set_timesteps(self._num_inference_steps)
+        start_step = self._resolve_start_step(
+            scheduler.timesteps,
+            cfg.initial_diversity_start_ratio,
+        )
+        grad_norms: list[float] = []
+        grad_failures = 0
+        diversity_steps = 0
+
+        for i, t in enumerate(scheduler.timesteps):
+            with torch.no_grad():
+                model_output = self._dit(population, t, cond)
+
+            if int(t.item()) > start_step:
+                div_grad = self._compute_diversity_gradient(population)
+                if div_grad is None:
+                    grad_failures += 1
+                    return self._eds_initial_fallback_to_iid(
+                        x_t=x_t,
+                        cond=cond,
+                        cfg=cfg,
+                        reason=f"diversity_gradient_none_at_step={i}_t={int(t.item())}",
+                    )
+                if not torch.isfinite(div_grad).all():
+                    grad_failures += 1
+                    return self._eds_initial_fallback_to_iid(
+                        x_t=x_t,
+                        cond=cond,
+                        cfg=cfg,
+                        reason=f"non-finite_diversity_gradient_at_step={i}_t={int(t.item())}",
+                    )
+
+                masked_div = self._mask_guidance_gradient(div_grad).to(
+                    device=model_output.device,
+                    dtype=model_output.dtype,
+                )
+                grad_norms.append(float(masked_div.detach().norm().cpu().item()))
+                model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += (
+                    RDT_DIVERSITY_SIGN
+                    * float(cfg.initial_diversity_scale)
+                    * masked_div[:, :, RDT_GUIDED_TRANSLATION_INDICES]
+                )
+                diversity_steps += 1
+
+            if not torch.isfinite(model_output).all():
+                return self._eds_initial_fallback_to_iid(
+                    x_t=x_t,
+                    cond=cond,
+                    cfg=cfg,
+                    reason=f"non-finite_model_output_at_step={i}_t={int(t.item())}",
+                )
+            population = scheduler.step(model_output, t, population).prev_sample.to(
+                dtype=x_t.dtype
+            )
+            if not torch.isfinite(population).all():
+                return self._eds_initial_fallback_to_iid(
+                    x_t=x_t,
+                    cond=cond,
+                    cfg=cfg,
+                    reason=f"non-finite_population_at_step={i}_t={int(t.item())}",
+                )
+
+        info = self._eds_empty_initial_sampler_info(cfg)
+        info["initial_diversity_steps"] = diversity_steps
+        info["initial_diversity_grad_failure_count"] = grad_failures
+        if grad_norms:
+            info["initial_diversity_grad_norm_mean"] = float(sum(grad_norms) / len(grad_norms))
+            info["initial_diversity_grad_norm_max"] = float(max(grad_norms))
+        return population, info
+
     def _eds_initial_population(self, *, x_t: Tensor, cond: dict, cfg: _EDSConfig) -> Tensor:
         start = time.perf_counter()
         self._last_eds_initial_sampler_info = self._eds_empty_initial_sampler_info(cfg)
@@ -1672,16 +1778,14 @@ class RDTSteer:
 
         if cfg.initial_sampling_mode == "iid":
             population, info = self._eds_initial_denoise_iid(x_t=x_t, cond=cond, cfg=cfg)
+        elif cfg.initial_sampling_mode == "rbf_diverse_denoise":
+            population, info = self._eds_initial_denoise_rbf_diverse(
+                x_t=x_t,
+                cond=cond,
+                cfg=cfg,
+            )
         else:
-            population, info = self._eds_initial_denoise_iid(x_t=x_t, cond=cond, cfg=cfg)
-            info["initial_diversity_fallback_used"] = True
-            info["initial_diversity_fallback_reason"] = (
-                f"unimplemented initial_sampling_mode={cfg.initial_sampling_mode}"
-            )
-            log.warning(
-                "EDS initial sampler fallback to iid: "
-                f"{info['initial_diversity_fallback_reason']}"
-            )
+            raise ValueError(f"Unsupported EDS initial_sampling_mode={cfg.initial_sampling_mode!r}")
         population = self._apply_action_mask(population, cond)
         info = {**self._eds_empty_initial_sampler_info(cfg), **info}
         info["initial_sampler_latency_s"] = float(time.perf_counter() - start)

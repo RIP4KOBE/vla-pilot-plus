@@ -154,7 +154,7 @@ class _StubScheduler:
     def step(self, model_output, t, x_t):
         self.last_step_args.append((model_output.detach().clone(), int(t.item()) if torch.is_tensor(t) else int(t)))
         out = MagicMock()
-        out.prev_sample = model_output.clone()
+        out.prev_sample = x_t + model_output.clone()
         out.pred_original_sample = None
         return out
 
@@ -893,6 +893,119 @@ def test_eds_initial_population_iid_mode_preserves_shape_and_mask(stub_steer):
     assert tuple(population.shape) == (3, 64, 128)
     assert torch.count_nonzero(population[:, :, 0]) == 0
     assert torch.isfinite(population).all()
+
+
+def test_eds_initial_population_rbf_diverse_uses_diversity_gradient(
+    stub_steer, stub_adapter, monkeypatch
+):
+    from core.rdt_policy_steer import _EDSConfig
+
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    calls = {"diversity": 0}
+
+    def fake_diversity(x_t):
+        calls["diversity"] += 1
+        grad = torch.zeros_like(x_t)
+        grad[:, :4, 39] = torch.tensor([0.0, 1.0, -1.0]).view(3, 1)
+        return grad
+
+    monkeypatch.setattr(stub_steer, "_compute_diversity_gradient", fake_diversity)
+    action_mask = torch.zeros(1, 1, 128)
+    action_mask[0, 0, [39, 40, 41, 42, 43, 44, 10]] = 1.0
+
+    population = stub_steer._eds_initial_population(
+        x_t=torch.zeros(3, 64, 128),
+        cond={"action_mask": action_mask},
+        cfg=_EDSConfig(
+            population_size=3,
+            initial_sampling_mode="rbf_diverse_denoise",
+            initial_diversity_scale=2.0,
+        ),
+    )
+
+    assert calls["diversity"] > 0
+    assert tuple(population.shape) == (3, 64, 128)
+    assert torch.count_nonzero(population[:, :, 0]) == 0
+    assert torch.count_nonzero(population[:, :4, 39]) > 0
+    info = stub_steer._last_eds_initial_sampler_info
+    assert info["initial_sampling_mode"] == "rbf_diverse_denoise"
+    assert info["initial_diversity_steps"] > 0
+    assert info["initial_diversity_fallback_used"] is False
+
+
+def test_eds_initial_population_rbf_diverse_warns_and_fallbacks_to_iid(
+    stub_steer, monkeypatch, caplog
+):
+    from core import rdt_policy_steer
+    from core.rdt_policy_steer import _EDSConfig
+
+    def no_diversity(_x_t):
+        return None
+
+    monkeypatch.setattr(stub_steer, "_compute_diversity_gradient", no_diversity)
+    warnings = []
+    monkeypatch.setattr(
+        rdt_policy_steer.log,
+        "warning",
+        lambda message: warnings.append(str(message)),
+    )
+    action_mask = torch.ones(1, 1, 128)
+
+    population = stub_steer._eds_initial_population(
+        x_t=torch.zeros(3, 64, 128),
+        cond={"action_mask": action_mask},
+        cfg=_EDSConfig(
+            population_size=3,
+            initial_sampling_mode="rbf_diverse_denoise",
+        ),
+    )
+
+    assert tuple(population.shape) == (3, 64, 128)
+    warning_text = "\n".join(warnings) + caplog.text
+    assert "fallback" in warning_text.lower()
+    assert "rbf_diverse_denoise" in warning_text
+    info = stub_steer._last_eds_initial_sampler_info
+    assert info["initial_diversity_fallback_used"] is True
+    assert info["initial_diversity_fallback_reason"]
+
+
+def test_eds_initial_population_rbf_diverse_nonfinite_gradient_fallbacks(
+    stub_steer, monkeypatch, caplog
+):
+    from core import rdt_policy_steer
+    from core.rdt_policy_steer import _EDSConfig
+
+    def bad_diversity(x_t):
+        grad = torch.zeros_like(x_t)
+        grad[0, 0, 39] = float("nan")
+        return grad
+
+    monkeypatch.setattr(stub_steer, "_compute_diversity_gradient", bad_diversity)
+    warnings = []
+    monkeypatch.setattr(
+        rdt_policy_steer.log,
+        "warning",
+        lambda message: warnings.append(str(message)),
+    )
+
+    population = stub_steer._eds_initial_population(
+        x_t=torch.zeros(3, 64, 128),
+        cond={"action_mask": torch.ones(1, 1, 128)},
+        cfg=_EDSConfig(
+            population_size=3,
+            initial_sampling_mode="rbf_diverse_denoise",
+        ),
+    )
+
+    assert torch.isfinite(population).all()
+    warning_text = "\n".join(warnings) + caplog.text
+    assert "non-finite" in warning_text.lower()
+    assert stub_steer._last_eds_initial_sampler_info["initial_diversity_fallback_used"] is True
 
 
 def test_eds_initial_population_rejects_cache_strategy_mismatch(stub_steer, tmp_path):
