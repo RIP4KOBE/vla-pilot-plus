@@ -6,7 +6,11 @@ import torch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from core.eds_mechanism_trace import EDSMechanismTrace, EDSParticleStage
-from utils.eds_mechanism_pretest_vis import _axis_limits, save_eds_mechanism_pretest_artifacts
+from utils.eds_mechanism_pretest_vis import (
+    _axis_limits,
+    _initial_reference_stage,
+    save_eds_mechanism_pretest_artifacts,
+)
 
 
 def _trace():
@@ -148,6 +152,19 @@ def test_stage_axis_limits_ignore_unscored_far_keypoints():
     assert float(maxs[0] - mins[0]) < 2.0
     assert float(maxs[1] - mins[1]) < 2.0
     assert float(maxs[2] - mins[2]) < 2.0
+
+
+def test_initial_reference_stage_prefers_initial_final_when_initial_appears_first():
+    trace = _trace()
+    initial = next(stage for stage in trace.stages if stage.stage == "initial")
+    initial_final = next(stage for stage in trace.stages if stage.stage == "initial_final")
+    trace.stages = [
+        initial,
+        initial_final,
+        *(stage for stage in trace.stages if stage.stage not in {"initial", "initial_final"}),
+    ]
+
+    assert _initial_reference_stage(trace) is initial_final
 
 
 def test_summary_contains_review_protocol(tmp_path):

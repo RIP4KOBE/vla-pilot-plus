@@ -226,14 +226,7 @@ def _plot_distance_curve(path: Path, trace: EDSMechanismTrace) -> None:
 
 def _plot_final_selected_vs_initial_best(path: Path, trace: EDSMechanismTrace) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    initial = next(
-        (
-            stage
-            for stage in trace.stages
-            if stage.stage in {"initial_final", "initial"}
-        ),
-        None,
-    )
+    initial = _initial_reference_stage(trace)
     final = _full_process_stages(trace)[-1] if _full_process_stages(trace) else None
 
     fig = plt.figure(figsize=(8, 7))
@@ -279,6 +272,16 @@ def _plot_final_selected_vs_initial_best(path: Path, trace: EDSMechanismTrace) -
     fig.tight_layout()
     fig.savefig(path)
     plt.close(fig)
+
+
+def _initial_reference_stage(trace: EDSMechanismTrace) -> EDSParticleStage | None:
+    initial_final = next(
+        (stage for stage in trace.stages if stage.stage == "initial_final"),
+        None,
+    )
+    if initial_final is not None:
+        return initial_final
+    return next((stage for stage in trace.stages if stage.stage == "initial"), None)
 
 
 def _write_summary(path: Path, trace: EDSMechanismTrace) -> None:
