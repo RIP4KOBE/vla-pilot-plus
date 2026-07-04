@@ -127,6 +127,42 @@ def test_build_main_command_uses_rdt_eds_metrics_dir():
     assert forbidden_policy not in text
 
 
+def test_build_main_command_can_use_cached_guidance_offline():
+    runner = _load_runner()
+    job = next(job for job in runner.build_jobs("level2", episodes=3) if job["label"] == "p16_c10")
+
+    cmd = runner.build_main_command(
+        job,
+        gpu="3",
+        timeout_seconds=120,
+        cached_functions_dir="/tmp/vlm_cache",
+        offline_vlm=True,
+    )
+
+    assert "main.use_vlm_stage_recognition=false" in cmd
+    assert "perception.gemini_grounding.enabled=false" in cmd
+    assert "main.cached_functions_dir=/tmp/vlm_cache" in cmd
+    assert "main.use_guidance=true" in cmd
+
+
+def test_unguided_offline_command_omits_cached_guidance_override():
+    runner = _load_runner()
+    job = next(job for job in runner.build_jobs("level2", episodes=3) if job["label"] == "unguided")
+
+    cmd = runner.build_main_command(
+        job,
+        gpu="3",
+        timeout_seconds=120,
+        cached_functions_dir="/tmp/vlm_cache",
+        offline_vlm=True,
+    )
+
+    assert "main.use_vlm_stage_recognition=false" in cmd
+    assert "perception.gemini_grounding.enabled=false" in cmd
+    assert "main.use_guidance=false" in cmd
+    assert not any(part.startswith("main.cached_functions_dir=") for part in cmd)
+
+
 def test_unguided_main_command_disables_guidance_without_guidance_type():
     runner = _load_runner()
     forbidden_override = "guidance_type=" + "v" + "ls"
