@@ -1733,7 +1733,7 @@ def test_eds_loop_tolerates_malformed_initial_sampler_metrics(
 
     def fake_initial_population(*, x_t, cond, cfg):
         stub_steer._last_eds_initial_sampler_info = {
-            "initial_sampling_mode": None,
+            "initial_sampling_mode": "bogus",
             "initial_diversity_scale": "bad",
             "initial_diversity_start_ratio": float("nan"),
             "initial_diversity_steps": None,
