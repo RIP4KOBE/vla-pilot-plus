@@ -42,6 +42,16 @@ class EDSChunkMetrics:
     population_size_observed: int = 0
     population_shape: list[int] = field(default_factory=list)
     score_shape: list[int] = field(default_factory=list)
+    initial_sampling_mode: str = "iid"
+    initial_diversity_scale: float | None = None
+    initial_diversity_start_ratio: float | None = None
+    initial_diversity_steps: int = 0
+    initial_diversity_grad_norm_mean: float | None = None
+    initial_diversity_grad_norm_max: float | None = None
+    initial_diversity_grad_failure_count: int = 0
+    initial_diversity_fallback_used: bool = False
+    initial_diversity_fallback_reason: str | None = None
+    initial_sampler_latency_s: float | None = None
     initial_best_reward: float | None = None
     final_best_reward: float | None = None
     initial_mean_reward: float | None = None

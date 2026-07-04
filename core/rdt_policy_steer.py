@@ -2048,6 +2048,33 @@ class RDTSteer:
         trace_stages: list[EDSParticleStage] = []
 
         population = self._eds_initial_population(x_t=x_t, cond=cond, cfg=cfg)
+        initial_sampler_info = getattr(self, "_last_eds_initial_sampler_info", None) or {}
+        metrics.initial_sampling_mode = str(
+            initial_sampler_info.get("initial_sampling_mode", cfg.initial_sampling_mode)
+        )
+        metrics.initial_diversity_scale = float(cfg.initial_diversity_scale)
+        metrics.initial_diversity_start_ratio = cfg.initial_diversity_start_ratio
+        metrics.initial_diversity_steps = int(
+            initial_sampler_info.get("initial_diversity_steps", 0)
+        )
+        metrics.initial_diversity_grad_norm_mean = initial_sampler_info.get(
+            "initial_diversity_grad_norm_mean"
+        )
+        metrics.initial_diversity_grad_norm_max = initial_sampler_info.get(
+            "initial_diversity_grad_norm_max"
+        )
+        metrics.initial_diversity_grad_failure_count = int(
+            initial_sampler_info.get("initial_diversity_grad_failure_count", 0)
+        )
+        metrics.initial_diversity_fallback_used = bool(
+            initial_sampler_info.get("initial_diversity_fallback_used", False)
+        )
+        metrics.initial_diversity_fallback_reason = initial_sampler_info.get(
+            "initial_diversity_fallback_reason"
+        )
+        metrics.initial_sampler_latency_s = initial_sampler_info.get(
+            "initial_sampler_latency_s"
+        )
         population = self._apply_action_mask(population, cond)
 
         population_scores, population_info = self._eds_score_population_as_cost(

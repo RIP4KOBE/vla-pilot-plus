@@ -42,6 +42,26 @@ def test_eds_chunk_metrics_serializes_nested_iter_metrics():
     json.dumps(payload)
 
 
+def test_eds_chunk_metrics_serializes_initial_sampler_fields():
+    metrics = EDSChunkMetrics(
+        initial_sampling_mode="rbf_diverse_denoise",
+        initial_diversity_scale=1.0,
+        initial_diversity_steps=3,
+        initial_diversity_grad_norm_mean=0.5,
+        initial_diversity_grad_norm_max=1.0,
+        initial_diversity_grad_failure_count=0,
+        initial_diversity_fallback_used=False,
+        initial_diversity_fallback_reason=None,
+        initial_sampler_latency_s=0.25,
+    )
+
+    payload = metrics.to_jsonable()
+
+    assert payload["initial_sampling_mode"] == "rbf_diverse_denoise"
+    assert payload["initial_diversity_steps"] == 3
+    assert payload["initial_sampler_latency_s"] == 0.25
+
+
 def test_append_and_read_jsonl_round_trip(tmp_path):
     path = tmp_path / "eds_metrics.jsonl"
 
