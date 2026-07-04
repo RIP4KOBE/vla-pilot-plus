@@ -865,6 +865,78 @@ def test_eds_initial_population_masks_cached_population(stub_steer, tmp_path):
     torch.testing.assert_close(saved["initial_population"], cached)
 
 
+def test_eds_initial_population_iid_mode_preserves_shape_and_mask(stub_steer):
+    from core.rdt_policy_steer import _EDSConfig
+
+    x_t = torch.ones(3, 64, 128)
+    action_mask = torch.zeros(1, 1, 128)
+    action_mask[0, 0, [39, 40, 41, 42, 43, 44, 10]] = 1.0
+    cond = {"action_mask": action_mask}
+
+    population = stub_steer._eds_initial_population(
+        x_t=x_t,
+        cond=cond,
+        cfg=_EDSConfig(population_size=3, initial_sampling_mode="iid"),
+    )
+
+    assert tuple(population.shape) == (3, 64, 128)
+    assert torch.count_nonzero(population[:, :, 0]) == 0
+    assert torch.isfinite(population).all()
+
+
+def test_eds_initial_population_rejects_cache_strategy_mismatch(stub_steer, tmp_path):
+    from core.rdt_policy_steer import _EDSConfig
+
+    cache_path = tmp_path / "eds_initial.pt"
+    torch.save(
+        {
+            "initial_population": torch.zeros(2, 64, 128),
+            "metadata": {"initial_sampling_mode": "iid"},
+        },
+        cache_path,
+    )
+    action_mask = torch.ones(1, 1, 128)
+
+    with pytest.raises(ValueError, match="initial_population_cache.*initial_sampling_mode"):
+        stub_steer._eds_initial_population(
+            x_t=torch.zeros(2, 64, 128),
+            cond={"action_mask": action_mask},
+            cfg=_EDSConfig(
+                population_size=2,
+                use_initial_cache=True,
+                initial_population_cache=str(cache_path),
+                initial_sampling_mode="rbf_diverse_denoise",
+            ),
+        )
+
+
+def test_eds_initial_population_warns_for_legacy_cache_without_metadata(
+    stub_steer, tmp_path, caplog, monkeypatch
+):
+    from core import rdt_policy_steer
+    from core.rdt_policy_steer import _EDSConfig
+
+    cache_path = tmp_path / "legacy_eds_initial.pt"
+    torch.save({"initial_population": torch.zeros(2, 64, 128)}, cache_path)
+    action_mask = torch.ones(1, 1, 128)
+    monkeypatch.setattr(rdt_policy_steer.log.logger, "propagate", True)
+    caplog.set_level("WARNING", logger="RDTSteer")
+
+    population = stub_steer._eds_initial_population(
+        x_t=torch.zeros(2, 64, 128),
+        cond={"action_mask": action_mask},
+        cfg=_EDSConfig(
+            population_size=2,
+            use_initial_cache=True,
+            initial_population_cache=str(cache_path),
+            initial_sampling_mode="iid",
+        ),
+    )
+
+    assert tuple(population.shape) == (2, 64, 128)
+    assert "metadata" in caplog.text.lower()
+
+
 def test_eds_rollout_reference_scores_clean_denoised_population(
     stub_steer,
     stub_adapter,

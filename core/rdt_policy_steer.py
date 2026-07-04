@@ -591,6 +591,7 @@ class RDTSteer:
         self._last_visualization_action_candidates: Optional[Tensor] = None
         self._last_eds_metrics: Optional[dict] = None
         self._last_eds_artifacts: Optional[dict] = None
+        self._last_eds_initial_sampler_info: Optional[dict] = None
         self._last_eds_mechanism_trace: Optional[EDSMechanismTrace] = None
 
         # Locate the inner DiT score network once at construction.
@@ -974,6 +975,7 @@ class RDTSteer:
         self._last_visualization_action_candidates = None
         self._last_eds_metrics = None
         self._last_eds_artifacts = None
+        self._last_eds_initial_sampler_info = None
         self._last_eds_mechanism_trace = None
         if self._obs_processor is not None:
             self._obs_processor.reset()
@@ -1463,6 +1465,22 @@ class RDTSteer:
         path.parent.mkdir(parents=True, exist_ok=True)
         torch.save({label: population.detach().cpu()}, path)
 
+    def _save_eds_initial_population_cache(
+        self,
+        population: Tensor,
+        cfg: _EDSConfig,
+        info: dict,
+    ) -> None:
+        if cfg.initial_population_cache is None:
+            raise ValueError("EDS initial_population save requires a cache path")
+        path = Path(cfg.initial_population_cache)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        metadata = self._eds_initial_cache_metadata(cfg, info)
+        torch.save(
+            {"initial_population": population.detach().cpu(), "metadata": metadata},
+            path,
+        )
+
     def _eds_validate_population_scores(self, scores: Tensor, expected_size: int) -> Tensor:
         if not torch.is_tensor(scores):
             raise ValueError("EDS population scores must be a torch.Tensor")
@@ -1501,14 +1519,84 @@ class RDTSteer:
             raise ValueError("EDS sampling probabilities must be finite with positive mass")
         return probabilities / probability_mass
 
+    def _eds_empty_initial_sampler_info(self, cfg: _EDSConfig) -> dict:
+        return {
+            "initial_sampling_mode": cfg.initial_sampling_mode,
+            "initial_diversity_scale": float(cfg.initial_diversity_scale),
+            "initial_diversity_start_ratio": cfg.initial_diversity_start_ratio,
+            "initial_diversity_steps": 0,
+            "initial_diversity_grad_norm_mean": None,
+            "initial_diversity_grad_norm_max": None,
+            "initial_diversity_grad_failure_count": 0,
+            "initial_diversity_fallback_used": False,
+            "initial_diversity_fallback_reason": None,
+            "initial_sampler_latency_s": None,
+        }
+
+    def _eds_initial_cache_metadata(self, cfg: _EDSConfig, info: dict) -> dict:
+        return {
+            "initial_sampling_mode": cfg.initial_sampling_mode,
+            "initial_diversity_scale": float(cfg.initial_diversity_scale),
+            "initial_diversity_start_ratio": cfg.initial_diversity_start_ratio,
+            "initial_diversity_fallback": cfg.initial_diversity_fallback,
+            "initial_diversity_steps": int(info.get("initial_diversity_steps", 0)),
+            "initial_diversity_fallback_used": bool(
+                info.get("initial_diversity_fallback_used", False)
+            ),
+            "initial_diversity_fallback_reason": info.get(
+                "initial_diversity_fallback_reason"
+            ),
+        }
+
+    def _eds_validate_initial_cache_metadata(self, metadata: dict | None, cfg: _EDSConfig) -> None:
+        if not cfg.initial_cache_metadata:
+            return
+        if metadata is None:
+            log.warning(
+                "EDS initial_population_cache has no metadata; assuming legacy cache "
+                f"for initial_sampling_mode={cfg.initial_sampling_mode}"
+            )
+            return
+        cached_mode = metadata.get("initial_sampling_mode")
+        if cached_mode != cfg.initial_sampling_mode:
+            raise ValueError(
+                "EDS initial_population_cache initial_sampling_mode mismatch: "
+                f"cache={cached_mode!r} config={cfg.initial_sampling_mode!r}"
+            )
+
+    def _eds_initial_denoise_iid(
+        self,
+        *,
+        x_t: Tensor,
+        cond: dict,
+        cfg: _EDSConfig,
+    ) -> tuple[Tensor, dict]:
+        del cfg
+        population = x_t
+        scheduler = self._noise_scheduler
+        scheduler.set_timesteps(self._num_inference_steps)
+        with torch.no_grad():
+            for t in scheduler.timesteps:
+                model_output = self._dit(population, t, cond)
+                population = scheduler.step(
+                    model_output,
+                    t,
+                    population,
+                ).prev_sample.to(dtype=x_t.dtype)
+        return population, {"initial_diversity_steps": 0}
+
     def _eds_initial_population(self, *, x_t: Tensor, cond: dict, cfg: _EDSConfig) -> Tensor:
         if cfg.use_initial_cache:
             if cfg.initial_population_cache is None:
                 raise ValueError("EDS use_initial_cache=true requires initial_population_cache")
             cache_path = Path(cfg.initial_population_cache)
-            cached = torch.load(cache_path, map_location=x_t.device)
-            if isinstance(cached, dict) and "initial_population" in cached:
-                cached = cached["initial_population"]
+            cached_payload = torch.load(cache_path, map_location=x_t.device)
+            metadata = None
+            cached = cached_payload
+            if isinstance(cached_payload, dict) and "initial_population" in cached_payload:
+                cached = cached_payload["initial_population"]
+                metadata = cached_payload.get("metadata")
+            self._eds_validate_initial_cache_metadata(metadata, cfg)
             if not torch.is_tensor(cached):
                 raise TypeError("Cached EDS initial_population must be a torch.Tensor")
             expected = (cfg.population_size, x_t.shape[1], x_t.shape[2])
@@ -1518,26 +1606,35 @@ class RDTSteer:
                 )
             population = self._apply_action_mask(cached.to(device=x_t.device, dtype=x_t.dtype), cond)
             if cfg.save_initial_cache:
-                self._save_eds_population_cache(
+                self._save_eds_initial_population_cache(
                     population,
-                    cfg.initial_population_cache,
-                    label="initial_population",
+                    cfg,
+                    self._eds_empty_initial_sampler_info(cfg),
                 )
             return population
 
-        population = x_t
-        scheduler = self._noise_scheduler
-        scheduler.set_timesteps(self._num_inference_steps)
-        with torch.no_grad():
-            for t in scheduler.timesteps:
-                model_output = self._dit(population, t, cond)
-                population = scheduler.step(model_output, t, population).prev_sample.to(dtype=x_t.dtype)
+        start = time.perf_counter()
+        if cfg.initial_sampling_mode == "iid":
+            population, info = self._eds_initial_denoise_iid(x_t=x_t, cond=cond, cfg=cfg)
+        else:
+            population, info = self._eds_initial_denoise_iid(x_t=x_t, cond=cond, cfg=cfg)
+            info["initial_diversity_fallback_used"] = True
+            info["initial_diversity_fallback_reason"] = (
+                f"unimplemented initial_sampling_mode={cfg.initial_sampling_mode}"
+            )
+            log.warning(
+                "EDS initial sampler fallback to iid: "
+                f"{info['initial_diversity_fallback_reason']}"
+            )
         population = self._apply_action_mask(population, cond)
+        info = {**self._eds_empty_initial_sampler_info(cfg), **info}
+        info["initial_sampler_latency_s"] = float(time.perf_counter() - start)
+        self._last_eds_initial_sampler_info = info
         if cfg.save_initial_cache:
-            self._save_eds_population_cache(
+            self._save_eds_initial_population_cache(
                 population,
-                cfg.initial_population_cache,
-                label="initial_population",
+                cfg,
+                info,
             )
         return population
 
