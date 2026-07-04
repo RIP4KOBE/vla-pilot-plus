@@ -972,6 +972,7 @@ def test_eds_initial_population_rbf_diverse_warns_and_fallbacks_to_iid(
     info = stub_steer._last_eds_initial_sampler_info
     assert info["initial_diversity_fallback_used"] is True
     assert info["initial_diversity_fallback_reason"]
+    assert info["initial_diversity_grad_failure_count"] == 1
 
 
 def test_eds_initial_population_rbf_diverse_nonfinite_gradient_fallbacks(
@@ -1005,7 +1006,9 @@ def test_eds_initial_population_rbf_diverse_nonfinite_gradient_fallbacks(
     assert torch.isfinite(population).all()
     warning_text = "\n".join(warnings) + caplog.text
     assert "non-finite" in warning_text.lower()
-    assert stub_steer._last_eds_initial_sampler_info["initial_diversity_fallback_used"] is True
+    info = stub_steer._last_eds_initial_sampler_info
+    assert info["initial_diversity_fallback_used"] is True
+    assert info["initial_diversity_grad_failure_count"] == 1
 
 
 def test_eds_initial_population_rejects_cache_strategy_mismatch(stub_steer, tmp_path):
