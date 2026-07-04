@@ -146,6 +146,20 @@ LEVEL3_METHODS = METHODS
 LEVEL4_METHODS = [
     METHODS[0],
     {
+        "method": "eds_rbf_diverse_initial",
+        "label": "eds_rbf_diverse_initial",
+        "population_size": 16,
+        "cem_iters": 10,
+        "use_cem": False,
+        "num_elites": 32,
+        "temperature": 0.1,
+        **REFERENCE_RENOISE,
+        "reward_mode": "normal",
+        "initial_sampling_mode": "rbf_diverse_denoise",
+        "initial_diversity_scale": 1.0,
+        "initial_diversity_start_ratio": None,
+    },
+    {
         "method": "eds_softmax_strong_weak_renoise",
         "label": "eds_softmax_strong_weak_renoise",
         "population_size": 32,
@@ -210,6 +224,10 @@ STATUS_FIELDS = [
 
 def now_iso() -> str:
     return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
+
+
+def _hydra_optional(value: object) -> str:
+    return "null" if value is None else str(value)
 
 
 def ensure_dirs() -> None:
@@ -311,6 +329,10 @@ def build_main_command(
                 f"main.eds_config.renoise_t_max={job['renoise_t_max']}",
                 f"main.eds_config.renoise_t_min={job['renoise_t_min']}",
                 f"main.eds_eval.reward_mode={job['reward_mode']}",
+                f"main.eds_config.initial_sampling_mode={job.get('initial_sampling_mode', 'iid')}",
+                f"main.eds_config.initial_diversity_scale={job.get('initial_diversity_scale', 1.0)}",
+                "main.eds_config.initial_diversity_start_ratio="
+                f"{_hydra_optional(job.get('initial_diversity_start_ratio'))}",
             ]
         )
     return command
@@ -603,6 +625,14 @@ def write_level4_report(episodes: int = 10) -> Path:
             for record in metrics
             if isinstance(record.get("eds_loop_latency_s"), (int, float))
         ]
+        initial_sampler_latency_values = [
+            float(record["initial_sampler_latency_s"])
+            for record in metrics
+            if isinstance(record.get("initial_sampler_latency_s"), (int, float))
+        ]
+        initial_fallback_count = sum(
+            1 for record in metrics if record.get("initial_diversity_fallback_used") is True
+        )
         rows.append(
             {
                 "suite": job["suite"],
@@ -613,6 +643,8 @@ def write_level4_report(episodes: int = 10) -> Path:
                 "success_rate": parsed["success_rate"],
                 "select_latency_mean": _mean(latency_values),
                 "eds_latency_mean": _mean(eds_latency_values),
+                "initial_sampler_latency_mean": _mean(initial_sampler_latency_values),
+                "initial_fallback_count": initial_fallback_count,
                 "videos": artifacts["videos"],
                 "metrics_records": artifacts["metrics_records"],
                 "qualitative_png": artifacts["qualitative_png"],
@@ -634,23 +666,29 @@ def write_level4_report(episodes: int = 10) -> Path:
         "- Policy: `rdt` only.",
         "- Benchmark: LIBERO-PRO OOD perturbations on `libero_object` only.",
         "- Episodes per job: `10`.",
-        "- Methods: `unguided`, `eds_softmax_strong_weak_renoise`, `eds_cem_resample_weak_renoise`.",
+        "- Methods: `unguided`, `eds_rbf_diverse_initial`, `eds_softmax_strong_weak_renoise`, `eds_cem_resample_weak_renoise`.",
         "- RDT+VLS, PI05, and previous wrong-checkpoint OOD runs are excluded.",
         "",
         "## Method Configs",
         "",
-        "| Method | Guidance | population_size | cem_iters | use_cem | num_elites | temperature | renoise_t_max -> min |",
-        "| --- | --- | ---: | ---: | --- | ---: | ---: | --- |",
+        "| Method | Guidance | population_size | cem_iters | use_cem | num_elites | temperature | renoise_t_max -> min | initial_sampling_mode | initial_diversity_scale | initial_diversity_start_ratio |",
+        "| --- | --- | ---: | ---: | --- | ---: | ---: | --- | --- | ---: | --- |",
     ]
     for method in LEVEL4_METHODS:
         if method["method"] == "unguided":
-            lines.append("| unguided | off | - | - | - | - | - | - |")
+            lines.append("| unguided | off | - | - | - | - | - | - | - | - | - |")
         else:
+            initial_sampling_mode = method.get("initial_sampling_mode", "iid")
+            initial_diversity_scale = method.get("initial_diversity_scale", 1.0)
+            initial_diversity_start_ratio = _hydra_optional(
+                method.get("initial_diversity_start_ratio")
+            )
             lines.append(
-                "| {label} | EDS | {population_size} | {cem_iters} | {use_cem} | "
-                "{num_elites} | {temperature} | {renoise_t_max} -> {renoise_t_min} |".format(
-                    **method
-                )
+                f"| {method['label']} | EDS | {method['population_size']} | "
+                f"{method['cem_iters']} | {method['use_cem']} | {method['num_elites']} | "
+                f"{method['temperature']} | {method['renoise_t_max']} -> "
+                f"{method['renoise_t_min']} | {initial_sampling_mode} | "
+                f"{initial_diversity_scale} | {initial_diversity_start_ratio} |"
             )
 
     lines.extend(
@@ -658,8 +696,8 @@ def write_level4_report(episodes: int = 10) -> Path:
             "",
             "## Success Rates",
             "",
-            "| Suite | Method | Complete | Success | SR % | Mean select latency s | Mean EDS latency s | Videos | Metrics records | Qualitative PNGs |",
-            "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+            "| Suite | Method | Complete | Success | SR | Select Latency Mean | EDS Latency Mean | Initial Sampler Latency Mean | Initial Fallback Count | Videos | Metrics | Qual PNG |",
+            "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
         ]
     )
     for row in rows:
@@ -679,9 +717,15 @@ def write_level4_report(episodes: int = 10) -> Path:
             if row["eds_latency_mean"] is not None
             else "-"
         )
+        initial_sampler_latency = (
+            f"{row['initial_sampler_latency_mean']:.3f}"
+            if row["initial_sampler_latency_mean"] is not None
+            else "-"
+        )
         lines.append(
             f"| `{row['suite']}` | `{row['method']}` | `{row['complete']}` | "
             f"{success_cell} | {sr_cell} | {select_latency} | {eds_latency} | "
+            f"{initial_sampler_latency} | {row['initial_fallback_count']} | "
             f"{row['videos']} | {row['metrics_records']} | {row['qualitative_png']} |"
         )
 
@@ -704,7 +748,7 @@ def write_level4_report(episodes: int = 10) -> Path:
         lines.append("Blocked/incomplete jobs:")
         lines.extend(f"- `{job_id}`" for job_id in incomplete)
     else:
-        lines.append("- All 18 Level 4 jobs have complete output markers.")
+        lines.append("- All 24 Level 4 jobs have complete output markers.")
         lines.append("- Every EDS job has a non-empty `eds_eval/eds_metrics.jsonl`.")
         lines.append("- `backend.libero.strict_perturbations=true` was used for Level 4 commands.")
 
@@ -716,6 +760,7 @@ def write_level4_report(episodes: int = 10) -> Path:
             "- Success/failure is parsed from each job's `results.txt`; process exit code alone is not treated as the result.",
             "- Video counts are based on `episode_*/*.mp4` under each job output directory.",
             "- Qualitative counts include saved keypoint, selected trajectory, population cloud, per-iteration best trajectory, and initial-vs-final overlays.",
+            "- Initial fallback count is the number of metrics records with `initial_diversity_fallback_used=true`.",
         ]
     )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")

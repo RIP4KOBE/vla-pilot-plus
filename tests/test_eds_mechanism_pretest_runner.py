@@ -36,3 +36,19 @@ def test_build_control_commands_include_zero_and_inverted_only():
     assert any("main.eds_eval.reward_mode=zero" in item for item in joined)
     assert any("main.eds_eval.reward_mode=inverted" in item for item in joined)
     assert not any("shuffled_keypoints" in item for item in joined)
+
+
+def test_build_pretest_command_can_enable_rbf_diverse_initial_sampler():
+    runner = _load_runner()
+
+    cmd = runner.build_pretest_command(
+        reward_mode="normal",
+        output_root=Path("outputs/pretest"),
+        initial_sampling_mode="rbf_diverse_denoise",
+        initial_diversity_scale=1.0,
+        initial_diversity_start_ratio=None,
+    )
+
+    assert "main.eds_config.initial_sampling_mode=rbf_diverse_denoise" in cmd
+    assert "main.eds_config.initial_diversity_scale=1.0" in cmd
+    assert "main.eds_config.initial_diversity_start_ratio=null" in cmd
