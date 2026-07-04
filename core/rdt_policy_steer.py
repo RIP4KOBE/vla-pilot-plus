@@ -1694,6 +1694,13 @@ class RDTSteer:
         }
 
     def _eds_validate_initial_cache_metadata(self, metadata: Mapping | None, cfg: _EDSConfig) -> None:
+        if not cfg.initial_cache_metadata:
+            log.warning(
+                "EDS initial_population_cache metadata validation is disabled; "
+                "initial sampler cache telemetry will use the current config "
+                f"initial_sampling_mode={cfg.initial_sampling_mode}"
+            )
+            return
         if metadata is None:
             if cfg.initial_sampling_mode != "iid":
                 raise ValueError(
