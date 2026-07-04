@@ -1,4 +1,5 @@
 import importlib.util
+import json
 from pathlib import Path
 
 
@@ -57,8 +58,19 @@ def test_level4_only_libero_object_perturbation_suites():
         "unguided",
         "eds_softmax_strong_weak_renoise",
         "eds_cem_resample_weak_renoise",
+        "eds_rbf_diverse_initial",
     }
-    assert len(jobs) == 18
+    assert len(jobs) == 24
+
+
+def test_level4_jobs_include_rbf_diverse_initial_sampler_variant():
+    runner = _load_runner()
+
+    jobs = runner.build_jobs("level4", episodes=10)
+    job = next(job for job in jobs if job["label"] == "eds_rbf_diverse_initial")
+
+    assert job["method"] == "eds_rbf_diverse_initial"
+    assert job["initial_sampling_mode"] == "rbf_diverse_denoise"
 
 
 def test_level2_smoke_uses_libero_object_and_required_ablations():
@@ -144,6 +156,78 @@ def test_level4_command_uses_strict_perturbations_video_and_method_overrides():
     assert "main.eds_config.temperature=1.0" in cmd
     assert "main.eds_config.renoise_t_max=3" in cmd
     assert "main.eds_config.renoise_t_min=1" in cmd
+
+
+def test_rbf_diverse_initial_sampler_command_adds_initial_overrides():
+    runner = _load_runner()
+    job = next(
+        job
+        for job in runner.build_jobs("level4", episodes=10)
+        if job["label"] == "eds_rbf_diverse_initial"
+    )
+
+    cmd = runner.build_main_command(job, gpu="3", timeout_seconds=120)
+
+    assert "main.eds_config.initial_sampling_mode=rbf_diverse_denoise" in cmd
+    assert "main.eds_config.initial_diversity_scale=1.0" in cmd
+    assert "main.eds_config.initial_diversity_start_ratio=null" in cmd
+
+
+def test_unguided_main_command_omits_initial_sampler_overrides():
+    runner = _load_runner()
+    job = next(job for job in runner.build_jobs("level4", episodes=10) if job["label"] == "unguided")
+
+    cmd = runner.build_main_command(job, gpu="3", timeout_seconds=120)
+
+    assert not any(part.startswith("main.eds_config.initial_sampling_mode=") for part in cmd)
+    assert not any(part.startswith("main.eds_config.initial_diversity_scale=") for part in cmd)
+    assert not any(part.startswith("main.eds_config.initial_diversity_start_ratio=") for part in cmd)
+
+
+def test_level4_report_includes_initial_sampler_latency_and_fallbacks(tmp_path):
+    runner = _load_runner()
+    runner.WORKTREE_ROOT = tmp_path
+    runner.EVIDENCE_ROOT = tmp_path / "evidence"
+    runner.RUN_ROOT = tmp_path / "runs"
+    job = next(
+        job
+        for job in runner.build_jobs("level4", episodes=10)
+        if job["label"] == "eds_rbf_diverse_initial"
+    )
+    output_dir = runner.RUN_ROOT / job["job_id"]
+    metrics_dir = output_dir / "eds_eval"
+    metrics_dir.mkdir(parents=True)
+    (output_dir / "results.txt").write_text(
+        "Success count: 1/2\nSuccess rate: 50.00%\n",
+        encoding="utf-8",
+    )
+    records = [
+        {
+            "select_action_latency_s": 2.0,
+            "eds_loop_latency_s": 0.5,
+            "initial_sampler_latency_s": 0.1,
+            "initial_diversity_fallback_used": True,
+        },
+        {
+            "select_action_latency_s": 4.0,
+            "eds_loop_latency_s": 1.5,
+            "initial_sampler_latency_s": 0.3,
+            "initial_diversity_fallback_used": False,
+        },
+    ]
+    (metrics_dir / "eds_metrics.jsonl").write_text(
+        "\n".join(json.dumps(record) for record in records) + "\n",
+        encoding="utf-8",
+    )
+
+    report = runner.write_level4_report(episodes=10)
+    text = report.read_text(encoding="utf-8")
+
+    assert (
+        "| Suite | Method | Complete | Success | SR | Select Latency Mean | EDS Latency Mean | "
+        "Initial Sampler Latency Mean | Initial Fallback Count | Videos | Metrics | Qual PNG |"
+    ) in text
+    assert "| `libero_object_object` | `eds_rbf_diverse_initial` | `True` | 1/2 | 50.00 | 3.000 | 1.000 | 0.200 | 1 | 0 | 2 | 0 |" in text
 
 
 def test_level_report_names_match_protocol():

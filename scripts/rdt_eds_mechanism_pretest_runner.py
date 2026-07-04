@@ -10,7 +10,18 @@ WORKTREE_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT_ROOT = WORKTREE_ROOT / "outputs" / "rdt_eds_mechanism_pretest"
 
 
-def build_pretest_command(*, reward_mode: str, output_root: Path) -> list[str]:
+def _hydra_optional(value: str | None) -> str:
+    return "null" if value is None else str(value)
+
+
+def build_pretest_command(
+    *,
+    reward_mode: str,
+    output_root: Path,
+    initial_sampling_mode: str = "iid",
+    initial_diversity_scale: float = 1.0,
+    initial_diversity_start_ratio: str | None = None,
+) -> list[str]:
     return [
         "python",
         "main.py",
@@ -30,6 +41,10 @@ def build_pretest_command(*, reward_mode: str, output_root: Path) -> list[str]:
         "main.eds_config.population_size=16",
         "main.eds_config.cem_iters=10",
         "main.eds_config.use_cem=false",
+        f"main.eds_config.initial_sampling_mode={initial_sampling_mode}",
+        f"main.eds_config.initial_diversity_scale={initial_diversity_scale}",
+        "main.eds_config.initial_diversity_start_ratio="
+        f"{_hydra_optional(initial_diversity_start_ratio)}",
         "main.eds_eval.enabled=true",
         "main.eds_eval.write_metrics=true",
         "main.eds_eval.save_qualitative=false",
@@ -45,10 +60,28 @@ def build_pretest_command(*, reward_mode: str, output_root: Path) -> list[str]:
     ]
 
 
-def build_control_commands(*, output_root: Path) -> list[list[str]]:
+def build_control_commands(
+    *,
+    output_root: Path,
+    initial_sampling_mode: str = "iid",
+    initial_diversity_scale: float = 1.0,
+    initial_diversity_start_ratio: str | None = None,
+) -> list[list[str]]:
     return [
-        build_pretest_command(reward_mode="zero", output_root=output_root),
-        build_pretest_command(reward_mode="inverted", output_root=output_root),
+        build_pretest_command(
+            reward_mode="zero",
+            output_root=output_root,
+            initial_sampling_mode=initial_sampling_mode,
+            initial_diversity_scale=initial_diversity_scale,
+            initial_diversity_start_ratio=initial_diversity_start_ratio,
+        ),
+        build_pretest_command(
+            reward_mode="inverted",
+            output_root=output_root,
+            initial_sampling_mode=initial_sampling_mode,
+            initial_diversity_scale=initial_diversity_scale,
+            initial_diversity_start_ratio=initial_diversity_start_ratio,
+        ),
     ]
 
 
@@ -61,13 +94,29 @@ def main() -> int:
         help="Run zero and inverted controls instead of the selected reward mode.",
     )
     parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
+    parser.add_argument("--initial-sampling-mode", default="iid")
+    parser.add_argument("--initial-diversity-scale", type=float, default=1.0)
+    parser.add_argument("--initial-diversity-start-ratio", default=None)
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
     commands = (
-        build_control_commands(output_root=args.output_root)
+        build_control_commands(
+            output_root=args.output_root,
+            initial_sampling_mode=args.initial_sampling_mode,
+            initial_diversity_scale=args.initial_diversity_scale,
+            initial_diversity_start_ratio=args.initial_diversity_start_ratio,
+        )
         if args.controls
-        else [build_pretest_command(reward_mode=args.reward_mode, output_root=args.output_root)]
+        else [
+            build_pretest_command(
+                reward_mode=args.reward_mode,
+                output_root=args.output_root,
+                initial_sampling_mode=args.initial_sampling_mode,
+                initial_diversity_scale=args.initial_diversity_scale,
+                initial_diversity_start_ratio=args.initial_diversity_start_ratio,
+            )
+        ]
     )
     for cmd in commands:
         print(" ".join(str(part) for part in cmd))
