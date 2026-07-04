@@ -939,6 +939,57 @@ def test_eds_initial_population_rbf_diverse_uses_diversity_gradient(
     assert info["initial_diversity_fallback_used"] is False
 
 
+def test_eds_mechanism_trace_records_rbf_initial_sampler_stages(
+    stub_steer, stub_adapter, mock_batch, monkeypatch
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+
+    def fake_diversity(x_t):
+        grad = torch.zeros_like(x_t)
+        grad[:, :4, 39] = torch.tensor([0.0, 1.0, -1.0]).view(3, 1)
+        return grad
+
+    monkeypatch.setattr(stub_steer, "_compute_diversity_gradient", fake_diversity)
+
+    stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_type="eds",
+        keypoints=np.zeros((1, 3), dtype=np.float32),
+        guidance_fns=[lambda keypoints, traj: -torch.linalg.norm(traj[:, -1, :3], dim=-1).sum()],
+        eds_config={
+            "population_size": 3,
+            "cem_iters": 1,
+            "temperature": 0.1,
+            "initial_sampling_mode": "rbf_diverse_denoise",
+            "mechanism_pretest": {
+                "enabled": True,
+                "first_chunk_only": True,
+                "save_single_step": True,
+                "save_full_process": True,
+                "save_tensors": True,
+                "plot_3d": False,
+                "max_full_process_iters": 1,
+            },
+        },
+        global_step=0,
+    )
+
+    trace = stub_steer.get_last_eds_mechanism_trace()
+    stages = {stage.stage for stage in trace.stages}
+
+    assert "initial_before_diversity" in stages
+    assert "initial_after_diversity_phase" in stages
+    assert "initial_final" in stages
+    assert trace.initial_sampler_info["initial_sampling_mode"] == "rbf_diverse_denoise"
+
+
 def test_eds_initial_population_rbf_diverse_cache_restores_telemetry(
     stub_steer, stub_adapter, tmp_path, monkeypatch
 ):

@@ -1755,6 +1755,7 @@ class RDTSteer:
             f"initial_sampling_mode={cfg.initial_sampling_mode} reason={reason} "
             f"population_shape={tuple(x_t.shape)}"
         )
+        self._last_eds_initial_sampler_trace_stages = []
         population, info = self._eds_initial_denoise_iid(x_t=x_t, cond=cond, cfg=cfg)
         info = {**self._eds_empty_initial_sampler_info(cfg), **info}
         info["initial_diversity_fallback_used"] = True
@@ -1778,6 +1779,10 @@ class RDTSteer:
             )
 
         population = x_t
+        trace_stages: list[tuple[str, Tensor]] = [
+            ("initial_before_diversity", population.detach())
+        ]
+        recorded_after_diversity = False
         scheduler = self._noise_scheduler
         scheduler.set_timesteps(self._num_inference_steps)
         start_step = self._resolve_start_step(
@@ -1789,6 +1794,10 @@ class RDTSteer:
         diversity_steps = 0
 
         for i, t in enumerate(scheduler.timesteps):
+            if int(t.item()) <= start_step and diversity_steps > 0 and not recorded_after_diversity:
+                trace_stages.append(("initial_after_diversity_phase", population.detach()))
+                recorded_after_diversity = True
+
             with torch.no_grad():
                 model_output = self._dit(population, t, cond)
 
@@ -1849,11 +1858,16 @@ class RDTSteer:
         if grad_norms:
             info["initial_diversity_grad_norm_mean"] = float(sum(grad_norms) / len(grad_norms))
             info["initial_diversity_grad_norm_max"] = float(max(grad_norms))
+        if diversity_steps > 0 and not recorded_after_diversity:
+            trace_stages.append(("initial_after_diversity_phase", population.detach()))
+        trace_stages.append(("initial_final", population.detach()))
+        self._last_eds_initial_sampler_trace_stages = trace_stages
         return population, info
 
     def _eds_initial_population(self, *, x_t: Tensor, cond: dict, cfg: _EDSConfig) -> Tensor:
         start = time.perf_counter()
         self._last_eds_initial_sampler_info = self._eds_empty_initial_sampler_info(cfg)
+        self._last_eds_initial_sampler_trace_stages = []
         if cfg.use_initial_cache:
             if cfg.initial_population_cache is None:
                 raise ValueError("EDS use_initial_cache=true requires initial_population_cache")
@@ -2148,10 +2162,11 @@ class RDTSteer:
         trace_stages: list[EDSParticleStage] = []
 
         population = self._eds_initial_population(x_t=x_t, cond=cond, cfg=cfg)
+        initial_sampler_info = getattr(self, "_last_eds_initial_sampler_info", None) or {}
         _populate_initial_sampler_metrics(
             metrics,
             cfg,
-            getattr(self, "_last_eds_initial_sampler_info", None),
+            initial_sampler_info,
         )
         population = self._apply_action_mask(population, cond)
 
@@ -2188,6 +2203,29 @@ class RDTSteer:
             population
         ).detach().cpu()
         if trace_enabled:
+            rewards_for_initial = self._eds_rewards_from_info(
+                population_scores,
+                population_info,
+            )
+            costs_for_initial = population_scores
+            for stage_name, stage_population in getattr(
+                self,
+                "_last_eds_initial_sampler_trace_stages",
+                [],
+            ):
+                stage_population = self._apply_action_mask(
+                    stage_population.to(device=population.device, dtype=population.dtype),
+                    cond,
+                )
+                trace_stages.append(
+                    self._eds_make_trace_stage(
+                        stage=stage_name,
+                        iter_idx=0,
+                        population=stage_population,
+                        costs=costs_for_initial,
+                        info={"rewards": rewards_for_initial},
+                    )
+                )
             trace_stages.append(
                 self._eds_make_trace_stage(
                     stage="initial",
@@ -2435,6 +2473,7 @@ class RDTSteer:
                 ),
                 stages=trace_stages,
                 selected_idx=best_idx,
+                initial_sampler_info=dict(initial_sampler_info),
             )
         else:
             self._last_eds_mechanism_trace = None

@@ -40,6 +40,7 @@ class EDSMechanismTrace:
     scoring_keypoint_indices: list[int] | None = None
     stages: list[EDSParticleStage] = field(default_factory=list)
     selected_idx: int | None = None
+    initial_sampler_info: dict[str, Any] = field(default_factory=dict)
 
 
 CSV_FIELDS = [
@@ -123,6 +124,7 @@ def _metadata_payload(trace: EDSMechanismTrace) -> dict[str, Any]:
         "use_cem": trace.use_cem,
         "selected_idx": trace.selected_idx,
         "scoring_keypoint_indices": trace.scoring_keypoint_indices,
+        "initial_sampler_info": trace.initial_sampler_info,
         "keypoints_shape": _shape_or_none(trace.keypoints),
         "num_stages": len(trace.stages),
         "stages": [

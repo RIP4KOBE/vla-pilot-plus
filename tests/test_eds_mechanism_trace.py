@@ -1,4 +1,5 @@
 import sys
+import json
 from csv import DictReader
 from pathlib import Path
 
@@ -62,6 +63,41 @@ def test_save_mechanism_trace_writes_metadata_csv_and_tensors(tmp_path):
     assert (tmp_path / "single_step_inner_loop" / "single_step_particles.csv").exists()
     assert (tmp_path / "tensors" / "mechanism_trace.pt").exists()
     assert str(tmp_path / "first_chunk_metadata.json") in paths
+
+
+def test_save_mechanism_trace_records_initial_sampler_metadata(tmp_path):
+    stage = EDSParticleStage(
+        stage="initial_final",
+        iter_idx=0,
+        actions=torch.zeros(2, 64, 128),
+        trajectories=torch.zeros(2, 2, 3),
+        rewards=torch.tensor([0.1, 0.2]),
+        costs=torch.tensor([-0.1, -0.2]),
+    )
+    trace = EDSMechanismTrace(
+        suite="libero_object",
+        task_id=1,
+        episode=0,
+        global_step=0,
+        reward_mode="normal",
+        population_size=2,
+        cem_iters=1,
+        use_cem=False,
+        keypoints=None,
+        stages=[stage],
+        selected_idx=1,
+        initial_sampler_info={
+            "initial_sampling_mode": "rbf_diverse_denoise",
+            "initial_diversity_steps": 3,
+        },
+    )
+
+    save_mechanism_trace(tmp_path, trace, save_tensors=True)
+
+    metadata = json.loads((tmp_path / "first_chunk_metadata.json").read_text())
+    assert metadata["initial_sampler_info"]["initial_sampling_mode"] == "rbf_diverse_denoise"
+    payload = torch.load(tmp_path / "tensors" / "mechanism_trace.pt")
+    assert payload["metadata"]["initial_sampler_info"]["initial_diversity_steps"] == 3
 
 
 def test_parent_rank_records_pre_resample_parent_order(tmp_path):
