@@ -522,6 +522,58 @@ def test_rdt_vls_config_sample_batch_size_overrides_post_init(
     assert any(latent_shape[0] == 4 for latent_shape, _ in stub_steer._rdt_model.dit.calls)
 
 
+def test_rdt_select_action_accepts_legacy_flat_vls_kwargs(
+    stub_steer,
+    stub_adapter,
+    mock_batch,
+    monkeypatch,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=1,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    captured = {}
+
+    def fake_vls(**kwargs):
+        captured.update(kwargs["vls_config"])
+        return torch.zeros(1, 64, 128)
+
+    monkeypatch.setattr(stub_steer, "_vls_guided_denoise_loop", fake_vls)
+
+    action = stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_type="vls",
+        guide_scale=7.5,
+        sample_batch_size=4,
+        use_diversity=False,
+        diversity_scale=0.25,
+        MCMC_steps=2,
+        use_fkd=True,
+        fkd_config={"resample_frequency": 3},
+        sigmoid_k=5.0,
+        sigmoid_x0=0.4,
+        start_ratio=0.6,
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        keypoints=np.zeros((3, 3), dtype=np.float32),
+    )
+
+    assert tuple(action.shape) == (1, 4, 7)
+    assert captured["guide_scale"] == 7.5
+    assert captured["sample_batch_size"] == 4
+    assert captured["use_diversity"] is False
+    assert captured["diversity_scale"] == 0.25
+    assert captured["MCMC_steps"] == 2
+    assert captured["use_fkd"] is True
+    assert captured["fkd"] == {"resample_frequency": 3}
+    assert captured["sigmoid_k"] == 5.0
+    assert captured["sigmoid_x0"] == 0.4
+    assert captured["start_ratio"] == 0.6
+
+
 def test_rdt_vls_omitted_config_falls_back_to_post_init_sample_batch_size(
     stub_steer,
     stub_adapter,
@@ -894,6 +946,61 @@ def test_eds_initial_population_iid_mode_preserves_shape_and_mask(stub_steer):
     assert tuple(population.shape) == (3, 64, 128)
     assert torch.count_nonzero(population[:, :, 0]) == 0
     assert torch.isfinite(population).all()
+
+
+def test_eds_initial_population_iid_rejects_nonfinite_after_masking(
+    stub_steer, monkeypatch
+):
+    from core.rdt_policy_steer import _EDSConfig
+
+    def fake_iid(*, x_t, cond, cfg):
+        population = torch.zeros_like(x_t)
+        population[:, :, 39] = float("nan")
+        return population, {"initial_diversity_steps": 0}
+
+    monkeypatch.setattr(stub_steer, "_eds_initial_denoise_iid", fake_iid)
+
+    with pytest.raises(ValueError, match="EDS initial population.*finite"):
+        stub_steer._eds_initial_population(
+            x_t=torch.zeros(2, 64, 128),
+            cond={"action_mask": torch.ones(1, 1, 128)},
+            cfg=_EDSConfig(population_size=2, initial_sampling_mode="iid"),
+        )
+
+
+def test_eds_initial_population_rbf_validation_failure_fallbacks_to_iid(
+    stub_steer, monkeypatch
+):
+    from core.rdt_policy_steer import _EDSConfig
+
+    calls = {"iid": 0}
+
+    def fake_rbf(*, x_t, cond, cfg):
+        population = torch.zeros_like(x_t)
+        population[:, :, 39] = float("nan")
+        return population, {"initial_diversity_steps": 1}
+
+    def fake_iid(*, x_t, cond, cfg):
+        calls["iid"] += 1
+        return torch.zeros_like(x_t), {"initial_diversity_steps": 0}
+
+    monkeypatch.setattr(stub_steer, "_eds_initial_denoise_rbf_diverse", fake_rbf)
+    monkeypatch.setattr(stub_steer, "_eds_initial_denoise_iid", fake_iid)
+
+    population = stub_steer._eds_initial_population(
+        x_t=torch.zeros(2, 64, 128),
+        cond={"action_mask": torch.ones(1, 1, 128)},
+        cfg=_EDSConfig(
+            population_size=2,
+            initial_sampling_mode="rbf_diverse_denoise",
+        ),
+    )
+
+    assert calls["iid"] == 1
+    assert torch.isfinite(population).all()
+    info = stub_steer._last_eds_initial_sampler_info
+    assert info["initial_diversity_fallback_used"] is True
+    assert "validation" in info["initial_diversity_fallback_reason"]
 
 
 def test_eds_initial_population_rbf_diverse_uses_diversity_gradient(
@@ -1300,6 +1407,27 @@ def test_eds_initial_population_warns_for_legacy_cache_without_metadata(
 
     assert tuple(population.shape) == (2, 64, 128)
     assert any("metadata" in message.lower() for message in warnings)
+
+
+def test_eds_initial_population_rejects_rbf_legacy_cache_without_metadata(
+    stub_steer, tmp_path
+):
+    from core.rdt_policy_steer import _EDSConfig
+
+    cache_path = tmp_path / "legacy_rbf_eds_initial.pt"
+    torch.save({"initial_population": torch.zeros(2, 64, 128)}, cache_path)
+
+    with pytest.raises(ValueError, match="metadata.*rbf_diverse_denoise"):
+        stub_steer._eds_initial_population(
+            x_t=torch.zeros(2, 64, 128),
+            cond={"action_mask": torch.ones(1, 1, 128)},
+            cfg=_EDSConfig(
+                population_size=2,
+                use_initial_cache=True,
+                initial_population_cache=str(cache_path),
+                initial_sampling_mode="rbf_diverse_denoise",
+            ),
+        )
 
 
 def test_eds_initial_population_rejects_resaving_legacy_cache_without_metadata(

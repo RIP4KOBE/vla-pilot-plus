@@ -197,6 +197,19 @@ def _resolve_vls_config(vls_config: Optional[dict], *, default_sample_batch_size
     return cfg
 
 
+def _merge_legacy_vls_kwargs(vls_config: Optional[dict], **legacy_kwargs) -> dict:
+    """Merge legacy flat VLS kwargs over the preferred grouped vls_config."""
+    cfg = dict(vls_config or {})
+    for field, value in legacy_kwargs.items():
+        if value is None:
+            continue
+        if field == "fkd_config":
+            cfg["fkd"] = value
+        else:
+            cfg[field] = value
+    return cfg
+
+
 def _rdt_flat_config_to_args(flat: dict) -> dict:
     """Convert an RDTRunner-style config.json into scripts/*_model.py args."""
     img_pos = flat.get("img_pos_embed_config", [["image", [2, 3, -729]]])
@@ -1126,6 +1139,16 @@ class RDTSteer:
         guidance_type: str = "vls",
         vls_config: Optional[dict] = None,
         eds_config: Optional[dict] = None,
+        guide_scale: Optional[float] = None,
+        sample_batch_size: Optional[int] = None,
+        use_diversity: Optional[bool] = None,
+        diversity_scale: Optional[float] = None,
+        MCMC_steps: Optional[int] = None,
+        use_fkd: Optional[bool] = None,
+        fkd_config: Optional[dict] = None,
+        sigmoid_k: Optional[float] = None,
+        sigmoid_x0: Optional[float] = None,
+        start_ratio: Optional[float] = None,
         verbose: bool = False,
         global_step: int = 0,
         current_stage: int = 1,
@@ -1149,6 +1172,19 @@ class RDTSteer:
 
             if use_guidance:
                 text_embed = self._get_lang_embed(converted.task)
+                merged_vls_config = _merge_legacy_vls_kwargs(
+                    vls_config,
+                    guide_scale=guide_scale,
+                    sample_batch_size=sample_batch_size,
+                    use_diversity=use_diversity,
+                    diversity_scale=diversity_scale,
+                    MCMC_steps=MCMC_steps,
+                    use_fkd=use_fkd,
+                    fkd_config=fkd_config,
+                    sigmoid_k=sigmoid_k,
+                    sigmoid_x0=sigmoid_x0,
+                    start_ratio=start_ratio,
+                )
                 raw = self._predict_guided(
                     converted.state_128,
                     converted.state_mask_128,
@@ -1157,7 +1193,7 @@ class RDTSteer:
                     keypoints=keypoints,
                     guidance_fns=guidance_fns,
                     guidance_type=guidance_type,
-                    vls_config=vls_config,
+                    vls_config=merged_vls_config,
                     eds_config=eds_config,
                     verbose=verbose,
                     global_step=global_step,
@@ -1658,9 +1694,14 @@ class RDTSteer:
         }
 
     def _eds_validate_initial_cache_metadata(self, metadata: Mapping | None, cfg: _EDSConfig) -> None:
-        if not cfg.initial_cache_metadata:
-            return
         if metadata is None:
+            if cfg.initial_sampling_mode != "iid":
+                raise ValueError(
+                    "EDS initial_population_cache metadata is required for "
+                    f"initial_sampling_mode={cfg.initial_sampling_mode}; "
+                    "save_initial_cache cannot mint metadata for a legacy cache; "
+                    "regenerate the cache with metadata or use a matching cache strategy."
+                )
             log.warning(
                 "EDS initial_population_cache has no metadata; assuming legacy cache "
                 f"for initial_sampling_mode={cfg.initial_sampling_mode}"
@@ -1741,6 +1782,34 @@ class RDTSteer:
                 ).prev_sample.to(dtype=x_t.dtype)
         return population, {"initial_diversity_steps": 0}
 
+    def _eds_initial_validate_population(
+        self,
+        population: Tensor,
+        *,
+        cond: dict,
+        cfg: _EDSConfig,
+        expected_shape: tuple[int, int, int],
+    ) -> None:
+        if not torch.is_tensor(population):
+            raise TypeError("EDS initial population must be a torch.Tensor")
+        expected = (
+            int(cfg.population_size),
+            int(expected_shape[1]),
+            int(expected_shape[2]),
+        )
+        if tuple(population.shape) != expected:
+            raise ValueError(
+                f"EDS initial population shape {tuple(population.shape)} != {expected}"
+            )
+        if not torch.isfinite(population).all():
+            raise ValueError("EDS initial population must be finite")
+        mask_violation = self._eds_action_mask_violation(population, cond)
+        if mask_violation > 1e-6:
+            raise ValueError(
+                "EDS initial population violates action mask: "
+                f"max_violation={mask_violation:.6g}"
+            )
+
     def _eds_initial_fallback_to_iid(
         self,
         *,
@@ -1749,11 +1818,26 @@ class RDTSteer:
         cfg: _EDSConfig,
         reason: str,
         grad_failure_count: int = 0,
+        step_idx: Optional[int] = None,
+        timestep: Optional[int] = None,
+        partial_population: Optional[Tensor] = None,
     ) -> tuple[Tensor, dict]:
+        details = []
+        if step_idx is not None:
+            details.append(f"step={int(step_idx)}")
+        if timestep is not None:
+            details.append(f"timestep={int(timestep)}")
+        if partial_population is not None:
+            details.append(f"partial_population_shape={tuple(partial_population.shape)}")
+            details.append(
+                "partial_population_finite="
+                f"{bool(torch.isfinite(partial_population).all().item())}"
+            )
+        detail_text = " " + " ".join(details) if details else ""
         log.warning(
             "EDS initial sampler fallback to iid: "
             f"initial_sampling_mode={cfg.initial_sampling_mode} reason={reason} "
-            f"population_shape={tuple(x_t.shape)}"
+            f"population_shape={tuple(x_t.shape)}{detail_text}"
         )
         self._last_eds_initial_sampler_trace_stages = []
         population, info = self._eds_initial_denoise_iid(x_t=x_t, cond=cond, cfg=cfg)
@@ -1811,6 +1895,9 @@ class RDTSteer:
                         cfg=cfg,
                         reason=f"diversity_gradient_none_at_step={i}_t={int(t.item())}",
                         grad_failure_count=grad_failures,
+                        step_idx=i,
+                        timestep=int(t.item()),
+                        partial_population=population,
                     )
                 if not torch.isfinite(div_grad).all():
                     grad_failures += 1
@@ -1820,6 +1907,9 @@ class RDTSteer:
                         cfg=cfg,
                         reason=f"non-finite_diversity_gradient_at_step={i}_t={int(t.item())}",
                         grad_failure_count=grad_failures,
+                        step_idx=i,
+                        timestep=int(t.item()),
+                        partial_population=population,
                     )
 
                 masked_div = self._mask_guidance_gradient(div_grad).to(
@@ -1840,6 +1930,9 @@ class RDTSteer:
                     cond=cond,
                     cfg=cfg,
                     reason=f"non-finite_model_output_at_step={i}_t={int(t.item())}",
+                    step_idx=i,
+                    timestep=int(t.item()),
+                    partial_population=population,
                 )
             population = scheduler.step(model_output, t, population).prev_sample.to(
                 dtype=x_t.dtype
@@ -1850,6 +1943,9 @@ class RDTSteer:
                     cond=cond,
                     cfg=cfg,
                     reason=f"non-finite_population_at_step={i}_t={int(t.item())}",
+                    step_idx=i,
+                    timestep=int(t.item()),
+                    partial_population=population,
                 )
 
         info = self._eds_empty_initial_sampler_info(cfg)
@@ -1892,6 +1988,12 @@ class RDTSteer:
                     f"Cached EDS initial_population shape {tuple(cached.shape)} != {expected}"
                 )
             population = self._apply_action_mask(cached.to(device=x_t.device, dtype=x_t.dtype), cond)
+            self._eds_initial_validate_population(
+                population,
+                cond=cond,
+                cfg=cfg,
+                expected_shape=tuple(x_t.shape),
+            )
             info = self._eds_initial_sampler_info_from_cache_metadata(
                 cfg,
                 metadata,
@@ -1917,6 +2019,30 @@ class RDTSteer:
         else:
             raise ValueError(f"Unsupported EDS initial_sampling_mode={cfg.initial_sampling_mode!r}")
         population = self._apply_action_mask(population, cond)
+        try:
+            self._eds_initial_validate_population(
+                population,
+                cond=cond,
+                cfg=cfg,
+                expected_shape=tuple(x_t.shape),
+            )
+        except (TypeError, ValueError) as exc:
+            if cfg.initial_sampling_mode != "rbf_diverse_denoise":
+                raise
+            population, info = self._eds_initial_fallback_to_iid(
+                x_t=x_t,
+                cond=cond,
+                cfg=cfg,
+                reason=f"validation_failed: {exc}",
+                partial_population=population,
+            )
+            population = self._apply_action_mask(population, cond)
+            self._eds_initial_validate_population(
+                population,
+                cond=cond,
+                cfg=cfg,
+                expected_shape=tuple(x_t.shape),
+            )
         info = {**self._eds_empty_initial_sampler_info(cfg), **info}
         info["initial_sampler_latency_s"] = float(time.perf_counter() - start)
         self._last_eds_initial_sampler_info = info
