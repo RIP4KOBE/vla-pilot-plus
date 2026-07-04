@@ -1749,9 +1749,10 @@ class RDTSteer:
         metadata: Mapping | None,
         *,
         latency_s: float,
+        trust_metadata: bool = True,
     ) -> dict:
         info = self._eds_empty_initial_sampler_info(cfg)
-        if isinstance(metadata, Mapping):
+        if trust_metadata and isinstance(metadata, Mapping):
             for field in (
                 "initial_sampling_mode",
                 "initial_diversity_scale",
@@ -2005,6 +2006,7 @@ class RDTSteer:
                 cfg,
                 metadata,
                 latency_s=time.perf_counter() - start,
+                trust_metadata=cfg.initial_cache_metadata,
             )
             self._last_eds_initial_sampler_info = info
             if cfg.save_initial_cache:
