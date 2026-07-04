@@ -42,6 +42,7 @@ RDT_GUIDED_TRANSLATION_INDICES = [39, 40, 41]
 RDT_GUIDED_ACTION_INDICES = [39, 40, 41, 42, 43, 44, 10]
 RDT_GUIDANCE_SIGN = 1.0
 RDT_DIVERSITY_SIGN = -1.0
+EDS_INITIAL_SAMPLING_MODES = {"iid", "rbf_diverse_denoise"}
 
 
 @dataclass(frozen=True)
@@ -107,6 +108,12 @@ def _safe_initial_sampler_bool(value) -> bool:
     return False
 
 
+def _safe_initial_sampler_mode(value, fallback: str) -> str:
+    if isinstance(value, str) and value in EDS_INITIAL_SAMPLING_MODES:
+        return value
+    return fallback
+
+
 def _safe_initial_sampler_float_field(
     info: Mapping,
     field_name: str,
@@ -123,11 +130,9 @@ def _populate_initial_sampler_metrics(
     info: Optional[Mapping],
 ) -> None:
     initial_sampler_info = info if isinstance(info, Mapping) else {}
-    initial_sampling_mode = initial_sampler_info.get("initial_sampling_mode")
-    metrics.initial_sampling_mode = (
-        str(initial_sampling_mode)
-        if initial_sampling_mode is not None
-        else cfg.initial_sampling_mode
+    metrics.initial_sampling_mode = _safe_initial_sampler_mode(
+        initial_sampler_info.get("initial_sampling_mode"),
+        cfg.initial_sampling_mode,
     )
     metrics.initial_diversity_scale = _safe_initial_sampler_float_field(
         initial_sampler_info,
