@@ -1636,6 +1636,7 @@ class RDTSteer:
         cond: dict,
         cfg: _EDSConfig,
         reason: str,
+        grad_failure_count: int = 0,
     ) -> tuple[Tensor, dict]:
         log.warning(
             "EDS initial sampler fallback to iid: "
@@ -1646,6 +1647,7 @@ class RDTSteer:
         info = {**self._eds_empty_initial_sampler_info(cfg), **info}
         info["initial_diversity_fallback_used"] = True
         info["initial_diversity_fallback_reason"] = reason
+        info["initial_diversity_grad_failure_count"] = int(grad_failure_count)
         return population, info
 
     def _eds_initial_denoise_rbf_diverse(
@@ -1687,6 +1689,7 @@ class RDTSteer:
                         cond=cond,
                         cfg=cfg,
                         reason=f"diversity_gradient_none_at_step={i}_t={int(t.item())}",
+                        grad_failure_count=grad_failures,
                     )
                 if not torch.isfinite(div_grad).all():
                     grad_failures += 1
@@ -1695,6 +1698,7 @@ class RDTSteer:
                         cond=cond,
                         cfg=cfg,
                         reason=f"non-finite_diversity_gradient_at_step={i}_t={int(t.item())}",
+                        grad_failure_count=grad_failures,
                     )
 
                 masked_div = self._mask_guidance_gradient(div_grad).to(
