@@ -678,6 +678,16 @@ def test_eds_config_defaults_match_reference_signature(stub_steer):
     assert cfg.save_ed_cache is False
 
 
+def test_eds_config_defaults_keep_iid_initial_sampling(stub_steer):
+    cfg = stub_steer._resolve_eds_config_with_reference_defaults({})
+
+    assert cfg.initial_sampling_mode == "iid"
+    assert cfg.initial_diversity_scale == 1.0
+    assert cfg.initial_diversity_start_ratio is None
+    assert cfg.initial_diversity_fallback == "iid"
+    assert cfg.initial_cache_metadata is True
+
+
 def test_eds_config_rejects_invalid_cem_elites(stub_steer):
     with pytest.raises(ValueError, match="num_elites"):
         stub_steer._resolve_eds_config_with_reference_defaults(
@@ -699,6 +709,37 @@ def test_eds_config_rejects_invalid_bool_string(stub_steer):
 def test_eds_config_rejects_invalid_reward_mode(stub_steer):
     with pytest.raises(ValueError, match="reward_mode"):
         stub_steer._resolve_eds_config_with_reference_defaults({"reward_mode": "sparse"})
+
+
+@pytest.mark.parametrize("mode", ["fps", "rbf", "", "iid+rbf"])
+def test_eds_config_rejects_invalid_initial_sampling_mode(stub_steer, mode):
+    with pytest.raises(ValueError, match="initial_sampling_mode"):
+        stub_steer._resolve_eds_config_with_reference_defaults(
+            {"initial_sampling_mode": mode}
+        )
+
+
+@pytest.mark.parametrize("scale", [float("nan"), float("inf"), -float("inf")])
+def test_eds_config_rejects_nonfinite_initial_diversity_scale(stub_steer, scale):
+    with pytest.raises(ValueError, match="initial_diversity_scale"):
+        stub_steer._resolve_eds_config_with_reference_defaults(
+            {"initial_diversity_scale": scale}
+        )
+
+
+@pytest.mark.parametrize("ratio", [-0.1, 1.1, float("nan"), float("inf")])
+def test_eds_config_rejects_invalid_initial_diversity_start_ratio(stub_steer, ratio):
+    with pytest.raises(ValueError, match="initial_diversity_start_ratio"):
+        stub_steer._resolve_eds_config_with_reference_defaults(
+            {"initial_diversity_start_ratio": ratio}
+        )
+
+
+def test_eds_config_rejects_non_iid_initial_diversity_fallback(stub_steer):
+    with pytest.raises(ValueError, match="initial_diversity_fallback"):
+        stub_steer._resolve_eds_config_with_reference_defaults(
+            {"initial_diversity_fallback": "raise"}
+        )
 
 
 @pytest.mark.parametrize("temperature", [float("nan"), float("inf")])

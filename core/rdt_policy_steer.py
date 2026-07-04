@@ -61,6 +61,11 @@ class _EDSConfig:
     reward_mode: str = "normal"
     shuffle_seed: int = 0
     mechanism_pretest: Optional[dict] = None
+    initial_sampling_mode: str = "iid"
+    initial_diversity_scale: float = 1.0
+    initial_diversity_start_ratio: Optional[float] = None
+    initial_diversity_fallback: str = "iid"
+    initial_cache_metadata: bool = True
 
 
 def _parse_eds_bool(value, field_name: str) -> bool:
@@ -2324,6 +2329,17 @@ class RDTSteer:
             reward_mode=str(cfg.get("reward_mode", "normal")),
             shuffle_seed=int(cfg.get("shuffle_seed", 0)),
             mechanism_pretest=cfg.get("mechanism_pretest", None),
+            initial_sampling_mode=str(cfg.get("initial_sampling_mode", "iid")),
+            initial_diversity_scale=float(cfg.get("initial_diversity_scale", 1.0)),
+            initial_diversity_start_ratio=(
+                None
+                if cfg.get("initial_diversity_start_ratio", None) is None
+                else float(cfg.get("initial_diversity_start_ratio"))
+            ),
+            initial_diversity_fallback=str(cfg.get("initial_diversity_fallback", "iid")),
+            initial_cache_metadata=_parse_eds_bool(
+                cfg.get("initial_cache_metadata", True), "initial_cache_metadata"
+            ),
         )
         if resolved.population_size <= 0:
             raise ValueError("EDS population_size must be positive")
@@ -2339,6 +2355,20 @@ class RDTSteer:
             raise ValueError(
                 "EDS reward_mode must be one of normal, zero, shuffled_keypoints, inverted"
             )
+        if resolved.initial_sampling_mode not in {"iid", "rbf_diverse_denoise"}:
+            raise ValueError(
+                "EDS initial_sampling_mode must be one of iid, rbf_diverse_denoise"
+            )
+        if not math.isfinite(resolved.initial_diversity_scale):
+            raise ValueError("EDS initial_diversity_scale must be finite")
+        if resolved.initial_diversity_start_ratio is not None:
+            ratio = float(resolved.initial_diversity_start_ratio)
+            if not math.isfinite(ratio) or ratio < 0.0 or ratio > 1.0:
+                raise ValueError(
+                    "EDS initial_diversity_start_ratio must be None or a finite value in [0, 1]"
+                )
+        if resolved.initial_diversity_fallback != "iid":
+            raise ValueError("EDS initial_diversity_fallback MVP only supports iid")
         if resolved.use_cem and resolved.num_elites > resolved.population_size:
             raise ValueError(
                 "EDS num_elites must be <= population_size when use_cem=true"
