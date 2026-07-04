@@ -13,7 +13,7 @@ import os
 import re
 import sys
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional, Tuple
@@ -1548,7 +1548,7 @@ class RDTSteer:
             ),
         }
 
-    def _eds_validate_initial_cache_metadata(self, metadata: dict | None, cfg: _EDSConfig) -> None:
+    def _eds_validate_initial_cache_metadata(self, metadata: Mapping | None, cfg: _EDSConfig) -> None:
         if not cfg.initial_cache_metadata:
             return
         if metadata is None:
@@ -1557,12 +1557,56 @@ class RDTSteer:
                 f"for initial_sampling_mode={cfg.initial_sampling_mode}"
             )
             return
-        cached_mode = metadata.get("initial_sampling_mode")
-        if cached_mode != cfg.initial_sampling_mode:
-            raise ValueError(
-                "EDS initial_population_cache initial_sampling_mode mismatch: "
-                f"cache={cached_mode!r} config={cfg.initial_sampling_mode!r}"
+        if not isinstance(metadata, Mapping):
+            raise TypeError(
+                "EDS initial_population_cache metadata must be a mapping, "
+                f"got {type(metadata).__name__}"
             )
+
+        expected = {
+            "initial_sampling_mode": cfg.initial_sampling_mode,
+            "initial_diversity_scale": float(cfg.initial_diversity_scale),
+            "initial_diversity_start_ratio": cfg.initial_diversity_start_ratio,
+            "initial_diversity_fallback": cfg.initial_diversity_fallback,
+        }
+        for field, expected_value in expected.items():
+            if field not in metadata:
+                continue
+            cached_value = metadata.get(field)
+            if cached_value != expected_value:
+                raise ValueError(
+                    f"EDS initial_population_cache {field} mismatch: "
+                    f"cache={cached_value!r} config={expected_value!r}"
+                )
+
+        missing = [field for field in expected if field not in metadata]
+        if missing:
+            raise ValueError(
+                "EDS initial_population_cache metadata missing required field: "
+                f"{missing[0]}"
+            )
+
+    def _eds_initial_sampler_info_from_cache_metadata(
+        self,
+        cfg: _EDSConfig,
+        metadata: Mapping | None,
+        *,
+        latency_s: float,
+    ) -> dict:
+        info = self._eds_empty_initial_sampler_info(cfg)
+        if isinstance(metadata, Mapping):
+            for field in (
+                "initial_sampling_mode",
+                "initial_diversity_scale",
+                "initial_diversity_start_ratio",
+                "initial_diversity_steps",
+                "initial_diversity_fallback_used",
+                "initial_diversity_fallback_reason",
+            ):
+                if field in metadata:
+                    info[field] = metadata[field]
+        info["initial_sampler_latency_s"] = float(latency_s)
+        return info
 
     def _eds_initial_denoise_iid(
         self,
@@ -1586,6 +1630,8 @@ class RDTSteer:
         return population, {"initial_diversity_steps": 0}
 
     def _eds_initial_population(self, *, x_t: Tensor, cond: dict, cfg: _EDSConfig) -> Tensor:
+        start = time.perf_counter()
+        self._last_eds_initial_sampler_info = self._eds_empty_initial_sampler_info(cfg)
         if cfg.use_initial_cache:
             if cfg.initial_population_cache is None:
                 raise ValueError("EDS use_initial_cache=true requires initial_population_cache")
@@ -1605,15 +1651,20 @@ class RDTSteer:
                     f"Cached EDS initial_population shape {tuple(cached.shape)} != {expected}"
                 )
             population = self._apply_action_mask(cached.to(device=x_t.device, dtype=x_t.dtype), cond)
+            info = self._eds_initial_sampler_info_from_cache_metadata(
+                cfg,
+                metadata,
+                latency_s=time.perf_counter() - start,
+            )
+            self._last_eds_initial_sampler_info = info
             if cfg.save_initial_cache:
                 self._save_eds_initial_population_cache(
                     population,
                     cfg,
-                    self._eds_empty_initial_sampler_info(cfg),
+                    info,
                 )
             return population
 
-        start = time.perf_counter()
         if cfg.initial_sampling_mode == "iid":
             population, info = self._eds_initial_denoise_iid(x_t=x_t, cond=cond, cfg=cfg)
         else:

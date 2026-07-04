@@ -911,7 +911,7 @@ def test_eds_initial_population_rejects_cache_strategy_mismatch(stub_steer, tmp_
 
 
 def test_eds_initial_population_warns_for_legacy_cache_without_metadata(
-    stub_steer, tmp_path, caplog, monkeypatch
+    stub_steer, tmp_path, monkeypatch
 ):
     from core import rdt_policy_steer
     from core.rdt_policy_steer import _EDSConfig
@@ -919,8 +919,12 @@ def test_eds_initial_population_warns_for_legacy_cache_without_metadata(
     cache_path = tmp_path / "legacy_eds_initial.pt"
     torch.save({"initial_population": torch.zeros(2, 64, 128)}, cache_path)
     action_mask = torch.ones(1, 1, 128)
-    monkeypatch.setattr(rdt_policy_steer.log.logger, "propagate", True)
-    caplog.set_level("WARNING", logger="RDTSteer")
+    warnings = []
+    monkeypatch.setattr(
+        rdt_policy_steer.log,
+        "warning",
+        lambda message: warnings.append(str(message)),
+    )
 
     population = stub_steer._eds_initial_population(
         x_t=torch.zeros(2, 64, 128),
@@ -934,7 +938,119 @@ def test_eds_initial_population_warns_for_legacy_cache_without_metadata(
     )
 
     assert tuple(population.shape) == (2, 64, 128)
-    assert "metadata" in caplog.text.lower()
+    assert any("metadata" in message.lower() for message in warnings)
+
+
+def test_eds_initial_population_cache_refreshes_sampler_info_after_fallback(
+    stub_steer, tmp_path
+):
+    from core.rdt_policy_steer import _EDSConfig
+
+    action_mask = torch.ones(1, 1, 128)
+    cond = {"action_mask": action_mask}
+    stub_steer._eds_initial_population(
+        x_t=torch.zeros(2, 64, 128),
+        cond=cond,
+        cfg=_EDSConfig(
+            population_size=2,
+            initial_sampling_mode="rbf_diverse_denoise",
+        ),
+    )
+    assert stub_steer._last_eds_initial_sampler_info["initial_diversity_fallback_used"] is True
+
+    cache_path = tmp_path / "eds_initial.pt"
+    torch.save(
+        {
+            "initial_population": torch.zeros(2, 64, 128),
+            "metadata": {
+                "initial_sampling_mode": "iid",
+                "initial_diversity_scale": 1.0,
+                "initial_diversity_start_ratio": None,
+                "initial_diversity_fallback": "iid",
+                "initial_diversity_steps": 0,
+                "initial_diversity_fallback_used": False,
+                "initial_diversity_fallback_reason": None,
+            },
+        },
+        cache_path,
+    )
+
+    stub_steer._eds_initial_population(
+        x_t=torch.zeros(2, 64, 128),
+        cond=cond,
+        cfg=_EDSConfig(
+            population_size=2,
+            use_initial_cache=True,
+            initial_population_cache=str(cache_path),
+            initial_sampling_mode="iid",
+        ),
+    )
+
+    info = stub_steer._last_eds_initial_sampler_info
+    assert info["initial_sampling_mode"] == "iid"
+    assert info["initial_diversity_fallback_used"] is False
+    assert info["initial_diversity_fallback_reason"] is None
+    assert info["initial_sampler_latency_s"] is not None
+
+
+def test_eds_initial_population_rejects_cache_diversity_scale_mismatch(
+    stub_steer, tmp_path
+):
+    from core.rdt_policy_steer import _EDSConfig
+
+    cache_path = tmp_path / "eds_initial.pt"
+    torch.save(
+        {
+            "initial_population": torch.zeros(2, 64, 128),
+            "metadata": {
+                "initial_sampling_mode": "rbf_diverse_denoise",
+                "initial_diversity_scale": 0.25,
+                "initial_diversity_start_ratio": 0.5,
+                "initial_diversity_fallback": "iid",
+            },
+        },
+        cache_path,
+    )
+
+    with pytest.raises(ValueError, match="initial_diversity_scale"):
+        stub_steer._eds_initial_population(
+            x_t=torch.zeros(2, 64, 128),
+            cond={"action_mask": torch.ones(1, 1, 128)},
+            cfg=_EDSConfig(
+                population_size=2,
+                use_initial_cache=True,
+                initial_population_cache=str(cache_path),
+                initial_sampling_mode="rbf_diverse_denoise",
+                initial_diversity_scale=2.0,
+                initial_diversity_start_ratio=0.5,
+            ),
+        )
+
+
+def test_eds_initial_population_rejects_malformed_cache_metadata(
+    stub_steer, tmp_path
+):
+    from core.rdt_policy_steer import _EDSConfig
+
+    cache_path = tmp_path / "eds_initial.pt"
+    torch.save(
+        {
+            "initial_population": torch.zeros(2, 64, 128),
+            "metadata": "bad",
+        },
+        cache_path,
+    )
+
+    with pytest.raises((TypeError, ValueError), match="metadata"):
+        stub_steer._eds_initial_population(
+            x_t=torch.zeros(2, 64, 128),
+            cond={"action_mask": torch.ones(1, 1, 128)},
+            cfg=_EDSConfig(
+                population_size=2,
+                use_initial_cache=True,
+                initial_population_cache=str(cache_path),
+            ),
+        )
 
 
 def test_eds_rollout_reference_scores_clean_denoised_population(
