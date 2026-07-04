@@ -712,7 +712,7 @@ def test_eds_config_rejects_invalid_reward_mode(stub_steer):
         stub_steer._resolve_eds_config_with_reference_defaults({"reward_mode": "sparse"})
 
 
-@pytest.mark.parametrize("mode", ["fps", "rbf", "", "iid+rbf"])
+@pytest.mark.parametrize("mode", ["bad_mode", "rbf", "", "iid+rbf"])
 def test_eds_config_rejects_invalid_initial_sampling_mode(stub_steer, mode):
     with pytest.raises(ValueError, match="initial_sampling_mode"):
         stub_steer._resolve_eds_config_with_reference_defaults(
