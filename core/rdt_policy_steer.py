@@ -96,10 +96,25 @@ def _safe_initial_sampler_bool(value) -> bool:
             return True
         if normalized in {"false", "0", "no"}:
             return False
-    if isinstance(value, (int, float)) and not isinstance(value, bool):
-        if math.isfinite(float(value)) and value in {0, 1}:
-            return bool(value)
+    if isinstance(value, int) and not isinstance(value, bool):
+        return value == 1 if value in {0, 1} else False
+    if isinstance(value, float):
+        try:
+            if math.isfinite(value) and value in {0.0, 1.0}:
+                return bool(value)
+        except (TypeError, ValueError, OverflowError):
+            return False
     return False
+
+
+def _safe_initial_sampler_float_field(
+    info: Mapping,
+    field_name: str,
+    fallback,
+) -> Optional[float]:
+    if field_name in info:
+        return _safe_initial_sampler_float(info.get(field_name))
+    return _safe_initial_sampler_float(fallback)
 
 
 def _populate_initial_sampler_metrics(
@@ -114,11 +129,15 @@ def _populate_initial_sampler_metrics(
         if initial_sampling_mode is not None
         else cfg.initial_sampling_mode
     )
-    metrics.initial_diversity_scale = _safe_initial_sampler_float(
-        cfg.initial_diversity_scale
+    metrics.initial_diversity_scale = _safe_initial_sampler_float_field(
+        initial_sampler_info,
+        "initial_diversity_scale",
+        cfg.initial_diversity_scale,
     )
-    metrics.initial_diversity_start_ratio = _safe_initial_sampler_float(
-        cfg.initial_diversity_start_ratio
+    metrics.initial_diversity_start_ratio = _safe_initial_sampler_float_field(
+        initial_sampler_info,
+        "initial_diversity_start_ratio",
+        cfg.initial_diversity_start_ratio,
     )
     metrics.initial_diversity_steps = _safe_initial_sampler_int(
         initial_sampler_info.get("initial_diversity_steps")

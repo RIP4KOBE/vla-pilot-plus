@@ -1734,10 +1734,13 @@ def test_eds_loop_tolerates_malformed_initial_sampler_metrics(
     def fake_initial_population(*, x_t, cond, cfg):
         stub_steer._last_eds_initial_sampler_info = {
             "initial_sampling_mode": None,
+            "initial_diversity_scale": "bad",
+            "initial_diversity_start_ratio": float("nan"),
             "initial_diversity_steps": None,
             "initial_diversity_grad_failure_count": "bad",
             "initial_diversity_grad_norm_mean": "bad",
             "initial_diversity_grad_norm_max": float("nan"),
+            "initial_diversity_fallback_used": 10**10000,
             "initial_sampler_latency_s": "bad",
         }
         return x_t
@@ -1762,10 +1765,13 @@ def test_eds_loop_tolerates_malformed_initial_sampler_metrics(
     metrics = stub_steer.get_last_eds_metrics()
 
     assert metrics["initial_sampling_mode"] == "rbf_diverse_denoise"
+    assert metrics["initial_diversity_scale"] is None
+    assert metrics["initial_diversity_start_ratio"] is None
     assert metrics["initial_diversity_steps"] == 0
     assert metrics["initial_diversity_grad_failure_count"] == 0
     assert metrics["initial_diversity_grad_norm_mean"] is None
     assert metrics["initial_diversity_grad_norm_max"] is None
+    assert metrics["initial_diversity_fallback_used"] is False
     assert metrics["initial_sampler_latency_s"] is None
 
 
