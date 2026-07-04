@@ -1465,6 +1465,56 @@ def test_eds_initial_population_allows_rbf_legacy_cache_when_metadata_disabled(
     assert any("metadata validation is disabled" in message for message in warnings)
 
 
+def test_eds_initial_population_ignores_stale_metadata_when_metadata_disabled(
+    stub_steer, tmp_path, monkeypatch
+):
+    from core import rdt_policy_steer
+    from core.rdt_policy_steer import _EDSConfig
+
+    cache_path = tmp_path / "stale_metadata_rbf_eds_initial.pt"
+    torch.save(
+        {
+            "initial_population": torch.ones(2, 64, 128),
+            "metadata": {
+                "initial_sampling_mode": "iid",
+                "initial_diversity_scale": 99.0,
+                "initial_diversity_start_ratio": 0.5,
+                "initial_diversity_fallback": "iid",
+                "initial_diversity_fallback_used": True,
+                "initial_diversity_fallback_reason": "stale-cache",
+            },
+        },
+        cache_path,
+    )
+    warnings = []
+    monkeypatch.setattr(
+        rdt_policy_steer.log,
+        "warning",
+        lambda message: warnings.append(str(message)),
+    )
+
+    stub_steer._eds_initial_population(
+        x_t=torch.zeros(2, 64, 128),
+        cond={"action_mask": torch.ones(1, 1, 128)},
+        cfg=_EDSConfig(
+            population_size=2,
+            use_initial_cache=True,
+            initial_population_cache=str(cache_path),
+            initial_sampling_mode="rbf_diverse_denoise",
+            initial_diversity_scale=1.0,
+            initial_cache_metadata=False,
+        ),
+    )
+
+    info = stub_steer._last_eds_initial_sampler_info
+    assert info["initial_sampling_mode"] == "rbf_diverse_denoise"
+    assert info["initial_diversity_scale"] == 1.0
+    assert info["initial_diversity_start_ratio"] is None
+    assert info["initial_diversity_fallback_used"] is False
+    assert info["initial_diversity_fallback_reason"] is None
+    assert any("metadata validation is disabled" in message for message in warnings)
+
+
 def test_eds_initial_population_rejects_resaving_legacy_cache_without_metadata(
     stub_steer, tmp_path
 ):
