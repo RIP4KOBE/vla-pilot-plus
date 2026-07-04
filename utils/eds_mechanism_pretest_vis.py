@@ -18,6 +18,9 @@ from core.eds_mechanism_trace import EDSMechanismTrace, EDSParticleStage
 
 
 STAGE_FILENAMES = {
+    "initial_before_diversity": "initial_before_diversity_3d.png",
+    "initial_after_diversity_phase": "initial_after_diversity_phase_3d.png",
+    "initial_final": "initial_final_3d.png",
     "initial": "00_initial_population_3d.png",
     "scored": "01_scored_population_3d.png",
     "resampled": "02_after_resample_3d.png",
@@ -223,7 +226,14 @@ def _plot_distance_curve(path: Path, trace: EDSMechanismTrace) -> None:
 
 def _plot_final_selected_vs_initial_best(path: Path, trace: EDSMechanismTrace) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    initial = next((stage for stage in trace.stages if stage.stage == "initial"), None)
+    initial = next(
+        (
+            stage
+            for stage in trace.stages
+            if stage.stage in {"initial_final", "initial"}
+        ),
+        None,
+    )
     final = _full_process_stages(trace)[-1] if _full_process_stages(trace) else None
 
     fig = plt.figure(figsize=(8, 7))

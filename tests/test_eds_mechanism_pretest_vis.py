@@ -12,6 +12,30 @@ from utils.eds_mechanism_pretest_vis import _axis_limits, save_eds_mechanism_pre
 def _trace():
     stages = [
         EDSParticleStage(
+            stage="initial_before_diversity",
+            iter_idx=0,
+            actions=torch.zeros(2, 64, 128),
+            trajectories=torch.zeros(2, 2, 3),
+            rewards=torch.tensor([0.0, 0.0]),
+            costs=torch.tensor([0.0, 0.0]),
+        ),
+        EDSParticleStage(
+            stage="initial_after_diversity_phase",
+            iter_idx=0,
+            actions=torch.zeros(2, 64, 128),
+            trajectories=torch.ones(2, 2, 3),
+            rewards=torch.tensor([0.0, 0.0]),
+            costs=torch.tensor([0.0, 0.0]),
+        ),
+        EDSParticleStage(
+            stage="initial_final",
+            iter_idx=0,
+            actions=torch.zeros(2, 64, 128),
+            trajectories=torch.ones(2, 2, 3) * 2.0,
+            rewards=torch.tensor([0.1, 0.2]),
+            costs=torch.tensor([-0.1, -0.2]),
+        ),
+        EDSParticleStage(
             stage="initial",
             iter_idx=0,
             actions=torch.zeros(2, 64, 128),
@@ -92,6 +116,18 @@ def test_save_eds_mechanism_pretest_artifacts_writes_pngs_and_summary(tmp_path):
     assert (tmp_path / "full_eds_process" / "per_iter_metrics.csv").exists()
     assert (tmp_path / "full_eds_process" / "full_process_summary.md").exists()
     assert any(path.endswith("reward_curve.png") for path in saved)
+
+
+def test_save_eds_mechanism_pretest_artifacts_writes_initial_sampler_stage_pngs(tmp_path):
+    save_eds_mechanism_pretest_artifacts(tmp_path, _trace())
+
+    assert (
+        tmp_path / "single_step_inner_loop" / "initial_before_diversity_3d.png"
+    ).exists()
+    assert (
+        tmp_path / "single_step_inner_loop" / "initial_after_diversity_phase_3d.png"
+    ).exists()
+    assert (tmp_path / "single_step_inner_loop" / "initial_final_3d.png").exists()
 
 
 def test_keypoints_json_contains_only_scoring_keypoint(tmp_path):
