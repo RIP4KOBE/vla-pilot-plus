@@ -68,6 +68,82 @@ class _EDSConfig:
     initial_cache_metadata: bool = True
 
 
+def _safe_initial_sampler_int(value) -> int:
+    if value is None:
+        return 0
+    try:
+        return int(value)
+    except (TypeError, ValueError, OverflowError):
+        return 0
+
+
+def _safe_initial_sampler_float(value) -> Optional[float]:
+    if value is None:
+        return None
+    try:
+        value_f = float(value)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    return value_f if math.isfinite(value_f) else None
+
+
+def _safe_initial_sampler_bool(value) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"true", "1", "yes"}:
+            return True
+        if normalized in {"false", "0", "no"}:
+            return False
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        if math.isfinite(float(value)) and value in {0, 1}:
+            return bool(value)
+    return False
+
+
+def _populate_initial_sampler_metrics(
+    metrics: EDSChunkMetrics,
+    cfg: _EDSConfig,
+    info: Optional[Mapping],
+) -> None:
+    initial_sampler_info = info if isinstance(info, Mapping) else {}
+    initial_sampling_mode = initial_sampler_info.get("initial_sampling_mode")
+    metrics.initial_sampling_mode = (
+        str(initial_sampling_mode)
+        if initial_sampling_mode is not None
+        else cfg.initial_sampling_mode
+    )
+    metrics.initial_diversity_scale = _safe_initial_sampler_float(
+        cfg.initial_diversity_scale
+    )
+    metrics.initial_diversity_start_ratio = _safe_initial_sampler_float(
+        cfg.initial_diversity_start_ratio
+    )
+    metrics.initial_diversity_steps = _safe_initial_sampler_int(
+        initial_sampler_info.get("initial_diversity_steps")
+    )
+    metrics.initial_diversity_grad_norm_mean = _safe_initial_sampler_float(
+        initial_sampler_info.get("initial_diversity_grad_norm_mean")
+    )
+    metrics.initial_diversity_grad_norm_max = _safe_initial_sampler_float(
+        initial_sampler_info.get("initial_diversity_grad_norm_max")
+    )
+    metrics.initial_diversity_grad_failure_count = _safe_initial_sampler_int(
+        initial_sampler_info.get("initial_diversity_grad_failure_count")
+    )
+    metrics.initial_diversity_fallback_used = _safe_initial_sampler_bool(
+        initial_sampler_info.get("initial_diversity_fallback_used")
+    )
+    fallback_reason = initial_sampler_info.get("initial_diversity_fallback_reason")
+    metrics.initial_diversity_fallback_reason = (
+        str(fallback_reason) if fallback_reason is not None else None
+    )
+    metrics.initial_sampler_latency_s = _safe_initial_sampler_float(
+        initial_sampler_info.get("initial_sampler_latency_s")
+    )
+
+
 def _parse_eds_bool(value, field_name: str) -> bool:
     if isinstance(value, bool):
         return value
@@ -2048,32 +2124,10 @@ class RDTSteer:
         trace_stages: list[EDSParticleStage] = []
 
         population = self._eds_initial_population(x_t=x_t, cond=cond, cfg=cfg)
-        initial_sampler_info = getattr(self, "_last_eds_initial_sampler_info", None) or {}
-        metrics.initial_sampling_mode = str(
-            initial_sampler_info.get("initial_sampling_mode", cfg.initial_sampling_mode)
-        )
-        metrics.initial_diversity_scale = float(cfg.initial_diversity_scale)
-        metrics.initial_diversity_start_ratio = cfg.initial_diversity_start_ratio
-        metrics.initial_diversity_steps = int(
-            initial_sampler_info.get("initial_diversity_steps", 0)
-        )
-        metrics.initial_diversity_grad_norm_mean = initial_sampler_info.get(
-            "initial_diversity_grad_norm_mean"
-        )
-        metrics.initial_diversity_grad_norm_max = initial_sampler_info.get(
-            "initial_diversity_grad_norm_max"
-        )
-        metrics.initial_diversity_grad_failure_count = int(
-            initial_sampler_info.get("initial_diversity_grad_failure_count", 0)
-        )
-        metrics.initial_diversity_fallback_used = bool(
-            initial_sampler_info.get("initial_diversity_fallback_used", False)
-        )
-        metrics.initial_diversity_fallback_reason = initial_sampler_info.get(
-            "initial_diversity_fallback_reason"
-        )
-        metrics.initial_sampler_latency_s = initial_sampler_info.get(
-            "initial_sampler_latency_s"
+        _populate_initial_sampler_metrics(
+            metrics,
+            cfg,
+            getattr(self, "_last_eds_initial_sampler_info", None),
         )
         population = self._apply_action_mask(population, cond)
 
