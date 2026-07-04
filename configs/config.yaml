@@ -67,6 +67,11 @@ main:
     use_initial_cache: false
     save_initial_cache: false
     save_ed_cache: false
+    initial_sampling_mode: iid
+    initial_diversity_scale: 1.0
+    initial_diversity_start_ratio: null
+    initial_diversity_fallback: iid
+    initial_cache_metadata: true
 
   eds_eval:
     enabled: false
