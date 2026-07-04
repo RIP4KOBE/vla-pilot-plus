@@ -276,6 +276,9 @@ def build_main_command(
     job: dict[str, object],
     gpu: str,
     timeout_seconds: int,
+    *,
+    cached_functions_dir: str | None = None,
+    offline_vlm: bool = False,
 ) -> list[str]:
     del gpu, timeout_seconds
     output_dir = RUN_ROOT / str(job["job_id"])
@@ -294,8 +297,8 @@ def build_main_command(
         f"main.episode_num={job['episodes']}",
         "backend.libero.max_episode_steps=240",
         f"backend.libero.strict_perturbations={str(is_level4).lower()}",
-        "main.use_vlm_stage_recognition=true",
-        "perception.gemini_grounding.enabled=true",
+        f"main.use_vlm_stage_recognition={str(not offline_vlm).lower()}",
+        f"perception.gemini_grounding.enabled={str(not offline_vlm).lower()}",
         f"main.render={str(is_level4).lower()}",
         "main.visualize_trajectory=true",
         "main.debug_draw_trajectory=true",
@@ -321,6 +324,8 @@ def build_main_command(
     if job["method"] == "unguided":
         command.append("main.use_guidance=false")
     else:
+        if cached_functions_dir is not None:
+            command.append(f"main.cached_functions_dir={cached_functions_dir}")
         command.extend(
             [
                 "main.use_guidance=true",
@@ -874,16 +879,40 @@ def level1_commands() -> list[list[str]]:
     ]
 
 
-def run_job(job: dict[str, object], gpu: str, timeout_seconds: int) -> dict[str, object]:
+def run_job(
+    job: dict[str, object],
+    gpu: str,
+    timeout_seconds: int,
+    *,
+    cached_functions_dir: str | None = None,
+    offline_vlm: bool = False,
+) -> dict[str, object]:
     ensure_dirs()
     output_dir = RUN_ROOT / str(job["job_id"])
     output_dir.mkdir(parents=True, exist_ok=True)
     log_file = EVIDENCE_ROOT / "logs" / f"{job['job_id']}.log"
-    command = build_main_command(job, gpu, timeout_seconds)
+    command = build_main_command(
+        job,
+        gpu,
+        timeout_seconds,
+        cached_functions_dir=cached_functions_dir,
+        offline_vlm=offline_vlm,
+    )
     env = os.environ.copy()
     env["CUDA_VISIBLE_DEVICES"] = str(gpu)
     env["PYTHONUNBUFFERED"] = "1"
     env.setdefault("OPENAI_BASE_URL", "https://api.poe.com/v1")
+    if offline_vlm:
+        env.setdefault("OPENAI_API_KEY", "dummy")
+        for key in (
+            "ALL_PROXY",
+            "all_proxy",
+            "HTTP_PROXY",
+            "http_proxy",
+            "HTTPS_PROXY",
+            "https_proxy",
+        ):
+            env.pop(key, None)
     env["LIBERO_CONFIG_PATH"] = str(LIBERO_CONFIG_PATH)
     pythonpath_parts = [str(LIBERO_PRO_ROOT)]
     if env.get("PYTHONPATH"):
@@ -940,7 +969,16 @@ def run_job(job: dict[str, object], gpu: str, timeout_seconds: int) -> dict[str,
     }
 
 
-def run_level(level: str, episodes: int, gpus: str, timeout_seconds: int, resume: bool = False) -> int:
+def run_level(
+    level: str,
+    episodes: int,
+    gpus: str,
+    timeout_seconds: int,
+    resume: bool = False,
+    *,
+    cached_functions_dir: str | None = None,
+    offline_vlm: bool = False,
+) -> int:
     ensure_dirs()
     gpu_list = [gpu.strip() for gpu in gpus.split(",") if gpu.strip()]
     if not gpu_list:
@@ -997,7 +1035,13 @@ def run_level(level: str, episodes: int, gpus: str, timeout_seconds: int, resume
                 with lock:
                     rows_by_id[job_id] = _status_row(job, "running", gpu=gpu)
                     write_status(list(rows_by_id.values()))
-                row = run_job(job, gpu=gpu, timeout_seconds=timeout_seconds)
+                row = run_job(
+                    job,
+                    gpu=gpu,
+                    timeout_seconds=timeout_seconds,
+                    cached_functions_dir=cached_functions_dir,
+                    offline_vlm=offline_vlm,
+                )
                 with lock:
                     rows_by_id[job_id] = row
                     write_status(list(rows_by_id.values()))
@@ -1020,6 +1064,12 @@ def run_level(level: str, episodes: int, gpus: str, timeout_seconds: int, resume
 def _add_online_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--level", choices=["level2", "level3", "level4"], required=True)
     parser.add_argument("--episodes", type=int, default=10)
+    parser.add_argument("--cached-functions-dir", default=None)
+    parser.add_argument(
+        "--offline-vlm",
+        action="store_true",
+        help="Disable Gemini/VLM stage services and set a dummy OpenAI key for cached-guidance runs.",
+    )
 
 
 def main() -> int:
@@ -1073,7 +1123,17 @@ def main() -> int:
         jobs = build_jobs(args.level, args.episodes)
         if args.job_index < 0 or args.job_index >= len(jobs):
             raise SystemExit(f"job-index must be between 0 and {len(jobs) - 1}")
-        print(shlex.join(build_main_command(jobs[args.job_index], args.gpu, args.timeout_seconds)))
+        print(
+            shlex.join(
+                build_main_command(
+                    jobs[args.job_index],
+                    args.gpu,
+                    args.timeout_seconds,
+                    cached_functions_dir=args.cached_functions_dir,
+                    offline_vlm=args.offline_vlm,
+                )
+            )
+        )
         return 0
     if args.cmd == "write-report":
         print(write_level_report(args.level, args.verdict, args.evidence))
@@ -1095,7 +1155,15 @@ def main() -> int:
             print(shlex.join(command))
         return 0
     if args.cmd == "run-level":
-        return run_level(args.level, args.episodes, args.gpus, args.timeout_seconds, args.resume)
+        return run_level(
+            args.level,
+            args.episodes,
+            args.gpus,
+            args.timeout_seconds,
+            args.resume,
+            cached_functions_dir=args.cached_functions_dir,
+            offline_vlm=args.offline_vlm,
+        )
     raise SystemExit(f"Unknown command: {args.cmd}")
 
 
