@@ -1540,6 +1540,15 @@ class RDTSteer:
             "initial_diversity_start_ratio": cfg.initial_diversity_start_ratio,
             "initial_diversity_fallback": cfg.initial_diversity_fallback,
             "initial_diversity_steps": int(info.get("initial_diversity_steps", 0)),
+            "initial_diversity_grad_failure_count": int(
+                info.get("initial_diversity_grad_failure_count", 0)
+            ),
+            "initial_diversity_grad_norm_mean": info.get(
+                "initial_diversity_grad_norm_mean"
+            ),
+            "initial_diversity_grad_norm_max": info.get(
+                "initial_diversity_grad_norm_max"
+            ),
             "initial_diversity_fallback_used": bool(
                 info.get("initial_diversity_fallback_used", False)
             ),
@@ -1600,6 +1609,9 @@ class RDTSteer:
                 "initial_diversity_scale",
                 "initial_diversity_start_ratio",
                 "initial_diversity_steps",
+                "initial_diversity_grad_failure_count",
+                "initial_diversity_grad_norm_mean",
+                "initial_diversity_grad_norm_max",
                 "initial_diversity_fallback_used",
                 "initial_diversity_fallback_reason",
             ):
