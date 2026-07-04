@@ -2203,11 +2203,6 @@ class RDTSteer:
             population
         ).detach().cpu()
         if trace_enabled:
-            rewards_for_initial = self._eds_rewards_from_info(
-                population_scores,
-                population_info,
-            )
-            costs_for_initial = population_scores
             for stage_name, stage_population in getattr(
                 self,
                 "_last_eds_initial_sampler_trace_stages",
@@ -2217,13 +2212,32 @@ class RDTSteer:
                     stage_population.to(device=population.device, dtype=population.dtype),
                     cond,
                 )
+                if (
+                    stage_name == "initial_final"
+                    and stage_population.shape == population.shape
+                    and torch.equal(stage_population.detach(), population.detach())
+                ):
+                    stage_scores = population_scores
+                    stage_info = population_info
+                else:
+                    stage_scores, stage_info = self._eds_score_population_as_cost(
+                        stage_population,
+                        keypoints=keypoints,
+                        guidance_fns=guidance_fns,
+                        reward_mode=cfg.reward_mode,
+                        shuffle_seed=cfg.shuffle_seed,
+                    )
+                    stage_scores = self._eds_validate_population_scores(
+                        stage_scores,
+                        cfg.population_size,
+                    )
                 trace_stages.append(
                     self._eds_make_trace_stage(
                         stage=stage_name,
                         iter_idx=0,
                         population=stage_population,
-                        costs=costs_for_initial,
-                        info={"rewards": rewards_for_initial},
+                        costs=stage_scores,
+                        info=stage_info,
                     )
                 )
             trace_stages.append(

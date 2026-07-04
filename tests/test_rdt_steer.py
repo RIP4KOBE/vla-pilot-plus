@@ -990,6 +990,84 @@ def test_eds_mechanism_trace_records_rbf_initial_sampler_stages(
     assert trace.initial_sampler_info["initial_sampling_mode"] == "rbf_diverse_denoise"
 
 
+def test_eds_initial_sampler_trace_stages_use_stage_population_rewards(
+    stub_steer, stub_adapter, mock_batch, monkeypatch
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+
+    def population_with_x_deltas(values):
+        population = torch.zeros(3, 64, 128, dtype=torch.float32)
+        population[:, :4, 39] = torch.tensor(values, dtype=torch.float32).view(3, 1)
+        return population
+
+    before_population = population_with_x_deltas([0.1, 0.2, 0.3])
+    after_population = population_with_x_deltas([0.4, 0.5, 0.6])
+    final_population = population_with_x_deltas([0.7, 0.8, 0.9])
+
+    def fake_initial_population(*, x_t, cond, cfg):
+        stub_steer._last_eds_initial_sampler_trace_stages = [
+            ("initial_before_diversity", before_population.to(device=x_t.device, dtype=x_t.dtype)),
+            (
+                "initial_after_diversity_phase",
+                after_population.to(device=x_t.device, dtype=x_t.dtype),
+            ),
+            ("initial_final", final_population.to(device=x_t.device, dtype=x_t.dtype)),
+        ]
+        stub_steer._last_eds_initial_sampler_info = {
+            "initial_sampling_mode": "rbf_diverse_denoise",
+        }
+        return final_population.to(device=x_t.device, dtype=x_t.dtype)
+
+    def reward_from_x_trajectory(keypoints, traj):
+        return traj[..., 0].sum()
+
+    monkeypatch.setattr(stub_steer, "_eds_initial_population", fake_initial_population)
+
+    stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_type="eds",
+        keypoints=np.zeros((1, 3), dtype=np.float32),
+        guidance_fns=[reward_from_x_trajectory],
+        eds_config={
+            "population_size": 3,
+            "cem_iters": 1,
+            "temperature": 0.1,
+            "initial_sampling_mode": "rbf_diverse_denoise",
+            "mechanism_pretest": {
+                "enabled": True,
+                "first_chunk_only": True,
+                "save_single_step": True,
+                "save_full_process": False,
+                "save_tensors": True,
+                "plot_3d": False,
+                "max_full_process_iters": 1,
+            },
+        },
+        global_step=0,
+    )
+
+    trace = stub_steer.get_last_eds_mechanism_trace()
+    stages = {stage.stage: stage for stage in trace.stages}
+    before_stage = stages["initial_before_diversity"]
+    final_stage = stages["initial_final"]
+
+    expected_before_rewards = before_stage.trajectories[..., 0].sum(dim=1)
+    expected_final_rewards = final_stage.trajectories[..., 0].sum(dim=1)
+
+    assert not torch.allclose(before_stage.rewards, final_stage.rewards)
+    torch.testing.assert_close(before_stage.rewards, expected_before_rewards)
+    torch.testing.assert_close(before_stage.costs, -expected_before_rewards)
+    torch.testing.assert_close(final_stage.rewards, expected_final_rewards)
+    torch.testing.assert_close(final_stage.costs, -expected_final_rewards)
+
+
 def test_eds_initial_population_rbf_diverse_cache_restores_telemetry(
     stub_steer, stub_adapter, tmp_path, monkeypatch
 ):
