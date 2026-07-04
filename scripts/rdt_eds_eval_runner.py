@@ -137,28 +137,32 @@ METHODS = [
         "reward_mode": "inverted",
     },
 ]
+RBF_DIVERSE_INITIAL_METHOD = {
+    "method": "eds_rbf_diverse_initial",
+    "label": "eds_rbf_diverse_initial",
+    "population_size": 16,
+    "cem_iters": 10,
+    "use_cem": False,
+    "num_elites": 32,
+    "temperature": 0.1,
+    **REFERENCE_RENOISE,
+    "reward_mode": "normal",
+    "initial_sampling_mode": "rbf_diverse_denoise",
+    "initial_diversity_scale": 1.0,
+    "initial_diversity_start_ratio": None,
+}
 LEVEL2_METHODS = [
-    method
-    for method in METHODS
-    if method["label"] in {"unguided", "p16_c10", "zero", "shuffled", "inverted"}
+    *[
+        method
+        for method in METHODS
+        if method["label"] in {"unguided", "p16_c10", "zero", "shuffled", "inverted"}
+    ],
+    RBF_DIVERSE_INITIAL_METHOD,
 ]
 LEVEL3_METHODS = METHODS
 LEVEL4_METHODS = [
     METHODS[0],
-    {
-        "method": "eds_rbf_diverse_initial",
-        "label": "eds_rbf_diverse_initial",
-        "population_size": 16,
-        "cem_iters": 10,
-        "use_cem": False,
-        "num_elites": 32,
-        "temperature": 0.1,
-        **REFERENCE_RENOISE,
-        "reward_mode": "normal",
-        "initial_sampling_mode": "rbf_diverse_denoise",
-        "initial_diversity_scale": 1.0,
-        "initial_diversity_start_ratio": None,
-    },
+    RBF_DIVERSE_INITIAL_METHOD,
     {
         "method": "eds_softmax_strong_weak_renoise",
         "label": "eds_softmax_strong_weak_renoise",

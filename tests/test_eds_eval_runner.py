@@ -80,7 +80,14 @@ def test_level2_smoke_uses_libero_object_and_required_ablations():
     labels = {job["label"] for job in jobs}
 
     assert {job["suite"] for job in jobs} == {"libero_object"}
-    assert labels == {"unguided", "p16_c10", "zero", "shuffled", "inverted"}
+    assert labels == {
+        "unguided",
+        "p16_c10",
+        "zero",
+        "shuffled",
+        "inverted",
+        "eds_rbf_diverse_initial",
+    }
 
     cmd = runner.build_main_command(jobs[0], gpu="0", timeout_seconds=120)
     assert "backend.libero.task_ids_filter=[0]" in cmd
@@ -162,7 +169,7 @@ def test_rbf_diverse_initial_sampler_command_adds_initial_overrides():
     runner = _load_runner()
     job = next(
         job
-        for job in runner.build_jobs("level4", episodes=10)
+        for job in runner.build_jobs("level2", episodes=10)
         if job["label"] == "eds_rbf_diverse_initial"
     )
 
