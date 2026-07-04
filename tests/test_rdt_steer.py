@@ -842,7 +842,18 @@ def test_eds_initial_population_masks_cached_population(stub_steer, tmp_path):
 
     population = torch.ones(2, 64, 128)
     cache_path = tmp_path / "eds_initial.pt"
-    torch.save({"initial_population": population}, cache_path)
+    torch.save(
+        {
+            "initial_population": population,
+            "metadata": {
+                "initial_sampling_mode": "iid",
+                "initial_diversity_scale": 1.0,
+                "initial_diversity_start_ratio": None,
+                "initial_diversity_fallback": "iid",
+            },
+        },
+        cache_path,
+    )
     x_t = torch.zeros(2, 64, 128)
     action_mask = torch.zeros(1, 1, 128)
     action_mask[0, 0, [39, 40, 41, 42, 43, 44, 10]] = 1.0
@@ -939,6 +950,28 @@ def test_eds_initial_population_warns_for_legacy_cache_without_metadata(
 
     assert tuple(population.shape) == (2, 64, 128)
     assert any("metadata" in message.lower() for message in warnings)
+
+
+def test_eds_initial_population_rejects_resaving_legacy_cache_without_metadata(
+    stub_steer, tmp_path
+):
+    from core.rdt_policy_steer import _EDSConfig
+
+    cache_path = tmp_path / "legacy_eds_initial.pt"
+    torch.save({"initial_population": torch.zeros(2, 64, 128)}, cache_path)
+
+    with pytest.raises(ValueError, match="metadata.*save_initial_cache"):
+        stub_steer._eds_initial_population(
+            x_t=torch.zeros(2, 64, 128),
+            cond={"action_mask": torch.ones(1, 1, 128)},
+            cfg=_EDSConfig(
+                population_size=2,
+                use_initial_cache=True,
+                save_initial_cache=True,
+                initial_population_cache=str(cache_path),
+                initial_sampling_mode="rbf_diverse_denoise",
+            ),
+        )
 
 
 def test_eds_initial_population_cache_refreshes_sampler_info_after_fallback(
