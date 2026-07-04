@@ -1721,6 +1721,54 @@ def test_eds_loop_records_initial_sampler_metrics(
     assert metrics["initial_sampler_latency_s"] is not None
 
 
+def test_eds_loop_tolerates_malformed_initial_sampler_metrics(
+    stub_steer, stub_adapter, mock_batch, monkeypatch
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+
+    def fake_initial_population(*, x_t, cond, cfg):
+        stub_steer._last_eds_initial_sampler_info = {
+            "initial_sampling_mode": None,
+            "initial_diversity_steps": None,
+            "initial_diversity_grad_failure_count": "bad",
+            "initial_diversity_grad_norm_mean": "bad",
+            "initial_diversity_grad_norm_max": float("nan"),
+            "initial_sampler_latency_s": "bad",
+        }
+        return x_t
+
+    monkeypatch.setattr(stub_steer, "_eds_initial_population", fake_initial_population)
+
+    stub_steer.select_action(
+        mock_batch,
+        generate_new_chunk=True,
+        use_guidance=True,
+        guidance_type="eds",
+        eds_config={
+            "population_size": 3,
+            "cem_iters": 1,
+            "temperature": 0.1,
+            "initial_sampling_mode": "rbf_diverse_denoise",
+        },
+        guidance_fns=[lambda keypoints, traj: torch.sum(traj[:, -1, 0])],
+        keypoints=np.array([[0.0, 0.0, 0.0]], dtype=np.float32),
+    )
+
+    metrics = stub_steer.get_last_eds_metrics()
+
+    assert metrics["initial_sampling_mode"] == "rbf_diverse_denoise"
+    assert metrics["initial_diversity_steps"] == 0
+    assert metrics["initial_diversity_grad_failure_count"] == 0
+    assert metrics["initial_diversity_grad_norm_mean"] is None
+    assert metrics["initial_diversity_grad_norm_max"] is None
+    assert metrics["initial_sampler_latency_s"] is None
+
+
 def test_eds_zero_reward_records_no_reward_spread(stub_steer, stub_adapter, mock_batch):
     stub_steer.post_init(
         adapter=stub_adapter,
