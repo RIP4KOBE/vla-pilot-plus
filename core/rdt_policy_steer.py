@@ -1643,6 +1643,11 @@ class RDTSteer:
                 cached = cached_payload["initial_population"]
                 metadata = cached_payload.get("metadata")
             self._eds_validate_initial_cache_metadata(metadata, cfg)
+            if metadata is None and cfg.save_initial_cache:
+                raise ValueError(
+                    "EDS initial_population_cache metadata is required when "
+                    "save_initial_cache=true; refusing to mint metadata for legacy cache"
+                )
             if not torch.is_tensor(cached):
                 raise TypeError("Cached EDS initial_population must be a torch.Tensor")
             expected = (cfg.population_size, x_t.shape[1], x_t.shape[2])
