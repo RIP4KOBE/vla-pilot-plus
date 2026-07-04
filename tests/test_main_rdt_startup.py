@@ -52,3 +52,44 @@ def test_visualization_action_chunk_prefers_policy_candidates():
     visualized = main._get_visualization_action_chunk(Policy(), Adapter(), fallback)
 
     torch.testing.assert_close(visualized, candidates + 1.0)
+
+
+def test_main_flat_vls_overrides_merge_into_grouped_config():
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    import main
+
+    cfg = OmegaConf.create(
+        {
+            "vls_config": {
+                "guide_scale": 40.0,
+                "sample_batch_size": 20,
+                "use_diversity": True,
+                "diversity_scale": 10.0,
+                "use_fkd": True,
+                "fkd": {"resample_frequency": 5},
+            },
+            "guide_scale": 12.5,
+            "sample_batch_size": 3,
+            "use_diversity": False,
+            "diversity_scale": 0.75,
+            "use_fkd": False,
+            "MCMC_steps": 2,
+            "sigmoid_k": 6.0,
+            "sigmoid_x0": 0.3,
+            "start_ratio": 0.4,
+            "fkd_config": {"resample_frequency": 9},
+        }
+    )
+
+    merged = main._main_vls_config(cfg)
+
+    assert merged["guide_scale"] == 12.5
+    assert merged["sample_batch_size"] == 3
+    assert merged["use_diversity"] is False
+    assert merged["diversity_scale"] == 0.75
+    assert merged["use_fkd"] is False
+    assert merged["MCMC_steps"] == 2
+    assert merged["sigmoid_k"] == 6.0
+    assert merged["sigmoid_x0"] == 0.3
+    assert merged["start_ratio"] == 0.4
+    assert merged["fkd"] == {"resample_frequency": 9}

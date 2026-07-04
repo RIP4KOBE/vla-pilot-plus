@@ -75,6 +75,49 @@ def _config_section_to_dict(section: Any, section_name: str) -> dict:
     raise TypeError(f"{section_name} must be a mapping, got {type(section).__name__}")
 
 
+_LEGACY_MAIN_VLS_FIELDS = (
+    "guide_scale",
+    "sample_batch_size",
+    "use_diversity",
+    "diversity_scale",
+    "MCMC_steps",
+    "use_fkd",
+    "sigmoid_k",
+    "sigmoid_x0",
+    "start_ratio",
+)
+
+
+def _config_has_key(section: Any, key: str) -> bool:
+    try:
+        return key in section
+    except TypeError:
+        return False
+
+
+def _main_vls_config(main_config: Any) -> dict:
+    """Merge preferred main.vls_config with legacy flat main.* VLS overrides."""
+    vls_config = _config_section_to_dict(main_config.get("vls_config"), "main.vls_config")
+    for field in _LEGACY_MAIN_VLS_FIELDS:
+        if _config_has_key(main_config, field):
+            vls_config[field] = main_config.get(field)
+    if _config_has_key(main_config, "fkd_config"):
+        fkd_config = main_config.get("fkd_config")
+        vls_config["fkd"] = (
+            _config_section_to_dict(fkd_config, "main.fkd_config")
+            if fkd_config is not None
+            else None
+        )
+    elif _config_has_key(main_config, "fkd"):
+        fkd_config = main_config.get("fkd")
+        vls_config["fkd"] = (
+            _config_section_to_dict(fkd_config, "main.fkd")
+            if fkd_config is not None
+            else None
+        )
+    return vls_config
+
+
 def _adapter_actual_task_id(adapter: Any) -> int | None:
     """Return the dataset task id, preserving filtered LIBERO task ids."""
     current_task_idx = getattr(adapter, "current_task_idx", None)
@@ -190,7 +233,7 @@ class Main:
         task_info = self.adapter.get_task_info()
         instruction = task_info.get('instruction', '')
         recommended_scale = task_info.get('recommended_guide_scale')
-        vls_config = _config_section_to_dict(self.config.get('vls_config'), "main.vls_config")
+        vls_config = _main_vls_config(self.config)
         base_guide_scale = vls_config.get('guide_scale', 80.0)
 
         # Override with recommended scale if available
@@ -267,10 +310,7 @@ class Main:
         self.policy.post_init(
             adapter=self.adapter,
             postprocessor=self.policy_postprocessor,
-            sample_batch_size=_config_section_to_dict(
-                self.config.get('vls_config'),
-                "main.vls_config",
-            ).get('sample_batch_size', 1),
+            sample_batch_size=_main_vls_config(self.config).get('sample_batch_size', 1),
             policy_config=policy_config.get(policy_type, {}),
         )
 
@@ -378,10 +418,7 @@ class Main:
         """Get observation in policy expected format (backend-agnostic)."""
         sample_num = policy_observation_sample_num(
             self.policy_type,
-            _config_section_to_dict(
-                self.config.get('vls_config'),
-                "main.vls_config",
-            ).get('sample_batch_size', None),
+            _main_vls_config(self.config).get('sample_batch_size', None),
         )
         observation = self.adapter.get_policy_observation(sample_num=sample_num)
 
@@ -733,7 +770,7 @@ class Main:
                     "expected one of {'vls', 'eds'}"
                 )
 
-            vls_config = _config_section_to_dict(self.config.get("vls_config"), "main.vls_config")
+            vls_config = _main_vls_config(self.config)
             eds_config = _config_section_to_dict(self.config.get("eds_config"), "main.eds_config")
             eds_eval_config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
             eds_pretest_config = _config_section_to_dict(
@@ -961,10 +998,7 @@ class Main:
                 scale = self.policy.get_last_scale()
 
                 # Use config values for consistent display
-                vls_config = _config_section_to_dict(
-                    self.config.get("vls_config"),
-                    "main.vls_config",
-                )
+                vls_config = _main_vls_config(self.config)
                 k = vls_config.get("sigmoid_k", 12.0)
                 x0 = vls_config.get("sigmoid_x0", 0.8)
                 sig_strength = 1.0 / (1.0 + np.exp(k * (norm_r - x0)))
