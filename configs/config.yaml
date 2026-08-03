@@ -37,6 +37,12 @@ main:
   guidance_type: vls  # valid: vls, eds
   use_vlm_stage_recognition: true  # Use Gemini to recognize current stage
   vlm_query_limit: 50  # Max VLM queries per episode
+  execution_horizon_mode: fixed  # valid: fixed, adaptive_prefix
+  execution_horizon_far: 8
+  execution_horizon_near: 4
+  execution_horizon_contact: 2
+  execution_near_distance: 0.08
+  execution_contact_distance: 0.04
 
   vls_config:
     use_diversity: true
@@ -72,6 +78,33 @@ main:
     initial_diversity_start_ratio: null
     initial_diversity_fallback: iid
     initial_cache_metadata: true
+    truncated_rollout_mode: baseline
+    rollout_diversity_scale: 1.0
+    rollout_diversity_start_ratio: 0.8
+    rollout_diversity_iters: 0
+    rollout_diversity_skip_final_steps: 0
+    parent_weighting_mode: legacy_temperature
+    selection_ess_target_ratio: 0.6
+    selection_beta_max: 100.0
+    selection_bisection_steps: 24
+    parent_coverage_mode: none
+    parent_anchor_count: 0
+    parent_anchor_reward_quantile: 0.5
+    elite_carryover_count: 0
+    rollout_diversity_control_mode: fixed
+    rollout_diversity_target_ratio: 1.0
+    rollout_diversity_band_ratio: 0.2
+    rollout_diversity_scale_min: 0.0
+    rollout_diversity_scale_max: 20.0
+    rollout_diversity_decay_floor: 0.25
+    chunk_population_mode: fresh
+    chunk_memory_fraction: 0.0
+    chunk_memory_renoise_steps: 2
+    chunk_memory_reward_guard_quantile: 0.25
+    search_schedule_mode: legacy_linear
+    adaptive_min_cem_iters: 4
+    adaptive_early_stop_patience: 2
+    adaptive_reward_improvement_eps: 0.001
 
   eds_eval:
     enabled: false
@@ -96,6 +129,7 @@ main:
     save_tensors: true
     plot_3d: true
     output_dir: outputs/rdt_eds_mechanism_pretest
+    output_mode: run_id  # valid: run_id, qualitative_chunk
     run_id: null
     max_chunks: 1
     max_full_process_iters: 10

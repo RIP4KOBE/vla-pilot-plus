@@ -19,6 +19,7 @@ import numpy as np
 import torch
 import cv2
 import matplotlib.pyplot as plt
+from pathlib import Path
 from typing import Optional, Dict, Tuple, List
 from torch.nn.functional import interpolate
 from kmeans_pytorch import kmeans
@@ -114,10 +115,19 @@ class KeypointDetector:
         logger.info(f"Loading DINOv2 model: {model_name}")
         self.feature_extractor_type = 'dinov2'
         self.patch_size = 14  # DINOv2 uses patch size 14
-        self.dino_model = torch.hub.load(
-            'facebookresearch/dinov2',
-            model_name
-        ).eval().to(self.device)
+        cached_repo = Path(torch.hub.get_dir()) / "facebookresearch_dinov2_main"
+        if (cached_repo / "hubconf.py").exists():
+            logger.info(f"Loading DINOv2 model from local torch hub cache: {cached_repo}")
+            self.dino_model = torch.hub.load(
+                str(cached_repo),
+                model_name,
+                source="local",
+            ).eval().to(self.device)
+        else:
+            self.dino_model = torch.hub.load(
+                'facebookresearch/dinov2',
+                model_name
+            ).eval().to(self.device)
         logger.info(f"DINOv2 model loaded: {model_name}")
 
     def _load_dinov3(self, model_name: str):
@@ -645,5 +655,4 @@ class KeypointDetector:
         )
         
         return keypoints, projected, mask_ids, dino_vis
-
 
