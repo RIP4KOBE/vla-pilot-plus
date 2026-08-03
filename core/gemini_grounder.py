@@ -13,6 +13,7 @@ import base64
 import os
 import re
 import io
+import time
 from typing import List, Dict, Tuple, Optional
 from PIL import Image
 from openai import OpenAI
@@ -141,6 +142,7 @@ class GeminiStageRecognizer:
         self.config = config
         self.model = config.get("model", "gemini-2.5-flash")
         self.client = _make_client(config)
+        self._last_result = None
 
         template_path = config.get("stage_template_path")
         if template_path is None:
@@ -150,6 +152,13 @@ class GeminiStageRecognizer:
             self.prompt_template = f.read()
 
         logger.info(f"GeminiStageRecognizer initialized with model: {self.model}")
+
+    @property
+    def last_result(self) -> Optional[Dict[str, object]]:
+        """Return a copy of the latest query metadata for audit logging."""
+        if self._last_result is None:
+            return None
+        return dict(self._last_result)
 
     def identify_stage_and_guidance(
         self,
@@ -186,6 +195,11 @@ class GeminiStageRecognizer:
         })
 
         stage_num, need_guidance = 1, True
+        output = None
+        evidence = ""
+        error = None
+        parse_ok = False
+        query_start_s = time.perf_counter()
         try:
             resp = self.client.chat.completions.create(
                 model=self.model,
@@ -195,24 +209,43 @@ class GeminiStageRecognizer:
             )
             output = resp.choices[0].message.content.strip()
 
-            m = re.search(r"stage\s+(\d+)", output.lower())
-            if m:
-                stage_num = int(m.group(1))
+            stage_match = re.search(r"stage\s+(\d+)", output.lower())
+            if stage_match:
+                stage_num = int(stage_match.group(1))
                 if num_stages:
                     stage_num = min(stage_num, num_stages)
 
-            m = re.search(r"guidance:\s*(yes|no)", output.lower())
-            if m:
-                need_guidance = m.group(1) == "yes"
+            guidance_match = re.search(r"guidance:\s*(yes|no)", output.lower())
+            if guidance_match:
+                need_guidance = guidance_match.group(1) == "yes"
 
-            evidence = ""
+            parse_ok = stage_match is not None and guidance_match is not None
+            if not parse_ok:
+                stage_num, need_guidance = 1, True
+                error = "Failed to parse both stage and guidance from response"
+
             m = re.search(r"evidence:\s*(.+)", output, re.IGNORECASE)
             if m:
                 evidence = m.group(1).strip()
 
-            logger.info(f"[Gemini] Stage:{stage_num} Guide:{'ON' if need_guidance else 'OFF'} | {evidence[:80]}")
+            if parse_ok:
+                logger.info(f"[Gemini] Stage:{stage_num} Guide:{'ON' if need_guidance else 'OFF'} | {evidence[:80]}")
+            else:
+                logger.error(error)
         except Exception as e:
+            error = str(e)
             logger.error(f"Gemini stage recognition failed: {e}")
+
+        self._last_result = {
+            "ok": error is None and parse_ok,
+            "parse_ok": parse_ok,
+            "raw_response": output,
+            "parsed_stage": stage_num,
+            "parsed_guidance": need_guidance,
+            "evidence": evidence,
+            "error": error,
+            "query_latency_s": float(time.perf_counter() - query_start_s),
+        }
 
         return stage_num, need_guidance
 

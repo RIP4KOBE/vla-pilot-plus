@@ -12,7 +12,7 @@
 
 ## Approved Spec
 
-- Design doc: `docs/01_specs/eds-init-pg-diverse-sampling-design.md`
+- Design doc: `docs/01_specs/2026-07-04-eds-init-pg-diverse-sampling-design.md`
 - Worktree: `/home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-pg-diverse-sampling`
 - Branch: `exp/eds-init-pg-diverse-sampling`
 
@@ -1554,7 +1554,7 @@ Expected: Either no output, or output only from context lines. If `_vls_guided_d
 Run:
 
 ```bash
-grep -R "farthest\\|fps\\|oversample" -n core tests scripts configs docs/01_specs/eds-init-pg-diverse-sampling-design.md docs/04_plans/2026-07-04-eds-init-pg-diverse-sampling.md
+grep -R "farthest\\|fps\\|oversample" -n core tests scripts configs docs/01_specs/2026-07-04-eds-init-pg-diverse-sampling-design.md docs/04_plans/2026-07-04-eds-init-pg-diverse-sampling.md
 ```
 
 Expected: no matches in `core/`, `tests/`, `scripts/`, or `configs/`. Matches in unrelated old docs are acceptable only outside this grep scope.
@@ -2048,4 +2048,3 @@ Use `superpowers:requesting-code-review` before opening a PR or asking for merge
   - Config field names match design: `initial_sampling_mode`, `initial_diversity_scale`, `initial_diversity_start_ratio`, `initial_diversity_fallback`, `initial_cache_metadata`.
   - Metrics field names match report requirements.
   - Trace field name is `initial_sampler_info` in dataclass and metadata.
-

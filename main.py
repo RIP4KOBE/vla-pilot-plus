@@ -145,6 +145,162 @@ def _adapter_actual_task_id(adapter: Any) -> int | None:
             return None
     return None
 
+
+_EXECUTION_HORIZON_CHOICES = frozenset({2, 4, 8})
+
+
+def _gripper_transition_in_prefix(
+    action_chunk: Any,
+    *,
+    prefix_steps: int,
+    previous_gripper_command: float | None = None,
+) -> bool | None:
+    """Detect a gripper sign change at the chunk boundary or inside its prefix."""
+    if action_chunk is None:
+        return None
+    if not isinstance(action_chunk, (torch.Tensor, np.ndarray)):
+        raise ValueError("action_chunk must be a torch.Tensor, numpy.ndarray, or None")
+    if (
+        isinstance(prefix_steps, bool)
+        or not isinstance(prefix_steps, int)
+        or prefix_steps < 2
+    ):
+        raise ValueError("prefix_steps must be an integer of at least 2")
+
+    shape = tuple(int(size) for size in action_chunk.shape)
+    if len(shape) != 3 or shape[0] != 1 or shape[2] != 7:
+        raise ValueError("action_chunk must have strict decoded LIBERO shape (1, T, 7)")
+    time_steps = shape[1]
+    if time_steps < 2:
+        raise ValueError("action_chunk time dimension T must be at least 2")
+    if prefix_steps > time_steps:
+        raise ValueError("prefix_steps must not exceed action_chunk time dimension T")
+
+    gripper = action_chunk[0, :prefix_steps, -1]
+    if isinstance(gripper, torch.Tensor):
+        if not bool(torch.isfinite(gripper).all().item()):
+            raise ValueError("gripper prefix contains nonfinite values")
+        values = gripper.detach().to(device="cpu", dtype=torch.float64).numpy()
+    else:
+        values = np.asarray(gripper, dtype=np.float64)
+        if not bool(np.isfinite(values).all()):
+            raise ValueError("gripper prefix contains nonfinite values")
+    boundary_transition = False
+    if previous_gripper_command is not None:
+        if isinstance(previous_gripper_command, bool):
+            raise ValueError("previous gripper command must be numeric, not bool")
+        previous_gripper_command = float(previous_gripper_command)
+        if not np.isfinite(previous_gripper_command):
+            raise ValueError("previous gripper command must be finite")
+        boundary_transition = previous_gripper_command * values[0] < 0.0
+    return bool(boundary_transition or np.any(values[:-1] * values[1:] < 0.0))
+
+
+def _resolve_execution_horizon(
+    *,
+    mode: str,
+    policy_horizon: int,
+    guidance_enabled: bool,
+    stage_changed: bool,
+    target_distance: float | None,
+    gripper_transition: bool | None,
+    far_steps: int = 8,
+    near_steps: int = 4,
+    contact_steps: int = 2,
+    near_distance: float = 0.08,
+    contact_distance: float = 0.04,
+) -> tuple[int, str]:
+    """Resolve how many actions from the current 8-step chunk to execute."""
+    mode = str(mode).lower()
+    if mode not in {"fixed", "adaptive_prefix"}:
+        raise ValueError(
+            "execution_horizon_mode must be one of "
+            "{'fixed', 'adaptive_prefix'}"
+        )
+
+    step_values = {
+        "policy_horizon": policy_horizon,
+        "far_steps": far_steps,
+        "near_steps": near_steps,
+        "contact_steps": contact_steps,
+    }
+    for name, value in step_values.items():
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise ValueError(f"{name} must be one of {sorted(_EXECUTION_HORIZON_CHOICES)}")
+        if value not in _EXECUTION_HORIZON_CHOICES:
+            raise ValueError(f"{name} must be one of {sorted(_EXECUTION_HORIZON_CHOICES)}")
+    if not (contact_steps <= near_steps <= far_steps <= policy_horizon):
+        raise ValueError(
+            "execution horizons must satisfy contact <= near <= far <= policy_horizon"
+        )
+
+    if isinstance(near_distance, bool) or isinstance(contact_distance, bool):
+        raise ValueError("execution distance thresholds must be numeric, not bool")
+    near_distance = float(near_distance)
+    contact_distance = float(contact_distance)
+    if not np.isfinite(near_distance) or near_distance < 0.0:
+        raise ValueError("execution_near_distance must be finite and nonnegative")
+    if not np.isfinite(contact_distance) or contact_distance < 0.0:
+        raise ValueError("execution_contact_distance must be finite and nonnegative")
+    if contact_distance > near_distance:
+        raise ValueError("execution_contact_distance must not exceed execution_near_distance")
+    if target_distance is not None:
+        if isinstance(target_distance, bool):
+            raise ValueError("target_distance must be numeric, not bool")
+        target_distance = float(target_distance)
+        if not np.isfinite(target_distance):
+            raise ValueError("target_distance must be finite when provided")
+
+    if mode == "fixed":
+        return policy_horizon, "fixed"
+    if gripper_transition is True:
+        return contact_steps, "gripper_transition"
+    if target_distance is not None and target_distance <= contact_distance:
+        return contact_steps, "contact_distance"
+    if stage_changed:
+        return min(near_steps, policy_horizon), "stage_change"
+    if not guidance_enabled:
+        return policy_horizon, "guidance_off"
+    if target_distance is not None and target_distance <= near_distance:
+        return near_steps, "near_distance"
+    if target_distance is None:
+        return far_steps, "target_distance_unavailable"
+    return far_steps, "far_distance"
+
+
+def _eds_mechanism_pretest_output_root(
+    *,
+    eds_pretest_config: dict,
+    eds_eval_config: dict,
+    run_id: str,
+    output_dir: str,
+    episode: int,
+    global_step: int,
+) -> Path:
+    output_mode = str(eds_pretest_config.get("output_mode", "run_id"))
+    if output_mode == "qualitative_chunk":
+        eval_root = Path(eds_eval_config.get("output_dir", output_dir))
+        return (
+            eval_root
+            / "qualitative"
+            / f"episode_{int(episode):03d}"
+            / f"chunk_{int(global_step):06d}"
+        )
+    if output_mode != "run_id":
+        raise ValueError(
+            "main.eds_mechanism_pretest.output_mode must be one of "
+            "{'run_id', 'qualitative_chunk'}"
+        )
+    return (
+        Path(
+            eds_pretest_config.get(
+                "output_dir",
+                "outputs/rdt_eds_mechanism_pretest",
+            )
+        )
+        / run_id
+    )
+
 # Add project root to path (for local modules like steer_utils, utils, etc.)
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 if PROJECT_ROOT not in sys.path:
@@ -548,6 +704,79 @@ class Main:
         val = action_chunk[0][action_idx][-1]
         return val.item() if hasattr(val, 'item') else val
 
+    def _get_gripper_edge_values(self, action_chunk) -> tuple[Optional[float], Optional[float]]:
+        """Return first/last gripper commands when the chunk shape is available."""
+        if action_chunk is None:
+            return None, None
+        try:
+            chunk_length = int(action_chunk.shape[1])
+            if chunk_length <= 0:
+                return None, None
+            return (
+                self._get_gripper_value(action_chunk, 0),
+                self._get_gripper_value(action_chunk, chunk_length - 1),
+            )
+        except (AttributeError, IndexError, TypeError, ValueError):
+            return None, None
+
+    def _stage_event_secrets(self) -> list[str]:
+        secrets = [
+            os.environ.get("OPENAI_API_KEY"),
+            os.environ.get("GOOGLE_API_KEY"),
+        ]
+        recognizer = getattr(self, "gemini_stage_recognizer", None)
+        recognizer_config = getattr(recognizer, "config", None)
+        if isinstance(recognizer_config, dict):
+            secrets.append(recognizer_config.get("api_key"))
+        return [str(secret) for secret in secrets if secret]
+
+    def _append_stage_event(self, event: dict) -> None:
+        """Append one redacted stage event without interrupting control on I/O failure."""
+        secrets = self._stage_event_secrets()
+        safe_event = {}
+        for key, value in event.items():
+            if isinstance(value, str):
+                for secret in secrets:
+                    value = value.replace(secret, "[REDACTED]")
+            safe_event[key] = value
+
+        eds_eval_config = _config_section_to_dict(
+            self.config.get("eds_eval"),
+            "main.eds_eval",
+        )
+        trace_root = eds_eval_config.get("output_dir") or self.output_dir
+        trace_path = Path(trace_root) / "stage_events.jsonl"
+        try:
+            append_jsonl(trace_path, safe_event)
+        except Exception as e:
+            log.warning(f"Failed to append stage-event trace to {trace_path}: {e}")
+
+    def _append_episode_metadata(
+        self,
+        *,
+        episode: int,
+        episode_seed: int,
+        task_id: Optional[int],
+    ) -> None:
+        """Persist the episode seed needed for paired A/B validation."""
+        eds_eval_config = _config_section_to_dict(
+            self.config.get("eds_eval"),
+            "main.eds_eval",
+        )
+        trace_root = eds_eval_config.get("output_dir") or self.output_dir
+        metadata_path = Path(trace_root) / "episode_metadata.jsonl"
+        try:
+            append_jsonl(
+                metadata_path,
+                {
+                    "episode_id": int(episode),
+                    "episode_seed": int(episode_seed),
+                    "task_id": task_id,
+                },
+            )
+        except Exception as e:
+            log.warning(f"Failed to append episode metadata to {metadata_path}: {e}")
+
     def _update_stage(self, state: dict, gripper_val: Optional[float],
                       upper_th: float, lower_th: float) -> dict:
         """
@@ -585,6 +814,11 @@ class Main:
         # Query VLM if triggered (with limit check)
         vlm_query_limit = self.config.get("vlm_query_limit", 10)
         vlm_query_count = state.get('vlm_query_count', 0)
+        stage_before = state['current_stage']
+        guidance_before = state['use_guidance']
+        query_status = None
+        skipped_reason = None
+        query_result = {}
 
         if trigger_reason and self.gemini_stage_recognizer is not None and vlm_query_count < vlm_query_limit:
             log.info(f"[Trigger] {trigger_reason} (query {vlm_query_count + 1}/{vlm_query_limit})")
@@ -600,12 +834,27 @@ class Main:
             )
 
             state['vlm_query_count'] = vlm_query_count + 1
+            query_result = getattr(self.gemini_stage_recognizer, "last_result", None) or {}
+            if query_result:
+                query_status = "ok" if query_result.get("ok") else "error"
+            else:
+                query_status = "completed_without_result_metadata"
 
             if new_stage != state['current_stage'] or need_guidance != state['use_guidance']:
                 log.info(f"[VLM] Stage: {state['current_stage']} → {new_stage}, Guidance: {state['use_guidance']} → {need_guidance}")
-                if new_stage != state['current_stage']:
+                stage_changed = new_stage != state['current_stage']
+                guidance_changed = need_guidance != state['use_guidance']
+                if stage_changed:
                     self.policy.reset_stage()
                     curr_reward = 0.0  # Reset for new stage
+                elif guidance_changed:
+                    reset_chunk_memory = getattr(
+                        self.policy,
+                        "reset_eds_chunk_memory",
+                        None,
+                    )
+                    if callable(reset_chunk_memory):
+                        reset_chunk_memory("guidance_change")
 
             state.update({
                 'current_stage': new_stage,
@@ -613,10 +862,46 @@ class Main:
             })
         elif trigger_reason and vlm_query_count >= vlm_query_limit:
             log.debug(f"[Trigger] {trigger_reason} (skipped, limit {vlm_query_limit} reached)")
+            query_status = "skipped"
+            skipped_reason = "query_limit_reached"
+        elif trigger_reason:
+            log.debug(f"[Trigger] {trigger_reason} (skipped, recognizer unavailable)")
+            query_status = "skipped"
+            skipped_reason = "recognizer_unavailable"
+
+        if trigger_reason:
+            self._append_stage_event({
+                "episode_id": state.get("episode_id"),
+                "task_id": state.get("task_id"),
+                "global_step": state.get("global_step"),
+                "chunk_id": state.get("chunk_id"),
+                "episode_seed": state.get("episode_seed"),
+                "trigger_reason": trigger_reason,
+                "stage_before": stage_before,
+                "stage_after": state['current_stage'],
+                "guidance_before": guidance_before,
+                "guidance_after": state['use_guidance'],
+                "vlm_query_count": state.get('vlm_query_count', vlm_query_count),
+                "vlm_query_limit": int(vlm_query_limit),
+                "gripper_value_used": gripper_val,
+                "previous_gripper_value": state.get("previous_gripper_value"),
+                "first_gripper_value": state.get("first_gripper_value"),
+                "last_gripper_value": state.get("last_gripper_value"),
+                "query_status": query_status,
+                "query_ok": query_result.get("ok"),
+                "skipped_reason": skipped_reason,
+                "raw_response": query_result.get("raw_response"),
+                "parsed_stage": query_result.get("parsed_stage"),
+                "parsed_guidance": query_result.get("parsed_guidance"),
+                "evidence": query_result.get("evidence"),
+                "error": query_result.get("error"),
+                "query_latency_s": query_result.get("query_latency_s"),
+            })
 
         # Update tracking state
         state['prev_norm_reward'] = curr_reward
         state['prev_gripper_open'] = curr_gripper_open
+        state['last_gripper_value_used'] = gripper_val
         return state
 
     def run(self):
@@ -668,7 +953,7 @@ class Main:
 
             # Wrap entire episode execution in try-except
             try:
-                self._run_episode(episode, episode_dir)
+                self._run_episode(episode, episode_dir, episode_seed)
             except Exception as e:
                 log.error(f"Episode {episode+1} execution failed: {e}")
                 import traceback
@@ -679,6 +964,11 @@ class Main:
                 fail_marker = os.path.join(episode_dir, f'episode_{episode+1}_fail_error.txt')
                 with open(fail_marker, 'w') as f:
                     f.write(f"Episode failed due to execution error: {e}\n")
+                self._save_execution_failure_video(
+                    episode=episode,
+                    episode_dir=episode_dir,
+                    error=e,
+                )
                 log.warning(f"Skipping episode {episode+1} due to execution error")
                 continue
 
@@ -693,9 +983,38 @@ class Main:
             f.write(f"Success count: {self.success_count}/{episode_num}\n")
             f.write(f"Success rate: {success_rate:.2f}%\n")
 
-    def _run_episode(self, episode: int, episode_dir: str):
+    def _save_execution_failure_video(
+        self,
+        *,
+        episode: int,
+        episode_dir: str,
+        error: Exception,
+    ) -> None:
+        """Persist frames collected before an episode execution failure."""
+        video_path = os.path.join(
+            episode_dir,
+            f"episode_{episode + 1}_fail_error",
+        )
+        try:
+            self.video_recorder.save_video(
+                save_path=video_path,
+                success=False,
+                behavior_name=f"execution_error_{type(error).__name__}",
+            )
+        except Exception as video_error:
+            log.warning(
+                f"Failed to save partial video for episode {episode + 1}: "
+                f"{video_error}"
+            )
+
+    def _run_episode(self, episode: int, episode_dir: str, episode_seed: int):
         """Run a single episode with the current configuration."""
         observation = self._get_policy_observation()
+        self._append_episode_metadata(
+            episode=episode,
+            episode_seed=episode_seed,
+            task_id=_adapter_actual_task_id(self.adapter),
+        )
 
         # Evaluation loop
         done = False
@@ -706,6 +1025,10 @@ class Main:
         action_executed = 0
         use_guidance = False
         action_horizon = self.policy._action_chunk_horizon
+        resolved_action_horizon = action_horizon
+        execution_horizon_reason = "fixed"
+        execution_horizon_stage_change = False
+        replan_count = 0
         current_stage = 1
         current_guidance_fns = None
 
@@ -713,8 +1036,10 @@ class Main:
         UPPER_THRESHOLD = self.config.get("schmitt_upper", 0.8)
         LOWER_THRESHOLD = self.config.get("schmitt_lower", 0.6)
         action_chunk = None
+        chunk_id = 0
         qualitative_chunks_saved = 0
         pretest_chunks_saved = 0
+        previous_executed_gripper_command = None
 
         log.info(f"Task description: {self.adapter.get_task_description()}")
 
@@ -737,18 +1062,44 @@ class Main:
             'current_stage': current_stage,
             'use_guidance': use_guidance,
             'vlm_query_count': 0,
+            'episode_id': int(episode),
+            'task_id': _adapter_actual_task_id(self.adapter),
+            'global_step': 0,
+            'chunk_id': 0,
+            'episode_seed': int(episode_seed),
+            'previous_gripper_value': None,
+            'first_gripper_value': None,
+            'last_gripper_value': None,
+            'last_gripper_value_used': None,
         }
 
         while not done:
             generate_new_chunk = (action_executed == 0)
+            if generate_new_chunk:
+                execution_horizon_stage_change = False
 
             if generate_new_chunk and self.config.get("use_guidance", True) and hasattr(self, 'guidance_fns'):
                 keypoints = self.keypoint_tracker.get_keypoint_positions()
                 mask_ids = self.keypoint_tracker.get_mask_ids()
 
                 # Update stage recognition
+                first_gripper_value, last_gripper_value = self._get_gripper_edge_values(
+                    action_chunk
+                )
                 gripper_val = self._get_gripper_value(action_chunk, action_executed)
+                stage_state.update({
+                    'task_id': _adapter_actual_task_id(self.adapter),
+                    'global_step': int(global_steps),
+                    'chunk_id': int(chunk_id),
+                    'previous_gripper_value': stage_state.get('last_gripper_value_used'),
+                    'first_gripper_value': first_gripper_value,
+                    'last_gripper_value': last_gripper_value,
+                })
+                stage_before_update = stage_state["current_stage"]
                 stage_state = self._update_stage(stage_state, gripper_val, UPPER_THRESHOLD, LOWER_THRESHOLD)
+                execution_horizon_stage_change = (
+                    stage_state["current_stage"] != stage_before_update
+                )
 
                 current_stage = stage_state['current_stage']
                 use_guidance = stage_state['use_guidance']
@@ -842,7 +1193,78 @@ class Main:
             select_action_start_s = time.perf_counter()
             action_chunk = self.policy.select_action(**select_kwargs)
             select_action_latency_s = float(time.perf_counter() - select_action_start_s)
+            if hasattr(self.adapter, 'env_postprocessor'):
+                action_transition = {"action": action_chunk}
+                action_transition = self.adapter.env_postprocessor(action_transition)
+                action_chunk = action_transition["action"]
+            if generate_new_chunk:
+                chunk_id += 1
+                replan_count += 1
             actual_task_id = _adapter_actual_task_id(self.adapter)
+
+            eds_metrics = None
+            if generate_new_chunk and use_guidance and guidance_type == "eds":
+                get_eds_metrics = getattr(self.policy, "get_last_eds_metrics", None)
+                if callable(get_eds_metrics):
+                    raw_eds_metrics = get_eds_metrics()
+                    if raw_eds_metrics is not None:
+                        if not isinstance(raw_eds_metrics, dict):
+                            raise TypeError("policy.get_last_eds_metrics() must return a dict or None")
+                        eds_metrics = dict(raw_eds_metrics)
+
+            if generate_new_chunk:
+                execution_mode = str(
+                    self.config.get("execution_horizon_mode", "fixed")
+                ).lower()
+                if execution_mode not in {"fixed", "adaptive_prefix"}:
+                    raise ValueError(
+                        "execution_horizon_mode must be one of "
+                        "{'fixed', 'adaptive_prefix'}"
+                    )
+                if execution_mode == "fixed":
+                    resolved_action_horizon = action_horizon
+                    execution_horizon_reason = "fixed"
+                elif guidance_type != "eds":
+                    resolved_action_horizon = action_horizon
+                    execution_horizon_reason = "non_eds_policy_horizon"
+                else:
+                    contact_prefix = self.config.get("execution_horizon_contact", 2)
+                    if (
+                        isinstance(contact_prefix, bool)
+                        or not isinstance(contact_prefix, int)
+                        or contact_prefix not in _EXECUTION_HORIZON_CHOICES
+                    ):
+                        raise ValueError(
+                            "execution_horizon_contact/contact_steps must be one of "
+                            f"{sorted(_EXECUTION_HORIZON_CHOICES)}"
+                        )
+                    target_distance = (
+                        eds_metrics.get("target_distance_after")
+                        if eds_metrics is not None
+                        else None
+                    )
+                    gripper_transition = _gripper_transition_in_prefix(
+                        action_chunk,
+                        prefix_steps=contact_prefix,
+                        previous_gripper_command=previous_executed_gripper_command,
+                    )
+                    resolved_action_horizon, execution_horizon_reason = (
+                        _resolve_execution_horizon(
+                            mode=execution_mode,
+                            policy_horizon=action_horizon,
+                            guidance_enabled=bool(use_guidance),
+                            stage_changed=bool(execution_horizon_stage_change),
+                            target_distance=target_distance,
+                            gripper_transition=gripper_transition,
+                            far_steps=self.config.get("execution_horizon_far", 8),
+                            near_steps=self.config.get("execution_horizon_near", 4),
+                            contact_steps=contact_prefix,
+                            near_distance=self.config.get("execution_near_distance", 0.08),
+                            contact_distance=self.config.get(
+                                "execution_contact_distance", 0.04
+                            ),
+                        )
+                    )
 
             if (
                 generate_new_chunk
@@ -850,9 +1272,7 @@ class Main:
                 and guidance_type == "eds"
                 and eds_eval_config.get("enabled", False)
                 and eds_eval_config.get("write_metrics", True)
-                and hasattr(self.policy, "get_last_eds_metrics")
             ):
-                eds_metrics = self.policy.get_last_eds_metrics()
                 if eds_metrics is not None:
                     eds_metrics.update(
                         {
@@ -866,6 +1286,12 @@ class Main:
                             "renoise_t_max": eds_config.get("renoise_t_max"),
                             "renoise_t_min": eds_config.get("renoise_t_min"),
                             "select_action_latency_s": select_action_latency_s,
+                            "execution_horizon_resolved": int(resolved_action_horizon),
+                            "execution_horizon_reason": execution_horizon_reason,
+                            "execution_horizon_stage_change": bool(
+                                execution_horizon_stage_change
+                            ),
+                            "replan_count": int(replan_count),
                         }
                     )
                     if (
@@ -915,6 +1341,15 @@ class Main:
                     trace.suite = getattr(self.adapter, "suite_name", None)
                     trace.task_id = actual_task_id
                     trace.episode = int(episode)
+                    trace.execution_info = {
+                        "enabled": execution_mode == "adaptive_prefix",
+                        "execution_horizon_resolved": int(resolved_action_horizon),
+                        "execution_horizon_reason": execution_horizon_reason,
+                        "execution_horizon_stage_change": bool(
+                            execution_horizon_stage_change
+                        ),
+                        "replan_count": int(replan_count),
+                    }
                     seed = int(eds_pretest_config.get("seed", 0))
                     run_id = eds_pretest_config.get("run_id") or build_run_id(
                         suite=str(trace.suite or "unknown_suite"),
@@ -924,14 +1359,13 @@ class Main:
                         population_size=int(trace.population_size),
                         cem_iters=int(trace.cem_iters),
                     )
-                    pretest_root = (
-                        Path(
-                            eds_pretest_config.get(
-                                "output_dir",
-                                "outputs/rdt_eds_mechanism_pretest",
-                            )
-                        )
-                        / run_id
+                    pretest_root = _eds_mechanism_pretest_output_root(
+                        eds_pretest_config=eds_pretest_config,
+                        eds_eval_config=eds_eval_config,
+                        run_id=str(run_id),
+                        output_dir=self.output_dir,
+                        episode=int(episode),
+                        global_step=int(global_steps),
                     )
                     saved_trace_paths = save_mechanism_trace(
                         pretest_root,
@@ -950,11 +1384,6 @@ class Main:
                     )
                     pretest_chunks_saved += 1
 
-            if hasattr(self.adapter, 'env_postprocessor'):
-                action_transition = {"action": action_chunk}
-                action_transition = self.adapter.env_postprocessor(action_transition)
-                action_chunk = action_transition["action"]
-
             # Get image and add status overlay
             if self.config.get("debug_draw_trajectory", False):
                 from utils.vis_utils import draw_action_trajectory_on_vlm_image
@@ -966,7 +1395,7 @@ class Main:
                 image = draw_action_trajectory_on_vlm_image(
                     adapter=self.adapter,
                     action_chunk=visualization_action_chunk[:, action_executed:],
-                    num_steps=action_horizon,
+                    num_steps=resolved_action_horizon,
                     global_step=global_steps,
                     action_executed=action_executed,
                 )
@@ -1014,9 +1443,10 @@ class Main:
             image_with_status = add_text_to_image(image, status_text)
             self.video_recorder.add_frame(self.adapter.vlm_camera, image_with_status)
             obs, reward, terminated, truncated, info = self.adapter.step(action_chunk[0][action_executed])
+            previous_executed_gripper_command = gripper_val
 
             action_executed += 1
-            if action_executed == action_horizon:
+            if action_executed == resolved_action_horizon:
                 action_executed = 0
 
             observation = self._get_policy_observation()

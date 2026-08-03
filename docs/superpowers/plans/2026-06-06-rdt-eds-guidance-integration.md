@@ -1204,7 +1204,7 @@ git commit -m "feat: add EDS guided denoise loop"
 ### Task 6: Final Integration Checks and Evaluation Gate
 
 **Files:**
-- Modify: `docs/01_specs/rdt_eds_guidance_integration_design.md` only if implementation reveals a spec mismatch
+- Modify: `docs/01_specs/2026-06-06-rdt-eds-guidance-integration-design.md` only if implementation reveals a spec mismatch
 - Test: full CPU test suite subset and one optional RDT smoke command
 
 - [ ] **Step 1: Run syntax checks**
@@ -1292,7 +1292,7 @@ Target gate: EDS SR is within 10-15 percentage points of VLS SR on the same eval
 If implementation changes the spec or adds evaluation notes:
 
 ```bash
-git add docs/01_specs/rdt_eds_guidance_integration_design.md
+git add docs/01_specs/2026-06-06-rdt-eds-guidance-integration-design.md
 git commit -m "docs: record EDS guidance validation notes"
 ```
 

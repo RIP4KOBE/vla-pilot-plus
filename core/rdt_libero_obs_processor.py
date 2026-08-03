@@ -144,7 +144,7 @@ class RDTLiberoObsProcessor:
         if np.any((gripper < gripper_low) | (gripper > gripper_high)):
             raise ValueError(
                 "Expected robot0_gripper_qpos values within raw qpos range "
-                f"[{GRIPPER_MIN}, {GRIPPER_MAX}]"
+                f"[{GRIPPER_MIN}, {GRIPPER_MAX}]; values={gripper.tolist()}"
             )
 
         gripper_norm = (gripper - GRIPPER_MIN) / (GRIPPER_MAX - GRIPPER_MIN)

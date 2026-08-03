@@ -4,7 +4,7 @@ Date: 2026-06-11
 
 Worktree: `.worktrees/feat/rdt_ed_steering_integration`
 
-Scope: evaluate whether the RDT+EDS steering mechanism is correctly deployed and algorithmically effective after implementing the integration design in `docs/01_specs/rdt_eds_guidance_integration_design.md`.
+Scope: evaluate whether the RDT+EDS steering mechanism is correctly deployed and algorithmically effective after implementing the integration design in `docs/01_specs/2026-06-06-rdt-eds-guidance-integration-design.md`.
 
 This protocol is restricted to:
 
@@ -27,7 +27,7 @@ The purpose of this evaluation is not to reinterpret previous OOD runs. Those ru
 
 The target question is narrower and cleaner:
 
-1. After deploying EDS according to `rdt_eds_guidance_integration_design.md`, does RDT actually enter the EDS path and execute the intended population optimization loop?
+1. After deploying EDS according to `2026-06-06-rdt-eds-guidance-integration-design.md`, does RDT actually enter the EDS path and execute the intended population optimization loop?
 2. Under a correctly loaded RDT checkpoint for LIBERO-Object, does EDS improve reward, target progress, and task behavior on `libero_object`?
 3. After LIBERO-PRO perturbations are correctly installed and generated, does EDS remain effective under perturbation OOD on `libero_object_*` suites?
 

@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "benchmark": "LIBERO-PRO libero_object_swap",
+  "task_ids": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  "episodes_per_profile": 10,
+  "strict_perturbations": true,
+  "stage_recognition": true,
+  "gemini_grounding": false,
+  "output_root": "/mnt/data/shared2/hynx/VLA-Pilot++/eds-init-pg-diverse-sampling/outputs/ood_eval/p2_adaptive_eds_rbf",
+  "worktree_symlink": "outputs/ood_eval/p2_adaptive_eds_rbf",
+  "experiment_code_state_sha256": "e7931dc95b5ed6f525ef86f83778fb93677a749cb08fa18db626d1f24eeabb7f",
+  "integration_manifest_sha256": "e29547879aadc3ea151ce79405f66a401a3d060b0eb09a972b6bea90861b8c17",
+  "provenance_note": "Stage A and the immutable integration manifest were validated under the frozen experiment code-state. Later changes only hardened report/validity parsing and did not alter or rerun experiment artifacts.",
+  "engineering_gate": {
+    "required_success_count": 5,
+    "best_valid_success_count": 3,
+    "best_new_component_success_count": 2,
+    "passed": false
+  },
+  "stage_a": [
+    {"profile": "p2_legacy_stage_on_rerun", "component": "legacy_baseline", "status": "done", "valid": true, "success_count": 3, "success_tasks": [3, 8, 9], "median_latency_s": 2.443445, "videos": 10, "metrics_records": 128, "qualitative_png": 1300},
+    {"profile": "p2_sel_ess05", "component": "adaptive_ess", "status": "done", "valid": true, "success_count": 0, "success_tasks": [], "median_latency_s": 2.459029, "videos": 10, "metrics_records": 191, "qualitative_png": 1320},
+    {"profile": "p2_sel_ess07", "component": "adaptive_ess", "status": "done", "valid": true, "success_count": 0, "success_tasks": [], "median_latency_s": 2.458913, "videos": 10, "metrics_records": 150, "qualitative_png": 1320},
+    {"profile": "p2_adaptrbf_t08_s10", "component": "adaptive_rollout_rbf", "status": "done", "valid": true, "success_count": 0, "success_tasks": [], "median_latency_s": 2.365720, "videos": 10, "metrics_records": 296, "qualitative_png": 1240},
+    {"profile": "p2_adaptrbf_t10_s20", "component": "adaptive_rollout_rbf", "status": "done", "valid": true, "success_count": 0, "success_tasks": [], "median_latency_s": 2.421882, "videos": 10, "metrics_records": 266, "qualitative_png": 1248},
+    {"profile": "p2_divres_k2_e1", "component": "diversity_aware_resampling", "status": "done", "valid": true, "success_count": 2, "success_tasks": [0, 4], "median_latency_s": 2.636293, "videos": 10, "metrics_records": 192, "qualitative_png": 1320},
+    {"profile": "p2_divres_k4_e2", "component": "diversity_aware_resampling", "status": "done", "valid": true, "success_count": 0, "success_tasks": [], "median_latency_s": 2.551197, "videos": 10, "metrics_records": 118, "qualitative_png": 1320},
+    {"profile": "p2_memory25", "component": "cross_chunk_memory", "status": "done", "valid": true, "success_count": 0, "success_tasks": [], "median_latency_s": 2.530193, "videos": 10, "metrics_records": 210, "qualitative_png": 1310},
+    {"profile": "p2_memory50", "component": "cross_chunk_memory", "status": "done", "valid": true, "success_count": 0, "success_tasks": [], "median_latency_s": 2.558946, "videos": 10, "metrics_records": 235, "qualitative_png": 1310},
+    {"profile": "p2_schedule_balanced", "component": "adaptive_schedule", "status": "done", "valid": true, "success_count": 1, "success_tasks": [8], "median_latency_s": 2.940020, "videos": 10, "metrics_records": 209, "qualitative_png": 1320},
+    {"profile": "p2_schedule_contact", "component": "adaptive_schedule", "status": "done", "valid": true, "success_count": 1, "success_tasks": [9], "median_latency_s": 2.943550, "videos": 10, "metrics_records": 290, "qualitative_png": 1320}
+  ],
+  "stage_b": [
+    {"profile": "p2_integrated_full", "status": "not_eligible", "job_launched": false, "reason": "No Stage A component satisfied the preregistered eligibility rule."},
+    {"profile": "p2_integrated_minimal", "status": "not_eligible", "job_launched": false, "reason": "No pair of eligible Stage A components exists."}
+  ],
+  "safety": {
+    "fallback_count": 0,
+    "nonfinite_count": 0,
+    "action_mask_violation_count": 0,
+    "ordinary_libero_fallback": false,
+    "qpos_execution_errors_retained_in_denominator": 2
+  }
+}

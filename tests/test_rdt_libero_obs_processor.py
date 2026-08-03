@@ -279,8 +279,10 @@ def test_out_of_range_gripper_qpos_raises_value_error():
     obs = _obs()
     obs["robot0_gripper_qpos"] = np.array([-1.0, 1.0], dtype=np.float32)
 
-    with pytest.raises(ValueError, match="robot0_gripper_qpos"):
+    with pytest.raises(ValueError, match="robot0_gripper_qpos") as exc_info:
         processor.process(obs)
+
+    assert "values=[-1.0, 1.0]" in str(exc_info.value)
 
 
 def test_empty_language_raises_value_error():
