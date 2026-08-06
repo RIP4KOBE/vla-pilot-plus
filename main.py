@@ -1138,6 +1138,9 @@ class Main:
 
     def _run_episode(self, episode: int, episode_dir: str, episode_seed: int):
         """Run a single episode with the current configuration."""
+        set_episode_context = getattr(self.policy, "set_eds_episode_context", None)
+        if callable(set_episode_context):
+            set_episode_context(int(episode), int(episode_seed))
         observation = self._get_policy_observation()
         qpos_violations_since_last_metric = _gripper_qpos_violation_count(observation)
         if qpos_violations_since_last_metric:

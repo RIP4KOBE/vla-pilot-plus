@@ -115,6 +115,18 @@ main:
     adaptive_min_cem_iters: 4
     adaptive_early_stop_patience: 2
     adaptive_reward_improvement_eps: 0.001
+    qd_archive_mode: none
+    qd_descriptor: target_relative_endpoint_xy
+    qd_grid_shape: [4, 4]
+    qd_cell_capacity: 1
+    qd_parent_sampling: uniform_cells
+    qd_sparse_exponent: 1.0
+    qd_bounds_quantiles: [0.05, 0.95]
+    qd_bounds_expand_fraction: 0.10
+    qd_min_axis_span_m: 0.08
+    qd_overflow_policy: clamp_edge
+    qd_tie_break: stable_fingerprint
+    qd_metrics_observer: false
 
   eds_eval:
     enabled: false

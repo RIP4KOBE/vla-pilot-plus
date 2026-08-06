@@ -16,6 +16,11 @@ class _DummyAdapter:
     def get_vlm_image(self):
         return self.image.copy()
 
+    def delta_actions_to_ee_trajectory(self, actions):
+        actions = torch.as_tensor(actions, dtype=torch.float32)
+        start = torch.zeros(1, 3)
+        return torch.cat([start, torch.cumsum(actions[:, :3], dim=0)], dim=0)
+
 
 def _dummy_image(value):
     image = np.zeros((8, 8, 3), dtype=np.uint8)
@@ -145,3 +150,60 @@ def test_save_eds_qualitative_artifacts_falls_back_when_keypoint_draw_fails(
     assert path.exists()
     image = imageio.imread(path)
     assert image[0, 0, 1] == 64
+
+
+def test_save_qd_archive_heatmaps_trajectories_and_timeline(tmp_path):
+    import utils.eds_eval_vis as vis
+
+    def state(iter_idx):
+        actions = torch.zeros(2, 4, 7)
+        actions[0, :, 0] = 0.01 * (iter_idx + 2)
+        actions[1, :, 1] = -0.01 * (iter_idx + 2)
+        return {
+            "iter_idx": iter_idx,
+            "actions": actions,
+            "rewards": torch.tensor([1.0 + iter_idx, 2.0 + iter_idx]),
+            "cell_ids": torch.tensor([0, 3]),
+            "archive": [
+                {
+                    "cell_id": 0,
+                    "reward": 1.0 + iter_idx,
+                    "fingerprint": "a" * 64,
+                    "source_iter": iter_idx,
+                    "parent_cell_id": 0 if iter_idx >= 0 else None,
+                    "insert_sequence": 0,
+                },
+                {
+                    "cell_id": 3,
+                    "reward": 2.0 + iter_idx,
+                    "fingerprint": "b" * 64,
+                    "source_iter": iter_idx,
+                    "parent_cell_id": 3 if iter_idx >= 0 else None,
+                    "insert_sequence": 1,
+                },
+            ],
+        }
+
+    saved = vis.save_eds_qualitative_artifacts(
+        output_dir=tmp_path,
+        adapter=_DummyAdapter(),
+        keypoints=np.array([[0.0, 0.0, 0.0]], dtype=np.float32),
+        mask_ids=None,
+        artifacts={
+            "qd_grid_shape": [2, 2],
+            "qd_bounds_xy_m": [[-0.04, -0.04], [0.04, 0.04]],
+            "qd_initial_archive": state(-1),
+            "qd_archive_by_iter": [state(i) for i in range(10)],
+        },
+        episode=0,
+        global_step=8,
+        max_iters=10,
+    )
+
+    output_root = tmp_path / "episode_000" / "chunk_000008"
+    names = {Path(path).name for path in saved}
+    for label in ("initial", "iter_001", "iter_005", "iter_010"):
+        assert f"qd_archive_heatmap_{label}.png" in names
+        assert f"qd_archive_trajectories_{label}.png" in names
+    assert "qd_archive_timeline.json" in names
+    assert imageio.imread(output_root / "qd_archive_heatmap_iter_010.png").size > 0

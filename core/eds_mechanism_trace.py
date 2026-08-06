@@ -50,6 +50,7 @@ class EDSMechanismTrace:
     adaptive_rollout_info: dict[str, Any] = field(default_factory=dict)
     chunk_memory_info: dict[str, Any] = field(default_factory=dict)
     search_schedule_info: dict[str, Any] = field(default_factory=dict)
+    qd_info: dict[str, Any] = field(default_factory=dict)
     execution_info: dict[str, Any] = field(default_factory=dict)
 
 
@@ -175,6 +176,7 @@ def load_mechanism_trace(input_dir: str | Path) -> EDSMechanismTrace:
         adaptive_rollout_info=metadata.get("adaptive_rollout_info", {}),
         chunk_memory_info=metadata.get("chunk_memory_info", {}),
         search_schedule_info=metadata.get("search_schedule_info", {}),
+        qd_info=metadata.get("qd_info", {}),
         execution_info=metadata.get("execution_info", {}),
     )
 
@@ -219,6 +221,7 @@ def _validate_mechanism_trace_payload(
         "adaptive_rollout_info",
         "chunk_memory_info",
         "search_schedule_info",
+        "qd_info",
         "execution_info",
     ):
         if field_name in metadata and not isinstance(metadata[field_name], dict):
@@ -340,6 +343,7 @@ def _metadata_payload(trace: EDSMechanismTrace) -> dict[str, Any]:
         "adaptive_rollout_info": _json_safe(trace.adaptive_rollout_info),
         "chunk_memory_info": _json_safe(trace.chunk_memory_info),
         "search_schedule_info": _json_safe(trace.search_schedule_info),
+        "qd_info": _json_safe(trace.qd_info),
         "execution_info": _json_safe(trace.execution_info),
         "keypoints_shape": _shape_or_none(trace.keypoints),
         "num_stages": len(trace.stages),
@@ -363,6 +367,7 @@ def _tensor_payload(trace: EDSMechanismTrace) -> dict[str, Any]:
         "adaptive_rollout_info": _json_safe(trace.adaptive_rollout_info),
         "chunk_memory_info": _json_safe(trace.chunk_memory_info),
         "search_schedule_info": _json_safe(trace.search_schedule_info),
+        "qd_info": _json_safe(trace.qd_info),
         "execution_info": _json_safe(trace.execution_info),
         "keypoints": _detach_cpu_or_none(trace.keypoints),
         "scoring_keypoint_indices": trace.scoring_keypoint_indices,

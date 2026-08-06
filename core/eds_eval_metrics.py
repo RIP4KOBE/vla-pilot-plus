@@ -423,6 +423,49 @@ class EDSChunkMetrics:
     execution_horizon_reason: str | None = None
     execution_horizon_stage_change: bool = False
     replan_count: int = 0
+    qd_archive_enabled: bool = False
+    qd_descriptor: str = "target_relative_endpoint_xy"
+    qd_grid_shape: list[int] = field(default_factory=list)
+    qd_cell_capacity: int = 1
+    qd_parent_sampling: str = "uniform_cells"
+    qd_bounds_xy_m: list[list[float]] = field(default_factory=list)
+    qd_bounds_source_initial_checksum: str | None = None
+    qd_initial_occupied_cells: int = 0
+    qd_initial_accounting: dict[str, int] = field(default_factory=dict)
+    qd_initial_descriptor_overflow_count: int = 0
+    qd_occupied_cells_by_iter: list[int] = field(default_factory=list)
+    qd_coverage_ratio_by_iter: list[float] = field(default_factory=list)
+    qd_cell_occupancy_entropy_by_iter: list[float] = field(default_factory=list)
+    qd_cumulative_cell_visits_by_iter: list[list[int]] = field(default_factory=list)
+    qd_descriptor_overflow_count_by_iter: list[int] = field(default_factory=list)
+    qd_descriptor_overflow_ratio_by_iter: list[float] = field(default_factory=list)
+    qd_archive_insertions_by_iter: list[int] = field(default_factory=list)
+    qd_archive_replacements_by_iter: list[int] = field(default_factory=list)
+    qd_archive_rejections_by_iter: list[int] = field(default_factory=list)
+    qd_archive_turnover_ratio_by_iter: list[float] = field(default_factory=list)
+    qd_per_cell_elite_reward_by_iter: list[dict[str, float]] = field(default_factory=list)
+    qd_archive_best_reward_by_iter: list[float] = field(default_factory=list)
+    qd_archive_mean_elite_reward_by_iter: list[float] = field(default_factory=list)
+    qd_parent_slots_by_cell_by_iter: list[dict[str, int]] = field(default_factory=list)
+    qd_parent_weights_by_cell_by_iter: list[dict[str, float]] = field(default_factory=list)
+    qd_parent_covered_cell_ratio_by_iter: list[float] = field(default_factory=list)
+    qd_parent_cell_unique_ratio_by_iter: list[float] = field(default_factory=list)
+    qd_selected_cell: int | None = None
+    qd_selected_reward: float | None = None
+    qd_selected_action_fingerprint: str | None = None
+    qd_global_best_action_fingerprint: str | None = None
+    qd_archive_endpoint_xy_spread_m_by_iter: list[float] = field(default_factory=list)
+    qd_fallback_used: bool = False
+    qd_fallback_reason: str | None = None
+    qd_accounting_violation_count: int = 0
+    qd_elite_monotonicity_violation_count: int = 0
+    qd_final_selection_mismatch_count: int = 0
+    qd_archive_update_latency_s: float = 0.0
+    qd_parent_allocation_latency_s: float = 0.0
+    qd_evaluation_count: int = 0
+    shadow_qd_observer_enabled: bool = False
+    shadow_qd_candidate_stream: list[dict[str, Any]] = field(default_factory=list)
+    shadow_qd_observer_checksum: str | None = None
     per_iter: list[EDSIterMetrics] = field(default_factory=list)
 
     def to_jsonable(self) -> dict[str, Any]:

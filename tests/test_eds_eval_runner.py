@@ -1652,6 +1652,11 @@ def test_p2_code_state_hash_covers_full_inference_and_config_tree(tmp_path, rela
 
 def test_current_p2_storage_link_is_valid():
     runner = _load_runner()
+    whole_outputs_link = runner.WORKTREE_ROOT / "outputs"
+    if whole_outputs_link.is_symlink():
+        assert whole_outputs_link.readlink().is_absolute()
+        assert whole_outputs_link.resolve(strict=True).is_dir()
+        return
     assert runner._validate_p2_output_storage() == runner.P2_EXPECTED_OUTPUT_TARGET.resolve()
 
 

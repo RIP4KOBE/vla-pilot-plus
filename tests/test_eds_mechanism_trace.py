@@ -196,6 +196,15 @@ def _trace() -> EDSMechanismTrace:
                 }
             ],
         },
+        qd_info={
+            "enabled": True,
+            "descriptor": "target_relative_endpoint_xy",
+            "bounds_xy_m": [[-0.04, -0.04], [0.04, 0.04]],
+            "bounds_source_initial_checksum": "abc123",
+            "occupied_cells_by_iter": [4, 5],
+            "parent_slots_by_cell_by_iter": [{"0": 4, "1": 4}],
+            "global_best_action_fingerprint": "f" * 64,
+        },
         execution_info={
             "enabled": True,
             "execution_horizon_resolved": 4,
@@ -232,6 +241,7 @@ def test_adaptive_trace_save_load_round_trip_preserves_small_metadata(tmp_path):
     _assert_json_safe(payload["metadata"])
     assert metadata["adaptive_rollout_info"]["nonfinite_probe"] is None
     assert payload["selection_info"] == metadata["selection_info"]
+    assert payload["qd_info"] == metadata["qd_info"]
     assert payload["execution_info"] == metadata["execution_info"]
 
     load_trace = getattr(trace_module, "load_mechanism_trace", None)
@@ -244,6 +254,7 @@ def test_adaptive_trace_save_load_round_trip_preserves_small_metadata(tmp_path):
     assert restored.adaptive_rollout_info == metadata["adaptive_rollout_info"]
     assert restored.chunk_memory_info == metadata["chunk_memory_info"]
     assert restored.search_schedule_info == metadata["search_schedule_info"]
+    assert restored.qd_info == metadata["qd_info"]
     assert restored.execution_info == metadata["execution_info"]
     assert restored.stages[0].parent_probabilities == [None, None, 0.3, 0.2]
     assert restored.stages[0].parent_selection_kinds[1] == "deterministic_anchor"

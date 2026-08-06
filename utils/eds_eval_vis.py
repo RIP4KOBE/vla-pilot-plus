@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -201,6 +202,165 @@ def _save_mechanism_metric_curves(
     return True
 
 
+def _qd_archive_states(artifacts: dict[str, Any], max_iters: int):
+    initial = artifacts.get("qd_initial_archive")
+    if isinstance(initial, dict) and initial:
+        yield "initial", initial
+    by_iter = {
+        int(item.get("iter_idx", -999)): item
+        for item in artifacts.get("qd_archive_by_iter", [])
+        if isinstance(item, dict)
+    }
+    for iter_idx, label in ((0, "iter_001"), (4, "iter_005"), (9, "iter_010")):
+        if iter_idx < int(max_iters) and iter_idx in by_iter:
+            yield label, by_iter[iter_idx]
+
+
+def _save_qd_heatmap(
+    path: Path,
+    state: dict[str, Any],
+    *,
+    grid_shape: tuple[int, int],
+    bounds_xy_m: list[list[float]],
+) -> None:
+    grid_x, grid_y = grid_shape
+    rewards = np.full((grid_y, grid_x), np.nan, dtype=np.float64)
+    for entry in state.get("archive", []):
+        cell_id = int(entry["cell_id"])
+        if not 0 <= cell_id < grid_x * grid_y:
+            raise ValueError("QD archive cell id is outside visualization grid")
+        rewards[cell_id // grid_x, cell_id % grid_x] = float(entry["reward"])
+    figure, axis = plt.subplots(figsize=(6, 5))
+    masked = np.ma.masked_invalid(rewards)
+    image = axis.imshow(masked, origin="lower", cmap="viridis")
+    for y in range(grid_y):
+        for x in range(grid_x):
+            value = rewards[y, x]
+            label = "empty" if not np.isfinite(value) else f"{value:.3g}"
+            axis.text(x, y, label, ha="center", va="center", fontsize=8)
+    axis.set_xlabel("cell x")
+    axis.set_ylabel("cell y")
+    axis.set_title(
+        "QD occupancy / elite reward\n"
+        f"bounds lo={bounds_xy_m[0]} hi={bounds_xy_m[1]} m"
+    )
+    figure.colorbar(image, ax=axis, label="elite reward")
+    figure.tight_layout()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    figure.savefig(path, dpi=160)
+    plt.close(figure)
+
+
+def _save_qd_trajectories(
+    path: Path,
+    adapter,
+    state: dict[str, Any],
+    *,
+    grid_shape: tuple[int, int],
+    keypoints,
+) -> None:
+    actions = _to_action_candidates(state.get("actions"))
+    cell_values = torch.as_tensor(state.get("cell_ids"), dtype=torch.long).reshape(-1)
+    if actions.ndim != 3 or actions.shape[-1] != 7:
+        raise ValueError("QD qualitative actions must have shape (archive,H,7)")
+    if cell_values.numel() != actions.shape[0]:
+        raise ValueError("QD qualitative cell ids must match archive actions")
+    figure = plt.figure(figsize=(15, 4.8))
+    axis_xy = figure.add_subplot(1, 3, 1)
+    axis_xz = figure.add_subplot(1, 3, 2)
+    axis_3d = figure.add_subplot(1, 3, 3, projection="3d")
+    cmap = plt.get_cmap("tab20")
+    cell_count = grid_shape[0] * grid_shape[1]
+    for action, raw_cell in zip(actions, cell_values.tolist()):
+        trajectory = adapter.delta_actions_to_ee_trajectory(action).detach().cpu().float()
+        if trajectory.ndim != 2 or trajectory.shape[1] < 3:
+            raise ValueError("adapter returned invalid QD EEF trajectory")
+        xyz = trajectory[:, :3].numpy()
+        color = cmap(int(raw_cell) / max(cell_count - 1, 1))
+        label = f"cell {int(raw_cell)}"
+        axis_xy.plot(xyz[:, 0], xyz[:, 1], color=color, label=label)
+        axis_xz.plot(xyz[:, 0], xyz[:, 2], color=color, label=label)
+        axis_3d.plot(xyz[:, 0], xyz[:, 1], xyz[:, 2], color=color, label=label)
+    target = None
+    if keypoints is not None:
+        target_values = np.asarray(keypoints, dtype=np.float64).reshape(-1)
+        if target_values.size >= 3 and np.isfinite(target_values[:3]).all():
+            target = target_values[:3]
+    if target is not None:
+        axis_xy.scatter(target[0], target[1], marker="*", s=120, c="red")
+        axis_xz.scatter(target[0], target[2], marker="*", s=120, c="red")
+        axis_3d.scatter(target[0], target[1], target[2], marker="*", s=120, c="red")
+    axis_xy.set(xlabel="X (m)", ylabel="Y (m)", title="EEF XY by QD cell")
+    axis_xz.set(xlabel="X (m)", ylabel="Z (m)", title="EEF XZ by QD cell")
+    axis_3d.set(xlabel="X (m)", ylabel="Y (m)", zlabel="Z (m)", title="EEF 3D by QD cell")
+    for axis in (axis_xy, axis_xz, axis_3d):
+        axis.grid(True, alpha=0.3)
+    handles, labels = axis_xy.get_legend_handles_labels()
+    unique = dict(zip(labels, handles))
+    figure.legend(unique.values(), unique.keys(), loc="lower center", ncol=4, fontsize=7)
+    figure.tight_layout(rect=(0, 0.08, 1, 1))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    figure.savefig(path, dpi=160)
+    plt.close(figure)
+
+
+def _save_qd_qualitative_artifacts(
+    output_root: Path,
+    adapter,
+    keypoints,
+    artifacts: dict[str, Any],
+    max_iters: int,
+) -> list[str]:
+    states = list(_qd_archive_states(artifacts, max_iters))
+    if not states:
+        return []
+    raw_grid_shape = artifacts.get("qd_grid_shape")
+    if (
+        not isinstance(raw_grid_shape, (list, tuple))
+        or len(raw_grid_shape) != 2
+    ):
+        raise ValueError("QD qualitative artifacts require qd_grid_shape")
+    grid_shape = (int(raw_grid_shape[0]), int(raw_grid_shape[1]))
+    bounds_xy_m = artifacts.get("qd_bounds_xy_m")
+    if not isinstance(bounds_xy_m, list) or len(bounds_xy_m) != 2:
+        raise ValueError("QD qualitative artifacts require qd_bounds_xy_m")
+    saved = []
+    timeline = []
+    for label, state in states:
+        heatmap_path = output_root / f"qd_archive_heatmap_{label}.png"
+        _save_qd_heatmap(
+            heatmap_path,
+            state,
+            grid_shape=grid_shape,
+            bounds_xy_m=bounds_xy_m,
+        )
+        saved.append(str(heatmap_path))
+        trajectory_path = output_root / f"qd_archive_trajectories_{label}.png"
+        _save_qd_trajectories(
+            trajectory_path,
+            adapter,
+            state,
+            grid_shape=grid_shape,
+            keypoints=keypoints,
+        )
+        saved.append(str(trajectory_path))
+        timeline.append(
+            {
+                "label": label,
+                "iter_idx": int(state.get("iter_idx", -1)),
+                "archive": state.get("archive", []),
+                "parent_slots_by_cell": state.get("parent_slots_by_cell", {}),
+            }
+        )
+    timeline_path = output_root / "qd_archive_timeline.json"
+    timeline_path.write_text(
+        json.dumps(timeline, indent=2, sort_keys=True, allow_nan=False) + "\n",
+        encoding="utf-8",
+    )
+    saved.append(str(timeline_path))
+    return saved
+
+
 def save_eds_qualitative_artifacts(
     output_dir: str | Path,
     adapter,
@@ -275,5 +435,15 @@ def save_eds_qualitative_artifacts(
         list(_iter_artifacts(artifacts.get("per_iter", []), max_iters)),
     ):
         saved.append(str(mechanism_curve_path))
+
+    saved.extend(
+        _save_qd_qualitative_artifacts(
+            output_root,
+            adapter,
+            keypoints,
+            artifacts,
+            max_iters,
+        )
+    )
 
     return saved

@@ -8,6 +8,7 @@ Duck-typed to match DiffusionPolicySteer / PI05PolicySteer:
 from __future__ import annotations
 
 import json
+import hashlib
 import math
 import os
 import re
@@ -31,6 +32,16 @@ from core.eds_eval_metrics import (
 from core.eds_mechanism_trace import EDSMechanismTrace, EDSParticleStage
 from core.env_adapters import BaseEnvAdapter
 from core.fkd_class import FKD
+from core.qd_ed import (
+    QDArchive,
+    QDBounds,
+    QDParentAllocation,
+    allocate_parent_slots,
+    cell_ids as qd_cell_ids,
+    fingerprint_action,
+    freeze_bounds as qd_freeze_bounds,
+    qd_descriptor,
+)
 from core.rdt_libero_action_converter import (
     ACTIVE_ACTION_INDICES_SORTED,
     ACTIVE_INDICES_SORTED,
@@ -109,6 +120,18 @@ class _EDSConfig:
     adaptive_min_cem_iters: int = 4
     adaptive_early_stop_patience: int = 2
     adaptive_reward_improvement_eps: float = 1e-3
+    qd_archive_mode: str = "none"
+    qd_descriptor: str = "target_relative_endpoint_xy"
+    qd_grid_shape: tuple[int, int] = (4, 4)
+    qd_cell_capacity: int = 1
+    qd_parent_sampling: str = "uniform_cells"
+    qd_sparse_exponent: float = 1.0
+    qd_bounds_quantiles: tuple[float, float] = (0.05, 0.95)
+    qd_bounds_expand_fraction: float = 0.10
+    qd_min_axis_span_m: float = 0.08
+    qd_overflow_policy: str = "clamp_edge"
+    qd_tie_break: str = "stable_fingerprint"
+    qd_metrics_observer: bool = False
 
 
 @dataclass(frozen=True)
@@ -400,6 +423,12 @@ def _parse_eds_rollout_diversity_iters(value) -> int | str:
     if parsed < 0:
         raise ValueError("EDS rollout_diversity_iters must be >= 0 or 'all'")
     return parsed
+
+
+def _parse_eds_pair(value, field_name: str, item_parser) -> tuple:
+    if not isinstance(value, (list, tuple)) or len(value) != 2:
+        raise ValueError(f"EDS {field_name} must contain exactly two values")
+    return tuple(item_parser(item, field_name) for item in value)
 
 
 def _resolve_vls_config(vls_config: Optional[dict], *, default_sample_batch_size: int) -> dict:
@@ -919,6 +948,8 @@ class RDTSteer:
         self._last_raw_reward: float = 0.0
         self._current_alpha_t: float = 0.5
         self._cached_action_steps_remaining: int = 0
+        self._eds_episode_index: int = 0
+        self._eds_episode_seed: int = 0
         self._debug_first_step = False
         self._action_summary_logged = False
         self._last_visualization_action_candidates: Optional[Tensor] = None
@@ -1315,6 +1346,18 @@ class RDTSteer:
         self._last_eds_mechanism_trace = None
         if self._obs_processor is not None:
             self._obs_processor.reset()
+
+    def set_eds_episode_context(self, episode_index: int, episode_seed: int) -> None:
+        if (
+            isinstance(episode_index, bool)
+            or not isinstance(episode_index, Integral)
+            or int(episode_index) < 0
+        ):
+            raise ValueError("EDS episode index must be a nonnegative integer")
+        if isinstance(episode_seed, bool) or not isinstance(episode_seed, Integral):
+            raise ValueError("EDS episode seed must be an integer")
+        self._eds_episode_index = int(episode_index)
+        self._eds_episode_seed = int(episode_seed)
 
     def reset_stage(self) -> None:
         self.reset_eds_chunk_memory("stage_change")
@@ -4496,6 +4539,49 @@ class RDTSteer:
             parent_selection_kinds=serialized_parent_selection_kinds,
         )
 
+    def _eds_qd_descriptor(
+        self, population: Tensor, keypoints: Optional[Tensor]
+    ) -> Tensor:
+        trajectories = self._rdt_sample_to_trajectory_3d(population)
+        return qd_descriptor(trajectories, keypoints)
+
+    @staticmethod
+    def _eds_qd_freeze_bounds(
+        descriptors: Tensor, cfg: _EDSConfig
+    ) -> QDBounds:
+        return qd_freeze_bounds(
+            descriptors,
+            quantiles=cfg.qd_bounds_quantiles,
+            expand_fraction=cfg.qd_bounds_expand_fraction,
+            min_axis_span_m=cfg.qd_min_axis_span_m,
+        )
+
+    @staticmethod
+    def _eds_qd_cell_ids(
+        descriptors: Tensor, bounds: QDBounds, cfg: _EDSConfig
+    ) -> tuple[Tensor, Tensor]:
+        return qd_cell_ids(descriptors, bounds, cfg.qd_grid_shape)
+
+    @staticmethod
+    def _eds_qd_allocate_parent_slots(
+        archive: QDArchive,
+        cfg: _EDSConfig,
+        *,
+        episode: int,
+        global_step: int,
+        iter_idx: int,
+    ) -> QDParentAllocation:
+        return allocate_parent_slots(
+            archive,
+            population_size=cfg.population_size,
+            sampling=cfg.qd_parent_sampling,
+            sparse_exponent=cfg.qd_sparse_exponent,
+            run_seed=cfg.shuffle_seed,
+            episode=episode,
+            global_step=global_step,
+            iter_idx=iter_idx,
+        )
+
     def _eds_guided_denoise_loop(
         self,
         *,
@@ -4537,7 +4623,14 @@ class RDTSteer:
             cfg.direction_rbf_endpoint_weight,
         ]
         metrics.direction_rbf_endpoint_scale_m = cfg.direction_rbf_endpoint_scale_m
+        metrics.qd_archive_enabled = cfg.qd_archive_mode == "grid_archive"
+        metrics.qd_descriptor = cfg.qd_descriptor
+        metrics.qd_grid_shape = list(cfg.qd_grid_shape)
+        metrics.qd_cell_capacity = cfg.qd_cell_capacity
+        metrics.qd_parent_sampling = cfg.qd_parent_sampling
+        metrics.shadow_qd_observer_enabled = bool(cfg.qd_metrics_observer)
         artifact_iters: list[dict] = []
+        qd_archive_artifacts: list[dict] = []
         action_mask = cond["action_mask"]
         trace_enabled = self._eds_pretest_enabled(cfg, global_step)
         trace_stages: list[EDSParticleStage] = []
@@ -4617,6 +4710,80 @@ class RDTSteer:
             cfg.population_size,
         )
         population_rewards = self._eds_rewards_from_info(population_scores, population_info)
+        qd_archive: QDArchive | None = None
+        qd_bounds: QDBounds | None = None
+        qd_initial_artifact: dict = {}
+
+        def record_shadow_qd_candidates(
+            iter_idx: int,
+            candidates: Tensor,
+            rewards: Tensor,
+        ) -> None:
+            if not cfg.qd_metrics_observer:
+                return
+            descriptors = self._eds_qd_descriptor(candidates, keypoints)
+            record = {
+                "iter_idx": int(iter_idx),
+                "descriptors_xy_m": descriptors.detach().cpu().tolist(),
+                "rewards": [
+                    float(value)
+                    for value in rewards.detach().float().cpu().tolist()
+                ],
+                "fingerprints": [
+                    fingerprint_action(action) for action in candidates
+                ],
+            }
+            metrics.shadow_qd_candidate_stream.append(record)
+
+        record_shadow_qd_candidates(-1, population, population_rewards)
+        if metrics.qd_archive_enabled:
+            initial_descriptors = self._eds_qd_descriptor(population, keypoints)
+            qd_bounds = self._eds_qd_freeze_bounds(initial_descriptors, cfg)
+            initial_cell_ids, initial_overflow = self._eds_qd_cell_ids(
+                initial_descriptors, qd_bounds, cfg
+            )
+            qd_archive = QDArchive(grid_shape=cfg.qd_grid_shape)
+            qd_update_start = time.perf_counter()
+            initial_update = qd_archive.update(
+                actions=population,
+                rewards=population_rewards,
+                costs=population_scores,
+                descriptors=initial_descriptors,
+                cell_ids=initial_cell_ids,
+                source_iter=-1,
+            )
+            metrics.qd_archive_update_latency_s += float(
+                time.perf_counter() - qd_update_start
+            )
+            metrics.qd_bounds_xy_m = [
+                qd_bounds.lo.detach().float().cpu().tolist(),
+                qd_bounds.hi.detach().float().cpu().tolist(),
+            ]
+            metrics.qd_bounds_source_initial_checksum = qd_bounds.checksum
+            metrics.qd_initial_occupied_cells = len(qd_archive.entries)
+            metrics.qd_initial_descriptor_overflow_count = int(
+                initial_overflow.sum().detach().cpu().item()
+            )
+            metrics.qd_initial_accounting = {
+                "insertions": initial_update.insertions,
+                "replacements": initial_update.replacements,
+                "rejections": initial_update.rejections,
+                "total": initial_update.total,
+            }
+            metrics.qd_evaluation_count = cfg.population_size
+            initial_actions, initial_rewards, initial_costs, _, initial_cells = (
+                qd_archive.elite_tensors()
+            )
+            qd_initial_artifact = {
+                "iter_idx": -1,
+                "archive": qd_archive.snapshot(),
+                "actions": self._decode_visualization_action_candidates(
+                    initial_actions
+                ).detach().cpu(),
+                "rewards": initial_rewards.detach().cpu(),
+                "costs": initial_costs.detach().cpu(),
+                "cell_ids": initial_cells.detach().cpu(),
+            }
         adaptive_diversity_reference = metrics.initial_eef_diversity_final
         initial_best_idx = int(torch.argmin(population_scores).item())
         max_action_mask_violation = self._eds_action_mask_violation(population, cond)
@@ -4811,13 +4978,108 @@ class RDTSteer:
                         best_lineage_stable=adaptive_best_lineage_stable,
                     )
                 )
+            qd_parent_cell_ids: Tensor | None = None
+            if qd_archive is not None:
+                allocation_start = time.perf_counter()
+                allocation = self._eds_qd_allocate_parent_slots(
+                    qd_archive,
+                    cfg,
+                    episode=int(getattr(self, "_eds_episode_index", 0)),
+                    global_step=global_step,
+                    iter_idx=i,
+                )
+                metrics.qd_parent_allocation_latency_s += float(
+                    time.perf_counter() - allocation_start
+                )
+                population = allocation.parent_actions.to(
+                    device=x_t.device, dtype=x_t.dtype
+                )
+                population_scores = allocation.parent_costs.to(
+                    device=population.device
+                )
+                population_rewards = allocation.parent_rewards.to(
+                    device=population.device
+                )
+                qd_parent_cell_ids = allocation.parent_cell_ids.to(
+                    device=population.device
+                )
+                chunk_population_sources = ("qd_archive",) * cfg.population_size
+                occupied_count = len(qd_archive.entries)
+                covered_count = sum(
+                    int(count > 0) for count in allocation.slot_counts.values()
+                )
+                unique_cell_ratio = float(
+                    qd_parent_cell_ids.unique().numel() / cfg.population_size
+                )
+                metrics.qd_parent_slots_by_cell_by_iter.append(
+                    {
+                        str(cell): int(count)
+                        for cell, count in allocation.slot_counts.items()
+                    }
+                )
+                metrics.qd_parent_weights_by_cell_by_iter.append(
+                    {
+                        str(cell): float(weight)
+                        for cell, weight in allocation.weights.items()
+                    }
+                )
+                metrics.qd_parent_covered_cell_ratio_by_iter.append(
+                    float(covered_count / occupied_count)
+                )
+                metrics.qd_parent_cell_unique_ratio_by_iter.append(
+                    unique_cell_ratio
+                )
+                identity_indices = torch.arange(
+                    cfg.population_size,
+                    device=population.device,
+                    dtype=torch.long,
+                )
+                selection_kind = f"qd_{cfg.qd_parent_sampling}"
+                plan = EDSParentPlan(
+                    elite_indices=torch.empty(
+                        0, device=population.device, dtype=torch.long
+                    ),
+                    offspring_parent_indices=identity_indices,
+                    offspring_sources=("qd_archive_offspring",)
+                    * cfg.population_size,
+                    info={
+                        "selection_beta": None,
+                        "selection_ess": None,
+                        "selection_ess_ratio": None,
+                        "selection_entropy_normalized": None,
+                        "selection_max_probability": None,
+                        "selection_degenerate_reward": False,
+                        "elite_count": 0,
+                        "anchor_requested_count": 0,
+                        "anchor_count": 0,
+                        "anchor_shortfall": 0,
+                        "anchor_eligible_count": cfg.population_size,
+                        "anchor_unique_ratio": None,
+                        "anchor_min_pairwise_eef_distance": None,
+                        "anchor_fallback_reason": None,
+                        "offspring_unique_parent_ratio": unique_cell_ratio,
+                        "parent_mode_coverage": float(
+                            covered_count / occupied_count
+                        ),
+                        "parent_count_by_source": {
+                            "elite": 0,
+                            "anchor_offspring": 0,
+                            "weighted_offspring": 0,
+                            "qd_archive_offspring": cfg.population_size,
+                        },
+                        "parent_probabilities": [None] * cfg.population_size,
+                        "parent_selection_kinds": [selection_kind]
+                        * cfg.population_size,
+                    },
+                )
+            else:
+                plan = self._eds_select_parent_plan(
+                    population,
+                    population_scores,
+                    cfg,
+                )
             parent_source_scores = population_scores
             parent_source_rewards = population_rewards
-            plan = self._eds_select_parent_plan(
-                population,
-                population_scores,
-                cfg,
-            )
             selection_info = None if cfg.use_cem else plan.info
             unique_parent_ratio = plan.info["offspring_unique_parent_ratio"]
             elite_count = int(plan.elite_indices.numel())
@@ -4940,7 +5202,8 @@ class RDTSteer:
             offspring_parent_probabilities = full_parent_probabilities[elite_count:]
             offspring_parent_selection_kinds = full_parent_selection_kinds[elite_count:]
             selection_trace_enabled = (
-                cfg.parent_weighting_mode != "legacy_temperature"
+                qd_archive is not None
+                or cfg.parent_weighting_mode != "legacy_temperature"
                 or cfg.parent_coverage_mode != "none"
                 or elite_count > 0
             )
@@ -5259,6 +5522,112 @@ class RDTSteer:
                 population_scores,
                 population_info,
             )
+            record_shadow_qd_candidates(i, population, population_rewards)
+            if qd_archive is not None:
+                if qd_bounds is None or qd_parent_cell_ids is None:
+                    raise RuntimeError("QD archive loop state is incomplete")
+                child_descriptors = self._eds_qd_descriptor(population, keypoints)
+                child_cell_ids, child_overflow = self._eds_qd_cell_ids(
+                    child_descriptors, qd_bounds, cfg
+                )
+                qd_update_start = time.perf_counter()
+                qd_update = qd_archive.update(
+                    actions=population,
+                    rewards=population_rewards,
+                    costs=population_scores,
+                    descriptors=child_descriptors,
+                    cell_ids=child_cell_ids,
+                    source_iter=i,
+                    parent_cell_ids=qd_parent_cell_ids,
+                )
+                metrics.qd_archive_update_latency_s += float(
+                    time.perf_counter() - qd_update_start
+                )
+                metrics.qd_evaluation_count += cfg.population_size
+                occupied_count = len(qd_archive.entries)
+                archive_rewards = [
+                    entry.reward for entry in qd_archive.entries.values()
+                ]
+                metrics.qd_occupied_cells_by_iter.append(occupied_count)
+                metrics.qd_coverage_ratio_by_iter.append(
+                    float(occupied_count / qd_archive.cell_count)
+                )
+                metrics.qd_cell_occupancy_entropy_by_iter.append(
+                    qd_archive.occupancy_entropy()
+                )
+                metrics.qd_cumulative_cell_visits_by_iter.append(
+                    [
+                        int(value)
+                        for value in qd_archive.cumulative_visits.tolist()
+                    ]
+                )
+                overflow_count = int(
+                    child_overflow.sum().detach().cpu().item()
+                )
+                metrics.qd_descriptor_overflow_count_by_iter.append(
+                    overflow_count
+                )
+                metrics.qd_descriptor_overflow_ratio_by_iter.append(
+                    float(overflow_count / cfg.population_size)
+                )
+                metrics.qd_archive_insertions_by_iter.append(
+                    qd_update.insertions
+                )
+                metrics.qd_archive_replacements_by_iter.append(
+                    qd_update.replacements
+                )
+                metrics.qd_archive_rejections_by_iter.append(
+                    qd_update.rejections
+                )
+                metrics.qd_archive_turnover_ratio_by_iter.append(
+                    float(
+                        (qd_update.insertions + qd_update.replacements)
+                        / cfg.population_size
+                    )
+                )
+                metrics.qd_per_cell_elite_reward_by_iter.append(
+                    {
+                        str(cell): float(entry.reward)
+                        for cell, entry in sorted(qd_archive.entries.items())
+                    }
+                )
+                metrics.qd_archive_best_reward_by_iter.append(
+                    float(max(archive_rewards))
+                )
+                metrics.qd_archive_mean_elite_reward_by_iter.append(
+                    float(sum(archive_rewards) / len(archive_rewards))
+                )
+                metrics.qd_archive_endpoint_xy_spread_m_by_iter.append(
+                    qd_archive.endpoint_xy_spread_m()
+                )
+                metrics.qd_accounting_violation_count = (
+                    qd_archive.accounting_violation_count
+                )
+                metrics.qd_elite_monotonicity_violation_count = (
+                    qd_archive.elite_monotonicity_violation_count
+                )
+                (
+                    qd_artifact_actions,
+                    qd_artifact_rewards,
+                    qd_artifact_costs,
+                    _,
+                    qd_artifact_cells,
+                ) = qd_archive.elite_tensors()
+                qd_archive_artifacts.append(
+                    {
+                        "iter_idx": i,
+                        "archive": qd_archive.snapshot(),
+                        "actions": self._decode_visualization_action_candidates(
+                            qd_artifact_actions
+                        ).detach().cpu(),
+                        "rewards": qd_artifact_rewards.detach().cpu(),
+                        "costs": qd_artifact_costs.detach().cpu(),
+                        "cell_ids": qd_artifact_cells.detach().cpu(),
+                        "parent_slots_by_cell": dict(
+                            metrics.qd_parent_slots_by_cell_by_iter[-1]
+                        ),
+                    }
+                )
 
             if trace_enabled:
                 if i == 0:
@@ -5689,13 +6058,40 @@ class RDTSteer:
                     / metrics.initial_anchor_lineage_count
                 )
 
+        qd_best_idx: int | None = None
+        if qd_archive is not None:
+            (
+                population,
+                population_rewards,
+                population_scores,
+                _,
+                qd_final_cells,
+            ) = qd_archive.elite_tensors()
+            population_info = {"rewards": population_rewards}
+            chunk_population_sources = ("qd_archive",) * int(population.shape[0])
+            selected_cell, selected_entry = qd_archive.select_global_best()
+            matches = torch.nonzero(
+                qd_final_cells == selected_cell, as_tuple=False
+            ).reshape(-1)
+            if matches.numel() != 1:
+                raise RuntimeError("QD selected cell is not unique in final archive")
+            qd_best_idx = int(matches[0].detach().cpu().item())
+            metrics.qd_selected_cell = selected_cell
+            metrics.qd_selected_reward = selected_entry.reward
+            metrics.qd_selected_action_fingerprint = selected_entry.fingerprint
+            metrics.qd_global_best_action_fingerprint = selected_entry.fingerprint
+
         metrics.nonfinite_count = int(
             (~torch.isfinite(population)).sum().detach().cpu().item()
         )
         if not torch.isfinite(population).all():
             raise ValueError("EDS-guided RDT latent contains non-finite values")
 
-        best_idx = int(torch.argmin(population_scores).item())
+        best_idx = (
+            qd_best_idx
+            if qd_best_idx is not None
+            else int(torch.argmin(population_scores).item())
+        )
         selected = population[best_idx : best_idx + 1]
         final_rewards = self._eds_rewards_from_info(population_scores, population_info)
         final_reward_spread = final_rewards.max() - final_rewards.mean()
@@ -5705,6 +6101,13 @@ class RDTSteer:
         metrics.selected_idx = best_idx
         metrics.selected_cost = float(population_scores[best_idx].detach().cpu().item())
         metrics.selected_reward = float(final_rewards[best_idx].detach().cpu().item())
+        if qd_archive is not None:
+            selected_fingerprint = fingerprint_action(selected[0])
+            if (
+                selected_fingerprint != metrics.qd_global_best_action_fingerprint
+                or metrics.selected_reward != metrics.qd_selected_reward
+            ):
+                metrics.qd_final_selection_mismatch_count += 1
         metrics.selected_chunk_population_source = chunk_population_sources[best_idx]
         metrics.chunk_to_chunk_selected_trajectory_distance = (
             self._eds_chunk_selected_trajectory_distance(
@@ -5837,6 +6240,28 @@ class RDTSteer:
             )
             self._eds_chunk_memory_reset_reason = None
 
+        if cfg.qd_metrics_observer:
+            metrics.shadow_qd_observer_checksum = hashlib.sha256(
+                json.dumps(
+                    metrics.shadow_qd_candidate_stream,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                ).encode("utf-8")
+            ).hexdigest()
+        if qd_archive is not None:
+            expected_evaluations = cfg.population_size * (cfg.cem_iters + 1)
+            if metrics.qd_evaluation_count != expected_evaluations:
+                raise RuntimeError(
+                    "QD evaluation accounting mismatch: "
+                    f"{metrics.qd_evaluation_count} != {expected_evaluations}"
+                )
+            if (
+                metrics.qd_accounting_violation_count
+                or metrics.qd_elite_monotonicity_violation_count
+                or metrics.qd_final_selection_mismatch_count
+            ):
+                raise RuntimeError("QD archive hard-gate violation")
+
         self._last_eds_metrics = metrics.to_jsonable()
         self._last_eds_artifacts = {
             "initial_actions": initial_action_candidates,
@@ -5844,6 +6269,10 @@ class RDTSteer:
             "final_scores": population_scores.detach().cpu(),
             "selected_idx": best_idx,
             "per_iter": artifact_iters,
+            "qd_bounds_xy_m": list(metrics.qd_bounds_xy_m),
+            "qd_grid_shape": list(metrics.qd_grid_shape),
+            "qd_initial_archive": qd_initial_artifact,
+            "qd_archive_by_iter": qd_archive_artifacts,
         }
         if trace_enabled:
             rollout_diversity_info = {
@@ -5959,6 +6388,11 @@ class RDTSteer:
                         for item in self._last_eds_metrics["per_iter"]
                     ],
                 }
+            qd_trace_info = {
+                key: value
+                for key, value in self._last_eds_metrics.items()
+                if key.startswith("qd_") or key.startswith("shadow_qd_")
+            }
             self._last_eds_mechanism_trace = EDSMechanismTrace(
                 suite=None,
                 task_id=None,
@@ -5981,6 +6415,7 @@ class RDTSteer:
                 adaptive_rollout_info=adaptive_rollout_trace_info,
                 chunk_memory_info=chunk_memory_trace_info,
                 search_schedule_info=search_schedule_trace_info,
+                qd_info=qd_trace_info,
             )
         else:
             self._last_eds_mechanism_trace = None
@@ -6458,6 +6893,45 @@ class RDTSteer:
                 cfg.get("adaptive_reward_improvement_eps", 1e-3),
                 "adaptive_reward_improvement_eps",
             ),
+            qd_archive_mode=str(cfg.get("qd_archive_mode", "none")),
+            qd_descriptor=str(
+                cfg.get("qd_descriptor", "target_relative_endpoint_xy")
+            ),
+            qd_grid_shape=_parse_eds_pair(
+                cfg.get("qd_grid_shape", (4, 4)),
+                "qd_grid_shape",
+                _parse_eds_int,
+            ),
+            qd_cell_capacity=_parse_eds_int(
+                cfg.get("qd_cell_capacity", 1), "qd_cell_capacity"
+            ),
+            qd_parent_sampling=str(
+                cfg.get("qd_parent_sampling", "uniform_cells")
+            ),
+            qd_sparse_exponent=_parse_eds_float(
+                cfg.get("qd_sparse_exponent", 1.0), "qd_sparse_exponent"
+            ),
+            qd_bounds_quantiles=_parse_eds_pair(
+                cfg.get("qd_bounds_quantiles", (0.05, 0.95)),
+                "qd_bounds_quantiles",
+                _parse_eds_float,
+            ),
+            qd_bounds_expand_fraction=_parse_eds_float(
+                cfg.get("qd_bounds_expand_fraction", 0.10),
+                "qd_bounds_expand_fraction",
+            ),
+            qd_min_axis_span_m=_parse_eds_float(
+                cfg.get("qd_min_axis_span_m", 0.08), "qd_min_axis_span_m"
+            ),
+            qd_overflow_policy=str(
+                cfg.get("qd_overflow_policy", "clamp_edge")
+            ),
+            qd_tie_break=str(
+                cfg.get("qd_tie_break", "stable_fingerprint")
+            ),
+            qd_metrics_observer=_parse_eds_bool(
+                cfg.get("qd_metrics_observer", False), "qd_metrics_observer"
+            ),
         )
         if resolved.population_size <= 0:
             raise ValueError("EDS population_size must be positive")
@@ -6642,6 +7116,74 @@ class RDTSteer:
                     f"{field_name} must be one of {sorted(EDS_DIVERSITY_DESCRIPTOR_MODES)}"
                 )
         _validate_direction_rbf_config(resolved.__dict__)
+        if resolved.qd_archive_mode not in {"none", "grid_archive"}:
+            raise ValueError("EDS qd_archive_mode must be one of none, grid_archive")
+        if resolved.qd_descriptor != "target_relative_endpoint_xy":
+            raise ValueError(
+                "EDS qd_descriptor must be target_relative_endpoint_xy"
+            )
+        if resolved.qd_grid_shape not in {(3, 3), (4, 4), (5, 5)}:
+            raise ValueError("EDS qd_grid_shape is not a preregistered square grid")
+        if resolved.qd_cell_capacity != 1:
+            raise ValueError("EDS qd_cell_capacity must be 1")
+        if resolved.qd_parent_sampling not in {
+            "uniform_cells",
+            "sparse_priority",
+        }:
+            raise ValueError(
+                "EDS qd_parent_sampling must be uniform_cells or sparse_priority"
+            )
+        if resolved.qd_sparse_exponent != 1.0:
+            raise ValueError("EDS qd_sparse_exponent must be 1.0")
+        if resolved.qd_bounds_quantiles not in {
+            (0.0, 1.0),
+            (0.05, 0.95),
+            (0.10, 0.90),
+        }:
+            raise ValueError("EDS qd_bounds_quantiles are not preregistered")
+        if resolved.qd_bounds_expand_fraction not in {0.0, 0.10, 0.20}:
+            raise ValueError(
+                "EDS qd_bounds_expand_fraction is not preregistered"
+            )
+        if resolved.qd_min_axis_span_m not in {0.04, 0.08, 0.12}:
+            raise ValueError("EDS qd_min_axis_span_m is not preregistered")
+        if resolved.qd_overflow_policy != "clamp_edge":
+            raise ValueError("EDS qd_overflow_policy must be clamp_edge")
+        if resolved.qd_tie_break != "stable_fingerprint":
+            raise ValueError("EDS qd_tie_break must be stable_fingerprint")
+
+        if resolved.qd_archive_mode == "grid_archive":
+            required = {
+                "population_size": 16,
+                "cem_iters": 10,
+                "use_cem": False,
+                "renoise_t_max": 3,
+                "renoise_t_min": 1,
+                "initial_sampling_mode": "rbf_diverse_denoise",
+                "initial_diversity_descriptor_mode": "absolute_eef",
+                "initial_diversity_scale": 20.0,
+                "initial_diversity_start_ratio": 0.8,
+                "truncated_rollout_mode": "rbf_diverse",
+                "rollout_diversity_descriptor_mode": "absolute_eef",
+                "rollout_diversity_scale": 20.0,
+                "rollout_diversity_start_ratio": 0.6,
+                "rollout_diversity_iters": "all",
+                "rollout_diversity_skip_final_steps": 0,
+                "parent_weighting_mode": "legacy_temperature",
+                "parent_coverage_mode": "none",
+                "parent_anchor_count": 0,
+                "elite_carryover_count": 0,
+                "chunk_population_mode": "fresh",
+                "chunk_memory_fraction": 0.0,
+                "rollout_diversity_control_mode": "fixed",
+                "search_schedule_mode": "legacy_linear",
+            }
+            for field_name, expected in required.items():
+                if getattr(resolved, field_name) != expected:
+                    raise ValueError(
+                        "EDS grid_archive requires "
+                        f"{field_name}={expected!r}"
+                    )
         return resolved
 
     def _adaptive_scale_for_scheduler_t(

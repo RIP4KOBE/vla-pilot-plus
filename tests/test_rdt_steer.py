@@ -493,6 +493,17 @@ def test_reset_clears_action_buffer_and_observation_history(stub_steer, stub_ada
         stub_steer._obs_processor.current()
 
 
+def test_eds_episode_context_validates_and_records_episode_for_local_qd_rng(stub_steer):
+    stub_steer.set_eds_episode_context(8, 151)
+
+    assert stub_steer._eds_episode_index == 8
+    assert stub_steer._eds_episode_seed == 151
+    with pytest.raises(ValueError, match="episode index"):
+        stub_steer.set_eds_episode_context(-1, 151)
+    with pytest.raises(ValueError, match="episode seed"):
+        stub_steer.set_eds_episode_context(8, True)
+
+
 def test_guided_select_action_uses_latent_particle_batch(stub_steer, stub_adapter, mock_batch):
     stub_steer.post_init(
         adapter=stub_adapter,
@@ -2172,6 +2183,136 @@ def test_eds_config_defaults_keep_iid_initial_sampling(stub_steer):
     assert cfg.initial_diversity_start_ratio is None
     assert cfg.initial_diversity_fallback == "iid"
     assert cfg.initial_cache_metadata is True
+
+
+def test_qd_config_defaults_are_legacy_safe_and_match_yaml(stub_steer):
+    cfg = stub_steer._resolve_eds_config_with_reference_defaults({})
+    config_path = Path(__file__).resolve().parents[1] / "configs" / "config.yaml"
+    yaml_eds = yaml.safe_load(config_path.read_text(encoding="utf-8"))["main"][
+        "eds_config"
+    ]
+    expected = {
+        "qd_archive_mode": "none",
+        "qd_descriptor": "target_relative_endpoint_xy",
+        "qd_grid_shape": (4, 4),
+        "qd_cell_capacity": 1,
+        "qd_parent_sampling": "uniform_cells",
+        "qd_sparse_exponent": 1.0,
+        "qd_bounds_quantiles": (0.05, 0.95),
+        "qd_bounds_expand_fraction": 0.10,
+        "qd_min_axis_span_m": 0.08,
+        "qd_overflow_policy": "clamp_edge",
+        "qd_tie_break": "stable_fingerprint",
+        "qd_metrics_observer": False,
+    }
+
+    assert {field: getattr(cfg, field) for field in expected} == expected
+    assert {
+        field: tuple(yaml_eds[field]) if field in {"qd_grid_shape", "qd_bounds_quantiles"} else yaml_eds[field]
+        for field in expected
+    } == expected
+
+
+def _valid_qd_config(**updates):
+    return {
+        "population_size": 16,
+        "cem_iters": 10,
+        "use_cem": False,
+        "renoise_t_max": 3,
+        "renoise_t_min": 1,
+        "initial_sampling_mode": "rbf_diverse_denoise",
+        "initial_diversity_descriptor_mode": "absolute_eef",
+        "initial_diversity_scale": 20.0,
+        "initial_diversity_start_ratio": 0.8,
+        "truncated_rollout_mode": "rbf_diverse",
+        "rollout_diversity_descriptor_mode": "absolute_eef",
+        "rollout_diversity_scale": 20.0,
+        "rollout_diversity_start_ratio": 0.6,
+        "rollout_diversity_iters": "all",
+        "rollout_diversity_skip_final_steps": 0,
+        "parent_weighting_mode": "legacy_temperature",
+        "parent_coverage_mode": "none",
+        "elite_carryover_count": 0,
+        "chunk_population_mode": "fresh",
+        "rollout_diversity_control_mode": "fixed",
+        "search_schedule_mode": "legacy_linear",
+        "qd_archive_mode": "grid_archive",
+        "qd_descriptor": "target_relative_endpoint_xy",
+        "qd_grid_shape": [4, 4],
+        "qd_cell_capacity": 1,
+        "qd_parent_sampling": "uniform_cells",
+        "qd_sparse_exponent": 1.0,
+        "qd_bounds_quantiles": [0.05, 0.95],
+        "qd_bounds_expand_fraction": 0.10,
+        "qd_min_axis_span_m": 0.08,
+        "qd_overflow_policy": "clamp_edge",
+        "qd_tie_break": "stable_fingerprint",
+        "qd_metrics_observer": True,
+        **updates,
+    }
+
+
+def test_qd_config_accepts_primary_and_sparse_registered_profiles(stub_steer):
+    uniform = stub_steer._resolve_eds_config_with_reference_defaults(
+        _valid_qd_config()
+    )
+    sparse = stub_steer._resolve_eds_config_with_reference_defaults(
+        _valid_qd_config(qd_parent_sampling="sparse_priority")
+    )
+
+    assert uniform.qd_archive_mode == "grid_archive"
+    assert uniform.qd_grid_shape == (4, 4)
+    assert uniform.qd_bounds_quantiles == (0.05, 0.95)
+    assert sparse.qd_parent_sampling == "sparse_priority"
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("qd_archive_mode", "map_elites"),
+        ("qd_descriptor", "endpoint_xyz"),
+        ("qd_grid_shape", [4]),
+        ("qd_grid_shape", [4, 5]),
+        ("qd_grid_shape", [6, 6]),
+        ("qd_cell_capacity", 2),
+        ("qd_parent_sampling", "reward_mix"),
+        ("qd_sparse_exponent", 0.5),
+        ("qd_bounds_quantiles", [0.2, 0.8]),
+        ("qd_bounds_expand_fraction", 0.3),
+        ("qd_min_axis_span_m", 0.1),
+        ("qd_overflow_policy", "expand"),
+        ("qd_tie_break", "candidate_index"),
+        ("qd_metrics_observer", "sometimes"),
+    ],
+)
+def test_qd_config_rejects_unregistered_values(stub_steer, field, value):
+    with pytest.raises(ValueError, match=field):
+        stub_steer._resolve_eds_config_with_reference_defaults(
+            _valid_qd_config(**{field: value})
+        )
+
+
+@pytest.mark.parametrize(
+    ("updates", "match"),
+    [
+        ({"use_cem": True, "num_elites": 16}, "use_cem"),
+        ({"population_size": 8}, "population_size"),
+        ({"cem_iters": 9, "adaptive_min_cem_iters": 4}, "cem_iters"),
+        ({"parent_weighting_mode": "adaptive_ess"}, "parent_weighting_mode"),
+        ({"parent_coverage_mode": "eef_kcenter", "parent_anchor_count": 1}, "parent_coverage_mode"),
+        ({"elite_carryover_count": 1}, "elite_carryover_count"),
+        ({"chunk_population_mode": "warm_start_mix", "chunk_memory_fraction": 0.5}, "chunk_population_mode"),
+        ({"rollout_diversity_control_mode": "adaptive_band"}, "rollout_diversity_control_mode"),
+        ({"search_schedule_mode": "adaptive"}, "search_schedule_mode"),
+        ({"initial_diversity_descriptor_mode": "direction_normalized_eef"}, "initial_diversity_descriptor_mode"),
+        ({"rollout_diversity_descriptor_mode": "direction_normalized_eef"}, "rollout_diversity_descriptor_mode"),
+    ],
+)
+def test_qd_config_rejects_incompatible_strategies(stub_steer, updates, match):
+    with pytest.raises(ValueError, match=match):
+        stub_steer._resolve_eds_config_with_reference_defaults(
+            _valid_qd_config(**updates)
+        )
 
 
 def test_eds_config_accepts_rollout_diversity_fields(stub_steer):
@@ -5638,6 +5779,189 @@ def test_eds_legacy_parent_loop_preserves_seeded_final_population(
 
     torch.testing.assert_close(captured_final[-1], expected_final)
     torch.testing.assert_close(selected, expected_selected)
+
+
+def test_qd_loop_bypasses_legacy_selector_preserves_archive_and_selects_global_best(
+    stub_steer,
+    stub_adapter,
+    monkeypatch,
+):
+    from core.qd_ed import fingerprint_action
+
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=16,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    cond = _rollout_cond(stub_steer)
+    initial = torch.zeros(16, 64, 128)
+    endpoint_values = torch.linspace(-0.06, 0.06, 4)
+    for index in range(16):
+        initial[index, :4, 39] = endpoint_values[index % 4] / 4.0
+        initial[index, :4, 40] = endpoint_values[index // 4] / 4.0
+        initial[index, :, 42] = -float(index)
+    rollout_call = 0
+
+    def score(samples, **kwargs):
+        costs = samples[:, 0, 42].detach().clone()
+        return costs, {"rewards": -costs}
+
+    def rollout(**kwargs):
+        nonlocal rollout_call
+        rollout_call += 1
+        children = kwargs["noisy_action"].clone()
+        for index in range(16):
+            x = endpoint_values[(index + rollout_call) % 4]
+            y = endpoint_values[(index // 4 + rollout_call) % 4]
+            children[index, :4, 39] = x / 4.0
+            children[index, :4, 40] = y / 4.0
+            children[index, :, 42] = -float(rollout_call * 100 + index)
+        costs, info = score(children)
+        return children, costs, info
+
+    monkeypatch.setattr(
+        stub_steer, "_eds_initial_population", lambda **kwargs: initial.clone()
+    )
+    monkeypatch.setattr(stub_steer, "_eds_score_population_as_cost", score)
+    monkeypatch.setattr(
+        stub_steer,
+        "_eds_select_parent_plan",
+        lambda *args, **kwargs: pytest.fail("QD called legacy parent selector"),
+    )
+    monkeypatch.setattr(
+        stub_steer, "_eds_renoise_reference", lambda samples, steps: samples
+    )
+    monkeypatch.setattr(stub_steer, "_eds_rollout_reference", rollout)
+    cfg = stub_steer._resolve_eds_config_with_reference_defaults(
+        _valid_qd_config()
+    )
+
+    selected = stub_steer._eds_guided_denoise_loop(
+        x_t=torch.zeros_like(initial),
+        cond=cond,
+        keypoints=torch.zeros(1, 3),
+        guidance_fns=None,
+        eds_config=cfg,
+        verbose=False,
+        global_step=24,
+        current_stage=1,
+    )
+    metrics = stub_steer.get_last_eds_metrics()
+    artifacts = stub_steer.get_last_eds_artifacts()
+
+    assert rollout_call == 10
+    assert metrics["qd_archive_enabled"] is True
+    assert metrics["qd_evaluation_count"] == 176
+    assert metrics["score_call_count"] == 11
+    assert len(metrics["qd_occupied_cells_by_iter"]) == 10
+    assert len(metrics["qd_parent_slots_by_cell_by_iter"]) == 10
+    assert all(
+        sum(int(count) for count in allocation.values()) == 16
+        for allocation in metrics["qd_parent_slots_by_cell_by_iter"]
+    )
+    assert all(
+        max(allocation.values()) - min(allocation.values()) <= 1
+        for allocation in metrics["qd_parent_slots_by_cell_by_iter"]
+    )
+    assert metrics["qd_accounting_violation_count"] == 0
+    assert metrics["qd_elite_monotonicity_violation_count"] == 0
+    assert metrics["qd_final_selection_mismatch_count"] == 0
+    assert metrics["qd_fallback_used"] is False
+    assert metrics["qd_selected_action_fingerprint"] == fingerprint_action(selected[0])
+    assert (
+        metrics["qd_selected_action_fingerprint"]
+        == metrics["qd_global_best_action_fingerprint"]
+    )
+    assert metrics["qd_selected_reward"] == pytest.approx(1015.0)
+    assert len(artifacts["qd_archive_by_iter"]) == 10
+    assert artifacts["qd_bounds_xy_m"] == metrics["qd_bounds_xy_m"]
+
+
+def test_qd_metrics_observer_is_bitwise_passive_for_legacy_loop(
+    stub_steer,
+    stub_adapter,
+    monkeypatch,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=4,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    cond = _rollout_cond(stub_steer)
+    initial = torch.zeros(4, 64, 128)
+    initial[:, :4, 39] = torch.arange(4, dtype=torch.float32)[:, None] / 16.0
+    initial[:, :, 42] = -torch.arange(4, dtype=torch.float32)[:, None]
+    parent_indices = []
+
+    def score(samples, **kwargs):
+        costs = samples[:, 0, 42].detach().clone()
+        return costs, {"rewards": -costs}
+
+    original_parent_selector = stub_steer._eds_select_parent_plan
+
+    def capture_parent(*args, **kwargs):
+        plan = original_parent_selector(*args, **kwargs)
+        parent_indices.append(plan.offspring_parent_indices.detach().clone())
+        return plan
+
+    def renoise(samples, steps):
+        return samples + torch.randn_like(samples) * 0.001
+
+    def rollout(**kwargs):
+        children = kwargs["noisy_action"].clone()
+        children[:, :, 42] -= 1.0
+        costs, info = score(children)
+        return children, costs, info
+
+    monkeypatch.setattr(
+        stub_steer, "_eds_initial_population", lambda **kwargs: initial.clone()
+    )
+    monkeypatch.setattr(stub_steer, "_eds_score_population_as_cost", score)
+    monkeypatch.setattr(stub_steer, "_eds_select_parent_plan", capture_parent)
+    monkeypatch.setattr(stub_steer, "_eds_renoise_reference", renoise)
+    monkeypatch.setattr(stub_steer, "_eds_rollout_reference", rollout)
+
+    def run(observer):
+        parent_indices.clear()
+        cfg = stub_steer._resolve_eds_config_with_reference_defaults(
+            {
+                "population_size": 4,
+                "cem_iters": 2,
+                "qd_archive_mode": "none",
+                "qd_metrics_observer": observer,
+            }
+        )
+        torch.manual_seed(91)
+        selected = stub_steer._eds_guided_denoise_loop(
+            x_t=torch.zeros_like(initial),
+            cond=cond,
+            keypoints=torch.zeros(1, 3),
+            guidance_fns=None,
+            eds_config=cfg,
+            verbose=False,
+            global_step=8,
+            current_stage=1,
+        )
+        return (
+            selected.detach().clone(),
+            torch.random.get_rng_state().clone(),
+            [value.clone() for value in parent_indices],
+            stub_steer.get_last_eds_metrics(),
+        )
+
+    off = run(False)
+    on = run(True)
+
+    assert torch.equal(on[0], off[0])
+    assert torch.equal(on[1], off[1])
+    assert len(on[2]) == len(off[2]) == 2
+    assert all(torch.equal(left, right) for left, right in zip(on[2], off[2]))
+    assert off[3]["shadow_qd_observer_enabled"] is False
+    assert off[3]["shadow_qd_candidate_stream"] == []
+    assert on[3]["shadow_qd_observer_enabled"] is True
+    assert len(on[3]["shadow_qd_candidate_stream"]) == 3
 
 
 @pytest.mark.parametrize("use_cem", [False, True], ids=["weighted", "cem"])

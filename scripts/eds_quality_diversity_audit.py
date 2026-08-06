@@ -1,0 +1,1290 @@
+#!/usr/bin/env python3
+"""Strict audit, frozen gates, ranking, and immutable decision for QD-ED."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import math
+import os
+import re
+import stat
+import subprocess
+import sys
+from collections import Counter
+from datetime import datetime, timezone
+from pathlib import Path
+from statistics import median
+from typing import Any, Callable, Iterable
+
+import torch
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+WORKTREE_ROOT = Path(__file__).resolve().parents[1]
+for import_root in (SCRIPT_DIR, WORKTREE_ROOT):
+    if str(import_root) not in sys.path:
+        sys.path.insert(0, str(import_root))
+
+import eds_quality_diversity_runner as runner
+from core.eds_eval_metrics import wilson_ci
+from core.qd_ed import QDBounds, cell_ids, freeze_bounds
+
+
+OUTPUT_TARGET = runner.OUTPUT_TARGET
+EXPERIMENT_ROOT = runner.EXPERIMENT_ROOT
+ANALYSIS_PATH = EXPERIMENT_ROOT / "analysis/qd_ed_formal_audit.json"
+PREFLIGHT_AUDIT_PATH = EXPERIMENT_ROOT / "analysis/libero_mechanism_preflight_audit.json"
+DECISION_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_decision_manifest.json"
+CONTACT_SHEET_ROOT = EXPERIMENT_ROOT / "analysis/qualitative_contact_sheets"
+REPORT_PATH = (
+    WORKTREE_ROOT
+    / "docs/03_evidence/eds_init_pg_diverse_sampling/"
+    "2026-08-06-eds-quality-diversity-report.md"
+)
+
+FAILURE_CATEGORIES = (
+    "no target acquisition",
+    "target pushed away",
+    "target dropped after grasp",
+    "basket displaced/collision",
+    "clutter swept/wrong-object interaction",
+    "unstable transport",
+    "placement/release failure",
+    "premature guidance OFF",
+    "guidance oscillation",
+    "qpos/execution error",
+    "timeout without completion",
+)
+COLLISION_COMPOSITE = {
+    "target pushed away",
+    "target dropped after grasp",
+    "basket displaced/collision",
+    "clutter swept/wrong-object interaction",
+}
+TEXT_SCAN_SUFFIXES = {
+    ".json",
+    ".jsonl",
+    ".txt",
+    ".log",
+    ".yaml",
+    ".yml",
+    ".md",
+    ".csv",
+    ".sha256",
+    ".py",
+    ".sh",
+}
+
+
+def _now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _canonical(value: object) -> str:
+    return json.dumps(
+        value,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+        allow_nan=False,
+    )
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        while block := handle.read(1024 * 1024):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _contains_credential(value: object) -> bool:
+    serialized = _canonical(value).lower()
+    secrets = [
+        os.environ.get(name, "").strip().lower()
+        for name in ("OPENAI_API_KEY", "GOOGLE_API_KEY")
+    ]
+    return any(secret and secret in serialized for secret in secrets) or any(
+        marker in serialized
+        for marker in ("sk-", "api_key=", "api-key=", "authorization: bearer")
+    )
+
+
+def _read_jsonl(path: Path) -> tuple[list[dict[str, Any]], list[str]]:
+    if not path.is_file():
+        return [], [f"missing JSONL: {path}"]
+    records: list[dict[str, Any]] = []
+    failures: list[str] = []
+    for number, line in enumerate(
+        path.read_text(encoding="utf-8", errors="strict").splitlines(), 1
+    ):
+        if not line.strip():
+            failures.append(f"blank JSONL record: {path}:{number}")
+            continue
+        try:
+            record = json.loads(line)
+        except ValueError as exc:
+            failures.append(f"invalid JSONL: {path}:{number}: {exc}")
+            continue
+        if not isinstance(record, dict):
+            failures.append(f"non-object JSONL record: {path}:{number}")
+            continue
+        records.append(record)
+    return records, failures
+
+
+def _finite_number(value: object) -> float | None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    result = float(value)
+    return result if math.isfinite(result) else None
+
+
+def _median(values: Iterable[object]) -> float | None:
+    finite = [item for value in values if (item := _finite_number(value)) is not None]
+    return float(median(finite)) if finite else None
+
+
+def _percentile(values: Iterable[object], quantile: float) -> float | None:
+    finite = sorted(
+        item for value in values if (item := _finite_number(value)) is not None
+    )
+    if not finite:
+        return None
+    position = (len(finite) - 1) * float(quantile)
+    lower = int(math.floor(position))
+    upper = int(math.ceil(position))
+    if lower == upper:
+        return float(finite[lower])
+    fraction = position - lower
+    return float(finite[lower] * (1.0 - fraction) + finite[upper] * fraction)
+
+
+def _profile_bounds(profile: dict[str, object], descriptors: torch.Tensor) -> QDBounds:
+    return freeze_bounds(
+        descriptors,
+        quantiles=profile["qd_bounds_quantiles"],
+        expand_fraction=float(profile["qd_bounds_expand_fraction"]),
+        min_axis_span_m=float(profile["qd_min_axis_span_m"]),
+    )
+
+
+def replay_shadow_archive(
+    stream: list[dict[str, object]], profile: dict[str, object]
+) -> dict[str, object]:
+    """Replay top-1 archive over a detached control stream for one QD profile."""
+    if not stream or stream[0].get("iter_idx") != -1:
+        raise ValueError("shadow stream must begin with initial iteration -1")
+    if [record.get("iter_idx") for record in stream] != list(range(-1, len(stream) - 1)):
+        raise ValueError("shadow stream iterations must be contiguous -1..K-1")
+    initial = torch.tensor(stream[0].get("descriptors_xy_m"), dtype=torch.float32)
+    bounds = _profile_bounds(profile, initial)
+    archive: dict[int, dict[str, object]] = {}
+    timeline: list[dict[str, object]] = []
+    total_insertions = total_replacements = total_rejections = 0
+    overflow_ratios: list[float] = []
+    evaluation_count = 0
+
+    for record in stream:
+        descriptors = torch.tensor(record.get("descriptors_xy_m"), dtype=torch.float32)
+        rewards = record.get("rewards")
+        fingerprints = record.get("fingerprints")
+        if (
+            descriptors.ndim != 2
+            or descriptors.shape[1] != 2
+            or not isinstance(rewards, list)
+            or not isinstance(fingerprints, list)
+            or len(rewards) != descriptors.shape[0]
+            or len(fingerprints) != descriptors.shape[0]
+        ):
+            raise ValueError("invalid shadow candidate record")
+        parsed_rewards = [_finite_number(value) for value in rewards]
+        if any(value is None for value in parsed_rewards) or any(
+            not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]+|[A-Za-z0-9]+", value)
+            for value in fingerprints
+        ):
+            raise ValueError("invalid shadow reward or fingerprint")
+        mapped, overflow = cell_ids(descriptors, bounds, profile["qd_grid_shape"])
+        batch: dict[int, list[dict[str, object]]] = {}
+        for index, cell in enumerate(mapped.tolist()):
+            batch.setdefault(int(cell), []).append(
+                {
+                    "reward": float(parsed_rewards[index]),
+                    "fingerprint": str(fingerprints[index]),
+                    "descriptor_xy_m": [float(value) for value in descriptors[index].tolist()],
+                    "source_iter": int(record["iter_idx"]),
+                }
+            )
+        insertions = replacements = rejections = 0
+        for cell in sorted(batch):
+            candidates = sorted(
+                batch[cell], key=lambda item: (-float(item["reward"]), str(item["fingerprint"]))
+            )
+            winner = candidates[0]
+            incumbent = archive.get(cell)
+            better = incumbent is None or (
+                float(winner["reward"]) > float(incumbent["reward"])
+                or (
+                    float(winner["reward"]) == float(incumbent["reward"])
+                    and str(winner["fingerprint"]) < str(incumbent["fingerprint"])
+                )
+            )
+            if better:
+                if incumbent is None:
+                    insertions += 1
+                else:
+                    replacements += 1
+                archive[cell] = winner
+                rejections += len(candidates) - 1
+            else:
+                rejections += len(candidates)
+        count = int(descriptors.shape[0])
+        if insertions + replacements + rejections != count:
+            raise RuntimeError("shadow archive update accounting mismatch")
+        evaluation_count += count
+        total_insertions += insertions
+        total_replacements += replacements
+        total_rejections += rejections
+        overflow_ratio = float(overflow.sum().item() / count)
+        overflow_ratios.append(overflow_ratio)
+        descriptors_in_archive = torch.tensor(
+            [archive[cell]["descriptor_xy_m"] for cell in sorted(archive)],
+            dtype=torch.float32,
+        )
+        spread = (
+            float(torch.pdist(descriptors_in_archive).mean().item())
+            if descriptors_in_archive.shape[0] >= 2
+            else 0.0
+        )
+        timeline.append(
+            {
+                "iter_idx": int(record["iter_idx"]),
+                "occupied_cells": len(archive),
+                "coverage_ratio": len(archive)
+                / int(profile["qd_grid_shape"][0] * profile["qd_grid_shape"][1]),
+                "endpoint_xy_spread_m": spread,
+                "best_reward": max(float(item["reward"]) for item in archive.values()),
+                "overflow_ratio": overflow_ratio,
+                "insertions": insertions,
+                "replacements": replacements,
+                "rejections": rejections,
+            }
+        )
+
+    final = timeline[-1]
+    return {
+        "bounds_xy_m": [bounds.lo.tolist(), bounds.hi.tolist()],
+        "bounds_source_initial_checksum": bounds.checksum,
+        "grid_shape": list(profile["qd_grid_shape"]),
+        "evaluation_count": evaluation_count,
+        "occupied_cells": len(archive),
+        "coverage_ratio": final["coverage_ratio"],
+        "endpoint_xy_spread_m": final["endpoint_xy_spread_m"],
+        "best_reward": final["best_reward"],
+        "overflow_ratio_p95": _percentile(overflow_ratios, 0.95),
+        "insertion_count": total_insertions,
+        "replacement_count": total_replacements,
+        "rejection_count": total_rejections,
+        "archive": {str(cell): archive[cell] for cell in sorted(archive)},
+        "timeline": timeline,
+    }
+
+
+def qd_mechanism_hard_gate(
+    metrics: list[dict[str, Any]], profile: dict[str, object]
+) -> dict[str, object]:
+    failures: list[str] = []
+    for index, record in enumerate(metrics):
+        identity = f"{record.get('episode')}/{record.get('global_step', index)}"
+        if record.get("qd_archive_enabled") is not True:
+            failures.append(f"{identity}: QD archive not enabled")
+            continue
+        if record.get("qd_evaluation_count") != 176:
+            failures.append(f"{identity}: complete chunk evaluation count != 176")
+        if record.get("score_call_count") != 11:
+            failures.append(f"{identity}: reward call budget != 11")
+        if record.get("qd_accounting_violation_count") != 0:
+            failures.append(f"{identity}: archive accounting violation")
+        if record.get("qd_elite_monotonicity_violation_count") != 0:
+            failures.append(f"{identity}: elite monotonicity violation")
+        if record.get("qd_final_selection_mismatch_count") != 0:
+            failures.append(f"{identity}: final selection mismatch")
+        if record.get("qd_fallback_used") is not False:
+            failures.append(f"{identity}: QD fallback")
+        initial = record.get("qd_initial_accounting")
+        if not isinstance(initial, dict) or sum(
+            int(initial.get(key, -1000))
+            for key in ("insertions", "replacements", "rejections")
+        ) != 16:
+            failures.append(f"{identity}: initial accounting != 16")
+        insertions = record.get("qd_archive_insertions_by_iter")
+        replacements = record.get("qd_archive_replacements_by_iter")
+        rejections = record.get("qd_archive_rejections_by_iter")
+        if not all(isinstance(value, list) and len(value) == 10 for value in (insertions, replacements, rejections)):
+            failures.append(f"{identity}: ten archive iterations required")
+        else:
+            for iteration, triple in enumerate(zip(insertions, replacements, rejections)):
+                if sum(int(value) for value in triple) != 16:
+                    failures.append(f"{identity}: iter {iteration} accounting != 16")
+        slots = record.get("qd_parent_slots_by_cell_by_iter")
+        weights = record.get("qd_parent_weights_by_cell_by_iter")
+        if not isinstance(slots, list) or len(slots) != 10:
+            failures.append(f"{identity}: ten parent allocations required")
+            continue
+        for iteration, allocation in enumerate(slots):
+            if not isinstance(allocation, dict) or sum(int(value) for value in allocation.values()) != 16:
+                failures.append(f"{identity}: iter {iteration} slot sum != 16")
+                continue
+            counts = [int(value) for value in allocation.values()]
+            if profile["qd_parent_sampling"] == "uniform_cells":
+                if max(counts) - min(counts) > 1:
+                    failures.append(f"{identity}: iter {iteration} uniform imbalance")
+            else:
+                if not isinstance(weights, list) or len(weights) != 10:
+                    failures.append(f"{identity}: sparse weights missing")
+                    break
+                iteration_weights = weights[iteration]
+                if set(iteration_weights) != set(allocation):
+                    failures.append(f"{identity}: iter {iteration} sparse cell mismatch")
+                    continue
+                raw = {cell: float(iteration_weights[cell]) for cell in allocation}
+                total = sum(raw.values())
+                exact = {cell: 16.0 * raw[cell] / total for cell in raw}
+                floors = {cell: math.floor(exact[cell]) for cell in raw}
+                remainder = 16 - sum(floors.values())
+                extras = sum(int(allocation[cell]) - floors[cell] for cell in raw)
+                if extras != remainder or any(int(allocation[cell]) - floors[cell] not in {0, 1} for cell in raw):
+                    failures.append(f"{identity}: iter {iteration} largest-remainder mismatch")
+                selected_fractions = sorted(
+                    (exact[cell] - floors[cell] for cell in raw if int(allocation[cell]) > floors[cell]),
+                    reverse=True,
+                )
+                rejected_fractions = sorted(
+                    (exact[cell] - floors[cell] for cell in raw if int(allocation[cell]) == floors[cell]),
+                    reverse=True,
+                )
+                if selected_fractions and rejected_fractions and min(selected_fractions) + 1e-9 < max(rejected_fractions):
+                    failures.append(f"{identity}: iter {iteration} remainder priority mismatch")
+    unique = list(dict.fromkeys(failures))
+    return {
+        "passed": bool(metrics) and not unique,
+        "active_chunk_count": len(metrics),
+        "additional_reward_model_vlm_calls_vs_control": 0 if metrics and not any("reward call" in item for item in unique) else None,
+        "failures": unique,
+    }
+
+
+def compare_mechanism(
+    candidate_metrics: list[dict[str, Any]],
+    control_metrics: list[dict[str, Any]],
+    profile: dict[str, object],
+) -> dict[str, object]:
+    controls = {
+        (record.get("episode"), record.get("global_step")): record
+        for record in control_metrics
+        if record.get("shadow_qd_observer_enabled") is True
+    }
+    coverage_delta: list[float] = []
+    spread_ratio: list[float] = []
+    best_delta: list[float] = []
+    overflow: list[float] = []
+    pairs: list[dict[str, object]] = []
+    replacement_active = 0
+    for record in candidate_metrics:
+        key = (record.get("episode"), record.get("global_step"))
+        control = controls.get(key)
+        if control is None:
+            continue
+        shadow = replay_shadow_archive(control["shadow_qd_candidate_stream"], profile)
+        candidate_coverage = _finite_number((record.get("qd_coverage_ratio_by_iter") or [None])[-1])
+        candidate_spread = _finite_number((record.get("qd_archive_endpoint_xy_spread_m_by_iter") or [None])[-1])
+        candidate_best = _finite_number((record.get("qd_archive_best_reward_by_iter") or [None])[-1])
+        if None in (candidate_coverage, candidate_spread, candidate_best):
+            continue
+        shadow_spread = float(shadow["endpoint_xy_spread_m"])
+        ratio = (
+            float(candidate_spread / shadow_spread)
+            if shadow_spread > 0.0
+            else (1.0 if candidate_spread == 0.0 else math.inf)
+        )
+        delta_coverage = float(candidate_coverage - float(shadow["coverage_ratio"]))
+        delta_best = float(candidate_best - float(shadow["best_reward"]))
+        coverage_delta.append(delta_coverage)
+        spread_ratio.append(ratio)
+        best_delta.append(delta_best)
+        chunk_overflow = [
+            float(value)
+            for value in record.get("qd_descriptor_overflow_ratio_by_iter", [])
+            if _finite_number(value) is not None
+        ]
+        overflow.extend(chunk_overflow)
+        active = any(int(value) > 0 for value in record.get("qd_archive_replacements_by_iter", []))
+        replacement_active += int(active)
+        pairs.append(
+            {
+                "episode": key[0],
+                "global_step": key[1],
+                "candidate_coverage": candidate_coverage,
+                "shadow_coverage": shadow["coverage_ratio"],
+                "normalized_coverage_delta": delta_coverage,
+                "candidate_endpoint_xy_spread_m": candidate_spread,
+                "shadow_endpoint_xy_spread_m": shadow_spread,
+                "endpoint_xy_spread_ratio": ratio,
+                "candidate_archive_best_reward": candidate_best,
+                "shadow_archive_best_reward": shadow["best_reward"],
+                "archive_best_reward_delta": delta_best,
+                "replacement_active": active,
+                "shadow_replay_checksum": hashlib.sha256(_canonical(shadow).encode()).hexdigest(),
+            }
+        )
+    return {
+        "paired_count": len(pairs),
+        "candidate_chunk_count": len(candidate_metrics),
+        "unpaired_candidate_chunk_count": len(candidate_metrics) - len(pairs),
+        "normalized_final_coverage_delta_median": _median(coverage_delta),
+        "endpoint_xy_spread_ratio_median": _median(spread_ratio),
+        "archive_best_reward_delta_median": _median(best_delta),
+        "replacement_active_chunk_ratio": (
+            replacement_active / len(candidate_metrics) if candidate_metrics else None
+        ),
+        "descriptor_overflow_ratio_p95": _percentile(overflow, 0.95),
+        "pairs": pairs,
+    }
+
+
+def evaluate_candidate_gates(
+    candidate: dict[str, Any], control: dict[str, Any]
+) -> dict[str, object]:
+    candidate_tasks = set(candidate.get("success_tasks", []))
+    control_tasks = set(control.get("success_tasks", []))
+    gained = sorted(candidate_tasks - control_tasks)
+    lost = sorted(control_tasks - candidate_tasks)
+    retained = sorted(candidate_tasks & control_tasks)
+    task_failures = []
+    if candidate.get("success_count", 0) < 5:
+        task_failures.append("success_count < 5")
+    if candidate.get("success_count", 0) < control.get("success_count", 0):
+        task_failures.append("success_count < control")
+    if len(gained) < len(lost):
+        task_failures.append("paired gained_tasks < lost_tasks")
+    mechanism = candidate.get("mechanism_comparison", {})
+    claim_checks = {
+        "normalized_final_coverage_delta_median_ge_0.05": (
+            _finite_number(mechanism.get("normalized_final_coverage_delta_median")) is not None
+            and float(mechanism["normalized_final_coverage_delta_median"]) >= 0.05
+        ),
+        "endpoint_xy_spread_ratio_median_ge_0.90": (
+            _finite_number(mechanism.get("endpoint_xy_spread_ratio_median")) is not None
+            and float(mechanism["endpoint_xy_spread_ratio_median"]) >= 0.90
+        ),
+        "archive_best_reward_delta_median_ge_0": (
+            _finite_number(mechanism.get("archive_best_reward_delta_median")) is not None
+            and float(mechanism["archive_best_reward_delta_median"]) >= 0.0
+        ),
+        "replacement_active_chunk_ratio_ge_0.50": (
+            _finite_number(mechanism.get("replacement_active_chunk_ratio")) is not None
+            and float(mechanism["replacement_active_chunk_ratio"]) >= 0.50
+        ),
+        "descriptor_overflow_ratio_p95_le_0.25": (
+            _finite_number(mechanism.get("descriptor_overflow_ratio_p95")) is not None
+            and float(mechanism["descriptor_overflow_ratio_p95"]) <= 0.25
+        ),
+    }
+    safety_checks = {
+        "qpos_execution_error_episodes_eq_0": candidate.get("execution_qpos_error_episodes") == 0,
+        "collision_composite_le_control": candidate.get("collision_push_drop_wrong_object", math.inf)
+        <= control.get("collision_push_drop_wrong_object", -math.inf),
+        "nonfinite_eq_0": candidate.get("nonfinite_count") == 0,
+        "action_mask_violation_eq_0": candidate.get("action_mask_violation_count") == 0,
+        "algorithm_fallback_eq_0": candidate.get("qd_fallback_count") == 0,
+    }
+    validity_passed = candidate.get("valid") is True
+    hard_passed = candidate.get("mechanism_hard", {}).get("passed") is True
+    task_passed = not task_failures
+    claim_passed = bool(claim_checks) and all(claim_checks.values())
+    safety_passed = all(safety_checks.values())
+    return {
+        "validity": {"passed": validity_passed, "failures": candidate.get("validity_failures", [])},
+        "paired": {
+            "gained_tasks": gained,
+            "lost_tasks": lost,
+            "retained_control_tasks": retained,
+            "gained_minus_lost": len(gained) - len(lost),
+        },
+        "task": {"passed": task_passed, "failures": task_failures},
+        "mechanism_hard": candidate.get("mechanism_hard", {"passed": False}),
+        "mechanism_claim": {
+            "passed": claim_passed,
+            "checks": claim_checks,
+            "failures": [key for key, passed in claim_checks.items() if not passed],
+        },
+        "safety": {
+            "passed": safety_passed,
+            "checks": safety_checks,
+            "failures": [key for key, passed in safety_checks.items() if not passed],
+        },
+        "all_passed": validity_passed and task_passed and hard_passed and claim_passed and safety_passed,
+    }
+
+
+def rank_candidates(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def desc(value: object) -> float:
+        parsed = _finite_number(value)
+        return -parsed if parsed is not None else math.inf
+
+    def asc(value: object) -> float:
+        parsed = _finite_number(value)
+        return parsed if parsed is not None else math.inf
+
+    ordered = sorted(
+        candidates,
+        key=lambda row: (
+            desc(row.get("success_count")),
+            desc(row.get("control_task_retention")),
+            desc(row.get("paired_gained_minus_lost")),
+            asc(row.get("execution_qpos_error_episodes")),
+            asc(row.get("collision_push_drop_wrong_object")),
+            desc(row.get("normalized_coverage_gain")),
+            desc(row.get("endpoint_xy_spread_retention")),
+            desc(row.get("archive_best_reward_delta")),
+            asc(row.get("selection_latency_p95_s")),
+            str(row.get("label", "")),
+        ),
+    )
+    return [{**row, "rank": rank} for rank, row in enumerate(ordered, 1)]
+
+
+def audit_attempt_ledger(
+    path: Path,
+    *,
+    expected_formal: set[tuple[str, int, int]],
+    expected_preflight: set[tuple[str, int, int]],
+    cap: int,
+) -> dict[str, object]:
+    records, failures = _read_jsonl(path)
+    ids = [row.get("attempt_id") for row in records]
+    if ids != list(range(1, len(records) + 1)):
+        failures.append("attempt ids are not contiguous")
+    if len(records) > cap:
+        failures.append(f"attempt cap exceeded: {len(records)} > {cap}")
+    actual_formal = {
+        (str(row.get("formal_label", row.get("label"))), int(row.get("task_id")), int(row.get("episode_seed")))
+        for row in records
+        if row.get("phase") == "formal"
+        and isinstance(row.get("task_id"), int)
+        and isinstance(row.get("episode_seed"), int)
+    }
+    actual_preflight = {
+        (str(row.get("formal_label", row.get("label"))), int(row.get("task_id")), int(row.get("episode_seed")))
+        for row in records
+        if row.get("phase") == "preflight"
+        and isinstance(row.get("task_id"), int)
+        and isinstance(row.get("episode_seed"), int)
+    }
+    if actual_formal != expected_formal:
+        failures.append("formal ledger cells do not match frozen matrix")
+    if actual_preflight != expected_preflight:
+        failures.append("preflight ledger cells do not match frozen matrix")
+    identities = [
+        (
+            row.get("phase"),
+            row.get("label"),
+            row.get("task_id"),
+            row.get("episode_seed"),
+            row.get("config_fingerprint"),
+        )
+        for row in records
+    ]
+    retries = len(identities) - len(set(identities))
+    if retries > 4:
+        failures.append(f"recovery attempts exceed 4: {retries}")
+    return {
+        "passed": not failures,
+        "attempt_count": len(records),
+        "formal_unique_cells": len(actual_formal),
+        "preflight_unique_cells": len(actual_preflight),
+        "recovery_attempts": retries,
+        "failures": list(dict.fromkeys(failures)),
+        "records": records,
+    }
+
+
+def _walk(value: object) -> Iterable[tuple[str, object]]:
+    if isinstance(value, dict):
+        for key, item in value.items():
+            yield str(key), item
+            yield from _walk(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from _walk(item)
+
+
+def _telemetry_counts(metrics: list[dict[str, Any]]) -> dict[str, int]:
+    counts = {
+        "nonfinite_count": 0,
+        "action_mask_violation_count": 0,
+        "qd_fallback_count": 0,
+        "execution_qpos_error_episodes": 0,
+    }
+    qpos_episodes: set[int] = set()
+    for record in metrics:
+        for key, value in _walk(record):
+            if key in {"nonfinite_count", "direction_rbf_nonfinite_count"} and isinstance(value, int) and not isinstance(value, bool):
+                counts["nonfinite_count"] += max(0, value)
+            if key == "action_mask_violation_max" and _finite_number(value) is not None and float(value) > 1e-8:
+                counts["action_mask_violation_count"] += 1
+            if key == "qd_fallback_used" and value is True:
+                counts["qd_fallback_count"] += 1
+            if key == "gripper_qpos_violation_count" and isinstance(value, int) and value > 0 and isinstance(record.get("episode"), int):
+                qpos_episodes.add(int(record["episode"]))
+    counts["execution_qpos_error_episodes"] = len(qpos_episodes)
+    return counts
+
+
+def _outcomes(output_dir: Path, episodes: int) -> tuple[dict[int, str], list[str], list[Path]]:
+    failures: list[str] = []
+    outcomes: dict[int, str] = {}
+    videos: list[Path] = []
+    hashes: set[str] = set()
+    for episode in range(episodes):
+        found = list((output_dir / f"episode_{episode + 1}").glob("*.mp4"))
+        if len(found) != 1:
+            failures.append(f"episode {episode} video count {len(found)} != 1")
+            continue
+        video = found[0]
+        videos.append(video)
+        digest = _sha256_file(video)
+        if digest in hashes:
+            failures.append(f"episode {episode} duplicate video checksum")
+        hashes.add(digest)
+        if "_success_" in video.name:
+            outcomes[episode] = "success"
+        elif "_fail_" in video.name:
+            outcomes[episode] = "fail"
+        else:
+            failures.append(f"episode {episode} video outcome suffix missing")
+    return outcomes, failures, videos
+
+
+def _classify_failures(
+    outcomes: dict[int, str], metrics: list[dict[str, Any]], output_dir: Path
+) -> dict[int, str]:
+    by_episode: dict[int, list[dict[str, Any]]] = {}
+    for record in metrics:
+        if isinstance(record.get("episode"), int):
+            by_episode.setdefault(int(record["episode"]), []).append(record)
+    result: dict[int, str] = {}
+    for episode, outcome in outcomes.items():
+        if outcome == "success":
+            result[episode] = "success"
+            continue
+        serialized = _canonical(by_episode.get(episode, [])).lower()
+        evidence = serialized
+        if "qpos" in evidence and ("error" in evidence or "violation" in evidence):
+            result[episode] = "qpos/execution error"
+        elif "wrong_object" in evidence or "wrong-object" in evidence:
+            result[episode] = "clutter swept/wrong-object interaction"
+        elif "collision" in evidence:
+            result[episode] = "basket displaced/collision"
+        elif "drop" in evidence:
+            result[episode] = "target dropped after grasp"
+        elif "push" in evidence:
+            result[episode] = "target pushed away"
+        else:
+            result[episode] = "timeout without completion"
+    return result
+
+
+def _qualitative_failures(output_dir: Path, episodes: int, *, qd: bool) -> list[str]:
+    failures = []
+    for episode in range(episodes):
+        root = output_dir / "eds_eval/qualitative" / f"episode_{episode:03d}"
+        chunks = [path for path in root.glob("chunk_*") if path.is_dir()]
+        if not chunks:
+            failures.append(f"episode {episode} qualitative chunks missing")
+            continue
+        if not qd:
+            continue
+        required = {
+            "qd_archive_heatmap_initial.png",
+            "qd_archive_heatmap_iter_001.png",
+            "qd_archive_heatmap_iter_005.png",
+            "qd_archive_heatmap_iter_010.png",
+            "qd_archive_trajectories_initial.png",
+            "qd_archive_trajectories_iter_001.png",
+            "qd_archive_trajectories_iter_005.png",
+            "qd_archive_trajectories_iter_010.png",
+            "qd_archive_timeline.json",
+        }
+        for chunk in chunks:
+            names = {path.name for path in chunk.iterdir() if path.is_file() and path.stat().st_size > 0}
+            missing = sorted(required - names)
+            if missing:
+                failures.append(f"episode {episode}/{chunk.name} QD qualitative missing: {','.join(missing)}")
+    return failures
+
+
+def _job_checksums(output_dir: Path) -> dict[str, str]:
+    checksums: dict[str, str] = {}
+    accepted = {
+        "results.txt",
+        "config_fingerprint.txt",
+        "job_manifest.json",
+        "config.yaml",
+        "overrides.yaml",
+        "hydra.yaml",
+        "eds_metrics.jsonl",
+        "episode_metadata.jsonl",
+        "stage_events.jsonl",
+        "main.log",
+    }
+    for path in sorted(output_dir.rglob("*")):
+        if not path.is_file() or path.is_symlink():
+            continue
+        if path.name in accepted or path.suffix in {".mp4", ".npz", ".png"}:
+            checksums[path.relative_to(output_dir).as_posix()] = _sha256_file(path)
+    log_path = output_dir.parent.parent / "runner_logs" / output_dir.parent.name / f"{output_dir.name}.log"
+    if log_path.is_file():
+        checksums[f"runner_log:{log_path.name}"] = _sha256_file(log_path)
+    return checksums
+
+
+def _metric_summary(metrics: list[dict[str, Any]], stages: list[dict[str, Any]]) -> dict[str, object]:
+    final_values = lambda key: [record.get(key, [None])[-1] if isinstance(record.get(key), list) and record.get(key) else None for record in metrics]
+    return {
+        "selection_latency_p95_s": _percentile((record.get("select_action_latency_s") for record in metrics), 0.95),
+        "qd_archive_update_latency_p95_s": _percentile((record.get("qd_archive_update_latency_s") for record in metrics), 0.95),
+        "qd_parent_allocation_latency_p95_s": _percentile((record.get("qd_parent_allocation_latency_s") for record in metrics), 0.95),
+        "eds_loop_latency_p95_s": _percentile((record.get("eds_loop_latency_s") for record in metrics), 0.95),
+        "stage_query_latency_p95_s": _percentile((record.get("query_latency_s") for record in stages), 0.95),
+        "endpoint_xy_spread_median": _median(final_values("qd_archive_endpoint_xy_spread_m_by_iter")),
+        "coverage_median": _median(final_values("qd_coverage_ratio_by_iter")),
+        "turnover_median": _median(value for record in metrics for value in record.get("qd_archive_turnover_ratio_by_iter", [])),
+        "overflow_p95": _percentile((value for record in metrics for value in record.get("qd_descriptor_overflow_ratio_by_iter", [])), 0.95),
+        "eef_direction_diversity_median": _median(final_values("eef_direction_diversity_by_iter")),
+        "trajectory_length_median": _median(final_values("selected_trajectory_length_by_iter")),
+        "max_step_median": _median(final_values("selected_max_step_displacement_by_iter")),
+        "chunk_boundary_jump_p95": _percentile((record.get("chunk_boundary_action_jump") for record in metrics), 0.95),
+    }
+
+
+def audit_job(
+    job: dict[str, object],
+    *,
+    credential_passed: bool,
+    base_validity_fn: Callable[[dict[str, object]], dict[str, object]] | None = None,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    output_dir = runner.base._output_dir(job)
+    validity_fn = base_validity_fn or runner.base._p2_job_validity
+    base_validity = validity_fn(job)
+    failures = [] if base_validity.get("valid") is True else [str(base_validity.get("failure_reason", "base validity failed"))]
+    try:
+        output_dir.resolve(strict=True).relative_to(OUTPUT_TARGET.resolve(strict=True))
+    except (OSError, ValueError):
+        failures.append("output realpath outside approved QD shared2 root")
+    metrics, metric_failures = _read_jsonl(output_dir / "eds_eval/eds_metrics.jsonl")
+    stages, stage_failures = _read_jsonl(output_dir / "eds_eval/stage_events.jsonl")
+    metadata, metadata_failures = _read_jsonl(output_dir / "eds_eval/episode_metadata.jsonl")
+    failures.extend(metric_failures + stage_failures + metadata_failures)
+    episodes = int(job["episodes"])
+    outcomes, video_failures, videos = _outcomes(output_dir, episodes)
+    failures.extend(video_failures)
+    expected_metadata = {
+        (episode, int(task), int(seed))
+        for episode, (task, seed) in enumerate(zip(job["task_ids_filter"], job["episode_seeds"]))
+    }
+    actual_metadata = {
+        (record.get("episode_id"), record.get("task_id"), record.get("episode_seed"))
+        for record in metadata
+    }
+    if actual_metadata != expected_metadata:
+        failures.append("episode task/seed metadata mismatch")
+    command = job["execution_record"]["normalized_command"]
+    if "backend.libero.strict_perturbations=true" not in command:
+        failures.append("strict perturbation not verified in frozen command")
+    if "backend.libero.suite_name=libero_object_swap" not in command:
+        failures.append("suite not verified in frozen command")
+    if any(record.get("initial_diversity_descriptor_mode") != "absolute_eef" or record.get("rollout_diversity_descriptor_mode") != "absolute_eef" for record in metrics):
+        failures.append("initial/rollout descriptor is not absolute_eef")
+    qd = job["qd_archive_mode"] == "grid_archive"
+    failures.extend(_qualitative_failures(output_dir, episodes, qd=qd))
+    if qd and any(record.get("qd_archive_enabled") is not True for record in metrics):
+        failures.append("QD metric enablement mismatch")
+    if not qd and any(record.get("qd_archive_enabled") is not False for record in metrics):
+        failures.append("control unexpectedly enabled QD archive")
+    if any(record.get("shadow_qd_observer_enabled") is not True or not record.get("shadow_qd_candidate_stream") for record in metrics):
+        failures.append("shadow observer stream missing")
+    telemetry = _telemetry_counts(metrics)
+    if telemetry["nonfinite_count"]:
+        failures.append("nonfinite telemetry")
+    if telemetry["action_mask_violation_count"]:
+        failures.append("action-mask violation telemetry")
+    if qd and telemetry["qd_fallback_count"]:
+        failures.append("QD fallback telemetry")
+    if not credential_passed:
+        failures.append("credential scan failed")
+    classifications = _classify_failures(outcomes, metrics, output_dir)
+    success_tasks = sorted(
+        int(job["task_ids_filter"][episode])
+        for episode, outcome in outcomes.items()
+        if outcome == "success"
+    )
+    collision_count = sum(
+        category in COLLISION_COMPOSITE for category in classifications.values()
+    )
+    lower, upper = wilson_ci(len(success_tasks), episodes) if episodes else (0.0, 0.0)
+    unique_failures = list(dict.fromkeys(item for item in failures if item))
+    summary = _metric_summary(metrics, stages)
+    hard = qd_mechanism_hard_gate(metrics, job) if qd else {
+        "passed": bool(metrics) and all(record.get("score_call_count") == 11 for record in metrics),
+        "active_chunk_count": len(metrics),
+        "failures": [] if metrics and all(record.get("score_call_count") == 11 for record in metrics) else ["control reward call budget mismatch"],
+    }
+    return ({
+        "label": job["label"],
+        "formal_label": job.get("formal_label", job["label"]),
+        "role": job["role"],
+        "phase": "preflight" if job["level"] == runner.PREFLIGHT_LEVEL else "formal",
+        "output_dir": str(output_dir),
+        "valid": not unique_failures,
+        "validity_failures": unique_failures,
+        "base_validity": base_validity,
+        "accepted_episode_count": len(outcomes),
+        "success_count": len(success_tasks),
+        "success_rate": len(success_tasks) / episodes if episodes else None,
+        "wilson_95": [lower, upper],
+        "success_tasks": success_tasks,
+        "task_outcomes": {str(job["task_ids_filter"][episode]): outcome for episode, outcome in sorted(outcomes.items())},
+        "failure_taxonomy": {str(job["task_ids_filter"][episode]): category for episode, category in sorted(classifications.items())},
+        "failure_taxonomy_counts": dict(Counter(classifications.values())),
+        "execution_qpos_error_episodes": max(
+            telemetry["execution_qpos_error_episodes"],
+            sum(value == "qpos/execution error" for value in classifications.values()),
+        ),
+        "collision_push_drop_wrong_object": collision_count,
+        **telemetry,
+        "metrics_record_count": len(metrics),
+        "stage_event_count": len(stages),
+        "video_count": len(videos),
+        "config_fingerprint": job["config_fingerprint"],
+        "code_state_sha256": job["execution_record"]["code_state_sha256"],
+        "mechanism_hard": hard,
+        "metric_summary": summary,
+        **summary,
+        "checksums": _job_checksums(output_dir),
+    }, metrics)
+
+
+def scan_credentials(roots: list[Path]) -> dict[str, object]:
+    findings: list[dict[str, str]] = []
+    secret_values = [
+        value.encode()
+        for name in ("OPENAI_API_KEY", "GOOGLE_API_KEY")
+        if (value := os.environ.get(name, "").strip())
+    ]
+    patterns = [
+        re.compile(rb"\bsk-[A-Za-z0-9_-]{16,}\b"),
+        re.compile(rb"(?i)\bapi[_-]?key\s*[:=]\s*[\"']?[A-Za-z0-9_-]{16,}"),
+        re.compile(rb"(?i)authorization:\s*bearer\s+[A-Za-z0-9._-]{16,}"),
+    ]
+    for root in roots:
+        if not root.exists():
+            continue
+        paths = [root] if root.is_file() else root.rglob("*")
+        for path in paths:
+            if not path.is_file() or path.is_symlink() or path.suffix.lower() not in TEXT_SCAN_SUFFIXES:
+                continue
+            try:
+                data = path.read_bytes().lower()
+            except OSError:
+                findings.append({"path": str(path), "reason": "unreadable"})
+                continue
+            if any(secret.lower() in data for secret in secret_values):
+                findings.append({"path": str(path), "reason": "environment credential value"})
+            elif "tests" not in path.parts and any(
+                pattern.search(data) for pattern in patterns
+            ):
+                findings.append({"path": str(path), "reason": "credential-like marker"})
+    return {"passed": not findings, "finding_count": len(findings), "findings": findings}
+
+
+def _expected_attempt_cells() -> tuple[set[tuple[str, int, int]], set[tuple[str, int, int]]]:
+    formal = {
+        (str(profile["label"]), task, runner.EPISODE_SEEDS[task])
+        for profile in runner.formal_profiles()
+        for task in range(10)
+    }
+    preflight = {
+        (label, task, runner.EPISODE_SEEDS[task])
+        for label in (
+            "p2_stage_on_abs_rbf_control",
+            "eds_quality_diversity_uniform_primary",
+            "eds_quality_diversity_sparse_primary",
+        )
+        for task in (0, 8)
+    }
+    return formal, preflight
+
+
+def audit_preflight() -> dict[str, object]:
+    credential = scan_credentials([EXPERIMENT_ROOT, WORKTREE_ROOT])
+    jobs = []
+    for job in runner.build_preflight_jobs():
+        audited, _ = audit_job(job, credential_passed=bool(credential["passed"]))
+        jobs.append(audited)
+    failures = []
+    for job in jobs:
+        if not job["valid"]:
+            failures.append(f"{job['label']}: invalid")
+        if not job["mechanism_hard"]["passed"]:
+            failures.append(f"{job['label']}: mechanism hard gate failed")
+    payload = {
+        "schema": "eds-quality-diversity-libero-preflight-audit-v1",
+        "created_at": _now(),
+        "jobs": jobs,
+        "credential_audit": credential,
+        "failures": failures,
+        "passed": not failures,
+    }
+    PREFLIGHT_AUDIT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    PREFLIGHT_AUDIT_PATH.write_text(json.dumps(payload, indent=2, sort_keys=True, allow_nan=False) + "\n")
+    return payload
+
+
+def audit_formal() -> dict[str, object]:
+    credential = scan_credentials([EXPERIMENT_ROOT, WORKTREE_ROOT])
+    audited_jobs: list[dict[str, Any]] = []
+    metrics_by_label: dict[str, list[dict[str, Any]]] = {}
+    for job in runner.build_jobs(runner.FORMAL_LEVEL, 10):
+        audited, metrics = audit_job(job, credential_passed=bool(credential["passed"]))
+        audited_jobs.append(audited)
+        metrics_by_label[str(job["label"])] = metrics
+    control = audited_jobs[0]
+    control_metrics = metrics_by_label[str(control["label"])]
+    candidates = []
+    profile_by_label = {str(profile["label"]): profile for profile in runner.formal_profiles()}
+    for candidate in audited_jobs[1:]:
+        label = str(candidate["label"])
+        comparison = compare_mechanism(metrics_by_label[label], control_metrics, profile_by_label[label])
+        candidate["mechanism_comparison"] = comparison
+        gates = evaluate_candidate_gates(candidate, control)
+        candidate["gates"] = gates
+        candidate["control_task_retention"] = len(gates["paired"]["retained_control_tasks"])
+        candidate["paired_gained_minus_lost"] = gates["paired"]["gained_minus_lost"]
+        candidate["normalized_coverage_gain"] = comparison["normalized_final_coverage_delta_median"]
+        candidate["endpoint_xy_spread_retention"] = comparison["endpoint_xy_spread_ratio_median"]
+        candidate["archive_best_reward_delta"] = comparison["archive_best_reward_delta_median"]
+        candidates.append(candidate)
+    ranking = rank_candidates(candidates)
+    ranked_by_label = {str(row["label"]): row for row in ranking}
+    audited_jobs = [control] + [ranked_by_label[str(job["label"])] for job in audited_jobs[1:]]
+    eligible = [row for row in ranking if row.get("gates", {}).get("all_passed") is True]
+    recommended = eligible[0]["label"] if eligible else None
+    formal_cells, preflight_cells = _expected_attempt_cells()
+    ledger = audit_attempt_ledger(
+        runner.ATTEMPT_LEDGER_PATH,
+        expected_formal=formal_cells,
+        expected_preflight=preflight_cells,
+        cap=runner.ATTEMPT_CAP,
+    )
+    storage = runner.storage_preflight()
+    payload = {
+        "schema": "eds-quality-diversity-formal-audit-v1",
+        "created_at": _now(),
+        "fixed_task_set_evidence_only": True,
+        "jobs": audited_jobs,
+        "ranking": [{"rank": row["rank"], "label": row["label"], "all_gates_passed": row["gates"]["all_passed"]} for row in ranking],
+        "recommended_label": recommended,
+        "decision": recommended or "no_adoption_keep_p2_stage_on_abs_rbf_control",
+        "attempt_ledger": ledger,
+        "credential_audit": credential,
+        "storage_audit": storage,
+        "run_manifest_sha256": _sha256_file(runner.RUN_MANIFEST_PATH),
+        "offline_preflight_sha256": _sha256_file(runner.OFFLINE_PREFLIGHT_PATH),
+        "libero_preflight_audit_sha256": _sha256_file(PREFLIGHT_AUDIT_PATH),
+    }
+    if _contains_credential(payload):
+        raise RuntimeError("formal audit contains credential material")
+    ANALYSIS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    ANALYSIS_PATH.write_text(json.dumps(payload, indent=2, sort_keys=True, allow_nan=False) + "\n")
+    return payload
+
+
+def freeze_decision_manifest(payload: dict[str, Any], path: Path = DECISION_PATH) -> dict[str, Any]:
+    path = Path(path)
+    sidecar = path.with_suffix(path.suffix + ".sha256")
+    if path.exists() or path.is_symlink() or sidecar.exists() or sidecar.is_symlink():
+        raise FileExistsError(path)
+    if _contains_credential(payload):
+        raise ValueError("decision manifest contains credential material")
+    frozen = dict(payload)
+    frozen.pop("canonical_manifest_checksum", None)
+    frozen["canonical_manifest_checksum"] = hashlib.sha256(
+        _canonical(frozen).encode()
+    ).hexdigest()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("x", encoding="utf-8") as handle:
+        json.dump(frozen, handle, indent=2, sort_keys=True, allow_nan=False)
+        handle.write("\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    file_digest = _sha256_file(path)
+    with sidecar.open("x", encoding="ascii") as handle:
+        handle.write(f"{file_digest}  {path.name}\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    path.chmod(0o444)
+    sidecar.chmod(0o444)
+    return frozen
+
+
+def verify_decision_manifest(path: Path = DECISION_PATH) -> dict[str, Any]:
+    path = Path(path)
+    sidecar = path.with_suffix(path.suffix + ".sha256")
+    if stat.S_IMODE(path.stat().st_mode) & 0o222 or stat.S_IMODE(sidecar.stat().st_mode) & 0o222:
+        raise ValueError("decision manifest or checksum sidecar is writable")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    expected = payload.get("canonical_manifest_checksum")
+    content = dict(payload)
+    content.pop("canonical_manifest_checksum", None)
+    if expected != hashlib.sha256(_canonical(content).encode()).hexdigest():
+        raise ValueError("decision manifest canonical checksum mismatch")
+    recorded_file_hash = sidecar.read_text(encoding="ascii").split()[0]
+    if recorded_file_hash != _sha256_file(path):
+        raise ValueError("decision manifest file checksum mismatch")
+    if _contains_credential(payload):
+        raise ValueError("decision manifest contains credential material")
+    return payload
+
+
+def decision_payload(analysis: dict[str, Any]) -> dict[str, Any]:
+    run_manifest = json.loads(runner.RUN_MANIFEST_PATH.read_text(encoding="utf-8"))
+    jobs = analysis["jobs"]
+    return {
+        "schema": "eds-quality-diversity-decision-manifest-v1",
+        "created_at": _now(),
+        "provenance": run_manifest["provenance"],
+        "run_manifest": {
+            "path": str(runner.RUN_MANIFEST_PATH),
+            "sha256": _sha256_file(runner.RUN_MANIFEST_PATH),
+        },
+        "profiles": run_manifest["formal_profiles"],
+        "matrix": {
+            "formal_job_count": 11,
+            "formal_unique_episodes": 110,
+            "preflight_unique_episodes": 6,
+            "ofat_complete": len(run_manifest["formal_profiles"]) == 11,
+        },
+        "attempts": analysis["attempt_ledger"],
+        "task_level_results": {job["label"]: job["task_outcomes"] for job in jobs},
+        "failure_taxonomy": {job["label"]: job["failure_taxonomy"] for job in jobs},
+        "jobs": [
+            {
+                key: job.get(key)
+                for key in (
+                    "label", "role", "valid", "validity_failures", "success_count",
+                    "success_rate", "wilson_95", "success_tasks", "failure_taxonomy_counts",
+                    "execution_qpos_error_episodes", "collision_push_drop_wrong_object",
+                    "nonfinite_count", "action_mask_violation_count", "qd_fallback_count",
+                    "mechanism_hard", "mechanism_comparison", "gates", "metric_summary",
+                    "config_fingerprint", "code_state_sha256", "checksums",
+                )
+            }
+            for job in jobs
+        ],
+        "ranking": analysis["ranking"],
+        "recommended_for_adoption": analysis["recommended_label"] is not None,
+        "recommended_label": analysis["recommended_label"],
+        "decision": analysis["decision"],
+        "credential_audit": analysis["credential_audit"],
+        "storage_audit": analysis["storage_audit"],
+        "analysis_artifacts": {
+            "formal_audit": {"path": str(ANALYSIS_PATH), "sha256": _sha256_file(ANALYSIS_PATH)},
+            "offline_preflight": {"path": str(runner.OFFLINE_PREFLIGHT_PATH), "sha256": _sha256_file(runner.OFFLINE_PREFLIGHT_PATH)},
+            "libero_preflight": {"path": str(PREFLIGHT_AUDIT_PATH), "sha256": _sha256_file(PREFLIGHT_AUDIT_PATH)},
+        },
+    }
+
+
+def _fmt(value: object, digits: int = 3) -> str:
+    parsed = _finite_number(value)
+    return "—" if parsed is None else f"{parsed:.{digits}f}"
+
+
+def _pass(value: object) -> str:
+    return "PASS" if value is True else "FAIL"
+
+
+def render_report(
+    analysis: dict[str, Any], *, provenance: dict[str, object]
+) -> str:
+    """Render the frozen, complete-table report without making repository writes."""
+    jobs = list(analysis.get("jobs", []))
+    lines = [
+        "# EDS Quality-Diversity / LIBERO Object-Swap OOD 最终报告",
+        "",
+        "> 本报告只描述预注册的 10 个固定 Object-Swap tasks 上的 paired engineering evidence；不宣称统计显著性、总体泛化或 QD 理论普遍成立。",
+        "",
+        "## 执行与 provenance",
+        "",
+        f"- Base commit：`{provenance.get('base_commit', '—')}`；QD code commit：`{provenance.get('code_commit', '—')}`。",
+        f"- Decision：`{analysis.get('decision', '—')}`。",
+        f"- Attempts：`{analysis.get('attempt_ledger', {}).get('attempt_count', '—')}/120`；recovery `{analysis.get('attempt_ledger', {}).get('recovery_attempts', '—')}`；ledger `{_pass(analysis.get('attempt_ledger', {}).get('passed'))}`。",
+        f"- Storage：`{analysis.get('storage_audit', {}).get('outputs_target', '—')}`；credential scan `{_pass(analysis.get('credential_audit', {}).get('passed'))}`。",
+        "",
+        "## 11-job 完整结果",
+        "",
+        "| Job | Valid | Success | SR | Wilson 95% | qpos | collision composite |",
+        "| --- | --- | ---: | ---: | --- | ---: | ---: |",
+    ]
+    for job in jobs:
+        ci = job.get("wilson_95") or [None, None]
+        lines.append(
+            f"| `{job.get('label')}` | {_pass(job.get('valid'))} | {job.get('success_count', '—')}/10 | {_fmt(job.get('success_rate'))} | [{_fmt(ci[0])}, {_fmt(ci[1])}] | {job.get('execution_qpos_error_episodes', '—')} | {job.get('collision_push_drop_wrong_object', '—')} |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Task-level paired outcome",
+            "",
+            "| Task | " + " | ".join(f"`{job.get('label')}`" for job in jobs) + " |",
+            "| ---: | " + " | ".join("---" for _ in jobs) + " |",
+        ]
+    )
+    for task in range(10):
+        lines.append(
+            f"| {task} | "
+            + " | ".join(str(job.get("task_outcomes", {}).get(str(task), "—")) for job in jobs)
+            + " |"
+        )
+    lines.extend(
+        [
+            "",
+            "## 机制与三类 gates",
+            "",
+            "| Candidate | Task | Mechanism hard | Mechanism claim | Safety | All | Δcoverage median | spread ratio | Δbest reward | replacement-active | overflow P95 |",
+            "| --- | --- | --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |",
+        ]
+    )
+    for job in jobs[1:]:
+        gates = job.get("gates", {})
+        mechanism = job.get("mechanism_comparison", {})
+        lines.append(
+            f"| `{job.get('label')}` | {_pass(gates.get('task', {}).get('passed'))} | {_pass(gates.get('mechanism_hard', {}).get('passed'))} | {_pass(gates.get('mechanism_claim', {}).get('passed'))} | {_pass(gates.get('safety', {}).get('passed'))} | {_pass(gates.get('all_passed'))} | {_fmt(mechanism.get('normalized_final_coverage_delta_median'))} | {_fmt(mechanism.get('endpoint_xy_spread_ratio_median'))} | {_fmt(mechanism.get('archive_best_reward_delta_median'))} | {_fmt(mechanism.get('replacement_active_chunk_ratio'))} | {_fmt(mechanism.get('descriptor_overflow_ratio_p95'))} |"
+        )
+    primary = next(
+        (job for job in jobs if job.get("label") == "eds_quality_diversity_uniform_primary"),
+        jobs[1] if len(jobs) > 1 else {},
+    )
+    lines.extend(
+        [
+            "",
+            "## 单因素主效应",
+            "",
+            "以下均相对 uniform primary；sparse 行只归因 parent sampler，其余为预注册 OFAT。",
+            "",
+            "| Job | Factor | Δsuccess | Δcoverage gain | Δspread retention | Δbest reward |",
+            "| --- | --- | ---: | ---: | ---: | ---: |",
+        ]
+    )
+    factors = {
+        "eds_quality_diversity_sparse_primary": "parent sampling",
+        "eds_quality_diversity_uniform_grid3": "grid 3x3",
+        "eds_quality_diversity_uniform_grid5": "grid 5x5",
+        "eds_quality_diversity_uniform_q00100": "quantiles .00/.100",
+        "eds_quality_diversity_uniform_q1090": "quantiles .10/.90",
+        "eds_quality_diversity_uniform_expand00": "expand .00",
+        "eds_quality_diversity_uniform_expand20": "expand .20",
+        "eds_quality_diversity_uniform_span04": "min span .04 m",
+        "eds_quality_diversity_uniform_span12": "min span .12 m",
+    }
+    primary_mechanism = primary.get("mechanism_comparison", {})
+    for job in jobs[1:]:
+        if job.get("label") == primary.get("label"):
+            continue
+        mechanism = job.get("mechanism_comparison", {})
+        lines.append(
+            f"| `{job.get('label')}` | {factors.get(str(job.get('label')), 'registered candidate')} | {_fmt((_finite_number(job.get('success_count')) or 0) - (_finite_number(primary.get('success_count')) or 0), 0)} | {_fmt((_finite_number(mechanism.get('normalized_final_coverage_delta_median')) or 0) - (_finite_number(primary_mechanism.get('normalized_final_coverage_delta_median')) or 0))} | {_fmt((_finite_number(mechanism.get('endpoint_xy_spread_ratio_median')) or 0) - (_finite_number(primary_mechanism.get('endpoint_xy_spread_ratio_median')) or 0))} | {_fmt((_finite_number(mechanism.get('archive_best_reward_delta_median')) or 0) - (_finite_number(primary_mechanism.get('archive_best_reward_delta_median')) or 0))} |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Failure taxonomy",
+            "",
+            "| Job | Categories |",
+            "| --- | --- |",
+        ]
+    )
+    for job in jobs:
+        categories = ", ".join(
+            f"{key}: {value}"
+            for key, value in sorted(job.get("failure_taxonomy_counts", {}).items())
+        ) or "—"
+        lines.append(f"| `{job.get('label')}` | {categories} |")
+    lines.extend(
+        [
+            "",
+            "## Latency 与定性证据",
+            "",
+            "| Job | Selection P95 s | QD update P95 s | Parent allocation P95 s | EDS loop P95 s | Stage P95 s |",
+            "| --- | ---: | ---: | ---: | ---: | ---: |",
+        ]
+    )
+    for job in jobs:
+        metrics = job.get("metric_summary", {})
+        lines.append(
+            f"| `{job.get('label')}` | {_fmt(metrics.get('selection_latency_p95_s'))} | {_fmt(metrics.get('qd_archive_update_latency_p95_s'))} | {_fmt(metrics.get('qd_parent_allocation_latency_p95_s'))} | {_fmt(metrics.get('eds_loop_latency_p95_s'))} | {_fmt(metrics.get('stage_query_latency_p95_s'))} |"
+        )
+    lines.extend(
+        [
+            "",
+            f"- Raw qualitative heatmaps/trajectories：各 job 的 `eds_eval/qualitative/episode_*/chunk_*/`。",
+            f"- 同时间坐标 contact sheets：`{CONTACT_SHEET_ROOT}`。",
+            "- 自动 failure taxonomy 对无明确 telemetry 的失败保守标为 `timeout without completion`；视觉复核注释单独保留，不把未观察到的因果机制写成事实。",
+            "",
+            "## Ranking 与结论",
+            "",
+        ]
+    )
+    for row in analysis.get("ranking", []):
+        lines.append(
+            f"{row.get('rank')}. `{row.get('label')}` — all gates `{row.get('all_gates_passed')}`"
+        )
+    lines.extend(
+        [
+            "",
+            f"最终 decision：`{analysis.get('decision', '—')}`。Gate 失败不构成追加实验或改变冻结参数的授权。",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "command",
+        choices=("audit-preflight", "audit-formal", "freeze-decision", "verify-decision"),
+    )
+    args = parser.parse_args()
+    if args.command == "audit-preflight":
+        payload = audit_preflight()
+        print(json.dumps({"passed": payload["passed"], "path": str(PREFLIGHT_AUDIT_PATH)}))
+        return 0 if payload["passed"] else 1
+    if args.command == "audit-formal":
+        payload = audit_formal()
+        print(json.dumps({"decision": payload["decision"], "path": str(ANALYSIS_PATH)}))
+        return 0
+    if args.command == "freeze-decision":
+        analysis = json.loads(ANALYSIS_PATH.read_text(encoding="utf-8"))
+        frozen = freeze_decision_manifest(decision_payload(analysis))
+        print(json.dumps({"decision": frozen["decision"], "path": str(DECISION_PATH)}))
+        return 0
+    verify_decision_manifest()
+    print(json.dumps({"verified": True, "path": str(DECISION_PATH)}))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

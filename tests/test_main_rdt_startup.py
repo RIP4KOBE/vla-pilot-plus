@@ -349,6 +349,10 @@ def _run_execution_horizon_episode(
             self.plan_index = -1
             self.metrics_reads = 0
             self.current_chunk = None
+            self.episode_context = []
+
+        def set_eds_episode_context(self, episode_index, episode_seed):
+            self.episode_context.append((episode_index, episode_seed))
 
         def select_action(self, *, generate_new_chunk, guidance_type=None, **kwargs):
             self.select_flags.append(bool(generate_new_chunk))
@@ -482,6 +486,18 @@ def _run_execution_horizon_episode(
     runner._run_episode(episode=0, episode_dir=str(tmp_path), episode_seed=7)
     metrics_records = [record for record in appended if "execution_horizon_resolved" in record]
     return runner, policy, metrics_records
+
+
+def test_main_sets_eds_episode_context_before_policy_sampling(monkeypatch, tmp_path):
+    _, policy, _ = _run_execution_horizon_episode(
+        monkeypatch,
+        tmp_path,
+        mode="fixed",
+        target_distances=[1.0],
+        max_steps=1,
+    )
+
+    assert policy.episode_context == [(0, 7)]
 
 
 def test_main_attaches_execution_decision_before_saving_mechanism_trace(
