@@ -49,9 +49,9 @@ MIN_FREE_BYTES = 50 * 1024**3
 ATTEMPT_CAP = 120
 EPISODE_SEEDS = [44, 235, 43, 546, 6, 621, 197, 87, 151, 548]
 SUPERSEDED_RUN_MANIFEST_PATH = (
-    EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v2.json"
+    EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v3.json"
 )
-RUN_MANIFEST_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v3.json"
+RUN_MANIFEST_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v4.json"
 ATTEMPT_LEDGER_PATH = EXPERIMENT_ROOT / "manifests/episode_attempt_ledger.jsonl"
 OFFLINE_PREFLIGHT_PATH = EXPERIMENT_ROOT / "analysis/offline_mechanism_preflight.json"
 LIBERO_PREFLIGHT_AUDIT_PATH = (
@@ -1256,15 +1256,16 @@ def freeze_run_manifest(
         "gates_frozen_by_design": True,
     }
     if (
-        RUN_MANIFEST_PATH.name == "qd_ed_run_manifest.v3.json"
+        RUN_MANIFEST_PATH.name == "qd_ed_run_manifest.v4.json"
         and SUPERSEDED_RUN_MANIFEST_PATH.is_file()
     ):
         payload["supersedes"] = {
             "path": str(SUPERSEDED_RUN_MANIFEST_PATH),
             "sha256": _sha256_bytes(SUPERSEDED_RUN_MANIFEST_PATH.read_bytes()),
             "reason": (
-                "pre-dispatch runner correction: episode attempts are counted "
-                "only after an append-only phase_dispatch event"
+                "pre-dispatch audit hardening: exact allocation replay, "
+                "formal-readiness gate, contact sheets, and conservative "
+                "failure taxonomy"
             ),
             "algorithm_matrix_or_gate_change": False,
         }
