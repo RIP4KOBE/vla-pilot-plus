@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import io
 import json
 import math
 import os
@@ -28,7 +29,13 @@ for import_root in (SCRIPT_DIR, WORKTREE_ROOT):
 
 import eds_quality_diversity_runner as runner
 from core.eds_eval_metrics import wilson_ci
-from core.qd_ed import QDBounds, cell_ids, freeze_bounds
+from core.qd_ed import (
+    QDArchive,
+    QDBounds,
+    allocate_parent_slots,
+    cell_ids,
+    freeze_bounds,
+)
 
 
 OUTPUT_TARGET = runner.OUTPUT_TARGET
@@ -372,6 +379,131 @@ def qd_mechanism_hard_gate(
         "active_chunk_count": len(metrics),
         "additional_reward_model_vlm_calls_vs_control": 0 if metrics and not any("reward call" in item for item in unique) else None,
         "failures": unique,
+    }
+
+
+def validate_parent_allocation_replay(
+    record: dict[str, Any], profile: dict[str, object]
+) -> dict[str, object]:
+    """Recompute archive visits and exact deterministic parent allocation."""
+    failures: list[str] = []
+    stream = record.get("shadow_qd_candidate_stream")
+    if not isinstance(stream, list) or len(stream) != 11:
+        return {"passed": False, "failures": ["candidate stream must contain initial + 10 iterations"]}
+    checksum = hashlib.sha256(_canonical(stream).encode()).hexdigest()
+    if checksum != record.get("shadow_qd_observer_checksum"):
+        failures.append("candidate stream checksum mismatch")
+    if [item.get("iter_idx") for item in stream if isinstance(item, dict)] != list(range(-1, 10)):
+        failures.append("candidate stream iteration identity mismatch")
+        return {"passed": False, "failures": failures}
+    try:
+        initial_descriptors = torch.tensor(
+            stream[0]["descriptors_xy_m"], dtype=torch.float32
+        )
+        bounds = _profile_bounds(profile, initial_descriptors)
+    except (KeyError, TypeError, ValueError, FloatingPointError) as exc:
+        failures.append(f"initial bounds replay failed: {type(exc).__name__}")
+        return {"passed": False, "failures": failures}
+    observed_bounds = record.get("qd_bounds_xy_m")
+    try:
+        observed_bounds_tensor = torch.tensor(observed_bounds, dtype=torch.float32)
+    except (TypeError, ValueError):
+        observed_bounds_tensor = torch.empty(0)
+    expected_bounds_tensor = torch.stack((bounds.lo, bounds.hi))
+    if observed_bounds_tensor.shape != (2, 2) or not torch.equal(
+        observed_bounds_tensor, expected_bounds_tensor
+    ):
+        failures.append("fixed bounds values do not match initial-population replay")
+    if record.get("qd_bounds_source_initial_checksum") != bounds.checksum:
+        failures.append("fixed bounds checksum mismatch")
+
+    archive = QDArchive(grid_shape=profile["qd_grid_shape"])
+
+    def update_archive(group: dict[str, Any], source_iter: int) -> None:
+        descriptors = torch.tensor(group["descriptors_xy_m"], dtype=torch.float32)
+        rewards = torch.tensor(group["rewards"], dtype=torch.float32)
+        if descriptors.shape != (16, 2) or rewards.shape != (16,):
+            raise ValueError("each candidate stream group must contain 16 candidates")
+        mapped, _ = cell_ids(descriptors, bounds, profile["qd_grid_shape"])
+        actions = (
+            torch.arange(32, dtype=torch.float32).reshape(16, 2)
+            + 1000.0 * (source_iter + 1)
+        )
+        archive.update(
+            actions=actions,
+            rewards=rewards,
+            costs=-rewards,
+            descriptors=descriptors,
+            cell_ids=mapped,
+            source_iter=source_iter,
+        )
+
+    try:
+        update_archive(stream[0], -1)
+    except (KeyError, TypeError, ValueError, FloatingPointError, RuntimeError) as exc:
+        failures.append(f"initial archive replay failed: {type(exc).__name__}")
+        return {"passed": False, "failures": failures}
+    observed_slots = record.get("qd_parent_slots_by_cell_by_iter")
+    observed_weights = record.get("qd_parent_weights_by_cell_by_iter")
+    if not isinstance(observed_slots, list) or len(observed_slots) != 10:
+        failures.append("ten observed parent slot allocations required")
+        return {"passed": False, "failures": failures}
+    if not isinstance(observed_weights, list) or len(observed_weights) != 10:
+        failures.append("ten observed parent weight allocations required")
+        return {"passed": False, "failures": failures}
+    replay_rows = []
+    for iteration in range(10):
+        allocation = allocate_parent_slots(
+            archive,
+            population_size=16,
+            sampling=str(profile["qd_parent_sampling"]),
+            sparse_exponent=float(profile.get("qd_sparse_exponent", 1.0)),
+            run_seed=int(profile.get("seed", 0)),
+            episode=int(record.get("episode", 0)),
+            global_step=int(record.get("global_step", 0)),
+            iter_idx=iteration,
+        )
+        expected_slots = {
+            str(cell): int(value)
+            for cell, value in allocation.slot_counts.items()
+        }
+        expected_weights = {
+            str(cell): float(value)
+            for cell, value in allocation.weights.items()
+        }
+        actual_slots = observed_slots[iteration]
+        actual_weights = observed_weights[iteration]
+        if actual_slots != expected_slots:
+            failures.append(f"iter {iteration} exact parent slots mismatch")
+        if not isinstance(actual_weights, dict) or set(actual_weights) != set(expected_weights) or any(
+            not math.isclose(
+                float(actual_weights[cell]),
+                expected_weights[cell],
+                rel_tol=0.0,
+                abs_tol=1.0e-12,
+            )
+            for cell in expected_weights
+        ):
+            failures.append(f"iter {iteration} inverse-visitation weights mismatch")
+        replay_rows.append(
+            {
+                "iter_idx": iteration,
+                "expected_slots": expected_slots,
+                "expected_weights": expected_weights,
+                "cumulative_visits": archive.cumulative_visits.tolist(),
+            }
+        )
+        try:
+            update_archive(stream[iteration + 1], iteration)
+        except (KeyError, TypeError, ValueError, FloatingPointError, RuntimeError) as exc:
+            failures.append(f"iter {iteration} archive replay failed: {type(exc).__name__}")
+            break
+    return {
+        "passed": not failures,
+        "stream_checksum": checksum,
+        "bounds_checksum": bounds.checksum,
+        "replay": replay_rows,
+        "failures": list(dict.fromkeys(failures)),
     }
 
 
@@ -721,17 +853,29 @@ def _classify_failures(
         if outcome == "success":
             result[episode] = "success"
             continue
-        serialized = _canonical(by_episode.get(episode, [])).lower()
-        evidence = serialized
-        if "qpos" in evidence and ("error" in evidence or "violation" in evidence):
+        episode_records = by_episode.get(episode, [])
+
+        def positive_key(*tokens: str) -> bool:
+            for record in episode_records:
+                for key, value in _walk(record):
+                    normalized = key.lower().replace("-", "_")
+                    if not any(token in normalized for token in tokens):
+                        continue
+                    if value is True or (
+                        _finite_number(value) is not None and float(value) > 0.0
+                    ):
+                        return True
+            return False
+
+        if positive_key("qpos"):
             result[episode] = "qpos/execution error"
-        elif "wrong_object" in evidence or "wrong-object" in evidence:
+        elif positive_key("wrong_object"):
             result[episode] = "clutter swept/wrong-object interaction"
-        elif "collision" in evidence:
+        elif positive_key("collision"):
             result[episode] = "basket displaced/collision"
-        elif "drop" in evidence:
+        elif positive_key("drop"):
             result[episode] = "target dropped after grasp"
-        elif "push" in evidence:
+        elif positive_key("push"):
             result[episode] = "target pushed away"
         else:
             result[episode] = "timeout without completion"
@@ -883,6 +1027,27 @@ def audit_job(
         "active_chunk_count": len(metrics),
         "failures": [] if metrics and all(record.get("score_call_count") == 11 for record in metrics) else ["control reward call budget mismatch"],
     }
+    allocation_replays = []
+    if qd:
+        for record in metrics:
+            replay = validate_parent_allocation_replay(record, job)
+            allocation_replays.append(
+                {
+                    "episode": record.get("episode"),
+                    "global_step": record.get("global_step"),
+                    **replay,
+                }
+            )
+            if not replay["passed"]:
+                hard["failures"].extend(
+                    f"{record.get('episode')}/{record.get('global_step')}: {failure}"
+                    for failure in replay["failures"]
+                )
+        hard["failures"] = list(dict.fromkeys(hard["failures"]))
+        hard["passed"] = bool(metrics) and not hard["failures"]
+        hard["exact_parent_allocation_replay_passed"] = bool(
+            allocation_replays
+        ) and all(row["passed"] for row in allocation_replays)
     return ({
         "label": job["label"],
         "formal_label": job.get("formal_label", job["label"]),
@@ -912,6 +1077,7 @@ def audit_job(
         "config_fingerprint": job["config_fingerprint"],
         "code_state_sha256": job["execution_record"]["code_state_sha256"],
         "mechanism_hard": hard,
+        "parent_allocation_replays": allocation_replays,
         "metric_summary": summary,
         **summary,
         "checksums": _job_checksums(output_dir),
@@ -949,6 +1115,166 @@ def scan_credentials(roots: list[Path]) -> dict[str, object]:
             ):
                 findings.append({"path": str(path), "reason": "credential-like marker"})
     return {"passed": not findings, "finding_count": len(findings), "findings": findings}
+
+
+def _ffmpeg_frame(video: Path, time_s: float):
+    from PIL import Image
+
+    result = subprocess.run(
+        [
+            "ffmpeg",
+            "-v",
+            "error",
+            "-ss",
+            f"{float(time_s):.3f}",
+            "-i",
+            str(video),
+            "-frames:v",
+            "1",
+            "-f",
+            "image2pipe",
+            "-vcodec",
+            "png",
+            "pipe:1",
+        ],
+        capture_output=True,
+        timeout=60,
+        check=False,
+    )
+    if result.returncode != 0 or not result.stdout:
+        raise RuntimeError("ffmpeg frame extraction failed")
+    with Image.open(io.BytesIO(result.stdout)) as image:
+        return image.convert("RGB")
+
+
+def generate_contact_sheets(
+    analysis: dict[str, Any],
+    *,
+    output_root: Path = CONTACT_SHEET_ROOT,
+    tasks: Iterable[int] = range(10),
+    times_s: Iterable[float] = (1.0, 3.0, 5.0),
+    frame_fn: Callable[[Path, float], Any] = _ffmpeg_frame,
+) -> dict[str, object]:
+    """Create immutable same-task/same-seed sheets at fixed video timestamps."""
+    from PIL import Image, ImageDraw, ImageOps
+
+    output_root = Path(output_root)
+    output_root.mkdir(parents=True, exist_ok=False)
+    jobs = list(analysis.get("jobs", []))
+    if not jobs:
+        raise ValueError("contact sheets require audited jobs")
+    sheet_rows = []
+    failures: list[str] = []
+    tile_width, frame_height, annotation_height = 320, 240, 70
+    columns = min(4, len(jobs))
+    rows = int(math.ceil(len(jobs) / columns))
+    for task in tasks:
+        task_id = int(task)
+        if not 0 <= task_id < 10:
+            raise ValueError("contact sheet task must be in 0..9")
+        for raw_time in times_s:
+            time_s = float(raw_time)
+            if not math.isfinite(time_s) or time_s < 0.0:
+                raise ValueError("contact sheet time must be finite and nonnegative")
+            canvas = Image.new(
+                "RGB",
+                (columns * tile_width, rows * (frame_height + annotation_height)),
+                color=(16, 16, 16),
+            )
+            draw = ImageDraw.Draw(canvas)
+            sources = []
+            for index, job in enumerate(jobs):
+                row, column = divmod(index, columns)
+                x = column * tile_width
+                y = row * (frame_height + annotation_height)
+                output_dir = Path(str(job.get("output_dir", "")))
+                videos = list(
+                    (output_dir / f"episode_{task_id + 1}").glob("*.mp4")
+                )
+                frame_error = None
+                if len(videos) == 1:
+                    video = videos[0]
+                    try:
+                        frame = frame_fn(video, time_s)
+                        frame = ImageOps.fit(
+                            frame.convert("RGB"),
+                            (tile_width, frame_height),
+                        )
+                    except Exception as exc:
+                        frame_error = type(exc).__name__
+                        frame = Image.new(
+                            "RGB", (tile_width, frame_height), color=(80, 0, 0)
+                        )
+                else:
+                    video = None
+                    frame_error = f"video_count_{len(videos)}"
+                    frame = Image.new(
+                        "RGB", (tile_width, frame_height), color=(80, 0, 0)
+                    )
+                canvas.paste(frame, (x, y))
+                outcome = job.get("task_outcomes", {}).get(str(task_id), "missing")
+                taxonomy = job.get("failure_taxonomy", {}).get(str(task_id), "—")
+                label = str(job.get("label", "unknown"))
+                annotation = (
+                    f"{label[:43]}\n"
+                    f"task={task_id} seed={runner.EPISODE_SEEDS[task_id]} t={time_s:.1f}s "
+                    f"outcome={outcome}\n{str(taxonomy)[:75]}"
+                )
+                draw.multiline_text(
+                    (x + 4, y + frame_height + 3),
+                    annotation,
+                    fill=(240, 240, 240),
+                    spacing=2,
+                )
+                if frame_error is not None:
+                    failures.append(
+                        f"task {task_id} time {time_s} {label}: {frame_error}"
+                    )
+                sources.append(
+                    {
+                        "label": label,
+                        "video": str(video) if video is not None else None,
+                        "video_sha256": (
+                            _sha256_file(video) if video is not None else None
+                        ),
+                        "outcome": outcome,
+                        "failure_taxonomy": taxonomy,
+                        "frame_error": frame_error,
+                    }
+                )
+            sheet_path = output_root / f"task_{task_id:02d}_t_{time_s:06.2f}s.png"
+            if sheet_path.exists() or sheet_path.is_symlink():
+                raise FileExistsError(sheet_path)
+            canvas.save(sheet_path, format="PNG")
+            sheet_rows.append(
+                {
+                    "task_id": task_id,
+                    "episode_seed": runner.EPISODE_SEEDS[task_id],
+                    "time_s": time_s,
+                    "path": str(sheet_path),
+                    "sha256": _sha256_file(sheet_path),
+                    "sources": sources,
+                }
+            )
+    payload = {
+        "schema": "eds-quality-diversity-contact-sheets-v1",
+        "created_at": _now(),
+        "same_absolute_time_coordinates": True,
+        "job_count": len(jobs),
+        "sheet_count": len(sheet_rows),
+        "sheets": sheet_rows,
+        "failures": failures,
+        "passed": not failures,
+    }
+    index = output_root / "contact_sheet_index.json"
+    with index.open("x", encoding="utf-8") as handle:
+        json.dump(payload, handle, indent=2, sort_keys=True, allow_nan=False)
+        handle.write("\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    payload["index_path"] = str(index)
+    payload["index_sha256"] = _sha256_file(index)
+    return payload
 
 
 def _expected_attempt_cells() -> tuple[set[tuple[str, int, int]], set[tuple[str, int, int]]]:
@@ -1046,6 +1372,7 @@ def audit_formal() -> dict[str, object]:
         "offline_preflight_sha256": _sha256_file(runner.OFFLINE_PREFLIGHT_PATH),
         "libero_preflight_audit_sha256": _sha256_file(PREFLIGHT_AUDIT_PATH),
     }
+    payload["qualitative_contact_sheets"] = generate_contact_sheets(payload)
     if _contains_credential(payload):
         raise RuntimeError("formal audit contains credential material")
     ANALYSIS_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -1146,6 +1473,9 @@ def decision_payload(analysis: dict[str, Any]) -> dict[str, Any]:
             "offline_preflight": {"path": str(runner.OFFLINE_PREFLIGHT_PATH), "sha256": _sha256_file(runner.OFFLINE_PREFLIGHT_PATH)},
             "libero_preflight": {"path": str(PREFLIGHT_AUDIT_PATH), "sha256": _sha256_file(PREFLIGHT_AUDIT_PATH)},
         },
+        "qualitative_contact_sheets": analysis.get(
+            "qualitative_contact_sheets", {}
+        ),
     }
 
 

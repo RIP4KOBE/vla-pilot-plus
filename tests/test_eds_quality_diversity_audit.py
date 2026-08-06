@@ -7,6 +7,7 @@ import stat
 from pathlib import Path
 
 import pytest
+import torch
 
 
 def _load_audit():
@@ -25,6 +26,10 @@ def _load_audit():
 
 
 audit = _load_audit()
+QDArchive = audit.QDArchive
+allocate_parent_slots = audit.allocate_parent_slots
+cell_ids = audit.cell_ids
+freeze_bounds = audit.freeze_bounds
 
 
 def _stream() -> list[dict[str, object]]:
@@ -192,6 +197,132 @@ def test_qd_metric_hard_gate_checks_accounting_and_allocations():
     result = audit.qd_mechanism_hard_gate([broken], _profile())
     assert result["passed"] is False
     assert any("accounting" in item for item in result["failures"])
+
+
+def test_parent_allocation_replay_validates_fixed_bounds_visits_and_exact_slots():
+    profile = _profile()
+    descriptors = [
+        [-0.04, -0.04],
+        [0.04, -0.04],
+        [-0.04, 0.04],
+        [0.04, 0.04],
+    ] * 4
+    stream = []
+    for iteration in range(-1, 10):
+        stream.append(
+            {
+                "iter_idx": iteration,
+                "descriptors_xy_m": descriptors,
+                "rewards": [float(index + 100 * (iteration + 1)) for index in range(16)],
+                "fingerprints": [f"{iteration + 1:02x}{index:02x}" for index in range(16)],
+            }
+        )
+    bounds = freeze_bounds(
+        torch.tensor(descriptors),
+        quantiles=profile["qd_bounds_quantiles"],
+        expand_fraction=profile["qd_bounds_expand_fraction"],
+        min_axis_span_m=profile["qd_min_axis_span_m"],
+    )
+    archive = QDArchive(grid_shape=profile["qd_grid_shape"])
+
+    def update(source_iter):
+        group = stream[source_iter + 1]
+        values = torch.tensor(group["descriptors_xy_m"])
+        cells, _ = cell_ids(values, bounds, profile["qd_grid_shape"])
+        rewards = torch.tensor(group["rewards"])
+        actions = torch.arange(32, dtype=torch.float32).reshape(16, 2) + 1000 * (source_iter + 1)
+        archive.update(
+            actions=actions,
+            rewards=rewards,
+            costs=-rewards,
+            descriptors=values,
+            cell_ids=cells,
+            source_iter=source_iter,
+        )
+
+    update(-1)
+    slots = []
+    weights = []
+    for iteration in range(10):
+        allocation = allocate_parent_slots(
+            archive,
+            population_size=16,
+            sampling="uniform_cells",
+            sparse_exponent=1.0,
+            run_seed=0,
+            episode=0,
+            global_step=8,
+            iter_idx=iteration,
+        )
+        slots.append({str(key): value for key, value in allocation.slot_counts.items()})
+        weights.append({str(key): value for key, value in allocation.weights.items()})
+        update(iteration)
+    record = {
+        "episode": 0,
+        "global_step": 8,
+        "qd_bounds_xy_m": [bounds.lo.tolist(), bounds.hi.tolist()],
+        "qd_bounds_source_initial_checksum": bounds.checksum,
+        "qd_parent_slots_by_cell_by_iter": slots,
+        "qd_parent_weights_by_cell_by_iter": weights,
+        "shadow_qd_candidate_stream": stream,
+        "shadow_qd_observer_checksum": hashlib.sha256(
+            json.dumps(stream, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest(),
+    }
+    result = audit.validate_parent_allocation_replay(record, profile)
+    assert result["passed"] is True
+    record["qd_parent_slots_by_cell_by_iter"][0]["0"] += 1
+    assert audit.validate_parent_allocation_replay(record, profile)["passed"] is False
+
+
+def test_contact_sheets_use_same_time_and_include_every_job(tmp_path: Path):
+    pytest.importorskip("PIL")
+    from PIL import Image
+
+    jobs = []
+    for index, label in enumerate(("control", "uniform", "sparse")):
+        output = tmp_path / label
+        video = output / "episode_1" / "episode_1_fail_agentview.mp4"
+        video.parent.mkdir(parents=True)
+        video.write_bytes(f"video-{label}".encode())
+        jobs.append(
+            {
+                "label": label,
+                "output_dir": str(output),
+                "task_outcomes": {"0": "fail"},
+                "failure_taxonomy": {"0": "timeout without completion"},
+            }
+        )
+    calls = []
+
+    def frame(video: Path, time_s: float):
+        calls.append((video, time_s))
+        return Image.new("RGB", (80, 60), color=(20, 40, 60))
+
+    result = audit.generate_contact_sheets(
+        {"jobs": jobs},
+        output_root=tmp_path / "sheets",
+        tasks=[0],
+        times_s=[5.0],
+        frame_fn=frame,
+    )
+    assert result["passed"] is True
+    assert len(calls) == 3
+    assert {time for _, time in calls} == {5.0}
+    assert Path(result["sheets"][0]["path"]).is_file()
+
+
+def test_failure_taxonomy_does_not_treat_zero_valued_key_names_as_evidence(tmp_path: Path):
+    result = audit._classify_failures(
+        {0: "fail", 1: "fail"},
+        [
+            {"episode": 0, "gripper_qpos_violation_count": 0, "collision_count": 0},
+            {"episode": 1, "gripper_qpos_violation_count": 2},
+        ],
+        tmp_path,
+    )
+    assert result[0] == "timeout without completion"
+    assert result[1] == "qpos/execution error"
 
 
 def test_audit_attempt_ledger_requires_cap_and_unique_formal_cells(tmp_path: Path):

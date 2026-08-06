@@ -49,11 +49,14 @@ MIN_FREE_BYTES = 50 * 1024**3
 ATTEMPT_CAP = 120
 EPISODE_SEEDS = [44, 235, 43, 546, 6, 621, 197, 87, 151, 548]
 SUPERSEDED_RUN_MANIFEST_PATH = (
-    EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.json"
+    EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v2.json"
 )
-RUN_MANIFEST_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v2.json"
+RUN_MANIFEST_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v3.json"
 ATTEMPT_LEDGER_PATH = EXPERIMENT_ROOT / "manifests/episode_attempt_ledger.jsonl"
 OFFLINE_PREFLIGHT_PATH = EXPERIMENT_ROOT / "analysis/offline_mechanism_preflight.json"
+LIBERO_PREFLIGHT_AUDIT_PATH = (
+    EXPERIMENT_ROOT / "analysis/libero_mechanism_preflight_audit.json"
+)
 GPU_REFERENCE_PATH = Path(
     "/mnt/data/shared2/zhuoli/output/p2_direction_normalized_rbf/"
     "manifests/gpu_reference_peak.json"
@@ -618,6 +621,81 @@ def reusable_phase_reservations(
     return sorted(active_ids)
 
 
+def validate_formal_readiness(
+    *,
+    offline_path: Path = OFFLINE_PREFLIGHT_PATH,
+    preflight_audit_path: Path = LIBERO_PREFLIGHT_AUDIT_PATH,
+    ledger_path: Path = ATTEMPT_LEDGER_PATH,
+) -> dict[str, object]:
+    try:
+        offline = json.loads(Path(offline_path).read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise RuntimeError("offline mechanism preflight evidence is missing") from exc
+    if not isinstance(offline, dict) or offline.get("passed") is not True:
+        raise RuntimeError("offline mechanism preflight did not pass")
+    try:
+        preflight = json.loads(
+            Path(preflight_audit_path).read_text(encoding="utf-8")
+        )
+    except (OSError, ValueError) as exc:
+        raise RuntimeError("LIBERO preflight audit evidence is missing") from exc
+    if not isinstance(preflight, dict) or preflight.get("passed") is not True:
+        raise RuntimeError("LIBERO preflight audit did not pass")
+    expected_labels = {
+        "p2_stage_on_abs_rbf_control",
+        "eds_quality_diversity_uniform_primary",
+        "eds_quality_diversity_sparse_primary",
+    }
+    jobs = preflight.get("jobs")
+    if not isinstance(jobs, list) or {
+        str(job.get("formal_label"))
+        for job in jobs
+        if isinstance(job, dict)
+    } != expected_labels:
+        raise RuntimeError("LIBERO preflight profiles do not match frozen matrix")
+    for job in jobs:
+        if (
+            job.get("valid") is not True
+            or job.get("mechanism_hard", {}).get("passed") is not True
+            or set(job.get("task_outcomes", {})) != {"0", "8"}
+        ):
+            raise RuntimeError("LIBERO preflight validity/mechanism evidence failed")
+    if preflight.get("credential_audit", {}).get("passed") is not True:
+        raise RuntimeError("LIBERO preflight credential audit failed")
+    state = attempt_ledger_state(Path(ledger_path))
+    dispatched_preflight = [
+        row
+        for row in state["active_attempts"]
+        if row.get("phase") == "preflight"
+        and int(row["attempt_id"]) in set(state["dispatched_attempt_ids"])
+    ]
+    if len(dispatched_preflight) != 6:
+        raise RuntimeError("formal readiness requires six dispatched preflight attempts")
+    identities = {
+        (
+            str(row.get("formal_label")),
+            int(row.get("task_id")),
+            int(row.get("episode_seed")),
+        )
+        for row in dispatched_preflight
+    }
+    expected_identities = {
+        (label, task, EPISODE_SEEDS[task])
+        for label in expected_labels
+        for task in (0, 8)
+    }
+    if identities != expected_identities:
+        raise RuntimeError("dispatched preflight attempts do not match frozen identities")
+    return {
+        "passed": True,
+        "offline_sha256": _sha256_bytes(Path(offline_path).read_bytes()),
+        "libero_preflight_audit_sha256": _sha256_bytes(
+            Path(preflight_audit_path).read_bytes()
+        ),
+        "dispatched_preflight_attempts": 6,
+    }
+
+
 def _attempt_records_for_jobs(
     jobs: list[dict[str, object]], phase: str
 ) -> list[dict[str, object]]:
@@ -1178,7 +1256,7 @@ def freeze_run_manifest(
         "gates_frozen_by_design": True,
     }
     if (
-        RUN_MANIFEST_PATH.name == "qd_ed_run_manifest.v2.json"
+        RUN_MANIFEST_PATH.name == "qd_ed_run_manifest.v3.json"
         and SUPERSEDED_RUN_MANIFEST_PATH.is_file()
     ):
         payload["supersedes"] = {
@@ -1292,6 +1370,8 @@ def _run_phase(
         raise ValueError("phase must be preflight or formal")
     if not RUN_MANIFEST_PATH.is_file() or (RUN_MANIFEST_PATH.stat().st_mode & 0o222):
         raise RuntimeError("immutable run manifest must exist before LIBERO attempts")
+    if phase == "formal":
+        validate_formal_readiness()
     storage_preflight()
     validate_runtime_credential()
     if not base._poe_healthcheck():

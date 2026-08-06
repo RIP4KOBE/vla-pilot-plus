@@ -223,6 +223,77 @@ def test_attempt_reservations_require_append_only_dispatch_event(tmp_path):
         )
 
 
+def test_formal_readiness_requires_passed_offline_libero_and_six_dispatches(tmp_path):
+    runner = _load_runner()
+    offline = tmp_path / "offline.json"
+    preflight = tmp_path / "preflight.json"
+    ledger = tmp_path / "ledger.jsonl"
+    offline.write_text(json.dumps({"passed": True}))
+    labels = [
+        "p2_stage_on_abs_rbf_control",
+        "eds_quality_diversity_uniform_primary",
+        "eds_quality_diversity_sparse_primary",
+    ]
+    preflight.write_text(
+        json.dumps(
+            {
+                "passed": True,
+                "credential_audit": {"passed": True},
+                "jobs": [
+                    {
+                        "formal_label": label,
+                        "valid": True,
+                        "mechanism_hard": {"passed": True},
+                        "task_outcomes": {"0": "fail", "8": "fail"},
+                    }
+                    for label in labels
+                ],
+            }
+        )
+    )
+    reservations = []
+    for label in labels:
+        for task, seed in ((0, 44), (8, 151)):
+            reservations.append(
+                {
+                    "phase": "preflight",
+                    "label": f"preflight__{label}",
+                    "formal_label": label,
+                    "task_id": task,
+                    "episode_seed": seed,
+                    "config_fingerprint": label,
+                }
+            )
+    created = runner.append_attempt_records(ledger, reservations)
+    with pytest.raises(RuntimeError, match="six dispatched"):
+        runner.validate_formal_readiness(
+            offline_path=offline,
+            preflight_audit_path=preflight,
+            ledger_path=ledger,
+        )
+    runner.append_ledger_event(
+        ledger,
+        {
+            "record_type": "phase_dispatch",
+            "phase": "preflight",
+            "attempt_ids": [row["attempt_id"] for row in created],
+        },
+    )
+    result = runner.validate_formal_readiness(
+        offline_path=offline,
+        preflight_audit_path=preflight,
+        ledger_path=ledger,
+    )
+    assert result["passed"] is True
+    preflight.write_text(json.dumps({"passed": False}))
+    with pytest.raises(RuntimeError, match="preflight audit did not pass"):
+        runner.validate_formal_readiness(
+            offline_path=offline,
+            preflight_audit_path=preflight,
+            ledger_path=ledger,
+        )
+
+
 def test_offline_mechanism_preflight_records_all_profiles_and_passes(tmp_path):
     runner = _load_runner()
     path = tmp_path / "offline.json"
