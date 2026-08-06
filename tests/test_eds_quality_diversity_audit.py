@@ -211,6 +211,18 @@ def test_audit_attempt_ledger_requires_cap_and_unique_formal_cells(tmp_path: Pat
                 }
             )
     path.write_text("".join(json.dumps(row) + "\n" for row in rows))
+    with path.open("a") as handle:
+        handle.write(
+            json.dumps(
+                {
+                    "ledger_event_id": 1,
+                    "record_type": "phase_dispatch",
+                    "phase": "formal",
+                    "attempt_ids": [1, 2, 3, 4],
+                }
+            )
+            + "\n"
+        )
     result = audit.audit_attempt_ledger(
         path,
         expected_formal={(label, task, [44, 235][task]) for label in ["a", "b"] for task in range(2)},
@@ -218,6 +230,7 @@ def test_audit_attempt_ledger_requires_cap_and_unique_formal_cells(tmp_path: Pat
         cap=4,
     )
     assert result["passed"] is True
+    assert result["actual_episode_attempt_count"] == 4
     with path.open("a") as handle:
         handle.write(json.dumps({**rows[0], "attempt_id": 5}) + "\n")
     assert audit.audit_attempt_ledger(

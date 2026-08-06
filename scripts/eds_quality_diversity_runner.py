@@ -48,7 +48,10 @@ ALLOWED_STORAGE_PREFIX = Path("/mnt/data/shared2/zhuoli/vla-pilot-plus-plus")
 MIN_FREE_BYTES = 50 * 1024**3
 ATTEMPT_CAP = 120
 EPISODE_SEEDS = [44, 235, 43, 546, 6, 621, 197, 87, 151, 548]
-RUN_MANIFEST_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.json"
+SUPERSEDED_RUN_MANIFEST_PATH = (
+    EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.json"
+)
+RUN_MANIFEST_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v2.json"
 ATTEMPT_LEDGER_PATH = EXPERIMENT_ROOT / "manifests/episode_attempt_ledger.jsonl"
 OFFLINE_PREFLIGHT_PATH = EXPERIMENT_ROOT / "analysis/offline_mechanism_preflight.json"
 GPU_REFERENCE_PATH = Path(
@@ -430,11 +433,114 @@ def read_attempt_ledger(path: Path = ATTEMPT_LEDGER_PATH) -> list[dict[str, obje
         if not isinstance(record, dict):
             raise RuntimeError(f"attempt ledger line {line_number} is not an object")
         records.append(record)
-    if [row.get("attempt_id") for row in records] != list(
-        range(1, len(records) + 1)
+    attempts = [
+        row
+        for row in records
+        if row.get("record_type", "episode_attempt") == "episode_attempt"
+    ]
+    if [row.get("attempt_id") for row in attempts] != list(
+        range(1, len(attempts) + 1)
     ):
         raise RuntimeError("attempt ledger ids are not contiguous append-only ids")
+    events = [row for row in records if row not in attempts]
+    if [row.get("ledger_event_id") for row in events] != list(
+        range(1, len(events) + 1)
+    ):
+        raise RuntimeError("attempt ledger event ids are not contiguous")
     return records
+
+
+def attempt_ledger_state(
+    path: Path = ATTEMPT_LEDGER_PATH,
+) -> dict[str, object]:
+    records = read_attempt_ledger(path)
+    attempts = [
+        row
+        for row in records
+        if row.get("record_type", "episode_attempt") == "episode_attempt"
+    ]
+    attempt_ids = {int(row["attempt_id"]) for row in attempts}
+    void_ids: set[int] = set()
+    dispatched_ids: set[int] = set()
+    dispatch_events = 0
+    for row in records:
+        record_type = row.get("record_type")
+        if record_type not in {"reservation_void", "phase_dispatch"}:
+            continue
+        ids = row.get("attempt_ids")
+        if (
+            not isinstance(ids, list)
+            or any(isinstance(value, bool) or not isinstance(value, int) for value in ids)
+            or not set(ids) <= attempt_ids
+        ):
+            raise RuntimeError(f"invalid {record_type} attempt ids")
+        if record_type == "reservation_void":
+            if set(ids) & dispatched_ids:
+                raise RuntimeError("a dispatched attempt reservation cannot be voided")
+            void_ids.update(ids)
+        else:
+            dispatch_events += 1
+            if set(ids) & void_ids:
+                raise RuntimeError("a void reservation cannot be dispatched")
+            if set(ids) & dispatched_ids:
+                raise RuntimeError("an attempt reservation cannot be dispatched twice")
+            dispatched_ids.update(ids)
+    active = [row for row in attempts if int(row["attempt_id"]) not in void_ids]
+    return {
+        "records": records,
+        "attempts": attempts,
+        "active_attempts": active,
+        "void_attempt_ids": sorted(void_ids),
+        "dispatched_attempt_ids": sorted(dispatched_ids),
+        "reserved_attempt_count": len(attempts),
+        "active_reservation_count": len(active),
+        "dispatched_attempt_count": len(dispatched_ids),
+        "dispatch_events": dispatch_events,
+    }
+
+
+def append_ledger_event(
+    path: Path, event: dict[str, object]
+) -> dict[str, object]:
+    if event.get("record_type") not in {"reservation_void", "phase_dispatch"}:
+        raise ValueError("unsupported attempt ledger event")
+    state = attempt_ledger_state(path)
+    records = state["records"]
+    prepared = {
+        "ledger_event_id": 1
+        + sum(
+            row.get("record_type", "episode_attempt") != "episode_attempt"
+            for row in records
+        ),
+        "created_at": _now(),
+        **event,
+    }
+    if _contains_credential(prepared):
+        raise RuntimeError("attempt ledger event contains credential material")
+    attempt_ids = prepared.get("attempt_ids")
+    if not isinstance(attempt_ids, list) or not attempt_ids:
+        raise ValueError("attempt ledger event requires nonempty attempt_ids")
+    known = {int(row["attempt_id"]) for row in state["attempts"]}
+    if any(
+        isinstance(value, bool) or not isinstance(value, int)
+        for value in attempt_ids
+    ) or not set(attempt_ids) <= known:
+        raise ValueError("attempt ledger event references unknown attempt ids")
+    if prepared["record_type"] == "reservation_void" and set(attempt_ids) & set(
+        state["dispatched_attempt_ids"]
+    ):
+        raise RuntimeError("cannot void an already dispatched attempt")
+    if prepared["record_type"] == "phase_dispatch":
+        if set(attempt_ids) & set(state["void_attempt_ids"]):
+            raise RuntimeError("cannot dispatch a void reservation")
+        if set(attempt_ids) & set(state["dispatched_attempt_ids"]):
+            raise RuntimeError("attempt already dispatched")
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(_canonical(prepared) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    attempt_ledger_state(path)
+    return prepared
 
 
 def append_attempt_records(
@@ -442,8 +548,9 @@ def append_attempt_records(
 ) -> list[dict[str, object]]:
     if not records:
         return []
-    existing = read_attempt_ledger(path)
-    if len(existing) + len(records) > ATTEMPT_CAP:
+    state = attempt_ledger_state(path)
+    existing_attempts = state["attempts"]
+    if int(state["active_reservation_count"]) + len(records) > ATTEMPT_CAP:
         raise RuntimeError("episode-attempt hard cap 120 would be exceeded")
     prepared = []
     for offset, raw in enumerate(records, start=1):
@@ -457,7 +564,7 @@ def append_attempt_records(
         if not required <= set(raw):
             raise ValueError("attempt record is missing required identity fields")
         record = {
-            "attempt_id": len(existing) + offset,
+            "attempt_id": len(existing_attempts) + offset,
             "record_type": "episode_attempt",
             "started_at": _now(),
             **raw,
@@ -472,6 +579,43 @@ def append_attempt_records(
         handle.flush()
         os.fsync(handle.fileno())
     return prepared
+
+
+def _attempt_identity(row: dict[str, object]) -> tuple[object, ...]:
+    return tuple(
+        row.get(key)
+        for key in (
+            "phase",
+            "label",
+            "formal_label",
+            "task_id",
+            "episode_seed",
+            "config_fingerprint",
+            "code_state_sha256",
+        )
+    )
+
+
+def reusable_phase_reservations(
+    path: Path,
+    *,
+    phase: str,
+    expected: list[dict[str, object]],
+) -> list[int]:
+    state = attempt_ledger_state(path)
+    active = [
+        row for row in state["active_attempts"] if row.get("phase") == phase
+    ]
+    if not active:
+        return []
+    active_ids = {int(row["attempt_id"]) for row in active}
+    if active_ids & set(state["dispatched_attempt_ids"]):
+        raise RuntimeError(f"{phase} attempt reservations were already dispatched")
+    if sorted(_attempt_identity(row) for row in active) != sorted(
+        _attempt_identity(row) for row in expected
+    ):
+        raise RuntimeError(f"{phase} attempt reservations do not match current code/config")
+    return sorted(active_ids)
 
 
 def _attempt_records_for_jobs(
@@ -1033,6 +1177,19 @@ def freeze_run_manifest(
         ],
         "gates_frozen_by_design": True,
     }
+    if (
+        RUN_MANIFEST_PATH.name == "qd_ed_run_manifest.v2.json"
+        and SUPERSEDED_RUN_MANIFEST_PATH.is_file()
+    ):
+        payload["supersedes"] = {
+            "path": str(SUPERSEDED_RUN_MANIFEST_PATH),
+            "sha256": _sha256_bytes(SUPERSEDED_RUN_MANIFEST_PATH.read_bytes()),
+            "reason": (
+                "pre-dispatch runner correction: episode attempts are counted "
+                "only after an append-only phase_dispatch event"
+            ),
+            "algorithm_matrix_or_gate_change": False,
+        }
     payload["manifest_payload_sha256"] = _sha256_bytes(
         _canonical(payload).encode("utf-8")
     )
@@ -1137,6 +1294,8 @@ def _run_phase(
         raise RuntimeError("immutable run manifest must exist before LIBERO attempts")
     storage_preflight()
     validate_runtime_credential()
+    if not base._poe_healthcheck():
+        raise RuntimeError("Poe Gemini health check failed before attempt dispatch")
     reference = load_gpu_reference()
     admission = admit_gpus(
         reference_peak_vram_mib=float(reference["reference_peak_vram_mib"])
@@ -1157,23 +1316,64 @@ def _run_phase(
     level = PREFLIGHT_LEVEL if phase == "preflight" else FORMAL_LEVEL
     episodes = 2 if phase == "preflight" else 10
     jobs = build_jobs(level, episodes)
-    existing = read_attempt_ledger(ATTEMPT_LEDGER_PATH)
-    if any(row.get("phase") == phase for row in existing):
-        raise RuntimeError(f"{phase} attempts already exist; use audited retry workflow")
-    append_attempt_records(
+    expected_reservations = _attempt_records_for_jobs(jobs, phase)
+    try:
+        attempt_ids = reusable_phase_reservations(
+            ATTEMPT_LEDGER_PATH,
+            phase=phase,
+            expected=expected_reservations,
+        )
+    except RuntimeError as exc:
+        if "already dispatched" in str(exc):
+            raise
+        state = attempt_ledger_state(ATTEMPT_LEDGER_PATH)
+        stale_ids = [
+            int(row["attempt_id"])
+            for row in state["active_attempts"]
+            if row.get("phase") == phase
+        ]
+        if not stale_ids:
+            raise
+        append_ledger_event(
+            ATTEMPT_LEDGER_PATH,
+            {
+                "record_type": "reservation_void",
+                "phase": phase,
+                "attempt_ids": stale_ids,
+                "reason": "pre-dispatch code/config reservation superseded",
+            },
+        )
+        attempt_ids = []
+    if not attempt_ids:
+        reservations = append_attempt_records(
+            ATTEMPT_LEDGER_PATH,
+            expected_reservations,
+        )
+        attempt_ids = [int(row["attempt_id"]) for row in reservations]
+    append_ledger_event(
         ATTEMPT_LEDGER_PATH,
-        _attempt_records_for_jobs(jobs, phase),
+        {
+            "record_type": "phase_dispatch",
+            "phase": phase,
+            "attempt_ids": attempt_ids,
+            "selected_gpu_indices": [int(item) for item in selected],
+        },
     )
-    result = base.run_level(
-        level,
-        episodes,
-        ",".join(selected),
-        timeout_seconds,
-        resume=False,
-        cached_functions_dir=str(EXPERIMENT_ROOT / "runtime_cache/cached_functions"),
-        offline_vlm=False,
-        gpu_poll_interval_s=30.0,
-    )
+    original_healthcheck = base._poe_healthcheck
+    base._poe_healthcheck = lambda: True
+    try:
+        result = base.run_level(
+            level,
+            episodes,
+            ",".join(selected),
+            timeout_seconds,
+            resume=False,
+            cached_functions_dir=str(EXPERIMENT_ROOT / "runtime_cache/cached_functions"),
+            offline_vlm=False,
+            gpu_poll_interval_s=30.0,
+        )
+    finally:
+        base._poe_healthcheck = original_healthcheck
     completion = admit_gpus(
         reference_peak_vram_mib=float(reference["reference_peak_vram_mib"]),
         wait_seconds=0.0,

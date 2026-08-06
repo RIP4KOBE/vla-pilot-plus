@@ -183,6 +183,46 @@ def test_attempt_ledger_is_append_only_and_enforces_shared_120_cap(tmp_path):
     assert ledger.read_bytes() == before
 
 
+def test_attempt_reservations_require_append_only_dispatch_event(tmp_path):
+    runner = _load_runner()
+    ledger = tmp_path / "ledger.jsonl"
+    reservations = runner.append_attempt_records(
+        ledger,
+        [
+            {
+                "phase": "preflight",
+                "label": "preflight__control",
+                "formal_label": "control",
+                "task_id": 0,
+                "episode_seed": 44,
+                "config_fingerprint": "a" * 64,
+            }
+        ],
+    )
+    state = runner.attempt_ledger_state(ledger)
+    assert state["reserved_attempt_count"] == 1
+    assert state["dispatched_attempt_count"] == 0
+    assert runner.reusable_phase_reservations(
+        ledger, phase="preflight", expected=reservations
+    ) == [1]
+
+    runner.append_ledger_event(
+        ledger,
+        {
+            "record_type": "phase_dispatch",
+            "phase": "preflight",
+            "attempt_ids": [1],
+        },
+    )
+    state = runner.attempt_ledger_state(ledger)
+    assert state["dispatched_attempt_count"] == 1
+    assert state["dispatch_events"] == 1
+    with pytest.raises(RuntimeError, match="already dispatched"):
+        runner.reusable_phase_reservations(
+            ledger, phase="preflight", expected=reservations
+        )
+
+
 def test_offline_mechanism_preflight_records_all_profiles_and_passes(tmp_path):
     runner = _load_runner()
     path = tmp_path / "offline.json"

@@ -563,21 +563,59 @@ def audit_attempt_ledger(
     cap: int,
 ) -> dict[str, object]:
     records, failures = _read_jsonl(path)
-    ids = [row.get("attempt_id") for row in records]
-    if ids != list(range(1, len(records) + 1)):
+    attempts = [
+        row
+        for row in records
+        if row.get("record_type", "episode_attempt") == "episode_attempt"
+    ]
+    events = [row for row in records if row not in attempts]
+    ids = [row.get("attempt_id") for row in attempts]
+    if ids != list(range(1, len(attempts) + 1)):
         failures.append("attempt ids are not contiguous")
-    if len(records) > cap:
-        failures.append(f"attempt cap exceeded: {len(records)} > {cap}")
+    event_ids = [row.get("ledger_event_id") for row in events]
+    if event_ids != list(range(1, len(events) + 1)):
+        failures.append("attempt event ids are not contiguous")
+    known_ids = {int(row["attempt_id"]) for row in attempts if isinstance(row.get("attempt_id"), int)}
+    void_ids: set[int] = set()
+    dispatched_ids: set[int] = set()
+    for event in events:
+        event_type = event.get("record_type")
+        event_attempt_ids = event.get("attempt_ids")
+        if event_type not in {"reservation_void", "phase_dispatch"}:
+            failures.append(f"unknown attempt ledger event: {event_type}")
+            continue
+        if not isinstance(event_attempt_ids, list) or not set(event_attempt_ids) <= known_ids:
+            failures.append(f"invalid {event_type} attempt ids")
+            continue
+        if event_type == "reservation_void":
+            if set(event_attempt_ids) & dispatched_ids:
+                failures.append("dispatched reservations were voided")
+            void_ids.update(int(value) for value in event_attempt_ids)
+        else:
+            if set(event_attempt_ids) & (void_ids | dispatched_ids):
+                failures.append("void/dispatched reservation was dispatched again")
+            dispatched_ids.update(int(value) for value in event_attempt_ids)
+    active = [row for row in attempts if int(row["attempt_id"]) not in void_ids]
+    dispatched = [row for row in active if int(row["attempt_id"]) in dispatched_ids]
+    if len(dispatched) > cap:
+        failures.append(f"actual episode-attempt cap exceeded: {len(dispatched)} > {cap}")
+    undispatched = sorted(
+        int(row["attempt_id"])
+        for row in active
+        if int(row["attempt_id"]) not in dispatched_ids
+    )
+    if undispatched:
+        failures.append("active reservations were not dispatched: " + ",".join(map(str, undispatched)))
     actual_formal = {
         (str(row.get("formal_label", row.get("label"))), int(row.get("task_id")), int(row.get("episode_seed")))
-        for row in records
+        for row in active
         if row.get("phase") == "formal"
         and isinstance(row.get("task_id"), int)
         and isinstance(row.get("episode_seed"), int)
     }
     actual_preflight = {
         (str(row.get("formal_label", row.get("label"))), int(row.get("task_id")), int(row.get("episode_seed")))
-        for row in records
+        for row in active
         if row.get("phase") == "preflight"
         and isinstance(row.get("task_id"), int)
         and isinstance(row.get("episode_seed"), int)
@@ -594,14 +632,18 @@ def audit_attempt_ledger(
             row.get("episode_seed"),
             row.get("config_fingerprint"),
         )
-        for row in records
+        for row in dispatched
     ]
     retries = len(identities) - len(set(identities))
     if retries > 4:
         failures.append(f"recovery attempts exceed 4: {retries}")
     return {
         "passed": not failures,
-        "attempt_count": len(records),
+        "attempt_count": len(dispatched),
+        "actual_episode_attempt_count": len(dispatched),
+        "reserved_attempt_count": len(attempts),
+        "void_reservation_count": len(void_ids),
+        "raw_ledger_record_count": len(records),
         "formal_unique_cells": len(actual_formal),
         "preflight_unique_cells": len(actual_preflight),
         "recovery_attempts": retries,
