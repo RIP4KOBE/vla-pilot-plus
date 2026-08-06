@@ -147,6 +147,102 @@ def _adapter_actual_task_id(adapter: Any) -> int | None:
 
 
 _EXECUTION_HORIZON_CHOICES = frozenset({2, 4, 8})
+_GRIPPER_QPOS_MIN = -0.04245
+_GRIPPER_QPOS_MAX = 0.05185
+_GRIPPER_QPOS_TOLERANCE = 1e-3
+
+
+def _episode_seed_schedule(value: Any, *, episode_num: int) -> list[int] | None:
+    """Validate an optional fixed environment-seed schedule for conservative resume."""
+    if value is None:
+        return None
+    if isinstance(value, (str, bytes)) or not isinstance(value, (list, tuple)):
+        try:
+            value = list(value)
+        except TypeError as exc:
+            raise ValueError("episode_seed_schedule must be a list of integers") from exc
+    seeds = list(value)
+    if len(seeds) != episode_num:
+        raise ValueError("episode_seed_schedule length must equal episode_num")
+    if any(
+        isinstance(seed, bool)
+        or not isinstance(seed, int)
+        or not 0 <= seed < 2**31
+        for seed in seeds
+    ):
+        raise ValueError("episode_seed_schedule values must be integers in [0, 2**31)")
+    return seeds
+
+
+def _episode_seed_for_index(
+    schedule: list[int] | None,
+    *,
+    episode_index: int,
+    sampled_seed: int,
+) -> int:
+    """Use a preregistered environment seed while retaining the legacy RNG draw."""
+    return int(sampled_seed if schedule is None else schedule[episode_index])
+
+
+def _adapter_episode_window(
+    *, episode_num: int, episode_start_index: int
+) -> dict[str, int]:
+    """Keep the full task schedule while positioning a conservative suffix resume."""
+    episode_num = int(episode_num)
+    episode_start_index = int(episode_start_index)
+    if episode_num <= 0:
+        raise ValueError("episode_num must be positive")
+    if not 0 <= episode_start_index < episode_num:
+        raise ValueError("episode_start_index must satisfy 0 <= start < episode_num")
+    return {
+        "episode_num": episode_num,
+        "episode_start_index": episode_start_index,
+    }
+
+
+def _chunk_boundary_action_jump(
+    action_chunk: Any,
+    previous_executed_action: Any | None,
+) -> float | None:
+    """Return translation jump from the last executed action to a new chunk."""
+    if previous_executed_action is None:
+        return None
+    if not isinstance(action_chunk, (torch.Tensor, np.ndarray)):
+        raise ValueError("action_chunk must be a tensor or ndarray")
+    if tuple(int(value) for value in action_chunk.shape[:1]) != (1,) or (
+        action_chunk.ndim != 3 or action_chunk.shape[1] <= 0 or action_chunk.shape[2] != 7
+    ):
+        raise ValueError("action_chunk must have shape (1, T, 7)")
+    current = action_chunk[0, 0, :3]
+    previous = previous_executed_action[:3]
+    if torch.is_tensor(current):
+        current_np = current.detach().cpu().numpy().astype(np.float64, copy=False)
+    else:
+        current_np = np.asarray(current, dtype=np.float64)
+    if torch.is_tensor(previous):
+        previous_np = previous.detach().cpu().numpy().astype(np.float64, copy=False)
+    else:
+        previous_np = np.asarray(previous, dtype=np.float64)
+    if current_np.shape != (3,) or previous_np.shape != (3,):
+        raise ValueError("boundary actions must expose three translation values")
+    if not np.isfinite(current_np).all() or not np.isfinite(previous_np).all():
+        raise ValueError("boundary action translations must be finite")
+    return float(np.linalg.norm(current_np - previous_np))
+
+
+def _gripper_qpos_violation_count(observation: Any) -> int:
+    """Count an observation-level gripper qpos range/shape/finite violation."""
+    if not isinstance(observation, dict) or "robot0_gripper_qpos" not in observation:
+        return 0
+    try:
+        values = np.asarray(observation["robot0_gripper_qpos"], dtype=np.float64)
+    except (TypeError, ValueError):
+        return 1
+    if values.shape != (2,) or not bool(np.isfinite(values).all()):
+        return 1
+    low = _GRIPPER_QPOS_MIN - _GRIPPER_QPOS_TOLERANCE
+    high = _GRIPPER_QPOS_MAX + _GRIPPER_QPOS_TOLERANCE
+    return int(bool(np.any(values < low) or np.any(values > high)))
 
 
 def _gripper_transition_in_prefix(
@@ -377,7 +473,12 @@ class Main:
         env_config = OmegaConf.to_container(cfg.backend.get(self.backend, {}), resolve=True)
 
         # Add main.episode_num to env_config for adapters that need it (e.g., LiberoAdapter)
-        env_config['episode_num'] = self.config.get('episode_num', 10)
+        env_config.update(
+            _adapter_episode_window(
+                episode_num=int(self.config.get('episode_num', 10)),
+                episode_start_index=int(self.config.get('episode_start_index', 0)),
+            )
+        )
         # Pass task instruction from cfg.main (set by task config) so adapter can surface it
         if self.config.get('instruction', ''):
             env_config['instruction'] = self.config.get('instruction')
@@ -777,6 +878,19 @@ class Main:
         except Exception as e:
             log.warning(f"Failed to append episode metadata to {metadata_path}: {e}")
 
+    def _append_safety_event(self, event: dict[str, Any]) -> None:
+        """Persist a small, credential-free observation safety event."""
+        eds_eval_config = _config_section_to_dict(
+            self.config.get("eds_eval"),
+            "main.eds_eval",
+        )
+        trace_root = eds_eval_config.get("output_dir") or self.output_dir
+        path = Path(trace_root) / "safety_events.jsonl"
+        try:
+            append_jsonl(path, event)
+        except Exception as e:
+            log.warning(f"Failed to append safety event to {path}: {e}")
+
     def _update_stage(self, state: dict, gripper_val: Optional[float],
                       upper_th: float, lower_th: float) -> dict:
         """
@@ -909,9 +1023,23 @@ class Main:
         self.success_count = 0
         base_output_dir = self.output_dir
         episode_num = self.config.get('episode_num', 10)
+        episode_start_index = int(self.config.get('episode_start_index', 0))
+        if not 0 <= episode_start_index < episode_num:
+            raise ValueError("episode_start_index must satisfy 0 <= start < episode_num")
+        episode_seed_schedule = _episode_seed_schedule(
+            self.config.get('episode_seed_schedule'),
+            episode_num=int(episode_num),
+        )
+        for _ in range(episode_start_index):
+            torch.randint(0, 1000, (1,)).item()
 
-        for episode in range(episode_num):
-            episode_seed = torch.randint(0, 1000, (1,)).item()
+        for episode in range(episode_start_index, episode_num):
+            sampled_seed = torch.randint(0, 1000, (1,)).item()
+            episode_seed = _episode_seed_for_index(
+                episode_seed_schedule,
+                episode_index=episode,
+                sampled_seed=sampled_seed,
+            )
             self.policy.reset()
             self.video_recorder.clear()
             episode_dir = os.path.join(base_output_dir, f'episode_{episode+1}')
@@ -973,14 +1101,15 @@ class Main:
                 continue
 
         # Final statistics
-        success_rate = self.success_count / episode_num * 100
-        log.info(f"Tested {episode_num} episodes, success rate: {success_rate:.2f}%")
+        executed_episode_count = episode_num - episode_start_index
+        success_rate = self.success_count / executed_episode_count * 100
+        log.info(f"Tested {executed_episode_count} episodes, success rate: {success_rate:.2f}%")
 
         # Save results
         log_file = os.path.join(self.output_dir, 'results.txt')
         with open(log_file, 'a') as f:
             f.write(f"Backend: {self.backend}\n")
-            f.write(f"Success count: {self.success_count}/{episode_num}\n")
+            f.write(f"Success count: {self.success_count}/{executed_episode_count}\n")
             f.write(f"Success rate: {success_rate:.2f}%\n")
 
     def _save_execution_failure_video(
@@ -1010,6 +1139,16 @@ class Main:
     def _run_episode(self, episode: int, episode_dir: str, episode_seed: int):
         """Run a single episode with the current configuration."""
         observation = self._get_policy_observation()
+        qpos_violations_since_last_metric = _gripper_qpos_violation_count(observation)
+        if qpos_violations_since_last_metric:
+            self._append_safety_event(
+                {
+                    "episode": int(episode),
+                    "global_step": 0,
+                    "event": "gripper_qpos_violation",
+                    "count": int(qpos_violations_since_last_metric),
+                }
+            )
         self._append_episode_metadata(
             episode=episode,
             episode_seed=episode_seed,
@@ -1040,6 +1179,7 @@ class Main:
         qualitative_chunks_saved = 0
         pretest_chunks_saved = 0
         previous_executed_gripper_command = None
+        previous_executed_action = None
 
         log.info(f"Task description: {self.adapter.get_task_description()}")
 
@@ -1292,6 +1432,13 @@ class Main:
                                 execution_horizon_stage_change
                             ),
                             "replan_count": int(replan_count),
+                            "chunk_boundary_action_jump": _chunk_boundary_action_jump(
+                                action_chunk,
+                                previous_executed_action,
+                            ),
+                            "gripper_qpos_violation_count": int(
+                                qpos_violations_since_last_metric
+                            ),
                         }
                     )
                     if (
@@ -1327,6 +1474,7 @@ class Main:
                         / "eds_metrics.jsonl"
                     )
                     append_jsonl(metrics_path, eds_metrics)
+                    qpos_violations_since_last_metric = 0
 
             if (
                 generate_new_chunk
@@ -1443,6 +1591,14 @@ class Main:
             image_with_status = add_text_to_image(image, status_text)
             self.video_recorder.add_frame(self.adapter.vlm_camera, image_with_status)
             obs, reward, terminated, truncated, info = self.adapter.step(action_chunk[0][action_executed])
+            previous_executed_action = action_chunk[0][action_executed]
+            if torch.is_tensor(previous_executed_action):
+                previous_executed_action = previous_executed_action.detach().cpu().clone()
+            else:
+                previous_executed_action = np.asarray(
+                    previous_executed_action,
+                    dtype=np.float64,
+                ).copy()
             previous_executed_gripper_command = gripper_val
 
             action_executed += 1
@@ -1451,6 +1607,17 @@ class Main:
 
             observation = self._get_policy_observation()
             global_steps += 1
+            current_qpos_violations = _gripper_qpos_violation_count(observation)
+            qpos_violations_since_last_metric += current_qpos_violations
+            if current_qpos_violations:
+                self._append_safety_event(
+                    {
+                        "episode": int(episode),
+                        "global_step": int(global_steps),
+                        "event": "gripper_qpos_violation",
+                        "count": int(current_qpos_violations),
+                    }
+                )
 
             if terminated or truncated:
                 is_success = info.get('success', False)

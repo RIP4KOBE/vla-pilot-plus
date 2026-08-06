@@ -1583,6 +1583,29 @@ def test_p2_fingerprint_binds_command_cache_head_and_code_state(tmp_path, monkey
     assert job["config_fingerprint"] != third
 
 
+def test_p2_bound_fingerprint_is_stable_during_a_long_run_but_detects_job_mutation(
+    tmp_path, monkeypatch
+):
+    runner = _load_runner()
+    root = tmp_path / "real-root"
+    monkeypatch.setattr(runner, "_git_head_revision", lambda: "a" * 40)
+    monkeypatch.setattr(runner, "_p2_code_state_sha256", lambda: "b" * 64)
+    job = runner.build_jobs("p2_adaptive_eds_rbf_stage_a", 10)[0]
+    runner._bind_p2_execution_context(job, real_root=root)
+    bound_fingerprint = job["config_fingerprint"]
+    bound_manifest = runner._p2_job_manifest_payload(job)
+
+    # Files may change while the already-dispatched process is running. Its bound
+    # dispatch identity must remain verifiable instead of being recomputed from disk.
+    monkeypatch.setattr(runner, "_git_head_revision", lambda: "c" * 40)
+    monkeypatch.setattr(runner, "_p2_code_state_sha256", lambda: "d" * 64)
+    assert runner._p2_config_fingerprint(job) == bound_fingerprint
+    assert runner._p2_job_manifest_payload(job) == bound_manifest
+
+    job["temperature"] = 0.2
+    assert runner._p2_config_fingerprint(job) != bound_fingerprint
+
+
 @pytest.mark.parametrize(
     "relative",
     [
@@ -4227,3 +4250,57 @@ def test_old_level_run_job_preserves_pre_p2_gpu_environment(tmp_path, monkeypatc
     assert captured["CUDA_VISIBLE_DEVICES"] == "2"
     assert "CUDA_DEVICE_ORDER" not in captured
     assert "MUJOCO_EGL_DEVICE_ID" not in captured
+
+
+def test_p2_joblib_runtime_safeguard_is_explicit_and_legacy_default_is_unchanged():
+    runner = _load_runner()
+    legacy_env = {"KEEP": "value"}
+
+    assert runner._apply_p2_runtime_safeguards({}, legacy_env) == {}
+    assert legacy_env == {"KEEP": "value"}
+
+    guarded_env = {"KEEP": "value"}
+    applied = runner._apply_p2_runtime_safeguards(
+        {"p2_joblib_multiprocessing": False}, guarded_env
+    )
+
+    assert applied == {"JOBLIB_MULTIPROCESSING": "0"}
+    assert guarded_env == {"KEEP": "value", "JOBLIB_MULTIPROCESSING": "0"}
+
+
+def test_p2_joblib_runtime_safeguard_rejects_non_boolean_values():
+    runner = _load_runner()
+
+    with pytest.raises(TypeError, match="p2_joblib_multiprocessing"):
+        runner._apply_p2_runtime_safeguards(
+            {"p2_joblib_multiprocessing": "false"}, {}
+        )
+
+
+def test_p2_render_gpu_safeguard_is_explicit_and_overrides_only_egl_device():
+    runner = _load_runner()
+    legacy_env = {"MUJOCO_EGL_DEVICE_ID": "7", "KEEP": "value"}
+
+    assert runner._apply_p2_runtime_safeguards({}, legacy_env) == {}
+    assert legacy_env == {"MUJOCO_EGL_DEVICE_ID": "7", "KEEP": "value"}
+
+    guarded_env = {"MUJOCO_EGL_DEVICE_ID": "7", "KEEP": "value"}
+    applied = runner._apply_p2_runtime_safeguards(
+        {"p2_render_gpu_index": 3}, guarded_env
+    )
+
+    assert applied == {
+        "MUJOCO_EGL_DEVICE_ID": "0",
+        "P2_RENDER_GPU_INDEX": "3",
+    }
+    assert guarded_env == {"MUJOCO_EGL_DEVICE_ID": "0", "KEEP": "value"}
+
+
+@pytest.mark.parametrize("value", [True, -1, 8, "3", 3.0])
+def test_p2_render_gpu_safeguard_rejects_invalid_physical_indices(value):
+    runner = _load_runner()
+
+    with pytest.raises((TypeError, ValueError), match="p2_render_gpu_index"):
+        runner._apply_p2_runtime_safeguards(
+            {"p2_render_gpu_index": value}, {"MUJOCO_EGL_DEVICE_ID": "7"}
+        )

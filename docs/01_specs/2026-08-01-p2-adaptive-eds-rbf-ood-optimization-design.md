@@ -2,9 +2,240 @@
 
 日期：`2026-08-01`
 
-修订日期：`2026-08-02`
+修订日期：`2026-08-03`
 
 状态：`Approved for implementation planning`
+
+## 0. 阅读入口：`p2_stage_on` Baseline 的 EDS+RBF 算法流程
+
+本节只描述 `use_guidance=true` 时进入 `_eds_guided_denoise_loop()` 的算法内部，不展开 VLM Stage Recognition、environment loop、视频记录或其他系统控制。`current_stage`、keypoints 和 reward functions 在这里都视为已经解析完成的 EDS 输入。
+
+`p2_stage_on` 对应正式复跑 profile `p2_legacy_stage_on_rerun`。它的 EDS 核心可以概括为：
+
+> **RBF-assisted initial full denoise 生成多样 population，EPS-CoT reward 对 population 评分，legacy softmax 有放回选择 parents，再通过 renoise + fixed RBF truncated denoise 反复演化，最后选择 reward 最高的 RDT action sample。**
+
+### 0.1 输入、输出与不变量
+
+| 项目 | P2 baseline 语义 |
+|---|---|
+| 输入 condition | RDT 编码后的 state、images、language、`action_mask` |
+| Steering context | `keypoints`、当前 stage 的 `guidance_fns`、`reward_mode=normal` |
+| Initial latent | 独立 Gaussian `x_T`，shape 为 `(16, 64, 128)` |
+| Population size | 固定 `16`，整个 EDS loop 不改变 batch size |
+| Diffusion scheduler | RDT 正式推理使用 `5` 个 denoise steps |
+| EDS iterations | 固定 `10` 轮 |
+| 输出 latent | final population 中 cost 最小的 `(1, 64, 128)` sample |
+| LIBERO decode | selected latent 的前 8 个 action slots -> `(1, 8, 7)` |
+
+算法始终维持以下 shape：
+
+```text
+initial / iterative population: (16, 64, 128)
+population costs / rewards:      (16,)
+selected policy sample:          (1, 64, 128)
+decoded action chunk:            (1, 8, 7)
+```
+
+其中 `64` 是 RDT prediction horizon，`128` 是统一 action layout。EDS reward 和 RBF diversity 使用前 8 个 action slots 投影出的 3D EEF trajectory；`_trajectory_reward_slice(..., "eds")` 的实际评分切片是 `[:, 1:8, :3]`。RBF gradient 只写回受控 translation slots，其他 action channels 仍由 RDT denoiser 预测。Initial denoise、每轮 rollout 和最终输出都必须满足 action mask 与 finite gate。
+
+### 0.2 单个 EDS Action Chunk 的完整流程图
+
+```mermaid
+flowchart TD
+    A[输入 cond / action_mask / keypoints / reward functions] --> B[Gaussian x_T<br/>16 x 64 x 128]
+    B --> C[Initial RBF-assisted full denoise<br/>5 scheduler steps<br/>scale=20, start_ratio=0.8]
+    C --> D[Apply action mask<br/>fresh initial population]
+    D --> E[可选 cross-chunk population composition]
+    E --> F[128D samples -> 3D EEF trajectories<br/>计算 reward 与 cost = -reward]
+    F --> G[初始化 trunc schedule<br/>3,2,2,2,2,1,1,1,1,1]
+    G --> H[进入 Evolutionary Refinement]
+    H --> I[Parent weighting 与 resampling]
+    I --> J[Renoise selected parents]
+    J --> K[Fixed RBF-assisted truncated denoise rollout]
+    K --> L[Apply action mask 并重新评分]
+    L --> M{达到 10 轮<br/>或 adaptive early stop?}
+    M -- 否 --> I
+    M -- 是 --> N[argmin final cost<br/>selected = 1 x 64 x 128]
+    N --> O[Decode first 8 slots<br/>1 x 8 x 7]
+
+    V4[优化四：warm_start_mix] -.替换 fresh-only composition.-> E
+    V1[优化一：adaptive ESS] -.替换 legacy parent weights.-> I
+    V3[优化三：elite + EEF k-center anchors] -.扩展 parent plan.-> I
+    V5A[优化五：adaptive renoise] -.动态控制 mutation strength.-> J
+    V2[优化二：adaptive rollout RBF] -.动态控制 RBF trigger 与 scale.-> K
+    V5B[优化五：adaptive iteration budget] -.允许提前结束.-> M
+    V5C[优化五：adaptive execution horizon] -.在 decode 后控制 2 / 4 / 8 prefix.-> O
+```
+
+这张图中的主干就是 P2 baseline。虚线节点表示组件级变体的插入点；所有虚线变体关闭时，数据流必须精确回到主干 legacy 行为。
+
+### 0.3 Initial RBF-Assisted Sampling
+
+Initial population 由 `_eds_initial_population()` 生成，baseline 配置为：
+
+```text
+initial_sampling_mode = rbf_diverse_denoise
+initial_diversity_scale = 20.0
+initial_diversity_start_ratio = 0.8
+population_size = 16
+num_inference_steps = 5
+```
+
+算法步骤如下：
+
+1. 从 16 个独立 Gaussian latents 开始，并使用同一个 RDT condition 完成 5-step policy denoise。
+2. 每个 denoise step 先在 `torch.no_grad()` 下得到 RDT `model_output`。
+3. 在高噪声 diversity phase，通过 `_compute_diversity_gradient(population)` 在 3D EEF trajectory space 计算 RBF repulsive gradient。
+4. 将 masked diversity gradient 以 `scale=20` 加到 `model_output` 的 RDT translation indices，再执行 scheduler step。
+5. `start_ratio=0.8` 经 `_resolve_start_step()` 转换为 timestep threshold；在当前 5-step descending scheduler 下，通常覆盖 final denoise step 之前的前 4 步。实际次数以 mechanism trace 为准。
+6. 完整 denoise 后 apply action mask，验证 shape、finite 和 mask violation，得到 `(16, 64, 128)` initial population。
+
+Initial RBF 是 gradient-assisted diversity sampling，但不使用 reward gradient。它的目标是先扩大 policy-denoised proposals 的 EEF behavior coverage，而不是直接朝 reward optimum 移动。若 diversity gradient、model output 或 population 出现异常，必须 warning 并回退 iid full denoise，不允许静默 fallback。
+
+### 0.4 Initial Scoring
+
+`_eds_score_population_as_cost()` 对 initial population 进行第一次 evolutionary fitness evaluation：
+
+```text
+sample_i (64 x 128)
+  -> _rdt_sample_to_trajectory_3d()
+  -> _trajectory_reward_slice(..., "eds")
+  -> reward_i = R(trajectory_i, keypoints)
+  -> cost_i = -reward_i
+```
+
+该评分只输出 detached `(16,)` rewards / costs，不执行 `torch.autograd.grad()`。因此 EDS parent selection、resampling、final selection 保持 gradient-free；只有 initial RBF 和 rollout RBF 使用 trajectory-space diversity gradient。
+
+### 0.5 单轮 Evolutionary Refinement 详解
+
+```mermaid
+flowchart TD
+    A[当前 population P_i 与 costs C_i] --> B[Legacy weights<br/>p = softmax((-C_i) x 0.1)]
+    B --> C[torch.multinomial<br/>replacement=true, sample 16]
+    C --> D[得到 parent population<br/>baseline 无 elite / anchor]
+    D --> E[按 n_trunc_steps add_noise]
+    E --> F[Reset scheduler particle history]
+    F --> G[取 scheduler 最后 n 个 timesteps]
+    G --> H[DiT predicts model_output]
+    H --> I{当前 local step<br/>是否属于 RBF phase?}
+    I -- 是 --> J[EEF RBF diversity gradient<br/>scale=20 写入 translation slots]
+    I -- 否 --> K[保留原 model_output]
+    J --> L[scheduler.step]
+    K --> L
+    L --> M{truncated steps 完成?}
+    M -- 否 --> H
+    M -- 是 --> N[Apply action mask]
+    N --> O[重新计算 rewards / costs]
+    O --> P[输出 P_i+1 与 C_i+1]
+
+    V1[Adaptive ESS weighting] -.替换 weights.-> B
+    V3[Elite carryover + EEF k-center] -.重构 parent slots.-> C
+    V5[Adaptive renoise] -.动态解析 n_trunc_steps.-> E
+    V2[Adaptive RBF controller] -.动态解析 trigger / scale.-> I
+```
+
+#### A. Legacy parent selection
+
+Baseline 使用：
+
+```text
+use_cem = false
+parent_weighting_mode = legacy_temperature
+temperature = 0.1
+p_i = softmax((-cost_i) * temperature)
+```
+
+`temperature` 在这里是 logits 的乘数，数值越小 selection pressure 越弱，实现语义更接近 inverse temperature。随后通过 `torch.multinomial(..., replacement=true)` 有放回采样 16 个 parents。
+
+虽然 profile 中保留 `num_elites=16`，但 `use_cem=false` 且 `elite_carryover_count=0`，所以 `num_elites` 在 P2 baseline 中不生效。Baseline 没有 deterministic elite，也没有 EEF diversity anchor；所有 16 个 slots 都来自 legacy weighted sampling。
+
+#### B. Fixed renoise schedule
+
+10 轮 EDS 的 legacy schedule 为：
+
+```text
+np.linspace(renoise_t_max=3, renoise_t_min=1, cem_iters=10).astype(int)
+-> [3, 2, 2, 2, 2, 1, 1, 1, 1, 1]
+```
+
+每轮 `_eds_renoise_reference()` 对 resampled parents 加入独立 Gaussian noise，并把它们送到 scheduler 对应的截断 timestep。`n_trunc_steps` 越大，mutation 越强，同时后续 denoiser 将粒子拉回 RDT prior 的作用也越强。
+
+#### C. Fixed RBF truncated rollout
+
+Baseline 在 10 轮 refinement 的每一轮都使用：
+
+```text
+truncated_rollout_mode = rbf_diverse
+rollout_diversity_control_mode = fixed
+rollout_diversity_scale = 20.0
+rollout_diversity_start_ratio = 0.6
+rollout_diversity_iters = all
+rollout_diversity_skip_final_steps = 0
+```
+
+对于长度为 `n` 的 truncated rollout，RBF 作用于最前面的 `ceil(n * 0.6)` 个 local denoise steps：
+
+| `n_trunc_steps` | RBF steps | 无 RBF 的剩余 denoise steps |
+|---:|---:|---:|
+| 3 | 2 | 1 |
+| 2 | 2 | 0 |
+| 1 | 1 | 0 |
+
+每个 RBF step 都先基于当前 noisy population 计算 EEF repulsive gradient，再修改 DiT `model_output`，最后调用 scheduler step。Rollout 完成后重新 apply action mask 和 score，形成下一轮 population。
+
+`eef_diversity_after_rollout_rbf_phase` 与 `eef_diversity_after_rollout_final` 的差值刻画 RBF 注入后被剩余 denoise / policy prior 消除的程度。Rollout RBF 异常时必须 warning，并从同一份 renoised population 回退到相同 `n_trunc_steps` 的普通 truncated denoise。
+
+### 0.6 Final Selection 与算法输出
+
+第 10 轮 rollout scoring 完成后，baseline 不做跨轮 archive 或风险校准，直接执行：
+
+```text
+best_idx = argmin(final_population_costs)
+selected = final_population[best_idx : best_idx + 1]
+```
+
+selected sample 必须 finite、满足 action mask，并保持 `(1, 64, 128)`。随后 RDT LIBERO decoder 只解码前 8 个 action slots，得到 `(1, 8, 7)`。`execution_horizon_mode=fixed` 位于 EDS 输出边界，baseline 使用全部 8-step prefix；`adaptive_prefix` 只改变后续何时重新调用 EDS，不改变本次 selected latent 或 decoder。
+
+### 0.7 Baseline Strategy Modes 与变体插入位置
+
+| 算法控制点 | P2 baseline | 本文组件级变体 | 直接影响 |
+|---|---|---|---|
+| Initial sampler | fixed RBF `s20/start0.8` | 本轮五项组件保持不变 | Initial EEF coverage |
+| Initial composition | `chunk_population_mode=fresh` | `warm_start_mix` | 跨 chunk mode 延续 |
+| Fitness scoring | fixed EPS-CoT stage reward | 本轮保持不变 | Evolutionary search objective |
+| Parent weighting | `legacy_temperature` | `adaptive_ess` | Selection pressure / ESS |
+| Parent coverage | `none` | `eef_kcenter` | Parent mode coverage |
+| Elite survival | `elite_carryover_count=0` | deterministic elite carryover | 高 reward lineage 保留 |
+| Renoise schedule | `legacy_linear` | adaptive renoise | Mutation / prior pull-back |
+| Rollout RBF controller | `fixed` | `adaptive_band` | Diversity trigger 与强度 |
+| Iteration budget | 固定 10 轮 | adaptive early stop | Refinement 深度与 latency |
+| Final selection | final argmin cost | 本轮保持不变 | 被执行的 trajectory mode |
+| Output prefix | fixed 8 | `adaptive_prefix` | 下一次 EDS replan 时机 |
+
+所有新增模式关闭时，必须恢复：
+
+```text
+legacy_temperature + no coverage + zero elite carryover
++ fixed rollout RBF + fresh population
++ legacy 3-to-1 schedule + 10 iterations + fixed 8-step prefix
+```
+
+这里的 legacy 并不表示关闭 RBF。P2 baseline 本身已经包含 initial RBF 和 fixed rollout RBF；关闭的是 adaptive weighting、coverage、memory 和 adaptive schedule 分支。
+
+### 0.8 后续 EDS+RBF 算法优化方向
+
+以下方向都能映射到上述内部数据流，但不属于本文已批准的五项实现范围：
+
+1. **Reward / scoring calibration**：在 initial 和 per-iteration scoring 中加入 phase-aware feasibility、grasp / placement progress、collision risk 或 reward uncertainty，先确保 selection objective 与真实成功条件一致。
+2. **Adaptive initial RBF**：根据 initial EEF diversity、endpoint spread 和 reward spread 动态调节 initial scale / start ratio，并保留一部分纯 RDT prior particles。
+3. **Confidence-gated parent plan**：只在 reward confidence 低、selection entropy 高时启用 k-center anchors，同时始终保留 baseline best lineage，利用 baseline 与 k-center 成功 task 的互补性。
+4. **QD-ED behavior archive**：跨 EDS iterations 维护 behavior cells 和每个 cell 的高 reward elite，以持续 coverage 代替每轮独立 k-center；应作为独立 strategy 评测。
+5. **Stage-conditioned population memory**：在 EDS 输入 context 已给定的前提下，按 `current_stage`、gripper state 和 trajectory descriptor 分区保存 population，并设计 shift / decay / reset 规则。
+6. **Diversity-retention controller**：同时观察 RBF phase 后和 final rollout 的 EEF diversity，若 prior pull-back 过强，则联合调节 RBF scale、RBF step mask 和 `n_trunc_steps`。
+7. **Risk-aware final selection**：在 final argmin 前加入 reward uncertainty、trajectory feasibility、mode consensus 或短 horizon validation，降低高分 outlier 被直接选中的风险。
+8. **Adaptive compute allocation**：联合决定 population size、renoise strength、iteration budget 和 output prefix，把计算集中在 reward 不确定或 mode coverage 不足的 action chunks。
+
+后续任何方案都应明确标注它修改了哪一个流程节点、读取哪些 online statistics、是否改变 RDT action prior，以及关闭该 mode 后如何精确回退到 P2 baseline。
 
 ## 1. 摘要
 

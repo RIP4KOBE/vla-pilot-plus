@@ -10,6 +10,193 @@ from typing import Any
 import torch
 
 
+def _finite_numbers(values: Any) -> list[float]:
+    if not isinstance(values, (list, tuple)):
+        return []
+    return [
+        float(value)
+        for value in values
+        if isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and math.isfinite(float(value))
+    ]
+
+
+def _linear_percentile(values: list[float], quantile: float) -> float | None:
+    finite = sorted(_finite_numbers(values))
+    if not finite:
+        return None
+    position = (len(finite) - 1) * quantile
+    low = int(math.floor(position))
+    high = int(math.ceil(position))
+    if low == high:
+        return finite[low]
+    weight = position - low
+    return finite[low] * (1.0 - weight) + finite[high] * weight
+
+
+def _correlation_record(left: list[float], right: list[float]) -> dict[str, Any]:
+    pairs = [
+        (x, y)
+        for x, y in zip(left, right)
+        if math.isfinite(x) and math.isfinite(y)
+    ]
+    count = len(pairs)
+    if count < 2:
+        return {
+            "value": None,
+            "valid_pair_count": count,
+            "warning": "insufficient_valid_pairs",
+        }
+    xs, ys = zip(*pairs)
+    x_mean = sum(xs) / count
+    y_mean = sum(ys) / count
+    x_centered = [value - x_mean for value in xs]
+    y_centered = [value - y_mean for value in ys]
+    x_ss = sum(value * value for value in x_centered)
+    y_ss = sum(value * value for value in y_centered)
+    if x_ss <= 0.0 or y_ss <= 0.0:
+        return {
+            "value": None,
+            "valid_pair_count": count,
+            "warning": "zero_variance",
+        }
+    correlation = sum(
+        x_value * y_value
+        for x_value, y_value in zip(x_centered, y_centered)
+    ) / math.sqrt(x_ss * y_ss)
+    return {
+        "value": float(max(-1.0, min(1.0, correlation))),
+        "valid_pair_count": count,
+        "warning": None,
+    }
+
+
+def direction_rbf_evidence_summary(
+    evidence_by_iter: list[list[dict[str, Any]]],
+    *,
+    weights: list[float] | tuple[float, float, float],
+) -> dict[str, Any]:
+    """Summarize raw Direction-RBF evidence without inventing invalid correlations."""
+    if (
+        not isinstance(weights, (list, tuple))
+        or len(weights) != 3
+        or any(
+            isinstance(value, bool)
+            or not isinstance(value, (int, float))
+            or not math.isfinite(float(value))
+            or float(value) < 0.0
+            for value in weights
+        )
+    ):
+        raise ValueError("Direction-RBF weights must be three finite nonnegative values")
+    weight_values = [float(value) for value in weights]
+    if not math.isclose(sum(weight_values), 1.0, rel_tol=0.0, abs_tol=1.0e-6):
+        raise ValueError("Direction-RBF weights must sum to 1")
+    if not isinstance(evidence_by_iter, list):
+        raise ValueError("Direction-RBF evidence must be grouped by iteration")
+
+    component_names = ("direction", "shape", "endpoint", "composite")
+    summary: dict[str, Any] = {}
+    for component in component_names:
+        for statistic in ("mean", "p90", "max"):
+            summary[f"direction_rbf_pairwise_{component}_{statistic}_by_iter"] = []
+    summary.update(
+        {
+            "direction_rbf_weighted_component_fraction_by_iter": [],
+            "direction_rbf_distance_path_length_delta_correlation_by_iter": [],
+            "direction_rbf_distance_direction_correlation_by_iter": [],
+            "direction_rbf_zero_path_descriptor_count_by_iter": [],
+            "direction_rbf_grad_norm_before_normalization_by_iter": [],
+            "direction_rbf_grad_norm_after_mask_by_iter": [],
+            "direction_rbf_zero_gradient_count": 0,
+            "direction_rbf_nonfinite_count": 0,
+        }
+    )
+
+    for group_index, raw_group in enumerate(evidence_by_iter):
+        if not isinstance(raw_group, list):
+            raise ValueError(f"Direction-RBF evidence group {group_index} must be a list")
+        group = [
+            item
+            for item in raw_group
+            if isinstance(item, dict)
+            and item.get("descriptor_mode") == "direction_normalized_eef"
+        ]
+        components: dict[str, list[float]] = {name: [] for name in component_names}
+        path_length_deltas: list[float] = []
+        grad_before: list[float] = []
+        grad_after: list[float] = []
+        zero_path_count = 0
+        for item in group:
+            item_components = {
+                name: _finite_numbers(item.get(f"pairwise_{name}"))
+                for name in component_names
+            }
+            lengths = _finite_numbers(item.get("path_lengths"))
+            expected_pair_count = len(lengths) * (len(lengths) - 1) // 2
+            if expected_pair_count == len(item_components["composite"]):
+                path_length_deltas.extend(
+                    abs(lengths[left] - lengths[right])
+                    for left in range(len(lengths))
+                    for right in range(left + 1, len(lengths))
+                )
+            for name in component_names:
+                components[name].extend(item_components[name])
+            before = item.get("grad_norm_before_normalization")
+            after = item.get("grad_norm_after_mask")
+            if isinstance(before, (int, float)) and not isinstance(before, bool) and math.isfinite(float(before)):
+                grad_before.append(float(before))
+            if isinstance(after, (int, float)) and not isinstance(after, bool) and math.isfinite(float(after)):
+                grad_after.append(float(after))
+            count = item.get("zero_path_descriptor_count", 0)
+            if isinstance(count, int) and not isinstance(count, bool) and count >= 0:
+                zero_path_count += count
+            summary["direction_rbf_zero_gradient_count"] += int(item.get("zero_gradient") is True)
+            nonfinite = item.get("nonfinite_count", 0)
+            if isinstance(nonfinite, int) and not isinstance(nonfinite, bool) and nonfinite >= 0:
+                summary["direction_rbf_nonfinite_count"] += nonfinite
+
+        for name in component_names:
+            values = components[name]
+            summary[f"direction_rbf_pairwise_{name}_mean_by_iter"].append(
+                sum(values) / len(values) if values else None
+            )
+            summary[f"direction_rbf_pairwise_{name}_p90_by_iter"].append(
+                _linear_percentile(values, 0.9)
+            )
+            summary[f"direction_rbf_pairwise_{name}_max_by_iter"].append(
+                max(values) if values else None
+            )
+        weighted_means = [
+            weight * (sum(components[name]) / len(components[name]))
+            if components[name]
+            else 0.0
+            for weight, name in zip(weight_values, component_names[:3])
+        ]
+        weighted_total = sum(weighted_means)
+        summary["direction_rbf_weighted_component_fraction_by_iter"].append(
+            {
+                name: value / weighted_total if weighted_total > 0.0 else None
+                for name, value in zip(component_names[:3], weighted_means)
+            }
+        )
+        summary["direction_rbf_distance_path_length_delta_correlation_by_iter"].append(
+            _correlation_record(components["composite"], path_length_deltas)
+        )
+        summary["direction_rbf_distance_direction_correlation_by_iter"].append(
+            _correlation_record(components["composite"], components["direction"])
+        )
+        summary["direction_rbf_zero_path_descriptor_count_by_iter"].append(zero_path_count)
+        summary["direction_rbf_grad_norm_before_normalization_by_iter"].append(
+            sum(grad_before) / len(grad_before) if grad_before else None
+        )
+        summary["direction_rbf_grad_norm_after_mask_by_iter"].append(
+            sum(grad_after) / len(grad_after) if grad_after else None
+        )
+    return summary
+
+
 @dataclass
 class EDSIterMetrics:
     iter_idx: int
@@ -50,6 +237,27 @@ class EDSIterMetrics:
     diversity_band_state: str | None = None
     best_lineage_stable: bool = False
     stable_lineage_count: int = 0
+    rollout_rbf_step_indices: list[int] = field(default_factory=list)
+    rollout_rbf_step_flags: list[bool] = field(default_factory=list)
+    rollout_rbf_step_count: int = 0
+    rollout_rbf_final_step_applied: bool = False
+    selected_trajectory_length: float | None = None
+    population_trajectory_length_mean: float | None = None
+    population_trajectory_length_p90: float | None = None
+    population_trajectory_length_max: float | None = None
+    selected_max_step_displacement: float | None = None
+    population_max_step_mean: float | None = None
+    population_max_step_p90: float | None = None
+    population_max_step_max: float | None = None
+    selected_trajectory_length_expansion_ratio: float | None = None
+    population_trajectory_length_expansion_ratio: float | None = None
+    selected_max_step_expansion_ratio: float | None = None
+    population_max_step_expansion_ratio: float | None = None
+    eef_direction_diversity: float | None = None
+    eef_direction_valid_count: int = 0
+    endpoint_direction_spread: float | None = None
+    endpoint_direction_valid_count: int = 0
+    direction_metric_warning: str | None = None
 
 
 @dataclass
@@ -118,6 +326,37 @@ class EDSChunkMetrics:
     endpoint_spread_before_rollout: float | None = None
     endpoint_spread_after_rollout_rbf_phase: float | None = None
     endpoint_spread_after_rollout_final: float | None = None
+    rollout_rbf_steps_by_iter: list[dict[str, Any]] = field(default_factory=list)
+    selected_trajectory_length_by_iter: list[float | None] = field(default_factory=list)
+    population_trajectory_length_mean_by_iter: list[float | None] = field(default_factory=list)
+    population_trajectory_length_p90_by_iter: list[float | None] = field(default_factory=list)
+    population_trajectory_length_max_by_iter: list[float | None] = field(default_factory=list)
+    selected_max_step_displacement_by_iter: list[float | None] = field(default_factory=list)
+    population_max_step_mean_by_iter: list[float | None] = field(default_factory=list)
+    population_max_step_p90_by_iter: list[float | None] = field(default_factory=list)
+    population_max_step_max_by_iter: list[float | None] = field(default_factory=list)
+    trajectory_length_expansion_ratio_by_iter: list[dict[str, float | None]] = field(
+        default_factory=list
+    )
+    max_step_expansion_ratio_by_iter: list[dict[str, float | None]] = field(
+        default_factory=list
+    )
+    eef_direction_diversity_by_iter: list[float | None] = field(default_factory=list)
+    endpoint_direction_spread_by_iter: list[float | None] = field(default_factory=list)
+    direction_metric_valid_count_by_iter: list[dict[str, int]] = field(default_factory=list)
+    direction_metric_warnings_by_iter: list[str | None] = field(default_factory=list)
+    chunk_boundary_action_jump: float | None = None
+    gripper_qpos_violation_count: int = 0
+    initial_diversity_descriptor_mode: str = "absolute_eef"
+    rollout_diversity_descriptor_mode: str = "absolute_eef"
+    direction_rbf_weights: list[float] = field(default_factory=list)
+    direction_rbf_endpoint_scale_m: float = 0.05
+    initial_direction_rbf_evidence_by_step: list[dict[str, Any]] = field(default_factory=list)
+    rollout_direction_rbf_evidence_by_iter: list[list[dict[str, Any]]] = field(default_factory=list)
+    initial_direction_rbf_metrics: dict[str, Any] = field(default_factory=dict)
+    rollout_direction_rbf_metrics: dict[str, Any] = field(default_factory=dict)
+    direction_rbf_zero_gradient_count: int = 0
+    direction_rbf_nonfinite_count: int = 0
     target_distance_before: float | None = None
     target_distance_after: float | None = None
     action_mask_violation_max: float = 0.0
@@ -187,7 +426,19 @@ class EDSChunkMetrics:
     per_iter: list[EDSIterMetrics] = field(default_factory=list)
 
     def to_jsonable(self) -> dict[str, Any]:
-        return _to_json_safe(self)
+        payload = _to_json_safe(self)
+        if self.direction_rbf_weights:
+            if self.initial_direction_rbf_evidence_by_step and not self.initial_direction_rbf_metrics:
+                payload["initial_direction_rbf_metrics"] = direction_rbf_evidence_summary(
+                    [[item] for item in self.initial_direction_rbf_evidence_by_step],
+                    weights=self.direction_rbf_weights,
+                )
+            if self.rollout_direction_rbf_evidence_by_iter and not self.rollout_direction_rbf_metrics:
+                payload["rollout_direction_rbf_metrics"] = direction_rbf_evidence_summary(
+                    self.rollout_direction_rbf_evidence_by_iter,
+                    weights=self.direction_rbf_weights,
+                )
+        return payload
 
 
 def _to_json_safe(value: Any) -> Any:
@@ -236,6 +487,131 @@ def finite_or_none(value: float | int | None) -> float | None:
         return None
     value_f = float(value)
     return value_f if math.isfinite(value_f) else None
+
+
+def _tensor_stat(values: torch.Tensor, kind: str) -> float | None:
+    values = values.detach().float().reshape(-1)
+    values = values[torch.isfinite(values)]
+    if values.numel() == 0:
+        return None
+    if kind == "mean":
+        result = values.mean()
+    elif kind == "p90":
+        result = torch.quantile(values, 0.9)
+    elif kind == "max":
+        result = values.max()
+    else:
+        raise ValueError(f"unsupported tensor statistic: {kind}")
+    return finite_or_none(float(result.detach().cpu().item()))
+
+
+def eef_population_geometry_metrics(
+    trajectories: torch.Tensor,
+    *,
+    selected_idx: int,
+    direction_epsilon: float = 1e-8,
+) -> dict[str, Any]:
+    """Measure EEF path magnitude and normalized direction spread for one population."""
+    if not torch.is_tensor(trajectories):
+        trajectories = torch.as_tensor(trajectories)
+    if trajectories.ndim != 3 or trajectories.shape[-1] < 3:
+        raise ValueError(
+            "EEF trajectories must have shape (population, time, >=3)"
+        )
+    population_size = int(trajectories.shape[0])
+    if population_size <= 0:
+        raise ValueError("EEF trajectory population must be nonempty")
+    if (
+        isinstance(selected_idx, bool)
+        or not isinstance(selected_idx, int)
+        or not 0 <= selected_idx < population_size
+    ):
+        raise ValueError("selected_idx must identify a population member")
+    if (
+        isinstance(direction_epsilon, bool)
+        or not math.isfinite(float(direction_epsilon))
+        or float(direction_epsilon) <= 0.0
+    ):
+        raise ValueError("direction_epsilon must be finite and positive")
+
+    xyz = trajectories[..., :3].detach().float()
+    warning: str | None = None
+    if not bool(torch.isfinite(xyz).all().item()):
+        warning = "nonfinite_trajectory_samples"
+
+    if xyz.shape[1] < 2:
+        step_norms = torch.zeros(
+            population_size, 0, dtype=xyz.dtype, device=xyz.device
+        )
+        lengths = torch.zeros(population_size, dtype=xyz.dtype, device=xyz.device)
+        max_steps = torch.zeros_like(lengths)
+    else:
+        step_norms = torch.linalg.vector_norm(xyz[:, 1:] - xyz[:, :-1], dim=-1)
+        lengths = step_norms.sum(dim=1)
+        max_steps = step_norms.max(dim=1).values
+
+    displacements = xyz[:, 1:] - xyz[:, :1]
+    displacement_norms = torch.linalg.vector_norm(displacements, dim=-1)
+    valid_steps = torch.isfinite(displacement_norms) & (
+        displacement_norms > float(direction_epsilon)
+    )
+    valid_particles = valid_steps.any(dim=1) if valid_steps.ndim == 2 else torch.zeros(
+        population_size, dtype=torch.bool, device=xyz.device
+    )
+    direction_valid_count = int(valid_particles.sum().detach().cpu().item())
+    eef_direction_diversity: float | None = None
+    if direction_valid_count >= 2:
+        normalized = torch.zeros_like(displacements)
+        normalized[valid_steps] = (
+            displacements[valid_steps]
+            / displacement_norms[valid_steps].unsqueeze(-1)
+        )
+        flattened = normalized[valid_particles].reshape(direction_valid_count, -1)
+        pairwise = torch.pdist(flattened, p=2)
+        eef_direction_diversity = _tensor_stat(pairwise, "mean")
+
+    endpoint_displacements = xyz[:, -1] - xyz[:, 0]
+    endpoint_norms = torch.linalg.vector_norm(endpoint_displacements, dim=-1)
+    valid_endpoints = torch.isfinite(endpoint_norms) & (
+        endpoint_norms > float(direction_epsilon)
+    )
+    endpoint_valid_count = int(valid_endpoints.sum().detach().cpu().item())
+    endpoint_direction_spread: float | None = None
+    if endpoint_valid_count >= 2:
+        unit_endpoints = (
+            endpoint_displacements[valid_endpoints]
+            / endpoint_norms[valid_endpoints].unsqueeze(-1)
+        )
+        cosine = unit_endpoints @ unit_endpoints.transpose(0, 1)
+        upper = torch.triu_indices(
+            endpoint_valid_count,
+            endpoint_valid_count,
+            offset=1,
+            device=cosine.device,
+        )
+        cosine_distance = 1.0 - cosine[upper[0], upper[1]].clamp(-1.0, 1.0)
+        endpoint_direction_spread = _tensor_stat(cosine_distance, "mean")
+
+    if direction_valid_count == 0 and endpoint_valid_count == 0:
+        warning = warning or "no_valid_direction_samples"
+    elif direction_valid_count < 2 or endpoint_valid_count < 2:
+        warning = warning or "insufficient_pairwise_direction_samples"
+
+    return {
+        "selected_trajectory_length": finite_or_none(lengths[selected_idx].item()),
+        "population_trajectory_length_mean": _tensor_stat(lengths, "mean"),
+        "population_trajectory_length_p90": _tensor_stat(lengths, "p90"),
+        "population_trajectory_length_max": _tensor_stat(lengths, "max"),
+        "selected_max_step_displacement": finite_or_none(max_steps[selected_idx].item()),
+        "population_max_step_mean": _tensor_stat(max_steps, "mean"),
+        "population_max_step_p90": _tensor_stat(max_steps, "p90"),
+        "population_max_step_max": _tensor_stat(max_steps, "max"),
+        "eef_direction_diversity": eef_direction_diversity,
+        "eef_direction_valid_count": direction_valid_count,
+        "endpoint_direction_spread": endpoint_direction_spread,
+        "endpoint_direction_valid_count": endpoint_valid_count,
+        "direction_metric_warning": warning,
+    }
 
 
 def wilson_ci(success: int, total: int, z: float = 1.96) -> tuple[float, float]:

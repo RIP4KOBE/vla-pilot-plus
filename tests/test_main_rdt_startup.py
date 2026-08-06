@@ -10,6 +10,67 @@ import torch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
+def test_episode_seed_schedule_preserves_preregistered_seed_on_suffix_resume():
+    import main
+
+    schedule = [44, 235, 43, 546, 6, 621, 197, 87, 151, 548]
+
+    assert main._episode_seed_schedule(schedule, episode_num=10) == schedule
+    assert main._episode_seed_for_index(schedule, episode_index=9, sampled_seed=683) == 548
+    assert main._episode_seed_for_index(None, episode_index=9, sampled_seed=683) == 683
+
+
+def test_adapter_episode_window_preserves_full_task_schedule_for_suffix_resume():
+    import main
+
+    assert main._adapter_episode_window(episode_num=10, episode_start_index=6) == {
+        "episode_num": 10,
+        "episode_start_index": 6,
+    }
+
+
+@pytest.mark.parametrize(
+    "schedule",
+    [
+        [44] * 9,
+        [44] * 11,
+        [44] * 9 + [True],
+        [44] * 9 + [-1],
+        [44] * 9 + [2**31],
+        "44,235",
+    ],
+)
+def test_episode_seed_schedule_rejects_invalid_values(schedule):
+    import main
+
+    with pytest.raises(ValueError):
+        main._episode_seed_schedule(schedule, episode_num=10)
+
+
+def test_chunk_boundary_action_jump_uses_translation_only():
+    import main
+
+    chunk = torch.tensor([[[4.0, 6.0, 3.0, 9.0, 9.0, 9.0, -1.0]]])
+    previous = torch.tensor([1.0, 2.0, 3.0, -9.0, -9.0, -9.0, 1.0])
+
+    assert main._chunk_boundary_action_jump(chunk, previous) == 5.0
+    assert main._chunk_boundary_action_jump(chunk, None) is None
+
+
+def test_gripper_qpos_violation_count_uses_nominal_range_and_tolerance():
+    import main
+
+    assert main._gripper_qpos_violation_count(
+        {"robot0_gripper_qpos": np.array([-0.04245, 0.05185])}
+    ) == 0
+    assert main._gripper_qpos_violation_count(
+        {"robot0_gripper_qpos": np.array([-0.05, 0.05185])}
+    ) == 1
+    assert main._gripper_qpos_violation_count(
+        {"robot0_gripper_qpos": np.array([np.nan, 0.0])}
+    ) == 1
+
+
 def test_execution_horizon_fixed_preserves_policy_horizon():
     import main
 
