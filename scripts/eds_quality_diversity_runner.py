@@ -48,15 +48,15 @@ OUTPUT_LINK = WORKTREE_ROOT / "outputs"
 OUTPUT_TARGET = EXPERIMENT_ROOT / "outputs"
 ALLOWED_STORAGE_PREFIX = Path("/mnt/data/shared2/zhuoli/vla-pilot-plus-plus")
 MIN_FREE_BYTES = 50 * 1024**3
-RECOVERY_ATTEMPT_LIMIT = 14
-ATTEMPT_CAP = 130
+RECOVERY_ATTEMPT_LIMIT = 18
+ATTEMPT_CAP = 134
 PINNED_GPU_INDEX = 5
 ALLOW_EXTERNAL_GPU_COLOCATION = True
 EPISODE_SEEDS = [44, 235, 43, 546, 6, 621, 197, 87, 151, 548]
 SUPERSEDED_RUN_MANIFEST_PATH = (
-    EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v9.json"
+    EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v10.json"
 )
-RUN_MANIFEST_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v10.json"
+RUN_MANIFEST_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v11.json"
 ATTEMPT_LEDGER_PATH = EXPERIMENT_ROOT / "manifests/episode_attempt_ledger.jsonl"
 OFFLINE_PREFLIGHT_PATH = EXPERIMENT_ROOT / "analysis/offline_mechanism_preflight.json"
 LIBERO_PREFLIGHT_AUDIT_PATH = (
@@ -1428,25 +1428,25 @@ def freeze_run_manifest(
         "gates_frozen_by_design": True,
     }
     if (
-        RUN_MANIFEST_PATH.name == "qd_ed_run_manifest.v10.json"
+        RUN_MANIFEST_PATH.name == "qd_ed_run_manifest.v11.json"
         and SUPERSEDED_RUN_MANIFEST_PATH.is_file()
     ):
         payload["supersedes"] = {
             "path": str(SUPERSEDED_RUN_MANIFEST_PATH),
             "sha256": _sha256_bytes(SUPERSEDED_RUN_MANIFEST_PATH.read_bytes()),
             "reason": (
-                "audited GPU 5 runtime recovery after six actual preflight "
-                "attempts: bounded read-only perception rerender, disabled "
-                "joblib multiprocessing, and removal of identical duplicate "
-                "Hydra overrides; recovery allowance 8->14 and actual attempt "
-                "cap 124->130 preserve the exact preflight and 110 formal "
-                "episodes without algorithm, matrix, task, seed, gate, or "
-                "ranking changes"
+                "audited GPU 5 graphics Xid recovery and user-requested server "
+                "reset: attempts 37-40 entered preflight before the reset, "
+                "while attempts 41-42 were proven aborted before episode "
+                "initialization; recovery allowance 14->18 and actual attempt "
+                "cap 130->134 preserve the exact six-episode preflight and 110 "
+                "formal episodes without algorithm, matrix, task, seed, gate, "
+                "ranking, GPU, or runtime-reliability changes"
             ),
             "algorithm_matrix_or_gate_change": False,
             "attempt_policy_change": True,
             "gpu_policy_change": False,
-            "runtime_reliability_change": True,
+            "runtime_reliability_change": False,
         }
     payload["manifest_payload_sha256"] = _sha256_bytes(
         _canonical(payload).encode("utf-8")

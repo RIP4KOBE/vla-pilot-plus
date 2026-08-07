@@ -233,7 +233,7 @@ def test_runtime_cache_is_exclusive_copied_and_checksum_validated(tmp_path):
         runner.validate_runtime_cache(target=target, manifest_path=manifest)
 
 
-def test_attempt_ledger_is_append_only_and_enforces_shared_130_cap(tmp_path):
+def test_attempt_ledger_is_append_only_and_enforces_shared_134_cap(tmp_path):
     runner = _load_runner()
     ledger = tmp_path / "attempts.jsonl"
     records = [
@@ -287,12 +287,12 @@ def test_attempt_ledger_is_append_only_and_enforces_shared_130_cap(tmp_path):
                 "episode_seed": 100 + index,
                 "config_fingerprint": "c" * 64,
             }
-            for index in range(8)
+            for index in range(12)
         ],
     )
-    assert len(runner.read_attempt_ledger(ledger)) == 130
+    assert len(runner.read_attempt_ledger(ledger)) == 134
     before = ledger.read_bytes()
-    with pytest.raises(RuntimeError, match="130"):
+    with pytest.raises(RuntimeError, match="134"):
         runner.append_attempt_records(
             ledger,
             [
@@ -905,8 +905,8 @@ def test_freeze_manifest_is_readonly_contains_provenance_and_is_immutable(
 
     assert result["formal_episode_count"] == 110
     assert result["preflight_episode_count"] == 6
-    assert result["attempt_cap"] == 130
-    assert result["recovery_attempt_limit"] == 14
+    assert result["attempt_cap"] == 134
+    assert result["recovery_attempt_limit"] == 18
     assert result["pinned_gpu_index"] == 5
     assert result["external_compute_colocation_authorized"] is True
     assert result["provenance"] == provenance
@@ -919,6 +919,38 @@ def test_freeze_manifest_is_readonly_contains_provenance_and_is_immutable(
             gpu_reference=reference,
         )
     assert path.read_bytes() == existing
+
+
+def test_freeze_manifest_v11_supersedes_v10_for_reset_recovery_only(
+    tmp_path, monkeypatch
+):
+    runner = _load_runner()
+    previous = tmp_path / "manifests" / "qd_ed_run_manifest.v10.json"
+    previous.parent.mkdir(parents=True)
+    previous.write_text('{"attempt_cap":130}\n')
+    previous.chmod(0o444)
+    current = tmp_path / "manifests" / "qd_ed_run_manifest.v11.json"
+    monkeypatch.setattr(runner, "SUPERSEDED_RUN_MANIFEST_PATH", previous)
+    monkeypatch.setattr(runner, "RUN_MANIFEST_PATH", current)
+
+    result = runner.freeze_run_manifest(
+        provenance={
+            "base_commit": "b" * 40,
+            "source_branch": "exp/eds-init-pg-diverse-sampling",
+            "new_branch": "exp/eds-quality-diversity",
+            "new_worktree_realpath": "/tmp/worktree",
+            "code_commit": "c" * 40,
+            "code_state_sha256": "d" * 64,
+        },
+        storage={"outputs_target": "/mnt/data/shared2/test"},
+        gpu_reference={"reference_peak_vram_mib": 30000},
+    )
+
+    assert result["supersedes"]["path"] == str(previous)
+    assert result["supersedes"]["algorithm_matrix_or_gate_change"] is False
+    assert result["supersedes"]["attempt_policy_change"] is True
+    assert result["supersedes"]["runtime_reliability_change"] is False
+    assert "server reset" in result["supersedes"]["reason"]
 
 
 def test_runtime_credential_check_reads_environment_without_returning_secret(monkeypatch):
