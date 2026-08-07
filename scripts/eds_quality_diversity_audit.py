@@ -112,9 +112,13 @@ def _contains_credential(value: object) -> bool:
         os.environ.get(name, "").strip().lower()
         for name in ("OPENAI_API_KEY", "GOOGLE_API_KEY")
     ]
-    return any(secret and secret in serialized for secret in secrets) or any(
-        marker in serialized
-        for marker in ("sk-", "api_key=", "api-key=", "authorization: bearer")
+    return (
+        any(secret and secret in serialized for secret in secrets)
+        or re.search(r"(?<![a-z0-9_])sk-[a-z0-9_-]{16,}", serialized) is not None
+        or any(
+            marker in serialized
+            for marker in ("api_key=", "api-key=", "authorization: bearer")
+        )
     )
 
 

@@ -190,6 +190,11 @@ def test_manifest_rejects_credentials(tmp_path: Path):
         )
 
 
+def test_credential_guard_does_not_treat_task_level_as_an_api_key():
+    assert audit._contains_credential("Task-level paired outcome") is False
+    assert audit._contains_credential("sk-" + "x" * 24) is True
+
+
 def test_audit_reuses_frozen_dispatch_identity(tmp_path: Path, monkeypatch):
     output_dir = tmp_path / "job"
     output_dir.mkdir()
