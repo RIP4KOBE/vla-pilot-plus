@@ -430,6 +430,88 @@ from utils.logging_utils import SteerLogger
 log = SteerLogger("Main")
 
 
+def _detect_keypoints_with_retries(
+    *,
+    adapter: Any,
+    detector: Any,
+    max_attempts: int,
+    initial_result: tuple[Any, ...] | None = None,
+    min_keypoints: int = 1,
+    required_mask_ids: tuple[int, ...] = (),
+) -> tuple[Any, ...]:
+    """Retry read-only perception renders when a shared EGL render is empty."""
+    if (
+        isinstance(max_attempts, bool)
+        or not isinstance(max_attempts, int)
+        or not 1 <= max_attempts <= 10
+    ):
+        raise ValueError("keypoint detection max_attempts must be an integer in [1, 10]")
+    if (
+        isinstance(min_keypoints, bool)
+        or not isinstance(min_keypoints, int)
+        or min_keypoints <= 0
+    ):
+        raise ValueError("min_keypoints must be a positive integer")
+
+    def sufficient(result: tuple[Any, ...]) -> bool:
+        keypoints = np.asarray(result[5]).reshape(-1, 3)
+        mask_ids = {int(value) for value in np.asarray(result[7]).reshape(-1)}
+        return len(keypoints) >= min_keypoints and set(required_mask_ids) <= mask_ids
+
+    attempts_used = 0
+    if initial_result is not None:
+        if len(initial_result) != 8:
+            raise ValueError("initial keypoint detection result must contain eight fields")
+        attempts_used = 1
+        if sufficient(initial_result):
+            return initial_result
+    while attempts_used < max_attempts:
+        attempts_used += 1
+        rgb, depth, points, segmentation, segment_id_to_name = (
+            adapter.get_keypoint_detection_inputs()
+        )
+        if (
+            segmentation is None
+            or segment_id_to_name is None
+            or not segment_id_to_name
+        ):
+            log.warning(
+                f"Keypoint render retry {attempts_used}/{max_attempts} "
+                "has no adapter segmentation"
+            )
+            continue
+        key_points, projected_img, mask_ids = detector.get_keypoints(
+            rgb=rgb,
+            points=points,
+            segmentation=segmentation,
+            segment_id_to_name=segment_id_to_name,
+        )
+        result = (
+            rgb,
+            depth,
+            points,
+            segmentation,
+            segment_id_to_name,
+            key_points,
+            projected_img,
+            mask_ids,
+        )
+        if sufficient(result):
+            if attempts_used > 1:
+                log.warning(
+                    "Recovered keypoint perception on render attempt "
+                    f"{attempts_used}/{max_attempts}"
+                )
+            return result
+        log.warning(
+            f"Keypoint render attempt {attempts_used}/{max_attempts} "
+            "produced insufficient candidates or required masks"
+        )
+    raise RuntimeError(
+        f"No keypoint candidates after {max_attempts} render attempts"
+    )
+
+
 def _get_visualization_action_chunk(policy: Any, adapter: Any, action_chunk: torch.Tensor) -> torch.Tensor:
     get_candidates = getattr(policy, "get_last_visualization_action_candidates", None)
     if not callable(get_candidates):
@@ -749,6 +831,48 @@ class Main:
             segmentation=segmentation,
             segment_id_to_name=segment_id_to_name
         )
+        max_detection_attempts = self.config.get(
+            "keypoint_detection_max_attempts", 1
+        )
+        if (
+            isinstance(max_detection_attempts, bool)
+            or not isinstance(max_detection_attempts, int)
+            or not 1 <= max_detection_attempts <= 10
+        ):
+            raise ValueError(
+                "main.keypoint_detection_max_attempts must be an integer in [1, 10]"
+            )
+        initial_keypoint_count = len(np.asarray(key_points).reshape(-1, 3))
+        initial_mask_ids = {int(value) for value in np.asarray(mask_ids).reshape(-1)}
+        if max_detection_attempts > 1 and (
+            initial_keypoint_count < 2 or not {1, 2} <= initial_mask_ids
+        ):
+            (
+                rgb,
+                depth,
+                points,
+                segmentation,
+                segment_id_to_name,
+                key_points,
+                projected_img,
+                mask_ids,
+            ) = _detect_keypoints_with_retries(
+                adapter=self.adapter,
+                detector=self.keypoint_detector,
+                max_attempts=max_detection_attempts,
+                min_keypoints=2,
+                required_mask_ids=(1, 2),
+                initial_result=(
+                    rgb,
+                    depth,
+                    points,
+                    segmentation,
+                    segment_id_to_name,
+                    key_points,
+                    projected_img,
+                    mask_ids,
+                ),
+            )
 
         # Register keypoints
         key_points_objects_map = self.keypoint_tracker.register_keypoints(

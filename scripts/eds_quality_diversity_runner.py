@@ -48,15 +48,15 @@ OUTPUT_LINK = WORKTREE_ROOT / "outputs"
 OUTPUT_TARGET = EXPERIMENT_ROOT / "outputs"
 ALLOWED_STORAGE_PREFIX = Path("/mnt/data/shared2/zhuoli/vla-pilot-plus-plus")
 MIN_FREE_BYTES = 50 * 1024**3
-RECOVERY_ATTEMPT_LIMIT = 8
-ATTEMPT_CAP = 124
+RECOVERY_ATTEMPT_LIMIT = 14
+ATTEMPT_CAP = 130
 PINNED_GPU_INDEX = 5
 ALLOW_EXTERNAL_GPU_COLOCATION = True
 EPISODE_SEEDS = [44, 235, 43, 546, 6, 621, 197, 87, 151, 548]
 SUPERSEDED_RUN_MANIFEST_PATH = (
-    EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v8.json"
+    EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v9.json"
 )
-RUN_MANIFEST_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v9.json"
+RUN_MANIFEST_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v10.json"
 ATTEMPT_LEDGER_PATH = EXPERIMENT_ROOT / "manifests/episode_attempt_ledger.jsonl"
 OFFLINE_PREFLIGHT_PATH = EXPERIMENT_ROOT / "analysis/offline_mechanism_preflight.json"
 LIBERO_PREFLIGHT_AUDIT_PATH = (
@@ -189,6 +189,8 @@ COMMON_PROFILE = {
     "qd_overflow_policy": "clamp_edge",
     "qd_tie_break": "stable_fingerprint",
     "qd_metrics_observer": True,
+    "p2_joblib_multiprocessing": False,
+    "p2_render_gpu_index": PINNED_GPU_INDEX,
 }
 
 
@@ -374,21 +376,13 @@ def _build_main_command(job, *args, **kwargs):
             "main.eds_config.rollout_diversity_descriptor_mode="
             + str(job["rollout_diversity_descriptor_mode"]),
             "main.eds_eval.max_visual_chunks_per_episode=2",
+            "main.keypoint_detection_max_attempts=3",
         ]
     )
     command.extend(
         f"main.eds_config.{field}={_hydra_value(job[field])}"
         for field in QD_CONFIG_FIELDS
     )
-    if job["level"] == PREFLIGHT_LEVEL:
-        command.extend(
-            [
-                "main.eds_mechanism_pretest.enabled=true",
-                "main.eds_mechanism_pretest.first_chunk_only=false",
-                "main.eds_mechanism_pretest.max_chunks=2",
-                "main.eds_mechanism_pretest.max_full_process_iters=10",
-            ]
-        )
     if _contains_credential(command):
         raise RuntimeError("QD command unexpectedly contains credential material")
     return command
@@ -1413,6 +1407,12 @@ def freeze_run_manifest(
             "historical_peak_headroom",
             "compute_mode_not_prohibited",
         ],
+        "runtime_reliability": {
+            "legacy_keypoint_detection_max_attempts": 1,
+            "qd_keypoint_detection_max_attempts": 3,
+            "perception_retry_changes_simulator_state": False,
+            "joblib_multiprocessing": False,
+        },
         "ranking_order": [
             "success_count_desc",
             "control_task_retention_desc",
@@ -1428,22 +1428,25 @@ def freeze_run_manifest(
         "gates_frozen_by_design": True,
     }
     if (
-        RUN_MANIFEST_PATH.name == "qd_ed_run_manifest.v9.json"
+        RUN_MANIFEST_PATH.name == "qd_ed_run_manifest.v10.json"
         and SUPERSEDED_RUN_MANIFEST_PATH.is_file()
     ):
         payload["supersedes"] = {
             "path": str(SUPERSEDED_RUN_MANIFEST_PATH),
             "sha256": _sha256_bytes(SUPERSEDED_RUN_MANIFEST_PATH.read_bytes()),
             "reason": (
-                "recovery archive correction for the GPU migration: allow a "
-                "job with no output/log only when immutable status and failure "
-                "evidence both prove it stopped before episode initialization; "
-                "no algorithm, matrix, task, seed, validity, gate, ranking, "
-                "GPU, recovery-limit, or attempt-cap change"
+                "audited GPU 5 runtime recovery after six actual preflight "
+                "attempts: bounded read-only perception rerender, disabled "
+                "joblib multiprocessing, and removal of identical duplicate "
+                "Hydra overrides; recovery allowance 8->14 and actual attempt "
+                "cap 124->130 preserve the exact preflight and 110 formal "
+                "episodes without algorithm, matrix, task, seed, gate, or "
+                "ranking changes"
             ),
             "algorithm_matrix_or_gate_change": False,
-            "attempt_policy_change": False,
+            "attempt_policy_change": True,
             "gpu_policy_change": False,
+            "runtime_reliability_change": True,
         }
     payload["manifest_payload_sha256"] = _sha256_bytes(
         _canonical(payload).encode("utf-8")

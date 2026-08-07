@@ -20,6 +20,78 @@ def test_episode_seed_schedule_preserves_preregistered_seed_on_suffix_resume():
     assert main._episode_seed_for_index(None, episode_index=9, sampled_seed=683) == 683
 
 
+def test_keypoint_detection_retries_render_until_nonempty():
+    import main
+
+    calls = []
+
+    class Adapter:
+        def get_keypoint_detection_inputs(self):
+            calls.append("render")
+            return (
+                np.zeros((2, 2, 3), dtype=np.uint8),
+                np.ones((2, 2), dtype=np.float32),
+                np.ones((2, 2, 3), dtype=np.float32),
+                np.ones((2, 2), dtype=np.int32),
+                {1: "object"},
+            )
+
+    class Detector:
+        def get_keypoints(self, **_kwargs):
+            calls.append("detect")
+            attempt = calls.count("detect")
+            if attempt < 3:
+                return np.empty((0, 3)), np.zeros((2, 2, 3)), np.empty((0,))
+            return (
+                np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]),
+                np.zeros((2, 2, 3)),
+                np.array([1, 2]),
+            )
+
+    result = main._detect_keypoints_with_retries(
+        adapter=Adapter(),
+        detector=Detector(),
+        max_attempts=3,
+        min_keypoints=2,
+        required_mask_ids=(1, 2),
+    )
+
+    assert calls == ["render", "detect", "render", "detect", "render", "detect"]
+    assert result[5].shape == (2, 3)
+    assert result[7].tolist() == [1, 2]
+
+
+def test_keypoint_detection_retry_fails_closed_after_budget():
+    import main
+
+    adapter = SimpleNamespace(
+        get_keypoint_detection_inputs=lambda: (
+            np.zeros((2, 2, 3), dtype=np.uint8),
+            np.ones((2, 2), dtype=np.float32),
+            np.ones((2, 2, 3), dtype=np.float32),
+            np.ones((2, 2), dtype=np.int32),
+            {1: "object"},
+        )
+    )
+    detector = SimpleNamespace(
+        get_keypoints=lambda **_kwargs: (
+            np.empty((0, 3)),
+            np.zeros((2, 2, 3)),
+            np.empty((0,)),
+        )
+    )
+
+    with pytest.raises(RuntimeError, match="after 3 render attempts"):
+        main._detect_keypoints_with_retries(
+            adapter=adapter, detector=detector, max_attempts=3
+        )
+
+    with pytest.raises(ValueError, match="max_attempts"):
+        main._detect_keypoints_with_retries(
+            adapter=adapter, detector=detector, max_attempts=0
+        )
+
+
 def test_adapter_episode_window_preserves_full_task_schedule_for_suffix_resume():
     import main
 

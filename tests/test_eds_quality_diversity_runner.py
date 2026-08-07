@@ -82,6 +82,22 @@ def test_preflight_matrix_is_exact_three_profiles_two_registered_tasks():
     assert all(job["task_ids_filter"] == [0, 8] for job in jobs)
     assert all(job["episode_seeds"] == [44, 151] for job in jobs)
     assert sum(int(job["episodes"]) for job in jobs) == 6
+    assert all(job["p2_joblib_multiprocessing"] is False for job in jobs)
+    assert all(job["p2_render_gpu_index"] == 5 for job in jobs)
+
+
+def test_preflight_command_has_unique_mechanism_overrides_and_render_retry():
+    runner = _load_runner()
+    job = runner.build_preflight_jobs()[0]
+
+    command = runner._build_main_command(job, "5", 10)
+    overrides = [token for token in command if "=" in token]
+    keys = [token.split("=", 1)[0].lstrip("+") for token in overrides]
+
+    assert len(keys) == len(set(keys))
+    assert command.count("main.eds_mechanism_pretest.enabled=true") == 1
+    assert command.count("main.eds_mechanism_pretest.max_chunks=2") == 1
+    assert "main.keypoint_detection_max_attempts=3" in command
 
 
 def test_normalized_command_overrides_accepts_only_identical_duplicates(
@@ -217,7 +233,7 @@ def test_runtime_cache_is_exclusive_copied_and_checksum_validated(tmp_path):
         runner.validate_runtime_cache(target=target, manifest_path=manifest)
 
 
-def test_attempt_ledger_is_append_only_and_enforces_shared_124_cap(tmp_path):
+def test_attempt_ledger_is_append_only_and_enforces_shared_130_cap(tmp_path):
     runner = _load_runner()
     ledger = tmp_path / "attempts.jsonl"
     records = [
@@ -271,12 +287,12 @@ def test_attempt_ledger_is_append_only_and_enforces_shared_124_cap(tmp_path):
                 "episode_seed": 100 + index,
                 "config_fingerprint": "c" * 64,
             }
-            for index in range(2)
+            for index in range(8)
         ],
     )
-    assert len(runner.read_attempt_ledger(ledger)) == 124
+    assert len(runner.read_attempt_ledger(ledger)) == 130
     before = ledger.read_bytes()
-    with pytest.raises(RuntimeError, match="124"):
+    with pytest.raises(RuntimeError, match="130"):
         runner.append_attempt_records(
             ledger,
             [
@@ -889,8 +905,8 @@ def test_freeze_manifest_is_readonly_contains_provenance_and_is_immutable(
 
     assert result["formal_episode_count"] == 110
     assert result["preflight_episode_count"] == 6
-    assert result["attempt_cap"] == 124
-    assert result["recovery_attempt_limit"] == 8
+    assert result["attempt_cap"] == 130
+    assert result["recovery_attempt_limit"] == 14
     assert result["pinned_gpu_index"] == 5
     assert result["external_compute_colocation_authorized"] is True
     assert result["provenance"] == provenance

@@ -8,6 +8,8 @@
 
 执行修订（`2026-08-07`，GPU 迁移）：用户明确要求停止本实验使用 GPU 3/4，将全部剩余 preflight 与 formal jobs 固定在 GPU 5，并明确授权与 GPU 5 上的外部 compute 进程共用以提高利用率。迁移时两个 task-0 preflight episodes 已初始化但未完成，另四个 reservations 经产物审计确认未进入 episode；因此 same-cell recovery allowance 从 `6` 放宽为 `8`，actual episode-attempt cap 从 `122` 放宽为 `124`，以便在 GPU 5 完整重跑固定的 `3 profiles × 2 tasks` 后仍执行原定 110 个 formal episodes。GPU 5 admission 继续强制两次快照、至少 `max(1.25× historical peak, peak+4096 MiB)` 的空闲显存和非 prohibited compute mode，但按本次明确授权不因外部 compute process 或利用率拒绝共置。该修订不改变 QD 算法、11-job 矩阵、tasks/seeds、配置、validity、gates、ranking、credential 或 shared2 storage 规则，不授权新增配置或 outcome。
 
+执行修订（`2026-08-07`，GPU 5 runtime recovery）：首次完整 GPU 5 preflight 的 6 个 attempts 均已实际进入 episode，但审计发现共享 EGL render 偶发返回空/近空 segmentation、相同 Hydra override 被重复追加，以及 joblib/loky 资源退出。用户此前已授权以完成任务为优先放宽软设置；因此仅为本实验启用最多 3 次不改变 simulator state 的 perception re-render、显式 `JOBLIB_MULTIPROCESSING=0`、去除相同的重复 override，并将 same-cell recovery allowance 从 `8` 放宽为 `14`、actual episode-attempt cap 从 `124` 放宽为 `130`。legacy default 仍为单次 keypoint detection；QD 算法、11-job formal 矩阵、tasks/seeds、gates、ranking、validity 与 storage 不变。
+
 ## 1. 摘要
 
 本阶段以 `p2_stage_on_abs_rbf_control` 为唯一算法基线，把当前 EDS 每轮基于 reward softmax 的有放回 parent resampling，替换为一个可落地、config-controlled 的 Quality-Diversity archive。QD-ED 在每个 `select_action` chunk 内按低维 behavior descriptor（BD）划分 cell，在每个 cell 中持续保留 reward 最高的 action elite，并从已占用 cells 均匀或稀疏优先地产生下一轮 offspring。最终仍只执行 archive 中 reward 最高的单个 action。

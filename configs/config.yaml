@@ -30,6 +30,7 @@ main:
   max_episode_steps: 240        # Max steps per episode (calvin.yaml references this via interpolation)
   output_dir: ${hydra:run.dir}
   cached_functions_dir: null
+  keypoint_detection_max_attempts: 1  # legacy default; QD shared-GPU runs use 3
   visualize_trajectory: true
   debug_draw_trajectory: true
   render: true
