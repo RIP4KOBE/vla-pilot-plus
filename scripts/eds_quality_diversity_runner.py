@@ -54,9 +54,9 @@ PINNED_GPU_INDEX = 5
 ALLOW_EXTERNAL_GPU_COLOCATION = True
 EPISODE_SEEDS = [44, 235, 43, 546, 6, 621, 197, 87, 151, 548]
 SUPERSEDED_RUN_MANIFEST_PATH = (
-    EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v7.json"
+    EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v8.json"
 )
-RUN_MANIFEST_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v8.json"
+RUN_MANIFEST_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v9.json"
 ATTEMPT_LEDGER_PATH = EXPERIMENT_ROOT / "manifests/episode_attempt_ledger.jsonl"
 OFFLINE_PREFLIGHT_PATH = EXPERIMENT_ROOT / "analysis/offline_mechanism_preflight.json"
 LIBERO_PREFLIGHT_AUDIT_PATH = (
@@ -1428,23 +1428,22 @@ def freeze_run_manifest(
         "gates_frozen_by_design": True,
     }
     if (
-        RUN_MANIFEST_PATH.name == "qd_ed_run_manifest.v8.json"
+        RUN_MANIFEST_PATH.name == "qd_ed_run_manifest.v9.json"
         and SUPERSEDED_RUN_MANIFEST_PATH.is_file()
     ):
         payload["supersedes"] = {
             "path": str(SUPERSEDED_RUN_MANIFEST_PATH),
             "sha256": _sha256_bytes(SUPERSEDED_RUN_MANIFEST_PATH.read_bytes()),
             "reason": (
-                "user-directed migration from GPUs 3/4 to shared GPU 5 after "
-                "two preflight episodes initialized but did not complete; "
-                "recovery allowance 6->8 and actual attempt cap 122->124 "
-                "preserve the exact six-cell preflight and 110 formal episodes "
-                "without algorithm, matrix, task, seed, validity, gate, or "
-                "ranking changes"
+                "recovery archive correction for the GPU migration: allow a "
+                "job with no output/log only when immutable status and failure "
+                "evidence both prove it stopped before episode initialization; "
+                "no algorithm, matrix, task, seed, validity, gate, ranking, "
+                "GPU, recovery-limit, or attempt-cap change"
             ),
             "algorithm_matrix_or_gate_change": False,
-            "attempt_policy_change": True,
-            "gpu_policy_change": True,
+            "attempt_policy_change": False,
+            "gpu_policy_change": False,
         }
     payload["manifest_payload_sha256"] = _sha256_bytes(
         _canonical(payload).encode("utf-8")
@@ -1636,10 +1635,58 @@ def archive_recovery_artifacts(
         failure_path = base._p2_safe_child_path(
             root, "failures", stage, f"{label}.json"
         )
+        if failure_path.exists() and (
+            not failure_path.is_file() or failure_path.is_symlink()
+        ):
+            raise RuntimeError(f"recovery failure evidence is unsafe: {label}")
+        output_exists = output_dir.exists()
+        log_exists = log_path.exists()
+        if not output_exists and not log_exists:
+            if not failure_path.is_file():
+                raise RuntimeError(
+                    f"recovery pre-episode failure evidence is missing: {label}"
+                )
+            try:
+                failure = json.loads(failure_path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, ValueError) as exc:
+                raise RuntimeError(
+                    f"recovery pre-episode failure evidence is unreadable: {label}"
+                ) from exc
+            status_reason = str(
+                rows_by_job[str(job["job_id"])].get("failure_reason", "")
+            ).lower()
+            failure_reason = (
+                str(failure.get("failure_reason", "")).lower()
+                if isinstance(failure, dict)
+                else ""
+            )
+            if (
+                not isinstance(failure, dict)
+                or failure.get("status") != "failed"
+                or failure.get("job_id") != job["job_id"]
+                or "before episode initialization" not in status_reason
+                or "before episode initialization" not in failure_reason
+            ):
+                raise RuntimeError(
+                    f"recovery pre-episode failure identity mismatch: {label}"
+                )
+            plans.append(
+                {
+                    "job": job,
+                    "output": None,
+                    "log": None,
+                    "failure": failure_path,
+                    "existing_config_fingerprint": None,
+                    "pre_episode_without_output": True,
+                }
+            )
+            continue
+        if not output_exists or not log_exists:
+            raise RuntimeError(f"recovery output/log pair is incomplete: {label}")
         if not output_dir.is_dir() or output_dir.is_symlink():
-            raise RuntimeError(f"recovery output is missing or unsafe: {label}")
+            raise RuntimeError(f"recovery output is unsafe: {label}")
         if not log_path.is_file() or log_path.is_symlink():
-            raise RuntimeError(f"recovery runner log is missing or unsafe: {label}")
+            raise RuntimeError(f"recovery runner log is unsafe: {label}")
         _tree_sha256(output_dir)
         fingerprint_path = output_dir / "config_fingerprint.txt"
         manifest_path = output_dir / "job_manifest.json"
@@ -1676,10 +1723,6 @@ def archive_recovery_artifacts(
             or any(old_job.get(key) != value for key, value in expected_identity.items())
         ):
             raise RuntimeError(f"recovery artifact identity mismatch: {label}")
-        if failure_path.exists() and (
-            not failure_path.is_file() or failure_path.is_symlink()
-        ):
-            raise RuntimeError(f"recovery failure evidence is unsafe: {label}")
         plans.append(
             {
                 "job": job,
@@ -1687,6 +1730,7 @@ def archive_recovery_artifacts(
                 "log": log_path,
                 "failure": failure_path if failure_path.exists() else None,
                 "existing_config_fingerprint": existing_fingerprint,
+                "pre_episode_without_output": False,
             }
         )
 
@@ -1747,6 +1791,9 @@ def archive_recovery_artifacts(
                     "existing_config_fingerprint"
                 ],
                 "next_config_fingerprint": str(job["config_fingerprint"]),
+                "pre_episode_without_output": bool(
+                    plan["pre_episode_without_output"]
+                ),
                 "archive_tree_sha256": _tree_sha256(archived_job),
             }
         )

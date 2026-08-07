@@ -572,6 +572,72 @@ def test_recovery_archive_rejects_inconsistent_identity_without_moving_anything(
     assert not (tmp_path / "stale").exists()
 
 
+def test_recovery_archive_accepts_evidenced_pre_episode_job_without_output_or_log(
+    tmp_path,
+):
+    runner = _load_runner()
+    jobs = [
+        {
+            "level": runner.PREFLIGHT_LEVEL,
+            "label": f"preflight__profile_{index}",
+            "formal_label": f"profile_{index}",
+            "job_id": f"job-{index}",
+            "task_ids_filter": [0, 8],
+            "episode_seeds": [44, 151],
+            "config_fingerprint": "b" * 64,
+        }
+        for index in range(3)
+    ]
+    _write_recovery_artifacts(runner, tmp_path, jobs)
+    pending = jobs[-1]
+    output = tmp_path / "libero_preflight" / pending["label"]
+    log = (
+        tmp_path
+        / "runner_logs"
+        / "libero_preflight"
+        / f"{pending['label']}.log"
+    )
+    import shutil
+
+    shutil.rmtree(output)
+    log.unlink()
+    failure = (
+        tmp_path / "failures" / "libero_preflight" / f"{pending['label']}.json"
+    )
+    failure.write_text(
+        json.dumps(
+            {
+                "status": "failed",
+                "job_id": pending["job_id"],
+                "failure_reason": "interrupted before episode initialization",
+            }
+        )
+        + "\n"
+    )
+    status = tmp_path / "libero_preflight" / "run_manifest.csv"
+    status.write_text(
+        status.read_text().replace(
+            f"{pending['job_id']},failed,1,pre-dispatch failure",
+            f"{pending['job_id']},failed,130,interrupted before episode initialization",
+        )
+    )
+
+    result = runner.archive_recovery_artifacts(
+        jobs,
+        real_root=tmp_path,
+        timestamp="20260807T060000000000Z",
+    )
+
+    archive = Path(result["archive_root"])
+    payload = json.loads((archive / "archive_manifest.json").read_text())
+    pending_evidence = next(
+        row for row in payload["jobs"] if row["job_id"] == pending["job_id"]
+    )
+    assert pending_evidence["pre_episode_without_output"] is True
+    assert pending_evidence["existing_config_fingerprint"] is None
+    assert (archive / "jobs" / pending["label"] / "failure.json").is_file()
+
+
 def test_recovery_phase_archives_before_reservation_and_dispatch(tmp_path, monkeypatch):
     runner = _load_runner()
     manifest = tmp_path / "run_manifest.json"
