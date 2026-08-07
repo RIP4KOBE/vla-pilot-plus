@@ -48,13 +48,15 @@ OUTPUT_LINK = WORKTREE_ROOT / "outputs"
 OUTPUT_TARGET = EXPERIMENT_ROOT / "outputs"
 ALLOWED_STORAGE_PREFIX = Path("/mnt/data/shared2/zhuoli/vla-pilot-plus-plus")
 MIN_FREE_BYTES = 50 * 1024**3
-RECOVERY_ATTEMPT_LIMIT = 6
-ATTEMPT_CAP = 122
+RECOVERY_ATTEMPT_LIMIT = 8
+ATTEMPT_CAP = 124
+PINNED_GPU_INDEX = 5
+ALLOW_EXTERNAL_GPU_COLOCATION = True
 EPISODE_SEEDS = [44, 235, 43, 546, 6, 621, 197, 87, 151, 548]
 SUPERSEDED_RUN_MANIFEST_PATH = (
-    EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v6.json"
+    EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v7.json"
 )
-RUN_MANIFEST_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v7.json"
+RUN_MANIFEST_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v8.json"
 ATTEMPT_LEDGER_PATH = EXPERIMENT_ROOT / "manifests/episode_attempt_ledger.jsonl"
 OFFLINE_PREFLIGHT_PATH = EXPERIMENT_ROOT / "analysis/offline_mechanism_preflight.json"
 LIBERO_PREFLIGHT_AUDIT_PATH = (
@@ -1251,15 +1253,19 @@ def _gpu_snapshot_failure(
     *,
     index: int,
     required_free: float,
+    allow_external_compute: bool = False,
 ) -> list[str]:
     if not 0 <= index <= 7:
         return ["index outside approved range 0..7"]
     if device is None:
         return ["GPU not visible"]
     reasons = []
-    if device.get("compute_processes"):
+    if device.get("compute_processes") and not allow_external_compute:
         reasons.append("external compute process present")
-    if float(device.get("utilization_percent", math.inf)) > 5.0:
+    if (
+        float(device.get("utilization_percent", math.inf)) > 5.0
+        and not allow_external_compute
+    ):
         reasons.append("utilization exceeds 5%")
     if float(device.get("memory_free_mib", -math.inf)) < required_free:
         reasons.append("insufficient free VRAM headroom")
@@ -1275,6 +1281,8 @@ def admit_gpus(
     snapshot_fn: Callable[[], list[dict[str, object]]] = gpu_snapshot,
     wait_fn: Callable[[float], None] = time.sleep,
     wait_seconds: float = 2.0,
+    pinned_gpu_index: int | None = None,
+    allow_external_compute: bool = False,
 ) -> dict[str, object]:
     reference_peak = float(reference_peak_vram_mib)
     if not math.isfinite(reference_peak) or reference_peak <= 0:
@@ -1289,17 +1297,26 @@ def admit_gpus(
     eligible = []
     excluded: dict[str, list[str]] = {}
     for index in all_indices:
+        if pinned_gpu_index is not None and index != pinned_gpu_index:
+            excluded[str(index)] = [f"not user-pinned GPU {pinned_gpu_index}"]
+            continue
         reasons = []
         reasons.extend(
             "snapshot1: " + reason
             for reason in _gpu_snapshot_failure(
-                first_by_index.get(index), index=index, required_free=required
+                first_by_index.get(index),
+                index=index,
+                required_free=required,
+                allow_external_compute=allow_external_compute,
             )
         )
         reasons.extend(
             "snapshot2: " + reason
             for reason in _gpu_snapshot_failure(
-                second_by_index.get(index), index=index, required_free=required
+                second_by_index.get(index),
+                index=index,
+                required_free=required,
+                allow_external_compute=allow_external_compute,
             )
         )
         if reasons:
@@ -1314,7 +1331,9 @@ def admit_gpus(
         "snapshots": [first, second],
         "eligible_gpu_indices": eligible,
         "excluded": excluded,
-        "max_concurrency": min(4, len(eligible)),
+        "max_concurrency": min(1 if pinned_gpu_index is not None else 4, len(eligible)),
+        "pinned_gpu_index": pinned_gpu_index,
+        "external_compute_colocation_authorized": bool(allow_external_compute),
     }
 
 
@@ -1387,6 +1406,13 @@ def freeze_run_manifest(
         "preflight_episode_count": 6,
         "recovery_attempt_limit": RECOVERY_ATTEMPT_LIMIT,
         "attempt_cap": ATTEMPT_CAP,
+        "pinned_gpu_index": PINNED_GPU_INDEX,
+        "external_compute_colocation_authorized": ALLOW_EXTERNAL_GPU_COLOCATION,
+        "gpu_colocation_safety_invariants": [
+            "two_snapshot_admission",
+            "historical_peak_headroom",
+            "compute_mode_not_prohibited",
+        ],
         "ranking_order": [
             "success_count_desc",
             "control_task_retention_desc",
@@ -1402,21 +1428,23 @@ def freeze_run_manifest(
         "gates_frozen_by_design": True,
     }
     if (
-        RUN_MANIFEST_PATH.name == "qd_ed_run_manifest.v7.json"
+        RUN_MANIFEST_PATH.name == "qd_ed_run_manifest.v8.json"
         and SUPERSEDED_RUN_MANIFEST_PATH.is_file()
     ):
         payload["supersedes"] = {
             "path": str(SUPERSEDED_RUN_MANIFEST_PATH),
             "sha256": _sha256_bytes(SUPERSEDED_RUN_MANIFEST_PATH.read_bytes()),
             "reason": (
-                "runner recovery-safety correction after a pre-episode "
-                "fingerprint guard: audit and archive the prior failed "
-                "preflight before reserving or dispatching its exact-cell "
-                "recovery; no algorithm, matrix, task, seed, gate, recovery "
-                "limit, or attempt-cap change"
+                "user-directed migration from GPUs 3/4 to shared GPU 5 after "
+                "two preflight episodes initialized but did not complete; "
+                "recovery allowance 6->8 and actual attempt cap 122->124 "
+                "preserve the exact six-cell preflight and 110 formal episodes "
+                "without algorithm, matrix, task, seed, validity, gate, or "
+                "ranking changes"
             ),
             "algorithm_matrix_or_gate_change": False,
-            "attempt_policy_change": False,
+            "attempt_policy_change": True,
+            "gpu_policy_change": True,
         }
     payload["manifest_payload_sha256"] = _sha256_bytes(
         _canonical(payload).encode("utf-8")
@@ -1470,6 +1498,8 @@ def validate_runtime_credential() -> dict[str, object]:
 
 
 def _gpu_probe(gpu: str) -> tuple[str, str]:
+    if str(gpu) != str(PINNED_GPU_INDEX):
+        return ("busy", f"only user-pinned GPU {PINNED_GPU_INDEX} is allowed")
     reference = load_gpu_reference()
     device = next(
         (item for item in gpu_snapshot() if str(item["index"]) == str(gpu)),
@@ -1479,8 +1509,13 @@ def _gpu_probe(gpu: str) -> tuple[str, str]:
         device,
         index=int(gpu),
         required_free=float(reference["required_free_vram_mib"]),
+        allow_external_compute=ALLOW_EXTERNAL_GPU_COLOCATION,
     )
-    return ("busy", "; ".join(reasons)) if reasons else ("idle", "admitted")
+    return (
+        ("busy", "; ".join(reasons))
+        if reasons
+        else ("idle", f"admitted shared GPU {PINNED_GPU_INDEX}")
+    )
 
 
 def configure_base() -> None:
@@ -1490,7 +1525,7 @@ def configure_base() -> None:
     base.P2_ALLOWED_OUTPUT_PREFIX = ALLOWED_STORAGE_PREFIX
     base.P2_MIN_FREE_BYTES = MIN_FREE_BYTES
     base.P2_LEVELS = set(base.P2_LEVELS) | {FORMAL_LEVEL, PREFLIGHT_LEVEL}
-    base.P2_ALLOWED_GPUS = {str(index) for index in range(8)}
+    base.P2_ALLOWED_GPUS = {str(PINNED_GPU_INDEX)}
     base.P2_REQUIRED_MOUNT = Path("/mnt/data/shared2")
     base.P2_TORCH_HUB_SEED = (
         Path("/mnt/data/shared2/zhuoli/output/p2_direction_normalized_rbf")
@@ -1766,11 +1801,13 @@ def _run_phase(
         raise RuntimeError("Poe Gemini health check failed before attempt dispatch")
     reference = load_gpu_reference()
     admission = admit_gpus(
-        reference_peak_vram_mib=float(reference["reference_peak_vram_mib"])
+        reference_peak_vram_mib=float(reference["reference_peak_vram_mib"]),
+        pinned_gpu_index=PINNED_GPU_INDEX,
+        allow_external_compute=ALLOW_EXTERNAL_GPU_COLOCATION,
     )
     eligible = [str(index) for index in admission["eligible_gpu_indices"]]
     if requested_gpus == "auto":
-        selected = eligible[:4]
+        selected = eligible[:1]
     else:
         selected = [item.strip() for item in requested_gpus.split(",") if item.strip()]
         if not selected or len(selected) != len(set(selected)):
@@ -1794,9 +1831,11 @@ def _run_phase(
             if row.get("phase") == "preflight"
             and int(row["attempt_id"]) in set(state["dispatched_attempt_ids"])
         ]
-        if len(prior) != 6:
+        if not 6 <= len(prior) or len(prior) + len(expected_reservations) > (
+            6 + RECOVERY_ATTEMPT_LIMIT
+        ):
             raise RuntimeError(
-                "explicit preflight recovery requires exactly six prior actual attempts"
+                "explicit preflight recovery exceeds approved exact-cell recovery budget"
             )
         prior_by_cell = {
             (
@@ -1886,6 +1925,8 @@ def _run_phase(
     completion = admit_gpus(
         reference_peak_vram_mib=float(reference["reference_peak_vram_mib"]),
         wait_seconds=0.0,
+        pinned_gpu_index=PINNED_GPU_INDEX,
+        allow_external_compute=ALLOW_EXTERNAL_GPU_COLOCATION,
     )
     completion["selected_gpu_indices"] = [int(item) for item in selected]
     completion["runner_exit_code"] = int(result)
@@ -1927,7 +1968,9 @@ def main() -> int:
                 admit_gpus(
                     reference_peak_vram_mib=float(
                         reference["reference_peak_vram_mib"]
-                    )
+                    ),
+                    pinned_gpu_index=PINNED_GPU_INDEX,
+                    allow_external_compute=ALLOW_EXTERNAL_GPU_COLOCATION,
                 ),
                 indent=2,
             )

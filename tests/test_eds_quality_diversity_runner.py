@@ -217,7 +217,7 @@ def test_runtime_cache_is_exclusive_copied_and_checksum_validated(tmp_path):
         runner.validate_runtime_cache(target=target, manifest_path=manifest)
 
 
-def test_attempt_ledger_is_append_only_and_enforces_shared_122_cap(tmp_path):
+def test_attempt_ledger_is_append_only_and_enforces_shared_124_cap(tmp_path):
     runner = _load_runner()
     ledger = tmp_path / "attempts.jsonl"
     records = [
@@ -261,9 +261,22 @@ def test_attempt_ledger_is_append_only_and_enforces_shared_122_cap(tmp_path):
             for index in range(6)
         ],
     )
+    runner.append_attempt_records(
+        ledger,
+        [
+            {
+                "phase": "retry",
+                "label": "job",
+                "task_id": 100 + index,
+                "episode_seed": 100 + index,
+                "config_fingerprint": "c" * 64,
+            }
+            for index in range(2)
+        ],
+    )
+    assert len(runner.read_attempt_ledger(ledger)) == 124
     before = ledger.read_bytes()
-    assert len(runner.read_attempt_ledger(ledger)) == 122
-    with pytest.raises(RuntimeError, match="122"):
+    with pytest.raises(RuntimeError, match="124"):
         runner.append_attempt_records(
             ledger,
             [
@@ -608,6 +621,22 @@ def test_recovery_phase_archives_before_reservation_and_dispatch(tmp_path, monke
             "attempt_ids": [row["attempt_id"] for row in prior],
         },
     )
+    prior_records = runner._attempt_records_for_jobs(jobs, "preflight")
+    interrupted = runner.append_attempt_records(
+        ledger,
+        [
+            {**prior_records[0], "recovery_of_attempt_id": 1},
+            {**prior_records[2], "recovery_of_attempt_id": 3},
+        ],
+    )
+    runner.append_ledger_event(
+        ledger,
+        {
+            "record_type": "phase_dispatch",
+            "phase": "preflight",
+            "attempt_ids": [row["attempt_id"] for row in interrupted],
+        },
+    )
     order = []
     original_append_attempts = runner.append_attempt_records
     original_append_event = runner.append_ledger_event
@@ -652,6 +681,12 @@ def test_recovery_phase_archives_before_reservation_and_dispatch(tmp_path, monke
     assert order == ["archive", "reserve", "dispatch", "run"]
     event = runner.read_attempt_ledger(ledger)[-1]
     assert event["recovery_archive"]["archive_manifest_sha256"] == "d" * 64
+    recovered = [
+        row
+        for row in runner.read_attempt_ledger(ledger)
+        if row.get("record_type") == "episode_attempt" and row["attempt_id"] >= 9
+    ]
+    assert [row["recovery_of_attempt_id"] for row in recovered] == [7, 2, 8, 4, 5, 6]
 
 
 def test_offline_mechanism_preflight_records_all_profiles_and_passes(tmp_path):
@@ -712,6 +747,57 @@ def test_gpu_admission_requires_two_clean_snapshots_and_headroom():
     assert result["excluded"]["8"]
 
 
+def test_gpu_admission_can_pin_gpu5_and_allow_authorized_colocation():
+    runner = _load_runner()
+    shared = _gpu(
+        5,
+        free=50000,
+        util=100,
+        processes=[{"pid": 99, "used_memory_mib": 888}],
+    )
+
+    result = runner.admit_gpus(
+        reference_peak_vram_mib=30000,
+        snapshot_fn=lambda: [_gpu(4), shared, _gpu(6)],
+        wait_fn=lambda _seconds: None,
+        wait_seconds=0,
+        pinned_gpu_index=5,
+        allow_external_compute=True,
+    )
+
+    assert result["eligible_gpu_indices"] == [5]
+    assert result["max_concurrency"] == 1
+    assert result["pinned_gpu_index"] == 5
+    assert result["external_compute_colocation_authorized"] is True
+    assert result["excluded"]["4"] == ["not user-pinned GPU 5"]
+    assert result["excluded"]["6"] == ["not user-pinned GPU 5"]
+
+
+def test_runtime_gpu_probe_only_admits_shared_gpu5_with_vram_headroom(monkeypatch):
+    runner = _load_runner()
+    monkeypatch.setattr(
+        runner,
+        "load_gpu_reference",
+        lambda: {"required_free_vram_mib": 22401.25},
+    )
+    monkeypatch.setattr(
+        runner,
+        "gpu_snapshot",
+        lambda: [
+            _gpu(4),
+            _gpu(
+                5,
+                free=50000,
+                util=100,
+                processes=[{"pid": 99, "used_memory_mib": 888}],
+            ),
+        ],
+    )
+
+    assert runner._gpu_probe("5") == ("idle", "admitted shared GPU 5")
+    assert runner._gpu_probe("4") == ("busy", "only user-pinned GPU 5 is allowed")
+
+
 def test_freeze_manifest_is_readonly_contains_provenance_and_is_immutable(
     tmp_path, monkeypatch
 ):
@@ -737,8 +823,10 @@ def test_freeze_manifest_is_readonly_contains_provenance_and_is_immutable(
 
     assert result["formal_episode_count"] == 110
     assert result["preflight_episode_count"] == 6
-    assert result["attempt_cap"] == 122
-    assert result["recovery_attempt_limit"] == 6
+    assert result["attempt_cap"] == 124
+    assert result["recovery_attempt_limit"] == 8
+    assert result["pinned_gpu_index"] == 5
+    assert result["external_compute_colocation_authorized"] is True
     assert result["provenance"] == provenance
     assert stat.S_IMODE(path.stat().st_mode) == 0o444
     existing = path.read_bytes()
