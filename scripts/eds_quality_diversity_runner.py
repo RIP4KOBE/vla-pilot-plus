@@ -49,9 +49,9 @@ MIN_FREE_BYTES = 50 * 1024**3
 ATTEMPT_CAP = 120
 EPISODE_SEEDS = [44, 235, 43, 546, 6, 621, 197, 87, 151, 548]
 SUPERSEDED_RUN_MANIFEST_PATH = (
-    EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v3.json"
+    EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v4.json"
 )
-RUN_MANIFEST_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v4.json"
+RUN_MANIFEST_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v5.json"
 ATTEMPT_LEDGER_PATH = EXPERIMENT_ROOT / "manifests/episode_attempt_ledger.jsonl"
 OFFLINE_PREFLIGHT_PATH = EXPERIMENT_ROOT / "analysis/offline_mechanism_preflight.json"
 LIBERO_PREFLIGHT_AUDIT_PATH = (
@@ -465,10 +465,15 @@ def attempt_ledger_state(
     attempt_ids = {int(row["attempt_id"]) for row in attempts}
     void_ids: set[int] = set()
     dispatched_ids: set[int] = set()
+    aborted_pre_episode_ids: set[int] = set()
     dispatch_events = 0
     for row in records:
         record_type = row.get("record_type")
-        if record_type not in {"reservation_void", "phase_dispatch"}:
+        if record_type not in {
+            "reservation_void",
+            "phase_dispatch",
+            "dispatch_aborted_pre_episode",
+        }:
             continue
         ids = row.get("attempt_ids")
         if (
@@ -481,23 +486,37 @@ def attempt_ledger_state(
             if set(ids) & dispatched_ids:
                 raise RuntimeError("a dispatched attempt reservation cannot be voided")
             void_ids.update(ids)
-        else:
+        elif record_type == "phase_dispatch":
             dispatch_events += 1
             if set(ids) & void_ids:
                 raise RuntimeError("a void reservation cannot be dispatched")
             if set(ids) & dispatched_ids:
                 raise RuntimeError("an attempt reservation cannot be dispatched twice")
             dispatched_ids.update(ids)
-    active = [row for row in attempts if int(row["attempt_id"]) not in void_ids]
+        else:
+            if not set(ids) <= (dispatched_ids - aborted_pre_episode_ids):
+                raise RuntimeError(
+                    "only dispatched, non-aborted attempts can be marked pre-episode aborted"
+                )
+            aborted_pre_episode_ids.update(ids)
+    active = [
+        row
+        for row in attempts
+        if int(row["attempt_id"])
+        not in (void_ids | aborted_pre_episode_ids)
+    ]
+    effective_dispatched_ids = dispatched_ids - aborted_pre_episode_ids
     return {
         "records": records,
         "attempts": attempts,
         "active_attempts": active,
         "void_attempt_ids": sorted(void_ids),
-        "dispatched_attempt_ids": sorted(dispatched_ids),
+        "dispatched_attempt_ids": sorted(effective_dispatched_ids),
+        "ever_dispatched_attempt_ids": sorted(dispatched_ids),
+        "aborted_pre_episode_attempt_ids": sorted(aborted_pre_episode_ids),
         "reserved_attempt_count": len(attempts),
         "active_reservation_count": len(active),
-        "dispatched_attempt_count": len(dispatched_ids),
+        "dispatched_attempt_count": len(effective_dispatched_ids),
         "dispatch_events": dispatch_events,
     }
 
@@ -505,7 +524,11 @@ def attempt_ledger_state(
 def append_ledger_event(
     path: Path, event: dict[str, object]
 ) -> dict[str, object]:
-    if event.get("record_type") not in {"reservation_void", "phase_dispatch"}:
+    if event.get("record_type") not in {
+        "reservation_void",
+        "phase_dispatch",
+        "dispatch_aborted_pre_episode",
+    }:
         raise ValueError("unsupported attempt ledger event")
     state = attempt_ledger_state(path)
     records = state["records"]
@@ -536,8 +559,16 @@ def append_ledger_event(
     if prepared["record_type"] == "phase_dispatch":
         if set(attempt_ids) & set(state["void_attempt_ids"]):
             raise RuntimeError("cannot dispatch a void reservation")
-        if set(attempt_ids) & set(state["dispatched_attempt_ids"]):
+        if set(attempt_ids) & set(state["ever_dispatched_attempt_ids"]):
             raise RuntimeError("attempt already dispatched")
+    if prepared["record_type"] == "dispatch_aborted_pre_episode":
+        eligible = set(state["ever_dispatched_attempt_ids"]) - set(
+            state["aborted_pre_episode_attempt_ids"]
+        )
+        if not set(attempt_ids) <= eligible:
+            raise RuntimeError(
+                "only dispatched attempts can be marked pre-episode aborted"
+            )
     with path.open("a", encoding="utf-8") as handle:
         handle.write(_canonical(prepared) + "\n")
         handle.flush()
@@ -1256,16 +1287,16 @@ def freeze_run_manifest(
         "gates_frozen_by_design": True,
     }
     if (
-        RUN_MANIFEST_PATH.name == "qd_ed_run_manifest.v4.json"
+        RUN_MANIFEST_PATH.name == "qd_ed_run_manifest.v5.json"
         and SUPERSEDED_RUN_MANIFEST_PATH.is_file()
     ):
         payload["supersedes"] = {
             "path": str(SUPERSEDED_RUN_MANIFEST_PATH),
             "sha256": _sha256_bytes(SUPERSEDED_RUN_MANIFEST_PATH.read_bytes()),
             "reason": (
-                "pre-dispatch audit hardening: exact allocation replay, "
-                "formal-readiness gate, contact sheets, and conservative "
-                "failure taxonomy"
+                "pre-episode infrastructure accounting: preserve dispatch "
+                "failures that occurred before episode initialization without "
+                "charging the actual episode-attempt cap"
             ),
             "algorithm_matrix_or_gate_change": False,
         }

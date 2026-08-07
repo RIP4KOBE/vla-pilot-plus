@@ -221,6 +221,21 @@ def test_attempt_reservations_require_append_only_dispatch_event(tmp_path):
         runner.reusable_phase_reservations(
             ledger, phase="preflight", expected=reservations
         )
+    runner.append_ledger_event(
+        ledger,
+        {
+            "record_type": "dispatch_aborted_pre_episode",
+            "phase": "preflight",
+            "attempt_ids": [1],
+            "reason": "model import failed before episode initialization",
+        },
+    )
+    state = runner.attempt_ledger_state(ledger)
+    assert state["dispatched_attempt_count"] == 0
+    assert state["aborted_pre_episode_attempt_ids"] == [1]
+    assert runner.reusable_phase_reservations(
+        ledger, phase="preflight", expected=reservations
+    ) == []
 
 
 def test_formal_readiness_requires_passed_offline_libero_and_six_dispatches(tmp_path):

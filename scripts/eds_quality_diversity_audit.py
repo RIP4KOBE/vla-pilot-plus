@@ -710,10 +710,15 @@ def audit_attempt_ledger(
     known_ids = {int(row["attempt_id"]) for row in attempts if isinstance(row.get("attempt_id"), int)}
     void_ids: set[int] = set()
     dispatched_ids: set[int] = set()
+    aborted_pre_episode_ids: set[int] = set()
     for event in events:
         event_type = event.get("record_type")
         event_attempt_ids = event.get("attempt_ids")
-        if event_type not in {"reservation_void", "phase_dispatch"}:
+        if event_type not in {
+            "reservation_void",
+            "phase_dispatch",
+            "dispatch_aborted_pre_episode",
+        }:
             failures.append(f"unknown attempt ledger event: {event_type}")
             continue
         if not isinstance(event_attempt_ids, list) or not set(event_attempt_ids) <= known_ids:
@@ -723,12 +728,30 @@ def audit_attempt_ledger(
             if set(event_attempt_ids) & dispatched_ids:
                 failures.append("dispatched reservations were voided")
             void_ids.update(int(value) for value in event_attempt_ids)
-        else:
+        elif event_type == "phase_dispatch":
             if set(event_attempt_ids) & (void_ids | dispatched_ids):
                 failures.append("void/dispatched reservation was dispatched again")
             dispatched_ids.update(int(value) for value in event_attempt_ids)
-    active = [row for row in attempts if int(row["attempt_id"]) not in void_ids]
-    dispatched = [row for row in active if int(row["attempt_id"]) in dispatched_ids]
+        else:
+            if not set(event_attempt_ids) <= (
+                dispatched_ids - aborted_pre_episode_ids
+            ):
+                failures.append("non-dispatched attempt marked pre-episode aborted")
+            aborted_pre_episode_ids.update(
+                int(value) for value in event_attempt_ids
+            )
+    active = [
+        row
+        for row in attempts
+        if int(row["attempt_id"])
+        not in (void_ids | aborted_pre_episode_ids)
+    ]
+    effective_dispatched_ids = dispatched_ids - aborted_pre_episode_ids
+    dispatched = [
+        row
+        for row in active
+        if int(row["attempt_id"]) in effective_dispatched_ids
+    ]
     if len(dispatched) > cap:
         failures.append(f"actual episode-attempt cap exceeded: {len(dispatched)} > {cap}")
     undispatched = sorted(
@@ -775,6 +798,7 @@ def audit_attempt_ledger(
         "actual_episode_attempt_count": len(dispatched),
         "reserved_attempt_count": len(attempts),
         "void_reservation_count": len(void_ids),
+        "aborted_pre_episode_count": len(aborted_pre_episode_ids),
         "raw_ledger_record_count": len(records),
         "formal_unique_cells": len(actual_formal),
         "preflight_unique_cells": len(actual_preflight),
