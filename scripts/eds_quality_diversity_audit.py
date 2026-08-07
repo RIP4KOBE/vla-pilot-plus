@@ -926,6 +926,15 @@ def _classify_failures(
     return result
 
 
+def _execution_error_episode_count(
+    telemetry: dict[str, int], classifications: dict[int, str]
+) -> int:
+    return max(
+        int(telemetry.get("execution_qpos_error_episodes", 0)),
+        sum(value == "qpos/execution error" for value in classifications.values()),
+    )
+
+
 def _qualitative_failures(output_dir: Path, episodes: int, *, qd: bool) -> list[str]:
     failures = []
     for episode in range(episodes):
@@ -1187,12 +1196,11 @@ def audit_job(
         "failure_taxonomy": {str(job["task_ids_filter"][episode]): category for episode, category in sorted(classifications.items())},
         "failure_taxonomy_counts": dict(Counter(classifications.values())),
         "error_evidence": error_evidence,
-        "execution_qpos_error_episodes": max(
-            telemetry["execution_qpos_error_episodes"],
-            sum(value == "qpos/execution error" for value in classifications.values()),
-        ),
         "collision_push_drop_wrong_object": collision_count,
         **telemetry,
+        "execution_qpos_error_episodes": _execution_error_episode_count(
+            telemetry, classifications
+        ),
         "metrics_record_count": len(metrics),
         "stage_event_count": len(stages),
         "video_count": len(videos),

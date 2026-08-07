@@ -388,6 +388,13 @@ def test_failure_taxonomy_uses_episode_error_traceback_as_execution_evidence(
     assert result == {4: "qpos/execution error"}
 
 
+def test_execution_error_count_includes_failure_taxonomy_evidence():
+    assert audit._execution_error_episode_count(
+        {"execution_qpos_error_episodes": 0},
+        {4: "qpos/execution error", 5: "timeout without completion"},
+    ) == 1
+
+
 def test_audit_attempt_ledger_requires_cap_and_unique_formal_cells(tmp_path: Path):
     path = tmp_path / "ledger.jsonl"
     rows = []
