@@ -148,6 +148,16 @@ def test_ranking_uses_all_ten_frozen_keys():
     assert [row["rank"] for row in ranked] == [1, 2, 3]
 
 
+def test_ranking_excludes_invalid_candidates():
+    ranked = audit.rank_candidates(
+        [
+            {"label": "invalid", "valid": False, "success_count": 10},
+            {"label": "valid", "valid": True, "success_count": 1},
+        ]
+    )
+    assert [row["label"] for row in ranked] == ["valid"]
+
+
 def test_decision_manifest_is_exclusive_readonly_and_has_sidecar(tmp_path: Path):
     path = tmp_path / "decision.json"
     frozen = audit.freeze_decision_manifest({"decision": "keep_control"}, path)
@@ -166,6 +176,31 @@ def test_manifest_rejects_credentials(tmp_path: Path):
             {"value": "authorization: bearer forbidden"},
             tmp_path / "decision.json",
         )
+
+
+def test_audit_reuses_frozen_dispatch_identity(tmp_path: Path, monkeypatch):
+    output_dir = tmp_path / "job"
+    output_dir.mkdir()
+    frozen_record = {
+        "git_revision": "a" * 40,
+        "code_state_sha256": "b" * 64,
+    }
+    (output_dir / "job_manifest.json").write_text(
+        json.dumps(
+            {
+                "execution_record": frozen_record,
+                "config_fingerprint": "c" * 64,
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(audit.runner.base, "_output_dir", lambda job: output_dir)
+    job = {"label": "candidate", "execution_record": {"current": True}}
+
+    audit._bind_frozen_job_identity_for_audit(job)
+
+    assert job["execution_record"] == frozen_record
+    assert job["config_fingerprint"] == "c" * 64
 
 
 def test_qd_metric_hard_gate_checks_accounting_and_allocations():

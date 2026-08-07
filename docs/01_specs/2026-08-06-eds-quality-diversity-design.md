@@ -4,6 +4,8 @@
 
 状态：`Approved for execution`
 
+执行修订（`2026-08-07`）：用户明确授权把本文所有设置视为可为完成任务而放宽的软设置。为保留 6 个已审计的 shared2 guidance-cache 基础设施失败 attempts，并原样重跑固定的 `3 profiles × 2 tasks` mechanism preflight，本次仅将 same-config recovery slots 从 `4` 放宽为 `6`、全阶段 actual episode-attempt cap 从 `120` 放宽为 `122`。该修订覆盖下文仍保留的原始 `4/120` 预注册文本；不改变 QD 算法、11-job 矩阵、tasks/seeds、配置、gates、ranking、GPU admission、validity 或 storage 规则，也不授权新增配置或 outcome。
+
 ## 1. 摘要
 
 本阶段以 `p2_stage_on_abs_rbf_control` 为唯一算法基线，把当前 EDS 每轮基于 reward softmax 的有放回 parent resampling，替换为一个可落地、config-controlled 的 Quality-Diversity archive。QD-ED 在每个 `select_action` chunk 内按低维 behavior descriptor（BD）划分 cell，在每个 cell 中持续保留 reward 最高的 action elite，并从已占用 cells 均匀或稀疏优先地产生下一轮 offspring。最终仍只执行 archive 中 reward 最高的单个 action。

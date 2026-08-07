@@ -84,6 +84,59 @@ def test_preflight_matrix_is_exact_three_profiles_two_registered_tasks():
     assert sum(int(job["episodes"]) for job in jobs) == 6
 
 
+def test_normalized_command_overrides_accepts_only_identical_duplicates(
+    monkeypatch, tmp_path
+):
+    runner = _load_runner()
+    monkeypatch.setattr(
+        runner.base,
+        "build_main_command",
+        lambda *args, **kwargs: [
+            "python",
+            "main.py",
+            "main.eds_mechanism_pretest.enabled=true",
+            "main.eds_mechanism_pretest.enabled=true",
+        ],
+    )
+    assert runner.base._p2_normalized_command_overrides(
+        {}, allow_identical_duplicates=True
+    ) == {
+        "main.eds_mechanism_pretest.enabled": True
+    }
+
+    monkeypatch.setattr(
+        runner.base,
+        "build_main_command",
+        lambda *args, **kwargs: [
+            "python",
+            "main.py",
+            "main.eds_mechanism_pretest.enabled=true",
+            "main.eds_mechanism_pretest.enabled=false",
+        ],
+    )
+    with pytest.raises(ValueError, match="conflicting duplicate override"):
+        runner.base._p2_normalized_command_overrides({})
+
+    overrides = tmp_path / "overrides.yaml"
+    overrides.write_text(
+        "- main.eds_mechanism_pretest.enabled=true\n"
+        "- main.eds_mechanism_pretest.enabled=true\n",
+        encoding="utf-8",
+    )
+    assert runner.base._parse_p2_overrides_file(
+        overrides, allow_identical_duplicates=True
+    ) == {
+        "main.eds_mechanism_pretest.enabled": True
+    }
+    overrides.write_text(
+        "- main.eds_mechanism_pretest.enabled=true\n"
+        "- main.eds_mechanism_pretest.enabled=false\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="conflicting override"):
+        runner.base._parse_p2_overrides_file(overrides)
+
+
 def test_main_command_contains_all_frozen_qd_fields_and_no_credential(monkeypatch):
     runner = _load_runner()
     monkeypatch.setenv("OPENAI_API_KEY", "REDACTED")
@@ -134,7 +187,37 @@ def test_storage_preflight_requires_entire_outputs_absolute_symlink(tmp_path, mo
         runner.storage_preflight()
 
 
-def test_attempt_ledger_is_append_only_and_enforces_shared_120_cap(tmp_path):
+def test_runtime_cache_is_exclusive_copied_and_checksum_validated(tmp_path):
+    runner = _load_runner()
+    source = tmp_path / "source"
+    source.mkdir()
+    for index, name in enumerate(runner.RUNTIME_CACHE_REQUIRED_FILES):
+        (source / name).write_bytes(f"artifact-{index}".encode())
+    target = tmp_path / "shared2" / "runtime_cache" / "cached_functions"
+    manifest = target.parent / "cached_functions.provenance.json"
+
+    prepared = runner.prepare_runtime_cache(
+        source=source,
+        target=target,
+        manifest_path=manifest,
+    )
+
+    assert prepared["target_realpath"] == str(target.resolve())
+    assert runner.validate_runtime_cache(
+        target=target, manifest_path=manifest
+    )["files"] == prepared["files"]
+    with pytest.raises(FileExistsError):
+        runner.prepare_runtime_cache(
+            source=source,
+            target=target,
+            manifest_path=manifest,
+        )
+    (target / runner.RUNTIME_CACHE_REQUIRED_FILES[0]).write_text("tampered")
+    with pytest.raises(RuntimeError, match="checksum mismatch"):
+        runner.validate_runtime_cache(target=target, manifest_path=manifest)
+
+
+def test_attempt_ledger_is_append_only_and_enforces_shared_122_cap(tmp_path):
     runner = _load_runner()
     ledger = tmp_path / "attempts.jsonl"
     records = [
@@ -162,11 +245,25 @@ def test_attempt_ledger_is_append_only_and_enforces_shared_120_cap(tmp_path):
         ],
     )
 
-    before = ledger.read_bytes()
     parsed = runner.read_attempt_ledger(ledger)
     assert len(parsed) == 116
     assert [row["attempt_id"] for row in parsed] == list(range(1, 117))
-    with pytest.raises(RuntimeError, match="120"):
+    runner.append_attempt_records(
+        ledger,
+        [
+            {
+                "phase": "retry",
+                "label": "job",
+                "task_id": index,
+                "episode_seed": index,
+                "config_fingerprint": "b" * 64,
+            }
+            for index in range(6)
+        ],
+    )
+    before = ledger.read_bytes()
+    assert len(runner.read_attempt_ledger(ledger)) == 122
+    with pytest.raises(RuntimeError, match="122"):
         runner.append_attempt_records(
             ledger,
             [
@@ -177,7 +274,7 @@ def test_attempt_ledger_is_append_only_and_enforces_shared_120_cap(tmp_path):
                     "episode_seed": index,
                     "config_fingerprint": "b" * 64,
                 }
-                for index in range(5)
+                for index in range(1)
             ],
         )
     assert ledger.read_bytes() == before
@@ -257,6 +354,8 @@ def test_formal_readiness_requires_passed_offline_libero_and_six_dispatches(tmp_
                 "jobs": [
                     {
                         "formal_label": label,
+                        "config_fingerprint": label,
+                        "code_state_sha256": "c" * 64,
                         "valid": True,
                         "mechanism_hard": {"passed": True},
                         "task_outcomes": {"0": "fail", "8": "fail"},
@@ -277,10 +376,11 @@ def test_formal_readiness_requires_passed_offline_libero_and_six_dispatches(tmp_
                     "task_id": task,
                     "episode_seed": seed,
                     "config_fingerprint": label,
+                    "code_state_sha256": "c" * 64,
                 }
             )
     created = runner.append_attempt_records(ledger, reservations)
-    with pytest.raises(RuntimeError, match="six dispatched"):
+    with pytest.raises(RuntimeError, match="six preflight attempts"):
         runner.validate_formal_readiness(
             offline_path=offline,
             preflight_audit_path=preflight,
@@ -300,6 +400,35 @@ def test_formal_readiness_requires_passed_offline_libero_and_six_dispatches(tmp_
         ledger_path=ledger,
     )
     assert result["passed"] is True
+    retry_reservations = [
+        {
+            **record,
+            "config_fingerprint": f"{record['formal_label']}-retry",
+            "code_state_sha256": "d" * 64,
+        }
+        for record in reservations
+    ]
+    retried = runner.append_attempt_records(ledger, retry_reservations)
+    runner.append_ledger_event(
+        ledger,
+        {
+            "record_type": "phase_dispatch",
+            "phase": "preflight",
+            "attempt_ids": [row["attempt_id"] for row in retried],
+        },
+    )
+    payload = json.loads(preflight.read_text())
+    for job in payload["jobs"]:
+        job["config_fingerprint"] = f"{job['formal_label']}-retry"
+        job["code_state_sha256"] = "d" * 64
+    preflight.write_text(json.dumps(payload))
+    result = runner.validate_formal_readiness(
+        offline_path=offline,
+        preflight_audit_path=preflight,
+        ledger_path=ledger,
+    )
+    assert result["dispatched_preflight_attempts"] == 12
+    assert result["accepted_latest_preflight_attempt_ids"] == list(range(7, 13))
     preflight.write_text(json.dumps({"passed": False}))
     with pytest.raises(RuntimeError, match="preflight audit did not pass"):
         runner.validate_formal_readiness(
@@ -392,7 +521,8 @@ def test_freeze_manifest_is_readonly_contains_provenance_and_is_immutable(
 
     assert result["formal_episode_count"] == 110
     assert result["preflight_episode_count"] == 6
-    assert result["attempt_cap"] == 120
+    assert result["attempt_cap"] == 122
+    assert result["recovery_attempt_limit"] == 6
     assert result["provenance"] == provenance
     assert stat.S_IMODE(path.stat().st_mode) == 0o444
     existing = path.read_bytes()

@@ -12,6 +12,7 @@ import shutil
 import subprocess
 import sys
 import time
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
@@ -46,16 +47,33 @@ OUTPUT_LINK = WORKTREE_ROOT / "outputs"
 OUTPUT_TARGET = EXPERIMENT_ROOT / "outputs"
 ALLOWED_STORAGE_PREFIX = Path("/mnt/data/shared2/zhuoli/vla-pilot-plus-plus")
 MIN_FREE_BYTES = 50 * 1024**3
-ATTEMPT_CAP = 120
+RECOVERY_ATTEMPT_LIMIT = 6
+ATTEMPT_CAP = 122
 EPISODE_SEEDS = [44, 235, 43, 546, 6, 621, 197, 87, 151, 548]
 SUPERSEDED_RUN_MANIFEST_PATH = (
-    EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v4.json"
+    EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v5.json"
 )
-RUN_MANIFEST_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v5.json"
+RUN_MANIFEST_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v6.json"
 ATTEMPT_LEDGER_PATH = EXPERIMENT_ROOT / "manifests/episode_attempt_ledger.jsonl"
 OFFLINE_PREFLIGHT_PATH = EXPERIMENT_ROOT / "analysis/offline_mechanism_preflight.json"
 LIBERO_PREFLIGHT_AUDIT_PATH = (
     EXPERIMENT_ROOT / "analysis/libero_mechanism_preflight_audit.json"
+)
+RUNTIME_CACHE_SOURCE = Path(
+    "/home/hynx/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/"
+    "episode_1/vlm_agent"
+)
+RUNTIME_CACHE_DIR = EXPERIMENT_ROOT / "runtime_cache/cached_functions"
+RUNTIME_CACHE_MANIFEST_PATH = (
+    EXPERIMENT_ROOT / "runtime_cache/cached_functions.provenance.json"
+)
+RUNTIME_CACHE_REQUIRED_FILES = (
+    "metadata.json",
+    "output_raw.txt",
+    "prompt.txt",
+    "query_img.png",
+    "stage1_guidance.txt",
+    "stage2_guidance.txt",
 )
 GPU_REFERENCE_PATH = Path(
     "/mnt/data/shared2/zhuoli/output/p2_direction_normalized_rbf/"
@@ -256,15 +274,16 @@ def formal_profiles() -> list[dict[str, object]]:
 
 
 def _bind_job(job: dict[str, object]) -> dict[str, object]:
-    return base._bind_p2_execution_context(
-        job,
-        real_root=OUTPUT_TARGET,
-        cached_functions_dir=str(EXPERIMENT_ROOT / "runtime_cache/cached_functions"),
-        offline_vlm=False,
-        storage_enforced=True,
-        git_revision=base._git_head_revision(),
-        code_state_sha256=base._p2_code_state_sha256(),
-    )
+    with configured_base():
+        return base._bind_p2_execution_context(
+            job,
+            real_root=OUTPUT_TARGET,
+            cached_functions_dir=str(RUNTIME_CACHE_DIR),
+            offline_vlm=False,
+            storage_enforced=True,
+            git_revision=base._git_head_revision(),
+            code_state_sha256=base._p2_code_state_sha256(),
+        )
 
 
 def build_jobs(level: str, episodes: int, **_kwargs) -> list[dict[str, object]]:
@@ -325,12 +344,8 @@ def build_preflight_jobs() -> list[dict[str, object]]:
     return jobs
 
 
-_BASE_BUILD_MAIN_COMMAND = getattr(
-    base, "_qd_original_build_main_command", base.build_main_command
-)
-base._qd_original_build_main_command = _BASE_BUILD_MAIN_COMMAND
-_BASE_STAGE_DIR = getattr(base, "_qd_original_stage_dir", base._p2_stage_dir)
-base._qd_original_stage_dir = _BASE_STAGE_DIR
+_BASE_BUILD_MAIN_COMMAND = base.build_main_command
+_BASE_STAGE_DIR = base._p2_stage_dir
 
 
 def _hydra_value(value: object) -> str:
@@ -344,7 +359,8 @@ def _hydra_value(value: object) -> str:
 
 
 def _build_main_command(job, *args, **kwargs):
-    command = _BASE_BUILD_MAIN_COMMAND(job, *args, **kwargs)
+    with configured_base():
+        command = _BASE_BUILD_MAIN_COMMAND(job, *args, **kwargs)
     command.append(
         "main.episode_seed_schedule=" + _hydra_value(job["episode_seeds"])
     )
@@ -418,6 +434,81 @@ def storage_preflight() -> dict[str, object]:
         "outputs_target": str(target),
         "free_bytes": int(free),
     }
+
+
+def _runtime_cache_hashes(path: Path) -> dict[str, str]:
+    missing = [name for name in RUNTIME_CACHE_REQUIRED_FILES if not (path / name).is_file()]
+    if missing:
+        raise RuntimeError("runtime guidance cache missing: " + ",".join(missing))
+    return {
+        name: _sha256_bytes((path / name).read_bytes())
+        for name in RUNTIME_CACHE_REQUIRED_FILES
+    }
+
+
+def prepare_runtime_cache(
+    *,
+    source: Path = RUNTIME_CACHE_SOURCE,
+    target: Path = RUNTIME_CACHE_DIR,
+    manifest_path: Path = RUNTIME_CACHE_MANIFEST_PATH,
+) -> dict[str, object]:
+    source = Path(source).resolve(strict=True)
+    target = Path(target)
+    manifest_path = Path(manifest_path)
+    source_hashes = _runtime_cache_hashes(source)
+    if target.exists() or target.is_symlink() or manifest_path.exists() or manifest_path.is_symlink():
+        raise FileExistsError("runtime cache target/provenance already exists")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    staging = target.parent / f".{target.name}.staging-{os.getpid()}"
+    if staging.exists() or staging.is_symlink():
+        raise FileExistsError(staging)
+    staging.mkdir()
+    try:
+        for name in RUNTIME_CACHE_REQUIRED_FILES:
+            shutil.copy2(source / name, staging / name)
+        if _runtime_cache_hashes(staging) != source_hashes:
+            raise RuntimeError("runtime guidance cache copy checksum mismatch")
+        staging.replace(target)
+    except Exception:
+        if staging.is_dir():
+            shutil.rmtree(staging)
+        raise
+    payload = {
+        "schema": "eds-quality-diversity-runtime-cache-v1",
+        "created_at": _now(),
+        "source_realpath": str(source),
+        "target_realpath": str(target.resolve(strict=True)),
+        "files": source_hashes,
+    }
+    if _contains_credential(payload):
+        raise RuntimeError("runtime cache provenance contains credential material")
+    with manifest_path.open("x", encoding="utf-8") as handle:
+        handle.write(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    return payload
+
+
+def validate_runtime_cache(
+    *,
+    target: Path = RUNTIME_CACHE_DIR,
+    manifest_path: Path = RUNTIME_CACHE_MANIFEST_PATH,
+) -> dict[str, object]:
+    target = Path(target)
+    manifest_path = Path(manifest_path)
+    if not target.is_dir() or target.is_symlink():
+        raise RuntimeError("shared2 runtime guidance cache is not prepared")
+    try:
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, ValueError) as exc:
+        raise RuntimeError("runtime cache provenance is missing or invalid") from exc
+    if not isinstance(payload, dict) or payload.get("schema") != "eds-quality-diversity-runtime-cache-v1":
+        raise RuntimeError("runtime cache provenance schema mismatch")
+    if payload.get("target_realpath") != str(target.resolve(strict=True)):
+        raise RuntimeError("runtime cache provenance target mismatch")
+    if payload.get("files") != _runtime_cache_hashes(target):
+        raise RuntimeError("runtime cache provenance checksum mismatch")
+    return payload
 
 
 def read_attempt_ledger(path: Path = ATTEMPT_LEDGER_PATH) -> list[dict[str, object]]:
@@ -585,7 +676,9 @@ def append_attempt_records(
     state = attempt_ledger_state(path)
     existing_attempts = state["attempts"]
     if int(state["active_reservation_count"]) + len(records) > ATTEMPT_CAP:
-        raise RuntimeError("episode-attempt hard cap 120 would be exceeded")
+        raise RuntimeError(
+            f"episode-attempt hard cap {ATTEMPT_CAP} would be exceeded"
+        )
     prepared = []
     for offset, raw in enumerate(records, start=1):
         required = {
@@ -700,16 +793,19 @@ def validate_formal_readiness(
         if row.get("phase") == "preflight"
         and int(row["attempt_id"]) in set(state["dispatched_attempt_ids"])
     ]
-    if len(dispatched_preflight) != 6:
-        raise RuntimeError("formal readiness requires six dispatched preflight attempts")
-    identities = {
-        (
+    if not 6 <= len(dispatched_preflight) <= 6 + RECOVERY_ATTEMPT_LIMIT:
+        raise RuntimeError(
+            "formal readiness requires six preflight attempts plus only approved recoveries"
+        )
+    latest_by_identity: dict[tuple[str, int, int], dict[str, object]] = {}
+    for row in dispatched_preflight:
+        identity = (
             str(row.get("formal_label")),
             int(row.get("task_id")),
             int(row.get("episode_seed")),
         )
-        for row in dispatched_preflight
-    }
+        latest_by_identity[identity] = row
+    identities = set(latest_by_identity)
     expected_identities = {
         (label, task, EPISODE_SEEDS[task])
         for label in expected_labels
@@ -717,13 +813,31 @@ def validate_formal_readiness(
     }
     if identities != expected_identities:
         raise RuntimeError("dispatched preflight attempts do not match frozen identities")
+    audited_fingerprints = {
+        str(job.get("formal_label")): (
+            job.get("config_fingerprint"),
+            job.get("code_state_sha256"),
+        )
+        for job in jobs
+    }
+    for identity, row in latest_by_identity.items():
+        if (
+            row.get("config_fingerprint"),
+            row.get("code_state_sha256"),
+        ) != audited_fingerprints[identity[0]]:
+            raise RuntimeError(
+                "latest preflight recovery identity does not match audited artifacts"
+            )
     return {
         "passed": True,
         "offline_sha256": _sha256_bytes(Path(offline_path).read_bytes()),
         "libero_preflight_audit_sha256": _sha256_bytes(
             Path(preflight_audit_path).read_bytes()
         ),
-        "dispatched_preflight_attempts": 6,
+        "dispatched_preflight_attempts": len(dispatched_preflight),
+        "accepted_latest_preflight_attempt_ids": sorted(
+            int(row["attempt_id"]) for row in latest_by_identity.values()
+        ),
     }
 
 
@@ -1270,8 +1384,8 @@ def freeze_run_manifest(
         "formal_job_count": 11,
         "formal_episode_count": 110,
         "preflight_episode_count": 6,
-        "recovery_attempt_limit": 4,
-        "attempt_cap": 120,
+        "recovery_attempt_limit": RECOVERY_ATTEMPT_LIMIT,
+        "attempt_cap": ATTEMPT_CAP,
         "ranking_order": [
             "success_count_desc",
             "control_task_retention_desc",
@@ -1287,18 +1401,20 @@ def freeze_run_manifest(
         "gates_frozen_by_design": True,
     }
     if (
-        RUN_MANIFEST_PATH.name == "qd_ed_run_manifest.v5.json"
+        RUN_MANIFEST_PATH.name == "qd_ed_run_manifest.v6.json"
         and SUPERSEDED_RUN_MANIFEST_PATH.is_file()
     ):
         payload["supersedes"] = {
             "path": str(SUPERSEDED_RUN_MANIFEST_PATH),
             "sha256": _sha256_bytes(SUPERSEDED_RUN_MANIFEST_PATH.read_bytes()),
             "reason": (
-                "pre-episode infrastructure accounting: preserve dispatch "
-                "failures that occurred before episode initialization without "
-                "charging the actual episode-attempt cap"
+                "user-authorized execution amendment after audited preflight "
+                "infrastructure failure: recovery limit 4->6 and attempt cap "
+                "120->122 so the exact six-episode preflight can be repeated "
+                "without changing algorithms, matrix, tasks, seeds, or gates"
             ),
             "algorithm_matrix_or_gate_change": False,
+            "attempt_policy_change": True,
         }
     payload["manifest_payload_sha256"] = _sha256_bytes(
         _canonical(payload).encode("utf-8")
@@ -1384,7 +1500,30 @@ def configure_base() -> None:
     base._p2_gpu_probe = _gpu_probe
 
 
-configure_base()
+@contextmanager
+def configured_base():
+    names = (
+        "P2_OUTPUT_ROOT",
+        "P2_STATUS_ROOT",
+        "P2_EXPECTED_OUTPUT_TARGET",
+        "P2_ALLOWED_OUTPUT_PREFIX",
+        "P2_MIN_FREE_BYTES",
+        "P2_LEVELS",
+        "P2_ALLOWED_GPUS",
+        "P2_REQUIRED_MOUNT",
+        "P2_TORCH_HUB_SEED",
+        "build_jobs",
+        "build_main_command",
+        "_p2_stage_dir",
+        "_p2_gpu_probe",
+    )
+    saved = {name: getattr(base, name) for name in names}
+    configure_base()
+    try:
+        yield
+    finally:
+        for name, value in saved.items():
+            setattr(base, name, value)
 
 
 def _write_gpu_admission(phase: str, payload: dict[str, object]) -> Path:
@@ -1396,15 +1535,22 @@ def _write_gpu_admission(phase: str, payload: dict[str, object]) -> Path:
 
 
 def _run_phase(
-    *, phase: str, requested_gpus: str, timeout_seconds: int
+    *,
+    phase: str,
+    requested_gpus: str,
+    timeout_seconds: int,
+    recovery: bool = False,
 ) -> int:
     if phase not in {"preflight", "formal"}:
         raise ValueError("phase must be preflight or formal")
+    if recovery and phase != "preflight":
+        raise ValueError("only LIBERO preflight supports explicit recovery")
     if not RUN_MANIFEST_PATH.is_file() or (RUN_MANIFEST_PATH.stat().st_mode & 0o222):
         raise RuntimeError("immutable run manifest must exist before LIBERO attempts")
     if phase == "formal":
         validate_formal_readiness()
     storage_preflight()
+    validate_runtime_cache()
     validate_runtime_credential()
     if not base._poe_healthcheck():
         raise RuntimeError("Poe Gemini health check failed before attempt dispatch")
@@ -1429,33 +1575,64 @@ def _run_phase(
     episodes = 2 if phase == "preflight" else 10
     jobs = build_jobs(level, episodes)
     expected_reservations = _attempt_records_for_jobs(jobs, phase)
-    try:
-        attempt_ids = reusable_phase_reservations(
-            ATTEMPT_LEDGER_PATH,
-            phase=phase,
-            expected=expected_reservations,
-        )
-    except RuntimeError as exc:
-        if "already dispatched" in str(exc):
-            raise
+    if recovery:
         state = attempt_ledger_state(ATTEMPT_LEDGER_PATH)
-        stale_ids = [
-            int(row["attempt_id"])
+        prior = [
+            row
             for row in state["active_attempts"]
-            if row.get("phase") == phase
+            if row.get("phase") == "preflight"
+            and int(row["attempt_id"]) in set(state["dispatched_attempt_ids"])
         ]
-        if not stale_ids:
-            raise
-        append_ledger_event(
-            ATTEMPT_LEDGER_PATH,
-            {
-                "record_type": "reservation_void",
-                "phase": phase,
-                "attempt_ids": stale_ids,
-                "reason": "pre-dispatch code/config reservation superseded",
-            },
-        )
+        if len(prior) != 6:
+            raise RuntimeError(
+                "explicit preflight recovery requires exactly six prior actual attempts"
+            )
+        prior_by_cell = {
+            (
+                str(row.get("formal_label")),
+                int(row.get("task_id")),
+                int(row.get("episode_seed")),
+            ): int(row["attempt_id"])
+            for row in prior
+        }
+        for record in expected_reservations:
+            cell = (
+                str(record.get("formal_label")),
+                int(record["task_id"]),
+                int(record["episode_seed"]),
+            )
+            if cell not in prior_by_cell:
+                raise RuntimeError("preflight recovery cell mismatch")
+            record["recovery_of_attempt_id"] = prior_by_cell[cell]
         attempt_ids = []
+    else:
+        try:
+            attempt_ids = reusable_phase_reservations(
+                ATTEMPT_LEDGER_PATH,
+                phase=phase,
+                expected=expected_reservations,
+            )
+        except RuntimeError as exc:
+            if "already dispatched" in str(exc):
+                raise
+            state = attempt_ledger_state(ATTEMPT_LEDGER_PATH)
+            stale_ids = [
+                int(row["attempt_id"])
+                for row in state["active_attempts"]
+                if row.get("phase") == phase
+            ]
+            if not stale_ids:
+                raise
+            append_ledger_event(
+                ATTEMPT_LEDGER_PATH,
+                {
+                    "record_type": "reservation_void",
+                    "phase": phase,
+                    "attempt_ids": stale_ids,
+                    "reason": "pre-dispatch code/config reservation superseded",
+                },
+            )
+            attempt_ids = []
     if not attempt_ids:
         reservations = append_attempt_records(
             ATTEMPT_LEDGER_PATH,
@@ -1471,21 +1648,22 @@ def _run_phase(
             "selected_gpu_indices": [int(item) for item in selected],
         },
     )
-    original_healthcheck = base._poe_healthcheck
-    base._poe_healthcheck = lambda: True
-    try:
-        result = base.run_level(
-            level,
-            episodes,
-            ",".join(selected),
-            timeout_seconds,
-            resume=False,
-            cached_functions_dir=str(EXPERIMENT_ROOT / "runtime_cache/cached_functions"),
-            offline_vlm=False,
-            gpu_poll_interval_s=30.0,
-        )
-    finally:
-        base._poe_healthcheck = original_healthcheck
+    with configured_base():
+        original_healthcheck = base._poe_healthcheck
+        base._poe_healthcheck = lambda: True
+        try:
+            result = base.run_level(
+                level,
+                episodes,
+                ",".join(selected),
+                timeout_seconds,
+                resume=False,
+                cached_functions_dir=str(RUNTIME_CACHE_DIR),
+                offline_vlm=False,
+                gpu_poll_interval_s=30.0,
+            )
+        finally:
+            base._poe_healthcheck = original_healthcheck
     completion = admit_gpus(
         reference_peak_vram_mib=float(reference["reference_peak_vram_mib"]),
         wait_seconds=0.0,
@@ -1500,17 +1678,21 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("storage-preflight")
+    subparsers.add_parser("prepare-runtime-cache")
     subparsers.add_parser("offline-mechanism-preflight")
     subparsers.add_parser("matrix")
     subparsers.add_parser("gpu-admission")
     subparsers.add_parser("freeze-manifest")
-    for name in ("run-libero-preflight", "run-formal"):
+    for name in ("run-libero-preflight", "retry-libero-preflight", "run-formal"):
         run = subparsers.add_parser(name)
         run.add_argument("--gpus", default="auto")
         run.add_argument("--timeout-seconds", type=int, default=28800)
     args = parser.parse_args()
     if args.command == "storage-preflight":
         print(json.dumps(storage_preflight(), indent=2))
+        return 0
+    if args.command == "prepare-runtime-cache":
+        print(json.dumps(prepare_runtime_cache(), indent=2))
         return 0
     if args.command == "offline-mechanism-preflight":
         result = offline_mechanism_preflight()
@@ -1545,6 +1727,13 @@ def main() -> int:
             phase="preflight",
             requested_gpus=args.gpus,
             timeout_seconds=args.timeout_seconds,
+        )
+    if args.command == "retry-libero-preflight":
+        return _run_phase(
+            phase="preflight",
+            requested_gpus=args.gpus,
+            timeout_seconds=args.timeout_seconds,
+            recovery=True,
         )
     return _run_phase(
         phase="formal",

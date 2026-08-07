@@ -670,7 +670,7 @@ def rank_candidates(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
         return parsed if parsed is not None else math.inf
 
     ordered = sorted(
-        candidates,
+        (row for row in candidates if row.get("valid") is True),
         key=lambda row: (
             desc(row.get("success_count")),
             desc(row.get("control_task_retention")),
@@ -693,6 +693,7 @@ def audit_attempt_ledger(
     expected_formal: set[tuple[str, int, int]],
     expected_preflight: set[tuple[str, int, int]],
     cap: int,
+    recovery_limit: int = runner.RECOVERY_ATTEMPT_LIMIT,
 ) -> dict[str, object]:
     records, failures = _read_jsonl(path)
     attempts = [
@@ -782,16 +783,17 @@ def audit_attempt_ledger(
     identities = [
         (
             row.get("phase"),
-            row.get("label"),
+            row.get("formal_label", row.get("label")),
             row.get("task_id"),
             row.get("episode_seed"),
-            row.get("config_fingerprint"),
         )
         for row in dispatched
     ]
     retries = len(identities) - len(set(identities))
-    if retries > 4:
-        failures.append(f"recovery attempts exceed 4: {retries}")
+    if retries > recovery_limit:
+        failures.append(
+            f"recovery attempts exceed {recovery_limit}: {retries}"
+        )
     return {
         "passed": not failures,
         "attempt_count": len(dispatched),
@@ -979,15 +981,40 @@ def _metric_summary(metrics: list[dict[str, Any]], stages: list[dict[str, Any]])
     }
 
 
+def _bind_frozen_job_identity_for_audit(job: dict[str, object]) -> None:
+    """Use the dispatch identity while revalidating current matrix semantics."""
+    manifest_path = runner.base._output_dir(job) / "job_manifest.json"
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, ValueError, RecursionError):
+        return
+    if not isinstance(manifest, dict):
+        return
+    execution_record = manifest.get("execution_record")
+    config_fingerprint = manifest.get("config_fingerprint")
+    if not isinstance(execution_record, dict) or not isinstance(
+        config_fingerprint, str
+    ):
+        return
+    job["execution_record"] = execution_record
+    job["config_fingerprint"] = config_fingerprint
+
+
 def audit_job(
     job: dict[str, object],
     *,
     credential_passed: bool,
     base_validity_fn: Callable[[dict[str, object]], dict[str, object]] | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
-    output_dir = runner.base._output_dir(job)
-    validity_fn = base_validity_fn or runner.base._p2_job_validity
-    base_validity = validity_fn(job)
+    with runner.configured_base():
+        output_dir = runner.base._output_dir(job)
+        _bind_frozen_job_identity_for_audit(job)
+        if base_validity_fn is None:
+            base_validity = runner.base._p2_job_validity(
+                job, allow_identical_overrides=True
+            )
+        else:
+            base_validity = base_validity_fn(job)
     failures = [] if base_validity.get("valid") is True else [str(base_validity.get("failure_reason", "base validity failed"))]
     try:
         output_dir.resolve(strict=True).relative_to(OUTPUT_TARGET.resolve(strict=True))
@@ -1078,6 +1105,9 @@ def audit_job(
         "role": job["role"],
         "phase": "preflight" if job["level"] == runner.PREFLIGHT_LEVEL else "formal",
         "output_dir": str(output_dir),
+        "execution_status": (
+            "artifacts_present" if output_dir.exists() else "not_dispatched"
+        ),
         "valid": not unique_failures,
         "validity_failures": unique_failures,
         "base_validity": base_validity,
@@ -1322,9 +1352,30 @@ def _expected_attempt_cells() -> tuple[set[tuple[str, int, int]], set[tuple[str,
 def audit_preflight() -> dict[str, object]:
     credential = scan_credentials([EXPERIMENT_ROOT, WORKTREE_ROOT])
     jobs = []
+    error_evidence: list[dict[str, object]] = []
     for job in runner.build_preflight_jobs():
         audited, _ = audit_job(job, credential_passed=bool(credential["passed"]))
         jobs.append(audited)
+        output_dir = Path(str(audited["output_dir"]))
+        for episode in range(1, int(job["episodes"]) + 1):
+            error_path = output_dir / f"episode_{episode}" / "error.txt"
+            if not error_path.is_file():
+                continue
+            text = error_path.read_text(encoding="utf-8", errors="replace")
+            error_evidence.append(
+                {
+                    "label": job["label"],
+                    "episode": episode - 1,
+                    "path": str(error_path),
+                    "sha256": _sha256_file(error_path),
+                    "missing_runtime_cache": (
+                        "cached_functions_dir does not exist" in text
+                    ),
+                    "api_authentication_error": (
+                        "401" in text or "authentication" in text.lower()
+                    ),
+                }
+            )
     failures = []
     for job in jobs:
         if not job["valid"]:
@@ -1336,6 +1387,19 @@ def audit_preflight() -> dict[str, object]:
         "created_at": _now(),
         "jobs": jobs,
         "credential_audit": credential,
+        "infrastructure_failure": {
+            "classification": "missing_shared2_runtime_guidance_cache",
+            "affected_episode_attempts": sum(
+                row["missing_runtime_cache"] is True for row in error_evidence
+            ),
+            "policy_rollout_started": any(
+                int(job["metrics_record_count"]) > 0 for job in jobs
+            ),
+            "api_authentication_error_detected": any(
+                row["api_authentication_error"] is True for row in error_evidence
+            ),
+            "evidence": error_evidence,
+        },
         "failures": failures,
         "passed": not failures,
     }
@@ -1370,7 +1434,9 @@ def audit_formal() -> dict[str, object]:
         candidates.append(candidate)
     ranking = rank_candidates(candidates)
     ranked_by_label = {str(row["label"]): row for row in ranking}
-    audited_jobs = [control] + [ranked_by_label[str(job["label"])] for job in audited_jobs[1:]]
+    audited_jobs = [control] + [
+        ranked_by_label.get(str(job["label"]), job) for job in audited_jobs[1:]
+    ]
     eligible = [row for row in ranking if row.get("gates", {}).get("all_passed") is True]
     recommended = eligible[0]["label"] if eligible else None
     formal_cells, preflight_cells = _expected_attempt_cells()
@@ -1379,8 +1445,37 @@ def audit_formal() -> dict[str, object]:
         expected_formal=formal_cells,
         expected_preflight=preflight_cells,
         cap=runner.ATTEMPT_CAP,
+        recovery_limit=runner.RECOVERY_ATTEMPT_LIMIT,
     )
     storage = runner.storage_preflight()
+    preflight_payload = json.loads(PREFLIGHT_AUDIT_PATH.read_text(encoding="utf-8"))
+    formal_completed = int(ledger["formal_unique_cells"])
+    formal_missing = 110 - formal_completed
+    completion = {
+        "status": "complete" if formal_missing == 0 else "incomplete",
+        "preflight_passed": preflight_payload.get("passed") is True,
+        "formal_dispatch_status": (
+            "completed"
+            if formal_missing == 0
+            else "not_dispatched_preflight_gate_failed"
+            if formal_completed == 0 and preflight_payload.get("passed") is not True
+            else "partially_completed"
+        ),
+        "formal_expected_episodes": 110,
+        "formal_completed_episodes": formal_completed,
+        "formal_missing_episodes": formal_missing,
+        "required_preflight_recovery_attempts": 6,
+        "available_recovery_slots": runner.RECOVERY_ATTEMPT_LIMIT,
+        "projected_total_attempts_if_full_preflight_recovery_and_formal_ran": 122,
+        "attempt_cap": runner.ATTEMPT_CAP,
+        "blocker": (
+            None
+            if formal_missing == 0
+            else "formal matrix has not completed"
+            if preflight_payload.get("passed") is True
+            else "LIBERO mechanism preflight has not passed"
+        ),
+    }
     payload = {
         "schema": "eds-quality-diversity-formal-audit-v1",
         "created_at": _now(),
@@ -1389,6 +1484,12 @@ def audit_formal() -> dict[str, object]:
         "ranking": [{"rank": row["rank"], "label": row["label"], "all_gates_passed": row["gates"]["all_passed"]} for row in ranking],
         "recommended_label": recommended,
         "decision": recommended or "no_adoption_keep_p2_stage_on_abs_rbf_control",
+        "completion": completion,
+        "ranking_status": (
+            "complete_valid_candidates"
+            if len(ranking) == 10
+            else "not_evaluable_incomplete_or_invalid_candidates"
+        ),
         "attempt_ledger": ledger,
         "credential_audit": credential,
         "storage_audit": storage,
@@ -1467,8 +1568,15 @@ def decision_payload(analysis: dict[str, Any]) -> dict[str, Any]:
             "formal_job_count": 11,
             "formal_unique_episodes": 110,
             "preflight_unique_episodes": 6,
+            "formal_completed_episodes": analysis.get("completion", {}).get(
+                "formal_completed_episodes"
+            ),
+            "formal_missing_episodes": analysis.get("completion", {}).get(
+                "formal_missing_episodes"
+            ),
             "ofat_complete": len(run_manifest["formal_profiles"]) == 11,
         },
+        "completion": analysis.get("completion", {}),
         "attempts": analysis["attempt_ledger"],
         "task_level_results": {job["label"]: job["task_outcomes"] for job in jobs},
         "failure_taxonomy": {job["label"]: job["failure_taxonomy"] for job in jobs},
@@ -1476,7 +1584,7 @@ def decision_payload(analysis: dict[str, Any]) -> dict[str, Any]:
             {
                 key: job.get(key)
                 for key in (
-                    "label", "role", "valid", "validity_failures", "success_count",
+                    "label", "role", "execution_status", "valid", "validity_failures", "success_count",
                     "success_rate", "wilson_95", "success_tasks", "failure_taxonomy_counts",
                     "execution_qpos_error_episodes", "collision_push_drop_wrong_object",
                     "nonfinite_count", "action_mask_violation_count", "qd_fallback_count",
@@ -1487,6 +1595,7 @@ def decision_payload(analysis: dict[str, Any]) -> dict[str, Any]:
             for job in jobs
         ],
         "ranking": analysis["ranking"],
+        "ranking_status": analysis.get("ranking_status"),
         "recommended_for_adoption": analysis["recommended_label"] is not None,
         "recommended_label": analysis["recommended_label"],
         "decision": analysis["decision"],
@@ -1526,18 +1635,21 @@ def render_report(
         "",
         f"- Base commit：`{provenance.get('base_commit', '—')}`；QD code commit：`{provenance.get('code_commit', '—')}`。",
         f"- Decision：`{analysis.get('decision', '—')}`。",
-        f"- Attempts：`{analysis.get('attempt_ledger', {}).get('attempt_count', '—')}/120`；recovery `{analysis.get('attempt_ledger', {}).get('recovery_attempts', '—')}`；ledger `{_pass(analysis.get('attempt_ledger', {}).get('passed'))}`。",
+        f"- Completion：`{analysis.get('completion', {}).get('status', '—')}`；formal `{analysis.get('completion', {}).get('formal_completed_episodes', '—')}/110`；`{analysis.get('completion', {}).get('formal_dispatch_status', '—')}`。",
+        f"- Stop reason：{analysis.get('completion', {}).get('blocker', '—')}。",
+        f"- Attempts：`{analysis.get('attempt_ledger', {}).get('attempt_count', '—')}/{runner.ATTEMPT_CAP}`；recovery `{analysis.get('attempt_ledger', {}).get('recovery_attempts', '—')}`；ledger `{_pass(analysis.get('attempt_ledger', {}).get('passed'))}`。",
         f"- Storage：`{analysis.get('storage_audit', {}).get('outputs_target', '—')}`；credential scan `{_pass(analysis.get('credential_audit', {}).get('passed'))}`。",
         "",
         "## 11-job 完整结果",
         "",
-        "| Job | Valid | Success | SR | Wilson 95% | qpos | collision composite |",
-        "| --- | --- | ---: | ---: | --- | ---: | ---: |",
+        "| Job | Execution | Valid | Success | SR | Wilson 95% | qpos | collision composite |",
+        "| --- | --- | --- | ---: | ---: | --- | ---: | ---: |",
     ]
     for job in jobs:
         ci = job.get("wilson_95") or [None, None]
+        dispatched = job.get("execution_status") != "not_dispatched"
         lines.append(
-            f"| `{job.get('label')}` | {_pass(job.get('valid'))} | {job.get('success_count', '—')}/10 | {_fmt(job.get('success_rate'))} | [{_fmt(ci[0])}, {_fmt(ci[1])}] | {job.get('execution_qpos_error_episodes', '—')} | {job.get('collision_push_drop_wrong_object', '—')} |"
+            f"| `{job.get('label')}` | {job.get('execution_status', '—')} | {_pass(job.get('valid'))} | {job.get('success_count', '—') if dispatched else '—'}/10 | {_fmt(job.get('success_rate')) if dispatched else '—'} | [{_fmt(ci[0])}, {_fmt(ci[1])}] | {job.get('execution_qpos_error_episodes', '—') if dispatched else '—'} | {job.get('collision_push_drop_wrong_object', '—') if dispatched else '—'} |"
         )
     lines.extend(
         [
@@ -1558,6 +1670,8 @@ def render_report(
         [
             "",
             "## 机制与三类 gates",
+            "",
+            "LIBERO mechanism preflight 未通过，formal 未 dispatch；因此 task、mechanism claim 与 safety gates 均未通过且不可作结果性解释。",
             "",
             "| Candidate | Task | Mechanism hard | Mechanism claim | Safety | All | Δcoverage median | spread ratio | Δbest reward | replacement-active | overflow P95 |",
             "| --- | --- | --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |",
@@ -1600,6 +1714,11 @@ def render_report(
         if job.get("label") == primary.get("label"):
             continue
         mechanism = job.get("mechanism_comparison", {})
+        if job.get("execution_status") == "not_dispatched":
+            lines.append(
+                f"| `{job.get('label')}` | {factors.get(str(job.get('label')), 'registered candidate')} | — | — | — | — |"
+            )
+            continue
         lines.append(
             f"| `{job.get('label')}` | {factors.get(str(job.get('label')), 'registered candidate')} | {_fmt((_finite_number(job.get('success_count')) or 0) - (_finite_number(primary.get('success_count')) or 0), 0)} | {_fmt((_finite_number(mechanism.get('normalized_final_coverage_delta_median')) or 0) - (_finite_number(primary_mechanism.get('normalized_final_coverage_delta_median')) or 0))} | {_fmt((_finite_number(mechanism.get('endpoint_xy_spread_ratio_median')) or 0) - (_finite_number(primary_mechanism.get('endpoint_xy_spread_ratio_median')) or 0))} | {_fmt((_finite_number(mechanism.get('archive_best_reward_delta_median')) or 0) - (_finite_number(primary_mechanism.get('archive_best_reward_delta_median')) or 0))} |"
         )

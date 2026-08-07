@@ -2706,6 +2706,7 @@ def _p2_normalized_command_overrides(
     job: dict[str, object],
     *,
     cached_functions_dir: str | None = None,
+    allow_identical_duplicates: bool = False,
 ) -> dict[str, object]:
     if cached_functions_dir is None:
         cached_functions_dir = str(
@@ -2723,6 +2724,12 @@ def _p2_normalized_command_overrides(
             continue
         key, value = _parse_override_assignment(item)
         if key in normalized:
+            if normalized[key] != value:
+                raise ValueError(
+                    f"build_main_command emitted conflicting duplicate override: {key}"
+                )
+            if allow_identical_duplicates:
+                continue
             raise ValueError(f"build_main_command emitted duplicate override: {key}")
         normalized[key] = value
     if not normalized:
@@ -2730,7 +2737,9 @@ def _p2_normalized_command_overrides(
     return normalized
 
 
-def _parse_p2_overrides_file(path: Path) -> dict[str, object]:
+def _parse_p2_overrides_file(
+    path: Path, *, allow_identical_duplicates: bool = False
+) -> dict[str, object]:
     if not path.is_file():
         raise ValueError(".hydra/overrides.yaml missing")
     text = path.read_text(encoding="utf-8", errors="strict")
@@ -2746,8 +2755,13 @@ def _parse_p2_overrides_file(path: Path) -> dict[str, object]:
     for item in loaded:
         key, value = _parse_override_assignment(item)
         if key in normalized:
-            conflict = "conflicting" if normalized[key] != value else "duplicate"
-            raise ValueError(f".hydra/overrides.yaml {conflict} override: {key}")
+            if normalized[key] != value:
+                raise ValueError(
+                    f".hydra/overrides.yaml conflicting override: {key}"
+                )
+            if allow_identical_duplicates:
+                continue
+            raise ValueError(f".hydra/overrides.yaml duplicate override: {key}")
         normalized[key] = value
     return normalized
 
@@ -3970,7 +3984,9 @@ def _p2_expected_episode_ids(job: dict[str, object]) -> set[int]:
     return set(range(episode_start_index, episode_num))
 
 
-def _p2_job_validity(job: dict[str, object]) -> dict[str, object]:
+def _p2_job_validity(
+    job: dict[str, object], *, allow_identical_overrides: bool = False
+) -> dict[str, object]:
     output_dir = _output_dir(job)
     metrics_dir = output_dir / "eds_eval"
     failures: list[str] = []
@@ -4020,14 +4036,19 @@ def _p2_job_validity(job: dict[str, object]) -> dict[str, object]:
         failures.append("strict perturbations not verified")
     if not suite_verified:
         failures.append("suite libero_object_swap not verified")
-    expected_overrides = _p2_normalized_command_overrides(job)
+    expected_overrides = _p2_normalized_command_overrides(
+        job, allow_identical_duplicates=allow_identical_overrides
+    )
     serialized_expected_overrides = {
         key: value
         for key, value in expected_overrides.items()
         if key != "hydra.run.dir"
     }
     try:
-        actual_overrides = _parse_p2_overrides_file(overrides_path)
+        actual_overrides = _parse_p2_overrides_file(
+            overrides_path,
+            allow_identical_duplicates=allow_identical_overrides,
+        )
     except (OSError, UnicodeError, ValueError) as exc:
         actual_overrides = {}
         failures.append(str(exc))
@@ -4273,7 +4294,13 @@ def _p2_job_validity(job: dict[str, object]) -> dict[str, object]:
         "stage_events": len(stage_events),
         "successful_stage_queries": successful_stage_queries,
         "episode_metadata_records": len(episode_metadata),
-        "config_fingerprint_verified": "config fingerprint mismatch" not in failures,
+        "config_fingerprint_verified": not any(
+            item in failures
+            for item in (
+                "config fingerprint mismatch",
+                "config_fingerprint.txt missing",
+            )
+        ),
         "runner_log_verified": runner_log_verified,
     }
 
