@@ -438,6 +438,222 @@ def test_formal_readiness_requires_passed_offline_libero_and_six_dispatches(tmp_
         )
 
 
+def _write_recovery_artifacts(runner, root, jobs, *, corrupt_label=None):
+    stage = root / "libero_preflight"
+    log_root = root / "runner_logs" / "libero_preflight"
+    failure_root = root / "failures" / "libero_preflight"
+    stage.mkdir(parents=True)
+    log_root.mkdir(parents=True)
+    failure_root.mkdir(parents=True)
+    rows = ["job_id,status,exit_code,failure_reason"]
+    for job in jobs:
+        output = stage / job["label"]
+        output.mkdir()
+        fingerprint = "a" * 64
+        (output / "config_fingerprint.txt").write_text(fingerprint + "\n")
+        manifest_label = (
+            "wrong-label" if corrupt_label == job["label"] else job["label"]
+        )
+        (output / "job_manifest.json").write_text(
+            json.dumps(
+                {
+                    "schema": "p2-adaptive-eds-rbf-job-v2",
+                    "config_fingerprint": fingerprint,
+                    "job": {
+                        "label": manifest_label,
+                        "formal_label": job["formal_label"],
+                        "level": runner.PREFLIGHT_LEVEL,
+                        "task_ids_filter": [0, 8],
+                        "episode_seeds": [44, 151],
+                    },
+                }
+            )
+            + "\n"
+        )
+        (output / "results.txt").write_text("old failure\n")
+        (log_root / f"{job['label']}.log").write_text("old log\n")
+        (failure_root / f"{job['label']}.json").write_text(
+            json.dumps({"status": "failed", "job_id": job["job_id"]}) + "\n"
+        )
+        rows.append(f"{job['job_id']},failed,1,pre-dispatch failure")
+    (stage / "run_manifest.csv").write_text("\n".join(rows) + "\n")
+
+
+def test_recovery_archives_consistent_old_fingerprint_artifacts_before_dispatch(
+    tmp_path,
+):
+    runner = _load_runner()
+    jobs = [
+        {
+            "level": runner.PREFLIGHT_LEVEL,
+            "label": f"preflight__profile_{index}",
+            "formal_label": f"profile_{index}",
+            "job_id": f"job-{index}",
+            "task_ids_filter": [0, 8],
+            "episode_seeds": [44, 151],
+            "config_fingerprint": "b" * 64,
+        }
+        for index in range(3)
+    ]
+    _write_recovery_artifacts(runner, tmp_path, jobs)
+
+    result = runner.archive_recovery_artifacts(
+        jobs,
+        real_root=tmp_path,
+        timestamp="20260807T060000000000Z",
+    )
+
+    archive = Path(result["archive_root"])
+    assert archive.is_dir()
+    assert result["archived_job_count"] == 3
+    assert result["archive_manifest_sha256"]
+    assert not (tmp_path / "libero_preflight" / "run_manifest.csv").exists()
+    for job in jobs:
+        assert not (tmp_path / "libero_preflight" / job["label"]).exists()
+        assert not (
+            tmp_path / "runner_logs" / "libero_preflight" / f"{job['label']}.log"
+        ).exists()
+        archived = archive / "jobs" / job["label"]
+        assert (archived / "output" / "results.txt").is_file()
+        assert (archived / "runner.log").is_file()
+        assert (archived / "failure.json").is_file()
+    payload = json.loads((archive / "archive_manifest.json").read_text())
+    assert payload["schema"] == "eds-qd-recovery-archive-v1"
+    assert payload["jobs"][0]["existing_config_fingerprint"] == "a" * 64
+    assert payload["jobs"][0]["next_config_fingerprint"] == "b" * 64
+    assert payload["status_csv"]["sha256"]
+
+
+def test_recovery_archive_rejects_inconsistent_identity_without_moving_anything(
+    tmp_path,
+):
+    runner = _load_runner()
+    jobs = [
+        {
+            "level": runner.PREFLIGHT_LEVEL,
+            "label": f"preflight__profile_{index}",
+            "formal_label": f"profile_{index}",
+            "job_id": f"job-{index}",
+            "task_ids_filter": [0, 8],
+            "episode_seeds": [44, 151],
+            "config_fingerprint": "b" * 64,
+        }
+        for index in range(3)
+    ]
+    _write_recovery_artifacts(
+        runner, tmp_path, jobs, corrupt_label=jobs[-1]["label"]
+    )
+
+    with pytest.raises(RuntimeError, match="identity mismatch"):
+        runner.archive_recovery_artifacts(
+            jobs,
+            real_root=tmp_path,
+            timestamp="20260807T060000000000Z",
+        )
+
+    assert (tmp_path / "libero_preflight" / "run_manifest.csv").is_file()
+    assert all(
+        (tmp_path / "libero_preflight" / job["label"]).is_dir()
+        for job in jobs
+    )
+    assert not (tmp_path / "stale").exists()
+
+
+def test_recovery_phase_archives_before_reservation_and_dispatch(tmp_path, monkeypatch):
+    runner = _load_runner()
+    manifest = tmp_path / "run_manifest.json"
+    manifest.write_text("{}\n")
+    manifest.chmod(0o444)
+    ledger = tmp_path / "ledger.jsonl"
+    monkeypatch.setattr(runner, "RUN_MANIFEST_PATH", manifest)
+    monkeypatch.setattr(runner, "ATTEMPT_LEDGER_PATH", ledger)
+    monkeypatch.setattr(runner, "storage_preflight", lambda: {})
+    monkeypatch.setattr(runner, "validate_runtime_cache", lambda: {})
+    monkeypatch.setattr(runner, "validate_runtime_credential", lambda: {})
+    monkeypatch.setattr(runner.base, "_poe_healthcheck", lambda: True)
+    monkeypatch.setattr(
+        runner, "load_gpu_reference", lambda: {"reference_peak_vram_mib": 1.0}
+    )
+    monkeypatch.setattr(
+        runner,
+        "admit_gpus",
+        lambda **_kwargs: {
+            "eligible_gpu_indices": [3],
+            "selected_gpu_indices": [3],
+        },
+    )
+    monkeypatch.setattr(runner, "_write_gpu_admission", lambda *_args: tmp_path)
+    jobs = [
+        {
+            "level": runner.PREFLIGHT_LEVEL,
+            "label": f"preflight__profile_{index}",
+            "formal_label": f"profile_{index}",
+            "job_id": f"job-{index}",
+            "task_ids_filter": [0, 8],
+            "episode_seeds": [44, 151],
+            "config_fingerprint": chr(ord("a") + index) * 64,
+            "execution_record": {"code_state_sha256": "c" * 64},
+        }
+        for index in range(3)
+    ]
+    monkeypatch.setattr(runner, "build_jobs", lambda *_args, **_kwargs: jobs)
+    prior = runner.append_attempt_records(
+        ledger, runner._attempt_records_for_jobs(jobs, "preflight")
+    )
+    runner.append_ledger_event(
+        ledger,
+        {
+            "record_type": "phase_dispatch",
+            "phase": "preflight",
+            "attempt_ids": [row["attempt_id"] for row in prior],
+        },
+    )
+    order = []
+    original_append_attempts = runner.append_attempt_records
+    original_append_event = runner.append_ledger_event
+
+    def archive(_jobs):
+        order.append("archive")
+        return {
+            "archive_root": "/shared2/archive",
+            "archive_manifest": "/shared2/archive/archive_manifest.json",
+            "archive_manifest_sha256": "d" * 64,
+            "archived_job_count": 3,
+        }
+
+    def append_attempts(path, records):
+        order.append("reserve")
+        return original_append_attempts(path, records)
+
+    def append_event(path, event):
+        if event["record_type"] == "phase_dispatch":
+            order.append("dispatch")
+        return original_append_event(path, event)
+
+    monkeypatch.setattr(runner, "archive_recovery_artifacts", archive)
+    monkeypatch.setattr(runner, "append_attempt_records", append_attempts)
+    monkeypatch.setattr(runner, "append_ledger_event", append_event)
+
+    def run_level(*_args, **_kwargs):
+        order.append("run")
+        return 0
+
+    monkeypatch.setattr(runner.base, "run_level", run_level)
+
+    assert (
+        runner._run_phase(
+            phase="preflight",
+            requested_gpus="auto",
+            timeout_seconds=1,
+            recovery=True,
+        )
+        == 0
+    )
+    assert order == ["archive", "reserve", "dispatch", "run"]
+    event = runner.read_attempt_ledger(ledger)[-1]
+    assert event["recovery_archive"]["archive_manifest_sha256"] == "d" * 64
+
+
 def test_offline_mechanism_preflight_records_all_profiles_and_passes(tmp_path):
     runner = _load_runner()
     path = tmp_path / "offline.json"

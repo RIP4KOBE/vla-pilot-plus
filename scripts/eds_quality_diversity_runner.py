@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import json
 import math
@@ -51,9 +52,9 @@ RECOVERY_ATTEMPT_LIMIT = 6
 ATTEMPT_CAP = 122
 EPISODE_SEEDS = [44, 235, 43, 546, 6, 621, 197, 87, 151, 548]
 SUPERSEDED_RUN_MANIFEST_PATH = (
-    EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v5.json"
+    EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v6.json"
 )
-RUN_MANIFEST_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v6.json"
+RUN_MANIFEST_PATH = EXPERIMENT_ROOT / "manifests/qd_ed_run_manifest.v7.json"
 ATTEMPT_LEDGER_PATH = EXPERIMENT_ROOT / "manifests/episode_attempt_ledger.jsonl"
 OFFLINE_PREFLIGHT_PATH = EXPERIMENT_ROOT / "analysis/offline_mechanism_preflight.json"
 LIBERO_PREFLIGHT_AUDIT_PATH = (
@@ -1401,20 +1402,21 @@ def freeze_run_manifest(
         "gates_frozen_by_design": True,
     }
     if (
-        RUN_MANIFEST_PATH.name == "qd_ed_run_manifest.v6.json"
+        RUN_MANIFEST_PATH.name == "qd_ed_run_manifest.v7.json"
         and SUPERSEDED_RUN_MANIFEST_PATH.is_file()
     ):
         payload["supersedes"] = {
             "path": str(SUPERSEDED_RUN_MANIFEST_PATH),
             "sha256": _sha256_bytes(SUPERSEDED_RUN_MANIFEST_PATH.read_bytes()),
             "reason": (
-                "user-authorized execution amendment after audited preflight "
-                "infrastructure failure: recovery limit 4->6 and attempt cap "
-                "120->122 so the exact six-episode preflight can be repeated "
-                "without changing algorithms, matrix, tasks, seeds, or gates"
+                "runner recovery-safety correction after a pre-episode "
+                "fingerprint guard: audit and archive the prior failed "
+                "preflight before reserving or dispatching its exact-cell "
+                "recovery; no algorithm, matrix, task, seed, gate, recovery "
+                "limit, or attempt-cap change"
             ),
             "algorithm_matrix_or_gate_change": False,
-            "attempt_policy_change": True,
+            "attempt_policy_change": False,
         }
     payload["manifest_payload_sha256"] = _sha256_bytes(
         _canonical(payload).encode("utf-8")
@@ -1534,6 +1536,214 @@ def _write_gpu_admission(phase: str, payload: dict[str, object]) -> Path:
     return path
 
 
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _tree_sha256(root: Path) -> str:
+    digest = hashlib.sha256()
+    for path in sorted(root.rglob("*"), key=lambda item: item.as_posix()):
+        if path.is_symlink():
+            raise RuntimeError(f"recovery artifact tree contains a symlink: {path}")
+        if not path.is_file():
+            continue
+        relative = path.relative_to(root).as_posix().encode("utf-8")
+        digest.update(len(relative).to_bytes(8, "big"))
+        digest.update(relative)
+        with path.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                digest.update(chunk)
+    return digest.hexdigest()
+
+
+def archive_recovery_artifacts(
+    jobs: list[dict[str, object]],
+    *,
+    real_root: Path = OUTPUT_TARGET,
+    timestamp: str | None = None,
+) -> dict[str, object]:
+    """Audit and archive a failed preflight before reserving recovery attempts."""
+    if len(jobs) != 3 or any(job.get("level") != PREFLIGHT_LEVEL for job in jobs):
+        raise RuntimeError("recovery archive requires the exact three preflight jobs")
+    labels = [str(job.get("label", "")) for job in jobs]
+    if len(set(labels)) != len(labels) or any(Path(label).name != label for label in labels):
+        raise RuntimeError("recovery archive job labels are invalid or duplicated")
+
+    root = Path(real_root).absolute()
+    stage = _stage_dir(PREFLIGHT_LEVEL)
+    status_path = base._p2_safe_child_path(root, stage, "run_manifest.csv")
+    if not status_path.is_file() or status_path.is_symlink():
+        raise RuntimeError("recovery archive requires a regular preflight status CSV")
+    try:
+        with status_path.open(newline="", encoding="utf-8") as handle:
+            status_rows = list(csv.DictReader(handle))
+    except (OSError, UnicodeError, csv.Error) as exc:
+        raise RuntimeError("recovery preflight status CSV is unreadable") from exc
+    rows_by_job = {str(row.get("job_id", "")): row for row in status_rows}
+    expected_job_ids = {str(job["job_id"]) for job in jobs}
+    if set(rows_by_job) != expected_job_ids or any(
+        str(rows_by_job[job_id].get("status", "")) in {"", "pending", "running"}
+        for job_id in expected_job_ids
+    ):
+        raise RuntimeError("recovery preflight status CSV is incomplete or still active")
+
+    plans: list[dict[str, object]] = []
+    for job in jobs:
+        label = str(job["label"])
+        output_dir = base._p2_safe_child_path(root, stage, label)
+        log_path = base._p2_safe_child_path(
+            root, "runner_logs", stage, f"{label}.log"
+        )
+        failure_path = base._p2_safe_child_path(
+            root, "failures", stage, f"{label}.json"
+        )
+        if not output_dir.is_dir() or output_dir.is_symlink():
+            raise RuntimeError(f"recovery output is missing or unsafe: {label}")
+        if not log_path.is_file() or log_path.is_symlink():
+            raise RuntimeError(f"recovery runner log is missing or unsafe: {label}")
+        _tree_sha256(output_dir)
+        fingerprint_path = output_dir / "config_fingerprint.txt"
+        manifest_path = output_dir / "job_manifest.json"
+        if (
+            not fingerprint_path.is_file()
+            or fingerprint_path.is_symlink()
+            or not manifest_path.is_file()
+            or manifest_path.is_symlink()
+        ):
+            raise RuntimeError(f"recovery identity files are missing or unsafe: {label}")
+        existing_fingerprint = fingerprint_path.read_text(
+            encoding="utf-8", errors="strict"
+        ).strip()
+        if len(existing_fingerprint) != 64 or any(
+            char not in "0123456789abcdef" for char in existing_fingerprint
+        ):
+            raise RuntimeError(f"recovery config fingerprint is invalid: {label}")
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, ValueError) as exc:
+            raise RuntimeError(f"recovery job manifest is unreadable: {label}") from exc
+        old_job = manifest.get("job") if isinstance(manifest, dict) else None
+        expected_identity = {
+            "label": label,
+            "formal_label": str(job["formal_label"]),
+            "level": PREFLIGHT_LEVEL,
+            "task_ids_filter": list(job["task_ids_filter"]),
+            "episode_seeds": list(job["episode_seeds"]),
+        }
+        if (
+            not isinstance(old_job, dict)
+            or manifest.get("schema") != "p2-adaptive-eds-rbf-job-v2"
+            or manifest.get("config_fingerprint") != existing_fingerprint
+            or any(old_job.get(key) != value for key, value in expected_identity.items())
+        ):
+            raise RuntimeError(f"recovery artifact identity mismatch: {label}")
+        if failure_path.exists() and (
+            not failure_path.is_file() or failure_path.is_symlink()
+        ):
+            raise RuntimeError(f"recovery failure evidence is unsafe: {label}")
+        plans.append(
+            {
+                "job": job,
+                "output": output_dir,
+                "log": log_path,
+                "failure": failure_path if failure_path.exists() else None,
+                "existing_config_fingerprint": existing_fingerprint,
+            }
+        )
+
+    stamp = timestamp or datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+    if Path(stamp).name != stamp:
+        raise RuntimeError("recovery archive timestamp is unsafe")
+    archive_parent = base._p2_safe_child_path(root, "stale", stage)
+    archive_parent.mkdir(parents=True, exist_ok=True)
+    archive_root = base._p2_safe_child_path(
+        root, "stale", stage, f"recovery_predispatch_{stamp}"
+    )
+    archive_root.mkdir(exist_ok=False)
+    jobs_root = base._p2_safe_child_path(archive_root, "jobs")
+    jobs_root.mkdir()
+    moved: list[tuple[Path, Path]] = []
+    try:
+        archived_status = base._p2_safe_child_path(archive_root, "phase_status.csv")
+        shutil.move(str(status_path), str(archived_status))
+        moved.append((archived_status, status_path))
+        for plan in plans:
+            job = plan["job"]
+            label = str(job["label"])
+            job_archive = base._p2_safe_child_path(jobs_root, label)
+            job_archive.mkdir()
+            destinations = (
+                (plan["output"], base._p2_safe_child_path(job_archive, "output")),
+                (plan["log"], base._p2_safe_child_path(job_archive, "runner.log")),
+                (
+                    plan["failure"],
+                    base._p2_safe_child_path(job_archive, "failure.json"),
+                ),
+            )
+            for source, destination in destinations:
+                if source is None:
+                    continue
+                shutil.move(str(source), str(destination))
+                moved.append((destination, source))
+        base._redact_secrets_in_text_tree(archive_root)
+    except Exception:
+        for destination, source in reversed(moved):
+            if destination.exists() and not source.exists():
+                source.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(str(destination), str(source))
+        shutil.rmtree(archive_root, ignore_errors=True)
+        raise
+
+    job_evidence = []
+    for plan in plans:
+        job = plan["job"]
+        label = str(job["label"])
+        archived_job = base._p2_safe_child_path(jobs_root, label)
+        job_evidence.append(
+            {
+                "job_id": str(job["job_id"]),
+                "label": label,
+                "formal_label": str(job["formal_label"]),
+                "existing_config_fingerprint": plan[
+                    "existing_config_fingerprint"
+                ],
+                "next_config_fingerprint": str(job["config_fingerprint"]),
+                "archive_tree_sha256": _tree_sha256(archived_job),
+            }
+        )
+    payload = {
+        "schema": "eds-qd-recovery-archive-v1",
+        "created_at": _now(),
+        "reason": "failed preflight preserved before exact-cell recovery dispatch",
+        "archive_root": str(archive_root),
+        "status_csv": {
+            "archived_path": str(archived_status),
+            "sha256": _sha256_file(archived_status),
+        },
+        "jobs": job_evidence,
+    }
+    payload["payload_sha256"] = _sha256_bytes(
+        _canonical(payload).encode("utf-8")
+    )
+    if _contains_credential(payload):
+        raise RuntimeError("recovery archive manifest contains credential material")
+    archive_manifest = base._p2_safe_child_path(archive_root, "archive_manifest.json")
+    with archive_manifest.open("x", encoding="utf-8") as handle:
+        handle.write(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    return {
+        "archive_root": str(archive_root),
+        "archive_manifest": str(archive_manifest),
+        "archive_manifest_sha256": _sha256_file(archive_manifest),
+        "archived_job_count": len(plans),
+    }
+
+
 def _run_phase(
     *,
     phase: str,
@@ -1575,6 +1785,7 @@ def _run_phase(
     episodes = 2 if phase == "preflight" else 10
     jobs = build_jobs(level, episodes)
     expected_reservations = _attempt_records_for_jobs(jobs, phase)
+    recovery_archive: dict[str, object] | None = None
     if recovery:
         state = attempt_ledger_state(ATTEMPT_LEDGER_PATH)
         prior = [
@@ -1604,6 +1815,14 @@ def _run_phase(
             if cell not in prior_by_cell:
                 raise RuntimeError("preflight recovery cell mismatch")
             record["recovery_of_attempt_id"] = prior_by_cell[cell]
+        if (
+            int(state["active_reservation_count"]) + len(expected_reservations)
+            > ATTEMPT_CAP
+        ):
+            raise RuntimeError(
+                f"episode-attempt hard cap {ATTEMPT_CAP} would be exceeded"
+            )
+        recovery_archive = archive_recovery_artifacts(jobs)
         attempt_ids = []
     else:
         try:
@@ -1639,15 +1858,15 @@ def _run_phase(
             expected_reservations,
         )
         attempt_ids = [int(row["attempt_id"]) for row in reservations]
-    append_ledger_event(
-        ATTEMPT_LEDGER_PATH,
-        {
-            "record_type": "phase_dispatch",
-            "phase": phase,
-            "attempt_ids": attempt_ids,
-            "selected_gpu_indices": [int(item) for item in selected],
-        },
-    )
+    dispatch_event = {
+        "record_type": "phase_dispatch",
+        "phase": phase,
+        "attempt_ids": attempt_ids,
+        "selected_gpu_indices": [int(item) for item in selected],
+    }
+    if recovery_archive is not None:
+        dispatch_event["recovery_archive"] = recovery_archive
+    append_ledger_event(ATTEMPT_LEDGER_PATH, dispatch_event)
     with configured_base():
         original_healthcheck = base._poe_healthcheck
         base._poe_healthcheck = lambda: True
