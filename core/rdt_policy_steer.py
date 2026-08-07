@@ -6143,7 +6143,11 @@ class RDTSteer:
                 else None
             )
             metrics.parent_count_by_source = dict(cumulative_parent_count_by_source)
-            metrics.selected_parent_source = last_particle_sources[best_idx]
+            metrics.selected_parent_source = (
+                chunk_population_sources[best_idx]
+                if qd_archive is not None
+                else last_particle_sources[best_idx]
+            )
             if first_elite_population is not None and first_elite_population.shape[0] > 0:
                 masked_first_elites = self._apply_action_mask(
                     first_elite_population,

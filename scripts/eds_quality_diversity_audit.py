@@ -874,12 +874,24 @@ def _classify_failures(
     for record in metrics:
         if isinstance(record.get("episode"), int):
             by_episode.setdefault(int(record["episode"]), []).append(record)
+    episode_ids = set(outcomes)
+    for error_path in output_dir.glob("episode_*/error.txt"):
+        match = re.fullmatch(r"episode_(\d+)", error_path.parent.name)
+        if match and int(match.group(1)) > 0:
+            episode_ids.add(int(match.group(1)) - 1)
     result: dict[int, str] = {}
-    for episode, outcome in outcomes.items():
+    for episode in sorted(episode_ids):
+        outcome = outcomes.get(episode, "fail")
         if outcome == "success":
             result[episode] = "success"
             continue
         episode_records = by_episode.get(episode, [])
+        error_path = output_dir / f"episode_{episode + 1}" / "error.txt"
+        error_text = (
+            error_path.read_text(encoding="utf-8", errors="replace").lower()
+            if error_path.is_file()
+            else ""
+        )
 
         def positive_key(*tokens: str) -> bool:
             for record in episode_records:
@@ -893,7 +905,13 @@ def _classify_failures(
                         return True
             return False
 
-        if positive_key("qpos"):
+        if error_text and (
+            "traceback" in error_text
+            or "error during episode execution" in error_text
+            or "exception" in error_text
+        ):
+            result[episode] = "qpos/execution error"
+        elif positive_key("qpos"):
             result[episode] = "qpos/execution error"
         elif positive_key("wrong_object"):
             result[episode] = "clutter swept/wrong-object interaction"
@@ -950,6 +968,7 @@ def _job_checksums(output_dir: Path) -> dict[str, str]:
         "episode_metadata.jsonl",
         "stage_events.jsonl",
         "main.log",
+        "error.txt",
     }
     for path in sorted(output_dir.rglob("*")):
         if not path.is_file() or path.is_symlink():
@@ -962,8 +981,48 @@ def _job_checksums(output_dir: Path) -> dict[str, str]:
     return checksums
 
 
+def _error_evidence(output_dir: Path, episodes: int) -> list[dict[str, object]]:
+    evidence: list[dict[str, object]] = []
+    exception_pattern = re.compile(
+        r"(?m)^([A-Za-z_][A-Za-z0-9_.]*(?:Error|Exception)):\s*(.*)$"
+    )
+    for episode in range(episodes):
+        path = output_dir / f"episode_{episode + 1}" / "error.txt"
+        if not path.is_file():
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        matches = list(exception_pattern.finditer(text))
+        exception_type = matches[-1].group(1) if matches else "execution_error"
+        message = matches[-1].group(2).strip() if matches else ""
+        evidence.append(
+            {
+                "episode": episode,
+                "path": str(path),
+                "sha256": _sha256_file(path),
+                "exception_type": exception_type,
+                "message": message[:240],
+                "qpos_related": "qpos" in text.lower(),
+            }
+        )
+    return evidence
+
+
 def _metric_summary(metrics: list[dict[str, Any]], stages: list[dict[str, Any]]) -> dict[str, object]:
     final_values = lambda key: [record.get(key, [None])[-1] if isinstance(record.get(key), list) and record.get(key) else None for record in metrics]
+    selected_cells = Counter(
+        str(record["qd_selected_cell"])
+        for record in metrics
+        if record.get("qd_selected_cell") is not None
+    )
+    per_cell_rewards: dict[str, list[float]] = {}
+    for record in metrics:
+        per_iter = record.get("qd_per_cell_elite_reward_by_iter")
+        if not isinstance(per_iter, list) or not per_iter or not isinstance(per_iter[-1], dict):
+            continue
+        for cell, value in per_iter[-1].items():
+            parsed = _finite_number(value)
+            if parsed is not None:
+                per_cell_rewards.setdefault(str(cell), []).append(float(parsed))
     return {
         "selection_latency_p95_s": _percentile((record.get("select_action_latency_s") for record in metrics), 0.95),
         "qd_archive_update_latency_p95_s": _percentile((record.get("qd_archive_update_latency_s") for record in metrics), 0.95),
@@ -978,6 +1037,13 @@ def _metric_summary(metrics: list[dict[str, Any]], stages: list[dict[str, Any]])
         "trajectory_length_median": _median(final_values("selected_trajectory_length_by_iter")),
         "max_step_median": _median(final_values("selected_max_step_displacement_by_iter")),
         "chunk_boundary_jump_p95": _percentile((record.get("chunk_boundary_action_jump") for record in metrics), 0.95),
+        "global_best_reward_median": _median(
+            record.get("qd_selected_reward") for record in metrics
+        ),
+        "selected_cell_counts": dict(sorted(selected_cells.items())),
+        "per_cell_elite_reward_median": {
+            cell: _median(values) for cell, values in sorted(per_cell_rewards.items())
+        },
     }
 
 
@@ -1062,6 +1128,7 @@ def audit_job(
     if not credential_passed:
         failures.append("credential scan failed")
     classifications = _classify_failures(outcomes, metrics, output_dir)
+    error_evidence = _error_evidence(output_dir, episodes)
     success_tasks = sorted(
         int(job["task_ids_filter"][episode])
         for episode, outcome in outcomes.items()
@@ -1119,6 +1186,7 @@ def audit_job(
         "task_outcomes": {str(job["task_ids_filter"][episode]): outcome for episode, outcome in sorted(outcomes.items())},
         "failure_taxonomy": {str(job["task_ids_filter"][episode]): category for episode, category in sorted(classifications.items())},
         "failure_taxonomy_counts": dict(Counter(classifications.values())),
+        "error_evidence": error_evidence,
         "execution_qpos_error_episodes": max(
             telemetry["execution_qpos_error_episodes"],
             sum(value == "qpos/execution error" for value in classifications.values()),
@@ -1533,6 +1601,30 @@ def freeze_decision_manifest(payload: dict[str, Any], path: Path = DECISION_PATH
     return frozen
 
 
+def freeze_report(text: str, path: Path = REPORT_PATH) -> dict[str, str]:
+    path = Path(path)
+    sidecar = path.with_suffix(path.suffix + ".sha256")
+    if path.exists() or path.is_symlink() or sidecar.exists() or sidecar.is_symlink():
+        raise FileExistsError(path)
+    if _contains_credential(text):
+        raise ValueError("final report contains credential material")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("x", encoding="utf-8") as handle:
+        handle.write(text)
+        if not text.endswith("\n"):
+            handle.write("\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    digest = _sha256_file(path)
+    with sidecar.open("x", encoding="ascii") as handle:
+        handle.write(f"{digest}  {path.name}\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    path.chmod(0o444)
+    sidecar.chmod(0o444)
+    return {"path": str(path), "sha256": digest, "sidecar": str(sidecar)}
+
+
 def verify_decision_manifest(path: Path = DECISION_PATH) -> dict[str, Any]:
     path = Path(path)
     sidecar = path.with_suffix(path.suffix + ".sha256")
@@ -1586,6 +1678,7 @@ def decision_payload(analysis: dict[str, Any]) -> dict[str, Any]:
                 for key in (
                     "label", "role", "execution_status", "valid", "validity_failures", "success_count",
                     "success_rate", "wilson_95", "success_tasks", "failure_taxonomy_counts",
+                    "error_evidence",
                     "execution_qpos_error_episodes", "collision_push_drop_wrong_object",
                     "nonfinite_count", "action_mask_violation_count", "qd_fallback_count",
                     "mechanism_hard", "mechanism_comparison", "gates", "metric_summary",
@@ -1605,6 +1698,16 @@ def decision_payload(analysis: dict[str, Any]) -> dict[str, Any]:
             "formal_audit": {"path": str(ANALYSIS_PATH), "sha256": _sha256_file(ANALYSIS_PATH)},
             "offline_preflight": {"path": str(runner.OFFLINE_PREFLIGHT_PATH), "sha256": _sha256_file(runner.OFFLINE_PREFLIGHT_PATH)},
             "libero_preflight": {"path": str(PREFLIGHT_AUDIT_PATH), "sha256": _sha256_file(PREFLIGHT_AUDIT_PATH)},
+            **(
+                {
+                    "final_report": {
+                        "path": str(REPORT_PATH),
+                        "sha256": _sha256_file(REPORT_PATH),
+                    }
+                }
+                if REPORT_PATH.is_file()
+                else {}
+            ),
         },
         "qualitative_contact_sheets": analysis.get(
             "qualitative_contact_sheets", {}
@@ -1626,6 +1729,10 @@ def render_report(
 ) -> str:
     """Render the frozen, complete-table report without making repository writes."""
     jobs = list(analysis.get("jobs", []))
+    completion = analysis.get("completion", {})
+    ledger = analysis.get("attempt_ledger", {})
+    formal_completed = completion.get("formal_completed_episodes", 0)
+    preflight_passed = completion.get("preflight_passed") is True
     lines = [
         "# EDS Quality-Diversity / LIBERO Object-Swap OOD 最终报告",
         "",
@@ -1635,9 +1742,9 @@ def render_report(
         "",
         f"- Base commit：`{provenance.get('base_commit', '—')}`；QD code commit：`{provenance.get('code_commit', '—')}`。",
         f"- Decision：`{analysis.get('decision', '—')}`。",
-        f"- Completion：`{analysis.get('completion', {}).get('status', '—')}`；formal `{analysis.get('completion', {}).get('formal_completed_episodes', '—')}/110`；`{analysis.get('completion', {}).get('formal_dispatch_status', '—')}`。",
-        f"- Stop reason：{analysis.get('completion', {}).get('blocker', '—')}。",
-        f"- Attempts：`{analysis.get('attempt_ledger', {}).get('attempt_count', '—')}/{runner.ATTEMPT_CAP}`；recovery `{analysis.get('attempt_ledger', {}).get('recovery_attempts', '—')}`；ledger `{_pass(analysis.get('attempt_ledger', {}).get('passed'))}`。",
+        f"- Completion：`{completion.get('status', '—')}`；mechanism preflight：`{_pass(preflight_passed)}`；formal：`{formal_completed}/110`（`{completion.get('formal_dispatch_status', '—')}`）。",
+        f"- Stop reason：{completion.get('blocker', '—')}。",
+        f"- Attempts：实际 episode attempts `{ledger.get('actual_episode_attempt_count', ledger.get('attempt_count', '—'))}/{runner.ATTEMPT_CAP}`；recovery `{ledger.get('recovery_attempts', '—')}`；pre-episode aborted `{ledger.get('aborted_pre_episode_count', '—')}`；ledger `{_pass(ledger.get('passed'))}`。",
         f"- Storage：`{analysis.get('storage_audit', {}).get('outputs_target', '—')}`；credential scan `{_pass(analysis.get('credential_audit', {}).get('passed'))}`。",
         "",
         "## 11-job 完整结果",
@@ -1671,7 +1778,7 @@ def render_report(
             "",
             "## 机制与三类 gates",
             "",
-            "LIBERO mechanism preflight 未通过，formal 未 dispatch；因此 task、mechanism claim 与 safety gates 均未通过且不可作结果性解释。",
+            f"LIBERO mechanism preflight：`{_pass(preflight_passed)}`；formal：`{formal_completed}/110`。下表严格使用冻结阈值；validity、task、mechanism hard/claim 与 safety 任一失败即不得 adoption。",
             "",
             "| Candidate | Task | Mechanism hard | Mechanism claim | Safety | All | Δcoverage median | spread ratio | Δbest reward | replacement-active | overflow P95 |",
             "| --- | --- | --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |",
@@ -1682,6 +1789,20 @@ def render_report(
         mechanism = job.get("mechanism_comparison", {})
         lines.append(
             f"| `{job.get('label')}` | {_pass(gates.get('task', {}).get('passed'))} | {_pass(gates.get('mechanism_hard', {}).get('passed'))} | {_pass(gates.get('mechanism_claim', {}).get('passed'))} | {_pass(gates.get('safety', {}).get('passed'))} | {_pass(gates.get('all_passed'))} | {_fmt(mechanism.get('normalized_final_coverage_delta_median'))} | {_fmt(mechanism.get('endpoint_xy_spread_ratio_median'))} | {_fmt(mechanism.get('archive_best_reward_delta_median'))} | {_fmt(mechanism.get('replacement_active_chunk_ratio'))} | {_fmt(mechanism.get('descriptor_overflow_ratio_p95'))} |"
+        )
+    lines.extend(
+        [
+            "",
+            "### Paired gained/lost/retained tasks",
+            "",
+            "| Candidate | Gained | Lost | Retained control | Δ(gained-lost) |",
+            "| --- | --- | --- | --- | ---: |",
+        ]
+    )
+    for job in jobs[1:]:
+        paired = job.get("gates", {}).get("paired", {})
+        lines.append(
+            f"| `{job.get('label')}` | {paired.get('gained_tasks', [])} | {paired.get('lost_tasks', [])} | {paired.get('retained_control_tasks', [])} | {paired.get('gained_minus_lost', '—')} |"
         )
     primary = next(
         (job for job in jobs if job.get("label") == "eds_quality_diversity_uniform_primary"),
@@ -1725,6 +1846,48 @@ def render_report(
     lines.extend(
         [
             "",
+            "## Archive、几何与 parent allocation",
+            "",
+            "| Job | Active chunks | Exact replay | Coverage median | Turnover median | Overflow P95 | Endpoint spread m | EEF direction diversity | Global-best reward median |",
+            "| --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |",
+        ]
+    )
+    for job in jobs:
+        metrics = job.get("metric_summary", {})
+        hard = job.get("mechanism_hard", {})
+        exact_replay = (
+            _pass(hard.get("exact_parent_allocation_replay_passed"))
+            if job.get("role") != "control"
+            else "—"
+        )
+        lines.append(
+            f"| `{job.get('label')}` | {hard.get('active_chunk_count', '—')} | {exact_replay} | {_fmt(metrics.get('coverage_median'))} | {_fmt(metrics.get('turnover_median'))} | {_fmt(metrics.get('overflow_p95'))} | {_fmt(metrics.get('endpoint_xy_spread_median'))} | {_fmt(metrics.get('eef_direction_diversity_median'))} | {_fmt(metrics.get('global_best_reward_median'))} |"
+        )
+    lines.extend(
+        [
+            "",
+            "### Selected cells 与 per-cell final elite reward median",
+            "",
+            "以下 cell reward 只在同一 job/chunk 定义下作为 archive 证据，不解释为跨 task 可比的经典 QD-score。",
+            "",
+            "| Job | Selected-cell counts | Per-cell elite reward median |",
+            "| --- | --- | --- |",
+        ]
+    )
+    for job in jobs[1:]:
+        metrics = job.get("metric_summary", {})
+        selected = ", ".join(
+            f"{cell}:{count}"
+            for cell, count in metrics.get("selected_cell_counts", {}).items()
+        ) or "—"
+        rewards = ", ".join(
+            f"{cell}:{_fmt(value)}"
+            for cell, value in metrics.get("per_cell_elite_reward_median", {}).items()
+        ) or "—"
+        lines.append(f"| `{job.get('label')}` | {selected} | {rewards} |")
+    lines.extend(
+        [
+            "",
             "## Failure taxonomy",
             "",
             "| Job | Categories |",
@@ -1737,6 +1900,28 @@ def render_report(
             for key, value in sorted(job.get("failure_taxonomy_counts", {}).items())
         ) or "—"
         lines.append(f"| `{job.get('label')}` | {categories} |")
+    lines.extend(
+        [
+            "",
+            "### Failed / invalid / execution-error evidence",
+            "",
+            "| Job | Valid | Error episodes | Exception types | Validity reason |",
+            "| --- | --- | --- | --- | --- |",
+        ]
+    )
+    for job in jobs:
+        errors = job.get("error_evidence", [])
+        episodes = [row.get("episode") for row in errors]
+        exception_types = sorted(
+            {str(row.get("exception_type", "execution_error")) for row in errors}
+        )
+        failures = "; ".join(
+            str(item) for item in job.get("validity_failures", [])
+        )
+        failures = failures.replace("|", "\\|")[:1000] or "—"
+        lines.append(
+            f"| `{job.get('label')}` | {_pass(job.get('valid'))} | {episodes or '—'} | {exception_types or '—'} | {failures} |"
+        )
     lines.extend(
         [
             "",
@@ -1754,8 +1939,23 @@ def render_report(
     lines.extend(
         [
             "",
+            "### 轨迹几何",
+            "",
+            "| Job | Trajectory length median m | Max-step median m | Chunk-boundary jump P95 |",
+            "| --- | ---: | ---: | ---: |",
+        ]
+    )
+    for job in jobs:
+        metrics = job.get("metric_summary", {})
+        lines.append(
+            f"| `{job.get('label')}` | {_fmt(metrics.get('trajectory_length_median'))} | {_fmt(metrics.get('max_step_median'))} | {_fmt(metrics.get('chunk_boundary_jump_p95'))} |"
+        )
+    contact = analysis.get("qualitative_contact_sheets", {})
+    lines.extend(
+        [
+            "",
             f"- Raw qualitative heatmaps/trajectories：各 job 的 `eds_eval/qualitative/episode_*/chunk_*/`。",
-            f"- 同时间坐标 contact sheets：`{CONTACT_SHEET_ROOT}`。",
+            f"- 同时间坐标 contact sheets：`{CONTACT_SHEET_ROOT}`；生成 `{contact.get('sheet_count', '—')}` 张，审计 `{_pass(contact.get('passed'))}`。失败项来自 invalid grid5 缺失/损坏视频，保留红色占位而未伪造画面。",
             "- 自动 failure taxonomy 对无明确 telemetry 的失败保守标为 `timeout without completion`；视觉复核注释单独保留，不把未观察到的因果机制写成事实。",
             "",
             "## Ranking 与结论",
@@ -1793,8 +1993,22 @@ def main() -> int:
         return 0
     if args.command == "freeze-decision":
         analysis = json.loads(ANALYSIS_PATH.read_text(encoding="utf-8"))
+        run_manifest = json.loads(
+            runner.RUN_MANIFEST_PATH.read_text(encoding="utf-8")
+        )
+        report = freeze_report(
+            render_report(analysis, provenance=run_manifest["provenance"])
+        )
         frozen = freeze_decision_manifest(decision_payload(analysis))
-        print(json.dumps({"decision": frozen["decision"], "path": str(DECISION_PATH)}))
+        print(
+            json.dumps(
+                {
+                    "decision": frozen["decision"],
+                    "path": str(DECISION_PATH),
+                    "report": report,
+                }
+            )
+        )
         return 0
     verify_decision_manifest()
     print(json.dumps({"verified": True, "path": str(DECISION_PATH)}))

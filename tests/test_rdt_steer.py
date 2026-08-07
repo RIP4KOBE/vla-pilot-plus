@@ -5878,6 +5878,83 @@ def test_qd_loop_bypasses_legacy_selector_preserves_archive_and_selects_global_b
     assert artifacts["qd_bounds_xy_m"] == metrics["qd_bounds_xy_m"]
 
 
+def test_qd_grid5_final_archive_larger_than_population_tracks_selected_source(
+    stub_steer,
+    stub_adapter,
+    monkeypatch,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=16,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    cond = _rollout_cond(stub_steer)
+    initial = torch.zeros(16, 64, 128)
+    initial_cells = [*range(15), 24]
+    for index, cell in enumerate(initial_cells):
+        initial[index, :4, 39] = float(cell // 5)
+        initial[index, :4, 40] = float(cell % 5)
+        initial[index, :, 42] = -float(index)
+
+    child_cells = [*range(15, 24), *range(7)]
+
+    def score(samples, **kwargs):
+        rewards = -samples[:, 0, 42].detach().clone()
+        return -rewards, {"rewards": rewards}
+
+    def rollout(**kwargs):
+        children = kwargs["noisy_action"].clone()
+        rewards = torch.arange(16, dtype=children.dtype, device=children.device) + 100.0
+        rewards[8] = 1_000.0
+        for index, cell in enumerate(child_cells):
+            children[index, :4, 39] = float(cell // 5)
+            children[index, :4, 40] = float(cell % 5)
+            children[index, :, 42] = -rewards[index]
+        costs, info = score(children)
+        return children, costs, info
+
+    monkeypatch.setattr(
+        stub_steer, "_eds_initial_population", lambda **kwargs: initial.clone()
+    )
+    monkeypatch.setattr(stub_steer, "_eds_score_population_as_cost", score)
+    monkeypatch.setattr(
+        stub_steer,
+        "_eds_qd_descriptor",
+        lambda population, keypoints: population[:, 0, 39:41],
+    )
+    monkeypatch.setattr(
+        stub_steer, "_eds_renoise_reference", lambda samples, steps: samples
+    )
+    monkeypatch.setattr(stub_steer, "_eds_rollout_reference", rollout)
+    cfg = stub_steer._resolve_eds_config_with_reference_defaults(
+        _valid_qd_config(
+            qd_grid_shape=[5, 5],
+            qd_bounds_quantiles=[0.0, 1.0],
+            qd_bounds_expand_fraction=0.0,
+            qd_min_axis_span_m=0.12,
+        )
+    )
+
+    selected = stub_steer._eds_guided_denoise_loop(
+        x_t=torch.zeros_like(initial),
+        cond=cond,
+        keypoints=torch.zeros(1, 3),
+        guidance_fns=None,
+        eds_config=cfg,
+        verbose=False,
+        global_step=0,
+        current_stage=0,
+    )
+    metrics = stub_steer.get_last_eds_metrics()
+
+    assert metrics["qd_occupied_cells_by_iter"] == [25] * cfg.cem_iters
+    assert metrics["selected_idx"] > cfg.population_size - 1
+    assert metrics["selected_parent_source"] == "qd_archive"
+    assert metrics["qd_selected_reward"] == pytest.approx(1_000.0)
+    assert selected.shape == (1, 64, 128)
+
+
 def test_qd_metrics_observer_is_bitwise_passive_for_legacy_loop(
     stub_steer,
     stub_adapter,

@@ -170,6 +170,18 @@ def test_decision_manifest_is_exclusive_readonly_and_has_sidecar(tmp_path: Path)
         audit.freeze_decision_manifest({}, path)
 
 
+def test_final_report_is_exclusive_readonly_and_has_sidecar(tmp_path: Path):
+    path = tmp_path / "report.md"
+    result = audit.freeze_report("final evidence\n", path)
+
+    assert result["sha256"] == hashlib.sha256(path.read_bytes()).hexdigest()
+    assert stat.S_IMODE(path.stat().st_mode) == 0o444
+    assert stat.S_IMODE(path.with_suffix(path.suffix + ".sha256").stat().st_mode) == 0o444
+    assert path.with_suffix(path.suffix + ".sha256").read_text().split()[0] == result["sha256"]
+    with pytest.raises(FileExistsError):
+        audit.freeze_report("replacement\n", path)
+
+
 def test_manifest_rejects_credentials(tmp_path: Path):
     with pytest.raises(ValueError, match="credential"):
         audit.freeze_decision_manifest(
@@ -360,6 +372,22 @@ def test_failure_taxonomy_does_not_treat_zero_valued_key_names_as_evidence(tmp_p
     assert result[1] == "qpos/execution error"
 
 
+def test_failure_taxonomy_uses_episode_error_traceback_as_execution_evidence(
+    tmp_path: Path,
+):
+    error = tmp_path / "episode_5" / "error.txt"
+    error.parent.mkdir(parents=True)
+    error.write_text(
+        "Traceback (most recent call last):\n"
+        "ValueError: Expected robot0_gripper_qpos values within raw qpos range\n",
+        encoding="utf-8",
+    )
+
+    result = audit._classify_failures({}, [], tmp_path)
+
+    assert result == {4: "qpos/execution error"}
+
+
 def test_audit_attempt_ledger_requires_cap_and_unique_formal_cells(tmp_path: Path):
     path = tmp_path / "ledger.jsonl"
     rows = []
@@ -436,6 +464,13 @@ def test_report_contains_full_job_task_gate_and_mechanism_tables():
             "jobs": jobs,
             "decision": "candidate_1",
             "ranking": [{"rank": 1, "label": "candidate_1", "all_gates_passed": True}],
+            "completion": {
+                "status": "complete",
+                "preflight_passed": True,
+                "formal_completed_episodes": 110,
+                "formal_dispatch_status": "completed",
+                "blocker": None,
+            },
             "attempt_ledger": {"attempt_count": 116, "recovery_attempts": 0, "passed": True},
             "credential_audit": {"passed": True},
             "storage_audit": {"outputs_target": "/mnt/data/shared2/test"},
@@ -447,3 +482,5 @@ def test_report_contains_full_job_task_gate_and_mechanism_tables():
     assert "机制与三类 gates" in text
     assert "单因素主效应" in text
     assert "candidate_10" in text
+    assert "mechanism preflight：`PASS`；formal：`110/110`" in text
+    assert "formal 未 dispatch" not in text
