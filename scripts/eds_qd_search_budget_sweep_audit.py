@@ -46,6 +46,11 @@ EQUAL_BUDGET_PAIRS = (
     ((48, 20), (64, 15)),
     ((48, 25), (64, 20)),
 )
+RECOVERY_TIMEOUT_PROVENANCE_PATH = (
+    runner.OUTPUT_TARGET
+    / "stale/formal/recovery_tool_timeout_20260808T215900Z"
+    / "eds_qd_uniform_expand20_p48_k20/interruption_provenance.json"
+)
 
 
 def _now() -> str:
@@ -88,6 +93,61 @@ def _ratio(value: object, reference: object) -> float | None:
     if numerator is None or denominator is None or denominator == 0.0:
         return None
     return numerator / denominator
+
+
+def execution_exception_audit(
+    path: Path = RECOVERY_TIMEOUT_PROVENANCE_PATH,
+) -> dict[str, object]:
+    """Audit the documented recovery timeout without hiding physical attempts."""
+    path = Path(path)
+    if not path.is_file():
+        return {
+            "present": False,
+            "passed": True,
+            "path": str(path),
+            "physical_episode_attempt_count": runner.ATTEMPT_CAP,
+            "soft_cap_exception_attempts": 0,
+            "hard_cap_passed": True,
+            "user_soft_cap_override_applied": False,
+            "failures": [],
+        }
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    failures: list[str] = []
+    required = {
+        "schema": "eds-qd-recovery-tool-timeout-v1",
+        "affected_label": "eds_qd_uniform_expand20_p48_k20",
+        "continuation_completed": True,
+        "algorithm_or_config_change": False,
+        "ledger_reserved_attempts": runner.ATTEMPT_CAP,
+        "soft_cap_exception_attempts": 1,
+    }
+    for key, expected in required.items():
+        if payload.get(key) != expected:
+            failures.append(f"{key} != {expected!r}")
+    physical = payload.get("actual_attempts_after_continuation")
+    if physical != runner.ATTEMPT_CAP + 1:
+        failures.append(
+            "physical attempt count is not exactly one above the frozen cap"
+        )
+    if payload.get("canonical_merged_result") != "1/10":
+        failures.append("canonical merged result is not 1/10")
+    return {
+        "present": True,
+        "passed": not failures,
+        "path": str(path),
+        "sha256": _sha256_file(path),
+        "affected_label": payload.get("affected_label"),
+        "interruption": payload.get("interruption"),
+        "physical_episode_attempt_count": physical,
+        "soft_cap_exception_attempts": payload.get(
+            "soft_cap_exception_attempts"
+        ),
+        "hard_cap_passed": isinstance(physical, int)
+        and physical <= runner.ATTEMPT_CAP,
+        "user_soft_cap_override_applied": True,
+        "canonical_merged_result": payload.get("canonical_merged_result"),
+        "failures": failures,
+    }
 
 
 def qd_mechanism_hard_gate(
@@ -772,6 +832,37 @@ def audit_formal() -> dict[str, object]:
         cap=runner.ATTEMPT_CAP,
         recovery_limit=runner.RECOVERY_ATTEMPT_LIMIT,
     )
+    execution_exception = execution_exception_audit()
+    if execution_exception["present"]:
+        reserved_attempts = int(ledger["actual_episode_attempt_count"])
+        ledger_structure_passed = bool(ledger["passed"])
+        ledger["ledger_reserved_episode_attempt_count"] = reserved_attempts
+        ledger["actual_episode_attempt_count"] = execution_exception[
+            "physical_episode_attempt_count"
+        ]
+        ledger["soft_cap_exception_attempts"] = execution_exception[
+            "soft_cap_exception_attempts"
+        ]
+        ledger["hard_cap_passed"] = execution_exception["hard_cap_passed"]
+        ledger["user_soft_cap_override_applied"] = execution_exception[
+            "user_soft_cap_override_applied"
+        ]
+        ledger["ledger_structure_passed"] = ledger_structure_passed
+        if execution_exception["hard_cap_passed"] is not True:
+            ledger["failures"] = list(
+                dict.fromkeys(
+                    [
+                        *ledger.get("failures", []),
+                        "physical episode attempts exceed frozen cap by 1 after "
+                        "outer tool timeout continuation",
+                    ]
+                )
+            )
+        ledger["passed"] = (
+            ledger_structure_passed
+            and execution_exception["passed"] is True
+            and execution_exception["hard_cap_passed"] is True
+        )
     storage = runner.storage_preflight()
     gpu = _gpu_audit()
     completed = sum(int(job.get("accepted_episode_count", 0)) for job in jobs)
@@ -822,6 +913,7 @@ def audit_formal() -> dict[str, object]:
         "credential_audit": credential,
         "storage_audit": storage,
         "gpu_audit": gpu,
+        "execution_exception_audit": execution_exception,
         "historical_source": historical_source,
         "run_manifest": {
             "path": str(runner.RUN_MANIFEST_PATH),
@@ -863,9 +955,10 @@ def render_report(analysis: dict[str, Any]) -> str:
         "## 执行摘要",
         "",
         f"- Completion：`{completion['status']}`，jobs `18`，accepted episodes `{completion['formal_accepted_episodes']}/180`。",
-        f"- Attempts：`{ledger.get('actual_episode_attempt_count')}/{runner.ATTEMPT_CAP}`；recovery `{ledger.get('recovery_attempts')}`；ledger `{_gate(ledger.get('passed'))}`。",
+        f"- Attempts：physical `{ledger.get('actual_episode_attempt_count')}/{runner.ATTEMPT_CAP}`；ledger reserved `{ledger.get('ledger_reserved_episode_attempt_count', ledger.get('reserved_attempt_count'))}`；recovery `{ledger.get('recovery_attempts')}`；hard cap `{_gate(ledger.get('hard_cap_passed', ledger.get('passed')))}`；user soft override `{ledger.get('user_soft_cap_override_applied', False)}`。",
         f"- Decision：`{analysis['decision']}`；存在 5/10 配置：`{analysis['any_passed_5_of_10_gate']}`。",
         f"- Credential / storage / GPU audit：`{_gate(analysis['credential_audit']['passed'])}` / `{_gate(analysis['storage_audit'] is not None)}` / `{_gate(analysis['gpu_audit']['passed'])}`。",
+        f"- Execution exception：`{analysis['execution_exception_audit'].get('present')}`；provenance `{analysis['execution_exception_audit'].get('path')}`；audit `{_gate(analysis['execution_exception_audit'].get('passed'))}`。",
         "",
         "## 18-job 定量结果与 gates",
         "",

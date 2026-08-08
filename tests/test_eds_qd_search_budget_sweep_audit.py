@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 from pathlib import Path
 
 
@@ -120,3 +121,32 @@ def test_expected_attempt_cells_are_exactly_180_formal_and_zero_preflight():
     formal, preflight = audit.expected_attempt_cells()
     assert len(formal) == 180
     assert preflight == set()
+
+
+def test_execution_exception_reports_physical_attempt_overrun(tmp_path):
+    audit = _load_audit()
+    path = tmp_path / "interruption_provenance.json"
+    path.write_text(
+        json.dumps(
+            {
+                "schema": "eds-qd-recovery-tool-timeout-v1",
+                "affected_label": "eds_qd_uniform_expand20_p48_k20",
+                "continuation_completed": True,
+                "algorithm_or_config_change": False,
+                "ledger_reserved_attempts": audit.runner.ATTEMPT_CAP,
+                "soft_cap_exception_attempts": 1,
+                "actual_attempts_after_continuation": (
+                    audit.runner.ATTEMPT_CAP + 1
+                ),
+                "canonical_merged_result": "1/10",
+                "interruption": "outer tool timeout",
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    result = audit.execution_exception_audit(path)
+    assert result["passed"] is True
+    assert result["physical_episode_attempt_count"] == 201
+    assert result["hard_cap_passed"] is False
+    assert result["user_soft_cap_override_applied"] is True
