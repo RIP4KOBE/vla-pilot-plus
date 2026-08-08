@@ -7157,9 +7157,18 @@ class RDTSteer:
             raise ValueError("EDS qd_tie_break must be stable_fingerprint")
 
         if resolved.qd_archive_mode == "grid_archive":
+            budget = (resolved.population_size, resolved.cem_iters)
+            approved_search_budgets = {
+                (population_size, cem_iters)
+                for population_size in (32, 48, 64)
+                for cem_iters in (15, 20, 25)
+            }
+            if budget != (16, 10) and budget not in approved_search_budgets:
+                raise ValueError(
+                    "EDS grid_archive population_size/cem_iters search budget "
+                    "must be legacy (16, 10) or an approved sweep pair"
+                )
             required = {
-                "population_size": 16,
-                "cem_iters": 10,
                 "use_cem": False,
                 "renoise_t_max": 3,
                 "renoise_t_min": 1,

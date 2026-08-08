@@ -2252,6 +2252,53 @@ def _valid_qd_config(**updates):
     }
 
 
+@pytest.mark.parametrize("population_size", [32, 48, 64])
+@pytest.mark.parametrize("cem_iters", [15, 20, 25])
+@pytest.mark.parametrize(
+    ("qd_parent_sampling", "qd_bounds_expand_fraction"),
+    [("uniform_cells", 0.20), ("sparse_priority", 0.10)],
+)
+def test_qd_config_accepts_approved_search_budget_sweep(
+    stub_steer,
+    population_size,
+    cem_iters,
+    qd_parent_sampling,
+    qd_bounds_expand_fraction,
+):
+    cfg = stub_steer._resolve_eds_config_with_reference_defaults(
+        _valid_qd_config(
+            population_size=population_size,
+            cem_iters=cem_iters,
+            num_elites=16,
+            qd_parent_sampling=qd_parent_sampling,
+            qd_bounds_expand_fraction=qd_bounds_expand_fraction,
+        )
+    )
+
+    assert cfg.population_size == population_size
+    assert cfg.cem_iters == cem_iters
+    assert cfg.num_elites == 16
+    assert cfg.use_cem is False
+
+
+@pytest.mark.parametrize(
+    ("population_size", "cem_iters"),
+    [(16, 15), (32, 10), (64, 30)],
+)
+def test_qd_config_rejects_unregistered_search_budget_pairs(
+    stub_steer,
+    population_size,
+    cem_iters,
+):
+    with pytest.raises(ValueError, match="approved sweep pair"):
+        stub_steer._resolve_eds_config_with_reference_defaults(
+            _valid_qd_config(
+                population_size=population_size,
+                cem_iters=cem_iters,
+            )
+        )
+
+
 def test_qd_config_accepts_primary_and_sparse_registered_profiles(stub_steer):
     uniform = stub_steer._resolve_eds_config_with_reference_defaults(
         _valid_qd_config()
@@ -5876,6 +5923,109 @@ def test_qd_loop_bypasses_legacy_selector_preserves_archive_and_selects_global_b
     assert metrics["qd_selected_reward"] == pytest.approx(1015.0)
     assert len(artifacts["qd_archive_by_iter"]) == 10
     assert artifacts["qd_bounds_xy_m"] == metrics["qd_bounds_xy_m"]
+
+
+def test_qd_loop_num_elites_is_bitwise_no_op_when_cem_is_disabled(
+    stub_steer,
+    stub_adapter,
+    monkeypatch,
+):
+    import copy
+
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=16,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    cond = _rollout_cond(stub_steer)
+    initial = torch.zeros(16, 64, 128)
+    endpoints = torch.linspace(-0.06, 0.06, 4)
+    for index in range(16):
+        initial[index, :4, 39] = endpoints[index % 4] / 4.0
+        initial[index, :4, 40] = endpoints[index // 4] / 4.0
+        initial[index, :, 42] = -float(index)
+    rollout_call = 0
+
+    def score(samples, **kwargs):
+        costs = samples[:, 0, 42].detach().clone()
+        return costs, {"rewards": -costs}
+
+    def rollout(**kwargs):
+        nonlocal rollout_call
+        rollout_call += 1
+        children = kwargs["noisy_action"].clone()
+        for index in range(16):
+            children[index, :4, 39] = endpoints[(index + rollout_call) % 4] / 4.0
+            children[index, :4, 40] = (
+                endpoints[(index // 4 + rollout_call) % 4] / 4.0
+            )
+            children[index, :, 42] = -float(rollout_call * 100 + index)
+        costs, info = score(children)
+        return children, costs, info
+
+    monkeypatch.setattr(
+        stub_steer, "_eds_initial_population", lambda **kwargs: initial.clone()
+    )
+    monkeypatch.setattr(stub_steer, "_eds_score_population_as_cost", score)
+    monkeypatch.setattr(
+        stub_steer, "_eds_renoise_reference", lambda samples, steps: samples
+    )
+    monkeypatch.setattr(stub_steer, "_eds_rollout_reference", rollout)
+
+    def run(num_elites):
+        nonlocal rollout_call
+        rollout_call = 0
+        cfg = stub_steer._resolve_eds_config_with_reference_defaults(
+            _valid_qd_config(
+                num_elites=num_elites,
+            )
+        )
+        torch.manual_seed(908)
+        selected = stub_steer._eds_guided_denoise_loop(
+            x_t=torch.zeros_like(initial),
+            cond=cond,
+            keypoints=torch.zeros(1, 3),
+            guidance_fns=None,
+            eds_config=cfg,
+            verbose=False,
+            global_step=16,
+            current_stage=1,
+        )
+        return (
+            selected.detach().clone(),
+            torch.random.get_rng_state().clone(),
+            copy.deepcopy(stub_steer.get_last_eds_metrics()),
+            copy.deepcopy(stub_steer.get_last_eds_artifacts()),
+        )
+
+    elites16 = run(16)
+    elites32 = run(32)
+
+    def assert_semantically_equal(left, right):
+        if isinstance(left, torch.Tensor):
+            assert isinstance(right, torch.Tensor)
+            assert torch.equal(left, right)
+        elif isinstance(left, dict):
+            comparable_keys = {
+                key for key in left if "latency" not in str(key)
+            }
+            assert comparable_keys == {
+                key for key in right if "latency" not in str(key)
+            }
+            for key in comparable_keys:
+                assert_semantically_equal(left[key], right[key])
+        elif isinstance(left, (list, tuple)):
+            assert len(left) == len(right)
+            for left_item, right_item in zip(left, right):
+                assert_semantically_equal(left_item, right_item)
+        else:
+            assert left == right
+
+    assert torch.equal(elites16[0], elites32[0])
+    assert torch.equal(elites16[1], elites32[1])
+    assert_semantically_equal(elites16[2], elites32[2])
+    assert_semantically_equal(elites16[3], elites32[3])
 
 
 def test_qd_grid5_final_archive_larger_than_population_tracks_selected_source(
