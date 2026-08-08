@@ -1135,6 +1135,7 @@ def _decision_payload(
         },
         "completion": analysis["completion"],
         "attempt_ledger": analysis["attempt_ledger"],
+        "execution_exception_audit": analysis["execution_exception_audit"],
         "job_status_counts": analysis["job_status_counts"],
         "jobs": [
             {

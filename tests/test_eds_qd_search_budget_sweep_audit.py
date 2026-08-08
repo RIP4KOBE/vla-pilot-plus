@@ -150,3 +150,41 @@ def test_execution_exception_reports_physical_attempt_overrun(tmp_path):
     assert result["physical_episode_attempt_count"] == 201
     assert result["hard_cap_passed"] is False
     assert result["user_soft_cap_override_applied"] is True
+
+
+def test_decision_payload_discloses_execution_exception(tmp_path, monkeypatch):
+    audit = _load_audit()
+    run_manifest = tmp_path / "run_manifest.json"
+    run_manifest.write_text(
+        json.dumps({"provenance": {"code_commit": "formal-code"}}) + "\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(audit.runner, "RUN_MANIFEST_PATH", run_manifest)
+    analysis = {
+        "decision": "no_configuration_passed_task_and_safety_gates",
+        "winner": None,
+        "any_passed_5_of_10_gate": False,
+        "completion": {"status": "complete"},
+        "attempt_ledger": {"actual_episode_attempt_count": 201},
+        "execution_exception_audit": {
+            "present": True,
+            "passed": True,
+            "hard_cap_passed": False,
+        },
+        "job_status_counts": {"valid": 18},
+        "jobs": [],
+        "ranking": [],
+        "parameter_effects": {},
+        "credential_audit": {"passed": True},
+        "storage_audit": {"passed": True},
+        "gpu_audit": {"passed": True},
+        "historical_source": {},
+        "run_manifest": {},
+        "num_elites_no_op_audit": {},
+    }
+    payload = audit._decision_payload(
+        analysis, {"path": "final_report.md", "sha256": "report-sha"}
+    )
+    assert payload["execution_exception_audit"] == analysis[
+        "execution_exception_audit"
+    ]
