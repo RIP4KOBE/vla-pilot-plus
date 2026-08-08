@@ -5,11 +5,11 @@ project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
   status: paused
-  phase: planning
+  phase: design_review
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: true
-  pause_reason: "The approved scope ends after design and workspace initialization; no GPU or formal evaluation is authorized in this phase."
+  pause_reason: "The design is complete and awaits user review; no algorithm implementation, GPU work, online episode, formal evaluation, storage initialization, or scheduled loop is authorized."
 
 provenance:
   repository_root: "/home/hynx/VLA-Pilot++"
@@ -24,6 +24,8 @@ provenance:
   baseline_design_sha256: "ea2e0c274591dfbd33d1518725de322c41e90f49d110a1cec0a0bf5c8f2a4251"
   baseline_report_sha256: "cbaa9df290e40bc8cca4affedd7b17fb46b3d32832f6e68d63eb77ae1340e16c"
   decision_manifest_sha256: "45ce8dc8948d8c472d4bd8255301cb824b3e5f2fbceab6857f00779cad8e984f"
+  new_design_path: "docs/01_specs/2026-08-08-eds-qd-autoresearch-libero-swap-ood-design.md"
+  new_design_sha256_before_plan_commit: "b397096fd4b5dbb1fe90900c2645d7b406fbcf8aa5073d4201d9c4045b3ce255"
 
 baseline:
   benchmark: "LIBERO-PRO libero_object_swap"
@@ -48,10 +50,18 @@ evaluation:
   hard_target_success_count: 5
   hard_target_total_tasks: 10
   must_not_underperform_contemporaneous_control: true
-  formal_set_is_holdout: true
-  development_split: "TBD and must be frozen before the first development episode"
-  validation_split: "TBD and must be frozen before the first development episode"
-  formal_split: "Historical task IDs and episode seeds above; one frozen final use except audited same-cell infrastructure recovery"
+  formal_set_is_pristine_holdout: false
+  formal_set_role: "Reuse-limited acceptance set: historical outcomes are known; a single candidate is frozen before one final use, and the outcome cannot feed back into the same research cycle"
+  development_split:
+    tasks: [3, 5, 8, 9]
+    dev_a_seeds: [512905, 150741, 463456, 452903]
+    dev_b_seeds: [558482, 165717, 160148, 160312]
+    canonical_hash_tokens: [dev_a, dev_b]
+  validation_split:
+    tasks: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    seeds: [41678, 829779, 856474, 666150, 876784, 652882, 288157, 522484, 262295, 200894]
+    canonical_hash_token: validation
+  formal_split: "Historical tasks 0..9 and seeds [44,235,43,546,6,621,197,87,151,548]; one frozen final use except audited same-cell infrastructure recovery"
   primary_track_compute_rule: "same or compute-matched EDS/model/reward/VLM call budget"
 
 literature:
@@ -62,7 +72,7 @@ literature:
     - "Quality-diversity selection that retains useful stepping stones without sacrificing task-aligned exploitation"
     - "Leakage-resistant development and validation for a ten-task fixed OOD engineering suite"
   evidence_gaps:
-    - "No frozen development/validation seeds have yet been approved"
+    - "The fixed ten-task formal set has historical exposure and cannot support a pristine holdout claim"
     - "Historical automatic timeout labels are not causal failure diagnoses"
     - "Reward-to-success calibration has not been measured by manipulation stage"
 
@@ -140,4 +150,3 @@ workspace:
   experiments_dir: "experiments/"
   to_human_dir: "to_human/"
   paper_dir: "paper/"
-

@@ -53,4 +53,3 @@ The historical Grid5 result is invalid algorithm evidence. Its episodes hit `Ind
 ## Optimization Trajectory
 
 No new-research experiment has run. Historical results are references, not entries in the new autoresearch trajectory. The trajectory starts only after an experiment protocol has been committed in the execution phase.
-
