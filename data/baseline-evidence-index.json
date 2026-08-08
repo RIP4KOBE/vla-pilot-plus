@@ -1,0 +1,67 @@
+{
+  "schema": "eds-qd-autoresearch-baseline-evidence-v1",
+  "created_at": "2026-08-08T00:00:00Z",
+  "base_commit": "5b0898e53d5b9e16200c17479a74746071215787",
+  "source_branch": "exp/eds-quality-diversity",
+  "source_worktree": "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-quality-diversity",
+  "new_branch": "exp/eds-qd-autoresearch-libero-swap-ood",
+  "new_worktree": "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood",
+  "source_untracked_excluded": [
+    "docs/01_specs/2026-08-08-eds-qd-search-budget-parameter-sweep-design.md"
+  ],
+  "git_blobs": {
+    "configs/config.yaml": "7f4eb5c4e659f63e1feb79511b9acc5ce10e70cd",
+    "core/qd_ed.py": "a9138b1f819d648f0d2b525a0a81e9142c13bd13",
+    "core/rdt_policy_steer.py": "1354e26c1aa351518ef362c568e3fef5f1f9dd95",
+    "scripts/eds_quality_diversity_runner.py": "d8d2f72ca3b106d009bb61d8e8bba8f810e4ba33",
+    "scripts/eds_quality_diversity_audit.py": "08b87077118ec01535881d25906fb7512c976652"
+  },
+  "evidence": [
+    {
+      "kind": "design",
+      "path": "docs/01_specs/2026-08-06-eds-quality-diversity-design.md",
+      "sha256": "ea2e0c274591dfbd33d1518725de322c41e90f49d110a1cec0a0bf5c8f2a4251"
+    },
+    {
+      "kind": "report",
+      "path": "docs/03_evidence/eds_init_pg_diverse_sampling/2026-08-06-eds-quality-diversity-report.md",
+      "sha256": "cbaa9df290e40bc8cca4affedd7b17fb46b3d32832f6e68d63eb77ae1340e16c"
+    },
+    {
+      "kind": "formal_audit",
+      "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/analysis/qd_ed_formal_audit.json",
+      "sha256": "56c4320e2f793e9dc856e34b3830e49595d69eb541d83b9d624b764bd81170ba"
+    },
+    {
+      "kind": "run_manifest",
+      "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/manifests/qd_ed_run_manifest.json",
+      "sha256": "62200ccc4692a946fb84d1d46851e28e610ece7aae9705356746302db2c4c1cc"
+    },
+    {
+      "kind": "attempt_ledger",
+      "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/manifests/episode_attempt_ledger.jsonl",
+      "sha256": "609e45a513cfca4074cbd9bbd22a6fa4e0bb5d64892832312fd63a006ec89e5e"
+    },
+    {
+      "kind": "decision_manifest",
+      "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/manifests/qd_ed_decision_manifest.json",
+      "sha256": "45ce8dc8948d8c472d4bd8255301cb824b3e5f2fbceab6857f00779cad8e984f",
+      "mode": "0444"
+    }
+  ],
+  "historical_summary": {
+    "decision": "no_adoption_keep_p2_stage_on_abs_rbf_control",
+    "control_success_count": 3,
+    "uniform_primary_success_count": 0,
+    "sparse_primary_success_count": 2,
+    "formal_completed_episodes": 110,
+    "actual_episode_attempts": 134,
+    "preflight_passed": true,
+    "credential_scan_passed": true
+  },
+  "planning_health_check": {
+    "command": "pytest -q tests/test_qd_ed_archive.py tests/test_eds_quality_diversity_runner.py tests/test_eds_quality_diversity_audit.py",
+    "result": "56 passed in 3.22s"
+  }
+}
+

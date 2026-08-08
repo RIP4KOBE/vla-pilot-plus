@@ -1,0 +1,2 @@
+{"record_type":"baseline_reference","experiment_id":null,"hypothesis_id":null,"stage":"historical","baseline_metric":{"control_success_count":3,"best_qd_success_count":2,"total_tasks":10},"candidate_metric":null,"delta":null,"validity":"audited_historical_reference","wall_time_min":null,"compute_cost":null,"change_summary":"Frozen EDS-QD historical reference; not a new autoresearch run","decision":"reference_only"}
+

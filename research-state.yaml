@@ -1,0 +1,143 @@
+# Research State — EDS-QD Autoresearch
+# Ground truth for pause/resume. Update after every experiment and outer-loop reflection.
+
+project:
+  title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
+  question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
+  status: paused
+  phase: planning
+  started: "2026-08-08"
+  domain: "vision-language-action inference-time search and quality-diversity"
+  planning_only: true
+  pause_reason: "The approved scope ends after design and workspace initialization; no GPU or formal evaluation is authorized in this phase."
+
+provenance:
+  repository_root: "/home/hynx/VLA-Pilot++"
+  source_worktree: "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-quality-diversity"
+  source_branch: "exp/eds-quality-diversity"
+  base_commit: "5b0898e53d5b9e16200c17479a74746071215787"
+  new_branch: "exp/eds-qd-autoresearch-libero-swap-ood"
+  new_worktree: "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood"
+  base_head_and_index_clean: true
+  source_untracked_excluded:
+    - "docs/01_specs/2026-08-08-eds-qd-search-budget-parameter-sweep-design.md"
+  baseline_design_sha256: "ea2e0c274591dfbd33d1518725de322c41e90f49d110a1cec0a0bf5c8f2a4251"
+  baseline_report_sha256: "cbaa9df290e40bc8cca4affedd7b17fb46b3d32832f6e68d63eb77ae1340e16c"
+  decision_manifest_sha256: "45ce8dc8948d8c472d4bd8255301cb824b3e5f2fbceab6857f00779cad8e984f"
+
+baseline:
+  benchmark: "LIBERO-PRO libero_object_swap"
+  strict_perturbations: true
+  formal_tasks: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+  formal_episode_seeds: [44, 235, 43, 546, 6, 621, 197, 87, 151, 548]
+  max_episode_steps: 720
+  control_success_count: 3
+  uniform_qd_success_count: 0
+  sparse_qd_success_count: 2
+  best_historical_qd_success_count: 2
+  decision: "no_adoption_keep_p2_stage_on_abs_rbf_control"
+  historical_formal_episodes: 110
+  historical_actual_episode_attempts: 134
+  historical_artifact_root: "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity"
+  existing_tests:
+    command: "pytest -q tests/test_qd_ed_archive.py tests/test_eds_quality_diversity_runner.py tests/test_eds_quality_diversity_audit.py"
+    result: "56 passed"
+    checked_at: "2026-08-08"
+
+evaluation:
+  hard_target_success_count: 5
+  hard_target_total_tasks: 10
+  must_not_underperform_contemporaneous_control: true
+  formal_set_is_holdout: true
+  development_split: "TBD and must be frozen before the first development episode"
+  validation_split: "TBD and must be frozen before the first development episode"
+  formal_split: "Historical task IDs and episode seeds above; one frozen final use except audited same-cell infrastructure recovery"
+  primary_track_compute_rule: "same or compute-matched EDS/model/reward/VLM call budget"
+
+literature:
+  status: pending_execution_phase
+  key_papers: []
+  open_problems:
+    - "Behavior descriptors that track phase-specific manipulation progress under a 16-particle search budget"
+    - "Quality-diversity selection that retains useful stepping stones without sacrificing task-aligned exploitation"
+    - "Leakage-resistant development and validation for a ten-task fixed OOD engineering suite"
+  evidence_gaps:
+    - "No frozen development/validation seeds have yet been approved"
+    - "Historical automatic timeout labels are not causal failure diagnoses"
+    - "Reward-to-success calibration has not been measured by manipulation stage"
+
+hypotheses:
+  - id: H1
+    statement: "The initial-population endpoint-XY bounds make later offspring overflow into edge cells, saturating occupancy and erasing behavior resolution; a physically calibrated or overflow-aware descriptor partition will reduce overflow while preserving task-relevant modes."
+    status: pending
+    motivation: "Historical valid QD profiles have median coverage 1.0 but overflow P95 0.938-1.0 and zero paired coverage gain."
+    parent: null
+    priority: high
+  - id: H2
+    statement: "Reward-only global-best execution and cell-local reward elitism preserve proxy quality that is weakly aligned with stage progress; stage-conditioned quality/selection will improve target progress and retain control-success tasks."
+    status: pending
+    motivation: "All QD variants had near-zero best-reward deltas while task outcomes ranged from 0/10 to 2/10 and lost control successes."
+    parent: null
+    priority: high
+  - id: H3
+    statement: "Fresh chunk-local archives select geometrically discontinuous actions, increasing trajectory length and chunk-boundary jump; bounded cross-chunk continuity or continuity-aware selection will reduce replanning discontinuity without collapsing search diversity."
+    status: pending
+    motivation: "QD trajectory medians and chunk-boundary P95 generally exceed the 0.093 m and 2.983 control references."
+    parent: null
+    priority: high
+  - id: H4
+    statement: "Uniform or inverse-visitation allocation over nearly saturated cells spends offspring on low-value niches; an explicit exploit/explore budget with quality guards will improve best-task progress at fixed 176 evaluations per complete chunk."
+    status: pending
+    motivation: "Sparse gains one new task but loses two control tasks; uniform primary loses all three control successes."
+    parent: null
+    priority: medium
+  - id: H5
+    statement: "A single endpoint descriptor and capacity-one archive merge manipulation behaviors whose future value differs by stage or trajectory shape; stage-aware descriptors or limited within-cell plurality will improve behavior retention."
+    status: pending
+    motivation: "The current descriptor omits Z, direction, gripper, trajectory shape, stage, and cross-chunk history."
+    parent: null
+    priority: medium
+
+experiments:
+  proxy_metric: "A preregistered promotion vector: phase-specific target progress, control-task retention, overflow, turnover, reward calibration, trajectory continuity, safety, latency, and call-budget accounting; no post-hoc scalarization."
+  baseline_value:
+    formal_control_success_count: 3
+    formal_best_qd_success_count: 2
+  best_value: null
+  total_runs: 0
+  trajectory_path: "data/experiment-trajectory.jsonl"
+  trajectory: []
+  active_experiment: null
+
+outer_loop:
+  cycle: 0
+  last_direction: null
+  last_reflection: ""
+  trigger_after_inner_runs: 5
+  no_progress_trigger: 3
+
+continuity:
+  user_consent_for_future_execution: true
+  scheduled_task_created: false
+  loop_enabled: false
+  planning_phase_must_not_enable_loop: true
+  pause_sentinel: ".autoresearch/PAUSE"
+
+resources:
+  proposed_artifact_root: "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood"
+  outputs_link: "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/outputs"
+  storage_initialized: false
+  gpu_work_authorized_in_current_phase: false
+  formal_evaluation_authorized_in_current_phase: false
+
+workspace:
+  design: "docs/01_specs/2026-08-08-eds-qd-autoresearch-libero-swap-ood-design.md"
+  findings: "findings.md"
+  log: "research-log.md"
+  literature_dir: "literature/"
+  source_dir: "src/"
+  data_dir: "data/"
+  experiments_dir: "experiments/"
+  to_human_dir: "to_human/"
+  paper_dir: "paper/"
+
