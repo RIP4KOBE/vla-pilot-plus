@@ -1,11 +1,11 @@
-# Current Status — `run_000_baseline_replay` Complete
+# Current Status — `run_001_allocation_ecology_diagnostic` Protocol Locked
 
 - Phase: inner-loop `QD-0`; next protocol pending.
 - State: active; frozen design approved for execution at `2026-08-10T15:00:35Z`.
 - Base commit: `5b0898e53d5b9e16200c17479a74746071215787`.
 - Init commit: `54b2487`.
 - Branch: `exp/eds-qd-autoresearch-libero-swap-ood`.
-- Active experiment: none; `run_001_allocation_ecology_diagnostic` must be protocol-locked before work begins.
+- Active experiment: `run_001_allocation_ecology_diagnostic` (`QD-0`, `CONFIRMATORY`, `PROTOCOL_LOCKED`).
 - Completed new experiments: 1 (`run_000`, zero episodes).
 - GPU jobs: 0.
 - Formal evaluations: 0.
@@ -23,4 +23,4 @@
 - Target state: historical best remains 2/10; target gap remains 3 tasks.
 - Decision: keep diagnostic evidence, reject direct compute scaling as the next move, and audit allocation/quality retention next.
 - Storage: owned artifact root initialized and linked as `outputs`; shared2 had 54 GiB available at replay start, only 4 GiB above the frozen admission floor.
-- Next action: lock a zero-episode allocation-ecology counterfactual protocol. No online candidate or formal run is authorized yet.
+- Next action: implement the deterministic CPU analyzer after protocol commit, then evaluate all 540 saved traces. No online candidate or formal run is authorized yet.

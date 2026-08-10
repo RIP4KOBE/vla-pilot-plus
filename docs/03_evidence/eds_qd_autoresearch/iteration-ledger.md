@@ -1,6 +1,6 @@
 # EDS+QD Autoresearch 统一迭代总账
 
-状态：`EXECUTING — run_000 COMPLETE; next QD-0 protocol pending — 0 algorithm iterations`
+状态：`EXECUTING — run_001_allocation_ecology_diagnostic / PROTOCOL_LOCKED — 0 algorithm iterations`
 
 本文件是 EDS+QD autoresearch 所有 inner-loop 与 outer-loop 过程的单一人工审查入口。所有条目按 iteration ID append-only；不能删除、覆盖或为改善叙事而重写负结果、invalid attempt、infrastructure failure 或 revert 记录。大型 raw artifacts 不嵌入 Git，但必须以稳定路径和 SHA-256 引用。
 
@@ -8,7 +8,8 @@
 
 | Iteration | 日期 | Scope level | 假设 | 修改摘要 | Split / tasks | 结果 | 决策 | Protocol commit | Result commit |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `run_000_baseline_replay` | 2026-08-10 | `QD-0` | H1–H5 | 只读回放旧 QD 与预算 sweep，验证 target-linked failure boundary | historical only | 6/6 gates PASS；4,705 QD chunks；budget max 1/10 | `KEEP_DIAGNOSTIC_EVIDENCE` | `5255e924ee925487406e35a27548d9db4e988642` | pending (this commit) |
+| `run_001_allocation_ecology_diagnostic` | 2026-08-10 | `QD-0` | H4 | saved-trace parent-quality inheritance 与 saturated slot audit | 540 historical traces；task strata 0–9 | pending | `PROTOCOL_LOCKED` | pending (this commit) | — |
+| `run_000_baseline_replay` | 2026-08-10 | `QD-0` | H1–H5 | 只读回放旧 QD 与预算 sweep，验证 target-linked failure boundary | historical only | 6/6 gates PASS；4,705 QD chunks；budget max 1/10 | `KEEP_DIAGNOSTIC_EVIDENCE` | `5255e924ee925487406e35a27548d9db4e988642` | `e0b252c983a3b62858c8fa676e7b32618660b364` |
 | — | 2026-08-10 | — | — | 执行授权；尚未开始算法迭代 | — | — | `APPROVED_EXECUTING` | — | — |
 
 ## 累计状态
@@ -24,6 +25,78 @@
 - Attempt budget：`0 / 143`。
 - 已完成新实验：1 个 `QD-0`；算法迭代仍为 0。
 - 当前结论：直接扩大 population/iterations 已被排除为下一方向；下一轮只做 allocation/quality-retention 反事实诊断。Formal evaluation 仍未授权。
+
+### `run_001_allocation_ecology_diagnostic` — 饱和 archive 的 parent 质量继承与 slot 生态
+
+#### A. 身份与状态
+
+- 日期与 UTC 时间：`2026-08-10T15:20:46Z`。
+- Inner/outer loop：inner loop 1。
+- 状态：`PROTOCOL_LOCKED`。
+- 标签：`CONFIRMATORY`。
+- 假设 ID：H4。
+- Scope level：`QD-0`。
+- 迭代前 best success / target gap：历史 EDS-QD `2/10`；gap 3。
+- 本轮预计翻转的失败 task：本轮零 episode、不翻转；若支持，唯一未来 QD-1 候选预期恢复 task 3 或 9，并保留 5/8。
+
+#### B. 历史证据与问题来源
+
+| 绝对路径 | Commit / SHA-256 | 原始数值或失败模式 | 证据等级 | 对本轮设计的影响 |
+| --- | --- | --- | --- | --- |
+| owned `run_000_baseline_replay/analysis.json` | `6ad13083…963` | 4,705 chunks；100% archive-only parents；0 direct elites | confirmatory replay | 从缺少 quality reserve 推进到 offspring yield 检验 |
+| budget `num_elites_no_op_audit.json` | `f75e48c5…120` | non-CEM QD 的 `num_elites` 无行为作用 | code/behavior audit | 不把现有参数误认为 exploitation |
+| original sparse `mechanism_trace.pt` example | `0d3d4d8f…174` | child reward、parent rank/index、slot telemetry 齐全 | raw tensor trace | 支持 0-episode counterfactual |
+| `core/qd_ed.py` | Git blob `a9138b1f…bd13` | uniform/inverse-visitation allocation 无 reward weight | source evidence | 锁定 H4 mechanism chain |
+
+- 已检索 catalog/query：`run_000` 27 profile summaries、mechanism trace schemas、archive timeline、elite survival metadata、QD allocation source。
+- 相冲突证据：archive 已做 cell-local reward elitism且最终选 global best；所以 zero direct carryover 本身不是 defect，必须验证 parent-quality inheritance。
+- 为什么没有重复已知失败：本轮不增加 population/iterations、不在线试 reserve ratio；只检验一个决定是否值得实现的因果前提。
+
+#### C. 锁定假设与判据
+
+- 机制陈述：饱和 archive 的 quality-blind slot allocation 欠采样高质量 parent；若 reward quality 可继承到 offspring，则固定 quality reserve 更可能保留已知成功模式。
+- 可证伪预测：top ranks 获得 `<=35%` slots；top-quartile child reward 高于 bottom；cluster-bootstrap CI lower `>0`；uniform/sparse family median 均 `>0`；rank-1 margin `>0`。
+- Primary metric：per-trace top-minus-bottom child reward margin；secondary 为 slot share、rank-1 margin、task subgroup。
+- Support/refute gates：详见 per-run protocol；任一 H4 gate fail 均禁止 H4 online candidate。
+- Safety/compute guardrails：540 immutable traces；0 episode/GPU/model/environment calls；local RNG seed 1701。
+- 替代解释：reward inheritance 可能只延续 proxy bias；saved offspring 不能直接模拟未生成的 extra children；task success subgroup 样本少。
+
+#### D. EDS+QD change map
+
+| EDS+QD 步骤 | Frozen / Changed | 修改内容 | 文件/符号 | 归因理由 |
+| --- | --- | --- | --- | --- |
+| EDS initial proposal | Frozen | none | — | 不改变行为 |
+| EDS rollout/mutation/budget | Frozen | saved offspring only | planned analyzer | 检验 fixed-budget yield |
+| QD descriptor/partition | Frozen | condition on full archive | trace `qd_info` | 隔离 saturation |
+| QD archive/replacement | Frozen | read ranks | trace stages | 识别 parent quality |
+| QD parent/allocation | Frozen | audit slots/yield | planned analyzer | H4 核心 |
+| QD quality/elitism | Frozen | existing reward rank only | trace stages | 不引入新 score |
+| QD final selection | Frozen | none | — | 无执行 counterfactual |
+| QD cross-chunk state | Frozen | subgroup only | path metadata | 不发散 |
+| EDS+QD instrumentation | Changed | deterministic CPU analyzer | `src/analyze_qd_allocation_ecology.py`（protocol 后实现） | 形成 QD-1 go/no-go evidence |
+
+- 明确冻结的非 EDS+QD 模块：checkpoint、perception、prompts、Stage、environment/reset、executor、evaluator。
+- 逐文件 diff 摘要：本 protocol commit 仅新增 protocol 并更新 ledger/state/log/status；无 analyzer 或算法实现。
+- Protocol commit：pending (this commit)。
+- Code/config/checkpoint fingerprint：QD blobs `a9138b1f…bd13` / `1354e26c…dd95`；checkpoint 不加载。
+- Protocol-lock 时 Git dirty-state：仅禁止修改的用户 untracked stage-guidance design；无算法 diff。
+
+#### E. 执行协议
+
+- Split/tasks/seeds：540 historical saved traces；task IDs 0–9 仅作 descriptive strata。
+- Exact command：见 `experiments/run_001_allocation_ecology_diagnostic/protocol.md`。
+- 环境 fingerprint：`vla-pilot` CPU PyTorch loader；local bootstrap RNG。
+- GPU index/UUID：不适用。
+- Expected evaluations/model/reward/VLM calls：全部 0。
+- Started / ended / wall time：尚未开始。
+
+#### F. 结果
+
+Pending。Protocol commit 后才允许实现 analyzer。
+
+#### G. 分析与决策
+
+- 预提交：valid + H4 gates 全过才允许另建固定 `4/16` quality-reserve QD-1 protocol；valid 但 H4 fail 则转 H1 partition diagnostic；invalid 只修 analyzer。
 
 ### `run_000_baseline_replay` — 历史基线与预算扩展回放
 
@@ -116,7 +189,7 @@
 - 替代解释与限制：budget sweep 没有 contemporaneous control；formal mapping 已曝光；archive reward 不是 stage progress；overflow 仍可能包含 useful exploration。
 - 决策：`KEEP_DIAGNOSTIC_EVIDENCE`。保留的是可复核 failure boundary，不是算法候选。
 - Reverted commit：不适用，无行为修改。
-- Result commit：pending (this commit)。
+- Result commit：`e0b252c983a3b62858c8fa676e7b32618660b364`。
 - 下一步及理由：锁定 `run_001_allocation_ecology_diagnostic`。历史 task loss 表明 retention 是直接 target gap；raw mechanism traces 可在 0 episode 下检验 quality-blind slots 与 elite lineage，符合 protocol 的预提交优先顺序。
 
 ## Execution authorization

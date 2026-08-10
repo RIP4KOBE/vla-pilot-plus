@@ -5,7 +5,7 @@ project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
   status: active
-  phase: inner_loop_qd0_next_protocol
+  phase: inner_loop_qd0
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: false
@@ -159,7 +159,16 @@ experiments:
       gpu_hours: 0
       protocol_commit: "5255e924ee925487406e35a27548d9db4e988642"
       analysis_sha256: "6ad1308363a512c9b2529a090682669bb096d5000159571d5798ddd296bad963"
-  active_experiment: null
+  active_experiment:
+    id: run_001_allocation_ecology_diagnostic
+    hypothesis_ids: [H4]
+    scope_level: QD-0
+    label: CONFIRMATORY
+    status: PROTOCOL_LOCKED
+    protocol_locked_at: "2026-08-10T15:20:46Z"
+    protocol_path: "experiments/run_001_allocation_ecology_diagnostic/protocol.md"
+    expected_online_episodes: 0
+    expected_gpu_hours: 0
 
 outer_loop:
   cycle: 0
