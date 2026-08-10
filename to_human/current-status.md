@@ -1,11 +1,12 @@
-# Current Status — Execution Bootstrap
+# Current Status — `run_000_baseline_replay` Protocol Locked
 
-- Phase: bootstrap and historical replay.
+- Phase: inner-loop `QD-0` historical replay.
 - State: active; frozen design approved for execution at `2026-08-10T15:00:35Z`.
 - Base commit: `5b0898e53d5b9e16200c17479a74746071215787`.
 - Init commit: `54b2487`.
 - Branch: `exp/eds-qd-autoresearch-libero-swap-ood`.
-- New experiments: 0.
+- Active experiment: `run_000_baseline_replay` (`CONFIRMATORY`, `PROTOCOL_LOCKED`).
+- Completed new experiments: 0.
 - GPU jobs: 0.
 - Formal evaluations: 0.
 - Scheduled continuity loops: 0.
@@ -18,4 +19,4 @@
 - GPU authorization: any dynamically eligible physical GPU 0–7; current GPU jobs remain 0.
 - Write boundary: algorithm and documentation changes only in this branch/worktree; large artifacts only in the owned proposed artifact root.
 - Design SHA-256 before latest plan commit: `4de266d0192781f5018c3ac1a276b40fd5e8701a8e0ba23dc21be52ad56ed852`.
-- Next action: build the read-only historical evidence catalog and lock `run_000_baseline_replay` before any algorithm or online change.
+- Next action: after the protocol commit, implement and run the deterministic read-only replay twice; no algorithm or online change is authorized in this iteration.
