@@ -1,6 +1,6 @@
 # EDS+QD Autoresearch 统一迭代总账
 
-状态：`EXECUTING — outer-loop 001 PIVOT to H1 partition; next protocol pending — 0 algorithm iterations`
+状态：`EXECUTING — run_002 H1 causal-envelope protocol locked — 0 algorithm iterations`
 
 本文件是 EDS+QD autoresearch 所有 inner-loop 与 outer-loop 过程的单一人工审查入口。所有条目按 iteration ID append-only；不能删除、覆盖或为改善叙事而重写负结果、invalid attempt、infrastructure failure 或 revert 记录。大型 raw artifacts 不嵌入 Git，但必须以稳定路径和 SHA-256 引用。
 
@@ -8,6 +8,7 @@
 
 | Iteration | 日期 | Scope level | 假设 | 修改摘要 | Split / tasks | 结果 | 决策 | Protocol commit | Result commit |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `run_002_partition_diagnostic` | 2026-08-10 | `QD-0` | H1 | fixed-initial vs 单一 `causal_envelope_v1` 4x4 partition replay | 27 frozen files；4x4 eligible chunks；task strata 3/5/8/9 | `PROTOCOL_LOCKED`；尚未执行 | pending | pending this commit | — |
 | `run_001_allocation_ecology_diagnostic` | 2026-08-10 | `QD-0` | H4 | saved-trace parent-quality inheritance 与 saturated slot audit | 540 traces / 9,000 stages；task strata 0–9 | 2 attempts `INVALID`；无可采纳 H4 outcome | `INVALID_CONCLUDE_AND_TRIGGER_OUTER_LOOP` | v1 `dcf234b…`; v2 `91ddd34…`; v3 `f6d7bc9…`; v4 `3d320f6…` | `cdd150b2c332e907c05cda90c7c09fd1f1799570` |
 | `run_000_baseline_replay` | 2026-08-10 | `QD-0` | H1–H5 | 只读回放旧 QD 与预算 sweep，验证 target-linked failure boundary | historical only | 6/6 gates PASS；4,705 QD chunks；budget max 1/10 | `KEEP_DIAGNOSTIC_EVIDENCE` | `5255e924ee925487406e35a27548d9db4e988642` | `e0b252c983a3b62858c8fa676e7b32618660b364` |
 | — | 2026-08-10 | — | — | 执行授权；尚未开始算法迭代 | — | — | `APPROVED_EXECUTING` | — | — |
@@ -23,8 +24,8 @@
 - Formal evaluations：0。
 - 累计 GPU-hours：0。
 - Attempt budget：`0 / 143`。
-- 已结束新实验：2 个 `QD-0`（1 complete，1 invalid）；算法迭代仍为 0。
-- 当前结论：outer-loop 001 已执行 `PIVOT_WITHIN_EDS_QD_TO_H1_PARTITION`；只允许一个 H1 partition counterfactual 后作 QD-1 go/no-go。Formal evaluation 仍未授权。
+- 已结束新实验：2 个 `QD-0`（1 complete，1 invalid）；另有 1 个 `QD-0` protocol locked；算法迭代仍为 0。
+- 当前结论：`run_002` 只允许 `causal_envelope_v1` 一个 H1 partition counterfactual；其结果决定 QD-1 go/no-go。Formal evaluation 仍未授权。
 
 ### `run_001_allocation_ecology_diagnostic` — 饱和 archive 的 parent 质量继承与 slot 生态
 
@@ -328,3 +329,80 @@
 - 当前 EDS+QD 机制理解：
 - 方向选择及 scope 合规性：
 - Findings/state/report 更新：
+
+### `run_002_partition_diagnostic` — Causal envelope 分区反事实
+
+#### A. 身份与状态
+
+- 日期与 UTC 时间：`2026-08-10T15:43:49Z`。
+- Inner/outer loop：outer-loop 001 pivot 后的 inner-loop QD-0。
+- 状态：`PROTOCOL_LOCKED`；尚未实现或执行。
+- 标签：`CONFIRMATORY`。
+- 假设 ID：H1。
+- Scope level：`QD-0`。
+- 迭代前 best success / target gap：历史 EDS-QD `2/10`；gap 3。
+- 本轮预计翻转的失败 task：本轮 0 episode；若全部 offline gate 支持，未来唯一 QD-1 候选必须保留 5/8 并恢复 3 或 9，才直接缩小 gap。
+
+#### B. 历史证据与问题来源
+
+| 绝对路径 | Commit / SHA-256 | 原始数值或失败模式 | 证据等级 | 对本轮设计的影响 |
+| --- | --- | --- | --- | --- |
+| owned `run_000_baseline_replay/analysis.json` | `6ad13083…963` | 27 files / 4,705 QD chunks；raw overflow P95 0.875；coverage median 1.0 | confirmatory replay | 冻结 raw JSONL 输入与 H1 failure boundary |
+| `core/qd_ed.py` | blob `a9138b1f…bd13` | initial bounds 后永久 clamp；capacity-one reward elite | source evidence | 单点修改仅针对 bounds/partition 与 rebin |
+| original EDS-QD report | `cbaa9df2…16c` | control `{3,8,9}`；best QD `{5,8}` | audited task outcome | task strata 与未来 retain/recover 目标 |
+| frozen design H1 | commit `1aee7648…981` | overflow P95 `<=0.25`、resolution `>=20%`、spread/mode guard | frozen protocol | 阈值不得由结果反向修改 |
+
+- 已检索 catalog/query：27-file manifest、original/budget profile metadata、`shadow_qd_candidate_stream`、bounds、per-iteration archive/overflow/reward/fingerprint fields，以及 current archive update/tie-break source。
+- 相冲突证据：expand20 与其他 bounds OFAT 均未 adoption；所以本轮不再试 expand scalar。Stored stream 不能重建 partition 改变后的 offspring，只能回答是否值得一次在线因果检验。
+- 为什么没有重复已知失败：唯一规则是无标量超参的 causal envelope + archive rebin；grid、descriptor、reward、allocation 与 compute 均不 sweep。
+
+#### C. 锁定假设与判据
+
+- 机制陈述：initial-only bounds 使 later descriptors 在 edge cells 内发生几何 aliasing；当前 batch 可见后单调扩展 envelope 并重分箱 incumbents，应降低 within-cell endpoint SSE，而不牺牲 mode count、endpoint spread 或全局 reward best。
+- 可证伪预测：unrepresented overflow P95 `<=0.25`；chunk/profile median resolution improvement `>=20%`；task 3/5/8/9 至少两个同方向；mode/spread median ratio各 `>=0.90`；global best 100% preserved。
+- Primary metric：paired `within_cell_endpoint_sse` 的 `1 - candidate/baseline`。
+- Support / reject：全部 validity + 6 项 H1 gates 见 per-run protocol；任一有效 gate fail 即本 cycle PARK H1，不试邻近 partition。
+- Safety/compute guardrails：0 episode/GPU/model/reward/VLM/environment call；同一 stored candidates；4x4、capacity one、16 slots、baseline evaluation budget不变。
+- 替代解释：几何 resolution 改善可能不对应 manipulation stage progress；因 parent cells 改变，真正 offspring stream 只能由随后 QD-1 Dev-A 验证。
+
+#### D. EDS+QD change map
+
+| EDS+QD 步骤 | Frozen / Changed | 修改内容 | 文件/符号 | 归因理由 |
+| --- | --- | --- | --- | --- |
+| EDS initial proposal | Frozen | stored initial batch；initial insertion不变 | JSONL stream iter -1 | 隔离 partition |
+| EDS rollout/mutation/budget | Frozen | stored offspring；无再生成 | JSONL stream iter >=0 | 0-call paired replay |
+| QD descriptor/partition | Counterfactual | fixed initial vs `causal_envelope_v1` | protocol 后 analyzer | H1 核心 |
+| QD archive/replacement | Counterfactual | bounds 扩展时 deterministic incumbent rebin | protocol 后 analyzer | 维持 cell semantic consistency |
+| QD parent/allocation | Frozen | 不从 stored stream 推断新 offspring | — | 防止无效因果外推 |
+| QD quality/elitism | Frozen | reward 再 fingerprint tie-break | source parity | 保持 quality 不变 |
+| QD final selection | Frozen | global reward best | replay | 检验 best preservation |
+| QD cross-chunk state | Frozen | fresh local archive | — | 不发散到 H3 |
+| EDS+QD instrumentation | Planned | deterministic JSONL analyzer | `src/analyze_qd_partition_counterfactual.py` | QD-1 go/no-go |
+
+- 明确冻结的非 EDS+QD 模块：checkpoint、perception/grounding、prompt、Stage、environment/reset、executor、evaluator。
+- 逐文件 diff 摘要：protocol commit 只增加 protocol，并更新 state/log/ledger；没有 analyzer 或算法实现。
+- Protocol commit：pending this commit。
+- Code/config fingerprint：QD blobs `a9138b1f…bd13` / `1354e26c…dd95`；source manifest `6ad13083…963`。
+- Protocol-lock dirty-state：仅用户受保护的 untracked stage-guidance design；不会 stage/modify。
+
+#### E. 执行协议
+
+- Split/tasks/seeds：27 immutable historical metrics files；仅 4x4 records 进入 paired estimand；task 3/5/8/9 作预注册 strata。
+- Exact command：见 `experiments/run_002_partition_diagnostic/protocol.md`。
+- 环境 fingerprint：CPU-only standard Python JSON analyzer；local permutation seed 1702。
+- GPU index/UUID：不适用。
+- Expected evaluations/model/reward/VLM calls：全部 0。
+- Started / ended / wall time：尚未开始。
+
+#### F. 结果
+
+- 状态：尚未执行；无可用 result、task outcome 或 mechanism statistic。
+- Promotion vector：未评估。
+- 迭代后 best success / target gap：仍为历史 `2/10` / 3。
+- 本轮与累计 episode/GPU-hour budget：`0/0`；累计 attempt `0/143`、GPU-hours `0/48`。
+
+#### G. 分析与决策
+
+- 当前决策：只锁定 protocol，不提前声称 H1 support。
+- 结果决策树：全部 gate pass → 仅授权一个 QD-1 protocol；valid gate fail → reject/park H1；首次 schema failure → 最多一次 protocol-first repair；第二次 → invalid + outer-loop。
+- 下一步：在本 protocol commit 后实现 analyzer，先做 baseline exactness，再执行三次 deterministic replay；任何算法实现仍未授权。
