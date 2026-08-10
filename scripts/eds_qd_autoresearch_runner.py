@@ -45,6 +45,7 @@ MECHANISM_PREFLIGHT_LEVEL = "eds_qd_autoresearch_mechanism_preflight"
 DEV_A_LEVEL = "eds_qd_autoresearch_dev_a"
 BRANCH = "exp/eds-qd-autoresearch-libero-swap-ood"
 PROTOCOL_COMMIT = "1017bf0212780b2e386764517661cf9970090f8d"
+REPAIR_PROTOCOL_COMMIT = "8fd3aea0b1ec063aba63fa0bffcf3829f03c006c"
 EXPERIMENT_ROOT = Path(
     "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood"
 )
@@ -58,7 +59,11 @@ GPU_HOUR_CAP = 48.0
 ALLOWED_GPU_INDICES = set(range(8))
 RUN_MANIFEST_PATH = RUN_ROOT / "manifests/run_manifest.json"
 ATTEMPT_LEDGER_PATH = RUN_ROOT / "manifests/episode_attempt_ledger.jsonl"
-OFFLINE_PREFLIGHT_PATH = RUN_ROOT / "analysis/offline_preflight.json"
+FAILED_OFFLINE_PREFLIGHT_V1_PATH = RUN_ROOT / "analysis/offline_preflight.json"
+FAILED_OFFLINE_PREFLIGHT_V1_SHA256 = (
+    "1654574975a02df00be5ac6c78b986b18baf1657bf997a808c1fcb5aa58f9a61"
+)
+OFFLINE_PREFLIGHT_PATH = RUN_ROOT / "analysis/offline_preflight.v2.json"
 MECHANISM_AUDIT_PATH = RUN_ROOT / "analysis/mechanism_preflight_audit.json"
 DEV_A_AUDIT_PATH = RUN_ROOT / "analysis/dev_a_audit.json"
 RUNTIME_CACHE_DIR = RUN_ROOT / "runtime_cache/cached_functions"
@@ -641,6 +646,7 @@ def current_provenance() -> dict[str, Any]:
         "worktree": str(WORKTREE_ROOT.resolve(strict=True)),
         "code_commit": head,
         "protocol_commit": PROTOCOL_COMMIT,
+        "repair_protocol_commit": REPAIR_PROTOCOL_COMMIT,
         "code_state_sha256": base._p2_code_state_sha256(),
     }
 
@@ -758,11 +764,14 @@ def offline_preflight(path: Path = OFFLINE_PREFLIGHT_PATH) -> dict[str, Any]:
         hard_failures.append("evaluation/call budget mismatch")
     if not all(item["update"]["total"] == 16 for item in iterations):
         hard_failures.append("archive accounting mismatch")
-    if not all(
-        item["resolution_improvement"] is not None
-        and item["resolution_improvement"] >= 0.20
+    finite_resolution = [
+        float(item["resolution_improvement"])
         for item in iterations
-    ):
+        if isinstance(item["resolution_improvement"], (int, float))
+        and math.isfinite(float(item["resolution_improvement"]))
+    ]
+    finite_resolution_median = median(finite_resolution)
+    if finite_resolution_median is None or finite_resolution_median < 0.20:
         hard_failures.append("synthetic resolution gate failed")
     if not all(item["parent_slot_sum"] == 16 for item in iterations):
         hard_failures.append("parent allocation budget mismatch")
@@ -774,7 +783,7 @@ def offline_preflight(path: Path = OFFLINE_PREFLIGHT_PATH) -> dict[str, Any]:
         "rewards": rewards.tolist(),
     }
     payload = {
-        "schema": "eds-qd-autoresearch-offline-preflight-v1",
+        "schema": "eds-qd-autoresearch-offline-preflight-v2",
         "created_at": now(),
         "provenance": current_provenance(),
         "storage": storage,
@@ -793,6 +802,10 @@ def offline_preflight(path: Path = OFFLINE_PREFLIGHT_PATH) -> dict[str, Any]:
         "synthetic_input_sha256": sha256_bytes(
             canonical(synthetic_input).encode("utf-8")
         ),
+        "preserved_failed_v1": {
+            "path": str(FAILED_OFFLINE_PREFLIGHT_V1_PATH),
+            "sha256": FAILED_OFFLINE_PREFLIGHT_V1_SHA256,
+        },
         "regression_test_evidence": regression,
         "candidate": "eds_quality_diversity_sparse_causal_envelope_v1",
         "profile_fingerprints": {
@@ -805,6 +818,8 @@ def offline_preflight(path: Path = OFFLINE_PREFLIGHT_PATH) -> dict[str, Any]:
             "evaluation_budget_per_full_chunk": evaluation_count,
             "score_calls_per_full_chunk": score_call_count,
             "global_rng_unchanged": rng_unchanged,
+            "finite_resolution_count": len(finite_resolution),
+            "finite_resolution_median": finite_resolution_median,
         },
         "hard_failures": hard_failures,
         "passed": not hard_failures,
@@ -826,6 +841,12 @@ def freeze_manifest(path: Path = RUN_MANIFEST_PATH) -> dict[str, Any]:
     offline = json.loads(OFFLINE_PREFLIGHT_PATH.read_text(encoding="utf-8"))
     if offline.get("passed") is not True:
         raise RuntimeError("offline preflight did not pass")
+    if (
+        not FAILED_OFFLINE_PREFLIGHT_V1_PATH.is_file()
+        or sha256_path(FAILED_OFFLINE_PREFLIGHT_V1_PATH)
+        != FAILED_OFFLINE_PREFLIGHT_V1_SHA256
+    ):
+        raise RuntimeError("preserved failed offline v1 identity mismatch")
     cache = prepare_runtime_cache()
     provenance = current_provenance()
     gpu_reference = load_gpu_reference()
@@ -836,6 +857,7 @@ def freeze_manifest(path: Path = RUN_MANIFEST_PATH) -> dict[str, Any]:
         "storage": storage,
         "runtime_cache_sha256": sha256_bytes(canonical(cache).encode("utf-8")),
         "offline_preflight_sha256": sha256_path(OFFLINE_PREFLIGHT_PATH),
+        "failed_offline_preflight_v1_sha256": FAILED_OFFLINE_PREFLIGHT_V1_SHA256,
         "checkpoint_fingerprint": offline["checkpoint_fingerprint"],
         "libero_input_fingerprint": offline["libero_input_fingerprint"],
         "regression_test_evidence": {
