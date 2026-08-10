@@ -1,6 +1,6 @@
 # EDS+QD Autoresearch 统一迭代总账
 
-状态：`EXECUTING — run_002 COMPLETE；one H1 causal-envelope QD-1 protocol authorized — 0 algorithm iterations`
+状态：`EXECUTING — run_010 causal-envelope QD-1 protocol locked — 0 algorithm iterations`
 
 本文件是 EDS+QD autoresearch 所有 inner-loop 与 outer-loop 过程的单一人工审查入口。所有条目按 iteration ID append-only；不能删除、覆盖或为改善叙事而重写负结果、invalid attempt、infrastructure failure 或 revert 记录。大型 raw artifacts 不嵌入 Git，但必须以稳定路径和 SHA-256 引用。
 
@@ -8,7 +8,8 @@
 
 | Iteration | 日期 | Scope level | 假设 | 修改摘要 | Split / tasks | 结果 | 决策 | Protocol commit | Result commit |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `run_002_partition_diagnostic` | 2026-08-10 | `QD-0` | H1 | fixed-initial vs 单一 `causal_envelope_v1` 4x4 partition replay | 27 frozen files；4,567 eligible chunks；task strata 3/5/8/9 | 10/10 gates PASS；resolution +30.1%；global best 100% | `KEEP_DIAGNOSTIC_EVIDENCE_AND_AUTHORIZE_ONE_QD1_PROTOCOL` | `862f7cc4f00d92a97f6a0103e760f3b6180a437f` | pending this commit |
+| `run_010_causal_envelope_candidate` | 2026-08-10 | `QD-1` | H1 | sparse QD + causal bounds expansion/archive rebin；其余冻结 | offline + preflight tasks 3/5 + paired Dev-A 3/5/8/9 | `PROTOCOL_LOCKED`；尚未实现/运行 | pending | pending this commit | — |
+| `run_002_partition_diagnostic` | 2026-08-10 | `QD-0` | H1 | fixed-initial vs 单一 `causal_envelope_v1` 4x4 partition replay | 27 frozen files；4,567 eligible chunks；task strata 3/5/8/9 | 10/10 gates PASS；resolution +30.1%；global best 100% | `KEEP_DIAGNOSTIC_EVIDENCE_AND_AUTHORIZE_ONE_QD1_PROTOCOL` | `862f7cc4f00d92a97f6a0103e760f3b6180a437f` | `29fcdb7940e35ce12d1d96e2651b7d813406052d` |
 | `run_001_allocation_ecology_diagnostic` | 2026-08-10 | `QD-0` | H4 | saved-trace parent-quality inheritance 与 saturated slot audit | 540 traces / 9,000 stages；task strata 0–9 | 2 attempts `INVALID`；无可采纳 H4 outcome | `INVALID_CONCLUDE_AND_TRIGGER_OUTER_LOOP` | v1 `dcf234b…`; v2 `91ddd34…`; v3 `f6d7bc9…`; v4 `3d320f6…` | `cdd150b2c332e907c05cda90c7c09fd1f1799570` |
 | `run_000_baseline_replay` | 2026-08-10 | `QD-0` | H1–H5 | 只读回放旧 QD 与预算 sweep，验证 target-linked failure boundary | historical only | 6/6 gates PASS；4,705 QD chunks；budget max 1/10 | `KEEP_DIAGNOSTIC_EVIDENCE` | `5255e924ee925487406e35a27548d9db4e988642` | `e0b252c983a3b62858c8fa676e7b32618660b364` |
 | — | 2026-08-10 | — | — | 执行授权；尚未开始算法迭代 | — | — | `APPROVED_EXECUTING` | — | — |
@@ -25,7 +26,7 @@
 - 累计 GPU-hours：0。
 - Attempt budget：`0 / 143`。
 - 已结束新实验：3 个 `QD-0`（2 complete，1 invalid）；算法迭代仍为 0。
-- 当前结论：`run_002` 全部门槛通过，只授权 `causal_envelope_v1` 一个 H1 QD-1 protocol；不授权相邻 partition 或 formal evaluation。
+- 当前结论：`run_010` QD-1 protocol 已锁定；Dev-A 必须 candidate success `>= control + 1` 且零 control-success loss。相邻 partition、Dev-B、validation、formal 均未授权。
 
 ### `run_001_allocation_ecology_diagnostic` — 饱和 archive 的 parent 质量继承与 slot 生态
 
@@ -423,5 +424,82 @@
 - H1：获得 offline support，授权一次 QD-1 因果测试；不授权参数 sweep 或 formal。
 - 替代解释：parent cell 改变会改变未来 offspring，stored stream 不能覆盖；endpoint resolution 不是 stage progress。
 - 决策：`KEEP_DIAGNOSTIC_EVIDENCE_AND_AUTHORIZE_ONE_QD1_PROTOCOL`。
-- Result commit：pending this commit。
+- Result commit：`29fcdb7940e35ce12d1d96e2651b7d813406052d`。
 - 下一步：先锁定 `run_010_causal_envelope_candidate` protocol，再以 TDD 实现 QD bounds expansion/archive rebin；CPU offline preflight PASS 后才进入 frozen mechanism preflight 与 Dev-A。
+
+### `run_010_causal_envelope_candidate` — Sparse QD causal envelope 因果候选
+
+#### A. 身份与状态
+
+- 日期与 UTC 时间：`2026-08-10T16:08:00Z`。
+- Inner/outer loop：outer-loop 001 下的首个 QD-1。
+- 状态：`PROTOCOL_LOCKED`；无算法 diff、测试结果或 online outcome。
+- 标签：`CONFIRMATORY`。
+- 假设 ID：H1。
+- Scope level：`QD-1`。
+- 迭代前 best success / target gap：历史 EDS-QD `2/10`；gap 3。
+- 本轮预计翻转的失败 task：以新 seed paired control 为准，在 3/5/8/9 中至少新增 1 个 success 且不丢任何 control success；机制目标为历史 retain 5/8、recover 3/9。
+
+#### B. 历史证据与问题来源
+
+| 绝对路径 | Commit / SHA-256 | 原始数值或失败模式 | 证据等级 | 对本轮设计的影响 |
+| --- | --- | --- | --- | --- |
+| owned `run_002_partition_diagnostic/analysis.json` | `e21d2598…d9a7` | 4,567 exact replays；resolution +30.1%；mode 0.9375；spread 2.0087；best retain 1.0 | confirmatory offline | 只授权 causal envelope 一个 QD-1 |
+| original EDS-QD report | `cbaa9df2…16c` | control `{3,8,9}`；sparse `{5,8}` | audited task outcome | sparse primary 为 base；retain/recover task map |
+| run_000 analysis | `6ad13083…963` | overflow P95 0.875；compute sweep max 1/10 | confirmatory replay | 不加 compute、不试邻近 grid/bounds |
+| `core/qd_ed.py` / `core/rdt_policy_steer.py` | blobs `a9138b1f…bd13` / `1354e26c…dd95` | fixed clamp、capacity-one、sparse visits、global reward best | source | 冻结除 partition/rebin 外语义 |
+
+- 已检索 catalog/query：run_000/001/002、original/budget reports、shadow streams、archive/metrics/config validation、runner attempt/GPU/storage/credential paths、frozen Dev-A split。
+- 相冲突证据：expand20 未 adoption；因此本轮不是 expand scalar。Offline common stream 不模拟新 parent 产生的 offspring；因此必须用 paired Dev-A success 决断。
+- 为什么没有重复已知失败：新 field 是 `qd_bounds_update_policy` 单点差异；grid、descriptor、capacity、allocation rule、reward、selection、Stage、compute 全冻结。
+
+#### C. 锁定假设与判据
+
+- 机制陈述：causal envelope 与 coherent archive/visit rebin 会把 offline geometry resolution 转化为更有效的 sparse parent/offspring feedback，从而至少翻转一个 Dev-A task 且不丢 control success。
+- 可证伪预测：offline/preflight 全硬门 PASS；Dev-A candidate `success >= control + 1`、control-success retention 100%、gain-loss `>=1`；online resolution 在至少 3/4 tasks `>=20%`。
+- Primary metric：paired Dev-A success count 与 gained/retained/lost task matrix。
+- Support gate：成功、retention、validity/safety、3/4 mechanism 与 compute gates 全 PASS。
+- Refute/reject gate：success tie/下降、任何 control-success loss、safety/call failure、只有 proxy gain、或机制 collapse；均停止 H1 不试相邻参数。
+- Safety/compute：14 unique cells；attempt cap 143；48 GPU-hours；176 eval/complete candidate chunk；动态 GPU admission。
+- 替代解释：new seeds 的 control outcome 可与历史 task map 不同；Stage telemetry 不是 success 替代；rebin/visit remap 的 online feedback 只能由本轮验证。
+
+#### D. EDS+QD change map
+
+| EDS+QD 步骤 | Frozen / Changed | 修改内容 | 文件/符号 | 归因理由 |
+| --- | --- | --- | --- | --- |
+| EDS initial proposal | Frozen | none | — | 保持 initial archive |
+| EDS rollout/mutation/budget | Frozen | 16×10，176 eval | — | compute matching |
+| QD descriptor/partition | Changed | current-batch causal no-shrink envelope | planned core helper/policy branch | H1 |
+| QD archive/replacement | Changed | incumbent rebin、collision elite、visit remap | planned `QDArchive` method | cell consistency |
+| QD parent/allocation | Frozen | sparse-priority rule不变 | existing allocator | 单点归因 |
+| QD quality/elitism | Frozen | reward/fingerprint | existing archive | 不混入 H2 |
+| QD final selection | Frozen | global reward best | existing selection | 不混入 H2 |
+| QD cross-chunk state | Frozen | fresh | existing | 不混入 H3 |
+| EDS+QD instrumentation | Changed | bounds/rebin/raw-overflow/resolution + owned runner/audit | planned metrics/scripts/tests | attribution/validity |
+
+- 明确冻结的非 EDS+QD 模块：checkpoint、perception、prompt、Stage recognizer/settings、environment/reset、executor、evaluator、post-processing。
+- 逐文件 diff 摘要：protocol commit 只新增 protocol 与 state/log/ledger；算法、runner、tests 尚未修改。
+- Protocol commit：pending this commit。
+- Protocol parent：`29fcdb7940e35ce12d1d96e2651b7d813406052d`；QD blobs 如上。
+- Dirty-state：仅用户保护的 untracked stage-guidance design；不会修改/stage。
+
+#### E. 执行协议
+
+- Offline：冻结九文件 pytest suite + dedicated runner tests + machine offline preflight。
+- Mechanism preflight：profiles control/sparse/candidate × tasks 3/5，seeds 512905/150741，`max_chunks=2`，6 cells。
+- Dev-A：control/candidate × tasks `[3,5,8,9]`，seeds `[512905,150741,463456,452903]`，8 full episodes。
+- Exact commands：见 per-run protocol；未实现前不执行。
+- GPU：0–7 动态两次+dispatch snapshot admission；当前无 selection/UUID。
+- Expected online unique cells / attempt / upper GPU budget：14 / 14 baseline attempts / 48 GPU-hours global cap。
+- Started / ended：尚未开始。
+
+#### F. 结果
+
+- 状态：尚未实现或执行；无 task outcome、GPU、attempt 或 algorithm iteration。
+- 当前 best / gap：历史 `2/10` / 3，不变。
+- 当前累计：attempt `0/143`；GPU-hours `0/48`；formal 0。
+
+#### G. 分析与决策
+
+- 当前只锁定 causal-envelope single candidate 与 success-first reject rule，不声称 online support。
+- 下一步：protocol commit 后 TDD 最小实现，固定/causal 两条 config path 和 dedicated runner；先过完整 CPU/offline gate。只有 offline PASS 才能 freeze manifest 与 GPU preflight。
