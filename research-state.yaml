@@ -164,9 +164,11 @@ experiments:
     hypothesis_ids: [H4]
     scope_level: QD-0
     label: CONFIRMATORY
-    status: PROTOCOL_LOCKED
+    status: PROTOCOL_LOCKED_V2
     protocol_locked_at: "2026-08-10T15:20:46Z"
-    protocol_path: "experiments/run_001_allocation_ecology_diagnostic/protocol.md"
+    protocol_path: "experiments/run_001_allocation_ecology_diagnostic/protocol-v2.md"
+    protocol_v1_commit: "dcf234b6999165de0a5bca4a8e44332896cc61dc"
+    protocol_amendment_reason: "Correct expected full-process stage count from 5,400 to 9,000 using per-profile cem_iters; no outcome statistics were computed before amendment"
     expected_online_episodes: 0
     expected_gpu_hours: 0
 

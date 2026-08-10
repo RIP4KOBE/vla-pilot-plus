@@ -1,6 +1,6 @@
 # EDS+QD Autoresearch 统一迭代总账
 
-状态：`EXECUTING — run_001_allocation_ecology_diagnostic / PROTOCOL_LOCKED — 0 algorithm iterations`
+状态：`EXECUTING — run_001_allocation_ecology_diagnostic / PROTOCOL_LOCKED_V2 — 0 algorithm iterations`
 
 本文件是 EDS+QD autoresearch 所有 inner-loop 与 outer-loop 过程的单一人工审查入口。所有条目按 iteration ID append-only；不能删除、覆盖或为改善叙事而重写负结果、invalid attempt、infrastructure failure 或 revert 记录。大型 raw artifacts 不嵌入 Git，但必须以稳定路径和 SHA-256 引用。
 
@@ -8,7 +8,7 @@
 
 | Iteration | 日期 | Scope level | 假设 | 修改摘要 | Split / tasks | 结果 | 决策 | Protocol commit | Result commit |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `run_001_allocation_ecology_diagnostic` | 2026-08-10 | `QD-0` | H4 | saved-trace parent-quality inheritance 与 saturated slot audit | 540 historical traces；task strata 0–9 | pending | `PROTOCOL_LOCKED` | pending (this commit) | — |
+| `run_001_allocation_ecology_diagnostic` | 2026-08-10 | `QD-0` | H4 | saved-trace parent-quality inheritance 与 saturated slot audit | 540 traces / 9,000 stages；task strata 0–9 | pending | `PROTOCOL_LOCKED_V2` | v1 `dcf234b6999165de0a5bca4a8e44332896cc61dc`; v2 pending | — |
 | `run_000_baseline_replay` | 2026-08-10 | `QD-0` | H1–H5 | 只读回放旧 QD 与预算 sweep，验证 target-linked failure boundary | historical only | 6/6 gates PASS；4,705 QD chunks；budget max 1/10 | `KEEP_DIAGNOSTIC_EVIDENCE` | `5255e924ee925487406e35a27548d9db4e988642` | `e0b252c983a3b62858c8fa676e7b32618660b364` |
 | — | 2026-08-10 | — | — | 执行授权；尚未开始算法迭代 | — | — | `APPROVED_EXECUTING` | — | — |
 
@@ -32,7 +32,7 @@
 
 - 日期与 UTC 时间：`2026-08-10T15:20:46Z`。
 - Inner/outer loop：inner loop 1。
-- 状态：`PROTOCOL_LOCKED`。
+- 状态：`PROTOCOL_LOCKED_V2`。
 - 标签：`CONFIRMATORY`。
 - 假设 ID：H4。
 - Scope level：`QD-0`。
@@ -77,7 +77,8 @@
 
 - 明确冻结的非 EDS+QD 模块：checkpoint、perception、prompts、Stage、environment/reset、executor、evaluator。
 - 逐文件 diff 摘要：本 protocol commit 仅新增 protocol 并更新 ledger/state/log/status；无 analyzer 或算法实现。
-- Protocol commit：pending (this commit)。
+- Protocol commit v1：`dcf234b6999165de0a5bca4a8e44332896cc61dc`。
+- Protocol v2 amendment：pending (this commit)。v1 把所有 trace 按原始 10 iterations 相乘而误写 5,400 stages；implementation 前按各 profile `cem_iters` 修正为 9,000。修订前未计算 reward margin、bootstrap、slot share 或 gate outcome；其余 hypotheses/gates 不变。
 - Code/config/checkpoint fingerprint：QD blobs `a9138b1f…bd13` / `1354e26c…dd95`；checkpoint 不加载。
 - Protocol-lock 时 Git dirty-state：仅禁止修改的用户 untracked stage-guidance design；无算法 diff。
 
