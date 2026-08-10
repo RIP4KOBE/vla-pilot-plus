@@ -183,7 +183,7 @@ experiments:
     gpu_hours: 0
     partition: causal_envelope_v1
     locked_at: "2026-08-10T15:43:49Z"
-    protocol_commit: pending_this_commit
+    protocol_commit: "862f7cc4f00d92a97f6a0103e760f3b6180a437f"
 
 outer_loop:
   cycle: 1

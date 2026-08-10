@@ -8,7 +8,7 @@
 
 | Iteration | 日期 | Scope level | 假设 | 修改摘要 | Split / tasks | 结果 | 决策 | Protocol commit | Result commit |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `run_002_partition_diagnostic` | 2026-08-10 | `QD-0` | H1 | fixed-initial vs 单一 `causal_envelope_v1` 4x4 partition replay | 27 frozen files；4x4 eligible chunks；task strata 3/5/8/9 | `PROTOCOL_LOCKED`；尚未执行 | pending | pending this commit | — |
+| `run_002_partition_diagnostic` | 2026-08-10 | `QD-0` | H1 | fixed-initial vs 单一 `causal_envelope_v1` 4x4 partition replay | 27 frozen files；4x4 eligible chunks；task strata 3/5/8/9 | `PROTOCOL_LOCKED`；尚未执行 | pending | `862f7cc4f00d92a97f6a0103e760f3b6180a437f` | — |
 | `run_001_allocation_ecology_diagnostic` | 2026-08-10 | `QD-0` | H4 | saved-trace parent-quality inheritance 与 saturated slot audit | 540 traces / 9,000 stages；task strata 0–9 | 2 attempts `INVALID`；无可采纳 H4 outcome | `INVALID_CONCLUDE_AND_TRIGGER_OUTER_LOOP` | v1 `dcf234b…`; v2 `91ddd34…`; v3 `f6d7bc9…`; v4 `3d320f6…` | `cdd150b2c332e907c05cda90c7c09fd1f1799570` |
 | `run_000_baseline_replay` | 2026-08-10 | `QD-0` | H1–H5 | 只读回放旧 QD 与预算 sweep，验证 target-linked failure boundary | historical only | 6/6 gates PASS；4,705 QD chunks；budget max 1/10 | `KEEP_DIAGNOSTIC_EVIDENCE` | `5255e924ee925487406e35a27548d9db4e988642` | `e0b252c983a3b62858c8fa676e7b32618660b364` |
 | — | 2026-08-10 | — | — | 执行授权；尚未开始算法迭代 | — | — | `APPROVED_EXECUTING` | — | — |
@@ -381,7 +381,7 @@
 
 - 明确冻结的非 EDS+QD 模块：checkpoint、perception/grounding、prompt、Stage、environment/reset、executor、evaluator。
 - 逐文件 diff 摘要：protocol commit 只增加 protocol，并更新 state/log/ledger；没有 analyzer 或算法实现。
-- Protocol commit：pending this commit。
+- Protocol commit：`862f7cc4f00d92a97f6a0103e760f3b6180a437f`。
 - Code/config fingerprint：QD blobs `a9138b1f…bd13` / `1354e26c…dd95`；source manifest `6ad13083…963`。
 - Protocol-lock dirty-state：仅用户受保护的 untracked stage-guidance design；不会 stage/modify。
 
