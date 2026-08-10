@@ -5,8 +5,9 @@
 - Base commit: `5b0898e53d5b9e16200c17479a74746071215787`.
 - Init commit: `54b2487`.
 - Branch: `exp/eds-qd-autoresearch-libero-swap-ood`.
-- Active experiment: `run_001_allocation_ecology_diagnostic` (`QD-0`, `CONFIRMATORY`, `PROTOCOL_LOCKED_V2`).
+- Active experiment: `run_001_allocation_ecology_diagnostic` (`QD-0`, `CONFIRMATORY`, `PROTOCOL_LOCKED_V3_AFTER_INVALID_INFRASTRUCTURE_ATTEMPT`).
 - Protocol amendment: before implementation, corrected expected full-process stages from 5,400 to 9,000 using each profile's configured iterations; no outcome statistic was inspected first.
+- Invalid attempt: analyzer confused population occurrence ranks with 16 archive-cell ranks and rejected 360 budget traces. The artifact is preserved but its H4 values are inadmissible. V3 freezes the source-faithful cell reconstruction before repair.
 - Completed new experiments: 1 (`run_000`, zero episodes).
 - GPU jobs: 0.
 - Formal evaluations: 0.
