@@ -540,3 +540,12 @@
 - Partition：iteration 0 fixed SSE=0 → resolution `null`；其余 9 个 finite improvements 均 1.0，中位数 1.0，PASS frozen `>=0.20` gate；首次 rebin collision 7，其余 0，winner/visit invariants PASS。
 - Target impact：仍无 task execution，不能宣称 success 改善。Best `2/10`、gap 3；attempt `0/143`、GPU-hours `0/48`、formal 0。
 - 决策：`KEEP_STAGE_A_PASS_AND_FREEZE_ONLINE_MANIFEST`。下一步只允许从该 v2 hash 和当前 committed code 冻结 immutable manifest，再做六-cell mechanism preflight GPU admission。
+
+#### K. Online manifest freeze
+
+- 时间：`2026-08-10T16:47:24Z`；pre-dispatch pause/storage checks PASS；仍为 attempt 0、GPU-hours 0、formal 0。
+- Immutable manifest：`run_010_causal_envelope_candidate/manifests/run_manifest.json`，mode `0444`，size 17,890 bytes，file SHA-256 `cb211e2ed3fe2cfa2512f0982153295c9f23fa9964e3f623d1ef3b1eef10ae34`，payload SHA-256 `20e7e17c70c4360df4d8534c4bc3ff0c204988bc4fd7acfa544ca4b7c8e9511e`。
+- Manifest binding：code commit `0f418417…54d5` / code-state `1b4c1c51…62e7`；offline v2 `3097afad…f7a9`；failed v1 `16545749…9a61`；checkpoint `a2026bcf…6c28`；LIBERO input `259c469e…38b8`；GPU reference `d49ea817…fff1`。
+- Matrix：mechanism preflight 6 unique cells（control/sparse/candidate × tasks 3/5）；Dev-A 8 unique cells（control/candidate × tasks 3/5/8/9）；attempt cap 143、GPU-hour cap 48、formal authorized false。
+- Runtime cache：6 files，provenance SHA-256 `4434ca3bafefdb8f0cdf747e6a4a60d73965033cb125bcd51be48ed14bdced7b`；全部位于 owned run root。
+- 下一步：动态检查 GPU 0–7 两次快照和 dispatch snapshot；只在无外部 compute、utilization <=5%、VRAM headroom 合格时发出 frozen 6-cell mechanism preflight。
