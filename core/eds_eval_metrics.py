@@ -428,8 +428,21 @@ class EDSChunkMetrics:
     qd_grid_shape: list[int] = field(default_factory=list)
     qd_cell_capacity: int = 1
     qd_parent_sampling: str = "uniform_cells"
+    qd_bounds_update_policy: str = "fixed_initial"
     qd_bounds_xy_m: list[list[float]] = field(default_factory=list)
     qd_bounds_source_initial_checksum: str | None = None
+    qd_bounds_xy_m_by_iter: list[list[list[float]]] = field(default_factory=list)
+    qd_bounds_checksum_by_iter: list[str] = field(default_factory=list)
+    qd_bounds_expanded_by_iter: list[bool] = field(default_factory=list)
+    qd_bounds_expansion_count: int = 0
+    qd_archive_rebin_collisions_by_iter: list[int] = field(default_factory=list)
+    qd_archive_rebin_visit_sum_before_by_iter: list[int] = field(default_factory=list)
+    qd_archive_rebin_visit_sum_after_by_iter: list[int] = field(default_factory=list)
+    qd_raw_initial_bounds_overflow_count_by_iter: list[int] = field(default_factory=list)
+    qd_raw_initial_bounds_overflow_ratio_by_iter: list[float] = field(default_factory=list)
+    qd_fixed_initial_within_cell_endpoint_sse_by_iter: list[float] = field(default_factory=list)
+    qd_active_within_cell_endpoint_sse_by_iter: list[float] = field(default_factory=list)
+    qd_partition_resolution_improvement_by_iter: list[float | None] = field(default_factory=list)
     qd_initial_occupied_cells: int = 0
     qd_initial_accounting: dict[str, int] = field(default_factory=dict)
     qd_initial_descriptor_overflow_count: int = 0

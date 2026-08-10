@@ -38,9 +38,11 @@ from core.qd_ed import (
     QDParentAllocation,
     allocate_parent_slots,
     cell_ids as qd_cell_ids,
+    expand_bounds as qd_expand_bounds,
     fingerprint_action,
     freeze_bounds as qd_freeze_bounds,
     qd_descriptor,
+    within_cell_endpoint_sse as qd_within_cell_endpoint_sse,
 )
 from core.rdt_libero_action_converter import (
     ACTIVE_ACTION_INDICES_SORTED,
@@ -129,6 +131,7 @@ class _EDSConfig:
     qd_bounds_quantiles: tuple[float, float] = (0.05, 0.95)
     qd_bounds_expand_fraction: float = 0.10
     qd_min_axis_span_m: float = 0.08
+    qd_bounds_update_policy: str = "fixed_initial"
     qd_overflow_policy: str = "clamp_edge"
     qd_tie_break: str = "stable_fingerprint"
     qd_metrics_observer: bool = False
@@ -4628,6 +4631,7 @@ class RDTSteer:
         metrics.qd_grid_shape = list(cfg.qd_grid_shape)
         metrics.qd_cell_capacity = cfg.qd_cell_capacity
         metrics.qd_parent_sampling = cfg.qd_parent_sampling
+        metrics.qd_bounds_update_policy = cfg.qd_bounds_update_policy
         metrics.shadow_qd_observer_enabled = bool(cfg.qd_metrics_observer)
         artifact_iters: list[dict] = []
         qd_archive_artifacts: list[dict] = []
@@ -4712,6 +4716,7 @@ class RDTSteer:
         population_rewards = self._eds_rewards_from_info(population_scores, population_info)
         qd_archive: QDArchive | None = None
         qd_bounds: QDBounds | None = None
+        qd_initial_bounds: QDBounds | None = None
         qd_initial_artifact: dict = {}
 
         def record_shadow_qd_candidates(
@@ -4739,6 +4744,7 @@ class RDTSteer:
         if metrics.qd_archive_enabled:
             initial_descriptors = self._eds_qd_descriptor(population, keypoints)
             qd_bounds = self._eds_qd_freeze_bounds(initial_descriptors, cfg)
+            qd_initial_bounds = qd_bounds
             initial_cell_ids, initial_overflow = self._eds_qd_cell_ids(
                 initial_descriptors, qd_bounds, cfg
             )
@@ -5524,11 +5530,50 @@ class RDTSteer:
             )
             record_shadow_qd_candidates(i, population, population_rewards)
             if qd_archive is not None:
-                if qd_bounds is None or qd_parent_cell_ids is None:
+                if (
+                    qd_bounds is None
+                    or qd_initial_bounds is None
+                    or qd_parent_cell_ids is None
+                ):
                     raise RuntimeError("QD archive loop state is incomplete")
                 child_descriptors = self._eds_qd_descriptor(population, keypoints)
+                fixed_initial_cell_ids, raw_initial_overflow = self._eds_qd_cell_ids(
+                    child_descriptors, qd_initial_bounds, cfg
+                )
+                bounds_expanded = False
+                rebin_collisions = 0
+                rebin_visit_sum_before = int(
+                    qd_archive.cumulative_visits.sum().detach().cpu().item()
+                )
+                rebin_visit_sum_after = rebin_visit_sum_before
+                if cfg.qd_bounds_update_policy == "causal_envelope_v1":
+                    expanded_bounds, bounds_expanded = qd_expand_bounds(
+                        qd_bounds, child_descriptors
+                    )
+                    if bounds_expanded:
+                        _, _, _, archive_descriptors, _ = qd_archive.elite_tensors()
+                        rebinned_cell_ids, _ = self._eds_qd_cell_ids(
+                            archive_descriptors, expanded_bounds, cfg
+                        )
+                        rebin_summary = qd_archive.rebin(rebinned_cell_ids)
+                        rebin_collisions = rebin_summary.collisions
+                        rebin_visit_sum_before = rebin_summary.visit_sum_before
+                        rebin_visit_sum_after = rebin_summary.visit_sum_after
+                        qd_bounds = expanded_bounds
+                        metrics.qd_bounds_expansion_count += 1
                 child_cell_ids, child_overflow = self._eds_qd_cell_ids(
                     child_descriptors, qd_bounds, cfg
+                )
+                fixed_initial_sse = qd_within_cell_endpoint_sse(
+                    child_descriptors, fixed_initial_cell_ids
+                )
+                active_sse = qd_within_cell_endpoint_sse(
+                    child_descriptors, child_cell_ids
+                )
+                resolution_improvement = (
+                    1.0 - active_sse / fixed_initial_sse
+                    if fixed_initial_sse > 0.0
+                    else None
                 )
                 qd_update_start = time.perf_counter()
                 qd_update = qd_archive.update(
@@ -5544,6 +5589,41 @@ class RDTSteer:
                     time.perf_counter() - qd_update_start
                 )
                 metrics.qd_evaluation_count += cfg.population_size
+                metrics.qd_bounds_xy_m_by_iter.append(
+                    [
+                        qd_bounds.lo.detach().float().cpu().tolist(),
+                        qd_bounds.hi.detach().float().cpu().tolist(),
+                    ]
+                )
+                metrics.qd_bounds_checksum_by_iter.append(qd_bounds.checksum)
+                metrics.qd_bounds_expanded_by_iter.append(bool(bounds_expanded))
+                metrics.qd_archive_rebin_collisions_by_iter.append(
+                    int(rebin_collisions)
+                )
+                metrics.qd_archive_rebin_visit_sum_before_by_iter.append(
+                    int(rebin_visit_sum_before)
+                )
+                metrics.qd_archive_rebin_visit_sum_after_by_iter.append(
+                    int(rebin_visit_sum_after)
+                )
+                raw_overflow_count = int(
+                    raw_initial_overflow.sum().detach().cpu().item()
+                )
+                metrics.qd_raw_initial_bounds_overflow_count_by_iter.append(
+                    raw_overflow_count
+                )
+                metrics.qd_raw_initial_bounds_overflow_ratio_by_iter.append(
+                    float(raw_overflow_count / cfg.population_size)
+                )
+                metrics.qd_fixed_initial_within_cell_endpoint_sse_by_iter.append(
+                    fixed_initial_sse
+                )
+                metrics.qd_active_within_cell_endpoint_sse_by_iter.append(
+                    active_sse
+                )
+                metrics.qd_partition_resolution_improvement_by_iter.append(
+                    resolution_improvement
+                )
                 occupied_count = len(qd_archive.entries)
                 archive_rewards = [
                     entry.reward for entry in qd_archive.entries.values()
@@ -6274,6 +6354,11 @@ class RDTSteer:
             "selected_idx": best_idx,
             "per_iter": artifact_iters,
             "qd_bounds_xy_m": list(metrics.qd_bounds_xy_m),
+            "qd_final_bounds_xy_m": (
+                list(metrics.qd_bounds_xy_m_by_iter[-1])
+                if metrics.qd_bounds_xy_m_by_iter
+                else list(metrics.qd_bounds_xy_m)
+            ),
             "qd_grid_shape": list(metrics.qd_grid_shape),
             "qd_initial_archive": qd_initial_artifact,
             "qd_archive_by_iter": qd_archive_artifacts,
@@ -6927,6 +7012,9 @@ class RDTSteer:
             qd_min_axis_span_m=_parse_eds_float(
                 cfg.get("qd_min_axis_span_m", 0.08), "qd_min_axis_span_m"
             ),
+            qd_bounds_update_policy=str(
+                cfg.get("qd_bounds_update_policy", "fixed_initial")
+            ),
             qd_overflow_policy=str(
                 cfg.get("qd_overflow_policy", "clamp_edge")
             ),
@@ -7151,6 +7239,14 @@ class RDTSteer:
             )
         if resolved.qd_min_axis_span_m not in {0.04, 0.08, 0.12}:
             raise ValueError("EDS qd_min_axis_span_m is not preregistered")
+        if resolved.qd_bounds_update_policy not in {
+            "fixed_initial",
+            "causal_envelope_v1",
+        }:
+            raise ValueError(
+                "EDS qd_bounds_update_policy must be fixed_initial or "
+                "causal_envelope_v1"
+            )
         if resolved.qd_overflow_policy != "clamp_edge":
             raise ValueError("EDS qd_overflow_policy must be clamp_edge")
         if resolved.qd_tie_break != "stable_fingerprint":

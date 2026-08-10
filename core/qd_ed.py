@@ -134,6 +134,56 @@ def freeze_bounds(
     return QDBounds(lo=lo.detach().clone(), hi=hi.detach().clone(), checksum=checksum)
 
 
+def expand_bounds(
+    bounds: QDBounds,
+    descriptors: Tensor,
+) -> tuple[QDBounds, bool]:
+    """Causally expand bounds to include a finite current descriptor batch."""
+    descriptors = _finite_tensor(
+        descriptors, name="QD causal-envelope descriptors", ndim=2
+    ).detach().to(dtype=torch.float32)
+    if descriptors.shape[0] <= 0 or descriptors.shape[1] != 2:
+        raise ValueError(
+            "QD causal-envelope descriptors must have shape (population, 2)"
+        )
+    lo = _finite_tensor(bounds.lo, name="QD bounds lower").to(
+        device=descriptors.device, dtype=descriptors.dtype
+    )
+    hi = _finite_tensor(bounds.hi, name="QD bounds upper").to(
+        device=descriptors.device, dtype=descriptors.dtype
+    )
+    if lo.shape != (2,) or hi.shape != (2,) or not bool(((hi - lo) > 0).all().item()):
+        raise ValueError("QD bounds must contain finite positive spans for two axes")
+    expanded_lo = torch.minimum(lo, descriptors.amin(dim=0))
+    expanded_hi = torch.maximum(hi, descriptors.amax(dim=0))
+    changed = not (
+        bool(torch.equal(expanded_lo, lo)) and bool(torch.equal(expanded_hi, hi))
+    )
+    if not changed:
+        return bounds, False
+    canonical_descriptors = sorted(
+        descriptors.detach().cpu().tolist(), key=lambda row: (row[0], row[1])
+    )
+    payload = {
+        "policy": "causal_envelope_v1",
+        "previous_checksum": bounds.checksum,
+        "descriptors": canonical_descriptors,
+        "lo": expanded_lo.detach().cpu().tolist(),
+        "hi": expanded_hi.detach().cpu().tolist(),
+    }
+    checksum = hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    return (
+        QDBounds(
+            lo=expanded_lo.detach().clone(),
+            hi=expanded_hi.detach().clone(),
+            checksum=checksum,
+        ),
+        True,
+    )
+
+
 def cell_ids(
     descriptors: Tensor,
     bounds: QDBounds,
@@ -162,6 +212,28 @@ def cell_ids(
     return grid_x * cell_y + cell_x, overflow
 
 
+def within_cell_endpoint_sse(descriptors: Tensor, assigned_cell_ids: Tensor) -> float:
+    """Return candidate-normalized within-cell endpoint squared error."""
+    descriptors = _finite_tensor(
+        descriptors, name="QD endpoint-SSE descriptors", ndim=2
+    ).detach().to(dtype=torch.float32)
+    if descriptors.shape[0] <= 0 or descriptors.shape[1] != 2:
+        raise ValueError("QD endpoint-SSE descriptors must have shape (population, 2)")
+    if not torch.is_tensor(assigned_cell_ids):
+        raise ValueError("QD endpoint-SSE cell ids must be a torch.Tensor")
+    assigned = assigned_cell_ids.detach().to(
+        device=descriptors.device, dtype=torch.long
+    ).reshape(-1)
+    if assigned.numel() != descriptors.shape[0]:
+        raise ValueError("QD endpoint-SSE cell ids must match descriptor count")
+    total = torch.zeros((), device=descriptors.device, dtype=torch.float32)
+    for assigned_cell in torch.unique(assigned, sorted=True):
+        points = descriptors[assigned == assigned_cell]
+        centered = points - points.mean(dim=0, keepdim=True)
+        total = total + centered.square().sum()
+    return float((total / descriptors.shape[0]).detach().cpu().item())
+
+
 @dataclass(frozen=True)
 class QDArchiveEntry:
     action: Tensor
@@ -180,6 +252,15 @@ class QDUpdateSummary:
     replacements: int
     rejections: int
     total: int
+
+
+@dataclass(frozen=True)
+class QDRebinSummary:
+    occupied_before: int
+    occupied_after: int
+    collisions: int
+    visit_sum_before: int
+    visit_sum_after: int
 
 
 @dataclass(frozen=True)
@@ -333,6 +414,53 @@ class QDArchive:
             key=lambda item: (-item[1].reward, item[1].fingerprint, item[0]),
         )
         return int(cell), entry
+
+    def rebin(self, target_cell_ids: Tensor) -> QDRebinSummary:
+        """Move current elites and their cell visits into a new partition."""
+        if not torch.is_tensor(target_cell_ids):
+            raise ValueError("QD rebin target cell ids must be a torch.Tensor")
+        targets = target_cell_ids.detach().to(device="cpu", dtype=torch.long).reshape(-1)
+        old_cells = sorted(self.entries)
+        if targets.numel() != len(old_cells):
+            raise ValueError("QD rebin requires one target cell for every archive elite")
+        if bool(((targets < 0) | (targets >= self.cell_count)).any().item()):
+            raise ValueError("QD rebin target cell id is outside the configured grid")
+        positive_visit_cells = set(
+            torch.nonzero(self.cumulative_visits > 0, as_tuple=False)
+            .reshape(-1)
+            .tolist()
+        )
+        if not positive_visit_cells.issubset(set(old_cells)):
+            raise RuntimeError("QD rebin cannot map visits for an empty archive cell")
+
+        visit_sum_before = int(self.cumulative_visits.sum().item())
+        remapped_visits = torch.zeros_like(self.cumulative_visits)
+        grouped: dict[int, list[QDArchiveEntry]] = {}
+        for old_cell, target_cell_tensor in zip(old_cells, targets, strict=True):
+            target_cell = int(target_cell_tensor.item())
+            grouped.setdefault(target_cell, []).append(self.entries[old_cell])
+            remapped_visits[target_cell] += self.cumulative_visits[old_cell]
+
+        remapped_entries: dict[int, QDArchiveEntry] = {}
+        for target_cell in sorted(grouped):
+            remapped_entries[target_cell] = min(
+                grouped[target_cell],
+                key=lambda entry: (-entry.reward, entry.fingerprint),
+            )
+        visit_sum_after = int(remapped_visits.sum().item())
+        if visit_sum_after != visit_sum_before:
+            raise RuntimeError("QD rebin failed to preserve cumulative visits")
+        occupied_before = len(self.entries)
+        occupied_after = len(remapped_entries)
+        self.entries = remapped_entries
+        self.cumulative_visits = remapped_visits
+        return QDRebinSummary(
+            occupied_before=occupied_before,
+            occupied_after=occupied_after,
+            collisions=occupied_before - occupied_after,
+            visit_sum_before=visit_sum_before,
+            visit_sum_after=visit_sum_after,
+        )
 
     def elite_tensors(self) -> tuple[Tensor, Tensor, Tensor, Tensor, Tensor]:
         if not self.entries:

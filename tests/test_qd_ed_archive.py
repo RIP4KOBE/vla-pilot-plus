@@ -13,6 +13,7 @@ from core.qd_ed import (
     QDArchive,
     allocate_parent_slots,
     cell_ids,
+    expand_bounds,
     fingerprint_action,
     freeze_bounds,
     qd_descriptor,
@@ -74,7 +75,6 @@ def test_zero_spread_population_uses_finite_minimum_span(minimum_span):
         expand_fraction=0.10,
         min_axis_span_m=minimum_span,
     )
-
     assert torch.isfinite(bounds.lo).all()
     assert torch.isfinite(bounds.hi).all()
     assert torch.allclose(
@@ -82,6 +82,46 @@ def test_zero_spread_population_uses_finite_minimum_span(minimum_span):
         torch.full((2,), minimum_span),
         atol=1e-7,
     )
+
+
+def test_causal_bounds_expand_to_current_envelope_without_shrinking_and_are_permutation_stable():
+    bounds = freeze_bounds(
+        torch.tensor([[-0.1, -0.2], [0.1, 0.2]]),
+        quantiles=(0.0, 1.0),
+        expand_fraction=0.0,
+        min_axis_span_m=0.04,
+    )
+    descriptors = torch.tensor(
+        [[0.4, -0.1], [-0.3, 0.6], [0.0, 0.0]], dtype=torch.float32
+    )
+
+    expanded, changed = expand_bounds(bounds, descriptors)
+    permuted, permuted_changed = expand_bounds(bounds, descriptors[[2, 0, 1]])
+    unchanged, unchanged_flag = expand_bounds(expanded, descriptors)
+
+    assert changed is True
+    assert permuted_changed is True
+    assert torch.equal(expanded.lo, torch.tensor([-0.3, -0.2]))
+    assert torch.equal(expanded.hi, torch.tensor([0.4, 0.6]))
+    assert expanded.checksum == permuted.checksum
+    assert torch.equal(expanded.lo, permuted.lo)
+    assert torch.equal(expanded.hi, permuted.hi)
+    assert unchanged_flag is False
+    assert unchanged is expanded
+
+
+def test_causal_bounds_expansion_fails_closed_on_nonfinite_or_invalid_bounds():
+    bounds = freeze_bounds(
+        torch.tensor([[0.0, 0.0], [1.0, 1.0]]),
+        quantiles=(0.0, 1.0),
+        expand_fraction=0.0,
+        min_axis_span_m=0.04,
+    )
+
+    with pytest.raises(FloatingPointError, match="descriptors"):
+        expand_bounds(bounds, torch.tensor([[float("nan"), 0.0]]))
+    with pytest.raises(ValueError, match="shape"):
+        expand_bounds(bounds, torch.zeros(1, 3))
 
 
 @pytest.mark.parametrize(
@@ -168,6 +208,47 @@ def test_archive_replacement_rejection_monotonicity_and_global_best():
     assert selected.fingerprint == fingerprint_action(_actions([3.0])[0])
     assert archive.elite_monotonicity_violation_count == 0
     assert archive.accounting_violation_count == 0
+
+
+def test_archive_rebin_resolves_collisions_and_preserves_visits_and_global_best():
+    archive = QDArchive(grid_shape=(2, 2))
+    actions = _actions([1.0, 2.0, 3.0])
+    archive.update(
+        actions=actions,
+        rewards=torch.tensor([1.0, 5.0, 3.0]),
+        costs=torch.tensor([-1.0, -5.0, -3.0]),
+        descriptors=torch.tensor([[0.1, 0.1], [0.2, 0.2], [0.9, 0.9]]),
+        cell_ids=torch.tensor([0, 1, 3]),
+        source_iter=-1,
+    )
+    archive.cumulative_visits = torch.tensor([7, 5, 0, 4])
+    best_before = archive.select_global_best()[1].fingerprint
+
+    summary = archive.rebin(torch.tensor([2, 2, 3]))
+
+    assert summary.occupied_before == 3
+    assert summary.occupied_after == 2
+    assert summary.collisions == 1
+    assert summary.visit_sum_before == 16
+    assert summary.visit_sum_after == 16
+    assert sorted(archive.entries) == [2, 3]
+    assert archive.entries[2].reward == 5.0
+    assert archive.cumulative_visits.tolist() == [0, 0, 12, 4]
+    assert archive.select_global_best()[1].fingerprint == best_before
+
+
+def test_archive_rebin_rejects_bad_mapping_without_mutation():
+    archive = _occupied_archive(3)
+    snapshot = archive.snapshot()
+    visits = archive.cumulative_visits.clone()
+
+    with pytest.raises(ValueError, match="one target cell"):
+        archive.rebin(torch.tensor([0, 1]))
+    with pytest.raises(ValueError, match="outside"):
+        archive.rebin(torch.tensor([0, 1, 16]))
+
+    assert archive.snapshot() == snapshot
+    assert torch.equal(archive.cumulative_visits, visits)
 
 
 def test_exact_reward_tie_keeps_lexicographically_smallest_fingerprint():

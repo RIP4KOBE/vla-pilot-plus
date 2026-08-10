@@ -125,6 +125,7 @@ main:
     qd_bounds_quantiles: [0.05, 0.95]
     qd_bounds_expand_fraction: 0.10
     qd_min_axis_span_m: 0.08
+    qd_bounds_update_policy: fixed_initial
     qd_overflow_policy: clamp_edge
     qd_tie_break: stable_fingerprint
     qd_metrics_observer: false

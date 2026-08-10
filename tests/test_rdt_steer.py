@@ -2201,6 +2201,7 @@ def test_qd_config_defaults_are_legacy_safe_and_match_yaml(stub_steer):
         "qd_bounds_quantiles": (0.05, 0.95),
         "qd_bounds_expand_fraction": 0.10,
         "qd_min_axis_span_m": 0.08,
+        "qd_bounds_update_policy": "fixed_initial",
         "qd_overflow_policy": "clamp_edge",
         "qd_tie_break": "stable_fingerprint",
         "qd_metrics_observer": False,
@@ -2245,6 +2246,7 @@ def _valid_qd_config(**updates):
         "qd_bounds_quantiles": [0.05, 0.95],
         "qd_bounds_expand_fraction": 0.10,
         "qd_min_axis_span_m": 0.08,
+        "qd_bounds_update_policy": "fixed_initial",
         "qd_overflow_policy": "clamp_edge",
         "qd_tie_break": "stable_fingerprint",
         "qd_metrics_observer": True,
@@ -2266,6 +2268,17 @@ def test_qd_config_accepts_primary_and_sparse_registered_profiles(stub_steer):
     assert sparse.qd_parent_sampling == "sparse_priority"
 
 
+def test_qd_config_accepts_causal_envelope_only_as_registered_bounds_policy(stub_steer):
+    candidate = stub_steer._resolve_eds_config_with_reference_defaults(
+        _valid_qd_config(
+            qd_parent_sampling="sparse_priority",
+            qd_bounds_update_policy="causal_envelope_v1",
+        )
+    )
+
+    assert candidate.qd_bounds_update_policy == "causal_envelope_v1"
+
+
 @pytest.mark.parametrize(
     ("field", "value"),
     [
@@ -2280,6 +2293,7 @@ def test_qd_config_accepts_primary_and_sparse_registered_profiles(stub_steer):
         ("qd_bounds_quantiles", [0.2, 0.8]),
         ("qd_bounds_expand_fraction", 0.3),
         ("qd_min_axis_span_m", 0.1),
+        ("qd_bounds_update_policy", "adaptive_reward_bounds"),
         ("qd_overflow_policy", "expand"),
         ("qd_tie_break", "candidate_index"),
         ("qd_metrics_observer", "sometimes"),
@@ -5868,6 +5882,10 @@ def test_qd_loop_bypasses_legacy_selector_preserves_archive_and_selects_global_b
     assert metrics["qd_elite_monotonicity_violation_count"] == 0
     assert metrics["qd_final_selection_mismatch_count"] == 0
     assert metrics["qd_fallback_used"] is False
+    assert metrics["qd_bounds_update_policy"] == "fixed_initial"
+    assert metrics["qd_bounds_expansion_count"] == 0
+    assert metrics["qd_bounds_expanded_by_iter"] == [False] * 10
+    assert metrics["qd_partition_resolution_improvement_by_iter"] == [None] * 10
     assert metrics["qd_selected_action_fingerprint"] == fingerprint_action(selected[0])
     assert (
         metrics["qd_selected_action_fingerprint"]
@@ -5876,6 +5894,105 @@ def test_qd_loop_bypasses_legacy_selector_preserves_archive_and_selects_global_b
     assert metrics["qd_selected_reward"] == pytest.approx(1015.0)
     assert len(artifacts["qd_archive_by_iter"]) == 10
     assert artifacts["qd_bounds_xy_m"] == metrics["qd_bounds_xy_m"]
+
+
+def test_qd_causal_envelope_expands_rebins_preserves_visits_and_call_budget(
+    stub_steer,
+    stub_adapter,
+    monkeypatch,
+):
+    from core.qd_ed import fingerprint_action
+
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=16,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    cond = _rollout_cond(stub_steer)
+    initial = torch.zeros(16, 64, 128)
+    initial_values = torch.linspace(-0.04, 0.04, 4)
+    for index in range(16):
+        initial[index, :4, 39] = initial_values[index % 4] / 4.0
+        initial[index, :4, 40] = initial_values[index // 4] / 4.0
+        initial[index, :, 42] = -float(index)
+    rollout_call = 0
+
+    def score(samples, **kwargs):
+        costs = samples[:, 0, 42].detach().clone()
+        return costs, {"rewards": -costs}
+
+    def rollout(**kwargs):
+        nonlocal rollout_call
+        rollout_call += 1
+        children = kwargs["noisy_action"].clone()
+        scale = 0.12 * rollout_call
+        endpoint_values = torch.linspace(-scale, scale, 4)
+        for index in range(16):
+            children[index, :4, 39] = endpoint_values[index % 4] / 4.0
+            children[index, :4, 40] = endpoint_values[index // 4] / 4.0
+            children[index, :, 42] = -float(rollout_call * 100 + index)
+        costs, info = score(children)
+        return children, costs, info
+
+    monkeypatch.setattr(
+        stub_steer, "_eds_initial_population", lambda **kwargs: initial.clone()
+    )
+    monkeypatch.setattr(stub_steer, "_eds_score_population_as_cost", score)
+    monkeypatch.setattr(
+        stub_steer, "_eds_renoise_reference", lambda samples, steps: samples
+    )
+    monkeypatch.setattr(stub_steer, "_eds_rollout_reference", rollout)
+    cfg = stub_steer._resolve_eds_config_with_reference_defaults(
+        _valid_qd_config(
+            qd_parent_sampling="sparse_priority",
+            qd_bounds_update_policy="causal_envelope_v1",
+        )
+    )
+
+    selected = stub_steer._eds_guided_denoise_loop(
+        x_t=torch.zeros_like(initial),
+        cond=cond,
+        keypoints=torch.zeros(1, 3),
+        guidance_fns=None,
+        eds_config=cfg,
+        verbose=False,
+        global_step=24,
+        current_stage=1,
+    )
+    metrics = stub_steer.get_last_eds_metrics()
+    artifacts = stub_steer.get_last_eds_artifacts()
+
+    assert rollout_call == 10
+    assert metrics["qd_bounds_update_policy"] == "causal_envelope_v1"
+    assert metrics["qd_bounds_expansion_count"] > 0
+    assert any(metrics["qd_bounds_expanded_by_iter"])
+    assert len(metrics["qd_bounds_xy_m_by_iter"]) == 10
+    assert len(metrics["qd_bounds_checksum_by_iter"]) == 10
+    assert any(metrics["qd_raw_initial_bounds_overflow_count_by_iter"])
+    assert metrics["qd_descriptor_overflow_count_by_iter"] == [0] * 10
+    assert all(
+        before == after
+        for before, after in zip(
+            metrics["qd_archive_rebin_visit_sum_before_by_iter"],
+            metrics["qd_archive_rebin_visit_sum_after_by_iter"],
+            strict=True,
+        )
+    )
+    assert any(
+        value is not None and value > 0.0
+        for value in metrics["qd_partition_resolution_improvement_by_iter"]
+    )
+    assert metrics["qd_evaluation_count"] == 176
+    assert metrics["score_call_count"] == 11
+    assert metrics["qd_accounting_violation_count"] == 0
+    assert metrics["qd_final_selection_mismatch_count"] == 0
+    assert metrics["qd_selected_action_fingerprint"] == fingerprint_action(selected[0])
+    assert (
+        metrics["qd_selected_action_fingerprint"]
+        == metrics["qd_global_best_action_fingerprint"]
+    )
+    assert artifacts["qd_final_bounds_xy_m"] == metrics["qd_bounds_xy_m_by_iter"][-1]
 
 
 def test_qd_grid5_final_archive_larger_than_population_tracks_selected_source(
