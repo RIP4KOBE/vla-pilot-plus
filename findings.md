@@ -37,6 +37,7 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 - `run_000_baseline_replay`: 6/6 gates PASS; 13/13 input hashes; 27/27 metrics files; 4,705 QD chunks; deterministic analysis SHA-256 `6ad13083…963`.
 - Search-budget replay: 18 valid configurations, max 1/10, success-task union `{0,7,8,9}`, and no valid `>=5/10` result.
 - `run_002_partition_diagnostic`: 10/10 frozen validity/scientific gates PASS; 4,567 exact 4x4 replays; resolution `+30.1%`; mode retention `0.9375`; spread ratio `2.0087`; global best retention `1.0`; three identical analysis hashes.
+- `run_010` Stage-A: immutable offline v2 PASS (`3097afad…f7a9`); 781 tests; full checkpoint and 20 LIBERO input files fingerprinted; 176/11 compute; zero post-envelope overflow; 10/10 visit/global-best invariants; finite synthetic resolution median 1.0. This remains mechanism evidence only.
 
 ## Patterns and Insights
 
@@ -72,4 +73,4 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 
 ## Optimization Trajectory
 
-`run_000_baseline_replay` is complete; `run_001_allocation_ecology_diagnostic` ended invalid after two infrastructure attempts; `run_002_partition_diagnostic` passed all gates; and `run_010` algorithm iteration 1 is implemented at `930cdb5` with 781 regression tests passing. No development episode, GPU job, or formal evaluation has run, so success remains historical 2/10 and target gap remains 3. The next action is the immutable offline preflight, followed by frozen mechanism preflight/Dev-A gates only if it passes.
+`run_000_baseline_replay` is complete; `run_001_allocation_ecology_diagnostic` ended invalid after two infrastructure attempts; `run_002_partition_diagnostic` passed all gates; and `run_010` algorithm iteration 1 has passed Stage-A offline validation after one preserved schema-only harness repair. No development episode, GPU job, or formal evaluation has run, so success remains historical 2/10 and target gap remains 3. The next action is immutable manifest freeze followed by the frozen six-cell mechanism preflight.

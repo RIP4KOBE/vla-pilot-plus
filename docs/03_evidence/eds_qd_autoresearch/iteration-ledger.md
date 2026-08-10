@@ -528,3 +528,15 @@
 - 唯一失败：synthetic iteration 0 的 fixed SSE 为 0，因此 resolution 正确为 `null`；iterations 1–9 均为 `1.0`。Runner 误加了“每轮都必须 finite 且 >=20%”这一 parent protocol 未注册的 quantifier。
 - 分类：offline audit fixture/schema defect，不是候选算法逻辑或 scientific refutation；没有 success/task/seed/GPU 结果被观察。
 - 唯一修复：新建 `protocol-v2.md`，先提交后才允许 runner 改为 v2 immutable path，并以 finite values median `>=0.20` 处理 zero-denominator；其余 gate 全部冻结。无第二次 schema repair。
+
+#### J. Stage-A v2 PASS
+
+- Repair protocol / implementation commits：`8fd3aea0b1ec063aba63fa0bffcf3829f03c006c` / `9729ff24ad34dc02a495f8fb5c717974da6f1756`；protocol-first 顺序满足。
+- 时间 / wall：`2026-08-10T16:45:47Z`；命令 wall `78.4 s`，其中冻结 regression `75.068 s`。
+- Immutable PASS artifact：`run_010_causal_envelope_candidate/analysis/offline_preflight.v2.json`，mode `0444`，size 19,777 bytes，SHA-256 `3097afadbf2f3a5ab827a8242c2f4bd43ed20bec46d0ff76c62fef2d7b62f7a9`。v1 failure `16545749…9a61` 同时保留。
+- Provenance：code commit `9729ff24…1756`；code-state `6250e7ca…d78`；active checkpoint aggregate `a2026bcf…6c28`，full weight `b4e3631d…aaa1`；LIBERO swap inputs aggregate `259c469e…38b8`。
+- Tests：冻结九文件 suite `781 passed`；无 test failure。
+- Mechanism/accounting：176 evaluations、11 score calls、10×16 offspring accounting、10×16 parent slots；raw overflow counts `[12,12,12,16,16,16,16,16,16,16]`，post-envelope counts 全 0；rebin visits 10/10 conserved；global-best fingerprints 10/10 unchanged；RNG unchanged。
+- Partition：iteration 0 fixed SSE=0 → resolution `null`；其余 9 个 finite improvements 均 1.0，中位数 1.0，PASS frozen `>=0.20` gate；首次 rebin collision 7，其余 0，winner/visit invariants PASS。
+- Target impact：仍无 task execution，不能宣称 success 改善。Best `2/10`、gap 3；attempt `0/143`、GPU-hours `0/48`、formal 0。
+- 决策：`KEEP_STAGE_A_PASS_AND_FREEZE_ONLINE_MANIFEST`。下一步只允许从该 v2 hash 和当前 committed code 冻结 immutable manifest，再做六-cell mechanism preflight GPU admission。
