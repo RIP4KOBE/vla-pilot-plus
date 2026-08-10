@@ -227,6 +227,7 @@ experiments:
     api_health_diagnostic_path: "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_010_causal_envelope_candidate/analysis/api_health_diagnostic_20260810T1659Z.json"
     api_health_diagnostic_sha256: "70afb86006c6c01517201b43562ea3c36e8d24680d8f1eec2f9ab2e219bcf227"
     api_health_result: "HTTP 401 invalid_api_key / authentication_error"
+    api_blocker_result_commit: "d6af68b5cf21634c88c1ee07efa3a2aa43bd4160"
     recovery_attempt_ids_created: []
     recovery_dispatches_remaining: 1
 

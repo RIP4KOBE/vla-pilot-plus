@@ -8,7 +8,7 @@
 
 | Iteration | 日期 | Scope level | 假设 | 修改摘要 | Split / tasks | 结果 | 决策 | Protocol commit | Result commit |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `run_010_causal_envelope_candidate` | 2026-08-10 | `QD-1` | H1 | sparse QD + causal bounds expansion/archive rebin；其余冻结 | offline PASS；preflight tasks 3/5 首派发在 episode 前 API abort | `PAUSED_INVALID_RUNTIME_CREDENTIAL`；0 task outcome | exact-cell recovery remains pending | v1 `1017bf0…`; offline v2 `8fd3aea…`; API recovery v3 `b344dc8…` | pending this result commit |
+| `run_010_causal_envelope_candidate` | 2026-08-10 | `QD-1` | H1 | sparse QD + causal bounds expansion/archive rebin；其余冻结 | offline PASS；preflight tasks 3/5 首派发在 episode 前 API abort | `PAUSED_INVALID_RUNTIME_CREDENTIAL`；0 task outcome | exact-cell recovery remains pending | v1 `1017bf0…`; offline v2 `8fd3aea…`; API recovery v3 `b344dc8…` | `d6af68b…` blocker result |
 | `run_002_partition_diagnostic` | 2026-08-10 | `QD-0` | H1 | fixed-initial vs 单一 `causal_envelope_v1` 4x4 partition replay | 27 frozen files；4,567 eligible chunks；task strata 3/5/8/9 | 10/10 gates PASS；resolution +30.1%；global best 100% | `KEEP_DIAGNOSTIC_EVIDENCE_AND_AUTHORIZE_ONE_QD1_PROTOCOL` | `862f7cc4f00d92a97f6a0103e760f3b6180a437f` | `29fcdb7940e35ce12d1d96e2651b7d813406052d` |
 | `run_001_allocation_ecology_diagnostic` | 2026-08-10 | `QD-0` | H4 | saved-trace parent-quality inheritance 与 saturated slot audit | 540 traces / 9,000 stages；task strata 0–9 | 2 attempts `INVALID`；无可采纳 H4 outcome | `INVALID_CONCLUDE_AND_TRIGGER_OUTER_LOOP` | v1 `dcf234b…`; v2 `91ddd34…`; v3 `f6d7bc9…`; v4 `3d320f6…` | `cdd150b2c332e907c05cda90c7c09fd1f1799570` |
 | `run_000_baseline_replay` | 2026-08-10 | `QD-0` | H1–H5 | 只读回放旧 QD 与预算 sweep，验证 target-linked failure boundary | historical only | 6/6 gates PASS；4,705 QD chunks；budget max 1/10 | `KEEP_DIAGNOSTIC_EVIDENCE` | `5255e924ee925487406e35a27548d9db4e988642` | `e0b252c983a3b62858c8fa676e7b32618660b364` |
@@ -571,3 +571,4 @@
 - Immutable diagnostic：owned `run_010_causal_envelope_candidate/analysis/api_health_diagnostic_20260810T1659Z.json`，mode `0444`，size 907 bytes，SHA-256 `70afb86006c6c01517201b43562ea3c36e8d24680d8f1eec2f9ab2e219bcf227`。
 - 恢复结果：未创建 IDs 7–12，未重新做 GPU admission，未启动 worker/episode，未生成 task outcome；initialized episode attempts `0/143`、GPU-hours 0、formal 0。v3 的一次 exact-cell dispatch authorization 尚未消耗。
 - Failure reason / next-step basis：这是外部运行时 credential invalidity，不是可由 EDS+QD 修改解决的失败，也没有提供算法优化信号。继续 algorithm exploration 不会直接缩小 gap，违反 success-first 原则；故状态转为 `PAUSED_INVALID_RUNTIME_CREDENTIAL`，直到执行环境配置有效 `OPENAI_API_KEY` 后从 v3 pre-reservation health check 恢复。
+- Infrastructure result commit：`d6af68b5cf21634c88c1ee07efa3a2aa43bd4160`。

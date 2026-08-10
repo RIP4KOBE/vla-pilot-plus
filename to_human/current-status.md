@@ -13,6 +13,7 @@
 - Recovery protocol commit: `b344dc850e8d63b2a78438d64d152693e8f7789f`; IDs 1–6 are append-only pre-episode aborted and there are no active/dispatched attempts.
 - Blocker: the v3 pre-reservation check and a redacted diagnostic returned Poe HTTP 401 `invalid_api_key`. DNS/HTTPS are healthy and the environment credential is present/non-dummy, so repeated dispatch is forbidden until the credential is replaced.
 - Diagnostic: immutable `analysis/api_health_diagnostic_20260810T1659Z.json`, SHA-256 `70afb860…f227`; no credential value was serialized.
+- Infrastructure result commit: `d6af68b5cf21634c88c1ee07efa3a2aa43bd4160`.
 - Resume condition: configure a valid `OPENAI_API_KEY` for Poe in the execution environment, then resume from v3. The next action is health check first; only PASS permits IDs 7–12 and fresh GPU admission.
 - Recovery budget remains available: no IDs 7–12, worker, episode, GPU-hour, or formal evaluation was created; initialized episode attempts remain `0/143`.
 - Dev-A remains gated behind mechanism PASS and requires candidate success `>= paired control +1` with zero loss of any control-success task.
