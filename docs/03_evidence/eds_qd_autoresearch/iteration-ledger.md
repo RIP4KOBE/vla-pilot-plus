@@ -1,6 +1,6 @@
 # EDS+QD Autoresearch 统一迭代总账
 
-状态：`EXECUTING — run_002 H1 causal-envelope protocol locked — 0 algorithm iterations`
+状态：`EXECUTING — run_002 COMPLETE；one H1 causal-envelope QD-1 protocol authorized — 0 algorithm iterations`
 
 本文件是 EDS+QD autoresearch 所有 inner-loop 与 outer-loop 过程的单一人工审查入口。所有条目按 iteration ID append-only；不能删除、覆盖或为改善叙事而重写负结果、invalid attempt、infrastructure failure 或 revert 记录。大型 raw artifacts 不嵌入 Git，但必须以稳定路径和 SHA-256 引用。
 
@@ -8,7 +8,7 @@
 
 | Iteration | 日期 | Scope level | 假设 | 修改摘要 | Split / tasks | 结果 | 决策 | Protocol commit | Result commit |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `run_002_partition_diagnostic` | 2026-08-10 | `QD-0` | H1 | fixed-initial vs 单一 `causal_envelope_v1` 4x4 partition replay | 27 frozen files；4x4 eligible chunks；task strata 3/5/8/9 | `PROTOCOL_LOCKED`；尚未执行 | pending | `862f7cc4f00d92a97f6a0103e760f3b6180a437f` | — |
+| `run_002_partition_diagnostic` | 2026-08-10 | `QD-0` | H1 | fixed-initial vs 单一 `causal_envelope_v1` 4x4 partition replay | 27 frozen files；4,567 eligible chunks；task strata 3/5/8/9 | 10/10 gates PASS；resolution +30.1%；global best 100% | `KEEP_DIAGNOSTIC_EVIDENCE_AND_AUTHORIZE_ONE_QD1_PROTOCOL` | `862f7cc4f00d92a97f6a0103e760f3b6180a437f` | pending this commit |
 | `run_001_allocation_ecology_diagnostic` | 2026-08-10 | `QD-0` | H4 | saved-trace parent-quality inheritance 与 saturated slot audit | 540 traces / 9,000 stages；task strata 0–9 | 2 attempts `INVALID`；无可采纳 H4 outcome | `INVALID_CONCLUDE_AND_TRIGGER_OUTER_LOOP` | v1 `dcf234b…`; v2 `91ddd34…`; v3 `f6d7bc9…`; v4 `3d320f6…` | `cdd150b2c332e907c05cda90c7c09fd1f1799570` |
 | `run_000_baseline_replay` | 2026-08-10 | `QD-0` | H1–H5 | 只读回放旧 QD 与预算 sweep，验证 target-linked failure boundary | historical only | 6/6 gates PASS；4,705 QD chunks；budget max 1/10 | `KEEP_DIAGNOSTIC_EVIDENCE` | `5255e924ee925487406e35a27548d9db4e988642` | `e0b252c983a3b62858c8fa676e7b32618660b364` |
 | — | 2026-08-10 | — | — | 执行授权；尚未开始算法迭代 | — | — | `APPROVED_EXECUTING` | — | — |
@@ -24,8 +24,8 @@
 - Formal evaluations：0。
 - 累计 GPU-hours：0。
 - Attempt budget：`0 / 143`。
-- 已结束新实验：2 个 `QD-0`（1 complete，1 invalid）；另有 1 个 `QD-0` protocol locked；算法迭代仍为 0。
-- 当前结论：`run_002` 只允许 `causal_envelope_v1` 一个 H1 partition counterfactual；其结果决定 QD-1 go/no-go。Formal evaluation 仍未授权。
+- 已结束新实验：3 个 `QD-0`（2 complete，1 invalid）；算法迭代仍为 0。
+- 当前结论：`run_002` 全部门槛通过，只授权 `causal_envelope_v1` 一个 H1 QD-1 protocol；不授权相邻 partition 或 formal evaluation。
 
 ### `run_001_allocation_ecology_diagnostic` — 饱和 archive 的 parent 质量继承与 slot 生态
 
@@ -336,7 +336,7 @@
 
 - 日期与 UTC 时间：`2026-08-10T15:43:49Z`。
 - Inner/outer loop：outer-loop 001 pivot 后的 inner-loop QD-0。
-- 状态：`PROTOCOL_LOCKED`；尚未实现或执行。
+- 状态：`COMPLETE`。
 - 标签：`CONFIRMATORY`。
 - 假设 ID：H1。
 - Scope level：`QD-0`。
@@ -377,7 +377,7 @@
 | QD quality/elitism | Frozen | reward 再 fingerprint tie-break | source parity | 保持 quality 不变 |
 | QD final selection | Frozen | global reward best | replay | 检验 best preservation |
 | QD cross-chunk state | Frozen | fresh local archive | — | 不发散到 H3 |
-| EDS+QD instrumentation | Planned | deterministic JSONL analyzer | `src/analyze_qd_partition_counterfactual.py` | QD-1 go/no-go |
+| EDS+QD instrumentation | Changed | deterministic JSONL analyzer | `src/analyze_qd_partition_counterfactual.py` | QD-1 go/no-go |
 
 - 明确冻结的非 EDS+QD 模块：checkpoint、perception/grounding、prompt、Stage、environment/reset、executor、evaluator。
 - 逐文件 diff 摘要：protocol commit 只增加 protocol，并更新 state/log/ledger；没有 analyzer 或算法实现。
@@ -392,17 +392,36 @@
 - 环境 fingerprint：CPU-only standard Python JSON analyzer；local permutation seed 1702。
 - GPU index/UUID：不适用。
 - Expected evaluations/model/reward/VLM calls：全部 0。
-- Started / ended / wall time：尚未开始。
+- Started / ended / wall time：canonical completed at `2026-08-10T15:56:20Z`，wall `149.2 s`；two repeats concurrent wall `148.9 s`。首次同命令受外层 120 s shell timeout 中止，未写 artifact；随后相同 commit/input/threshold 完成。
 
 #### F. 结果
 
-- 状态：尚未执行；无可用 result、task outcome 或 mechanism statistic。
-- Promotion vector：未评估。
+- 状态：`COMPLETE`；validity 与 scientific gates 全 PASS。
+
+| Stratum | Resolution improvement median | Support threshold | Result |
+| --- | ---: | ---: | --- |
+| task 3 | 0.273937 | 0.20 | PASS |
+| task 5 | 0.318165 | 0.20 | PASS |
+| task 8 | 0.326254 | 0.20 | PASS |
+| task 9 | 0.308536 | 0.20 | PASS |
+
+- 全局：27/27 hashes；4,705 records；4,567 eligible 4x4 exact replay；138 个 3x3 records 按 protocol 排除；0 malformed、baseline mismatch、permutation failure。
+- Primary：equal-chunk resolution `+0.300775`；equal-profile `+0.309348`。
+- Guardrails：candidate represented-overflow P95 `0.0`，同时 raw initial-bound overflow P95 如实保持 `0.875`；occupied-mode ratio median `0.9375`；archive-spread ratio median `2.008744`；global best preserve `1.0`。
+- Promotion vector：只通过 offline QD-0 → one QD-1 protocol；无 environment success、task gain/loss 或 formal promotion。
 - 迭代后 best success / target gap：仍为历史 `2/10` / 3。
+- 实际新增、保留与丢失 tasks：无在线 episode，均为空。
+- Raw artifact：owned `run_002_partition_diagnostic/analysis.json` SHA-256 `e21d2598981f8dbe538d35da77b33b31585a92b4e960c7056bef7d729e20d9a7`；manifest `d322720…abcd`；summary `7b638e0f…7450`。
+- Determinism：canonical + two complete repeats 三个 analysis hashes 完全相同；repeat 临时目录验证后移入 trash，仅保留 canonical 11 MiB artifact。
+- Failure/recovery：首次 120 s 外层 shell timeout 在 artifact write 前终止；相同 command/commit/input 重跑完成。它不属于 episode attempt、data validity failure 或 scientific threshold amendment。
 - 本轮与累计 episode/GPU-hour budget：`0/0`；累计 attempt `0/143`、GPU-hours `0/48`。
 
 #### G. 分析与决策
 
-- 当前决策：只锁定 protocol，不提前声称 H1 support。
-- 结果决策树：全部 gate pass → 仅授权一个 QD-1 protocol；valid gate fail → reject/park H1；首次 schema failure → 最多一次 protocol-first repair；第二次 → invalid + outer-loop。
-- 下一步：在本 protocol commit 后实现 analyzer，先做 baseline exactness，再执行三次 deterministic replay；任何算法实现仍未授权。
+- 观察事实：causal envelope 在 common stream 上显著降低 within-cell XY distortion，同时保留近满 archive mode count、扩大 meter-scale endpoint spread，并从不丢失 global reward best。
+- Target gap：未缩小；本轮没有 task execution，不能把 geometry 结果当 success。
+- H1：获得 offline support，授权一次 QD-1 因果测试；不授权参数 sweep 或 formal。
+- 替代解释：parent cell 改变会改变未来 offspring，stored stream 不能覆盖；endpoint resolution 不是 stage progress。
+- 决策：`KEEP_DIAGNOSTIC_EVIDENCE_AND_AUTHORIZE_ONE_QD1_PROTOCOL`。
+- Result commit：pending this commit。
+- 下一步：先锁定 `run_010_causal_envelope_candidate` protocol，再以 TDD 实现 QD bounds expansion/archive rebin；CPU offline preflight PASS 后才进入 frozen mechanism preflight 与 Dev-A。

@@ -20,6 +20,8 @@ The `run_000_baseline_replay` machine replay adds a stronger ecology boundary. A
 
 Outer-loop cycle 1 pivots to H1 partition diagnostics. This choice is evidence-ranked, not novelty-ranked: H1 has valid and deterministic JSONL coverage/overflow telemetry, whereas H4's required inheritance evidence is invalid and H3's generic smoothing intervention has negative historical task evidence. Only one partition counterfactual is allowed before an online go/no-go, preventing a return to grid/bounds sweeps.
 
+`run_002_partition_diagnostic` supports that single H1 counterfactual. Across 4,567 exact-replayed 4x4 chunks, causal monotonic bounds expansion reduced within-cell endpoint SSE by median 30.1% (30.9% with equal profile weight), with all target-linked historical task strata 3/5/8/9 above 27%. Median occupied-mode retention was 93.75%, archive endpoint spread increased 2.01x, and every global reward-best fingerprint was retained. The raw initial-bound overflow P95 remained explicitly 0.875; the zero candidate overflow is the post-envelope representability metric, not a claim that exploration stopped. This is strong offline authorization for one QD-1 test, not evidence of task success.
+
 Direct compute scaling is no longer an active direction. The 18 valid budget configurations ranged from 512 to 1,664 evaluations per complete chunk but all scored 0/10 or 1/10, with aggregate Spearman correlation 0.0 between evaluations/chunk and success. This does not prove compute can never help; it shows that compute without changing QD allocation/retention did not shrink the target gap.
 
 ## Key Results
@@ -32,6 +34,7 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 - Planning baseline health check: 56 QD archive/runner/audit tests pass on base commit.
 - `run_000_baseline_replay`: 6/6 gates PASS; 13/13 input hashes; 27/27 metrics files; 4,705 QD chunks; deterministic analysis SHA-256 `6ad13083…963`.
 - Search-budget replay: 18 valid configurations, max 1/10, success-task union `{0,7,8,9}`, and no valid `>=5/10` result.
+- `run_002_partition_diagnostic`: 10/10 frozen validity/scientific gates PASS; 4,567 exact 4x4 replays; resolution `+30.1%`; mode retention `0.9375`; spread ratio `2.0087`; global best retention `1.0`; three identical analysis hashes.
 
 ## Patterns and Insights
 
@@ -43,6 +46,7 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 6. Increasing QD population/iterations without changing archive ecology does not preserve or combine successful modes.
 7. The absence of a direct global-quality reserve is a concrete, code-and-telemetry-supported retention gap; it is not yet proof that any particular reserve ratio improves task success.
 8. Saved mechanism traces require explicit temporal and entity-level schemas; occurrence ranks, archive-cell ranks, allocation occupancy and post-update coverage are not interchangeable.
+9. A parameter-free causal envelope can improve geometric partition resolution without losing the reward-best candidate on a common stream, but only online parent/offspring feedback can establish a task benefit.
 
 ## Lessons and Constraints
 
@@ -66,4 +70,4 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 
 ## Optimization Trajectory
 
-`run_000_baseline_replay` is complete; `run_001_allocation_ecology_diagnostic` ended invalid after two infrastructure attempts. Neither changed success or target gap. No algorithm candidate, development episode, GPU job, or formal evaluation has run. An outer-loop pivot must select the next target-linked QD mechanism.
+`run_000_baseline_replay` is complete; `run_001_allocation_ecology_diagnostic` ended invalid after two infrastructure attempts; `run_002_partition_diagnostic` passed all gates and authorizes one `causal_envelope_v1` QD-1 protocol. None changed success or target gap. No algorithm candidate, development episode, GPU job, or formal evaluation has run. The next action is protocol-first implementation and verification of that one QD-1 candidate, followed by frozen preflight/Dev-A gates only if CPU validation passes.
