@@ -1,6 +1,6 @@
 # EDS+QD Autoresearch 统一迭代总账
 
-状态：`PLANNING_ONLY — 0 algorithm iterations`
+状态：`EXECUTING — bootstrap_historical_replay — 0 algorithm iterations`
 
 本文件是 EDS+QD autoresearch 所有 inner-loop 与 outer-loop 过程的单一人工审查入口。所有条目按 iteration ID append-only；不能删除、覆盖或为改善叙事而重写负结果、invalid attempt、infrastructure failure 或 revert 记录。大型 raw artifacts 不嵌入 Git，但必须以稳定路径和 SHA-256 引用。
 
@@ -8,7 +8,7 @@
 
 | Iteration | 日期 | Scope level | 假设 | 修改摘要 | Split / tasks | 结果 | 决策 | Protocol commit | Result commit |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| — | — | — | — | 尚未开始算法迭代 | — | — | `PAUSED_FOR_DESIGN_REVIEW` | — | — |
+| — | 2026-08-10 | — | — | 执行授权；尚未开始算法迭代 | — | — | `APPROVED_EXECUTING` | — | — |
 
 ## 累计状态
 
@@ -21,7 +21,16 @@
 - Formal evaluations：0。
 - 累计 GPU-hours：0。
 - Attempt budget：`0 / 143`。
-- 当前结论：方案修订中；不授权执行。
+- 当前结论：冻结方案已获正式执行授权；formal evaluation 仍须通过 promotion gates。
+
+## Execution authorization
+
+- UTC：`2026-08-10T15:00:35Z`。
+- Frozen design commit：`1aee76489ea8989a832dec49b747239f2db90981`。
+- State transition：`paused/design_review → active/bootstrap_historical_replay`。
+- 授权范围：按冻结方案自主执行 EDS+QD autoresearch；GPU 0–7 动态准入；routine inner/outer-loop decisions 不逐次请求确认。
+- 未改变：target `>=5/10`、split/formal/budget/write-boundary、安全与暂停规则。
+- 授权时计数：algorithm iterations 0、online episodes 0、GPU jobs 0、formal evaluations 0、GPU-hours 0。
 
 ## 条目模板（每轮复制并追加）
 

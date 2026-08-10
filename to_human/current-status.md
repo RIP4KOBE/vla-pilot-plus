@@ -1,7 +1,7 @@
-# Current Status — Design Review
+# Current Status — Execution Bootstrap
 
-- Phase: revised design review; planning and workspace initialization are complete.
-- State: paused by approved scope boundary.
+- Phase: bootstrap and historical replay.
+- State: active; frozen design approved for execution at `2026-08-10T15:00:35Z`.
 - Base commit: `5b0898e53d5b9e16200c17479a74746071215787`.
 - Init commit: `54b2487`.
 - Branch: `exp/eds-qd-autoresearch-libero-swap-ood`.
@@ -15,7 +15,7 @@
 - Optimization scope: EDS+QD core mechanisms only, QD-first.
 - Historical evidence: entire repository/worktrees and shared2 experiment history may be analyzed read-only.
 - Canonical iteration record: `docs/03_evidence/eds_qd_autoresearch/iteration-ledger.md`.
-- Future GPU authorization: any dynamically eligible physical GPU 0–7; current GPU jobs remain 0.
+- GPU authorization: any dynamically eligible physical GPU 0–7; current GPU jobs remain 0.
 - Write boundary: algorithm and documentation changes only in this branch/worktree; large artifacts only in the owned proposed artifact root.
 - Design SHA-256 before latest plan commit: `4de266d0192781f5018c3ac1a276b40fd5e8701a8e0ba23dc21be52ad56ed852`.
-- Next action: user review. Execution remains unauthorized until the design status is explicitly approved.
+- Next action: build the read-only historical evidence catalog and lock `run_000_baseline_replay` before any algorithm or online change.

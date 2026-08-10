@@ -40,7 +40,7 @@ The historical Grid5 result is invalid algorithm evidence. Its episodes hit `Ind
 - Keep the official task/seed mapping hidden from iterative selection after it is frozen.
 - Protocol commits must precede results commits; invalid and negative results remain append-only evidence.
 - The old Grid5 result is invalid because of a bookkeeping exception, not a valid negative result about 5x5 discretization.
-- Do not enable a wall-clock continuity loop during the current planning-only phase.
+- A wall-clock continuity loop has user consent in the execution phase, but it must preserve the pause sentinel, owned-process, write-boundary and no-duplication rules.
 
 ## Open Questions
 

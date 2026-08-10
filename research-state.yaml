@@ -4,12 +4,14 @@
 project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
-  status: paused
-  phase: design_review
+  status: active
+  phase: bootstrap_historical_replay
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
-  planning_only: true
-  pause_reason: "The EDS+QD-core-only design revision is complete and awaits user review; no algorithm implementation, GPU work, online episode, formal evaluation, storage initialization, or scheduled loop is authorized."
+  planning_only: false
+  approved_for_execution_at: "2026-08-10T15:00:35Z"
+  approval_source: "User explicitly supplied the formal execution prompt for frozen design commit 1aee76489ea8989a832dec49b747239f2db90981"
+  pause_reason: null
 
 provenance:
   repository_root: "/home/hynx/VLA-Pilot++"
@@ -159,14 +161,15 @@ continuity:
   user_consent_for_future_execution: true
   scheduled_task_created: false
   loop_enabled: false
-  planning_phase_must_not_enable_loop: true
+  planning_phase_must_not_enable_loop: false
+  execution_authorized: true
   pause_sentinel: ".autoresearch/PAUSE"
 
 resources:
   proposed_artifact_root: "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood"
   outputs_link: "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/outputs"
   storage_initialized: false
-  gpu_work_authorized_in_current_phase: false
+  gpu_work_authorized_in_current_phase: true
   formal_evaluation_authorized_in_current_phase: false
   future_execution_gpu_indices_authorized: [0, 1, 2, 3, 4, 5, 6, 7]
   future_execution_max_concurrent_workers: 8
