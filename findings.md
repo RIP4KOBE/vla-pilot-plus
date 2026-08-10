@@ -22,6 +22,8 @@ Outer-loop cycle 1 pivots to H1 partition diagnostics. This choice is evidence-r
 
 `run_002_partition_diagnostic` supports that single H1 counterfactual. Across 4,567 exact-replayed 4x4 chunks, causal monotonic bounds expansion reduced within-cell endpoint SSE by median 30.1% (30.9% with equal profile weight), with all target-linked historical task strata 3/5/8/9 above 27%. Median occupied-mode retention was 93.75%, archive endpoint spread increased 2.01x, and every global reward-best fingerprint was retained. The raw initial-bound overflow P95 remained explicitly 0.875; the zero candidate overflow is the post-envelope representability metric, not a claim that exploration stopped. This is strong offline authorization for one QD-1 test, not evidence of task success.
 
+`run_010_causal_envelope_candidate` is now implemented but has not produced outcome evidence. The candidate expands bounds only from the current scored offspring batch, deterministically re-bins incumbents, conserves cumulative sparse-priority visits, and retains the unchanged reward/fingerprint global-best selection. The fixed policy remains the default. The frozen nine-file regression suite passes 781 tests; this establishes implementation compatibility, not success improvement. Offline fingerprint/preflight and all online gates remain pending.
+
 Direct compute scaling is no longer an active direction. The 18 valid budget configurations ranged from 512 to 1,664 evaluations per complete chunk but all scored 0/10 or 1/10, with aggregate Spearman correlation 0.0 between evaluations/chunk and success. This does not prove compute can never help; it shows that compute without changing QD allocation/retention did not shrink the target gap.
 
 ## Key Results
@@ -70,4 +72,4 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 
 ## Optimization Trajectory
 
-`run_000_baseline_replay` is complete; `run_001_allocation_ecology_diagnostic` ended invalid after two infrastructure attempts; `run_002_partition_diagnostic` passed all gates and authorizes one `causal_envelope_v1` QD-1 protocol. None changed success or target gap. No algorithm candidate, development episode, GPU job, or formal evaluation has run. The next action is protocol-first implementation and verification of that one QD-1 candidate, followed by frozen preflight/Dev-A gates only if CPU validation passes.
+`run_000_baseline_replay` is complete; `run_001_allocation_ecology_diagnostic` ended invalid after two infrastructure attempts; `run_002_partition_diagnostic` passed all gates; and `run_010` algorithm iteration 1 is implemented at `930cdb5` with 781 regression tests passing. No development episode, GPU job, or formal evaluation has run, so success remains historical 2/10 and target gap remains 3. The next action is the immutable offline preflight, followed by frozen mechanism preflight/Dev-A gates only if it passes.

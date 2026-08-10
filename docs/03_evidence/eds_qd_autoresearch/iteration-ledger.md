@@ -503,3 +503,19 @@
 
 - 当前只锁定 causal-envelope single candidate 与 success-first reject rule，不声称 online support。
 - 下一步：protocol commit 后 TDD 最小实现，固定/causal 两条 config path 和 dedicated runner；先过完整 CPU/offline gate。只有 offline PASS 才能 freeze manifest 与 GPU preflight。
+
+#### H. 实现与提交（追加记录）
+
+- 时间：`2026-08-10T16:39:09Z`；状态从 `PROTOCOL_LOCKED` 推进到 `IMPLEMENTED_OFFLINE_VALIDATION_PENDING`。
+- Protocol commit：`1017bf0212780b2e386764517661cf9970090f8d`，严格早于 implementation commit `930cdb5295b8f9b4ee099298764c3af3c078d6b7`。
+- 算法 iteration：1。尚无 online task outcome，best 仍为历史 `2/10`、target gap 仍为 3；attempt `0/143`、GPU-hours `0/48`、formal 0。
+- TDD 记录：bounds/archive tests 首先因缺少 `expand_bounds` import 红灯；实现后 core tests 22 passed。Dedicated runner tests 首先因 runner 文件不存在而 6 failed；实现后扩充到 8 passed。最终冻结九文件 suite 为 `781 passed in 71.32s`。
+- QD partition：新增 `expand_bounds`，每个已评分 offspring batch 只扩不缩，非有限输入 fail closed，checksum 对 batch permutation 稳定。
+- QD archive：新增 deterministic `rebin`；按 reward/fingerprint 解 collision，将旧 cell cumulative visits 映射并求和，强制总 visits 守恒，global reward-best 不因 rebin 丢失。
+- QD loop：只有 `qd_bounds_update_policy=causal_envelope_v1` 启用 expand→incumbent rebin→child insert；`fixed_initial` 为默认并保持既有路径。Population/iterations/reward/parent rule/final selection 均未改变，完整 chunk 仍为 176 evaluations / 11 score calls。
+- Telemetry：新增逐 iteration active bounds/checksum、expand、rebin collision/visit、raw initial-bound overflow、post-envelope overflow、fixed/active within-cell SSE 和 resolution improvement；final selection/accounting/fallback 字段继续保留。
+- Runner/audit：冻结 6-cell mechanism preflight 与 8-cell Dev-A；无 Dev-B/validation/formal CLI。加入 143-attempt fail-closed ledger、隐式 retry 拒绝、50 GiB storage、pause、credential、artifact checksum、checkpoint/LIBERO input fingerprint、GPU-hour、task/safety/mechanism/latency gates。
+- GPU 隔离：移除旧 profile 的物理 GPU 5 EGL pin，使 MuJoCo 跟随每个动态 admitted worker GPU；本 worktree `.libero_config` 仅重绑定到本 worktree 的同版 LIBERO-PRO 文件，未写其他 worktree。
+- Source SHA-256：`configs/config.yaml b20791a2…daf8`；`core/qd_ed.py 1516bb75…70b9`；`core/rdt_policy_steer.py b8806d7a…1ff2`；`core/eds_eval_metrics.py d8fb4d04…3429`；runner `c1887cac…c0a`；runner tests `5ae0a254…45a3`。
+- Dirty-state：implementation commit 后仅保留用户保护的 untracked `docs/01_specs/2026-08-10-eds-qd-stage-guidance-transition-design.md`；从未修改、stage 或 commit。
+- 下一步：先提交本状态索引，再运行 immutable offline preflight。只有 machine PASS 才能 freeze run manifest 和进入 GPU admission；当前不授权任何 GPU dispatch。

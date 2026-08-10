@@ -1,31 +1,14 @@
-# Current Status — Outer Loop 001 Pivoted to H1 Partition
+# Current Status — run_010 Implementation Complete
 
-- Phase: inner-loop QD-0; next H1 protocol pending.
-- State: active; frozen design approved for execution at `2026-08-10T15:00:35Z`.
-- Base commit: `5b0898e53d5b9e16200c17479a74746071215787`.
-- Init commit: `54b2487`.
-- Branch: `exp/eds-qd-autoresearch-libero-swap-ood`.
-- Active experiment: none. `run_001_allocation_ecology_diagnostic` ended `INVALID / INFRASTRUCTURE_FAILURE` after two attempts.
-- Protocol amendment: before implementation, corrected expected full-process stages from 5,400 to 9,000 using each profile's configured iterations; no outcome statistic was inspected first.
-- Invalid attempt: analyzer confused population occurrence ranks with 16 archive-cell ranks and rejected 360 budget traces. The artifact is preserved but its H4 values are inadmissible. V3 freezes the source-faithful cell reconstruction before repair.
-- Final temporal amendment: parent slot maps are pre-update while coverage is post-update; V4 uses the actual 16-cell slot map to select saturated allocations. No aggregate recovery was run before this lock.
-- Completed new experiments: 1 (`run_000`, zero episodes).
-- GPU jobs: 0.
-- Formal evaluations: 0.
-- Scheduled continuity loops: 0.
-- Design: `docs/01_specs/2026-08-08-eds-qd-autoresearch-libero-swap-ood-design.md`.
-- Primary objective: raise EDS-QD to at least 5/10 valid formal successes; stop immediately when all hard gates pass.
-- Initial target gap: historical best EDS-QD 2/10 → target 5/10, gap 3 tasks.
-- Optimization scope: EDS+QD core mechanisms only, QD-first.
-- Historical evidence: entire repository/worktrees and shared2 experiment history may be analyzed read-only.
-- Canonical iteration record: `docs/03_evidence/eds_qd_autoresearch/iteration-ledger.md`.
-- GPU authorization: any dynamically eligible physical GPU 0–7; current GPU jobs remain 0.
-- Write boundary: algorithm and documentation changes only in this branch/worktree; large artifacts only in the owned proposed artifact root.
-- Design SHA-256 before latest plan commit: `4de266d0192781f5018c3ac1a276b40fd5e8701a8e0ba23dc21be52ad56ed852`.
-- `run_000` result: 6/6 gates PASS; 4,705 QD chunks; 100% archive-only parents and zero direct elite carryover; 18 compute-sweep configs maxed at 1/10.
-- Target state: historical best remains 2/10; target gap remains 3 tasks.
-- Decision: keep diagnostic evidence, reject direct compute scaling as the next move, and audit allocation/quality retention next.
-- Storage: owned artifact root initialized and linked as `outputs`; shared2 had 54 GiB available at replay start, only 4 GiB above the frozen admission floor.
-- `run_001` outcome: no admissible H4 statistic; no allocation candidate authorized. Failure was telemetry/analyzer semantics, not an algorithm result.
-- Outer-loop decision: park H4 and run exactly one H1 JSONL partition counterfactual; no broad grid/bounds sweep.
-- Next action: lock `run_002_partition_diagnostic`; no online candidate or formal run is authorized yet.
+- Phase: inner-loop QD-1 offline validation; execution remains active and interruptible through `.autoresearch/PAUSE`.
+- Primary objective: valid formal LIBERO-PRO `libero_object_swap >=5/10`; historical EDS-QD best is `2/10`, gap 3.
+- Active experiment: `run_010_causal_envelope_candidate`, status `IMPLEMENTED_OFFLINE_VALIDATION_PENDING`.
+- Protocol commit: `1017bf0212780b2e386764517661cf9970090f8d`; implementation commit: `930cdb5295b8f9b4ee099298764c3af3c078d6b7`.
+- Candidate: sparse EDS-QD plus the single `causal_envelope_v1` partition/rebin change; all other EDS/QD and non-EDS-QD semantics are frozen by protocol.
+- Verification: TDD completed; frozen nine-file suite `781 passed in 71.32s`.
+- Online budget consumed: attempts `0/143`, GPU-hours `0/48`, formal uses 0. No online success claim exists yet.
+- Next gate: run immutable CPU offline preflight and freeze a manifest only on PASS. Then execute the six-cell mechanism preflight with dynamically admitted idle GPUs 0–7.
+- Dev-A remains gated behind mechanism PASS and requires candidate success `>= paired control +1` with zero loss of any control-success task.
+- Dev-B, validation, and formal evaluation are not authorized by the current protocol.
+- All new artifacts are confined to `/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_010_causal_envelope_candidate`; other worktrees and historical artifacts remain read-only.
+- User-owned untracked `docs/01_specs/2026-08-10-eds-qd-stage-guidance-transition-design.md` remains untouched and excluded from every commit.

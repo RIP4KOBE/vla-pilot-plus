@@ -5,7 +5,7 @@ project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
   status: active
-  phase: inner_loop_qd1_protocol_locked
+  phase: inner_loop_qd1_offline_validation
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: false
@@ -108,7 +108,7 @@ literature:
 hypotheses:
   - id: H1
     statement: "The initial-population endpoint-XY bounds make later offspring overflow into edge cells, saturating occupancy and erasing behavior resolution; a physically calibrated or overflow-aware descriptor partition will reduce overflow while preserving task-relevant modes."
-    status: qd1_causal_envelope_protocol_locked
+    status: qd1_causal_envelope_implemented_offline_validation
     motivation: "Historical valid QD profiles have median coverage 1.0 but overflow P95 0.938-1.0 and zero paired coverage gain."
     parent: null
     priority: high
@@ -145,7 +145,7 @@ experiments:
   best_value: null
   target_success_count: 5
   current_target_gap_from_historical_best_qd: 3
-  total_runs: 3
+  total_runs: 4
   trajectory_path: "data/experiment-trajectory.jsonl"
   trajectory:
     - id: run_000_baseline_replay
@@ -193,7 +193,7 @@ experiments:
     scope_level: QD-1
     hypothesis_id: H1
     label: CONFIRMATORY
-    status: PROTOCOL_LOCKED
+    status: IMPLEMENTED_OFFLINE_VALIDATION_PENDING
     target_gap_before: 3
     historical_best_success_count: 2
     online_unique_cells_reserved: 14
@@ -201,7 +201,11 @@ experiments:
     gpu_hours: 0
     candidate: eds_quality_diversity_sparse_causal_envelope_v1
     locked_at: "2026-08-10T16:08:00Z"
-    protocol_commit: pending_this_commit
+    protocol_commit: "1017bf0212780b2e386764517661cf9970090f8d"
+    implementation_commit: "930cdb5295b8f9b4ee099298764c3af3c078d6b7"
+    algorithm_iteration: 1
+    implementation_test_result: "781 passed in 71.32s"
+    offline_preflight_status: pending
 
 outer_loop:
   cycle: 1
