@@ -519,3 +519,12 @@
 - Source SHA-256：`configs/config.yaml b20791a2…daf8`；`core/qd_ed.py 1516bb75…70b9`；`core/rdt_policy_steer.py b8806d7a…1ff2`；`core/eds_eval_metrics.py d8fb4d04…3429`；runner `c1887cac…c0a`；runner tests `5ae0a254…45a3`。
 - Dirty-state：implementation commit 后仅保留用户保护的 untracked `docs/01_specs/2026-08-10-eds-qd-stage-guidance-transition-design.md`；从未修改、stage 或 commit。
 - 下一步：先提交本状态索引，再运行 immutable offline preflight。只有 machine PASS 才能 freeze run manifest 和进入 GPU admission；当前不授权任何 GPU dispatch。
+
+#### I. Stage-A 首次失败与唯一 protocol-first repair
+
+- 时间：`2026-08-10T16:42:10Z`；命令为冻结的 `storage-preflight` 后接 `offline-preflight`；wall `79.2 s`；online attempt/GPU/formal 均为 0。
+- Immutable failed artifact：`run_010_causal_envelope_candidate/analysis/offline_preflight.json`，mode `0444`，SHA-256 `1654574975a02df00be5ac6c78b986b18baf1657bf997a808c1fcb5aa58f9a61`。
+- 已通过：storage（约 212.5 GiB free）、781 tests、full checkpoint `b4e3631d…aaa1` / aggregate `a2026bcf…6c28`、LIBERO input aggregate `259c469e…38b8`、source/config fingerprints、176 evaluations、11 score calls、10/10 accounting、raw overflow disclosed、post-envelope overflow 0、10/10 visit conservation、10/10 rebin global-best preservation、RNG passive。
+- 唯一失败：synthetic iteration 0 的 fixed SSE 为 0，因此 resolution 正确为 `null`；iterations 1–9 均为 `1.0`。Runner 误加了“每轮都必须 finite 且 >=20%”这一 parent protocol 未注册的 quantifier。
+- 分类：offline audit fixture/schema defect，不是候选算法逻辑或 scientific refutation；没有 success/task/seed/GPU 结果被观察。
+- 唯一修复：新建 `protocol-v2.md`，先提交后才允许 runner 改为 v2 immutable path，并以 finite values median `>=0.20` 处理 zero-denominator；其余 gate 全部冻结。无第二次 schema repair。

@@ -5,7 +5,7 @@ project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
   status: active
-  phase: inner_loop_qd1_offline_validation
+  phase: inner_loop_qd1_offline_repair_protocol_locked
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: false
@@ -193,7 +193,7 @@ experiments:
     scope_level: QD-1
     hypothesis_id: H1
     label: CONFIRMATORY
-    status: IMPLEMENTED_OFFLINE_VALIDATION_PENDING
+    status: OFFLINE_V1_INVALID_SCHEMA_REPAIR_PROTOCOL_LOCKED
     target_gap_before: 3
     historical_best_success_count: 2
     online_unique_cells_reserved: 14
@@ -205,7 +205,9 @@ experiments:
     implementation_commit: "930cdb5295b8f9b4ee099298764c3af3c078d6b7"
     algorithm_iteration: 1
     implementation_test_result: "781 passed in 71.32s"
-    offline_preflight_status: pending
+    offline_preflight_status: "v1_invalid_schema_only; v2 protocol locked"
+    offline_preflight_v1_sha256: "1654574975a02df00be5ac6c78b986b18baf1657bf997a808c1fcb5aa58f9a61"
+    offline_schema_repairs_used: 1
 
 outer_loop:
   cycle: 1
