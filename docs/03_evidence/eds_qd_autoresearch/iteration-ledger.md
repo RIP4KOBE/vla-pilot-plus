@@ -1,6 +1,6 @@
 # EDS+QD Autoresearch 统一迭代总账
 
-状态：`EXECUTING — run_001 / PROTOCOL_LOCKED_V4 after 1 INVALID infrastructure attempt — 0 algorithm iterations`
+状态：`EXECUTING — run_001 INVALID; outer-loop infrastructure reflection required — 0 algorithm iterations`
 
 本文件是 EDS+QD autoresearch 所有 inner-loop 与 outer-loop 过程的单一人工审查入口。所有条目按 iteration ID append-only；不能删除、覆盖或为改善叙事而重写负结果、invalid attempt、infrastructure failure 或 revert 记录。大型 raw artifacts 不嵌入 Git，但必须以稳定路径和 SHA-256 引用。
 
@@ -8,7 +8,7 @@
 
 | Iteration | 日期 | Scope level | 假设 | 修改摘要 | Split / tasks | 结果 | 决策 | Protocol commit | Result commit |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `run_001_allocation_ecology_diagnostic` | 2026-08-10 | `QD-0` | H4 | saved-trace parent-quality inheritance 与 saturated slot audit | 540 traces / 9,000 stages；task strata 0–9 | first attempt `INVALID`（rank semantics）；recovery pending | `PROTOCOL_LOCKED_V4` | v1 `dcf234b…`; v2 `91ddd34…`; v3 `f6d7bc9…`; v4 pending | — |
+| `run_001_allocation_ecology_diagnostic` | 2026-08-10 | `QD-0` | H4 | saved-trace parent-quality inheritance 与 saturated slot audit | 540 traces / 9,000 stages；task strata 0–9 | 2 attempts `INVALID`；无可采纳 H4 outcome | `INVALID_CONCLUDE_AND_TRIGGER_OUTER_LOOP` | v1 `dcf234b…`; v2 `91ddd34…`; v3 `f6d7bc9…`; v4 `3d320f6…` | pending (this commit) |
 | `run_000_baseline_replay` | 2026-08-10 | `QD-0` | H1–H5 | 只读回放旧 QD 与预算 sweep，验证 target-linked failure boundary | historical only | 6/6 gates PASS；4,705 QD chunks；budget max 1/10 | `KEEP_DIAGNOSTIC_EVIDENCE` | `5255e924ee925487406e35a27548d9db4e988642` | `e0b252c983a3b62858c8fa676e7b32618660b364` |
 | — | 2026-08-10 | — | — | 执行授权；尚未开始算法迭代 | — | — | `APPROVED_EXECUTING` | — | — |
 
@@ -23,8 +23,8 @@
 - Formal evaluations：0。
 - 累计 GPU-hours：0。
 - Attempt budget：`0 / 143`。
-- 已完成新实验：1 个 `QD-0`；算法迭代仍为 0。
-- 当前结论：直接扩大 population/iterations 已被排除为下一方向；下一轮只做 allocation/quality-retention 反事实诊断。Formal evaluation 仍未授权。
+- 已结束新实验：2 个 `QD-0`（1 complete，1 invalid）；算法迭代仍为 0。
+- 当前结论：直接扩大 compute 已排除；H4 trace diagnostic 因 telemetry semantics invalid 且停止 repair；立即触发 outer-loop，候选 pivot 为 H1 partition。Formal evaluation 仍未授权。
 
 ### `run_001_allocation_ecology_diagnostic` — 饱和 archive 的 parent 质量继承与 slot 生态
 
@@ -32,7 +32,7 @@
 
 - 日期与 UTC 时间：`2026-08-10T15:20:46Z`。
 - Inner/outer loop：inner loop 1。
-- 状态：`PROTOCOL_LOCKED_V4_BEFORE_RECOVERY_EXECUTION`。
+- 状态：`INVALID`；标签 `INFRASTRUCTURE_FAILURE`。
 - 标签：`CONFIRMATORY`。
 - 假设 ID：H4。
 - Scope level：`QD-0`。
@@ -81,7 +81,7 @@
 - Protocol v2 amendment：`91ddd34f64d129549147f42c64244b552398a624`。v1 把所有 trace 按原始 10 iterations 相乘而误写 5,400 stages；implementation 前按各 profile `cem_iters` 修正为 9,000。修订前未计算 reward margin、bootstrap、slot share 或 gate outcome；其余 hypotheses/gates 不变。
 - Invalid attempt：首次 analyzer 找到 540 files / 9,000 stages，但错误地把 budget population occurrence ranks `1..N` 限制为 archive-cell ranks `1..16`，从而拒绝 360 traces；artifact SHA-256 `c59cbe97…24b5`。该次 H4 数值全部不可采信。
 - Protocol v3 repair：`f6d7bc9a1d579fcbb55e36905beafd1a2ba8264c`。按 source 的 sorted-cell/repeated-slot 顺序重建 child-to-cell，并用每 cell mean occurrence rank 定义 16-cell quality quartiles；所有原 thresholds 不变。
-- Protocol v4 temporal alignment：pending (this commit)。两个 single-file precheck 发现 slot allocation 发生在 archive update 前，而 coverage 指标记录在 update 后；故用实际 parent slot map 的 16 个正计数 cells 定义饱和，排除 15→16 transition iteration。未运行 aggregate H4 statistics，原 thresholds 不变；这是本轮最后一次 schema amendment。
+- Protocol v4 temporal alignment：`3d320f6a143a74cbc31625f2f12ccdd77995c7f4`。两个 single-file precheck 发现 slot allocation 发生在 archive update 前，而 coverage 指标记录在 update 后；故用实际 parent slot map 的 16 个正计数 cells 定义饱和，排除 15→16 transition iteration。未运行 aggregate H4 statistics，原 thresholds 不变；这是本轮最后一次 schema amendment。
 - Code/config/checkpoint fingerprint：QD blobs `a9138b1f…bd13` / `1354e26c…dd95`；checkpoint 不加载。
 - Protocol-lock 时 Git dirty-state：仅禁止修改的用户 untracked stage-guidance design；无算法 diff。
 
@@ -96,11 +96,25 @@
 
 #### F. 结果
 
-首次 attempt：`INVALID / INFRASTRUCTURE_FAILURE`，原因是 analyzer rank semantics 错误；不是 H4 refutation。V3 recovery protocol commit 后才允许修复。
+| Attempt | Result | Accounting | Failure | Artifact |
+| --- | --- | --- | --- | --- |
+| initial | INVALID | 27 profiles / 540 traces / 9,000 stages | occurrence rank 被误当 16-cell rank；360 budget traces rejected | `c59cbe97…24b5` |
+| v4 recovery | INVALID | 27 / 540 / 9,000；374,400 children | 52 sparse traces 有合法 zero-slot cells，违反 v4 analyzer validity assumption | `489a7156…fda0` |
+
+- Promotion vector：validity FAIL；所有 H4 reward/slot/task subgroup values inadmissible；无 success、retention 或 task progress 结论。
+- 迭代后 best success / target gap：`2/10` / 3，不变。
+- Raw artifacts：owned `run_001_allocation_ecology_diagnostic/{analysis.json,repaired_v3/analysis.json}`；完整 hashes 见 per-run analysis。
+- Failure taxonomy：两次 `INFRASTRUCTURE_FAILURE`；无环境/算法/safety outcome。
+- 本轮与累计 budget：0 episodes，0 GPU-hours；attempt `0/143`。
 
 #### G. 分析与决策
 
-- 预提交规则不变：valid + H4 gates 全过才允许另建固定 `4/16` quality-reserve QD-1 protocol；valid 但 H4 fail 则转 H1；v4 后任何 validity failure 均停止 repair 并触发 infrastructure review。
+- 观察事实：trace file/stage/root accounting 均正确；telemetry 的 occurrence-rank/cell-rank、pre/post-update occupancy、zero-slot semantics 不能由原 analyzer 假设安全合并。
+- Target gap：未缩小；零在线 task evidence。
+- H4：unresolved，不支持也不否证；本 cycle 不授权 H4 online candidate。
+- 决策：`INVALID_CONCLUDE_AND_TRIGGER_OUTER_LOOP`，遵守 v4 禁止继续 repair。
+- Result commit：pending (this commit)。
+- 下一步：outer-loop reflection 后 pivot 到 H1 partition diagnostic，以 JSONL descriptor stream 直接回答 overflow/aliasing，不继续 trace analyzer 探索。
 
 ### `run_000_baseline_replay` — 历史基线与预算扩展回放
 

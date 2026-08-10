@@ -1,11 +1,11 @@
-# Current Status — `run_001_allocation_ecology_diagnostic` Protocol Locked
+# Current Status — `run_001` Invalid; Outer Loop Required
 
-- Phase: inner-loop `QD-0`; next protocol pending.
+- Phase: outer-loop infrastructure reflection required.
 - State: active; frozen design approved for execution at `2026-08-10T15:00:35Z`.
 - Base commit: `5b0898e53d5b9e16200c17479a74746071215787`.
 - Init commit: `54b2487`.
 - Branch: `exp/eds-qd-autoresearch-libero-swap-ood`.
-- Active experiment: `run_001_allocation_ecology_diagnostic` (`QD-0`, `CONFIRMATORY`, `PROTOCOL_LOCKED_V4_BEFORE_RECOVERY_EXECUTION`).
+- Active experiment: none. `run_001_allocation_ecology_diagnostic` ended `INVALID / INFRASTRUCTURE_FAILURE` after two attempts.
 - Protocol amendment: before implementation, corrected expected full-process stages from 5,400 to 9,000 using each profile's configured iterations; no outcome statistic was inspected first.
 - Invalid attempt: analyzer confused population occurrence ranks with 16 archive-cell ranks and rejected 360 budget traces. The artifact is preserved but its H4 values are inadmissible. V3 freezes the source-faithful cell reconstruction before repair.
 - Final temporal amendment: parent slot maps are pre-update while coverage is post-update; V4 uses the actual 16-cell slot map to select saturated allocations. No aggregate recovery was run before this lock.
@@ -26,4 +26,5 @@
 - Target state: historical best remains 2/10; target gap remains 3 tasks.
 - Decision: keep diagnostic evidence, reject direct compute scaling as the next move, and audit allocation/quality retention next.
 - Storage: owned artifact root initialized and linked as `outputs`; shared2 had 54 GiB available at replay start, only 4 GiB above the frozen admission floor.
-- Next action: implement the deterministic CPU analyzer after protocol commit, then evaluate all 540 saved traces. No online candidate or formal run is authorized yet.
+- `run_001` outcome: no admissible H4 statistic; no allocation candidate authorized. Failure was telemetry/analyzer semantics, not an algorithm result.
+- Next action: complete outer-loop reflection and pivot to H1 partition diagnostics; no online candidate or formal run is authorized yet.

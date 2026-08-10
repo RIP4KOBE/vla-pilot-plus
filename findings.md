@@ -16,6 +16,8 @@ The historical Grid5 result is invalid algorithm evidence. Its episodes hit `Ind
 
 The `run_000_baseline_replay` machine replay adds a stronger ecology boundary. Across 4,705 QD chunks from 27 original and budget-study metrics files, every chunk reported zero direct elite carryover and archive-only parent selection; the accumulated parent counts were 3,281,360 archive offspring and zero direct elites. The configured `num_elites` is a no-op in the non-CEM QD branch. Thus the current QD process has cell-local reward elitism but no explicit population budget reserved for globally strong lineages.
 
+`run_001_allocation_ecology_diagnostic` is invalid and supplies no reward-inheritance conclusion. The audit exposed three telemetry semantics that must not be conflated: parent ranks apply to population occurrences rather than unique cells; parent slot maps are pre-update while same-index coverage is post-update; and sparse-priority can assign zero slots to occupied cells. After two infrastructure attempts the preregistered stop rule ended repair. H4 remains unresolved and is not authorized for online evaluation in this cycle.
+
 Direct compute scaling is no longer an active direction. The 18 valid budget configurations ranged from 512 to 1,664 evaluations per complete chunk but all scored 0/10 or 1/10, with aggregate Spearman correlation 0.0 between evaluations/chunk and success. This does not prove compute can never help; it shows that compute without changing QD allocation/retention did not shrink the target gap.
 
 ## Key Results
@@ -38,6 +40,7 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 5. A ten-task formal suite is too small to serve simultaneously as an iterative tuning set and an unbiased final acceptance set; development and validation seeds must be isolated before execution.
 6. Increasing QD population/iterations without changing archive ecology does not preserve or combine successful modes.
 7. The absence of a direct global-quality reserve is a concrete, code-and-telemetry-supported retention gap; it is not yet proof that any particular reserve ratio improves task success.
+8. Saved mechanism traces require explicit temporal and entity-level schemas; occurrence ranks, archive-cell ranks, allocation occupancy and post-update coverage are not interchangeable.
 
 ## Lessons and Constraints
 
@@ -61,4 +64,4 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 
 ## Optimization Trajectory
 
-`run_000_baseline_replay` is complete as a zero-episode QD-0 diagnostic. It did not change success or target gap, but eliminated direct compute scaling as the next direction and selected an allocation-ecology counterfactual. No algorithm candidate, development episode, GPU job, or formal evaluation has run.
+`run_000_baseline_replay` is complete; `run_001_allocation_ecology_diagnostic` ended invalid after two infrastructure attempts. Neither changed success or target gap. No algorithm candidate, development episode, GPU job, or formal evaluation has run. An outer-loop pivot must select the next target-linked QD mechanism.
