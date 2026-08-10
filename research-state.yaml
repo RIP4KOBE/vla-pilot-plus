@@ -9,7 +9,7 @@ project:
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: true
-  pause_reason: "The design is complete and awaits user review; no algorithm implementation, GPU work, online episode, formal evaluation, storage initialization, or scheduled loop is authorized."
+  pause_reason: "The EDS+QD-core-only design revision is complete and awaits user review; no algorithm implementation, GPU work, online episode, formal evaluation, storage initialization, or scheduled loop is authorized."
 
 provenance:
   repository_root: "/home/hynx/VLA-Pilot++"
@@ -21,11 +21,38 @@ provenance:
   base_head_and_index_clean: true
   source_untracked_excluded:
     - "docs/01_specs/2026-08-08-eds-qd-search-budget-parameter-sweep-design.md"
+  new_worktree_untracked_excluded:
+    - "docs/01_specs/2026-08-10-eds-qd-stage-guidance-transition-design.md"
   baseline_design_sha256: "ea2e0c274591dfbd33d1518725de322c41e90f49d110a1cec0a0bf5c8f2a4251"
   baseline_report_sha256: "cbaa9df290e40bc8cca4affedd7b17fb46b3d32832f6e68d63eb77ae1340e16c"
   decision_manifest_sha256: "45ce8dc8948d8c472d4bd8255301cb824b3e5f2fbceab6857f00779cad8e984f"
   new_design_path: "docs/01_specs/2026-08-08-eds-qd-autoresearch-libero-swap-ood-design.md"
-  new_design_sha256_before_plan_commit: "b397096fd4b5dbb1fe90900c2645d7b406fbcf8aa5073d4201d9c4045b3ce255"
+  new_design_sha256_before_plan_commit: "4de266d0192781f5018c3ac1a276b40fd5e8701a8e0ba23dc21be52ad56ed852"
+
+scope:
+  optimization_scope: "EDS+QD core mechanisms only"
+  primary_objective: "Reach at least 5 valid successes out of 10 on LIBERO-PRO libero_object_swap; stop once the frozen formal candidate passes all hard gates"
+  initial_best_eds_qd_success_count: 2
+  initial_target_gap: 3
+  mechanism_metrics_role: "Diagnostics for choosing success-improving EDS+QD changes; never an excuse for open-ended exploration or a blocker to valid/safe success unless they reveal validity, leakage, accounting, or safety problems"
+  priority: "QD-first; EDS changes require evidence that QD-only changes are insufficient or that the bottleneck is at the EDS-QD interface"
+  allowed_steps:
+    - "EDS initial proposal representation, sampling, and initialization"
+    - "EDS rollout, mutation, candidate generation, and compute-matched budget allocation"
+    - "QD behavior descriptor, normalization, bounds, and partition"
+    - "QD archive capacity, insertion, replacement, eviction, overflow, and elite retention"
+    - "QD parent sampling, visitation, exploit/explore allocation, and offspring budget"
+    - "QD quality, novelty, progress scoring, cell elitism, and tie-breaking"
+    - "QD archive-to-execution elite ranking and selection"
+    - "Cross-chunk QD seeding, lineage, continuity memory, and reset"
+    - "Instrumentation, replay, runner, audit, and visualization used only for EDS+QD attribution"
+  out_of_scope:
+    - "Checkpoint/backbone, perception/grounding, task prompts, Stage recognizer, environment/reset, action executor, and evaluator changes"
+    - "Independent planners, policies, controllers, or post-processing algorithms outside EDS+QD"
+  historical_read_roots:
+    - "/home/hynx/VLA-Pilot++"
+    - "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus"
+  write_policy: "Algorithm code and all documents may be written only inside the new worktree; large artifacts only inside the owned proposed artifact root; every other workspace/worktree/artifact path is read-only"
 
 baseline:
   benchmark: "LIBERO-PRO libero_object_swap"
@@ -109,11 +136,13 @@ hypotheses:
     priority: medium
 
 experiments:
-  proxy_metric: "A preregistered promotion vector: phase-specific target progress, control-task retention, overflow, turnover, reward calibration, trajectory continuity, safety, latency, and call-budget accounting; no post-hoc scalarization."
+  proxy_metric: "Task-first preregistered promotion vector: validity/safety, environment success, target gap to 5, gained/lost tasks, control retention, then task-linked stage progress and QD mechanism diagnostics; no post-hoc scalarization."
   baseline_value:
     formal_control_success_count: 3
     formal_best_qd_success_count: 2
   best_value: null
+  target_success_count: 5
+  current_target_gap_from_historical_best_qd: 3
   total_runs: 0
   trajectory_path: "data/experiment-trajectory.jsonl"
   trajectory: []
@@ -139,6 +168,9 @@ resources:
   storage_initialized: false
   gpu_work_authorized_in_current_phase: false
   formal_evaluation_authorized_in_current_phase: false
+  future_execution_gpu_indices_authorized: [0, 1, 2, 3, 4, 5, 6, 7]
+  future_execution_max_concurrent_workers: 8
+  gpu_selection_rule: "Any eligible GPU 0-7 after dynamic admission; one worker per GPU; parallelize only independent cells from the same frozen protocol"
 
 workspace:
   design: "docs/01_specs/2026-08-08-eds-qd-autoresearch-libero-swap-ood-design.md"
@@ -147,6 +179,8 @@ workspace:
   literature_dir: "literature/"
   source_dir: "src/"
   data_dir: "data/"
+  historical_evidence_catalog: "data/historical-evidence-catalog.jsonl"
   experiments_dir: "experiments/"
+  canonical_iteration_ledger: "docs/03_evidence/eds_qd_autoresearch/iteration-ledger.md"
   to_human_dir: "to_human/"
   paper_dir: "paper/"

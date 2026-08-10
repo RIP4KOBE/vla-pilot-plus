@@ -1,6 +1,6 @@
 # Current Status — Design Review
 
-- Phase: design review; planning and workspace initialization are complete.
+- Phase: revised design review; planning and workspace initialization are complete.
 - State: paused by approved scope boundary.
 - Base commit: `5b0898e53d5b9e16200c17479a74746071215787`.
 - Init commit: `54b2487`.
@@ -10,5 +10,12 @@
 - Formal evaluations: 0.
 - Scheduled continuity loops: 0.
 - Design: `docs/01_specs/2026-08-08-eds-qd-autoresearch-libero-swap-ood-design.md`.
-- Design SHA-256 before plan commit: `b397096fd4b5dbb1fe90900c2645d7b406fbcf8aa5073d4201d9c4045b3ce255`.
+- Primary objective: raise EDS-QD to at least 5/10 valid formal successes; stop immediately when all hard gates pass.
+- Initial target gap: historical best EDS-QD 2/10 → target 5/10, gap 3 tasks.
+- Optimization scope: EDS+QD core mechanisms only, QD-first.
+- Historical evidence: entire repository/worktrees and shared2 experiment history may be analyzed read-only.
+- Canonical iteration record: `docs/03_evidence/eds_qd_autoresearch/iteration-ledger.md`.
+- Future GPU authorization: any dynamically eligible physical GPU 0–7; current GPU jobs remain 0.
+- Write boundary: algorithm and documentation changes only in this branch/worktree; large artifacts only in the owned proposed artifact root.
+- Design SHA-256 before latest plan commit: `4de266d0192781f5018c3ac1a276b40fd5e8701a8e0ba23dc21be52ad56ed852`.
 - Next action: user review. Execution remains unauthorized until the design status is explicitly approved.
