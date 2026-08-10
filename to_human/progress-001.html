@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>EDS-QD Autoresearch Progress 001</title>
+  <style>
+    body { font-family: sans-serif; max-width: 980px; margin: 40px auto; line-height: 1.55; color: #20242a; }
+    table { border-collapse: collapse; width: 100%; margin: 16px 0 28px; }
+    th, td { border: 1px solid #c9ced6; padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: #eef2f7; }
+    .bad { color: #9b1c1c; } .good { color: #176b3a; } .neutral { color: #5b6472; }
+    code { background: #f3f5f7; padding: 1px 4px; }
+  </style>
+</head>
+<body>
+  <h1>EDS-QD Autoresearch — Outer Loop 001</h1>
+  <p><strong>目标状态：</strong>历史 best <code>2/10</code>，目标 <code>&gt;=5/10</code>，gap 仍为 3；新在线 episode、GPU job、formal evaluation 均为 0。</p>
+  <table>
+    <thead><tr><th>Run</th><th>结果</th><th>对目标的影响</th><th>决定</th></tr></thead>
+    <tbody>
+      <tr><td><code>run_000</code></td><td class="good">6/6 gates PASS；4,705 chunks；18 个 compute configs 最大 1/10</td><td class="neutral">gap 不变；排除直接扩大预算</td><td>KEEP diagnostic evidence</td></tr>
+      <tr><td><code>run_001</code></td><td class="bad">两次 trace analyzer validity failure；H4 outcome 不可采纳</td><td class="neutral">gap 不变；不授权 H4 online candidate</td><td>INVALID / stop repair</td></tr>
+    </tbody>
+  </table>
+  <h2>Outer-loop 决定</h2>
+  <p><strong>PIVOT_WITHIN_EDS_QD → H1 descriptor/partition。</strong>H1 已有稳定 JSONL 证据：coverage median 1.0、raw overflow P95 0.875、profile overflow P95 0.98125。H4 暂停，因为其 go/no-go 依赖的 trace entity/time semantics 未通过 validity。</p>
+  <p>下一步仅运行一个零 episode partition counterfactual。若它不能给出 task-linked、可实现的单点 partition 规则，就否决 H1；若通过，则提交独立 QD-1 protocol，目标是保留 tasks 5/8 并恢复 task 3 或 9。</p>
+</body>
+</html>

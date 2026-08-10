@@ -18,6 +18,8 @@ The `run_000_baseline_replay` machine replay adds a stronger ecology boundary. A
 
 `run_001_allocation_ecology_diagnostic` is invalid and supplies no reward-inheritance conclusion. The audit exposed three telemetry semantics that must not be conflated: parent ranks apply to population occurrences rather than unique cells; parent slot maps are pre-update while same-index coverage is post-update; and sparse-priority can assign zero slots to occupied cells. After two infrastructure attempts the preregistered stop rule ended repair. H4 remains unresolved and is not authorized for online evaluation in this cycle.
 
+Outer-loop cycle 1 pivots to H1 partition diagnostics. This choice is evidence-ranked, not novelty-ranked: H1 has valid and deterministic JSONL coverage/overflow telemetry, whereas H4's required inheritance evidence is invalid and H3's generic smoothing intervention has negative historical task evidence. Only one partition counterfactual is allowed before an online go/no-go, preventing a return to grid/bounds sweeps.
+
 Direct compute scaling is no longer an active direction. The 18 valid budget configurations ranged from 512 to 1,664 evaluations per complete chunk but all scored 0/10 or 1/10, with aggregate Spearman correlation 0.0 between evaluations/chunk and success. This does not prove compute can never help; it shows that compute without changing QD allocation/retention did not shrink the target gap.
 
 ## Key Results

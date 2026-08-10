@@ -5,7 +5,7 @@ project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
   status: active
-  phase: outer_loop_required_after_infrastructure_failures
+  phase: inner_loop_qd0_next_protocol
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: false
@@ -175,9 +175,9 @@ experiments:
   active_experiment: null
 
 outer_loop:
-  cycle: 0
-  last_direction: null
-  last_reflection: ""
+  cycle: 1
+  last_direction: PIVOT_WITHIN_EDS_QD_TO_H1_PARTITION
+  last_reflection: "Run_000 ruled out direct compute scaling; run_001 produced two invalid trace-infrastructure attempts and no admissible H4 outcome. Pivot to one H1 JSONL partition counterfactual because overflow/coverage evidence is valid, stable, QD-core, and closer to an implementable single-point candidate. H4 is parked for this cycle."
   trigger_after_inner_runs: 5
   no_progress_trigger: 3
 

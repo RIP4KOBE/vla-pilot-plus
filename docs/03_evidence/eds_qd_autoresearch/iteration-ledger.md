@@ -1,6 +1,6 @@
 # EDS+QD Autoresearch 统一迭代总账
 
-状态：`EXECUTING — run_001 INVALID; outer-loop infrastructure reflection required — 0 algorithm iterations`
+状态：`EXECUTING — outer-loop 001 PIVOT to H1 partition; next protocol pending — 0 algorithm iterations`
 
 本文件是 EDS+QD autoresearch 所有 inner-loop 与 outer-loop 过程的单一人工审查入口。所有条目按 iteration ID append-only；不能删除、覆盖或为改善叙事而重写负结果、invalid attempt、infrastructure failure 或 revert 记录。大型 raw artifacts 不嵌入 Git，但必须以稳定路径和 SHA-256 引用。
 
@@ -8,7 +8,7 @@
 
 | Iteration | 日期 | Scope level | 假设 | 修改摘要 | Split / tasks | 结果 | 决策 | Protocol commit | Result commit |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `run_001_allocation_ecology_diagnostic` | 2026-08-10 | `QD-0` | H4 | saved-trace parent-quality inheritance 与 saturated slot audit | 540 traces / 9,000 stages；task strata 0–9 | 2 attempts `INVALID`；无可采纳 H4 outcome | `INVALID_CONCLUDE_AND_TRIGGER_OUTER_LOOP` | v1 `dcf234b…`; v2 `91ddd34…`; v3 `f6d7bc9…`; v4 `3d320f6…` | pending (this commit) |
+| `run_001_allocation_ecology_diagnostic` | 2026-08-10 | `QD-0` | H4 | saved-trace parent-quality inheritance 与 saturated slot audit | 540 traces / 9,000 stages；task strata 0–9 | 2 attempts `INVALID`；无可采纳 H4 outcome | `INVALID_CONCLUDE_AND_TRIGGER_OUTER_LOOP` | v1 `dcf234b…`; v2 `91ddd34…`; v3 `f6d7bc9…`; v4 `3d320f6…` | `cdd150b2c332e907c05cda90c7c09fd1f1799570` |
 | `run_000_baseline_replay` | 2026-08-10 | `QD-0` | H1–H5 | 只读回放旧 QD 与预算 sweep，验证 target-linked failure boundary | historical only | 6/6 gates PASS；4,705 QD chunks；budget max 1/10 | `KEEP_DIAGNOSTIC_EVIDENCE` | `5255e924ee925487406e35a27548d9db4e988642` | `e0b252c983a3b62858c8fa676e7b32618660b364` |
 | — | 2026-08-10 | — | — | 执行授权；尚未开始算法迭代 | — | — | `APPROVED_EXECUTING` | — | — |
 
@@ -24,7 +24,7 @@
 - 累计 GPU-hours：0。
 - Attempt budget：`0 / 143`。
 - 已结束新实验：2 个 `QD-0`（1 complete，1 invalid）；算法迭代仍为 0。
-- 当前结论：直接扩大 compute 已排除；H4 trace diagnostic 因 telemetry semantics invalid 且停止 repair；立即触发 outer-loop，候选 pivot 为 H1 partition。Formal evaluation 仍未授权。
+- 当前结论：outer-loop 001 已执行 `PIVOT_WITHIN_EDS_QD_TO_H1_PARTITION`；只允许一个 H1 partition counterfactual 后作 QD-1 go/no-go。Formal evaluation 仍未授权。
 
 ### `run_001_allocation_ecology_diagnostic` — 饱和 archive 的 parent 质量继承与 slot 生态
 
@@ -113,8 +113,23 @@
 - Target gap：未缩小；零在线 task evidence。
 - H4：unresolved，不支持也不否证；本 cycle 不授权 H4 online candidate。
 - 决策：`INVALID_CONCLUDE_AND_TRIGGER_OUTER_LOOP`，遵守 v4 禁止继续 repair。
-- Result commit：pending (this commit)。
+- Result commit：`cdd150b2c332e907c05cda90c7c09fd1f1799570`。
 - 下一步：outer-loop reflection 后 pivot 到 H1 partition diagnostic，以 JSONL descriptor stream 直接回答 overflow/aliasing，不继续 trace analyzer 探索。
+
+#### H. Outer-loop reflection 001
+
+- 触发原因：`run_001` 连续两次 infrastructure validity failure；继续修 analyzer 将偏离 `>=5/10` 第一目标。
+- 全部结果：`run_000` 为 positive diagnostic、target gap 不变；`run_001` invalid、无算法结论、target gap 不变；无 negative online candidate。
+- Task trajectory：仍只有历史 control `{3,8,9}` 与 best QD `{5,8}`；新 gained/retained/lost task 均为空。
+- Descriptor evidence：13/13 hashes、4,705 JSONL chunks、coverage median 1.0、raw overflow P95 0.875、profile overflow P95 0.98125；证据有效且可直接 replay。
+- Quality/ecology evidence：run_000 证明无 direct elite reserve 与 archive-only parent source；但 run_001 无有效 quality-inheritance gate，H4 parked，不能 online。
+- Continuity evidence：历史 clean-tail 在 motion 更平滑时 success `3→2→0`，不是第一方向。
+- Execution/Stage：冻结且 out of scope，不作为 pivot。
+- Observation：initial-bound endpoint partition 将大量 later offspring clamp 到 edges，同时 coverage 已无法区分 useful modes。
+- Inference：比继续修 trace 或堆 compute 更可能产生最小可归因 QD-1 的方向，是 overflow-aware/physically stable partition；仍需 counterfactual 证明它提高 resolution，而非仅改变 coverage 数字。
+- 方向：`PIVOT_WITHIN_EDS_QD_TO_H1_PARTITION`。
+- 下一轮唯一候选：`run_002_partition_diagnostic`，零 episode；若支持，未来单点 QD-1 预期保留 tasks 5/8 并恢复 3 或 9；若不支持，H1 reject 而不 sweep grids/bounds。
+- Human report：`to_human/progress-001.html`。
 
 ### `run_000_baseline_replay` — 历史基线与预算扩展回放
 

@@ -1,6 +1,6 @@
-# Current Status — `run_001` Invalid; Outer Loop Required
+# Current Status — Outer Loop 001 Pivoted to H1 Partition
 
-- Phase: outer-loop infrastructure reflection required.
+- Phase: inner-loop QD-0; next H1 protocol pending.
 - State: active; frozen design approved for execution at `2026-08-10T15:00:35Z`.
 - Base commit: `5b0898e53d5b9e16200c17479a74746071215787`.
 - Init commit: `54b2487`.
@@ -27,4 +27,5 @@
 - Decision: keep diagnostic evidence, reject direct compute scaling as the next move, and audit allocation/quality retention next.
 - Storage: owned artifact root initialized and linked as `outputs`; shared2 had 54 GiB available at replay start, only 4 GiB above the frozen admission floor.
 - `run_001` outcome: no admissible H4 statistic; no allocation candidate authorized. Failure was telemetry/analyzer semantics, not an algorithm result.
-- Next action: complete outer-loop reflection and pivot to H1 partition diagnostics; no online candidate or formal run is authorized yet.
+- Outer-loop decision: park H4 and run exactly one H1 JSONL partition counterfactual; no broad grid/bounds sweep.
+- Next action: lock `run_002_partition_diagnostic`; no online candidate or formal run is authorized yet.
