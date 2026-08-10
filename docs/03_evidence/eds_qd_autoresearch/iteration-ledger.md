@@ -1,6 +1,6 @@
 # EDS+QD Autoresearch 统一迭代总账
 
-状态：`EXECUTING — run_010 causal-envelope QD-1 protocol locked — 0 algorithm iterations`
+状态：`EXECUTING — run_010 mechanism preflight pre-episode API recovery protocol locked — 1 algorithm iteration`
 
 本文件是 EDS+QD autoresearch 所有 inner-loop 与 outer-loop 过程的单一人工审查入口。所有条目按 iteration ID append-only；不能删除、覆盖或为改善叙事而重写负结果、invalid attempt、infrastructure failure 或 revert 记录。大型 raw artifacts 不嵌入 Git，但必须以稳定路径和 SHA-256 引用。
 
@@ -8,7 +8,7 @@
 
 | Iteration | 日期 | Scope level | 假设 | 修改摘要 | Split / tasks | 结果 | 决策 | Protocol commit | Result commit |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `run_010_causal_envelope_candidate` | 2026-08-10 | `QD-1` | H1 | sparse QD + causal bounds expansion/archive rebin；其余冻结 | offline + preflight tasks 3/5 + paired Dev-A 3/5/8/9 | `PROTOCOL_LOCKED`；尚未实现/运行 | pending | pending this commit | — |
+| `run_010_causal_envelope_candidate` | 2026-08-10 | `QD-1` | H1 | sparse QD + causal bounds expansion/archive rebin；其余冻结 | offline PASS；preflight tasks 3/5 首派发在 episode 前 API abort | `RECOVERY_PROTOCOL_LOCKED`；0 task outcome | exact-cell recovery pending | v1 `1017bf0…`; offline v2 `8fd3aea…`; API recovery v3 pending this commit | — |
 | `run_002_partition_diagnostic` | 2026-08-10 | `QD-0` | H1 | fixed-initial vs 单一 `causal_envelope_v1` 4x4 partition replay | 27 frozen files；4,567 eligible chunks；task strata 3/5/8/9 | 10/10 gates PASS；resolution +30.1%；global best 100% | `KEEP_DIAGNOSTIC_EVIDENCE_AND_AUTHORIZE_ONE_QD1_PROTOCOL` | `862f7cc4f00d92a97f6a0103e760f3b6180a437f` | `29fcdb7940e35ce12d1d96e2651b7d813406052d` |
 | `run_001_allocation_ecology_diagnostic` | 2026-08-10 | `QD-0` | H4 | saved-trace parent-quality inheritance 与 saturated slot audit | 540 traces / 9,000 stages；task strata 0–9 | 2 attempts `INVALID`；无可采纳 H4 outcome | `INVALID_CONCLUDE_AND_TRIGGER_OUTER_LOOP` | v1 `dcf234b…`; v2 `91ddd34…`; v3 `f6d7bc9…`; v4 `3d320f6…` | `cdd150b2c332e907c05cda90c7c09fd1f1799570` |
 | `run_000_baseline_replay` | 2026-08-10 | `QD-0` | H1–H5 | 只读回放旧 QD 与预算 sweep，验证 target-linked failure boundary | historical only | 6/6 gates PASS；4,705 QD chunks；budget max 1/10 | `KEEP_DIAGNOSTIC_EVIDENCE` | `5255e924ee925487406e35a27548d9db4e988642` | `e0b252c983a3b62858c8fa676e7b32618660b364` |
@@ -24,9 +24,9 @@
 - GPU jobs：0。
 - Formal evaluations：0。
 - 累计 GPU-hours：0。
-- Attempt budget：`0 / 143`。
-- 已结束新实验：3 个 `QD-0`（2 complete，1 invalid）；算法迭代仍为 0。
-- 当前结论：`run_010` QD-1 protocol 已锁定；Dev-A 必须 candidate success `>= control + 1` 且零 control-success loss。相邻 partition、Dev-B、validation、formal 均未授权。
+- Attempt budget：6 个 reservation 已派发但在 episode 前中止，实际 episode attempts `0 / 143`；若 API 健康恢复，exact-cell recovery 最多新增 6 个 reservation。
+- 已结束新实验：3 个 `QD-0`（2 complete，1 invalid）；QD-1 算法迭代 1 正在执行。
+- 当前结论：`run_010` Stage-A PASS；首次 mechanism-preflight 派发没有启动 worker/episode，按 v3 做一次 API exact-cell recovery。Dev-A 仍要求 candidate success `>= control + 1` 且零 control-success loss。相邻 partition、Dev-B、validation、formal 均未授权。
 
 ### `run_001_allocation_ecology_diagnostic` — 饱和 archive 的 parent 质量继承与 slot 生态
 
@@ -549,3 +549,18 @@
 - Matrix：mechanism preflight 6 unique cells（control/sparse/candidate × tasks 3/5）；Dev-A 8 unique cells（control/candidate × tasks 3/5/8/9）；attempt cap 143、GPU-hour cap 48、formal authorized false。
 - Runtime cache：6 files，provenance SHA-256 `4434ca3bafefdb8f0cdf747e6a4a60d73965033cb125bcd51be48ed14bdced7b`；全部位于 owned run root。
 - 下一步：动态检查 GPU 0–7 两次快照和 dispatch snapshot；只在无外部 compute、utilization <=5%、VRAM headroom 合格时发出 frozen 6-cell mechanism preflight。
+
+#### L. Mechanism preflight 首派发：episode 前 API 中止与恢复 protocol
+
+- 时间：首派发从 `2026-08-10T16:48:32Z` 左右开始，GPU admission / reservation 于 `16:49:04Z` 完成；命令 wall `39.2 s`，随后 base runner 报 `Poe Gemini health check failed`。
+- Exact command：`python scripts/eds_qd_autoresearch_runner.py run-mechanism-preflight --gpus auto --timeout-seconds 28800`。
+- Pause/storage/credential-presence：PASS；credential 值未打印或持久化。
+- GPU evidence：两次 admission snapshot 相隔 30 s，只有 GPU 7 合格；其 index/UUID 为 `7 / GPU-48473162-9548-1a19-04aa-ea86c5349187`，两次与 immediate dispatch snapshot 均无 compute process、utilization 0%、free VRAM 142,960 MiB。GPU 0–6 因外部 compute 和/或 utilization 被排除，没有抢占或干扰。
+- GPU artifact：owned `run_010_causal_envelope_candidate/manifests/gpu_eds_qd_autoresearch_mechanism_preflight_1786380544.json`，SHA-256 `53db933fe0c2394643b36d2d76c39f8ec49558cc62e976e8e8cffa472c5ce579`。
+- Attempt evidence：append-only ledger 在 incident protocol lock 前 SHA-256 `4e255f9380feb5a7c395002c8693ee0be813d2033426e23a343e02cdbc3f30ce`；IDs 1–6 对应 control/sparse/candidate × task 3/5，并有一次 phase dispatch。
+- Pre-episode 证明：owned run root 中没有 online output directory、`run_manifest.csv`、phase status CSV、runner log、failure JSON 或 episode metrics；唯一新增文件是 GPU admission 与 attempt ledger。失败发生在 `base.run_level` 的启动 health check，尚未初始化 worker/episode。
+- 分类：`INFRASTRUCTURE_FAILURE / API_TRANSIENT / DISPATCH_ABORTED_PRE_EPISODE`。它不是 task failure、policy timeout 或 mechanism gate outcome；task-level success 增减与失败原因均为 `N/A / 0 observed tasks`。
+- Target impact：best 仍为历史 `2/10`，gap 3；本事件未缩小 gap，也没有产生反向调参信息。算法 iteration、profiles、tasks/seeds、promotion thresholds 与 formal authorization均不变。
+- Protocol-first recovery：新增 `experiments/run_010_causal_envelope_candidate/protocol-v3.md`。它只授权一次 exact-cell recovery：先为 IDs 1–6 追加 pre-episode abort event；再在 API health PASS 后，以 frozen scientific revision `d018f8ac…991` / code-state `3626b52b…9839c` 创建 IDs 7–12，分别带 `recovery_of_attempt_id=1..6`；重新动态 admission；不修改 source 或 immutable manifest。
+- Budget accounting：实际 initialized episode attempts 仍 `0/143`，GPU-hours 仍 0；6 个中止 reservation 永久保留，恢复最多占用 6/15 个 infrastructure slots。若恢复前 health 仍失败，则不产生新 reservation；若第二次仍在 worker 前失败，v3 要求中止并停止，不授权第三次派发。
+- 决策：`RECOVER_EXACT_CELLS_ONCE`。下一步仅执行 v3 事务恢复；mechanism PASS 前不启动 Dev-A。

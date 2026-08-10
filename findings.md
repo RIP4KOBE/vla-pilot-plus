@@ -50,6 +50,7 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 7. The absence of a direct global-quality reserve is a concrete, code-and-telemetry-supported retention gap; it is not yet proof that any particular reserve ratio improves task success.
 8. Saved mechanism traces require explicit temporal and entity-level schemas; occurrence ranks, archive-cell ranks, allocation occupancy and post-update coverage are not interchangeable.
 9. A parameter-free causal envelope can improve geometric partition resolution without losing the reward-best candidate on a common stream, but only online parent/offspring feedback can establish a task benefit.
+10. Online transaction ordering is part of validity: the run_010 dispatcher reserved cells before the base runner repeated its Poe health check. The resulting IDs 1–6 are auditable pre-episode infrastructure aborts, not policy outcomes; an exact-cell recovery must health-check before creating replacement reservations.
 
 ## Lessons and Constraints
 
@@ -73,4 +74,4 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 
 ## Optimization Trajectory
 
-`run_000_baseline_replay` is complete; `run_001_allocation_ecology_diagnostic` ended invalid after two infrastructure attempts; `run_002_partition_diagnostic` passed all gates; and `run_010` algorithm iteration 1 has passed Stage-A offline validation after one preserved schema-only harness repair. No development episode, GPU job, or formal evaluation has run, so success remains historical 2/10 and target gap remains 3. The next action is immutable manifest freeze followed by the frozen six-cell mechanism preflight.
+`run_000_baseline_replay` is complete; `run_001_allocation_ecology_diagnostic` ended invalid after two infrastructure attempts; `run_002_partition_diagnostic` passed all gates; and `run_010` algorithm iteration 1 passed Stage-A offline validation after one preserved schema-only harness repair. Its first six-cell mechanism-preflight dispatch failed the Poe health check before worker/episode initialization; no task outcome exists, success remains historical 2/10, and target gap remains 3. Protocol v3 authorizes one exact-cell API recovery with the scientific code/config/checkpoint/manifest frozen and health checked before replacement reservation.
