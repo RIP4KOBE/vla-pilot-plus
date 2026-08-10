@@ -3979,9 +3979,14 @@ def _p2_stage_query_failures(
 def _p2_expected_episode_ids(job: dict[str, object]) -> set[int]:
     episode_num = int(job["episodes"])
     episode_start_index = int(job.get("episode_start_index", 0))
-    if episode_num <= 0 or not 0 <= episode_start_index < episode_num:
+    episode_stop_index = int(job.get("episode_stop_index", episode_num))
+    if (
+        episode_num <= 0
+        or not 0 <= episode_start_index < episode_num
+        or not episode_start_index < episode_stop_index <= episode_num
+    ):
         raise ValueError("invalid P2 episode window")
-    return set(range(episode_start_index, episode_num))
+    return set(range(episode_start_index, episode_stop_index))
 
 
 def _p2_job_validity(

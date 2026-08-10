@@ -158,28 +158,26 @@ class KeypointTracker:
         assert self._keypoint_registry, \
             "Keypoints have not been registered yet. Call register_keypoints() first."
         
-        positions = []
-        
-        for idx in range(len(self._keypoints)):
-            info = self._keypoint_registry[idx]
-            
-            if info.segment_index == 0:
-                # Background - return initial position
-                positions.append(info.initial_world_pos)
-            else:
-                # Get the current pose of the object from the adapter
-                current_pose = self.adapter.get_object_pose_by_segment(info.segment_index)
-                
-                if current_pose is not None:
-                    # Convert local coordinates to world coordinates
-                    world_pos = self._compute_world_position(info.local_pos, current_pose)
-                    positions.append(world_pos)
-                else:
-                    # Cannot get pose, return initial position
-                    log.warning(f"Could not get pose for keypoint {idx} (segment {info.segment_index})")
-                    positions.append(info.initial_world_pos)
-        
+        positions = [
+            self.get_keypoint_position(idx) for idx in range(len(self._keypoints))
+        ]
         return np.array(positions)
+
+    def get_keypoint_position(self, keypoint_idx: int) -> np.ndarray:
+        """Return one tracked keypoint without refreshing unrelated objects."""
+        if keypoint_idx not in self._keypoint_registry:
+            raise IndexError(f"unregistered keypoint index: {keypoint_idx}")
+        info = self._keypoint_registry[keypoint_idx]
+        if info.segment_index == 0:
+            return info.initial_world_pos.copy()
+        current_pose = self.adapter.get_object_pose_by_segment(info.segment_index)
+        if current_pose is None:
+            log.warning(
+                f"Could not get pose for keypoint {keypoint_idx} "
+                f"(segment {info.segment_index})"
+            )
+            return info.initial_world_pos.copy()
+        return self._compute_world_position(info.local_pos, current_pose)
     
     def get_object_name_by_keypoint(self, keypoint_idx: int) -> Optional[str]:
         """

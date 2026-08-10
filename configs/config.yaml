@@ -39,7 +39,23 @@ main:
   use_guidance: false
   guidance_type: vls  # valid: vls, eds
   use_vlm_stage_recognition: true  # Use Gemini to recognize current stage
+  stage_transition_mode: legacy_vlm  # valid: legacy_vlm, physical_fsm_v1
   vlm_query_limit: 50  # Max VLM queries per episode
+  physical_fsm:
+    target_keypoint_index: 0
+    destination_keypoint_index: 1
+    near_threshold_m: 0.08
+    follow_error_max_m: 0.02
+    lift_confirm_m: 0.02
+    grasp_confirm_steps: 4
+    drop_relative_drift_m: 0.05
+    drop_fall_m: 0.02
+    drop_confirm_steps: 3
+    min_state_dwell_steps: 2
+    release_verify_timeout_steps: 8
+    destination_region_radius_m: 0.08
+    gripper_closed_aperture_max_m: 0.07
+    gripper_open_aperture_min_m: 0.075
   execution_horizon_mode: fixed  # valid: fixed, adaptive_prefix
   execution_horizon_far: 8
   execution_horizon_near: 4

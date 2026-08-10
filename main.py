@@ -422,12 +422,48 @@ from utils.eds_mechanism_pretest_vis import save_eds_mechanism_pretest_artifacts
 from core.policy_observation_sampling import policy_observation_sample_num
 from core.eds_eval_metrics import append_jsonl
 from core.eds_mechanism_trace import build_run_id, save_mechanism_trace
+from core.stage_guidance_fsm import (
+    PhysicalEvidence,
+    PhysicalFSMConfig,
+    StageGuidanceFSM,
+)
 
 # Import logging utility
 from utils.logging_utils import SteerLogger
 
 # Create logger instance
 log = SteerLogger("Main")
+
+
+def _stage_transition_mode(value: Any) -> str:
+    mode = str(value).lower()
+    allowed = {"legacy_vlm", "physical_fsm_v1"}
+    if mode not in allowed:
+        raise ValueError(
+            "main.stage_transition_mode must be one of "
+            "{'legacy_vlm', 'physical_fsm_v1'}"
+        )
+    return mode
+
+
+def _invalidate_chunk_for_fsm_transition(
+    *,
+    policy: Any,
+    action_chunk: Any,
+    action_executed: int,
+    state_before: str,
+    state_after: str,
+) -> tuple[None, int]:
+    """Discard an old chunk and reset both stage and QD chunk memory."""
+    del action_chunk, action_executed
+    policy.reset_stage()
+    reset_chunk_memory = getattr(policy, "reset_eds_chunk_memory", None)
+    if callable(reset_chunk_memory):
+        reset_chunk_memory("physical_fsm_transition")
+    log.info(
+        f"[PHYSICAL_FSM] invalidated action chunk: {state_before} -> {state_after}"
+    )
+    return None, 0
 
 
 def _detect_keypoints_with_retries(
@@ -1016,7 +1052,8 @@ class Main:
             log.warning(f"Failed to append safety event to {path}: {e}")
 
     def _update_stage(self, state: dict, gripper_val: Optional[float],
-                      upper_th: float, lower_th: float) -> dict:
+                      upper_th: float, lower_th: float, *,
+                      advisory_only: bool = False) -> dict:
         """
         Update stage recognition state based on reward and gripper triggers.
         Returns updated state dict.
@@ -1078,7 +1115,13 @@ class Main:
             else:
                 query_status = "completed_without_result_metadata"
 
-            if new_stage != state['current_stage'] or need_guidance != state['use_guidance']:
+            if (
+                not advisory_only
+                and (
+                    new_stage != state['current_stage']
+                    or need_guidance != state['use_guidance']
+                )
+            ):
                 log.info(f"[VLM] Stage: {state['current_stage']} → {new_stage}, Guidance: {state['use_guidance']} → {need_guidance}")
                 stage_changed = new_stage != state['current_stage']
                 guidance_changed = need_guidance != state['use_guidance']
@@ -1094,10 +1137,11 @@ class Main:
                     if callable(reset_chunk_memory):
                         reset_chunk_memory("guidance_change")
 
-            state.update({
-                'current_stage': new_stage,
-                'use_guidance': need_guidance,
-            })
+            if not advisory_only:
+                state.update({
+                    'current_stage': new_stage,
+                    'use_guidance': need_guidance,
+                })
         elif trigger_reason and vlm_query_count >= vlm_query_limit:
             log.debug(f"[Trigger] {trigger_reason} (skipped, limit {vlm_query_limit} reached)")
             query_status = "skipped"
@@ -1108,7 +1152,7 @@ class Main:
             skipped_reason = "recognizer_unavailable"
 
         if trigger_reason:
-            self._append_stage_event({
+            event = {
                 "episode_id": state.get("episode_id"),
                 "task_id": state.get("task_id"),
                 "global_step": state.get("global_step"),
@@ -1134,7 +1178,20 @@ class Main:
                 "evidence": query_result.get("evidence"),
                 "error": query_result.get("error"),
                 "query_latency_s": query_result.get("query_latency_s"),
-            })
+            }
+            if advisory_only:
+                event["advisory_only"] = True
+            self._append_stage_event(event)
+            if advisory_only:
+                state["last_vlm_advisory"] = {
+                    "query_status": query_status,
+                    "query_ok": query_result.get("ok"),
+                    "parsed_stage": query_result.get("parsed_stage"),
+                    "parsed_guidance": query_result.get("parsed_guidance"),
+                    "query_latency_s": query_result.get("query_latency_s"),
+                    "query_count": state.get("vlm_query_count", vlm_query_count),
+                    "control_authority": False,
+                }
 
         # Update tracking state
         state['prev_norm_reward'] = curr_reward
@@ -1150,6 +1207,11 @@ class Main:
         episode_start_index = int(self.config.get('episode_start_index', 0))
         if not 0 <= episode_start_index < episode_num:
             raise ValueError("episode_start_index must satisfy 0 <= start < episode_num")
+        episode_stop_index = int(self.config.get('episode_stop_index', episode_num))
+        if not episode_start_index < episode_stop_index <= episode_num:
+            raise ValueError(
+                "episode_stop_index must satisfy start < stop <= episode_num"
+            )
         episode_seed_schedule = _episode_seed_schedule(
             self.config.get('episode_seed_schedule'),
             episode_num=int(episode_num),
@@ -1157,7 +1219,7 @@ class Main:
         for _ in range(episode_start_index):
             torch.randint(0, 1000, (1,)).item()
 
-        for episode in range(episode_start_index, episode_num):
+        for episode in range(episode_start_index, episode_stop_index):
             sampled_seed = torch.randint(0, 1000, (1,)).item()
             episode_seed = _episode_seed_for_index(
                 episode_seed_schedule,
@@ -1225,7 +1287,7 @@ class Main:
                 continue
 
         # Final statistics
-        executed_episode_count = episode_num - episode_start_index
+        executed_episode_count = episode_stop_index - episode_start_index
         success_rate = self.success_count / executed_episode_count * 100
         log.info(f"Tested {executed_episode_count} episodes, success rate: {success_rate:.2f}%")
 
@@ -1307,6 +1369,7 @@ class Main:
         pretest_chunks_saved = 0
         previous_executed_gripper_command = None
         previous_executed_action = None
+        pending_fsm_stage_change = False
 
         log.info(f"Task description: {self.adapter.get_task_description()}")
 
@@ -1314,6 +1377,37 @@ class Main:
         current_stage = 1
         use_guidance = self.config.get("use_guidance", True) and hasattr(self, 'guidance_fns')
         current_guidance_fns = self.guidance_fns.get(current_stage, []) if use_guidance else None
+        transition_mode = _stage_transition_mode(
+            self.config.get("stage_transition_mode", "legacy_vlm")
+        )
+        physical_fsm = None
+        fsm_target_keypoint_index = None
+        fsm_destination_position = None
+        if transition_mode == "physical_fsm_v1":
+            if not use_guidance:
+                raise RuntimeError("physical_fsm_v1 requires main.use_guidance=true")
+            fsm_section = _config_section_to_dict(
+                self.config.get("physical_fsm"), "main.physical_fsm"
+            )
+            fsm_target_keypoint_index = int(
+                fsm_section.pop("target_keypoint_index", 0)
+            )
+            destination_keypoint_index = int(
+                fsm_section.pop("destination_keypoint_index", 1)
+            )
+            if fsm_target_keypoint_index != 0 or destination_keypoint_index != 1:
+                raise ValueError(
+                    "physical_fsm_v1 frozen keypoint resolver requires target=0, destination=1"
+                )
+            physical_fsm = StageGuidanceFSM(
+                PhysicalFSMConfig.from_mapping(fsm_section)
+            )
+            fsm_destination_position = self.keypoint_tracker.get_keypoint_position(
+                destination_keypoint_index
+            )
+            current_stage = physical_fsm.current_stage
+            use_guidance = physical_fsm.use_guidance
+            current_guidance_fns = self.guidance_fns.get(current_stage, [])
 
         # Check if guidance functions are available
         if use_guidance and not current_guidance_fns:
@@ -1338,12 +1432,14 @@ class Main:
             'first_gripper_value': None,
             'last_gripper_value': None,
             'last_gripper_value_used': None,
+            'last_vlm_advisory': {"query_status": "not_queried", "control_authority": False},
         }
 
         while not done:
             generate_new_chunk = (action_executed == 0)
             if generate_new_chunk:
-                execution_horizon_stage_change = False
+                execution_horizon_stage_change = pending_fsm_stage_change
+                pending_fsm_stage_change = False
 
             if generate_new_chunk and self.config.get("use_guidance", True) and hasattr(self, 'guidance_fns'):
                 keypoints = self.keypoint_tracker.get_keypoint_positions()
@@ -1363,16 +1459,38 @@ class Main:
                     'last_gripper_value': last_gripper_value,
                 })
                 stage_before_update = stage_state["current_stage"]
-                stage_state = self._update_stage(stage_state, gripper_val, UPPER_THRESHOLD, LOWER_THRESHOLD)
-                execution_horizon_stage_change = (
-                    stage_state["current_stage"] != stage_before_update
-                )
-
-                current_stage = stage_state['current_stage']
-                use_guidance = stage_state['use_guidance']
+                if transition_mode == "physical_fsm_v1":
+                    stage_state = self._update_stage(
+                        stage_state,
+                        gripper_val,
+                        UPPER_THRESHOLD,
+                        LOWER_THRESHOLD,
+                        advisory_only=True,
+                    )
+                    current_stage = physical_fsm.current_stage
+                    use_guidance = physical_fsm.use_guidance
+                    stage_state["current_stage"] = current_stage
+                    stage_state["use_guidance"] = use_guidance
+                else:
+                    stage_state = self._update_stage(
+                        stage_state,
+                        gripper_val,
+                        UPPER_THRESHOLD,
+                        LOWER_THRESHOLD,
+                    )
+                    execution_horizon_stage_change = (
+                        stage_state["current_stage"] != stage_before_update
+                    )
+                    current_stage = stage_state['current_stage']
+                    use_guidance = stage_state['use_guidance']
                 current_guidance_fns = self.guidance_fns.get(current_stage, []) if use_guidance else None
 
                 if use_guidance and not current_guidance_fns:
+                    if transition_mode == "physical_fsm_v1":
+                        raise RuntimeError(
+                            f"physical FSM derived guidance ON but stage {current_stage} "
+                            "has no guidance functions"
+                        )
                     log.warning(f"No guidance functions for stage {current_stage}, disabling")
                     use_guidance = False
                     current_guidance_fns = None
@@ -1729,6 +1847,60 @@ class Main:
             previous_executed_gripper_command = gripper_val
 
             action_executed += 1
+            chunk_invalidated = False
+            if transition_mode == "physical_fsm_v1":
+                if not isinstance(obs, dict) or "robot0_gripper_qpos" not in obs:
+                    raise RuntimeError(
+                        "physical_fsm_v1 requires post-step robot0_gripper_qpos"
+                    )
+                target_position = self.keypoint_tracker.get_keypoint_position(
+                    fsm_target_keypoint_index
+                )
+                eef_position = self.adapter.get_ee_pose_world().position
+                fsm_update = physical_fsm.update(
+                    PhysicalEvidence(
+                        step=int(global_steps + 1),
+                        executed_gripper_command=float(gripper_val),
+                        gripper_qpos=np.asarray(obs["robot0_gripper_qpos"]),
+                        object_position=target_position,
+                        eef_position=eef_position,
+                        destination_position=fsm_destination_position,
+                        success=bool(info.get("success", False)),
+                    )
+                )
+                if fsm_update.state_changed:
+                    stage_changed = fsm_update.current_stage != current_stage
+                    action_chunk, action_executed = _invalidate_chunk_for_fsm_transition(
+                        policy=self.policy,
+                        action_chunk=action_chunk,
+                        action_executed=action_executed,
+                        state_before=fsm_update.state_before.value,
+                        state_after=fsm_update.state_after.value,
+                    )
+                    chunk_invalidated = True
+                    pending_fsm_stage_change = stage_changed
+                current_stage = fsm_update.current_stage
+                use_guidance = fsm_update.use_guidance
+                current_guidance_fns = (
+                    self.guidance_fns.get(current_stage, []) if use_guidance else None
+                )
+                stage_state["current_stage"] = current_stage
+                stage_state["use_guidance"] = use_guidance
+                trace_root = Path(
+                    eds_eval_config.get("output_dir", self.output_dir)
+                )
+                append_jsonl(
+                    trace_root / "fsm_trace.jsonl",
+                    fsm_update.trace_record(
+                        episode=int(episode),
+                        task_id=actual_task_id,
+                        episode_seed=int(episode_seed),
+                        chunk_id=int(chunk_id),
+                        chunk_invalidated=chunk_invalidated,
+                        vlm_advisory=stage_state.get("last_vlm_advisory"),
+                    ),
+                )
+
             if action_executed == resolved_action_horizon:
                 action_executed = 0
 
