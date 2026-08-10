@@ -1,6 +1,6 @@
 # EDS+QD Autoresearch 统一迭代总账
 
-状态：`EXECUTING — run_001 / PROTOCOL_LOCKED_V3 after 1 INVALID infrastructure attempt — 0 algorithm iterations`
+状态：`EXECUTING — run_001 / PROTOCOL_LOCKED_V4 after 1 INVALID infrastructure attempt — 0 algorithm iterations`
 
 本文件是 EDS+QD autoresearch 所有 inner-loop 与 outer-loop 过程的单一人工审查入口。所有条目按 iteration ID append-only；不能删除、覆盖或为改善叙事而重写负结果、invalid attempt、infrastructure failure 或 revert 记录。大型 raw artifacts 不嵌入 Git，但必须以稳定路径和 SHA-256 引用。
 
@@ -8,7 +8,7 @@
 
 | Iteration | 日期 | Scope level | 假设 | 修改摘要 | Split / tasks | 结果 | 决策 | Protocol commit | Result commit |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `run_001_allocation_ecology_diagnostic` | 2026-08-10 | `QD-0` | H4 | saved-trace parent-quality inheritance 与 saturated slot audit | 540 traces / 9,000 stages；task strata 0–9 | first attempt `INVALID`（rank semantics）；recovery pending | `PROTOCOL_LOCKED_V3` | v1 `dcf234b…`; v2 `91ddd34…`; v3 pending | — |
+| `run_001_allocation_ecology_diagnostic` | 2026-08-10 | `QD-0` | H4 | saved-trace parent-quality inheritance 与 saturated slot audit | 540 traces / 9,000 stages；task strata 0–9 | first attempt `INVALID`（rank semantics）；recovery pending | `PROTOCOL_LOCKED_V4` | v1 `dcf234b…`; v2 `91ddd34…`; v3 `f6d7bc9…`; v4 pending | — |
 | `run_000_baseline_replay` | 2026-08-10 | `QD-0` | H1–H5 | 只读回放旧 QD 与预算 sweep，验证 target-linked failure boundary | historical only | 6/6 gates PASS；4,705 QD chunks；budget max 1/10 | `KEEP_DIAGNOSTIC_EVIDENCE` | `5255e924ee925487406e35a27548d9db4e988642` | `e0b252c983a3b62858c8fa676e7b32618660b364` |
 | — | 2026-08-10 | — | — | 执行授权；尚未开始算法迭代 | — | — | `APPROVED_EXECUTING` | — | — |
 
@@ -32,7 +32,7 @@
 
 - 日期与 UTC 时间：`2026-08-10T15:20:46Z`。
 - Inner/outer loop：inner loop 1。
-- 状态：`PROTOCOL_LOCKED_V3_AFTER_INVALID_INFRASTRUCTURE_ATTEMPT`。
+- 状态：`PROTOCOL_LOCKED_V4_BEFORE_RECOVERY_EXECUTION`。
 - 标签：`CONFIRMATORY`。
 - 假设 ID：H4。
 - Scope level：`QD-0`。
@@ -80,7 +80,8 @@
 - Protocol commit v1：`dcf234b6999165de0a5bca4a8e44332896cc61dc`。
 - Protocol v2 amendment：`91ddd34f64d129549147f42c64244b552398a624`。v1 把所有 trace 按原始 10 iterations 相乘而误写 5,400 stages；implementation 前按各 profile `cem_iters` 修正为 9,000。修订前未计算 reward margin、bootstrap、slot share 或 gate outcome；其余 hypotheses/gates 不变。
 - Invalid attempt：首次 analyzer 找到 540 files / 9,000 stages，但错误地把 budget population occurrence ranks `1..N` 限制为 archive-cell ranks `1..16`，从而拒绝 360 traces；artifact SHA-256 `c59cbe97…24b5`。该次 H4 数值全部不可采信。
-- Protocol v3 repair：pending (this commit)。按 source 的 sorted-cell/repeated-slot 顺序重建 child-to-cell，并用每 cell mean occurrence rank 定义 16-cell quality quartiles；所有原 thresholds 不变。
+- Protocol v3 repair：`f6d7bc9a1d579fcbb55e36905beafd1a2ba8264c`。按 source 的 sorted-cell/repeated-slot 顺序重建 child-to-cell，并用每 cell mean occurrence rank 定义 16-cell quality quartiles；所有原 thresholds 不变。
+- Protocol v4 temporal alignment：pending (this commit)。两个 single-file precheck 发现 slot allocation 发生在 archive update 前，而 coverage 指标记录在 update 后；故用实际 parent slot map 的 16 个正计数 cells 定义饱和，排除 15→16 transition iteration。未运行 aggregate H4 statistics，原 thresholds 不变；这是本轮最后一次 schema amendment。
 - Code/config/checkpoint fingerprint：QD blobs `a9138b1f…bd13` / `1354e26c…dd95`；checkpoint 不加载。
 - Protocol-lock 时 Git dirty-state：仅禁止修改的用户 untracked stage-guidance design；无算法 diff。
 
@@ -99,7 +100,7 @@
 
 #### G. 分析与决策
 
-- 预提交规则不变：valid + H4 gates 全过才允许另建固定 `4/16` quality-reserve QD-1 protocol；valid 但 H4 fail 则转 H1；v3 同一 failure 再现则停止 repair 并触发 infrastructure review。
+- 预提交规则不变：valid + H4 gates 全过才允许另建固定 `4/16` quality-reserve QD-1 protocol；valid 但 H4 fail 则转 H1；v4 后任何 validity failure 均停止 repair 并触发 infrastructure review。
 
 ### `run_000_baseline_replay` — 历史基线与预算扩展回放
 

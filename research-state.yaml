@@ -164,14 +164,16 @@ experiments:
     hypothesis_ids: [H4]
     scope_level: QD-0
     label: CONFIRMATORY
-    status: PROTOCOL_LOCKED_V3_AFTER_INVALID_INFRASTRUCTURE_ATTEMPT
+    status: PROTOCOL_LOCKED_V4_BEFORE_RECOVERY_EXECUTION
     protocol_locked_at: "2026-08-10T15:20:46Z"
-    protocol_path: "experiments/run_001_allocation_ecology_diagnostic/protocol-v3.md"
+    protocol_path: "experiments/run_001_allocation_ecology_diagnostic/protocol-v4.md"
     protocol_v1_commit: "dcf234b6999165de0a5bca4a8e44332896cc61dc"
     protocol_amendment_reason: "Correct expected full-process stage count from 5,400 to 9,000 using per-profile cem_iters; no outcome statistics were computed before amendment"
     invalid_attempt_count: 1
     invalid_attempt_sha256: "c59cbe979706320fb90ecee7a1bfe874fe3222b5f0578a23fa3b0b2e0c5e24b5"
     invalid_attempt_reason: "Analyzer confused population occurrence ranks 1..N with the 16 archive-cell quality ranks; 360 budget traces were rejected"
+    protocol_v3_commit: "f6d7bc9a1d579fcbb55e36905beafd1a2ba8264c"
+    protocol_v4_reason: "Use pre-update parent slot-map occupancy rather than post-update coverage to define saturated parent allocation; discovered in two single-file prechecks before aggregate recovery"
     expected_online_episodes: 0
     expected_gpu_hours: 0
 
