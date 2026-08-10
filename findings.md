@@ -38,6 +38,7 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 - Search-budget replay: 18 valid configurations, max 1/10, success-task union `{0,7,8,9}`, and no valid `>=5/10` result.
 - `run_002_partition_diagnostic`: 10/10 frozen validity/scientific gates PASS; 4,567 exact 4x4 replays; resolution `+30.1%`; mode retention `0.9375`; spread ratio `2.0087`; global best retention `1.0`; three identical analysis hashes.
 - `run_010` Stage-A: immutable offline v2 PASS (`3097afad…f7a9`); 781 tests; full checkpoint and 20 LIBERO input files fingerprinted; 176/11 compute; zero post-envelope overflow; 10/10 visit/global-best invariants; finite synthetic resolution median 1.0. This remains mechanism evidence only.
+- `run_010` online start: IDs 1–6 were aborted before episode initialization. A pre-reservation recovery diagnostic showed Poe HTTP 401 `invalid_api_key` despite working DNS/HTTPS and a present non-dummy environment credential; no task evidence exists and exact-cell recovery remains unconsumed.
 
 ## Patterns and Insights
 
@@ -51,6 +52,7 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 8. Saved mechanism traces require explicit temporal and entity-level schemas; occurrence ranks, archive-cell ranks, allocation occupancy and post-update coverage are not interchangeable.
 9. A parameter-free causal envelope can improve geometric partition resolution without losing the reward-best candidate on a common stream, but only online parent/offspring feedback can establish a task benefit.
 10. Online transaction ordering is part of validity: the run_010 dispatcher reserved cells before the base runner repeated its Poe health check. The resulting IDs 1–6 are auditable pre-episode infrastructure aborts, not policy outcomes; an exact-cell recovery must health-check before creating replacement reservations.
+11. Repeated health-check retries are not a productive inner loop when the service returns deterministic authentication failure. Runtime credential repair is required before any target-linked EDS+QD conclusion can be obtained.
 
 ## Lessons and Constraints
 
@@ -74,4 +76,4 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 
 ## Optimization Trajectory
 
-`run_000_baseline_replay` is complete; `run_001_allocation_ecology_diagnostic` ended invalid after two infrastructure attempts; `run_002_partition_diagnostic` passed all gates; and `run_010` algorithm iteration 1 passed Stage-A offline validation after one preserved schema-only harness repair. Its first six-cell mechanism-preflight dispatch failed the Poe health check before worker/episode initialization; no task outcome exists, success remains historical 2/10, and target gap remains 3. Protocol v3 authorizes one exact-cell API recovery with the scientific code/config/checkpoint/manifest frozen and health checked before replacement reservation.
+`run_000_baseline_replay` is complete; `run_001_allocation_ecology_diagnostic` ended invalid after two infrastructure attempts; `run_002_partition_diagnostic` passed all gates; and `run_010` algorithm iteration 1 passed Stage-A offline validation after one preserved schema-only harness repair. Its first six-cell mechanism-preflight dispatch failed before worker/episode initialization; the v3 pre-reservation check then diagnosed HTTP 401 `invalid_api_key` and created no replacement attempts. Success remains historical 2/10 and target gap remains 3. Research is paused for valid runtime credentials; after repair, v3 still authorizes one exact-cell recovery with scientific code/config/checkpoint/manifest frozen.

@@ -1,6 +1,6 @@
 # EDS+QD Autoresearch 统一迭代总账
 
-状态：`EXECUTING — run_010 mechanism preflight pre-episode API recovery protocol locked — 1 algorithm iteration`
+状态：`PAUSED — run_010 pre-reservation Poe credential invalid — 1 algorithm iteration`
 
 本文件是 EDS+QD autoresearch 所有 inner-loop 与 outer-loop 过程的单一人工审查入口。所有条目按 iteration ID append-only；不能删除、覆盖或为改善叙事而重写负结果、invalid attempt、infrastructure failure 或 revert 记录。大型 raw artifacts 不嵌入 Git，但必须以稳定路径和 SHA-256 引用。
 
@@ -8,7 +8,7 @@
 
 | Iteration | 日期 | Scope level | 假设 | 修改摘要 | Split / tasks | 结果 | 决策 | Protocol commit | Result commit |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `run_010_causal_envelope_candidate` | 2026-08-10 | `QD-1` | H1 | sparse QD + causal bounds expansion/archive rebin；其余冻结 | offline PASS；preflight tasks 3/5 首派发在 episode 前 API abort | `RECOVERY_PROTOCOL_LOCKED`；0 task outcome | exact-cell recovery pending | v1 `1017bf0…`; offline v2 `8fd3aea…`; API recovery v3 pending this commit | — |
+| `run_010_causal_envelope_candidate` | 2026-08-10 | `QD-1` | H1 | sparse QD + causal bounds expansion/archive rebin；其余冻结 | offline PASS；preflight tasks 3/5 首派发在 episode 前 API abort | `PAUSED_INVALID_RUNTIME_CREDENTIAL`；0 task outcome | exact-cell recovery remains pending | v1 `1017bf0…`; offline v2 `8fd3aea…`; API recovery v3 `b344dc8…` | pending this result commit |
 | `run_002_partition_diagnostic` | 2026-08-10 | `QD-0` | H1 | fixed-initial vs 单一 `causal_envelope_v1` 4x4 partition replay | 27 frozen files；4,567 eligible chunks；task strata 3/5/8/9 | 10/10 gates PASS；resolution +30.1%；global best 100% | `KEEP_DIAGNOSTIC_EVIDENCE_AND_AUTHORIZE_ONE_QD1_PROTOCOL` | `862f7cc4f00d92a97f6a0103e760f3b6180a437f` | `29fcdb7940e35ce12d1d96e2651b7d813406052d` |
 | `run_001_allocation_ecology_diagnostic` | 2026-08-10 | `QD-0` | H4 | saved-trace parent-quality inheritance 与 saturated slot audit | 540 traces / 9,000 stages；task strata 0–9 | 2 attempts `INVALID`；无可采纳 H4 outcome | `INVALID_CONCLUDE_AND_TRIGGER_OUTER_LOOP` | v1 `dcf234b…`; v2 `91ddd34…`; v3 `f6d7bc9…`; v4 `3d320f6…` | `cdd150b2c332e907c05cda90c7c09fd1f1799570` |
 | `run_000_baseline_replay` | 2026-08-10 | `QD-0` | H1–H5 | 只读回放旧 QD 与预算 sweep，验证 target-linked failure boundary | historical only | 6/6 gates PASS；4,705 QD chunks；budget max 1/10 | `KEEP_DIAGNOSTIC_EVIDENCE` | `5255e924ee925487406e35a27548d9db4e988642` | `e0b252c983a3b62858c8fa676e7b32618660b364` |
@@ -26,7 +26,7 @@
 - 累计 GPU-hours：0。
 - Attempt budget：6 个 reservation 已派发但在 episode 前中止，实际 episode attempts `0 / 143`；若 API 健康恢复，exact-cell recovery 最多新增 6 个 reservation。
 - 已结束新实验：3 个 `QD-0`（2 complete，1 invalid）；QD-1 算法迭代 1 正在执行。
-- 当前结论：`run_010` Stage-A PASS；首次 mechanism-preflight 派发没有启动 worker/episode，按 v3 做一次 API exact-cell recovery。Dev-A 仍要求 candidate success `>= control + 1` 且零 control-success loss。相邻 partition、Dev-B、validation、formal 均未授权。
+- 当前结论：`run_010` Stage-A PASS；首次 mechanism-preflight 派发没有启动 worker/episode。v3 的恢复前 health check 明确返回 HTTP 401 `invalid_api_key`，因此没有创建 IDs 7–12，研究安全暂停等待有效运行时凭据。Dev-A 仍要求 candidate success `>= control + 1` 且零 control-success loss。相邻 partition、Dev-B、validation、formal 均未授权。
 
 ### `run_001_allocation_ecology_diagnostic` — 饱和 archive 的 parent 质量继承与 slot 生态
 
@@ -564,3 +564,10 @@
 - Protocol-first recovery：新增 `experiments/run_010_causal_envelope_candidate/protocol-v3.md`。它只授权一次 exact-cell recovery：先为 IDs 1–6 追加 pre-episode abort event；再在 API health PASS 后，以 frozen scientific revision `d018f8ac…991` / code-state `3626b52b…9839c` 创建 IDs 7–12，分别带 `recovery_of_attempt_id=1..6`；重新动态 admission；不修改 source 或 immutable manifest。
 - Budget accounting：实际 initialized episode attempts 仍 `0/143`，GPU-hours 仍 0；6 个中止 reservation 永久保留，恢复最多占用 6/15 个 infrastructure slots。若恢复前 health 仍失败，则不产生新 reservation；若第二次仍在 worker 前失败，v3 要求中止并停止，不授权第三次派发。
 - 决策：`RECOVER_EXACT_CELLS_ONCE`。下一步仅执行 v3 事务恢复；mechanism PASS 前不启动 Dev-A。
+- Protocol commit：`b344dc850e8d63b2a78438d64d152693e8f7789f`，严格先于 abort event、恢复健康检查与诊断 artifact。
+- Abort ledger：event 2 将 IDs 1–6 标为 `dispatch_aborted_pre_episode`；写入 event 2 时错误填写了正确前缀 `b344dc8` 但错误的完整 commit 后缀，event 3 以 append-only `provenance_correction` 给出正确完整 SHA；没有重写任一旧行。修正后 ledger SHA-256 `de67193d8a72c1f96ef1e0ca087cbaa7d6b14135ba390ad9abb1e8b350467fba`。
+- v3 恢复前检查：临时切到 frozen scientific revision `d018f8ac…991` 后，pause/storage/manifest/ledger/cache/credential-presence 与零 online artifact assertions 均 PASS；随后 Poe health check 再次失败，wrapper 在 GPU admission 和 replacement reservation 之前退出，target branch 已恢复。
+- 诊断：credential 存在且不是 dummy；`api.poe.com` DNS 解析 PASS（2 addresses），HTTPS endpoint 可达；authenticated `gemini-2.5-flash` 请求返回 HTTP 401、code `invalid_api_key`、type `authentication_error`。没有记录 credential 值、响应文本或 header。
+- Immutable diagnostic：owned `run_010_causal_envelope_candidate/analysis/api_health_diagnostic_20260810T1659Z.json`，mode `0444`，size 907 bytes，SHA-256 `70afb86006c6c01517201b43562ea3c36e8d24680d8f1eec2f9ab2e219bcf227`。
+- 恢复结果：未创建 IDs 7–12，未重新做 GPU admission，未启动 worker/episode，未生成 task outcome；initialized episode attempts `0/143`、GPU-hours 0、formal 0。v3 的一次 exact-cell dispatch authorization 尚未消耗。
+- Failure reason / next-step basis：这是外部运行时 credential invalidity，不是可由 EDS+QD 修改解决的失败，也没有提供算法优化信号。继续 algorithm exploration 不会直接缩小 gap，违反 success-first 原则；故状态转为 `PAUSED_INVALID_RUNTIME_CREDENTIAL`，直到执行环境配置有效 `OPENAI_API_KEY` 后从 v3 pre-reservation health check 恢复。
