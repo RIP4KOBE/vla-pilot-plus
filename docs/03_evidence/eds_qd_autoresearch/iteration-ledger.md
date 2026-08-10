@@ -1,6 +1,6 @@
 # EDS+QD Autoresearch 统一迭代总账
 
-状态：`EXECUTING — run_000_baseline_replay / PROTOCOL_LOCKED — 0 algorithm iterations`
+状态：`EXECUTING — run_000 COMPLETE; next QD-0 protocol pending — 0 algorithm iterations`
 
 本文件是 EDS+QD autoresearch 所有 inner-loop 与 outer-loop 过程的单一人工审查入口。所有条目按 iteration ID append-only；不能删除、覆盖或为改善叙事而重写负结果、invalid attempt、infrastructure failure 或 revert 记录。大型 raw artifacts 不嵌入 Git，但必须以稳定路径和 SHA-256 引用。
 
@@ -8,7 +8,7 @@
 
 | Iteration | 日期 | Scope level | 假设 | 修改摘要 | Split / tasks | 结果 | 决策 | Protocol commit | Result commit |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `run_000_baseline_replay` | 2026-08-10 | `QD-0` | H1–H5 | 只读回放旧 QD 与预算 sweep，验证 target-linked failure boundary | historical only | pending | `PROTOCOL_LOCKED` | pending (this commit) | — |
+| `run_000_baseline_replay` | 2026-08-10 | `QD-0` | H1–H5 | 只读回放旧 QD 与预算 sweep，验证 target-linked failure boundary | historical only | 6/6 gates PASS；4,705 QD chunks；budget max 1/10 | `KEEP_DIAGNOSTIC_EVIDENCE` | `5255e924ee925487406e35a27548d9db4e988642` | pending (this commit) |
 | — | 2026-08-10 | — | — | 执行授权；尚未开始算法迭代 | — | — | `APPROVED_EXECUTING` | — | — |
 
 ## 累计状态
@@ -22,7 +22,8 @@
 - Formal evaluations：0。
 - 累计 GPU-hours：0。
 - Attempt budget：`0 / 143`。
-- 当前结论：冻结方案已获正式执行授权；formal evaluation 仍须通过 promotion gates。
+- 已完成新实验：1 个 `QD-0`；算法迭代仍为 0。
+- 当前结论：直接扩大 population/iterations 已被排除为下一方向；下一轮只做 allocation/quality-retention 反事实诊断。Formal evaluation 仍未授权。
 
 ### `run_000_baseline_replay` — 历史基线与预算扩展回放
 
@@ -30,7 +31,7 @@
 
 - 日期与 UTC 时间：`2026-08-10T15:05:31Z`。
 - Inner/outer loop：inner loop 0，bootstrap diagnostic。
-- 状态：`PROTOCOL_LOCKED`。
+- 状态：`COMPLETE`。
 - 标签：`CONFIRMATORY`。
 - 假设 ID：H1–H5；本轮只审计，不一次性宣称全部成立。
 - Scope level：`QD-0`。
@@ -76,8 +77,8 @@
 | EDS+QD instrumentation | Changed | deterministic historical parser | `src/replay_historical_eds_qd.py`（protocol 后实现） | 形成可复核 evidence packet |
 
 - 明确冻结的非 EDS+QD 模块：checkpoint/backbone、perception/grounding、prompts、Stage recognizer、environment/reset、executor、evaluator。
-- 逐文件 diff 摘要：本 protocol commit 仅新增 catalog/protocol 并更新 ledger/state/log/status；没有算法或 replay 实现。
-- Protocol commit：pending (this commit；提交后回填 hash 只能在 result 记录，不改写 protocol)。
+- 逐文件 diff 摘要：protocol commit 仅新增 catalog/protocol 与状态记录；result commit 新增 `src/replay_historical_eds_qd.py` 和本轮 `analysis.md`，只读解析 historical audit/metrics；无算法行为修改。
+- Protocol commit：`5255e924ee925487406e35a27548d9db4e988642`。
 - Code/config/checkpoint fingerprint：`core/qd_ed.py` Git blob `a9138b1f…bd13`；`core/rdt_policy_steer.py` Git blob `1354e26c…dd95`；checkpoint 不加载。
 - Protocol-lock 时 Git dirty-state：仅用户保留且禁止修改的 untracked `docs/01_specs/2026-08-10-eds-qd-stage-guidance-transition-design.md`；无算法 diff。
 
@@ -88,15 +89,35 @@
 - 环境 fingerprint：CPU/offline parser；Git HEAD before protocol `d35170073c8ef12d035f854446c439dcfeec1efe`。
 - GPU index/UUID 与 admission snapshots：不适用。
 - Expected evaluations/model/reward/VLM calls：全部 0。
-- Started / ended / wall time：尚未开始。
+- Started / ended / wall time：timed deterministic replay `2026-08-10T15:15:49Z → 15:15:55Z`；wall `6.16 s`，CPU `5.71 s`，max RSS `271,376 KiB`。另有 protocol-required independent repeat，canonical JSON hash 相同。
 
 #### F. 结果
 
-Pending。Protocol lock 后才允许实现、运行与追加结果。
+| Historical profile/config | Control outcome | Candidate outcome | Mechanism metric | Safety | Calls | Validity |
+| --- | --- | --- | --- | --- | --- | --- |
+| original uniform primary | `{3,8,9}` | `{}` = 0/10 | coverage 1.0；overflow P95 0.9375 | PASS | historical 176 eval/full chunk | valid |
+| original sparse primary | `{3,8,9}` | `{5,8}` = 2/10 | coverage 1.0；overflow P95 0.9375 | PASS | historical 176 eval/full chunk | valid |
+| budget uniform family, 9 configs | historical control only | each 0/10 or 1/10；union `{7,9}` | eval/chunk 512–1664；success/eval Spearman -0.2598 | PASS | historical only | 9/9 valid |
+| budget sparse family, 9 configs | historical control only | each 0/10 or 1/10；union `{0,8}` | eval/chunk 512–1664；success/eval Spearman +0.2598 | one qpos episode at p64/k20 | historical only | 9/9 base-valid; safety exception preserved |
+
+- Promotion vector：offline validity 6/6 gates PASS；environment success 不变；target gap 不变；no new/lost tasks；机制诊断支持但未授权 online promotion。
+- 迭代后 best success / target gap：历史 `2/10`；gap `3`，均不变。
+- 实际新增、保留与丢失 tasks：新实验无 task execution；历史 sparse 对 control 为 gain `{5}`、retain `{8}`、loss `{3,9}`。
+- Raw artifact：`/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_000_baseline_replay/analysis.json`，SHA-256 `6ad1308363a512c9b2529a090682669bb096d5000159571d5798ddd296bad963`；summary SHA-256 `e0defa0b535d27cca8c84a3085d4958cbf1de98baf8d621a6ef82d2eea79f245`。
+- Failure taxonomy / exception：本轮无 failure；保留历史 budget-sweep `201 > 200` physical-attempt exception 与一个 qpos safety episode。
+- Retry/recovery provenance：无在线 retry；三个 replay 的 canonical JSON SHA-256 一致。
+- 本轮与累计 episode/GPU-hour budget：`0/0`；累计 attempt `0/143`，GPU-hours `0/48`。
 
 #### G. 分析与决策
 
-- 预提交决策：support gates 全过则 `KEEP` 诊断证据，排除 compute scaling，并按 protocol 的确定性顺序只选一个下一 `QD-0`；否则 `INVALID` 并仅修复 provenance/parser。
+- 观察到的事实：13/13 catalog hashes；27/27 metrics files；4,705/4,705 records 为 zero direct elite carryover 且 archive-only parents；3,281,360 archive-parent selections 对 0 direct-elite selections；coverage median 1.0；raw overflow P95 0.875；18 个 budget configs 最大 1/10，总 success/eval Spearman 0.0。
+- 本轮是否缩小 `>=5/10` target gap：否，零 episode 诊断，gap 保持 3。
+- 对机制假设的支持/否证：H1 和 H4 获诊断支持；H2/H5 unresolved；H3 因 clean-tail `3→2→0` 被降级但未否证。
+- 替代解释与限制：budget sweep 没有 contemporaneous control；formal mapping 已曝光；archive reward 不是 stage progress；overflow 仍可能包含 useful exploration。
+- 决策：`KEEP_DIAGNOSTIC_EVIDENCE`。保留的是可复核 failure boundary，不是算法候选。
+- Reverted commit：不适用，无行为修改。
+- Result commit：pending (this commit)。
+- 下一步及理由：锁定 `run_001_allocation_ecology_diagnostic`。历史 task loss 表明 retention 是直接 target gap；raw mechanism traces 可在 0 episode 下检验 quality-blind slots 与 elite lineage，符合 protocol 的预提交优先顺序。
 
 ## Execution authorization
 

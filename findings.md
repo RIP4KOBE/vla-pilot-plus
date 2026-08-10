@@ -14,6 +14,10 @@ There is also a geometry warning. The control's selected trajectory-length media
 
 The historical Grid5 result is invalid algorithm evidence. Its episodes hit `IndexError: tuple index out of range` when final archive selection indexed stale particle-source bookkeeping. Current HEAD contains a QD-aware source bookkeeping branch, but the old Grid5 outcomes remain invalid and must not be used to rank grid resolution. Future tests must explicitly cover archives with more occupied cells than population-source tuples before any online promotion.
 
+The `run_000_baseline_replay` machine replay adds a stronger ecology boundary. Across 4,705 QD chunks from 27 original and budget-study metrics files, every chunk reported zero direct elite carryover and archive-only parent selection; the accumulated parent counts were 3,281,360 archive offspring and zero direct elites. The configured `num_elites` is a no-op in the non-CEM QD branch. Thus the current QD process has cell-local reward elitism but no explicit population budget reserved for globally strong lineages.
+
+Direct compute scaling is no longer an active direction. The 18 valid budget configurations ranged from 512 to 1,664 evaluations per complete chunk but all scored 0/10 or 1/10, with aggregate Spearman correlation 0.0 between evaluations/chunk and success. This does not prove compute can never help; it shows that compute without changing QD allocation/retention did not shrink the target gap.
+
 ## Key Results
 
 - Historical contemporaneous control: 3/10 on frozen tasks/seeds.
@@ -22,6 +26,8 @@ The historical Grid5 result is invalid algorithm evidence. Its episodes hit `Ind
 - Historical valid QD profiles: coverage median 1.0 with overflow P95 0.938–1.0 and paired coverage gain 0.
 - All QD candidates: no adoption; decision manifest and report checksums verify.
 - Planning baseline health check: 56 QD archive/runner/audit tests pass on base commit.
+- `run_000_baseline_replay`: 6/6 gates PASS; 13/13 input hashes; 27/27 metrics files; 4,705 QD chunks; deterministic analysis SHA-256 `6ad13083…963`.
+- Search-budget replay: 18 valid configurations, max 1/10, success-task union `{0,7,8,9}`, and no valid `>=5/10` result.
 
 ## Patterns and Insights
 
@@ -30,6 +36,8 @@ The historical Grid5 result is invalid algorithm evidence. Its episodes hit `Ind
 3. Exploration can discover a new success (task 5) but currently fails to retain known control successes, indicating an exploit/retain problem rather than a simple lack-of-diversity problem.
 4. The QD policies tend to generate longer or more discontinuous selected motion, which may consume the 720-step budget without completing placement.
 5. A ten-task formal suite is too small to serve simultaneously as an iterative tuning set and an unbiased final acceptance set; development and validation seeds must be isolated before execution.
+6. Increasing QD population/iterations without changing archive ecology does not preserve or combine successful modes.
+7. The absence of a direct global-quality reserve is a concrete, code-and-telemetry-supported retention gap; it is not yet proof that any particular reserve ratio improves task success.
 
 ## Lessons and Constraints
 
@@ -49,7 +57,8 @@ The historical Grid5 result is invalid algorithm evidence. Its episodes hit `Ind
 - Can control-success modes be retained with a fixed 176-evaluation budget while still exploring new behaviors?
 - Is cross-chunk discontinuity a cause of timeout, or merely correlated with harder episodes?
 - Which development/validation seeds provide representative but leakage-safe promotion evidence?
+- Do high-reward archive cells produce better offspring than quality-blind or inverse-visitation slots on saved traces, and what is the smallest fixed-budget reserve justified by that counterfactual?
 
 ## Optimization Trajectory
 
-No new-research experiment has run. Historical results are references, not entries in the new autoresearch trajectory. The trajectory starts only after an experiment protocol has been committed in the execution phase.
+`run_000_baseline_replay` is complete as a zero-episode QD-0 diagnostic. It did not change success or target gap, but eliminated direct compute scaling as the next direction and selected an allocation-ecology counterfactual. No algorithm candidate, development episode, GPU job, or formal evaluation has run.
