@@ -44,6 +44,7 @@ from core.qd_ed import (
 MECHANISM_PREFLIGHT_LEVEL = "eds_qd_autoresearch_mechanism_preflight"
 DEV_A_LEVEL = "eds_qd_autoresearch_dev_a"
 DEV_B_LEVEL = "eds_qd_autoresearch_dev_b"
+VALIDATION_LEVEL = "eds_qd_autoresearch_validation"
 BRANCH = "exp/eds-qd-autoresearch-libero-swap-ood"
 PROTOCOL_COMMIT = "1017bf0212780b2e386764517661cf9970090f8d"
 REPAIR_PROTOCOL_COMMIT = "8fd3aea0b1ec063aba63fa0bffcf3829f03c006c"
@@ -75,6 +76,8 @@ FAILED_DEV_B_MANIFEST_V1_SHA256 = (
 )
 DEV_B_MANIFEST_PATH = RUN_ROOT / "manifests/dev_b_manifest.v2.json"
 DEV_B_AUDIT_PATH = RUN_ROOT / "analysis/dev_b_audit.json"
+VALIDATION_MANIFEST_PATH = RUN_ROOT / "manifests/validation_manifest.json"
+VALIDATION_AUDIT_PATH = RUN_ROOT / "analysis/validation_audit.json"
 RUNTIME_CACHE_DIR = RUN_ROOT / "runtime_cache/cached_functions"
 RUNTIME_CACHE_MANIFEST_PATH = RUN_ROOT / "runtime_cache/provenance.json"
 RUNTIME_CACHE_SOURCE = Path(
@@ -105,6 +108,19 @@ PROTECTED_UNTRACKED = (
 DEV_TASKS = [3, 5, 8, 9]
 DEV_A_SEEDS = [512905, 150741, 463456, 452903]
 DEV_B_SEEDS = [558482, 165717, 160148, 160312]
+VALIDATION_TASKS = list(range(10))
+VALIDATION_SEEDS = [
+    41678,
+    829779,
+    856474,
+    666150,
+    876784,
+    652882,
+    288157,
+    522484,
+    262295,
+    200894,
+]
 PREFLIGHT_TASKS = [3, 5]
 PREFLIGHT_SEEDS = DEV_A_SEEDS[:2]
 
@@ -116,6 +132,12 @@ MECHANISM_AUDIT_V2_SHA256 = (
 )
 DEV_A_AUDIT_V2_SHA256 = (
     "9c6d3ecee60d50c7e574b2a795c864483c85c812c0883a96ec81aa5d5d889fa9"
+)
+DEV_B_MANIFEST_V2_SHA256 = (
+    "20b1349da2f09335f1ce1be7f96e7cdd81c1bb689b41dfb6d275acdaaaa1278e"
+)
+DEV_B_AUDIT_SHA256 = (
+    "7a73b3ae67d3980147bb48d14198b4de9cbabb14262c82effce656b3f91ff64f"
 )
 PRE_EPISODE_INCIDENT_GPU_HOURS = 0.023594
 DEV_B_ALGORITHM_SOURCE_SHA256 = {
@@ -302,9 +324,13 @@ def profiles() -> list[dict[str, Any]]:
 
 def _bind_job(job: dict[str, Any]) -> dict[str, Any]:
     manifest_path = (
-        DEV_B_MANIFEST_PATH
-        if job.get("level") == DEV_B_LEVEL
-        else RUN_MANIFEST_PATH
+        VALIDATION_MANIFEST_PATH
+        if job.get("level") == VALIDATION_LEVEL
+        else (
+            DEV_B_MANIFEST_PATH
+            if job.get("level") == DEV_B_LEVEL
+            else RUN_MANIFEST_PATH
+        )
     )
     if manifest_path.is_file():
         if manifest_path.stat().st_mode & 0o222:
@@ -345,9 +371,15 @@ def build_jobs(level: str, episodes: int | None = None, *, bind: bool = True, **
         selected = [profiles()[0], profiles()[2]]
         expected_episodes = 4
         max_chunks = None
+    elif level == VALIDATION_LEVEL:
+        task_ids = VALIDATION_TASKS
+        seeds = VALIDATION_SEEDS
+        selected = [profiles()[0], profiles()[2]]
+        expected_episodes = 10
+        max_chunks = None
     else:
         raise ValueError(
-            "phase must be mechanism_preflight, dev_a, or dev_b; formal is forbidden"
+            "phase must be mechanism_preflight, dev_a, dev_b, or validation; formal is forbidden"
         )
     if episodes is not None and int(episodes) != expected_episodes:
         raise ValueError(f"{level} requires exactly {expected_episodes} episodes")
@@ -360,7 +392,11 @@ def build_jobs(level: str, episodes: int | None = None, *, bind: bool = True, **
             else (
                 f"dev_a__{formal_label}"
                 if level == DEV_A_LEVEL
-                else f"dev_b__{formal_label}"
+                else (
+                    f"dev_b__{formal_label}"
+                    if level == DEV_B_LEVEL
+                    else f"validation__{formal_label}"
+                )
             )
         )
         job = {
@@ -423,7 +459,12 @@ def _build_main_command(job: dict[str, Any], *args: Any, **kwargs: Any) -> list[
 
 
 def stage_dir(level: Any) -> str:
-    if str(level) in {MECHANISM_PREFLIGHT_LEVEL, DEV_A_LEVEL, DEV_B_LEVEL}:
+    if str(level) in {
+        MECHANISM_PREFLIGHT_LEVEL,
+        DEV_A_LEVEL,
+        DEV_B_LEVEL,
+        VALIDATION_LEVEL,
+    }:
         return "run_010_causal_envelope_candidate"
     return _BASE_STAGE_DIR(level)
 
@@ -456,6 +497,7 @@ def configure_base() -> None:
         MECHANISM_PREFLIGHT_LEVEL,
         DEV_A_LEVEL,
         DEV_B_LEVEL,
+        VALIDATION_LEVEL,
     }
     base.P2_ALLOWED_GPUS = {str(index) for index in ALLOWED_GPU_INDICES}
     base.P2_REQUIRED_MOUNT = Path("/mnt/data/shared2")
@@ -674,6 +716,7 @@ def profile_fingerprint(profile: dict[str, Any]) -> str:
         "dev_tasks": DEV_TASKS,
         "dev_a_seeds": DEV_A_SEEDS,
         "dev_b_seeds": DEV_B_SEEDS,
+        "validation_seeds": VALIDATION_SEEDS,
     }
     return sha256_bytes(canonical(payload).encode("utf-8"))
 
@@ -1065,7 +1108,8 @@ def freeze_dev_b_manifest(path: Path = DEV_B_MANIFEST_PATH) -> dict[str, Any]:
     return payload
 
 
-def validate_dev_b_manifest(path: Path = DEV_B_MANIFEST_PATH) -> dict[str, Any]:
+def validate_dev_b_manifest(path: Path | None = None) -> dict[str, Any]:
+    path = path or DEV_B_MANIFEST_PATH
     if not path.is_file() or path.stat().st_mode & 0o222:
         raise RuntimeError("immutable Dev-B manifest is required")
     payload = json.loads(path.read_text(encoding="utf-8"))
@@ -1086,6 +1130,119 @@ def validate_dev_b_manifest(path: Path = DEV_B_MANIFEST_PATH) -> dict[str, Any]:
     current_code_state = base._p2_code_state_sha256()
     if payload.get("provenance", {}).get("code_state_sha256") != current_code_state:
         raise RuntimeError("Dev-B manifest code-state mismatch")
+    return payload
+
+
+def _validation_manifest_payload(
+    *,
+    provenance: dict[str, Any],
+    storage: dict[str, Any],
+    runtime_cache_sha256: str,
+    checkpoint: dict[str, Any],
+    libero_inputs: dict[str, Any],
+    algorithm_source_fingerprints: dict[str, str],
+    jobs: list[dict[str, Any]],
+) -> dict[str, Any]:
+    if algorithm_source_fingerprints != DEV_B_ALGORITHM_SOURCE_SHA256:
+        raise RuntimeError("validation algorithm differs from frozen candidate")
+    return {
+        "schema": "eds-qd-autoresearch-run010-validation-manifest-v1",
+        "created_at": now(),
+        "provenance": provenance,
+        "storage": storage,
+        "runtime_cache_sha256": runtime_cache_sha256,
+        "checkpoint_fingerprint": checkpoint,
+        "libero_input_fingerprint": libero_inputs,
+        "algorithm_source_fingerprints": algorithm_source_fingerprints,
+        "parent_evidence": {
+            "original_run_manifest_sha256": ORIGINAL_RUN_MANIFEST_SHA256,
+            "mechanism_audit_v2_sha256": MECHANISM_AUDIT_V2_SHA256,
+            "dev_a_audit_v2_sha256": DEV_A_AUDIT_V2_SHA256,
+            "dev_b_manifest_v2_sha256": DEV_B_MANIFEST_V2_SHA256,
+            "dev_b_audit_sha256": DEV_B_AUDIT_SHA256,
+        },
+        "suite": "libero_object_swap",
+        "strict_perturbations": True,
+        "max_episode_steps": 720,
+        "profiles": [profiles()[0]["label"], profiles()[2]["label"]],
+        "validation": {
+            "tasks": VALIDATION_TASKS,
+            "seeds": VALIDATION_SEEDS,
+            "unique_cells": 20,
+            "target_success_count": 5,
+            "job_matrix_sha256": sha256_bytes(canonical(jobs).encode("utf-8")),
+        },
+        "attempt_cap": ATTEMPT_CAP,
+        "gpu_hour_cap": GPU_HOUR_CAP,
+        "allowed_gpu_indices": sorted(ALLOWED_GPU_INDICES),
+        "formal_authorized": False,
+    }
+
+
+def freeze_validation_manifest(
+    path: Path = VALIDATION_MANIFEST_PATH,
+) -> dict[str, Any]:
+    pause_preflight()
+    storage = storage_preflight()
+    if sha256_path(RUN_MANIFEST_PATH) != ORIGINAL_RUN_MANIFEST_SHA256:
+        raise RuntimeError("original immutable run manifest identity mismatch")
+    if sha256_path(DEV_B_MANIFEST_PATH) != DEV_B_MANIFEST_V2_SHA256:
+        raise RuntimeError("Dev-B manifest v2 identity mismatch")
+    _require_immutable_pass_artifact(DEV_B_AUDIT_PATH, DEV_B_AUDIT_SHA256)
+    cache = legacy.validate_runtime_cache(
+        target=RUNTIME_CACHE_DIR, manifest_path=RUNTIME_CACHE_MANIFEST_PATH
+    )
+    algorithm_sources = {
+        relative: sha256_path(WORKTREE_ROOT / relative)
+        for relative in DEV_B_ALGORITHM_SOURCE_SHA256
+    }
+    payload = _validation_manifest_payload(
+        provenance=current_provenance(),
+        storage=storage,
+        runtime_cache_sha256=sha256_bytes(canonical(cache).encode("utf-8")),
+        checkpoint=checkpoint_fingerprint(),
+        libero_inputs=libero_input_fingerprint(),
+        algorithm_source_fingerprints=algorithm_sources,
+        jobs=build_jobs(VALIDATION_LEVEL, bind=False),
+    )
+    payload["payload_sha256"] = sha256_bytes(canonical(payload).encode("utf-8"))
+    if contains_credential(payload):
+        raise RuntimeError("validation manifest contains credential material")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("x", encoding="utf-8") as handle:
+        handle.write(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    path.chmod(0o444)
+    return payload
+
+
+def validate_validation_manifest(
+    path: Path | None = None,
+) -> dict[str, Any]:
+    path = path or VALIDATION_MANIFEST_PATH
+    if not path.is_file() or path.stat().st_mode & 0o222:
+        raise RuntimeError("immutable validation manifest is required")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    recorded_hash = payload.get("payload_sha256")
+    unhashed = {key: value for key, value in payload.items() if key != "payload_sha256"}
+    if recorded_hash != sha256_bytes(canonical(unhashed).encode("utf-8")):
+        raise RuntimeError("validation manifest payload hash mismatch")
+    if payload.get("formal_authorized") is not False:
+        raise RuntimeError("validation manifest must forbid formal evaluation")
+    if payload.get("algorithm_source_fingerprints") != DEV_B_ALGORITHM_SOURCE_SHA256:
+        raise RuntimeError("validation manifest algorithm identity mismatch")
+    actual_sources = {
+        relative: sha256_path(WORKTREE_ROOT / relative)
+        for relative in DEV_B_ALGORITHM_SOURCE_SHA256
+    }
+    if actual_sources != DEV_B_ALGORITHM_SOURCE_SHA256:
+        raise RuntimeError("current algorithm differs from validation winner candidate")
+    if (
+        payload.get("provenance", {}).get("code_state_sha256")
+        != base._p2_code_state_sha256()
+    ):
+        raise RuntimeError("validation manifest code-state mismatch")
     return payload
 
 
@@ -1148,6 +1305,9 @@ def run_phase(level: str, *, gpus: str, timeout_seconds: int) -> int:
             DEV_A_AUDIT_V2_PATH, DEV_A_AUDIT_V2_SHA256
         )
         validate_dev_b_manifest()
+    elif level == VALIDATION_LEVEL:
+        _require_immutable_pass_artifact(DEV_B_AUDIT_PATH, DEV_B_AUDIT_SHA256)
+        validate_validation_manifest()
     legacy.validate_runtime_cache(
         target=RUNTIME_CACHE_DIR, manifest_path=RUNTIME_CACHE_MANIFEST_PATH
     )
@@ -1193,7 +1353,12 @@ def run_phase(level: str, *, gpus: str, timeout_seconds: int) -> int:
     with configured_base():
         return base.run_level(
             level,
-            2 if level == MECHANISM_PREFLIGHT_LEVEL else 4,
+            {
+                MECHANISM_PREFLIGHT_LEVEL: 2,
+                DEV_A_LEVEL: 4,
+                DEV_B_LEVEL: 4,
+                VALIDATION_LEVEL: 10,
+            }[level],
             ",".join(selected),
             timeout_seconds,
             resume=False,
@@ -1969,6 +2134,236 @@ def audit_dev_b(path: Path = DEV_B_AUDIT_PATH) -> dict[str, Any]:
     return payload
 
 
+def validation_target_gate(
+    *, control_success: set[int], candidate_success: set[int]
+) -> dict[str, Any]:
+    gained = sorted(candidate_success - control_success)
+    retained = sorted(candidate_success & control_success)
+    lost = sorted(control_success - candidate_success)
+    gained_minus_lost = len(gained) - len(lost)
+    failures: list[str] = []
+    if len(candidate_success) < 5:
+        failures.append("candidate validation success is below 5/10")
+    if len(candidate_success) < len(control_success):
+        failures.append("candidate validation success is below control")
+    if gained_minus_lost < 0:
+        failures.append("validation gained-minus-lost is below zero")
+    return {
+        "passed": not failures,
+        "gained": gained,
+        "retained": retained,
+        "lost": lost,
+        "gained_minus_lost": gained_minus_lost,
+        "failures": failures,
+    }
+
+
+def audit_validation(path: Path = VALIDATION_AUDIT_PATH) -> dict[str, Any]:
+    validate_validation_manifest()
+    mechanism_audit = _require_immutable_pass_artifact(
+        MECHANISM_AUDIT_V2_PATH, MECHANISM_AUDIT_V2_SHA256
+    )
+    dev_b_audit = _require_immutable_pass_artifact(
+        DEV_B_AUDIT_PATH, DEV_B_AUDIT_SHA256
+    )
+    evidence = [_job_evidence(job) for job in build_jobs(VALIDATION_LEVEL)]
+    control = next(item for item in evidence if item["formal_label"] == profiles()[0]["label"])
+    candidate = next(item for item in evidence if item["formal_label"] == profiles()[2]["label"])
+    control_success = {
+        int(task) for task, outcome in control["outcomes"].items() if outcome == "success"
+    }
+    candidate_success = {
+        int(task) for task, outcome in candidate["outcomes"].items() if outcome == "success"
+    }
+    target_gate = validation_target_gate(
+        control_success=control_success, candidate_success=candidate_success
+    )
+    failures = list(target_gate["failures"])
+    for item in evidence:
+        if item["valid"] is not True:
+            failures.append(
+                f"invalid validation job {item['formal_label']}: {item['failure_reason']}"
+            )
+        if item["credential_audit"]["passed"] is not True:
+            failures.append(f"credential audit failed for {item['formal_label']}")
+        mechanism = _mechanism_checks(
+            item,
+            next(
+                profile
+                for profile in profiles()
+                if profile["label"] == item["formal_label"]
+            ),
+        )
+        item["mechanism_gate"] = mechanism
+        failures.extend(
+            f"{item['formal_label']}: {failure}"
+            for failure in mechanism["failures"]
+        )
+
+    resolution_by_task: dict[str, float | None] = {}
+    for task in VALIDATION_TASKS:
+        values = [
+            float(value)
+            for record in candidate["metrics"]
+            if record.get("task_id") == task
+            for value in record.get("qd_partition_resolution_improvement_by_iter", [])
+            if isinstance(value, (int, float)) and math.isfinite(float(value))
+        ]
+        resolution_by_task[str(task)] = median(values)
+    mechanism_support = sum(
+        value is not None and value >= 0.20 for value in resolution_by_task.values()
+    )
+    if mechanism_support < 7:
+        failures.append("online resolution support is below 7/10 validation tasks")
+    post_overflow_p95 = percentile(
+        _metric_values(candidate["metrics"], "qd_descriptor_overflow_ratio_by_iter"),
+        0.95,
+    )
+    raw_overflow_p95 = percentile(
+        _metric_values(
+            candidate["metrics"], "qd_raw_initial_bounds_overflow_ratio_by_iter"
+        ),
+        0.95,
+    )
+    if post_overflow_p95 is None or post_overflow_p95 > 0.25:
+        failures.append("candidate post-envelope overflow P95 exceeds 0.25")
+    if raw_overflow_p95 is None:
+        failures.append("candidate raw initial-bound overflow telemetry is missing")
+
+    control_safety = control["failure_classification_by_task"]
+    candidate_safety = candidate["failure_classification_by_task"]
+    collision_categories = {
+        "target pushed away",
+        "target dropped after grasp",
+        "basket displaced/collision",
+        "clutter swept/wrong-object interaction",
+    }
+    control_collision_count = sum(
+        value in collision_categories for value in control_safety.values()
+    )
+    candidate_collision_count = sum(
+        value in collision_categories for value in candidate_safety.values()
+    )
+    candidate_qpos_count = sum(
+        value == "qpos/execution error" for value in candidate_safety.values()
+    )
+    if candidate_collision_count > control_collision_count:
+        failures.append("candidate collision/push/drop/wrong-object count exceeds control")
+    if candidate_qpos_count or candidate["telemetry_counts"]["execution_qpos_error_episodes"]:
+        failures.append("candidate has a qpos/execution error")
+
+    archive_by_task: dict[str, dict[str, float | None]] = {}
+    for task in VALIDATION_TASKS:
+        records = [
+            record for record in candidate["metrics"] if record.get("task_id") == task
+        ]
+        occupied_ratios: list[float] = []
+        spreads: list[float] = []
+        for record in records:
+            occupied = record.get("qd_occupied_cells_by_iter")
+            initial_occupied = record.get("qd_initial_occupied_cells")
+            if (
+                isinstance(occupied, list)
+                and occupied
+                and isinstance(occupied[-1], (int, float))
+                and isinstance(initial_occupied, (int, float))
+                and float(initial_occupied) > 0
+            ):
+                occupied_ratios.append(float(occupied[-1]) / float(initial_occupied))
+            spread = record.get("qd_archive_endpoint_xy_spread_m_by_iter")
+            if isinstance(spread, list) and spread and isinstance(spread[-1], (int, float)):
+                spreads.append(float(spread[-1]))
+        archive_by_task[str(task)] = {
+            "final_occupied_mode_ratio_median": median(occupied_ratios),
+            "archive_endpoint_spread_median_m": median(spreads),
+        }
+        if (
+            archive_by_task[str(task)]["final_occupied_mode_ratio_median"] is None
+            or archive_by_task[str(task)]["final_occupied_mode_ratio_median"] <= 0
+            or archive_by_task[str(task)]["archive_endpoint_spread_median_m"] is None
+            or archive_by_task[str(task)]["archive_endpoint_spread_median_m"] <= 0
+        ):
+            failures.append(f"task {task} archive mode/spread is nonfinite or collapsed")
+
+    candidate_latency = percentile(
+        _metric_values(candidate["metrics"], "select_action_latency_s"), 0.95
+    )
+    reference_latency = mechanism_audit.get("sparse_reference_selection_latency_p95_s")
+    latency_ratio = (
+        candidate_latency / float(reference_latency)
+        if candidate_latency is not None
+        and isinstance(reference_latency, (int, float))
+        and float(reference_latency) > 0
+        else None
+    )
+    if latency_ratio is None or latency_ratio > 1.25:
+        failures.append("candidate validation selection latency exceeds sparse reference 1.25x")
+
+    status = _status_summary()
+    previous_gpu_hours = dev_b_audit.get("cumulative_gpu_hours")
+    cumulative_gpu_hours = (
+        float(previous_gpu_hours) + float(status["gpu_hours"])
+        if isinstance(previous_gpu_hours, (int, float))
+        and isinstance(status.get("gpu_hours"), (int, float))
+        else None
+    )
+    if cumulative_gpu_hours is None or cumulative_gpu_hours > GPU_HOUR_CAP:
+        failures.append("actual cumulative GPU-hours exceed or cannot verify 48-hour cap")
+    attempts = attempt_ledger_audit(
+        {
+            MECHANISM_PREFLIGHT_LEVEL,
+            DEV_A_LEVEL,
+            DEV_B_LEVEL,
+            VALIDATION_LEVEL,
+        }
+    )
+    if not attempts["passed"]:
+        failures.extend(attempts["failures"])
+    run_root_credential_audit = credential_tree_audit(RUN_ROOT)
+    if not run_root_credential_audit["passed"]:
+        failures.extend(run_root_credential_audit["failures"])
+    payload = {
+        "schema": "eds-qd-autoresearch-validation-audit-v1",
+        "created_at": now(),
+        "jobs": [
+            {key: value for key, value in item.items() if key != "metrics"}
+            for item in evidence
+        ],
+        "task_matrix": {
+            "control_success_tasks": sorted(control_success),
+            "candidate_success_tasks": sorted(candidate_success),
+            **{key: target_gate[key] for key in ("gained", "retained", "lost")},
+        },
+        "target_gate": target_gate,
+        "resolution_by_task": resolution_by_task,
+        "mechanism_support_task_count": mechanism_support,
+        "candidate_raw_initial_bounds_overflow_p95": raw_overflow_p95,
+        "candidate_post_envelope_overflow_p95": post_overflow_p95,
+        "archive_by_task": archive_by_task,
+        "safety": {
+            "control_failure_classification_by_task": control_safety,
+            "candidate_failure_classification_by_task": candidate_safety,
+            "control_collision_push_drop_wrong_object_count": control_collision_count,
+            "candidate_collision_push_drop_wrong_object_count": candidate_collision_count,
+            "candidate_qpos_error_count": candidate_qpos_count,
+        },
+        "candidate_selection_latency_p95_s": candidate_latency,
+        "sparse_preflight_selection_latency_p95_s": reference_latency,
+        "candidate_to_sparse_selection_latency_ratio": latency_ratio,
+        "status": status,
+        "prior_cumulative_gpu_hours": previous_gpu_hours,
+        "cumulative_gpu_hours": cumulative_gpu_hours,
+        "attempt_ledger": attempts,
+        "run_root_credential_audit": run_root_credential_audit,
+        "hard_failures": list(dict.fromkeys(failures)),
+        "passed": not failures,
+    }
+    if contains_credential(payload):
+        raise RuntimeError("validation audit contains credential material")
+    _write_json(path, payload)
+    return payload
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -1976,14 +2371,21 @@ def main() -> int:
     subparsers.add_parser("offline-preflight")
     subparsers.add_parser("freeze-manifest")
     subparsers.add_parser("freeze-dev-b-manifest")
+    subparsers.add_parser("freeze-validation-manifest")
     subparsers.add_parser("matrix")
-    for name in ("run-mechanism-preflight", "run-dev-a", "run-dev-b"):
+    for name in (
+        "run-mechanism-preflight",
+        "run-dev-a",
+        "run-dev-b",
+        "run-validation",
+    ):
         command = subparsers.add_parser(name)
         command.add_argument("--gpus", default="auto")
         command.add_argument("--timeout-seconds", type=int, default=28800)
     subparsers.add_parser("audit-mechanism-preflight")
     subparsers.add_parser("audit-dev-a")
     subparsers.add_parser("audit-dev-b")
+    subparsers.add_parser("audit-validation")
     args = parser.parse_args()
     if args.command == "storage-preflight":
         print(json.dumps(storage_preflight(), indent=2))
@@ -1998,6 +2400,9 @@ def main() -> int:
     if args.command == "freeze-dev-b-manifest":
         print(json.dumps(freeze_dev_b_manifest(), indent=2))
         return 0
+    if args.command == "freeze-validation-manifest":
+        print(json.dumps(freeze_validation_manifest(), indent=2))
+        return 0
     if args.command == "matrix":
         print(
             json.dumps(
@@ -2005,6 +2410,7 @@ def main() -> int:
                     "mechanism_preflight": build_jobs(MECHANISM_PREFLIGHT_LEVEL, bind=False),
                     "dev_a": build_jobs(DEV_A_LEVEL, bind=False),
                     "dev_b": build_jobs(DEV_B_LEVEL, bind=False),
+                    "validation": build_jobs(VALIDATION_LEVEL, bind=False),
                 },
                 indent=2,
             )
@@ -2028,6 +2434,12 @@ def main() -> int:
             gpus=args.gpus,
             timeout_seconds=args.timeout_seconds,
         )
+    if args.command == "run-validation":
+        return run_phase(
+            VALIDATION_LEVEL,
+            gpus=args.gpus,
+            timeout_seconds=args.timeout_seconds,
+        )
     if args.command == "audit-mechanism-preflight":
         result = audit_mechanism_preflight()
         print(json.dumps(result, indent=2))
@@ -2036,7 +2448,11 @@ def main() -> int:
         result = audit_dev_a()
         print(json.dumps(result, indent=2))
         return 0 if result["passed"] else 1
-    result = audit_dev_b()
+    if args.command == "audit-dev-b":
+        result = audit_dev_b()
+        print(json.dumps(result, indent=2))
+        return 0 if result["passed"] else 1
+    result = audit_validation()
     print(json.dumps(result, indent=2))
     return 0 if result["passed"] else 1
 

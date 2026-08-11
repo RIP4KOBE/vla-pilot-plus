@@ -739,3 +739,12 @@
 - Implementation：只允许 dedicated runner/tests；algorithm four hashes冻结。Implementation commit 后新冻 `validation_manifest.json`，`formal_authorized=false`。
 - Budget：新增 effective/unique cells 20，预计 global effective 42 / reservations 54；按 Dev-B 比例约新增 `~2.09 GPU-hours`，projected total `~3.28/48`。
 - Decision：PASS 仅冻结 single validation winner 并授权新 formal protocol；FAIL 则 `CONCLUDE_VALIDATION_NO_FORMAL`。当前 formal 0。
+
+#### AC. Validation runner implementation 与 tests
+
+- Protocol-first：v11 commit `4b9c72c0eec68538839195a181bd5128b44ab4d7` 早于 runner/tests 修改。
+- TDD：新增 validation level/matrix/target/manifest/pre-gate/real-binder tests 后 `5 failed, 10 passed`；实现后 dedicated `16 passed in 1.59s`，py_compile PASS。
+- Frozen regression：九文件 suite `789 passed in 88.75s`。
+- Runner：新增 exact 10-task validation seeds、20-cell versioned manifest、Dev-B PASS pre-gate、10-episode run count、`>=5/10`/not-below-control/7-of-10 mechanism/safety/latency/accounting/budget audit；无 formal command。
+- Algorithm freeze：四个 algorithm/config hashes 与 v9/v11 完全一致；算法 iteration 仍 1。
+- 当前无 validation manifest/attempt/GPU/task/formal。下一步从 committed implementation freeze manifest；未冻结不 dispatch。

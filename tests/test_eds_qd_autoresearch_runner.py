@@ -47,6 +47,7 @@ def test_phase_matrices_are_exact_and_have_no_formal_phase():
     preflight = runner.build_jobs(runner.MECHANISM_PREFLIGHT_LEVEL, bind=False)
     dev_a = runner.build_jobs(runner.DEV_A_LEVEL, bind=False)
     dev_b = runner.build_jobs(runner.DEV_B_LEVEL, bind=False)
+    validation = runner.build_jobs(runner.VALIDATION_LEVEL, bind=False)
 
     assert [job["formal_label"] for job in preflight] == [
         "p2_stage_on_abs_rbf_control",
@@ -73,6 +74,16 @@ def test_phase_matrices_are_exact_and_have_no_formal_phase():
     assert all(
         job["episode_seeds"] == [558482, 165717, 160148, 160312]
         for job in dev_b
+    )
+    assert [job["formal_label"] for job in validation] == [
+        "p2_stage_on_abs_rbf_control",
+        "eds_quality_diversity_sparse_causal_envelope_v1",
+    ]
+    assert all(job["task_ids_filter"] == list(range(10)) for job in validation)
+    assert all(
+        job["episode_seeds"]
+        == [41678, 829779, 856474, 666150, 876784, 652882, 288157, 522484, 262295, 200894]
+        for job in validation
     )
     with pytest.raises(ValueError, match="phase"):
         runner.build_jobs("formal", bind=False)
@@ -294,6 +305,99 @@ def test_dev_b_job_binding_uses_the_versioned_manifest(tmp_path, monkeypatch):
 
     assert bound["manifest_path"] == str(dev_b.resolve())
     assert bound["manifest_sha256"] == runner.sha256_path(dev_b)
+    assert bound["execution_record"]["code_state_sha256"]
+    assert bound["config_fingerprint"]
+
+
+def test_validation_target_gate_requires_five_and_not_below_control():
+    runner = _load_runner()
+
+    passed = runner.validation_target_gate(
+        control_success={0, 1, 2, 3},
+        candidate_success={0, 1, 2, 3, 4},
+    )
+    assert passed == {
+        "passed": True,
+        "gained": [4],
+        "retained": [0, 1, 2, 3],
+        "lost": [],
+        "gained_minus_lost": 1,
+        "failures": [],
+    }
+
+    below_target = runner.validation_target_gate(
+        control_success=set(), candidate_success={0, 1, 2, 3}
+    )
+    assert below_target["passed"] is False
+    assert "candidate validation success is below 5/10" in below_target["failures"]
+
+    below_control = runner.validation_target_gate(
+        control_success={0, 1, 2, 3, 4, 5},
+        candidate_success={0, 1, 2, 3, 4},
+    )
+    assert below_control["passed"] is False
+    assert "candidate validation success is below control" in below_control["failures"]
+
+
+def test_validation_manifest_payload_forbids_formal_and_binds_dev_b():
+    runner = _load_runner()
+    jobs = runner.build_jobs(runner.VALIDATION_LEVEL, bind=False)
+
+    payload = runner._validation_manifest_payload(
+        provenance={"code_commit": "implementation", "code_state_sha256": "state"},
+        storage={"passed": True},
+        runtime_cache_sha256="cache",
+        checkpoint={"aggregate_sha256": "checkpoint"},
+        libero_inputs={"aggregate_sha256": "libero"},
+        algorithm_source_fingerprints=runner.DEV_B_ALGORITHM_SOURCE_SHA256,
+        jobs=jobs,
+    )
+
+    assert payload["formal_authorized"] is False
+    assert payload["validation"]["tasks"] == list(range(10))
+    assert payload["validation"]["seeds"] == runner.VALIDATION_SEEDS
+    assert payload["validation"]["unique_cells"] == 20
+    assert payload["parent_evidence"]["dev_b_audit_sha256"] == runner.DEV_B_AUDIT_SHA256
+
+
+def test_run_validation_requires_manifest_before_credential(tmp_path, monkeypatch):
+    runner = _load_runner()
+    run_manifest = tmp_path / "run_manifest.json"
+    run_manifest.write_text("{}\n", encoding="utf-8")
+    run_manifest.chmod(0o444)
+    offline = tmp_path / "offline.json"
+    offline.write_text('{"passed": true}\n', encoding="utf-8")
+    monkeypatch.setattr(runner, "RUN_MANIFEST_PATH", run_manifest)
+    monkeypatch.setattr(runner, "OFFLINE_PREFLIGHT_PATH", offline)
+    monkeypatch.setattr(runner, "VALIDATION_MANIFEST_PATH", tmp_path / "missing.json")
+    monkeypatch.setattr(runner, "pause_preflight", lambda *args, **kwargs: None)
+    monkeypatch.setattr(runner, "storage_preflight", lambda *args, **kwargs: {"passed": True})
+    monkeypatch.setattr(
+        runner,
+        "_require_immutable_pass_artifact",
+        lambda *args, **kwargs: {"passed": True},
+    )
+    monkeypatch.setattr(
+        runner,
+        "validate_credential",
+        lambda: pytest.fail("credential validation ran before validation manifest gate"),
+    )
+
+    with pytest.raises(RuntimeError, match="immutable validation manifest"):
+        runner.run_phase(runner.VALIDATION_LEVEL, gpus="auto", timeout_seconds=1)
+
+
+def test_validation_job_binding_uses_validation_manifest(tmp_path, monkeypatch):
+    runner = _load_runner()
+    manifest = tmp_path / "validation_manifest.json"
+    manifest.write_text('{"formal_authorized": false}\n', encoding="utf-8")
+    manifest.chmod(0o444)
+    monkeypatch.setattr(runner, "VALIDATION_MANIFEST_PATH", manifest)
+
+    bound = runner.build_jobs(runner.VALIDATION_LEVEL)[0]
+
+    assert bound["manifest_path"] == str(manifest.resolve())
+    assert bound["manifest_sha256"] == runner.sha256_path(manifest)
     assert bound["execution_record"]["code_state_sha256"]
     assert bound["config_fingerprint"]
 
