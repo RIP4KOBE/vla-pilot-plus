@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+from contextlib import nullcontext
 from pathlib import Path
 
 import pytest
@@ -46,6 +47,7 @@ def test_phase_matrices_are_exact_and_have_no_formal_phase():
     runner = _load_runner()
     preflight = runner.build_jobs(runner.MECHANISM_PREFLIGHT_LEVEL, bind=False)
     dev_a = runner.build_jobs(runner.DEV_A_LEVEL, bind=False)
+    dev_b = runner.build_jobs(runner.DEV_B_LEVEL, bind=False)
 
     assert [job["formal_label"] for job in preflight] == [
         "p2_stage_on_abs_rbf_control",
@@ -63,6 +65,15 @@ def test_phase_matrices_are_exact_and_have_no_formal_phase():
     assert all(
         job["episode_seeds"] == [512905, 150741, 463456, 452903]
         for job in dev_a
+    )
+    assert [job["formal_label"] for job in dev_b] == [
+        "p2_stage_on_abs_rbf_control",
+        "eds_quality_diversity_sparse_causal_envelope_v1",
+    ]
+    assert all(job["task_ids_filter"] == [3, 5, 8, 9] for job in dev_b)
+    assert all(
+        job["episode_seeds"] == [558482, 165717, 160148, 160312]
+        for job in dev_b
     )
     with pytest.raises(ValueError, match="phase"):
         runner.build_jobs("formal", bind=False)
@@ -158,8 +169,11 @@ def test_artifact_and_credential_audits_fail_closed(tmp_path, monkeypatch):
     root = tmp_path / "artifacts"
     root.mkdir()
     (root / "safe.json").write_text('{"ok": true}\n', encoding="utf-8")
+    (root / "prompt.txt").write_text(
+        "CRITICAL - Task-Specific Guidance Patterns\n", encoding="utf-8"
+    )
     inventory = runner.artifact_inventory(root)
-    assert inventory["file_count"] == 1
+    assert inventory["file_count"] == 2
     assert runner.credential_tree_audit(root)["passed"] is True
 
     monkeypatch.setenv("OPENAI_API_KEY", "unit-test-secret-value")
@@ -170,6 +184,121 @@ def test_artifact_and_credential_audits_fail_closed(tmp_path, monkeypatch):
     link.symlink_to(root / "safe.json")
     with pytest.raises(RuntimeError, match="symlinked"):
         runner.artifact_inventory(root)
+
+
+def test_dev_b_target_gate_requires_replicated_success_and_zero_loss():
+    runner = _load_runner()
+
+    passed = runner.dev_b_target_gate(
+        control_success=set(),
+        candidate_success={9},
+        dev_a_task_matrix={"gained": [9], "lost": []},
+    )
+    assert passed == {
+        "passed": True,
+        "gained": [9],
+        "retained": [],
+        "lost": [],
+        "pooled_gained_minus_lost": 2,
+        "failures": [],
+    }
+
+    tied = runner.dev_b_target_gate(
+        control_success=set(),
+        candidate_success=set(),
+        dev_a_task_matrix={"gained": [9], "lost": []},
+    )
+    assert tied["passed"] is False
+    assert "candidate success is not control +1" in tied["failures"]
+
+    lost = runner.dev_b_target_gate(
+        control_success={8},
+        candidate_success={9},
+        dev_a_task_matrix={"gained": [9], "lost": []},
+    )
+    assert lost["passed"] is False
+    assert lost["lost"] == [8]
+
+
+def test_dev_b_manifest_payload_binds_pass_evidence_and_forbids_formal():
+    runner = _load_runner()
+    jobs = runner.build_jobs(runner.DEV_B_LEVEL, bind=False)
+
+    payload = runner._dev_b_manifest_payload(
+        provenance={"code_commit": "implementation", "code_state_sha256": "state"},
+        storage={"passed": True},
+        runtime_cache_sha256="cache",
+        checkpoint={"aggregate_sha256": "checkpoint"},
+        libero_inputs={"aggregate_sha256": "libero"},
+        algorithm_source_fingerprints=runner.DEV_B_ALGORITHM_SOURCE_SHA256,
+        jobs=jobs,
+    )
+
+    assert payload["formal_authorized"] is False
+    assert payload["parent_evidence"] == {
+        "original_run_manifest_sha256": runner.ORIGINAL_RUN_MANIFEST_SHA256,
+        "mechanism_audit_v2_sha256": runner.MECHANISM_AUDIT_V2_SHA256,
+        "dev_a_audit_v2_sha256": runner.DEV_A_AUDIT_V2_SHA256,
+    }
+    assert payload["dev_b"]["tasks"] == [3, 5, 8, 9]
+    assert payload["dev_b"]["seeds"] == [558482, 165717, 160148, 160312]
+    assert payload["dev_b"]["unique_cells"] == 8
+    assert payload["algorithm_source_fingerprints"] == runner.DEV_B_ALGORITHM_SOURCE_SHA256
+
+
+def test_run_dev_b_requires_manifest_before_credential_or_admission(
+    tmp_path, monkeypatch
+):
+    runner = _load_runner()
+    run_manifest = tmp_path / "run_manifest.json"
+    run_manifest.write_text("{}\n", encoding="utf-8")
+    run_manifest.chmod(0o444)
+    offline = tmp_path / "offline.json"
+    offline.write_text('{"passed": true}\n', encoding="utf-8")
+    missing_dev_b_manifest = tmp_path / "dev_b_manifest.json"
+    monkeypatch.setattr(runner, "RUN_MANIFEST_PATH", run_manifest)
+    monkeypatch.setattr(runner, "OFFLINE_PREFLIGHT_PATH", offline)
+    monkeypatch.setattr(runner, "DEV_B_MANIFEST_PATH", missing_dev_b_manifest)
+    monkeypatch.setattr(runner, "pause_preflight", lambda *args, **kwargs: None)
+    monkeypatch.setattr(runner, "storage_preflight", lambda *args, **kwargs: {"passed": True})
+    monkeypatch.setattr(
+        runner,
+        "_require_immutable_pass_artifact",
+        lambda *args, **kwargs: {"passed": True},
+    )
+    monkeypatch.setattr(
+        runner,
+        "validate_credential",
+        lambda: pytest.fail("credential validation ran before the Dev-B manifest gate"),
+    )
+
+    with pytest.raises(RuntimeError, match="immutable Dev-B manifest"):
+        runner.run_phase(runner.DEV_B_LEVEL, gpus="auto", timeout_seconds=1)
+
+
+def test_dev_b_job_binding_uses_the_versioned_manifest(tmp_path, monkeypatch):
+    runner = _load_runner()
+    original = tmp_path / "run_manifest.json"
+    original.write_text("{}\n", encoding="utf-8")
+    original.chmod(0o444)
+    dev_b = tmp_path / "dev_b_manifest.json"
+    dev_b.write_text('{"formal_authorized": false}\n', encoding="utf-8")
+    dev_b.chmod(0o444)
+    monkeypatch.setattr(runner, "RUN_MANIFEST_PATH", original)
+    monkeypatch.setattr(runner, "DEV_B_MANIFEST_PATH", dev_b)
+    monkeypatch.setattr(runner, "configured_base", lambda: nullcontext())
+    monkeypatch.setattr(runner.base, "_git_head_revision", lambda: "revision")
+    monkeypatch.setattr(runner.base, "_p2_code_state_sha256", lambda: "code-state")
+    monkeypatch.setattr(
+        runner.base,
+        "_bind_p2_execution_context",
+        lambda job, **kwargs: job,
+    )
+
+    bound = runner._bind_job({"level": runner.DEV_B_LEVEL})
+
+    assert bound["manifest_path"] == str(dev_b.resolve())
+    assert bound["manifest_sha256"] == runner.sha256_path(dev_b)
 
 
 def test_gpu_admission_uses_only_idle_authorized_indices():

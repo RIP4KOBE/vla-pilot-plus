@@ -673,3 +673,13 @@
 - Manifest：implementation/test commit 后冻结新 `dev_b_manifest.json`，绑定 original manifest、mechanism/Dev-A v2、algorithm blobs、checkpoint/LIBERO/cache/matrix/caps，`formal_authorized=false`。
 - Budget projection：新增 unique/effective cells 8，预计 reservations 34、effective cells 22；按 Dev-A device wall 估计新增约 `0.445 GPU-hours`，总计约 `1.215/48`。
 - Decision boundary：PASS 仅授权新 validation protocol；FAIL 则 revert causal-envelope 并 outer-loop，不能相邻调参。当前无 validation/formal authorization。
+
+#### V. Dev-B runner implementation 与 tests
+
+- Protocol-first：v9 commit `9664b9259373897fdeadd7b1963d8e1a00353dd6` 早于 runner/tests 修改。
+- TDD 红灯：新增 matrix、strict credential、target gate、manifest 与 pre-reservation/binding tests 后为 `4 failed, 6 passed`，失败准确对应缺少 Dev-B level/target/manifest API 和旧 `Task-Specific` 误报。
+- TDD 绿灯：dedicated runner tests `12 passed in 1.22s`；py_compile PASS；冻结九文件 suite `785 passed in 75.95s`。
+- Runner change：新增 Dev-B level/seeds、versioned manifest freeze/validation、Dev-A PASS pre-gate、Dev-B CLI、target/pooled/mechanism/safety/latency/accounting/budget audit；Dev-B jobs 绑定新 manifest。没有 validation/formal command。
+- Credential fix：canonical detector 只匹配 present environment secret equality、standalone long `sk-` token、长 API assignment 或 Bearer；普通 `Task-Specific` 不再误报，真实长 token test 仍 fail closed。
+- Algorithm freeze verification：`qd_ed.py 1516bb75…70b9`、`rdt_policy_steer.py b8806d7a…c1ff2`、`eds_eval_metrics.py d8fb4d04…429`、`config.yaml b20791a2…daf8` 全部不变；算法 iteration 仍为 1。
+- 当前无新 artifact/attempt/GPU/task/formal 结果。下一步：提交 implementation/state 后，从该 exact commit 冻结 immutable Dev-B manifest；未冻结前不得 dispatch。

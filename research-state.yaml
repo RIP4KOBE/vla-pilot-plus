@@ -5,7 +5,7 @@ project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
   status: active
-  phase: inner_loop_qd1_dev_b_protocol_locked
+  phase: inner_loop_qd1_dev_b_implemented_manifest_pending
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: false
@@ -108,7 +108,7 @@ literature:
 hypotheses:
   - id: H1
     statement: "The initial-population endpoint-XY bounds make later offspring overflow into edge cells, saturating occupancy and erasing behavior resolution; a physically calibrated or overflow-aware descriptor partition will reduce overflow while preserving task-relevant modes."
-    status: qd1_causal_envelope_dev_b_protocol_locked
+    status: qd1_causal_envelope_dev_b_implemented
     motivation: "Historical valid QD profiles have median coverage 1.0 but overflow P95 0.938-1.0 and zero paired coverage gain."
     parent: null
     priority: high
@@ -193,7 +193,7 @@ experiments:
     scope_level: QD-1
     hypothesis_id: H1
     label: CONFIRMATORY
-    status: DEV_B_PROTOCOL_LOCKED
+    status: DEV_B_IMPLEMENTED_MANIFEST_PENDING
     target_gap_before: 3
     historical_best_success_count: 2
     online_unique_cells_reserved: 14
@@ -306,13 +306,18 @@ experiments:
     dev_a_audit_v2_hard_failures: 0
     dev_a_target_gate: "candidate 1/4 vs control 0/4; gained task 9; zero lost"
     decision: KEEP_AND_AUTHORIZE_DEV_B_PROTOCOL
-    dev_b_status: PROTOCOL_LOCKED_IMPLEMENTATION_PENDING
+    dev_b_status: IMPLEMENTED_TESTS_PASS_MANIFEST_PENDING
     dev_b_protocol: "experiments/run_010_causal_envelope_candidate/protocol-v9.md"
-    dev_b_protocol_commit: pending_this_commit
+    dev_b_protocol_commit: "9664b9259373897fdeadd7b1963d8e1a00353dd6"
     dev_b_tasks: [3, 5, 8, 9]
     dev_b_seeds: [558482, 165717, 160148, 160312]
     dev_b_unique_cells: 8
     dev_b_algorithm_change_authorized: false
+    dev_b_tdd_red_result: "4 failed, 6 passed"
+    dev_b_dedicated_test_result: "12 passed in 1.22s"
+    dev_b_regression_test_result: "785 passed in 75.95s"
+    dev_b_algorithm_hashes_verified_unchanged: true
+    dev_b_implementation_commit: pending_this_commit
 
 outer_loop:
   cycle: 1
