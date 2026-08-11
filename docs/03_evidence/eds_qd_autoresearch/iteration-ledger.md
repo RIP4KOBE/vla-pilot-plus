@@ -788,3 +788,13 @@
 - Isolation boundary：validation seeds 已揭示。任何现在基于结果修改的 H2/H3/H4 candidate 均不能复用它们；没有新的 holdout seeds/预算/design authorization 时无法生成 formal-eligible winner。此边界比剩余 GPU/attempt budget优先。
 - Protocol-first：新增 `protocol-v12.md`，在 cycle decision manifest/final report 前冻结：0 algorithm/config/GPU/API/LIBERO/attempt/formal；只允许 evidence freeze、final reporting 与 strict scans。
 - Direction：`CONCLUDE_NO_ADOPTION_WITHIN_FROZEN_CYCLE_REQUEST_VERSIONED_REDESIGN`。未来最有依据的 redesign proposal 是 H2 QD quality/replacement/final-selection calibration，但必须新设计、新 leakage-safe holdout seeds、明确预算和用户批准；当前不执行。
+
+#### AH. Cycle decision freeze and final handoff
+
+- Protocol/result order：validation result commit `eca85e69504cb4240e8b059f65f6237d4fb54272` 先于 conclusion protocol commit `028e3029ee13a7139b5508d250ec9e9947334b80`；v12 又先于 decision manifest/report。没有 post-validation algorithm/config change 或 episode。
+- Immutable decision：`manifests/cycle_decision_manifest.json`，mode 0444，size 5,263 bytes，SHA-256 `dc443cea6baa1194aead93b289a5aef36dde67de54114aa017c53b25727b06a0`。绑定 frozen design、v11/v12、implementation/code-state/result commit、四个 algorithm hashes、validation/mechanism/Dev audits、task matrix、attempt/GPU-hour、formal=0、write boundary 与 credential=false。
+- Final objective：未达成。Candidate validation `1/10`，gap 4；historical formal best/gap `2/10 / 3`，因为 formal 正确未运行。Mechanism 10/10 PASS 不能覆盖 target FAIL。
+- Budget final：42 effective online episodes，54 total reservations，`2.934767/48 GPU-hours`，formal episodes 0。剩余预算不授权突破 holdout isolation。
+- Reports：`docs/03_evidence/eds_qd_autoresearch/2026-08-11-eds-qd-autoresearch-final-report.md`，SHA `6bce8c7b…a54858d`；`to_human/progress-002.html`，SHA `3c0efdbd…f294af`。Canonical ledger 本文保留全部算法改动、protocol/result、task-level outcome、failure、GPU、artifact/hash 与 decision。
+- Workspace：所有 code/docs 修改仅当前 branch/worktree；large artifacts 仅 owned root；protected `docs/01_specs/2026-08-10-eds-qd-stage-guidance-transition-design.md` 保持 untracked、未修改、未 stage/commit；历史 worktree/shared2 只读。
+- Final state：`concluded_no_adoption_current_cycle`，GPU/formal execution disabled。未来若要继续，必须显式批准 versioned redesign：新 validation holdout、新预算，并限定 H2 QD quality/replacement/final-selection；不得复用已揭示 validation 做 tuning。

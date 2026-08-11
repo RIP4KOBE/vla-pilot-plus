@@ -60,6 +60,7 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 13. Causal-envelope QD produced a paired full-episode gain on task 9 under a new seed while control failed all four Dev-A tasks; this is target-linked evidence, but a single split success is not sufficient to predict 5/10 formal acceptance.
 14. Independent Dev-B replicated and strengthened the task advantage on different seeds (2/4 vs 0/4), with different gained tasks 5/8 and no losses. The cross-split direction now supports full ten-task validation without changing the candidate.
 15. Perfectly activating the intended QD partition mechanism does not imply success transfer: all ten validation tasks showed resolution improvement, yet only task 0 succeeded and none of the three development gains replicated. Endpoint partition saturation was real but was not the dominant completion bottleneck.
+16. The next evidence-supported QD question is quality rather than partition size: reward-only cell elitism and archive-global final selection remain unchanged after H1. This is a redesign hypothesis, not an authorized inference from validation task identities.
 
 ## Lessons and Constraints
 
@@ -81,7 +82,10 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 - Is cross-chunk discontinuity a cause of timeout, or merely correlated with harder episodes?
 - Which development/validation seeds provide representative but leakage-safe promotion evidence?
 - Do high-reward archive cells produce better offspring than quality-blind or inverse-visitation slots on saved traces, and what is the smallest fixed-budget reserve justified by that counterfactual?
+- Under a new leakage-safe design, can observation-derived progress calibrate QD replacement/final selection without privileged evaluator input or extra model calls?
 
 ## Optimization Trajectory
 
 `run_000_baseline_replay` ruled out direct compute scaling; `run_001_allocation_ecology_diagnostic` ended invalid; `run_002_partition_diagnostic` supported H1 offline; and `run_010` algorithm iteration 1 passed mechanism/Dev-A/Dev-B but failed validation at 1/10 versus the 5/10 target. The historical formal best remains 2/10 and formal target gap remains 3 because formal was correctly not run; the candidate's observed validation gap is 4. The fixed validation set is now exposed, so outer-loop cycle 2 must conclude this frozen cycle or request a versioned redesign with new holdout seeds.
+
+Outer-loop cycle 2 selected `CONCLUDE_NO_ADOPTION_WITHIN_FROZEN_CYCLE_REQUEST_VERSIONED_REDESIGN`. Execution is disabled; the only proposed future direction is H2 QD quality/replacement/final selection under a new design and holdout, not continued exploration on this cycle.

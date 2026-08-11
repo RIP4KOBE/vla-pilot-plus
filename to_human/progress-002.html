@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EDS-QD Autoresearch — Cycle 2</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; color: #17202a; }
+    h1, h2 { color: #14324b; }
+    .decision { border-left: 6px solid #b03a2e; background: #fbeee6; padding: 14px 18px; }
+    table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+    th, td { border: 1px solid #ccd1d1; padding: 9px; text-align: left; }
+    th { background: #eaf2f8; }
+    .bar { display: inline-block; height: 14px; background: #2e86c1; vertical-align: middle; margin-right: 8px; }
+    code { background: #f4f6f7; padding: 2px 5px; }
+  </style>
+</head>
+<body>
+  <h1>EDS-QD Autoresearch：当前冻结周期结束</h1>
+  <div class="decision"><strong>结论：</strong>validation candidate 1/10，低于 5/10；不运行 formal。当前周期 no-adoption，后续需 versioned redesign。</div>
+  <h2>成功率轨迹</h2>
+  <table>
+    <tr><th>证据层</th><th>Control</th><th>Candidate</th><th>解释</th></tr>
+    <tr><td>Dev-A</td><td><span class="bar" style="width:0"></span>0/4</td><td><span class="bar" style="width:25%"></span>1/4</td><td>gain task 9</td></tr>
+    <tr><td>Dev-B</td><td><span class="bar" style="width:0"></span>0/4</td><td><span class="bar" style="width:50%"></span>2/4</td><td>gains tasks 5,8</td></tr>
+    <tr><td>Validation</td><td><span class="bar" style="width:0"></span>0/10</td><td><span class="bar" style="width:10%"></span>1/10</td><td>gain task 0; target FAIL</td></tr>
+  </table>
+  <h2>关键结论</h2>
+  <ul>
+    <li>H1 mechanism：10/10 tasks 支持，post-overflow 0。</li>
+    <li>Task objective：1/10，距离 gate 仍差 4。</li>
+    <li>Safety/accounting/credential/latency：全部 PASS。</li>
+    <li>预算：42 effective episodes，2.934767/48 GPU-hours，formal 0。</li>
+  </ul>
+  <p>下一候选不能复用已揭示 validation。若继续，需针对 H2 QD quality/replacement/final selection 新建设计、holdout seeds 和预算并获得批准。</p>
+</body>
+</html>
