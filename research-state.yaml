@@ -5,7 +5,7 @@ project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
   status: active
-  phase: inner_loop_qd1_dev_b_pass_validation_protocol_required
+  phase: inner_loop_qd1_validation_protocol_locked
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: false
@@ -108,7 +108,7 @@ literature:
 hypotheses:
   - id: H1
     statement: "The initial-population endpoint-XY bounds make later offspring overflow into edge cells, saturating occupancy and erasing behavior resolution; a physically calibrated or overflow-aware descriptor partition will reduce overflow while preserving task-relevant modes."
-    status: qd1_causal_envelope_dev_b_pass
+    status: qd1_causal_envelope_validation_protocol_locked
     motivation: "Historical valid QD profiles have median coverage 1.0 but overflow P95 0.938-1.0 and zero paired coverage gain."
     parent: null
     priority: high
@@ -193,7 +193,7 @@ experiments:
     scope_level: QD-1
     hypothesis_id: H1
     label: CONFIRMATORY
-    status: DEV_B_PASS_VALIDATION_PROTOCOL_REQUIRED
+    status: VALIDATION_PROTOCOL_LOCKED
     target_gap_before: 3
     historical_best_success_count: 2
     online_unique_cells_reserved: 14
@@ -355,6 +355,14 @@ experiments:
     dev_b_audit_mode: "0444"
     dev_b_audit_status: PASS
     decision: KEEP_AND_AUTHORIZE_NEW_VALIDATION_PROTOCOL
+    validation_status: PROTOCOL_LOCKED_IMPLEMENTATION_PENDING
+    validation_protocol: "experiments/run_010_causal_envelope_candidate/protocol-v11.md"
+    validation_protocol_commit: pending_this_commit
+    validation_tasks: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    validation_seeds: [41678, 829779, 856474, 666150, 876784, 652882, 288157, 522484, 262295, 200894]
+    validation_unique_cells: 20
+    validation_target_success_count: 5
+    validation_algorithm_change_authorized: false
 
 outer_loop:
   cycle: 1

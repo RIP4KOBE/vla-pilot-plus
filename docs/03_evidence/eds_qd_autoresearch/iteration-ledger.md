@@ -728,3 +728,14 @@
 - Immutable audit：`analysis/dev_b_audit.json`，mode 0444，size 361,566 bytes，SHA `7a73b3ae67d3980147bb48d14198b4de9cbabb14262c82effce656b3f91ff64f`；hard failures 0，strict credential scan 544 files / 0 failures。
 - Target impact：development direction连续两 split 正增益且零 loss，支持 candidate 可能缩小正式 gap；但 formal best/gap 仍 `2/10 / 3`，因为 development outcome 不替代 validation/formal。
 - Decision：`KEEP_AND_AUTHORIZE_NEW_VALIDATION_PROTOCOL`。Candidate code/config/threshold 必须保持不变；下一步 full 10-task independent validation paired control/candidate。当前 formal 仍未授权。
+
+#### AB. Full validation protocol v11
+
+- 状态：`VALIDATION_PROTOCOL_LOCKED`，任何 runner change/manifest/reservation/result 前提交。
+- 依据：Dev-A/Dev-B unchanged candidate 对 paired controls 分别 `1/4 vs 0/4`、`2/4 vs 0/4`，pooled gains tasks 9/5/8、zero losses。Validation 直接检验达到 5/10 的可迁移性。
+- Matrix：control/candidate × tasks 0–9 × seeds `[41678,829779,856474,666150,876784,652882,288157,522484,262295,200894]`，20 full episodes。
+- Goal gate：candidate 必须 validation `>=5/10`、不低于 control、gained-minus-lost >=0；否则不运行 formal。不能用 validation outcomes 调参后复用 split。
+- Mechanism/safety：resolution >=0.20 至少 7/10 tasks、post overflow <=0.25、archive noncollapse、latency <=1.25x、calls/accounting/safety/credential 全硬门。
+- Implementation：只允许 dedicated runner/tests；algorithm four hashes冻结。Implementation commit 后新冻 `validation_manifest.json`，`formal_authorized=false`。
+- Budget：新增 effective/unique cells 20，预计 global effective 42 / reservations 54；按 Dev-B 比例约新增 `~2.09 GPU-hours`，projected total `~3.28/48`。
+- Decision：PASS 仅冻结 single validation winner 并授权新 formal protocol；FAIL 则 `CONCLUDE_VALIDATION_NO_FORMAL`。当前 formal 0。
