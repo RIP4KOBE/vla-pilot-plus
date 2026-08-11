@@ -635,3 +635,11 @@
 - Frozen bindings：scientific revision/code-state `d018f8ac…991` / `3626b52b…9839c`；control/candidate config fingerprints `298badf2…0e0` / `65502f2a…df0`。
 - 已知 audit defect 前置关闭：execution 与 audit 都在 frozen revision；audit 复用 mechanism v2 已 PASS 的 strict credential predicate，不编辑 runtime cache，不改变任何科学 gate。
 - Target rule：candidate 必须 `>= control +1`、保留全部 control-success tasks、gained-minus-lost `>=1`；tie/proxy-only 必须 reject/revert。Dev-B、validation、formal 仍未授权。
+
+#### R. Dev-A pre-admission gate-path failure 与 v7 recovery
+
+- 首次 invocation 在 `1.5 s` 内由 frozen runner 本地抛出 `mechanism preflight did not pass`；原因是 `run_phase` 固定读取保留的 invalid v1 audit path，未读取 v5 生成的 immutable PASS v2。
+- Failure boundary：发生在 credential validation、API health、job build、GPU admission、attempt reservation、worker/episode 前。Attempt ledger 仍为 `5f497138…065c`；无 `dev_a__*` output 或 Dev-A GPU manifest；attempt/GPU/task/formal 增量全 0。
+- 分类：`INFRASTRUCTURE_FAILURE / PRE_ADMISSION_GATE_PATH`，不是 policy、task 或 candidate failure，不可用于优化。
+- Protocol-first：新增 v7，只允许一次 frozen process-local `MECHANISM_AUDIT_PATH → mechanism_preflight_audit.v2.json` 后调用 unchanged `run_phase`；v1/v2 均不覆盖，不改 source，不消费 same-cell recovery slot。
+- Target impact：best `2/10`、gap 3 不变；v6 全部 matrix、audit 与 target gate 继续生效。
