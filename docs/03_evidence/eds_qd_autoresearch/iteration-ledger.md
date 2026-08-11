@@ -643,3 +643,14 @@
 - 分类：`INFRASTRUCTURE_FAILURE / PRE_ADMISSION_GATE_PATH`，不是 policy、task 或 candidate failure，不可用于优化。
 - Protocol-first：新增 v7，只允许一次 frozen process-local `MECHANISM_AUDIT_PATH → mechanism_preflight_audit.v2.json` 后调用 unchanged `run_phase`；v1/v2 均不覆盖，不改 source，不消费 same-cell recovery slot。
 - Target impact：best `2/10`、gap 3 不变；v6 全部 matrix、audit 与 target gate 继续生效。
+
+#### S. Dev-A execution 结果与 audit v8 repair protocol
+
+- Execution：v7 process-local gate path 指向 immutable mechanism v2 后，health/admission PASS；GPU 0/1 执行 attempts 19–26，wrapper exit 0 / wall `909.1 s`。两个 job manifests 均 valid。
+- Task matrix：control tasks 3/5/8/9 = fail/fail/fail/fail（`0/4`）；candidate = fail/fail/fail/success（`1/4`）。Gained `[9]`、retained `[]`、lost `[]`；target gate 的 `candidate >= control+1`、零丢失、gained-minus-lost `+1` 均满足。
+- Failure analysis：两者 tasks 3/5/8 与 control task 9 均为 `timeout without completion`；candidate task 9 完成。无 collision/push/drop/wrong-object、qpos/execution、nonfinite、action-mask 或 fallback failure。不能从 timeout 标签臆测更细阶段原因。
+- QD mechanism：candidate resolution medians task 3/5/8/9 = `0.62347/0.65301/0.53008/0.49968`，4/4 >=0.20；raw/post overflow P95 `0.9375/0`；occupied-mode ratios `1.20/1.091/1.182/1.182`，archive spread medians `0.238/0.222/0.221/0.210 m`，无 collapse；latency ratio `0.96824`。
+- Accounting/budget：attempt audit expected/actual effective cells `14/14`、global reservations 26，PASS；Dev-A walls `736.411/864.636 s = 0.444735 GPU-hours`。Mechanism+Dev-A `0.746570`，含 pre-episode incident 总计 `0.770164/48 GPU-hours`。
+- Evidence：GPU admission `0bd1214c…1b1b`；attempt ledger `591be919…ade7`；run CSV `34482e0e…8280`。
+- 首次 Dev-A audit（INVALID）：`analysis/dev_a_audit.json`，size 361,984，SHA-256 `95d7d1fbb8fe0f076267cdc4af2aedcad8c7822be6128b53f948d7e8e23e3d4a`。唯一 hard failure 是其 internal `MECHANISM_AUDIT_PATH` 仍读取 invalid v1；同一 artifact 中其余 target/validity/mechanism/safety/latency/attempt/credential/budget 全 PASS。
+- Protocol-first：新增 v8，只允许一次 no-episode v2 audit，同时设置 in-memory upstream path 为 immutable mechanism v2 并复用 strict credential predicate；不覆盖 v1、不修改 source、不重跑 task。若 v2 PASS，run_010 才能冻结为 Dev-A promotion PASS 并进入新 Dev-B protocol；当前 formal 仍 0。

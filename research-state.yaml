@@ -5,7 +5,7 @@ project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
   status: active
-  phase: inner_loop_qd1_dev_a_gate_path_recovery_locked
+  phase: inner_loop_qd1_dev_a_audit_recovery_locked
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: false
@@ -108,7 +108,7 @@ literature:
 hypotheses:
   - id: H1
     statement: "The initial-population endpoint-XY bounds make later offspring overflow into edge cells, saturating occupancy and erasing behavior resolution; a physically calibrated or overflow-aware descriptor partition will reduce overflow while preserving task-relevant modes."
-    status: qd1_causal_envelope_dev_a_gate_path_recovery_locked
+    status: qd1_causal_envelope_dev_a_audit_recovery_locked
     motivation: "Historical valid QD profiles have median coverage 1.0 but overflow P95 0.938-1.0 and zero paired coverage gain."
     parent: null
     priority: high
@@ -193,16 +193,16 @@ experiments:
     scope_level: QD-1
     hypothesis_id: H1
     label: CONFIRMATORY
-    status: DEV_A_GATE_PATH_RECOVERY_LOCKED
+    status: DEV_A_AUDIT_RECOVERY_LOCKED
     target_gap_before: 3
     historical_best_success_count: 2
     online_unique_cells_reserved: 14
-    online_episode_attempts: 6
+    online_episode_attempts: 14
     pre_episode_aborted_reservations: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     active_or_dispatched_attempts: []
     same_cell_recovery_slots_authorized: 12
     same_cell_recovery_dispatches_authorized: 2
-    gpu_hours: 0.32542844444444445
+    gpu_hours: 0.7701637222222223
     candidate: eds_quality_diversity_sparse_causal_envelope_v1
     locked_at: "2026-08-10T16:08:00Z"
     protocol_commit: "1017bf0212780b2e386764517661cf9970090f8d"
@@ -272,7 +272,7 @@ experiments:
     mechanism_audit_v2_job_validity: "3/3 PASS"
     mechanism_audit_v2_attempt_ledger: PASS
     mechanism_audit_v2_strict_credential_patterns: "0 matches"
-    dev_a_status: PRE_ADMISSION_GATE_PATH_RECOVERY_READY
+    dev_a_status: EXECUTION_COMPLETE_AUDIT_RECOVERY_READY
     dev_a_binding_protocol: "experiments/run_010_causal_envelope_candidate/protocol-v6.md"
     dev_a_binding_protocol_commit: "dc0b00cc92a79d4ba71620d9488aaa659bf13c97"
     dev_a_control_config_fingerprint: "298badf27bc38e5f3fa0ae52c43686beb4e4e81ae39de87caa3c4e086d200e0e"
@@ -280,7 +280,24 @@ experiments:
     dev_a_gate_path_failure: "frozen runner read preserved invalid v1 mechanism audit instead of passing immutable v2"
     dev_a_gate_path_failure_consumed_attempts: 0
     dev_a_gate_path_recovery_protocol: "experiments/run_010_causal_envelope_candidate/protocol-v7.md"
-    dev_a_gate_path_recovery_protocol_commit: pending_this_commit
+    dev_a_gate_path_recovery_protocol_commit: "bcf4e4ffae795c6f1225637ac9b62d845f21ca62"
+    dev_a_attempt_ids: [19, 20, 21, 22, 23, 24, 25, 26]
+    dev_a_attempt_ledger_sha256: "591be9196ef53bdd77dfc895100b304cb7b4be1202124dd49724de3ee392ade7"
+    dev_a_gpu_admission_sha256: "0bd1214cc3c38c2eb94748698e6c1a95a456c8aa310768c2ad0f359057c61b1b"
+    dev_a_run_manifest_csv_sha256: "34482e0edf516200f3593fa70d3863920ced0f22a04efc0adae87f805b108280"
+    dev_a_control_success_tasks: []
+    dev_a_candidate_success_tasks: [9]
+    dev_a_gained_tasks: [9]
+    dev_a_retained_tasks: []
+    dev_a_lost_tasks: []
+    dev_a_candidate_resolution_by_task: {3: 0.6234744211791277, 5: 0.6530129052626543, 8: 0.5300846141920116, 9: 0.49967587382469575}
+    dev_a_candidate_post_envelope_overflow_p95: 0.0
+    dev_a_candidate_to_sparse_latency_ratio: 0.9682446099656091
+    invalid_dev_a_audit_path: "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_010_causal_envelope_candidate/analysis/dev_a_audit.json"
+    invalid_dev_a_audit_sha256: "95d7d1fbb8fe0f076267cdc4af2aedcad8c7822be6128b53f948d7e8e23e3d4a"
+    invalid_dev_a_audit_reason: "single upstream path failure: audit read preserved invalid mechanism v1 instead of passing v2"
+    dev_a_audit_recovery_protocol: "experiments/run_010_causal_envelope_candidate/protocol-v8.md"
+    dev_a_audit_recovery_protocol_commit: pending_this_commit
 
 outer_loop:
   cycle: 1
