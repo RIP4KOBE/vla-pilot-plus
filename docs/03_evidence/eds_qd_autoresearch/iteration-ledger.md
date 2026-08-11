@@ -1,6 +1,6 @@
 # EDS+QD Autoresearch 统一迭代总账
 
-状态：`EXECUTING — run_010 exact-cell recovery health check pending — 1 algorithm iteration`
+状态：`EXECUTING — run_010 exact-gitlink import-recovery protocol locked — 1 algorithm iteration`
 
 本文件是 EDS+QD autoresearch 所有 inner-loop 与 outer-loop 过程的单一人工审查入口。所有条目按 iteration ID append-only；不能删除、覆盖或为改善叙事而重写负结果、invalid attempt、infrastructure failure 或 revert 记录。大型 raw artifacts 不嵌入 Git，但必须以稳定路径和 SHA-256 引用。
 
@@ -8,7 +8,7 @@
 
 | Iteration | 日期 | Scope level | 假设 | 修改摘要 | Split / tasks | 结果 | 决策 | Protocol commit | Result commit |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `run_010_causal_envelope_candidate` | 2026-08-10 | `QD-1` | H1 | sparse QD + causal bounds expansion/archive rebin；其余冻结 | offline PASS；preflight tasks 3/5 首派发在 episode 前 API abort | `RECOVERY_HEALTHCHECK_PENDING`；0 task outcome | exact-cell recovery pending | v1 `1017bf0…`; offline v2 `8fd3aea…`; API recovery v3 `b344dc8…` | `d6af68b…` blocker result |
+| `run_010_causal_envelope_candidate` | 2026-08-10 | `QD-1` | H1 | sparse QD + causal bounds expansion/archive rebin；其余冻结 | offline PASS；两次 preflight dispatch 均在 episode 前 infra abort | `IMPORT_RECOVERY_PROTOCOL_LOCKED`；0 task outcome | exact gitlink final recovery pending | v1 `1017bf0…`; v2 `8fd3aea…`; v3 `b344dc8…`; v4 pending this commit | `d6af68b…` blocker result |
 | `run_002_partition_diagnostic` | 2026-08-10 | `QD-0` | H1 | fixed-initial vs 单一 `causal_envelope_v1` 4x4 partition replay | 27 frozen files；4,567 eligible chunks；task strata 3/5/8/9 | 10/10 gates PASS；resolution +30.1%；global best 100% | `KEEP_DIAGNOSTIC_EVIDENCE_AND_AUTHORIZE_ONE_QD1_PROTOCOL` | `862f7cc4f00d92a97f6a0103e760f3b6180a437f` | `29fcdb7940e35ce12d1d96e2651b7d813406052d` |
 | `run_001_allocation_ecology_diagnostic` | 2026-08-10 | `QD-0` | H4 | saved-trace parent-quality inheritance 与 saturated slot audit | 540 traces / 9,000 stages；task strata 0–9 | 2 attempts `INVALID`；无可采纳 H4 outcome | `INVALID_CONCLUDE_AND_TRIGGER_OUTER_LOOP` | v1 `dcf234b…`; v2 `91ddd34…`; v3 `f6d7bc9…`; v4 `3d320f6…` | `cdd150b2c332e907c05cda90c7c09fd1f1799570` |
 | `run_000_baseline_replay` | 2026-08-10 | `QD-0` | H1–H5 | 只读回放旧 QD 与预算 sweep，验证 target-linked failure boundary | historical only | 6/6 gates PASS；4,705 QD chunks；budget max 1/10 | `KEEP_DIAGNOSTIC_EVIDENCE` | `5255e924ee925487406e35a27548d9db4e988642` | `e0b252c983a3b62858c8fa676e7b32618660b364` |
@@ -23,10 +23,10 @@
 - 新在线 episodes：0。
 - GPU jobs：0。
 - Formal evaluations：0。
-- 累计 GPU-hours：0。
-- Attempt budget：6 个 reservation 已派发但在 episode 前中止，实际 episode attempts `0 / 143`；若 API 健康恢复，exact-cell recovery 最多新增 6 个 reservation。
+- 累计 GPU-hours：`0.023594 / 48`（IDs 7–12 三个 worker 的 pre-episode import failure device-wall sum）。
+- Attempt budget：IDs 1–6 已在 episode 前中止；IDs 7–12 已派发但产生一致的 pre-episode import failure，待 v4 commit 后追加 abort event。实际 initialized episode attempts `0 / 143`；same-cell recovery slots 已用 6/15。
 - 已结束新实验：3 个 `QD-0`（2 complete，1 invalid）；QD-1 算法迭代 1 正在执行。
-- 当前结论：`run_010` Stage-A PASS；首次 mechanism-preflight 派发没有启动 worker/episode。v3 的恢复前 health check 明确返回 HTTP 401 `invalid_api_key`，因此没有创建 IDs 7–12，研究安全暂停等待有效运行时凭据。Dev-A 仍要求 candidate success `>= control + 1` 且零 control-success loss。相邻 partition、Dev-B、validation、formal 均未授权。
+- 当前结论：`run_010` Stage-A PASS；replacement credential health PASS，但 v3 recovery 暴露当前 worktree 的 pinned RDT gitlink 未初始化。0 task outcome，best/gap 不变。v4 只允许初始化 exact gitlink并做最后一次 six-cell recovery；Dev-A 仍要求 candidate success `>= control + 1` 且零 control-success loss。相邻 partition、Dev-B、validation、formal 均未授权。
 
 ### `run_001_allocation_ecology_diagnostic` — 饱和 archive 的 parent 质量继承与 slot 生态
 
@@ -580,3 +580,17 @@
 - Secret handling：只允许作为当前 recovery process 的临时环境变量；不回显、不写 artifact/worktree、不进入 worker command/Hydra、manifest、attempt ledger、research docs 或 Git。总账不记录 credential 值或可逆 fingerprint。
 - Resume invariants：branch 为 `exp/eds-qd-autoresearch-libero-swap-ood`；protected untracked design 未修改；pause sentinel absent；无 owned process；IDs 1–6 仍为 pre-episode aborted；active/dispatched attempts 0；recovery dispatch remaining 1；manifest/source/config/checkpoint/task/seed bindings不变。
 - 下一步：提交本状态转换；临时切换 frozen scientific revision `d018f8ac…991`，先做 Poe health check。只有 PASS 才允许 fresh GPU admission 与 IDs 7–12 exact-cell recovery。
+
+#### N. v3 recovery outcome 与 exact-gitlink v4 protocol
+
+- 时间：credential health PASS 后，GPU admission artifact 创建于 `2026-08-11T00:09:32.658562Z`；attempts 7–12 于 `00:09:34Z` reserve/dispatch；三个 jobs 于 `00:09:40Z` 启动、`00:10:08Z` 结束。
+- Credential：pre-reservation Poe health PASS；credential 值从未写入 artifact、worker command、Hydra、manifest、ledger、docs 或 Git。owned root exact-secret scan 0 matches。
+- GPU admission：fresh snapshots 选择 GPU 0/1/2，UUID 分别 `GPU-4c78c923-a68a-8e06-e07b-11bdd642118e`、`GPU-053aaa97-5574-46a0-cb86-83d0518d8877`、`GPU-a5d6a5f8-b6df-7f3a-c3dc-19734c41ec0e`；两次 snapshots 与 immediate dispatch 均 util 0%、无 compute process、free 143,157 MiB。artifact SHA-256 `70a087481b05263b0946fe0d0de95b58ac2906e56fab119b8a2e4a4f6abb9ed4`。
+- Attempt ledger：IDs 7–12 exact match IDs 1–6 的 phase/profile/task/seed/config/code-state，带 `recovery_of_attempt_id=1..6`；dispatch 后 ledger SHA-256 `3702dbc95318685d2e52fcf55e64debe282f7d7f8c589c68a628ae65cacefd3d`。
+- 三个一致 failure boundary：Hydra started；LIBERO adapter built frozen task 3/5 envs；checkpoint path resolved；随后 `ModuleNotFoundError: scripts.maniskill_model` / `ImportError: Ensure third_party/rdt is initialized`。模型未构造，episode/reset/action/task observation 未开始。
+- Task-level outcome：control/sparse/candidate 全部 `0 observed episodes`；success gain/retention/loss、failure taxonomy 与 mechanism metrics 均 N/A。不得把 missing results/videos/metrics 的 wrapper summary当 policy failure。
+- Artifact evidence：phase CSV SHA `d5f2c5e7…c05c`；control/sparse/candidate output-tree hashes `ad1c60f9…a953` / `bb55001d…096a` / `e99a1a40…1132`；runner-log hashes `dc00a9b7…406` / `f8a4a2c3…e83c` / `c6134848…33e`。全部保留，未 overwrite/delete。
+- Budget：worker walls `28.287/28.478/28.174 s`，device sum `84.939 s = 0.023594 GPU-hours`；initialized episode attempts 0，formal 0；six recovery slots consumed。
+- Root cause：parent tree pins `third_party/rdt` gitlink `b896f4dcac8ed1c3fae4a056200db267607f131f`；当前 worktree submodule status 为 leading `-` / empty directory。只读 baseline worktree已在相同 gitlink初始化且 clean。故为 worktree bootstrap omission，不是算法/source version差异。
+- Protocol-first decision：新增 `protocol-v4.md`，只允许 current worktree 初始化 exact gitlink、clean import probe、unchanged code-state验证、归档旧 artifacts、为 IDs 7–12 追加 pre-episode abort，再进行唯一 final IDs 13–18 recovery。v4 后不再授权完整 six-cell retry。
+- Target impact：仍为历史 best `2/10` / gap 3；本结果没有算法优化信号，不能反向调参。

@@ -1,6 +1,6 @@
-# Current Status — Recovery Health Check Pending
+# Current Status — Exact RDT Gitlink Recovery Protocol Locked
 
-- Phase: resumed inner-loop QD-1 exact-cell recovery; pre-reservation health check pending and no owned process is running yet.
+- Phase: v3 recovery ended before episode initialization; v4 exact-gitlink recovery protocol locked and no owned process is running.
 - Primary objective: valid formal LIBERO-PRO `libero_object_swap >=5/10`; historical EDS-QD best is `2/10`, gap 3.
 - Active experiment: `run_010_causal_envelope_candidate`, status `MANIFEST_FROZEN_MECHANISM_PREFLIGHT_READY`.
 - Protocol commit: `1017bf0212780b2e386764517661cf9970090f8d`; implementation commit: `930cdb5295b8f9b4ee099298764c3af3c078d6b7`.
@@ -11,11 +11,12 @@
 - Online budget consumed: initialized episode attempts `0/143`, GPU-hours `0/48`, formal uses 0. No online success claim exists yet.
 - Immutable online manifest: `cb211e2e…ae34`; formal is explicitly unauthorized.
 - Recovery protocol commit: `b344dc850e8d63b2a78438d64d152693e8f7789f`; IDs 1–6 are append-only pre-episode aborted and there are no active/dispatched attempts.
-- Resume: user supplied a replacement runtime credential on 2026-08-11. Its value is not persisted or logged; health must pass before GPU admission/reservation.
+- Credential and admission: replacement credential health PASS; fresh idle GPUs 0/1/2 admitted and IDs 7–12 dispatched with exact identity.
 - Diagnostic: immutable `analysis/api_health_diagnostic_20260810T1659Z.json`, SHA-256 `70afb860…f227`; no credential value was serialized.
 - Infrastructure result commit: `d6af68b5cf21634c88c1ee07efa3a2aa43bd4160`.
-- Next action: run v3 health check first; only PASS permits IDs 7–12 and fresh GPU admission.
-- Recovery budget remains available: no IDs 7–12, worker, episode, GPU-hour, or formal evaluation was created; initialized episode attempts remain `0/143`.
+- v3 outcome: all three workers stopped before model/episode initialization because current worktree's pinned `third_party/rdt` submodule was uninitialized and `scripts.maniskill_model` was missing. Zero metrics/videos/task outcomes.
+- Budget: initialized episode attempts `0/143`; recovery slots used `6/15`; GPU-hours `0.023594/48`; formal 0.
+- Next action after v4 commit: preserve/abort/archive IDs 7–12 artifacts, initialize only exact pinned RDT gitlink `b896f4d…31f`, verify clean import and unchanged scientific code-state, then allow one final IDs 13–18 recovery. No later six-cell retry is authorized.
 - Dev-A remains gated behind mechanism PASS and requires candidate success `>= paired control +1` with zero loss of any control-success task.
 - Dev-B, validation, and formal evaluation are not authorized by the current protocol.
 - All new artifacts are confined to `/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_010_causal_envelope_candidate`; other worktrees and historical artifacts remain read-only.
