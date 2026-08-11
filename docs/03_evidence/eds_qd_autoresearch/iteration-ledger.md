@@ -1,6 +1,6 @@
 # EDS+QD Autoresearch 统一迭代总账
 
-状态：`PAUSED — run_010 pre-reservation Poe credential invalid — 1 algorithm iteration`
+状态：`EXECUTING — run_010 exact-cell recovery health check pending — 1 algorithm iteration`
 
 本文件是 EDS+QD autoresearch 所有 inner-loop 与 outer-loop 过程的单一人工审查入口。所有条目按 iteration ID append-only；不能删除、覆盖或为改善叙事而重写负结果、invalid attempt、infrastructure failure 或 revert 记录。大型 raw artifacts 不嵌入 Git，但必须以稳定路径和 SHA-256 引用。
 
@@ -8,7 +8,7 @@
 
 | Iteration | 日期 | Scope level | 假设 | 修改摘要 | Split / tasks | 结果 | 决策 | Protocol commit | Result commit |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `run_010_causal_envelope_candidate` | 2026-08-10 | `QD-1` | H1 | sparse QD + causal bounds expansion/archive rebin；其余冻结 | offline PASS；preflight tasks 3/5 首派发在 episode 前 API abort | `PAUSED_INVALID_RUNTIME_CREDENTIAL`；0 task outcome | exact-cell recovery remains pending | v1 `1017bf0…`; offline v2 `8fd3aea…`; API recovery v3 `b344dc8…` | `d6af68b…` blocker result |
+| `run_010_causal_envelope_candidate` | 2026-08-10 | `QD-1` | H1 | sparse QD + causal bounds expansion/archive rebin；其余冻结 | offline PASS；preflight tasks 3/5 首派发在 episode 前 API abort | `RECOVERY_HEALTHCHECK_PENDING`；0 task outcome | exact-cell recovery pending | v1 `1017bf0…`; offline v2 `8fd3aea…`; API recovery v3 `b344dc8…` | `d6af68b…` blocker result |
 | `run_002_partition_diagnostic` | 2026-08-10 | `QD-0` | H1 | fixed-initial vs 单一 `causal_envelope_v1` 4x4 partition replay | 27 frozen files；4,567 eligible chunks；task strata 3/5/8/9 | 10/10 gates PASS；resolution +30.1%；global best 100% | `KEEP_DIAGNOSTIC_EVIDENCE_AND_AUTHORIZE_ONE_QD1_PROTOCOL` | `862f7cc4f00d92a97f6a0103e760f3b6180a437f` | `29fcdb7940e35ce12d1d96e2651b7d813406052d` |
 | `run_001_allocation_ecology_diagnostic` | 2026-08-10 | `QD-0` | H4 | saved-trace parent-quality inheritance 与 saturated slot audit | 540 traces / 9,000 stages；task strata 0–9 | 2 attempts `INVALID`；无可采纳 H4 outcome | `INVALID_CONCLUDE_AND_TRIGGER_OUTER_LOOP` | v1 `dcf234b…`; v2 `91ddd34…`; v3 `f6d7bc9…`; v4 `3d320f6…` | `cdd150b2c332e907c05cda90c7c09fd1f1799570` |
 | `run_000_baseline_replay` | 2026-08-10 | `QD-0` | H1–H5 | 只读回放旧 QD 与预算 sweep，验证 target-linked failure boundary | historical only | 6/6 gates PASS；4,705 QD chunks；budget max 1/10 | `KEEP_DIAGNOSTIC_EVIDENCE` | `5255e924ee925487406e35a27548d9db4e988642` | `e0b252c983a3b62858c8fa676e7b32618660b364` |
@@ -572,3 +572,11 @@
 - 恢复结果：未创建 IDs 7–12，未重新做 GPU admission，未启动 worker/episode，未生成 task outcome；initialized episode attempts `0/143`、GPU-hours 0、formal 0。v3 的一次 exact-cell dispatch authorization 尚未消耗。
 - Failure reason / next-step basis：这是外部运行时 credential invalidity，不是可由 EDS+QD 修改解决的失败，也没有提供算法优化信号。继续 algorithm exploration 不会直接缩小 gap，违反 success-first 原则；故状态转为 `PAUSED_INVALID_RUNTIME_CREDENTIAL`，直到执行环境配置有效 `OPENAI_API_KEY` 后从 v3 pre-reservation health check 恢复。
 - Infrastructure result commit：`d6af68b5cf21634c88c1ee07efa3a2aa43bd4160`。
+
+#### M. 运行时凭据恢复与 v3 resume
+
+- 时间：`2026-08-11T00:07:53Z`；用户提供 replacement Poe runtime credential 并明确要求继续任务。
+- 状态转换：`PAUSED_INVALID_RUNTIME_CREDENTIAL → RECOVERY_HEALTHCHECK_PENDING`；本转换先于任何新 API health check、GPU admission 或 attempt reservation。
+- Secret handling：只允许作为当前 recovery process 的临时环境变量；不回显、不写 artifact/worktree、不进入 worker command/Hydra、manifest、attempt ledger、research docs 或 Git。总账不记录 credential 值或可逆 fingerprint。
+- Resume invariants：branch 为 `exp/eds-qd-autoresearch-libero-swap-ood`；protected untracked design 未修改；pause sentinel absent；无 owned process；IDs 1–6 仍为 pre-episode aborted；active/dispatched attempts 0；recovery dispatch remaining 1；manifest/source/config/checkpoint/task/seed bindings不变。
+- 下一步：提交本状态转换；临时切换 frozen scientific revision `d018f8ac…991`，先做 Poe health check。只有 PASS 才允许 fresh GPU admission 与 IDs 7–12 exact-cell recovery。

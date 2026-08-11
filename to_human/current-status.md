@@ -1,6 +1,6 @@
-# Current Status — Paused on Invalid Poe Runtime Credential
+# Current Status — Recovery Health Check Pending
 
-- Phase: infrastructure-blocked pause before recovery reservation; no owned process is running.
+- Phase: resumed inner-loop QD-1 exact-cell recovery; pre-reservation health check pending and no owned process is running yet.
 - Primary objective: valid formal LIBERO-PRO `libero_object_swap >=5/10`; historical EDS-QD best is `2/10`, gap 3.
 - Active experiment: `run_010_causal_envelope_candidate`, status `MANIFEST_FROZEN_MECHANISM_PREFLIGHT_READY`.
 - Protocol commit: `1017bf0212780b2e386764517661cf9970090f8d`; implementation commit: `930cdb5295b8f9b4ee099298764c3af3c078d6b7`.
@@ -11,10 +11,10 @@
 - Online budget consumed: initialized episode attempts `0/143`, GPU-hours `0/48`, formal uses 0. No online success claim exists yet.
 - Immutable online manifest: `cb211e2e…ae34`; formal is explicitly unauthorized.
 - Recovery protocol commit: `b344dc850e8d63b2a78438d64d152693e8f7789f`; IDs 1–6 are append-only pre-episode aborted and there are no active/dispatched attempts.
-- Blocker: the v3 pre-reservation check and a redacted diagnostic returned Poe HTTP 401 `invalid_api_key`. DNS/HTTPS are healthy and the environment credential is present/non-dummy, so repeated dispatch is forbidden until the credential is replaced.
+- Resume: user supplied a replacement runtime credential on 2026-08-11. Its value is not persisted or logged; health must pass before GPU admission/reservation.
 - Diagnostic: immutable `analysis/api_health_diagnostic_20260810T1659Z.json`, SHA-256 `70afb860…f227`; no credential value was serialized.
 - Infrastructure result commit: `d6af68b5cf21634c88c1ee07efa3a2aa43bd4160`.
-- Resume condition: configure a valid `OPENAI_API_KEY` for Poe in the execution environment, then resume from v3. The next action is health check first; only PASS permits IDs 7–12 and fresh GPU admission.
+- Next action: run v3 health check first; only PASS permits IDs 7–12 and fresh GPU admission.
 - Recovery budget remains available: no IDs 7–12, worker, episode, GPU-hour, or formal evaluation was created; initialized episode attempts remain `0/143`.
 - Dev-A remains gated behind mechanism PASS and requires candidate success `>= paired control +1` with zero loss of any control-success task.
 - Dev-B, validation, and formal evaluation are not authorized by the current protocol.

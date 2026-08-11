@@ -4,14 +4,14 @@
 project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
-  status: paused
-  phase: infrastructure_blocked_invalid_poe_runtime_credential
+  status: active
+  phase: inner_loop_qd1_exact_cell_recovery_healthcheck_pending
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: false
   approved_for_execution_at: "2026-08-10T15:00:35Z"
   approval_source: "User explicitly supplied the formal execution prompt for frozen design commit 1aee76489ea8989a832dec49b747239f2db90981"
-  pause_reason: "Protocol-v3 pre-reservation health check and a redacted diagnostic both returned Poe HTTP 401 invalid_api_key. No replacement attempt was created; configure a valid OPENAI_API_KEY in the execution environment before resume."
+  pause_reason: null
 
 provenance:
   repository_root: "/home/hynx/VLA-Pilot++"
@@ -108,7 +108,7 @@ literature:
 hypotheses:
   - id: H1
     statement: "The initial-population endpoint-XY bounds make later offspring overflow into edge cells, saturating occupancy and erasing behavior resolution; a physically calibrated or overflow-aware descriptor partition will reduce overflow while preserving task-relevant modes."
-    status: qd1_causal_envelope_paused_invalid_runtime_credential
+    status: qd1_causal_envelope_exact_cell_recovery_healthcheck_pending
     motivation: "Historical valid QD profiles have median coverage 1.0 but overflow P95 0.938-1.0 and zero paired coverage gain."
     parent: null
     priority: high
@@ -193,7 +193,7 @@ experiments:
     scope_level: QD-1
     hypothesis_id: H1
     label: CONFIRMATORY
-    status: PAUSED_INVALID_RUNTIME_CREDENTIAL
+    status: RECOVERY_HEALTHCHECK_PENDING
     target_gap_before: 3
     historical_best_success_count: 2
     online_unique_cells_reserved: 14
@@ -230,6 +230,7 @@ experiments:
     api_blocker_result_commit: "d6af68b5cf21634c88c1ee07efa3a2aa43bd4160"
     recovery_attempt_ids_created: []
     recovery_dispatches_remaining: 1
+    resumed_with_user_supplied_runtime_credential_at: "2026-08-11T00:07:53Z"
 
 outer_loop:
   cycle: 1
@@ -250,7 +251,7 @@ resources:
   proposed_artifact_root: "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood"
   outputs_link: "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/outputs"
   storage_initialized: true
-  gpu_work_authorized_in_current_phase: false
+  gpu_work_authorized_in_current_phase: true
   formal_evaluation_authorized_in_current_phase: false
   future_execution_gpu_indices_authorized: [0, 1, 2, 3, 4, 5, 6, 7]
   future_execution_max_concurrent_workers: 8
