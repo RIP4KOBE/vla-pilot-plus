@@ -654,3 +654,11 @@
 - Evidence：GPU admission `0bd1214c…1b1b`；attempt ledger `591be919…ade7`；run CSV `34482e0e…8280`。
 - 首次 Dev-A audit（INVALID）：`analysis/dev_a_audit.json`，size 361,984，SHA-256 `95d7d1fbb8fe0f076267cdc4af2aedcad8c7822be6128b53f948d7e8e23e3d4a`。唯一 hard failure 是其 internal `MECHANISM_AUDIT_PATH` 仍读取 invalid v1；同一 artifact 中其余 target/validity/mechanism/safety/latency/attempt/credential/budget 全 PASS。
 - Protocol-first：新增 v8，只允许一次 no-episode v2 audit，同时设置 in-memory upstream path 为 immutable mechanism v2 并复用 strict credential predicate；不覆盖 v1、不修改 source、不重跑 task。若 v2 PASS，run_010 才能冻结为 Dev-A promotion PASS 并进入新 Dev-B protocol；当前 formal 仍 0。
+
+#### T. Dev-A audit v2 PASS 与 promotion decision
+
+- Protocol/result order：v8 commit `a49895c71df509c2a2ee6572893faf242057efd6` 先于 corrected audit；未产生新 API/GPU/attempt/episode/formal work。
+- Immutable v2：`analysis/dev_a_audit.v2.json`，mode 0444，size 361,936 bytes，SHA-256 `9c6d3ecee60d50c7e574b2a795c864483c85c812c0883a96ec81aa5d5d889fa9`。Invalid v1 `95d7d1fb…3d4a` 同时 mode 0444 保留。
+- Audit：`passed=true`、hard failures 0；task matrix candidate `[9]` vs control `[]`，gained `[9]`、lost `[]`；mechanism support 4/4；post-overflow 0；latency ratio `0.96824461`；attempt、safety、artifact、strict credential gates 全 PASS。
+- Target gap 分析：本 split 从 paired control `0/4` 提升到 candidate `1/4`，新增一个 target-linked task success；但正式 best 仍是历史 `2/10`、formal target gap 仍 3，因为 Dev-A 不能替代 validation/formal。结果方向与“恢复 task 9 retention sentinel”预测一致。
+- Decision：`KEEP_AND_AUTHORIZE_DEV_B_PROTOCOL`。Candidate code/config/threshold 不变；Dev-B 必须使用独立 seeds `[558482,165717,160148,160312]` 复现方向。不得直接跳 validation，不得因 Dev-A success 调参。

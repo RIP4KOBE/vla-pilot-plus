@@ -5,7 +5,7 @@ project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
   status: active
-  phase: inner_loop_qd1_dev_a_audit_recovery_locked
+  phase: inner_loop_qd1_dev_a_pass_dev_b_protocol_required
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: false
@@ -108,7 +108,7 @@ literature:
 hypotheses:
   - id: H1
     statement: "The initial-population endpoint-XY bounds make later offspring overflow into edge cells, saturating occupancy and erasing behavior resolution; a physically calibrated or overflow-aware descriptor partition will reduce overflow while preserving task-relevant modes."
-    status: qd1_causal_envelope_dev_a_audit_recovery_locked
+    status: qd1_causal_envelope_dev_a_pass
     motivation: "Historical valid QD profiles have median coverage 1.0 but overflow P95 0.938-1.0 and zero paired coverage gain."
     parent: null
     priority: high
@@ -193,7 +193,7 @@ experiments:
     scope_level: QD-1
     hypothesis_id: H1
     label: CONFIRMATORY
-    status: DEV_A_AUDIT_RECOVERY_LOCKED
+    status: DEV_A_PASS_DEV_B_PROTOCOL_REQUIRED
     target_gap_before: 3
     historical_best_success_count: 2
     online_unique_cells_reserved: 14
@@ -272,7 +272,7 @@ experiments:
     mechanism_audit_v2_job_validity: "3/3 PASS"
     mechanism_audit_v2_attempt_ledger: PASS
     mechanism_audit_v2_strict_credential_patterns: "0 matches"
-    dev_a_status: EXECUTION_COMPLETE_AUDIT_RECOVERY_READY
+    dev_a_status: PASS
     dev_a_binding_protocol: "experiments/run_010_causal_envelope_candidate/protocol-v6.md"
     dev_a_binding_protocol_commit: "dc0b00cc92a79d4ba71620d9488aaa659bf13c97"
     dev_a_control_config_fingerprint: "298badf27bc38e5f3fa0ae52c43686beb4e4e81ae39de87caa3c4e086d200e0e"
@@ -297,7 +297,15 @@ experiments:
     invalid_dev_a_audit_sha256: "95d7d1fbb8fe0f076267cdc4af2aedcad8c7822be6128b53f948d7e8e23e3d4a"
     invalid_dev_a_audit_reason: "single upstream path failure: audit read preserved invalid mechanism v1 instead of passing v2"
     dev_a_audit_recovery_protocol: "experiments/run_010_causal_envelope_candidate/protocol-v8.md"
-    dev_a_audit_recovery_protocol_commit: pending_this_commit
+    dev_a_audit_recovery_protocol_commit: "a49895c71df509c2a2ee6572893faf242057efd6"
+    invalid_dev_a_audit_mode: "0444"
+    dev_a_audit_v2_path: "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_010_causal_envelope_candidate/analysis/dev_a_audit.v2.json"
+    dev_a_audit_v2_sha256: "9c6d3ecee60d50c7e574b2a795c864483c85c812c0883a96ec81aa5d5d889fa9"
+    dev_a_audit_v2_mode: "0444"
+    dev_a_audit_v2_status: PASS
+    dev_a_audit_v2_hard_failures: 0
+    dev_a_target_gate: "candidate 1/4 vs control 0/4; gained task 9; zero lost"
+    decision: KEEP_AND_AUTHORIZE_DEV_B_PROTOCOL
 
 outer_loop:
   cycle: 1
