@@ -600,3 +600,18 @@
 - Exact repair：仅在当前 worktree 执行 `git submodule update --init --checkout third_party/rdt`；实际 HEAD `b896f4dcac8ed1c3fae4a056200db267607f131f`，submodule clean，parent 无 tracked diff；其他 worktree/submodule未写。
 - Pre-reservation verification：在 frozen revision `d018f8ac…991` 复算 code-state仍为 `3626b52b…9839c`；`vla-pilot` 成功 import `scripts.maniskill_model.create_model` 与 `models.rdt_runner.RDTRunner`；immutable manifest 与 ledger invariants PASS。
 - 状态：`FINAL_EXACT_CELL_RECOVERY_READY`。下一步 health/storage/admission 再验后才可创建 IDs 13–18；这是 v4 授权的最后完整 six-cell retry。
+
+#### O. v4 final recovery 结果与 mechanism audit v5 repair protocol
+
+- 时间：final admission artifact 创建于 `2026-08-11T00:19:54Z`；完整 runner wall `489.7 s`。服务 health、storage、pause、manifest、runtime cache、frozen revision/code-state 与 exact RDT gitlink checks 均 PASS。
+- GPU admission：fresh two-snapshot + immediate dispatch 选择 GPU 0/1/2；artifact SHA-256 `209553223e711b95763dba3942d79e97debb1f072dd7f90b3e0a65bbfb559914`。未抢占或干扰外部进程。
+- Attempts：IDs 13–18 是 IDs 7–12 的 exact-cell recovery，覆盖 control/sparse/candidate × task 3/5；attempt ledger SHA-256 `5f4971382bc97f25c103a4a904a761cb45fa872412b0c4caa1377d6c4561065c`。IDs 1–12 继续作为 pre-episode abort append-only 保留；v4 不再剩余 full-matrix retry。
+- Task-level outcome：control `0/2`、sparse `0/2`、candidate `0/2`；六个 task cells 均为 `timeout without completion`。这是冻结的 `max_chunks=2` mechanism plumbing probe，不是 Dev-A 或 formal 成功率判据；不得用这六个 outcome 调参。
+- Failure analysis：所有 profile 均未在两个 chunks 内完成 task 3/5；无 qpos/execution、nonfinite、action-mask、fallback、drop/collision/wrong-object plumbing failure。短 horizon 只能证明机制运行路径，不提供可靠的阶段因果诊断。
+- Mechanism：candidate raw initial-bound overflow P95 `0.9375`、post-envelope overflow P95 `0`；candidate/sparse selection latency P95 `2.65048/2.73929 s`，ratio `0.96758`；candidate 41 条 metrics 的 bounds/rebin/visit/global-best/accounting telemetry 均存在并通过单项检查。
+- Compute：final profile walls `382.305/260.393/443.906 s`，合计 `0.301834 GPU-hours`；加 v3 pre-episode import failure 共 `0.325428 GPU-hours`。Projected frozen matrix `0.70428 GPU-hours`，远低于 48 cap。
+- Credential handling：owned worktree/artifact exact-secret scan 0；未记录 credential 值或可逆 fingerprint。
+- 首次 audit（INVALID）：`analysis/mechanism_preflight_audit.json`，size 287,125，SHA-256 `d42dee30fad4c9d1ef6e8ffa02b73cb78830e736d7ea7c5e7877be8a9be4d6c7`。操作员误在文档 HEAD `eb9dd733…735` 而非 frozen scientific revision `d018f8ac…991` 运行，导致三个 expected config fingerprints 与冻结 job manifests 不同；其宽泛 `sk-` substring detector 又将 runtime-cache 普通标题 `Task-Specific` 误判为 credential。该 audit 不得用于 candidate 结论。
+- 只读 root-cause verification：在 `d018f8ac…991` 重建 jobs 后，control/sparse/candidate fingerprints 精确为 `7dd8ca75…ed2` / `d083b1b7…9f2` / `296f14ae…f83`，三者 `_p2_job_validity` 均 PASS；严格 standalone token/API assignment/Bearer detector 扫描 192 个文本 artifacts 为 0 matches。
+- Protocol-first repair：新增 `protocol-v5.md`；只授权一次 no-episode/no-GPU v2 audit，使用 frozen revision、原科学 gates 和严格 credential predicate，写新 immutable `mechanism_preflight_audit.v2.json` 并保留 v1。无第三次 audit repair。
+- Target impact：best 仍为历史 `2/10`、gap 3；formal 0。只有 v2 aggregate PASS 才允许执行已冻结 Dev-A；当前不授权 Dev-B/validation/formal。
