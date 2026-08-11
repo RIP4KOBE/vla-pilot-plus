@@ -779,3 +779,12 @@
 - Immutable audit：`analysis/validation_audit.json`，mode 0444，size 880,602 bytes，SHA-256 `3f72d025b492e24e7f615db7c3207c4927710794797dd228edf0579ab1290774`；`passed=false` 仅因 target gate。
 - Interpretation：H1 partition-resolution mechanism 被跨十 tasks 支持，但“该机制足以将成功率推到 5/10”被否证。更好 resolution 不是 completion 的充分条件；development gains 的幅度不具 validation 稳健性。不能将 10/10 mechanism support 误报为算法成功。
 - Decision：`REJECT_CAUSAL_ENVELOPE_AS_INSUFFICIENT_AND_CONCLUDE_VALIDATION_NO_FORMAL`。按 v11 不运行 formal、不修改 candidate 后复用已揭示 validation、不做相邻参数试探；触发 outer-loop cycle 2 决定当前冻结 cycle 的 CONCLUDE 或 versioned redesign 请求。
+
+#### AG. Outer-loop cycle 2 conclusion protocol
+
+- Trigger：valid validation target FAIL 与 development/validation magnitude mismatch；formal 未授权。Outer-loop 对 descriptor/quality/ecology/continuity/execution 证据重新分类，优先判断是否存在不泄漏且能直接缩小 4-success validation gap 的同-cycle next candidate。
+- Read-only evidence：当前 validation audit `3f72d025…0774` 与 result analysis `a6d02543…8c5b3`；search-budget report `/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/search_budget_sweep_20260808/analysis/final_report.md`，SHA `580cf8c0…30c1e`（18 configs 全 0/10 或 1/10）；Stage/guidance report `/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/stage_guidance_transition_20260810/analysis/final_report.md`，SHA `ecc7554c…ac426`（FSM 0/20、lost task 7、safety FAIL）。外部源零写入。
+- Synthesis：H1 的 descriptor partition 问题确实存在但不是 dominant completion bottleneck；直接 compute scaling 已被否证为有效方向；generic Stage/guidance transition 既无 success 又有安全/retention 退化；H4 telemetry 无有效结论；H2 reward-quality/final-selection 仍是 EDS+QD 内合理方向，但没有已冻结且未见 validation 的候选。
+- Isolation boundary：validation seeds 已揭示。任何现在基于结果修改的 H2/H3/H4 candidate 均不能复用它们；没有新的 holdout seeds/预算/design authorization 时无法生成 formal-eligible winner。此边界比剩余 GPU/attempt budget优先。
+- Protocol-first：新增 `protocol-v12.md`，在 cycle decision manifest/final report 前冻结：0 algorithm/config/GPU/API/LIBERO/attempt/formal；只允许 evidence freeze、final reporting 与 strict scans。
+- Direction：`CONCLUDE_NO_ADOPTION_WITHIN_FROZEN_CYCLE_REQUEST_VERSIONED_REDESIGN`。未来最有依据的 redesign proposal 是 H2 QD quality/replacement/final-selection calibration，但必须新设计、新 leakage-safe holdout seeds、明确预算和用户批准；当前不执行。

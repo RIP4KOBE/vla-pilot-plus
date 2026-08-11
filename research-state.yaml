@@ -5,7 +5,7 @@ project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
   status: active
-  phase: outer_loop_cycle_2_pending_after_validation_fail
+  phase: outer_loop_cycle_2_conclusion_protocol_locked
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: false
@@ -193,7 +193,7 @@ experiments:
     scope_level: QD-1
     hypothesis_id: H1
     label: CONFIRMATORY
-    status: COMPLETE_VALIDATION_FAIL_NO_FORMAL
+    status: OUTER_LOOP_CONCLUSION_PROTOCOL_LOCKED
     target_gap_before: 3
     historical_best_success_count: 2
     online_unique_cells_reserved: 42
@@ -409,11 +409,13 @@ experiments:
     validation_audit_mode: "0444"
     validation_audit_status: FAIL_TARGET_ONLY
     decision: CONCLUDE_VALIDATION_NO_FORMAL_AND_TRIGGER_OUTER_LOOP
+    outer_loop_conclusion_protocol: "experiments/run_010_causal_envelope_candidate/protocol-v12.md"
+    outer_loop_conclusion_protocol_commit: pending_this_commit
 
 outer_loop:
   cycle: 2
-  last_direction: PENDING_VALIDATION_FAIL_REFLECTION
-  last_reflection: "H1 causal-envelope mechanics generalized to all ten validation tasks, but task success did not: candidate 1/10 versus control 0/10, below the 5/10 gate. Protocol v11 forbids formal and validation-outcome retuning; outer-loop cycle 2 must decide conclusion versus versioned redesign."
+  last_direction: CONCLUSION_PROTOCOL_LOCKED_PENDING_EVIDENCE_FREEZE
+  last_reflection: "H1 causal-envelope mechanics generalized to all ten validation tasks, but task success did not: candidate 1/10 versus control 0/10. Historical compute scaling and Stage/guidance transition also failed. The exposed validation split makes a modified candidate ineligible within this cycle; v12 locks no-adoption conclusion plus a versioned-redesign request boundary."
   trigger_after_inner_runs: 5
   no_progress_trigger: 3
 
