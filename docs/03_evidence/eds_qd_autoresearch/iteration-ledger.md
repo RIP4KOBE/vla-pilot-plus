@@ -1,6 +1,6 @@
 # EDS+QD Autoresearch 统一迭代总账
 
-状态：`EXECUTING — run_010 exact-gitlink import-recovery protocol locked — 1 algorithm iteration`
+状态：`EXECUTING — run_010 final exact-cell recovery ready — 1 algorithm iteration`
 
 本文件是 EDS+QD autoresearch 所有 inner-loop 与 outer-loop 过程的单一人工审查入口。所有条目按 iteration ID append-only；不能删除、覆盖或为改善叙事而重写负结果、invalid attempt、infrastructure failure 或 revert 记录。大型 raw artifacts 不嵌入 Git，但必须以稳定路径和 SHA-256 引用。
 
@@ -8,7 +8,7 @@
 
 | Iteration | 日期 | Scope level | 假设 | 修改摘要 | Split / tasks | 结果 | 决策 | Protocol commit | Result commit |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `run_010_causal_envelope_candidate` | 2026-08-10 | `QD-1` | H1 | sparse QD + causal bounds expansion/archive rebin；其余冻结 | offline PASS；两次 preflight dispatch 均在 episode 前 infra abort | `IMPORT_RECOVERY_PROTOCOL_LOCKED`；0 task outcome | exact gitlink final recovery pending | v1 `1017bf0…`; v2 `8fd3aea…`; v3 `b344dc8…`; v4 pending this commit | `d6af68b…` blocker result |
+| `run_010_causal_envelope_candidate` | 2026-08-10 | `QD-1` | H1 | sparse QD + causal bounds expansion/archive rebin；其余冻结 | offline PASS；两次 preflight dispatch 均在 episode 前 infra abort | `FINAL_EXACT_CELL_RECOVERY_READY`；0 task outcome | exact gitlink verified；final recovery pending | v1 `1017bf0…`; v2 `8fd3aea…`; v3 `b344dc8…`; v4 `8016905…` | `d6af68b…` blocker result |
 | `run_002_partition_diagnostic` | 2026-08-10 | `QD-0` | H1 | fixed-initial vs 单一 `causal_envelope_v1` 4x4 partition replay | 27 frozen files；4,567 eligible chunks；task strata 3/5/8/9 | 10/10 gates PASS；resolution +30.1%；global best 100% | `KEEP_DIAGNOSTIC_EVIDENCE_AND_AUTHORIZE_ONE_QD1_PROTOCOL` | `862f7cc4f00d92a97f6a0103e760f3b6180a437f` | `29fcdb7940e35ce12d1d96e2651b7d813406052d` |
 | `run_001_allocation_ecology_diagnostic` | 2026-08-10 | `QD-0` | H4 | saved-trace parent-quality inheritance 与 saturated slot audit | 540 traces / 9,000 stages；task strata 0–9 | 2 attempts `INVALID`；无可采纳 H4 outcome | `INVALID_CONCLUDE_AND_TRIGGER_OUTER_LOOP` | v1 `dcf234b…`; v2 `91ddd34…`; v3 `f6d7bc9…`; v4 `3d320f6…` | `cdd150b2c332e907c05cda90c7c09fd1f1799570` |
 | `run_000_baseline_replay` | 2026-08-10 | `QD-0` | H1–H5 | 只读回放旧 QD 与预算 sweep，验证 target-linked failure boundary | historical only | 6/6 gates PASS；4,705 QD chunks；budget max 1/10 | `KEEP_DIAGNOSTIC_EVIDENCE` | `5255e924ee925487406e35a27548d9db4e988642` | `e0b252c983a3b62858c8fa676e7b32618660b364` |
@@ -21,10 +21,10 @@
 - 历史 best EDS-QD success：`2/10`。
 - 当前 target gap：`5 - 2 = 3` tasks。
 - 新在线 episodes：0。
-- GPU jobs：0。
+- GPU jobs：3 个 v3 worker 均在 episode 前 import failure；当前 owned jobs 0。
 - Formal evaluations：0。
 - 累计 GPU-hours：`0.023594 / 48`（IDs 7–12 三个 worker 的 pre-episode import failure device-wall sum）。
-- Attempt budget：IDs 1–6 已在 episode 前中止；IDs 7–12 已派发但产生一致的 pre-episode import failure，待 v4 commit 后追加 abort event。实际 initialized episode attempts `0 / 143`；same-cell recovery slots 已用 6/15。
+- Attempt budget：IDs 1–12 均已 append-only 标为 pre-episode aborted；active/dispatched 0。实际 initialized episode attempts `0 / 143`；same-cell recovery slots 已用 6/15，v4 最终 recovery 将再用 6 slots。
 - 已结束新实验：3 个 `QD-0`（2 complete，1 invalid）；QD-1 算法迭代 1 正在执行。
 - 当前结论：`run_010` Stage-A PASS；replacement credential health PASS，但 v3 recovery 暴露当前 worktree 的 pinned RDT gitlink 未初始化。0 task outcome，best/gap 不变。v4 只允许初始化 exact gitlink并做最后一次 six-cell recovery；Dev-A 仍要求 candidate success `>= control + 1` 且零 control-success loss。相邻 partition、Dev-B、validation、formal 均未授权。
 
@@ -594,3 +594,9 @@
 - Root cause：parent tree pins `third_party/rdt` gitlink `b896f4dcac8ed1c3fae4a056200db267607f131f`；当前 worktree submodule status 为 leading `-` / empty directory。只读 baseline worktree已在相同 gitlink初始化且 clean。故为 worktree bootstrap omission，不是算法/source version差异。
 - Protocol-first decision：新增 `protocol-v4.md`，只允许 current worktree 初始化 exact gitlink、clean import probe、unchanged code-state验证、归档旧 artifacts、为 IDs 7–12 追加 pre-episode abort，再进行唯一 final IDs 13–18 recovery。v4 后不再授权完整 six-cell retry。
 - Target impact：仍为历史 best `2/10` / gap 3；本结果没有算法优化信号，不能反向调参。
+- Protocol v4 commit：`80169057ef170dbe702c5cd25c6f4ac03b14381e`，严格早于 abort/archive/submodule initialization/import probe。
+- Attempt closure：ledger event 5 将 IDs 7–12 标为 `pre_episode_import_infrastructure`；IDs 1–12 全部 aborted，active/dispatched 0；ledger SHA-256 `5e8a913694ea4826a1f1ffa95f9a7fbbb60b304cd5fc0e15c13ee97b82cd2138`。
+- Preservation：三 output trees、三 runner logs 与 phase CSV 已移动到 owned `stale/pre_episode_import_failure_20260811T001519Z/`；无 delete/overwrite。Immutable archive manifest mode 0444，SHA-256 `4b981ad1a36725aab2c4ea055f5c4f639025b9da3c13ef4b2e5849d3d13d6929`，payload `67e645ca…c8a`，credential pattern matches 0。
+- Exact repair：仅在当前 worktree 执行 `git submodule update --init --checkout third_party/rdt`；实际 HEAD `b896f4dcac8ed1c3fae4a056200db267607f131f`，submodule clean，parent 无 tracked diff；其他 worktree/submodule未写。
+- Pre-reservation verification：在 frozen revision `d018f8ac…991` 复算 code-state仍为 `3626b52b…9839c`；`vla-pilot` 成功 import `scripts.maniskill_model.create_model` 与 `models.rdt_runner.RDTRunner`；immutable manifest 与 ledger invariants PASS。
+- 状态：`FINAL_EXACT_CELL_RECOVERY_READY`。下一步 health/storage/admission 再验后才可创建 IDs 13–18；这是 v4 授权的最后完整 six-cell retry。
