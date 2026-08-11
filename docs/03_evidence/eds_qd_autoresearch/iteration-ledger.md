@@ -691,3 +691,12 @@
 - Binding：original manifest `cb211e2e…ae34`、mechanism v2 `c7e93f92…08ab`、Dev-A v2 `9c6d3ece…9fa9`、checkpoint aggregate `a2026bcf…6c28`、LIBERO inputs `259c469e…38b8`、runtime cache、algorithm four hashes 与 exact 8-cell matrix。
 - Policy：attempt cap 143、GPU-hour cap 48、GPU 0–7、strict perturbations、720 steps、`formal_authorized=false`；validation/formal CLI 不存在。
 - 状态：`DEV_B_READY`。下一步只允许 detached implementation commit 上 preflight/health、fresh GPU admission、IDs 27–34 reservation/dispatch；若任何 pre-reservation gate fail，不创建 attempts。
+
+#### X. Dev-B pre-reservation execution-context failure 与 v10
+
+- 首次 invocation 通过 manifest/storage/credential health 与 fresh admission 后，在 `_attempt_records` 因 `KeyError: execution_record` 中止。
+- Root cause：dedicated `configure_base()` 的 temporary `base.P2_LEVELS` union 只含 mechanism/Dev-A，遗漏新 Dev-B；base binder 按 fail-closed 规则原样返回 job。
+- Boundary：attempt ledger 仍 `591be919…ade7`，IDs 27–34 不存在；无 `dev_b__*` output、worker、episode、task outcome 或 device-wall GPU-hour。分类为 pre-reservation infrastructure，不是 candidate result。
+- Admission evidence：`gpu_eds_qd_autoresearch_dev_b_1786410996.json`，SHA `fa8d86718045a87a6cfcf3ef3e6dfd42b134fed16c6cc784ad402d497559310c`，selected 0/1；不得复用。
+- Protocol-first v10：只允许 whitelist 一行修复 + real-binder test；因 code-state 改变，保留 manifest v1 `375f7830…d9d6`，从 repair commit 新冻 `dev_b_manifest.v2.json` 后 fresh admission。算法 hashes/gates/matrix 不变。
+- Budget/target：attempt/GPU/task/formal 增量 0；best/gap 仍 `2/10 / 3`。若再次发生 pre-reservation code-path failure，停止 Dev-B 并 outer-loop，不再追加 runner repair。
