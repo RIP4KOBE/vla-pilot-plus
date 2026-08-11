@@ -5,7 +5,7 @@ project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
   status: active
-  phase: inner_loop_qd1_validation_ready
+  phase: inner_loop_qd1_validation_waiting_gpu_admission
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: false
@@ -193,7 +193,7 @@ experiments:
     scope_level: QD-1
     hypothesis_id: H1
     label: CONFIRMATORY
-    status: VALIDATION_READY
+    status: VALIDATION_WAITING_GPU_ADMISSION
     target_gap_before: 3
     historical_best_success_count: 2
     online_unique_cells_reserved: 14
@@ -355,7 +355,7 @@ experiments:
     dev_b_audit_mode: "0444"
     dev_b_audit_status: PASS
     decision: KEEP_AND_AUTHORIZE_NEW_VALIDATION_PROTOCOL
-    validation_status: MANIFEST_FROZEN_READY
+    validation_status: PRE_RESERVATION_GPU_WAIT
     validation_protocol: "experiments/run_010_causal_envelope_candidate/protocol-v11.md"
     validation_protocol_commit: "4b9c72c0eec68538839195a181bd5128b44ab4d7"
     validation_tasks: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -375,6 +375,15 @@ experiments:
     validation_manifest_job_matrix_sha256: "a2bd300ffd8fe95be554832d7c6c7b1da2f8c6811a77d4fca70799f40cdaba81"
     validation_manifest_mode: "0444"
     validation_manifest_size_bytes: 9055
+    validation_first_admission_invoked_at: "2026-08-11T01:50:20Z"
+    validation_first_admission_result: "REJECTED_PRE_RESERVATION_NO_ELIGIBLE_GPU"
+    validation_first_admission_reason: "Every GPU 0-7 had an external compute process during both required snapshots; co-location is forbidden"
+    validation_first_admission_artifact: null
+    validation_first_admission_attempts_consumed: 0
+    validation_first_admission_gpu_hours: 0
+    validation_attempt_ledger_sha256_after_rejection: "beee12bf7c142fabfe5ee29b62700c9d51d16a412bb4bd88b83d720406d9ccc4"
+    validation_output_directories_after_rejection: 0
+    validation_resource_decision: WAIT_FOR_FRESH_GPU_ADMISSION_WITHOUT_PROTOCOL_OR_SCIENCE_CHANGE
 
 outer_loop:
   cycle: 1

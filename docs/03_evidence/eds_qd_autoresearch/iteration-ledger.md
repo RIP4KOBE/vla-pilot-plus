@@ -756,3 +756,11 @@
 - Exact matrix：control/candidate × tasks 0–9 × frozen validation seeds，共 20 episodes；matrix SHA-256 `a2bd300ffd8fe95be554832d7c6c7b1da2f8c6811a77d4fca70799f40cdaba81`。两个 bound jobs 均含 execution record，并精确引用该 manifest file SHA。
 - Parent/identity：绑定 original run manifest、mechanism v2、Dev-A v2、Dev-B manifest/audit、checkpoint、LIBERO inputs、runtime cache 与未改变的四个 algorithm/config hashes；`formal_authorized=false`。
 - 状态：`VALIDATION_READY`。Freeze 本身新增 attempt/GPU/task/formal 均为 0；下一步只允许 detached implementation commit 上 fresh health/admission 后执行 IDs 35–54。Validation PASS 才能另立 formal protocol，FAIL 必须不运行 formal。
+
+#### AE. Validation pre-reservation GPU admission wait
+
+- Invocation boundary：在 detached implementation `838b555…` 以 ephemeral runtime credential 调用 frozen `run-validation --gpus auto`。Immutable parent evidence、validation manifest、runtime cache 与 credential health 已通过；two-snapshot admission 返回 `eligible_gpu_indices=[]`，随后 `_select_gpus` fail closed。
+- Resource cause：连续 snapshots 中 GPU 0–7 每张均存在外部 compute process；冻结方案禁止任何共卡。后续约 55 分钟只读监控仍显示跨八卡外部负载，且期间出现更多外部进程；本研究未终止、暂停、修改或抢占它们。
+- Failure boundary：发生在 admission artifact 写入、immediate dispatch snapshot、attempt reservation、worker/model load、API episode 与 LIBERO reset 之前。因此没有失败 admission artifact；这不是算法/task outcome，也不占 same-cell recovery。
+- Accounting proof：episode attempt ledger 仍为 42 JSONL records、22 effective cells、last attempt ID 34，SHA-256 `beee12bf7c142fabfe5ee29b62700c9d51d16a412bb4bd88b83d720406d9ccc4`；`validation__*` output directories 为 0；新增 attempt/episode/device-wall GPU-hour/formal use 全 0。
+- Target impact：candidate validation 仍未观测，历史正式 best `2/10`、gap 3 不变。Decision `WAIT_FOR_FRESH_GPU_ADMISSION_WITHOUT_PROTOCOL_OR_SCIENCE_CHANGE`；资源可用时从同一 detached implementation/manifest 重新 fresh admission，不修改 matrix、seed、gate 或算法。
