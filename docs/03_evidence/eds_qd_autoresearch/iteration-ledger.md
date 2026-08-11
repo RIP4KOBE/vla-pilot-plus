@@ -748,3 +748,11 @@
 - Runner：新增 exact 10-task validation seeds、20-cell versioned manifest、Dev-B PASS pre-gate、10-episode run count、`>=5/10`/not-below-control/7-of-10 mechanism/safety/latency/accounting/budget audit；无 formal command。
 - Algorithm freeze：四个 algorithm/config hashes 与 v9/v11 完全一致；算法 iteration 仍 1。
 - 当前无 validation manifest/attempt/GPU/task/formal。下一步从 committed implementation freeze manifest；未冻结不 dispatch。
+
+#### AD. Validation immutable manifest freeze
+
+- Implementation binding：`838b5550f96dfb9d8dbcf59bfc8052b9e1038350`；code-state `5446d4fd7a1011fc1c1b96a5cd4d1c7abaa4cc976657a0241e802385c8cf5024`。
+- Manifest：`manifests/validation_manifest.json`，mode 0444，size 9,055 bytes，file SHA-256 `0b9a19fc648bc7b0cf7291bd003387c01be82a015087b684e2d85007d41acd02`，payload `242833f405d48d282238e7739ff94e8620c733980be72ea8ad080e3e479916a3`。
+- Exact matrix：control/candidate × tasks 0–9 × frozen validation seeds，共 20 episodes；matrix SHA-256 `a2bd300ffd8fe95be554832d7c6c7b1da2f8c6811a77d4fca70799f40cdaba81`。两个 bound jobs 均含 execution record，并精确引用该 manifest file SHA。
+- Parent/identity：绑定 original run manifest、mechanism v2、Dev-A v2、Dev-B manifest/audit、checkpoint、LIBERO inputs、runtime cache 与未改变的四个 algorithm/config hashes；`formal_authorized=false`。
+- 状态：`VALIDATION_READY`。Freeze 本身新增 attempt/GPU/task/formal 均为 0；下一步只允许 detached implementation commit 上 fresh health/admission 后执行 IDs 35–54。Validation PASS 才能另立 formal protocol，FAIL 必须不运行 formal。
