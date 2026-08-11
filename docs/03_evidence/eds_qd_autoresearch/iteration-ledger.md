@@ -683,3 +683,11 @@
 - Credential fix：canonical detector 只匹配 present environment secret equality、standalone long `sk-` token、长 API assignment 或 Bearer；普通 `Task-Specific` 不再误报，真实长 token test 仍 fail closed。
 - Algorithm freeze verification：`qd_ed.py 1516bb75…70b9`、`rdt_policy_steer.py b8806d7a…c1ff2`、`eds_eval_metrics.py d8fb4d04…429`、`config.yaml b20791a2…daf8` 全部不变；算法 iteration 仍为 1。
 - 当前无新 artifact/attempt/GPU/task/formal 结果。下一步：提交 implementation/state 后，从该 exact commit 冻结 immutable Dev-B manifest；未冻结前不得 dispatch。
+
+#### W. Dev-B immutable manifest freeze
+
+- Implementation commit/code-state：`9ae7c00c0699c3a27b8424ffddd64ad8eb6615cb` / `03119526333d76fcbead4cd58453fd3e0dca7437ef92ad86e4d825475307b59e`。
+- Manifest：`manifests/dev_b_manifest.json`，mode 0444，size 8,682 bytes，file SHA-256 `375f78307ab4b02b112979486cccadd8bfcda6982133dd3fafdfc5c89919d9d6`，payload `296b25a832292be31a0a3d089b1f7d0dde7f0655a74e475861633d15b73ff3db`。
+- Binding：original manifest `cb211e2e…ae34`、mechanism v2 `c7e93f92…08ab`、Dev-A v2 `9c6d3ece…9fa9`、checkpoint aggregate `a2026bcf…6c28`、LIBERO inputs `259c469e…38b8`、runtime cache、algorithm four hashes 与 exact 8-cell matrix。
+- Policy：attempt cap 143、GPU-hour cap 48、GPU 0–7、strict perturbations、720 steps、`formal_authorized=false`；validation/formal CLI 不存在。
+- 状态：`DEV_B_READY`。下一步只允许 detached implementation commit 上 preflight/health、fresh GPU admission、IDs 27–34 reservation/dispatch；若任何 pre-reservation gate fail，不创建 attempts。
