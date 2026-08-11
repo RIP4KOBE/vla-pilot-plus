@@ -717,3 +717,14 @@
 - Preservation：v2 显式绑定 preserved v1 `375f7830…d9d6`，以及 v9 的 original/mechanism/Dev-A/algorithm/checkpoint/LIBERO/cache/matrix/caps 全部不变。
 - Binding probe：control/candidate bound jobs 均含 execution record、config fingerprint，manifest SHA 均精确为 `20b1349d…278e`。
 - 状态：`DEV_B_FINAL_READY`。下一步 detached `31bb8d5` 完全 fresh health/admission；成功才创建 IDs 27–34。若再发生 pre-reservation code-path failure，按 v10 stop boundary 中止 Dev-B。
+
+#### AA. Dev-B execution/audit PASS 与 validation decision
+
+- Execution：fresh admission artifact `73a0da5e…06dc`，GPU 0/1；IDs 27–34；wrapper exit 0 / wall `851.9 s`。Control/candidate 两 jobs 均 valid，manifest SHA `20b1349d…278e`。
+- Task matrix：control tasks 3/5/8/9 = fail/fail/fail/fail（`0/4`）；candidate = fail/success/success/fail（`2/4`）。Gained `[5,8]`、lost `[]`；Dev-B target gain +2，和 Dev-A `[9]` pooled gained-minus-lost `+3`。
+- Failure analysis：control 四 tasks 与 candidate tasks 3/9 为 `timeout without completion`；candidate tasks 5/8 完成。Collision/push/drop/wrong-object、qpos/nonfinite/action-mask/fallback 全 0。
+- Mechanism：resolution medians task 3/5/8/9 `0.48837/0.52565/0.49856/0.60343`，4/4 >=0.20；raw/post overflow P95 `0.971875/0`；archive mode ratios >1、spreads `0.212–0.227 m`；latency ratio `0.966079`。
+- Budget/accounting：Dev-B walls `807.166/694.879 s = 0.417235 GPU-hours`；含 incident/mechanism/Dev-A 累计 `1.187398/48`。Attempt expected/actual effective `22/22`，global reservations 34，PASS。
+- Immutable audit：`analysis/dev_b_audit.json`，mode 0444，size 361,566 bytes，SHA `7a73b3ae67d3980147bb48d14198b4de9cbabb14262c82effce656b3f91ff64f`；hard failures 0，strict credential scan 544 files / 0 failures。
+- Target impact：development direction连续两 split 正增益且零 loss，支持 candidate 可能缩小正式 gap；但 formal best/gap 仍 `2/10 / 3`，因为 development outcome 不替代 validation/formal。
+- Decision：`KEEP_AND_AUTHORIZE_NEW_VALIDATION_PROTOCOL`。Candidate code/config/threshold 必须保持不变；下一步 full 10-task independent validation paired control/candidate。当前 formal 仍未授权。
