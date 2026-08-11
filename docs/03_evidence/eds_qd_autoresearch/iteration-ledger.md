@@ -662,3 +662,14 @@
 - Audit：`passed=true`、hard failures 0；task matrix candidate `[9]` vs control `[]`，gained `[9]`、lost `[]`；mechanism support 4/4；post-overflow 0；latency ratio `0.96824461`；attempt、safety、artifact、strict credential gates 全 PASS。
 - Target gap 分析：本 split 从 paired control `0/4` 提升到 candidate `1/4`，新增一个 target-linked task success；但正式 best 仍是历史 `2/10`、formal target gap 仍 3，因为 Dev-A 不能替代 validation/formal。结果方向与“恢复 task 9 retention sentinel”预测一致。
 - Decision：`KEEP_AND_AUTHORIZE_DEV_B_PROTOCOL`。Candidate code/config/threshold 不变；Dev-B 必须使用独立 seeds `[558482,165717,160148,160312]` 复现方向。不得直接跳 validation，不得因 Dev-A success 调参。
+
+#### U. Dev-B confirmation protocol v9
+
+- 状态：`DEV_B_PROTOCOL_LOCKED`；protocol 在任何 runner 修改、manifest、reservation/dispatch/result 前提交。
+- 目标依据：Dev-A candidate 以 task 9 取得 `1/4 vs 0/4`，但正式 best/gap 仍 `2/10 / 3`。Dev-B 只回答独立 seeds 是否复现真实 success 优势，不为机制叙事追加计算。
+- Matrix：unchanged control/candidate × tasks `[3,5,8,9]` × Dev-B seeds `[558482,165717,160148,160312]`，8 full episodes。
+- Algorithm freeze：`qd_ed.py 1516bb75…70b9`；`rdt_policy_steer.py b8806d7a…c1ff2`；`eds_eval_metrics.py d8fb4d04…429`；`config.yaml b20791a2…daf8`。只允许 dedicated runner/tests plumbing。
+- Promotion：Dev-B candidate 必须 `>=control+1`、zero lost、gained-minus-lost `>=1`；pooled Dev-A+Dev-B >=1；validity/safety/mechanism/latency/accounting/artifact/credential/budget 全 PASS。Success tie 直接 revert，不接受 proxy-only。
+- Manifest：implementation/test commit 后冻结新 `dev_b_manifest.json`，绑定 original manifest、mechanism/Dev-A v2、algorithm blobs、checkpoint/LIBERO/cache/matrix/caps，`formal_authorized=false`。
+- Budget projection：新增 unique/effective cells 8，预计 reservations 34、effective cells 22；按 Dev-A device wall 估计新增约 `0.445 GPU-hours`，总计约 `1.215/48`。
+- Decision boundary：PASS 仅授权新 validation protocol；FAIL 则 revert causal-envelope 并 outer-loop，不能相邻调参。当前无 validation/formal authorization。
