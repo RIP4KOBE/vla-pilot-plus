@@ -615,3 +615,15 @@
 - 只读 root-cause verification：在 `d018f8ac…991` 重建 jobs 后，control/sparse/candidate fingerprints 精确为 `7dd8ca75…ed2` / `d083b1b7…9f2` / `296f14ae…f83`，三者 `_p2_job_validity` 均 PASS；严格 standalone token/API assignment/Bearer detector 扫描 192 个文本 artifacts 为 0 matches。
 - Protocol-first repair：新增 `protocol-v5.md`；只授权一次 no-episode/no-GPU v2 audit，使用 frozen revision、原科学 gates 和严格 credential predicate，写新 immutable `mechanism_preflight_audit.v2.json` 并保留 v1。无第三次 audit repair。
 - Target impact：best 仍为历史 `2/10`、gap 3；formal 0。只有 v2 aggregate PASS 才允许执行已冻结 Dev-A；当前不授权 Dev-B/validation/formal。
+
+#### P. Mechanism audit v2 PASS
+
+- Protocol-first：audit repair protocol commit `adfadeaf3efcf2dfad257edfb3a452fd3028ac9b` 先于 v2 artifact；未修改 scientific runner、算法、config、manifest、task/seed/checkpoint 或阈值。
+- Invocation：在 detached frozen revision `d018f8ac…991` 验证 code-state `3626b52b…9839c`、exact RDT gitlink、manifest `cb211e2e…ae34`、attempt ledger `5f497138…065c` 与 clean tracked state 后执行；无 API、GPU、episode、attempt 或 formal 消耗。
+- Immutable v2：`analysis/mechanism_preflight_audit.v2.json`，mode 0444，size 287,404 bytes，SHA-256 `c7e93f9255aee10f71e2519fa9e539cd537ca4ed89c905cebe334db5c68508ab`。v1 invalid artifact `d42dee30…d6c7` 同样 mode 0444、永久保留。
+- Validity：control/sparse/candidate `3/3` jobs valid；三个 config fingerprints 与 job manifests 精确匹配；hard failures `0`。
+- Mechanism/safety/accounting：candidate bounds/rebin/visits/global-best PASS；raw/post overflow P95 `0.9375/0`；latency ratio `0.9675801291 <= 1.25`；qpos/execution、nonfinite、action-mask、fallback 与 disallowed safety failures 全 0。
+- Attempts/budget：frozen phase actual cells 6、global effective dispatched 6、global reservations 18，attempt audit PASS；final run `0.301834 GPU-hours`，projected total `0.70428 GPU-hours <=48`。累计含 pre-episode import incident 为 `0.325428 GPU-hours`。
+- Credential：strict v2 在 run root 对 standalone long `sk-` token、API-key assignment、Authorization Bearer 和 present environment-secret equality 均 0 matches；credential audit PASS。用户 credential 从未持久化。
+- Task analysis：三 profile 在短 horizon 均 `0/2`，success gain/retention/loss 为 0/0/0；共同 failure `timeout without completion`，无可归因的 candidate safety/plumbing regression。该结果只满足 Stage-B 机制门，不缩小 target gap。
+- 决策：`KEEP_MECHANISM_PREFLIGHT_PASS_AND_RUN_FROZEN_DEV_A`。历史 best `2/10`、gap 3、formal 0；下一步只允许 parent protocol 已冻结的 control/candidate × tasks `[3,5,8,9]` full episodes。Dev-A target tie 或失败必须立即 revert causal-envelope，不能以 proxy 继续。
