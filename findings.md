@@ -22,7 +22,7 @@ Outer-loop cycle 1 pivots to H1 partition diagnostics. This choice is evidence-r
 
 `run_002_partition_diagnostic` supports that single H1 counterfactual. Across 4,567 exact-replayed 4x4 chunks, causal monotonic bounds expansion reduced within-cell endpoint SSE by median 30.1% (30.9% with equal profile weight), with all target-linked historical task strata 3/5/8/9 above 27%. Median occupied-mode retention was 93.75%, archive endpoint spread increased 2.01x, and every global reward-best fingerprint was retained. The raw initial-bound overflow P95 remained explicitly 0.875; the zero candidate overflow is the post-envelope representability metric, not a claim that exploration stopped. This is strong offline authorization for one QD-1 test, not evidence of task success.
 
-`run_010_causal_envelope_candidate` is implemented and has passed Stage-A, mechanism preflight, Dev-A, and independent Dev-B confirmation. The candidate expands bounds only from the current scored offspring batch, deterministically re-bins incumbents, conserves cumulative sparse-priority visits, and retains the unchanged reward/fingerprint global-best selection. Dev-A was 1/4 versus control 0/4 with gained task 9; Dev-B was 2/4 versus control 0/4 with gained tasks 5 and 8. Across both independent splits the unchanged candidate gained three task-seed cells and lost none. Resolution support was 4/4 on each split, post-envelope overflow P95 stayed 0, and selection latency stayed below the sparse preflight reference. This is repeat target-linked evidence and authorizes validation, but it does not change the historical formal 2/10 reference.
+`run_010_causal_envelope_candidate` completed validation and failed the primary target. The unchanged candidate scored 1/10 (task 0) versus control 0/10, far below the frozen 5/10 gate. Its Dev-A/Dev-B gains on tasks 9/5/8 did not replicate. This was not a mechanism-plumbing failure: resolution support held on 10/10 validation tasks, post-envelope overflow P95 was 0, archive spread did not collapse, latency was 1.092x the sparse reference, and all safety/accounting/credential gates passed. H1 is therefore supported as a partition-resolution mechanism but refuted as a sufficient success mechanism. Protocol v11 forbids formal and outcome-driven reuse of this validation set.
 
 Direct compute scaling is no longer an active direction. The 18 valid budget configurations ranged from 512 to 1,664 evaluations per complete chunk but all scored 0/10 or 1/10, with aggregate Spearman correlation 0.0 between evaluations/chunk and success. This does not prove compute can never help; it shows that compute without changing QD allocation/retention did not shrink the target gap.
 
@@ -41,6 +41,7 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 - `run_010` mechanism preflight: after append-only recovery of two pre-episode infrastructure incidents, exact frozen attempts 13–18 completed; aggregate v2 audit PASS with 3/3 valid jobs and zero hard failures (`c7e93f92…08ab`). Control/sparse/candidate each scored 0/2 in the two-chunk plumbing horizon; this unlocks Dev-A only.
 - `run_010` Dev-A: immutable v2 audit PASS (`9c6d3ece…9fa9`); candidate 1/4 vs control 0/4, gained task 9, lost none; 4/4 tasks support the partition mechanism and all safety/accounting/latency gates pass. Dev-B confirmation is required.
 - `run_010` Dev-B: immutable audit PASS (`7a73b3ae…f64f`); candidate 2/4 vs control 0/4, gained tasks 5/8, lost none; pooled Dev-A+Dev-B gain +3; 4/4 mechanism support and all hard gates pass. A new validation protocol is authorized.
+- `run_010` validation: immutable audit valid/target-FAIL (`3f72d025…0774`); candidate 1/10 (task 0) vs control 0/10; gained task 0, lost none; 10/10 mechanism support, post-overflow 0, latency 1.0922x, clean safety/accounting/credential, cumulative 2.9348 GPU-hours. Formal is forbidden.
 
 ## Patterns and Insights
 
@@ -58,6 +59,7 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 12. Result audits must bind to the same frozen scientific revision as job manifests; documentation-only commits alter code-state/config binding and can create false invalidity without changing the executed policy.
 13. Causal-envelope QD produced a paired full-episode gain on task 9 under a new seed while control failed all four Dev-A tasks; this is target-linked evidence, but a single split success is not sufficient to predict 5/10 formal acceptance.
 14. Independent Dev-B replicated and strengthened the task advantage on different seeds (2/4 vs 0/4), with different gained tasks 5/8 and no losses. The cross-split direction now supports full ten-task validation without changing the candidate.
+15. Perfectly activating the intended QD partition mechanism does not imply success transfer: all ten validation tasks showed resolution improvement, yet only task 0 succeeded and none of the three development gains replicated. Endpoint partition saturation was real but was not the dominant completion bottleneck.
 
 ## Lessons and Constraints
 
@@ -69,6 +71,7 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 - Protocol commits must precede results commits; invalid and negative results remain append-only evidence.
 - The old Grid5 result is invalid because of a bookkeeping exception, not a valid negative result about 5x5 discretization.
 - A wall-clock continuity loop has user consent in the execution phase, but it must preserve the pause sentinel, owned-process, write-boundary and no-duplication rules.
+- Once a candidate has exposed the fixed validation set and failed the target, it cannot be modified and re-evaluated on that set. Further algorithm work requires a versioned redesign with new holdout seeds; it is not a routine adjacent iteration.
 
 ## Open Questions
 
@@ -81,4 +84,4 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 
 ## Optimization Trajectory
 
-`run_000_baseline_replay` is complete; `run_001_allocation_ecology_diagnostic` ended invalid after two infrastructure attempts; `run_002_partition_diagnostic` passed all gates; and `run_010` algorithm iteration 1 passed Stage-A, mechanism preflight, Dev-A, and Dev-B. The unchanged candidate gained task 9 in Dev-A and tasks 5/8 in Dev-B, with paired controls 0/4 on both splits and zero losses. Preserved infrastructure/audit invalidities do not alter the scientific result. Historical formal best remains 2/10 and target gap remains 3; the next authorized step is a new full ten-task validation protocol, not formal execution.
+`run_000_baseline_replay` ruled out direct compute scaling; `run_001_allocation_ecology_diagnostic` ended invalid; `run_002_partition_diagnostic` supported H1 offline; and `run_010` algorithm iteration 1 passed mechanism/Dev-A/Dev-B but failed validation at 1/10 versus the 5/10 target. The historical formal best remains 2/10 and formal target gap remains 3 because formal was correctly not run; the candidate's observed validation gap is 4. The fixed validation set is now exposed, so outer-loop cycle 2 must conclude this frozen cycle or request a versioned redesign with new holdout seeds.
