@@ -709,3 +709,11 @@
 - Tests：dedicated `12 passed in 1.35s`；py_compile PASS；冻结九文件 `785 passed in 74.73s`。
 - Algorithm freeze：四个 algorithm/config SHA-256 再次与 v9 完全一致；无 algorithm iteration 增量。
 - 当前无新 manifest v2/attempt/GPU/task/formal。下一步：提交 repair implementation，从 exact commit 冻结 manifest v2，随后才允许 completely fresh admission。
+
+#### Z. Dev-B manifest v2 freeze 与 final readiness
+
+- Repair commit/code-state：`31bb8d5bb7a9a30f83de1b03abf36af5e9e2d381` / `63b380a786692fa57e76205b525d2c83d7a1322616ad970f821f88126accf258`。
+- Manifest v2：`manifests/dev_b_manifest.v2.json`，mode 0444，size 8,963 bytes，file SHA `20b1349da2f09335f1ce1be7f96e7cdd81c1bb689b41dfb6d275acdaaaa1278e`，payload `05a8ff3f388e1da3486203aaf889fa4bcf59978a37e5f88ea38e8c31327e78ba`。
+- Preservation：v2 显式绑定 preserved v1 `375f7830…d9d6`，以及 v9 的 original/mechanism/Dev-A/algorithm/checkpoint/LIBERO/cache/matrix/caps 全部不变。
+- Binding probe：control/candidate bound jobs 均含 execution record、config fingerprint，manifest SHA 均精确为 `20b1349d…278e`。
+- 状态：`DEV_B_FINAL_READY`。下一步 detached `31bb8d5` 完全 fresh health/admission；成功才创建 IDs 27–34。若再发生 pre-reservation code-path failure，按 v10 stop boundary 中止 Dev-B。
