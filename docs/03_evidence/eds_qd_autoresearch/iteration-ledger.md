@@ -627,3 +627,11 @@
 - Credential：strict v2 在 run root 对 standalone long `sk-` token、API-key assignment、Authorization Bearer 和 present environment-secret equality 均 0 matches；credential audit PASS。用户 credential 从未持久化。
 - Task analysis：三 profile 在短 horizon 均 `0/2`，success gain/retention/loss 为 0/0/0；共同 failure `timeout without completion`，无可归因的 candidate safety/plumbing regression。该结果只满足 Stage-B 机制门，不缩小 target gap。
 - 决策：`KEEP_MECHANISM_PREFLIGHT_PASS_AND_RUN_FROZEN_DEV_A`。历史 best `2/10`、gap 3、formal 0；下一步只允许 parent protocol 已冻结的 control/candidate × tasks `[3,5,8,9]` full episodes。Dev-A target tie 或失败必须立即 revert causal-envelope，不能以 proxy 继续。
+
+#### Q. Dev-A execution/audit binding protocol
+
+- 状态：`DEV_A_PROTOCOL_LOCKED_READY`；protocol v6 在任何 Dev-A reservation/dispatch/result 前写入并提交。
+- Matrix 不变：control/candidate × tasks `[3,5,8,9]` × seeds `[512905,150741,463456,452903]`，共 8 full episodes；两个 output roots 在 lock 时均不存在。
+- Frozen bindings：scientific revision/code-state `d018f8ac…991` / `3626b52b…9839c`；control/candidate config fingerprints `298badf2…0e0` / `65502f2a…df0`。
+- 已知 audit defect 前置关闭：execution 与 audit 都在 frozen revision；audit 复用 mechanism v2 已 PASS 的 strict credential predicate，不编辑 runtime cache，不改变任何科学 gate。
+- Target rule：candidate 必须 `>= control +1`、保留全部 control-success tasks、gained-minus-lost `>=1`；tie/proxy-only 必须 reject/revert。Dev-B、validation、formal 仍未授权。
