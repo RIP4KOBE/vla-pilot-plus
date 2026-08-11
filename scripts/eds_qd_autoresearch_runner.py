@@ -69,7 +69,11 @@ MECHANISM_AUDIT_PATH = RUN_ROOT / "analysis/mechanism_preflight_audit.json"
 DEV_A_AUDIT_PATH = RUN_ROOT / "analysis/dev_a_audit.json"
 MECHANISM_AUDIT_V2_PATH = RUN_ROOT / "analysis/mechanism_preflight_audit.v2.json"
 DEV_A_AUDIT_V2_PATH = RUN_ROOT / "analysis/dev_a_audit.v2.json"
-DEV_B_MANIFEST_PATH = RUN_ROOT / "manifests/dev_b_manifest.json"
+FAILED_DEV_B_MANIFEST_V1_PATH = RUN_ROOT / "manifests/dev_b_manifest.json"
+FAILED_DEV_B_MANIFEST_V1_SHA256 = (
+    "375f78307ab4b02b112979486cccadd8bfcda6982133dd3fafdfc5c89919d9d6"
+)
+DEV_B_MANIFEST_PATH = RUN_ROOT / "manifests/dev_b_manifest.v2.json"
 DEV_B_AUDIT_PATH = RUN_ROOT / "analysis/dev_b_audit.json"
 RUNTIME_CACHE_DIR = RUN_ROOT / "runtime_cache/cached_functions"
 RUNTIME_CACHE_MANIFEST_PATH = RUN_ROOT / "runtime_cache/provenance.json"
@@ -419,7 +423,7 @@ def _build_main_command(job: dict[str, Any], *args: Any, **kwargs: Any) -> list[
 
 
 def stage_dir(level: Any) -> str:
-    if str(level) in {MECHANISM_PREFLIGHT_LEVEL, DEV_A_LEVEL}:
+    if str(level) in {MECHANISM_PREFLIGHT_LEVEL, DEV_A_LEVEL, DEV_B_LEVEL}:
         return "run_010_causal_envelope_candidate"
     return _BASE_STAGE_DIR(level)
 
@@ -451,6 +455,7 @@ def configure_base() -> None:
     base.P2_LEVELS = set(base.P2_LEVELS) | {
         MECHANISM_PREFLIGHT_LEVEL,
         DEV_A_LEVEL,
+        DEV_B_LEVEL,
     }
     base.P2_ALLOWED_GPUS = {str(index) for index in ALLOWED_GPU_INDICES}
     base.P2_REQUIRED_MOUNT = Path("/mnt/data/shared2")
@@ -980,7 +985,7 @@ def _dev_b_manifest_payload(
     if algorithm_source_fingerprints != DEV_B_ALGORITHM_SOURCE_SHA256:
         raise RuntimeError("Dev-B algorithm source differs from the frozen candidate")
     return {
-        "schema": "eds-qd-autoresearch-run010-dev-b-manifest-v1",
+        "schema": "eds-qd-autoresearch-run010-dev-b-manifest-v2",
         "created_at": now(),
         "provenance": provenance,
         "storage": storage,
@@ -992,6 +997,10 @@ def _dev_b_manifest_payload(
             "original_run_manifest_sha256": ORIGINAL_RUN_MANIFEST_SHA256,
             "mechanism_audit_v2_sha256": MECHANISM_AUDIT_V2_SHA256,
             "dev_a_audit_v2_sha256": DEV_A_AUDIT_V2_SHA256,
+        },
+        "preserved_dev_b_manifest_v1": {
+            "path": str(FAILED_DEV_B_MANIFEST_V1_PATH),
+            "sha256": FAILED_DEV_B_MANIFEST_V1_SHA256,
         },
         "suite": "libero_object_swap",
         "strict_perturbations": True,
@@ -1017,6 +1026,13 @@ def freeze_dev_b_manifest(path: Path = DEV_B_MANIFEST_PATH) -> dict[str, Any]:
     storage = storage_preflight()
     if sha256_path(RUN_MANIFEST_PATH) != ORIGINAL_RUN_MANIFEST_SHA256:
         raise RuntimeError("original immutable run manifest identity mismatch")
+    if (
+        not FAILED_DEV_B_MANIFEST_V1_PATH.is_file()
+        or FAILED_DEV_B_MANIFEST_V1_PATH.stat().st_mode & 0o222
+        or sha256_path(FAILED_DEV_B_MANIFEST_V1_PATH)
+        != FAILED_DEV_B_MANIFEST_V1_SHA256
+    ):
+        raise RuntimeError("preserved Dev-B manifest v1 identity mismatch")
     _require_immutable_pass_artifact(
         MECHANISM_AUDIT_V2_PATH, MECHANISM_AUDIT_V2_SHA256
     )

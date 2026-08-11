@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import importlib.util
 import json
-from contextlib import nullcontext
 from pathlib import Path
 
 import pytest
@@ -235,6 +234,7 @@ def test_dev_b_manifest_payload_binds_pass_evidence_and_forbids_formal():
     )
 
     assert payload["formal_authorized"] is False
+    assert payload["schema"] == "eds-qd-autoresearch-run010-dev-b-manifest-v2"
     assert payload["parent_evidence"] == {
         "original_run_manifest_sha256": runner.ORIGINAL_RUN_MANIFEST_SHA256,
         "mechanism_audit_v2_sha256": runner.MECHANISM_AUDIT_V2_SHA256,
@@ -244,6 +244,9 @@ def test_dev_b_manifest_payload_binds_pass_evidence_and_forbids_formal():
     assert payload["dev_b"]["seeds"] == [558482, 165717, 160148, 160312]
     assert payload["dev_b"]["unique_cells"] == 8
     assert payload["algorithm_source_fingerprints"] == runner.DEV_B_ALGORITHM_SOURCE_SHA256
+    assert payload["preserved_dev_b_manifest_v1"]["sha256"] == (
+        runner.FAILED_DEV_B_MANIFEST_V1_SHA256
+    )
 
 
 def test_run_dev_b_requires_manifest_before_credential_or_admission(
@@ -286,19 +289,13 @@ def test_dev_b_job_binding_uses_the_versioned_manifest(tmp_path, monkeypatch):
     dev_b.chmod(0o444)
     monkeypatch.setattr(runner, "RUN_MANIFEST_PATH", original)
     monkeypatch.setattr(runner, "DEV_B_MANIFEST_PATH", dev_b)
-    monkeypatch.setattr(runner, "configured_base", lambda: nullcontext())
-    monkeypatch.setattr(runner.base, "_git_head_revision", lambda: "revision")
-    monkeypatch.setattr(runner.base, "_p2_code_state_sha256", lambda: "code-state")
-    monkeypatch.setattr(
-        runner.base,
-        "_bind_p2_execution_context",
-        lambda job, **kwargs: job,
-    )
 
-    bound = runner._bind_job({"level": runner.DEV_B_LEVEL})
+    bound = runner.build_jobs(runner.DEV_B_LEVEL)[0]
 
     assert bound["manifest_path"] == str(dev_b.resolve())
     assert bound["manifest_sha256"] == runner.sha256_path(dev_b)
+    assert bound["execution_record"]["code_state_sha256"]
+    assert bound["config_fingerprint"]
 
 
 def test_gpu_admission_uses_only_idle_authorized_indices():

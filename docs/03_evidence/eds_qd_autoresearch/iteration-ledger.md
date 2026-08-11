@@ -700,3 +700,12 @@
 - Admission evidence：`gpu_eds_qd_autoresearch_dev_b_1786410996.json`，SHA `fa8d86718045a87a6cfcf3ef3e6dfd42b134fed16c6cc784ad402d497559310c`，selected 0/1；不得复用。
 - Protocol-first v10：只允许 whitelist 一行修复 + real-binder test；因 code-state 改变，保留 manifest v1 `375f7830…d9d6`，从 repair commit 新冻 `dev_b_manifest.v2.json` 后 fresh admission。算法 hashes/gates/matrix 不变。
 - Budget/target：attempt/GPU/task/formal 增量 0；best/gap 仍 `2/10 / 3`。若再次发生 pre-reservation code-path failure，停止 Dev-B 并 outer-loop，不再追加 runner repair。
+
+#### Y. v10 execution-context repair implementation
+
+- Protocol-first：v10 commit `922d435325fc24460f38d3b6c9309bc819d6f5f7` 早于 repair code/test。
+- Real-binder TDD：在仅加入 `base.P2_LEVELS` 后首先因 `stage_dir` 仍不识别 Dev-B 红灯；同一 execution-context 边界内把 Dev-B 加入 level 与 stage-dir 两处 mapping 后，bound jobs 均含 execution record、config fingerprint 和 versioned manifest binding。
+- Manifest versioning：constant/schema 升级到 `dev_b_manifest.v2.json` / v2；freeze 必须验证 preserved v1 mode/hash，v1 永不覆盖。
+- Tests：dedicated `12 passed in 1.35s`；py_compile PASS；冻结九文件 `785 passed in 74.73s`。
+- Algorithm freeze：四个 algorithm/config SHA-256 再次与 v9 完全一致；无 algorithm iteration 增量。
+- 当前无新 manifest v2/attempt/GPU/task/formal。下一步：提交 repair implementation，从 exact commit 冻结 manifest v2，随后才允许 completely fresh admission。
