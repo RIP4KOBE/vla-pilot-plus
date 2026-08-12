@@ -945,3 +945,12 @@
 - Isolation：mechanism tasks/seeds `[3,8,9] / [955865,522754,845886]`；Dev-A `[0,1,2,4,6,7] / [307995,262892,731741,14859,648306,960581]`；validation tasks 0..9 / `[733557,563986,984766,598490,834409,827884,504577,82408,891085,7487]`；全部与先前 split/formal 不重叠。
 - Budget：v3 前 48 effective episodes、66 reservations、`3.7471009444444445` GPU-hours、formal 0。新 scientific cap 58；全走完为 124/143，保留 19 recovery；GPU cap仍48 hours。
 - Protocol boundary：design commit 前后均无 core/config change、GPU/API/LIBERO/reservation。下一步只能 protocol-first `run_030_global_quality_anchor_diagnostic` zero-episode checksum-bound reconstruction；PASS只授权implementation protocol。
+
+#### AW. run_030 allocation reconstruction protocol
+
+- Temporal lock：v3 design commit `f30e47c` 后、analyzer implementation与aggregate confirmatory result前冻结 `experiments/run_030_global_quality_anchor_diagnostic/protocol.md`。
+- Inputs：精确绑定 owned Run010 preflight/Dev-A/Dev-B/validation candidate metrics 与 Run023 candidate metrics，共5 files/419 rows；SHA分别 `09a77e90…7eca`、`535be576…6e84`、`6f948370…048d`、`7afb70e2…00bd`、`f18e2fcf…7273`。Production QD SHA `1516bb75…70b9`；禁止recursive/stale/outcome/protected input。
+- Eligibility：每 row只用 i=1..9 的 prior rewards/visits 与 next saved slots；只接受 unique maximum reward，equal maxima因缺 fingerprint tie data而显式排除；固定 run_seed0、episode/global_step/iter、sparse exponent1。
+- Baseline：用synthetic archive调用 unchanged production allocator population16，必须 100%等于保存slot map。Candidate：unique global-best dedicated 1 slot + unchanged allocator population15；分别记录dedicated/sparse/total。
+- Gates：>=300 transitions/>=3 tasks；baseline zero-slot overall >=25%且>=2 tasks各>=20%；candidate 1+15/16、zero omission；median occupied-cell coverage retention >=0.85；dual scientific payload byte identity、Torch RNG isolation、credential/write/accounting PASS。
+- Boundary：只允许新增 dedicated script/test；large JSON只写 owned Run030 root。当前 core/config/GPU/API/model/LIBERO/reservation/Dev/validation/formal授权均0；PASS只授权implementation protocol。
