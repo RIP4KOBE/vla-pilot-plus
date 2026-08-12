@@ -1176,3 +1176,12 @@
 - Protocol-first：新增`protocol-v3.md`只授权修改v5 runner/test并创建新的immutable recovery manifest；original manifest、append-only ledger既有行和incident archive均不可覆盖。Runner/test commit与manifest/health/admission必须先于reservation/GPU/API/LIBERO。
 - Accounting：当前仍94 reservations、66 effective episodes、约5.73640/48 GPUh；protocol阶段新增reservation/episode/GPU/formal均0。恢复成功预期变为98/144，之后不再授权Run044 retry。
 - Target：historical formal best/gap仍2/10、3；此次授权仅解除基础设施预算block，不构成算法成功或Dev-A授权。
+
+#### BU. Run044 exact recovery valid mechanism FAIL
+
+- Order/identity：protocol `5da58a0` -> runner `c071a76` -> immutable recovery manifest -> health/admission -> IDs95–98。Manifest mode0444、file SHA `8e8b5ec5…9652`、payload `f472b63e…3060`；admission只选空闲GPU4/5。两job metadata均精确为episode0 `(task5,666847)`、episode1 `(task7,87603)`。
+- Task-level：control `0/2`、candidate `0/2`，tasks5/7全部`timeout without completion`；delta0，gained/retained/lost均空，candidate diagnostic gap-to-five为5。没有task-level gain，不改变historical formal 2/10或gap3。
+- Mechanism：control gate PASS；candidate 41 records、410 anchor activations、1,685 secondary parents。Task5为38 records/380 anchors/1,573 secondary，task7为3/30/112。410个QD iterations中407个secondary count>0，但task5 `(step40,iter2)/(step168,iter0)/(step216,iter2)`三个iteration为0，违反冻结的every-iteration positive activation gate。
+- Other gates：task noninferiority/retention PASS，safety/fallback/nonfinite/mask/qpos PASS，无disallowed outcome；candidate/control latency P95 `2.730221/2.610942s`，ratio `1.045684<=1.25`；identity/artifact/credential/ledger均PASS。
+- Artifact/accounting：immutable audit mode0444、SHA `57544a82…1cc9`，sole hard failures即上述3个真实zero-parent identities；ledger SHA `ac1a7713…f8d0`，IDs91–94继续aborted/inadmissible、IDs95–98为science，global98/144。Recovery GPU1.210429h、累计6.946832/48h；effective episodes累计70；formal0。
+- Decision：`CONCLUDE_H5_V5_ONLINE_MECHANISM_FAIL_NO_ADOPTION`。不得用1,685 aggregate activations覆盖per-iteration gate，不得Dev-A/validation/formal、rerun、放宽gate或创建第六candidate。下一步只允许result commit后protocol-first outer-loop conclusion。

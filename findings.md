@@ -179,3 +179,23 @@ The v3 task-level evidence is now internally consistent with the primary objecti
 The immutable v3 decision is `CONCLUDE_NO_ADOPTION_WITHIN_V3_CYCLE_TARGET_NOT_MET`. One dedicated global-quality parent repairs a pervasive sparse-allocation lineage omission without increasing compute, but Dev-A shows that lineage retention alone is not sufficient for task completion. V3 ends after 66 effective online episodes, 90 reservations and 5.447063 GPU-hours, with no v3 validation or formal episode.
 
 No same-cycle candidate remains. Any future design must treat Run034 as revealed historical evidence and cannot tune on its tasks/seeds. The remaining evidence-supported diagnosis is that archive reward/final selection is weakly aligned with observable manipulation progress; pursuing it requires a new versioned, QD-first EDS+QD design and explicit approval rather than continuation of v3.
+
+## V5 Protected-Quality Lane Conclusion
+
+Run044 exact recovery is a valid negative result. Both control and protected
+secondary candidate scored `0/2` on the exact task 5/7 cells, with all four
+outcomes timing out; task delta, gained tasks and lost tasks are all zero. The
+candidate's secondary lane was highly active (1,685 parents; 407/410 QD
+iterations positive), but three real task-5 iterations had no secondary parent,
+which fails the frozen per-iteration activation gate. Thus role separation
+solves quality eviction and usually provides alternate lineages, but does not
+guarantee online alternate availability or translate to task completion.
+Aggregate secondary activity must not be treated as success evidence.
+
+H5-v5 is the frozen final evidence-backed candidate without prior task gain, and
+Run044 produced no task gain. Its valid mechanism FAIL therefore forbids Dev-A,
+validation, formal, a gate relaxation, an outcome-driven rerun and a sixth
+candidate. Cumulative accounting is 70 effective online episodes, 98/144
+reservations and 6.946832/48 GPU-hours; historical formal best/gap remain 2/10
+and 3. The next step is an immutable outer-loop no-adoption conclusion, not more
+mechanism exploration.
