@@ -870,3 +870,13 @@
 - Transaction：manifest/cache/input/code 验证 -> runtime credential + real health（不记录值）-> two-snapshot admission + immediate snapshot -> 才 reserve global IDs 55–60 -> dispatch。此前 global 54；完成 scientific reservations 为 60/143。
 - Gates：candidate 至少一 fallback 和一 active chunk；fallback `176/11/0` 且 non-QD selection，active `176/11/176` 且 QD selection；control QD off；全 validity/safety/accounting/credential/write-boundary PASS，candidate latency P95 <= control 1.25x。
 - Current authorization：runner/audit implementation 与 manifest freeze only；manifest 前 GPU/attempt=0，Dev-A/B/validation/formal 均未授权。
+
+#### AP. run_023 runner/manifest freeze and pre-reservation credential block
+
+- Implementation/tests：runner commit `d3f09b82dcd87ad0cde2038da0200e93287db3b7`；new/v1 runner+QD tests 88 PASS，run_021 focused 6 PASS，general eval/metrics/startup 352 PASS，非重叠总计 446。Core/config hashes 未变。
+- Manifest：owned `mechanism_manifest.json`，mode 0444，size 15,842，file SHA `d51a44042357b129595cc220faeecd5a9029f2424e0b803711a32ed31a8ec718`，payload `944047076b4347e582f9dd442e685c7b820f358e78dd0a9631fca01d700066c3`，code-state `26001c76…bb96`。Control/candidate fingerprints `f21f6ac6…2aa9` / `862b0d95…2d9c`；tasks/seeds/cells/run_022/checkpoint/LIBERO/cache/caps/formal=false 全绑定。
+- Transaction failure：manifest/storage/cache/credential-presence PASS 后，真实 pre-reservation Stage/Poe health FAIL。一次脱敏 diagnostic 仅输出 `AuthenticationError / HTTP 401 / invalid_api_key`；credential value、headers、exception text、reversible fingerprint 均未写入。
+- Boundary/accounting：failure 在 two-snapshot admission、immediate snapshot、GPU manifest、reservation、dispatch、worker/model、LIBERO reset 前。Run_023 attempt ledger 不存在；global reservations 仍 54，IDs 55–60 未使用；新增 online episode/GPU-hour/validation/formal 均 0。
+- Incident record：`experiments/run_023_reward_degenerate_online_mechanism/pre-reservation-health.md`，SHA-256 `779c515a67f0991e381fedad28ceda9b6045a66adb4d77fce06364df0ead00fe`。
+- Interpretation：纯 infrastructure/auth blocker，不是 H2 算法或 task outcome；historical formal best/gap 仍 `2/10 / 3`，六 cell 与所有 gates 不变。
+- Resume：需要 valid process-environment credential。由于本 incident record 会推进 documentation HEAD，恢复前必须 protocol-first versioned manifest/rebind，保留完全相同 runner/core/config/profile/matrix/input/cache/caps 和未使用 IDs；不得改 science。

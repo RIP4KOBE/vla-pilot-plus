@@ -5,7 +5,7 @@ project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
   status: running
-  phase: v2_h2_online_mechanism_protocol_locked_runner_required
+  phase: v2_h2_online_mechanism_waiting_valid_runtime_credential_pre_reservation
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: false
@@ -558,8 +558,10 @@ continuation_v2:
     gpu_hours: 0.0
     decision: KEEP_OFFLINE_MECHANISM_PASS_AND_AUTHORIZE_ONLINE_MECHANISM_PROTOCOL_ONLY
   run_023:
-    status: PROTOCOL_LOCKED
+    status: BLOCKED_PRE_RESERVATION_INVALID_CREDENTIAL
     protocol: "experiments/run_023_reward_degenerate_online_mechanism/protocol.md"
+    protocol_commit: "73724cec4d8c60096e5c6baed46274c7098964a3"
+    runner_implementation_commit: "d3f09b82dcd87ad0cde2038da0200e93287db3b7"
     algorithm_iteration: 2
     tasks: [2, 3, 9]
     seeds: [932032, 615132, 718536]
@@ -573,8 +575,31 @@ continuation_v2:
     allowed_new_files:
       - "scripts/eds_qd_autoresearch_v2_runner.py"
       - "tests/test_eds_qd_autoresearch_v2_runner.py"
-    gpu_authorized_before_manifest: false
-    online_episode_attempts_authorized_before_manifest: 0
+    runner_dedicated_and_legacy_tests: "88 passed"
+    run_021_focused_tests: "6 passed, 361 deselected"
+    general_eval_regression: "352 passed"
+    combined_nonoverlapping_tests: 446
+    manifest_path: "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_023_reward_degenerate_online_mechanism/manifests/mechanism_manifest.json"
+    manifest_file_sha256: "d51a44042357b129595cc220faeecd5a9029f2424e0b803711a32ed31a8ec718"
+    manifest_payload_sha256: "944047076b4347e582f9dd442e685c7b820f358e78dd0a9631fca01d700066c3"
+    manifest_mode: "0444"
+    manifest_size_bytes: 15842
+    manifest_code_state_sha256: "26001c7644b0a07183d35a3bef9591bf6bd928af279d6cffcc4327406c5bbb96"
+    control_profile_fingerprint: "f21f6ac6703320ae369ccf4edd147aca96a69a34ce87a2ee38e5d5f7ec312aa9"
+    candidate_profile_fingerprint: "862b0d9532e5b31ec55ea74fd97b466b89256e334e85ac2b126a209efefc2d9c"
+    credential_presence_check: PASS
+    real_health_check: FAIL
+    health_failure_http_status: 401
+    health_failure_error_code: invalid_api_key
+    credential_value_recorded: false
+    credential_fingerprint_recorded: false
+    gpu_admission_invoked: false
+    new_reservations: 0
+    new_gpu_hours: 0.0
+    online_episode_attempts: 0
+    recovery_requires_versioned_manifest_rebind: true
+    health_incident_record: "experiments/run_023_reward_degenerate_online_mechanism/pre-reservation-health.md"
+    health_incident_record_sha256: "779c515a67f0991e381fedad28ceda9b6045a66adb4d77fce06364df0ead00fe"
     dev_a_authorized: false
     formal_authorized: false
-  next_action: "Implement/test only the run_023 v2 runner/audit, commit it, then freeze and validate the immutable six-cell manifest before any credential health check, GPU admission, or reservation"
+  next_action: "Wait for a valid process-environment credential; after it is available, commit a protocol-first manifest/rebinding recovery that preserves all frozen science, then repeat health before any GPU admission or reservation"
