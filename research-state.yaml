@@ -1067,7 +1067,7 @@ continuation_v5:
   candidate: qd_protected_quality_secondary_v1
   candidate_stack: "capacity-one exact protected quality lane + one non-evicting secondary lane per quality cell + sparse_priority + causal_envelope_v1 + global-quality anchor1; fallback disabled"
   active_experiment: run_041_protected_quality_lane_diagnostic
-  phase: RUN041_PROTOCOL_PENDING_COMMIT
+  phase: RUN042_IMPLEMENTATION_PROTOCOL_PENDING_COMMIT
   final_candidate_without_prior_task_gain: true
   pre_v5_effective_online_episodes: 66
   pre_v5_global_reservations: 90
@@ -1125,4 +1125,17 @@ continuation_v5:
     core_config_change_authorized: false
     gpu_authorized: false
     online_episode_attempts_authorized: 0
-  next_action: "Commit Run041 result, then lock a separate TDD core implementation protocol"
+  run_042:
+    status: PROTOCOL_LOCKED_BEFORE_IMPLEMENTATION
+    protocol: "experiments/run_042_protected_quality_lane_implementation/protocol.md"
+    protocol_sha256: "7125aa543199980ed237403034ac4992e6844d3b576bf10c9c31d274c4c38406"
+    parent_result_commit: "f1d16cc"
+    allowed_core_files: 3
+    allowed_config_files: 1
+    allowed_test_files: 2
+    core_config_change_authorized: true
+    gpu_authorized: false
+    online_episode_attempts_authorized: 0
+    candidate_secondary_lane_mode: protected_reward_v1
+    compute_contract: "176 search / 176 QD / 11 score calls"
+  next_action: "Commit Run042 protocol, then implement exactly the six-file TDD change and run full applicable regression"

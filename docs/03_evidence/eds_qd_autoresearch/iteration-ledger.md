@@ -1133,3 +1133,13 @@
 - Artifacts：canonical/replay byte-identical、mode0444、24,017 bytes、file SHA `7eb5032d…3e89`、payload `6acc6976…4596`、strict credential0；所有write均在owned Run041 root。
 - Decision：`KEEP_H5_V5_OFFLINE_PASS_AUTHORIZE_IMPLEMENTATION_PROTOCOL_ONLY`。这是mechanism consistency，不是success evidence；必须另立core implementation protocol并TDD，不能直接online。
 - Accounting：新增GPU/API/model/LIBERO/reservation/online/formal为0；累计仍66 episodes、90/143 reservations、5.447063/48 GPUh、formal0；best/gap 2/10、3。
+
+#### BP. Run042 core implementation protocol
+
+- Order/scope：Run041 result commit `f1d16cc`后冻结；implementation前无core/config/test change。Whitelist严格3 core + config + `test_qd_ed_archive.py/test_rdt_steer.py`。
+- Config：新增default-off `qd_secondary_lane_mode`，只允许none/protected_reward_v1；protected只在grid+capacity1+sparse+causal+anchor1+fallback none合法。
+- Semantics：`entries`继续是capacity1 quality；secondary独立每quality cell至多1个、无visits/occupancy/global-best/final execution。Update/rebin先保持quality exact，再从映射alternate池选secondary；无quality cell即discard。
+- Allocation：quality-only production 1+15 cell counts不变，cell内stateless rotation；secondary与quality都rollout。完整chunk仍176/176/11。
+- Telemetry：mode、secondary occupancy/parents/ratio/fingerprint/cells/activation/rebin discard/invariant violation、source labels；既有quality/anchor/final telemetry保持authoritative。
+- Gates：none identity、fail-closed config、update/rebin/duplicate/no-alt、allocation/anchor/final/source/RNG、integrated secondary activation与176/176/11、安全/accounting、全量适用回归。
+- Authorization：当前GPU/API/model/LIBERO/reservation/online/Dev/validation/formal全部0；PASS只可另立CPU mechanism protocol。
