@@ -5,7 +5,7 @@ project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
   status: running
-  phase: run_033_online_mechanism_pass_dev_a_protocol_authorized
+  phase: run_034_dev_a_protocol_locked
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: false
@@ -127,7 +127,7 @@ hypotheses:
     priority: high
   - id: H4
     statement: "Uniform or inverse-visitation allocation over nearly saturated cells spends offspring on low-value niches; an explicit exploit/explore budget with quality guards will improve best-task progress at fixed 176 evaluations per complete chunk."
-    status: v3_online_mechanism_pass_dev_a_protocol_authorized
+    status: v3_dev_a_protocol_locked
     motivation: "Sparse gains one new task but loses two control tasks; uniform primary loses all three control successes."
     parent: null
     priority: medium
@@ -687,8 +687,8 @@ continuation_v3:
   candidate_limit: 1
   candidate: qd_global_quality_anchor_v1
   candidate_stack: "sparse_priority + causal_envelope_v1 + exactly one global-quality parent anchor; v2 fallback disabled"
-  active_experiment: run_033_global_quality_anchor_online_mechanism
-  phase: RUN_033_ONLINE_MECHANISM_PASS_DEV_A_PROTOCOL_AUTHORIZED
+  active_experiment: run_034_global_quality_anchor_dev_a
+  phase: RUN_034_DEV_A_PROTOCOL_LOCKED
   pre_v3_effective_online_episodes: 48
   pre_v3_global_reservations: 66
   pre_v3_gpu_hours: 3.7471009444444445
@@ -867,4 +867,25 @@ continuation_v3:
     decision: KEEP_H4_V3_ONLINE_MECHANISM_PASS_AND_AUTHORIZE_DEV_A_PROTOCOL_ONLY
     dev_a_authorized: true
     formal_authorized: false
-  next_action: "Freeze and commit the paired six-task Dev-A protocol on tasks [0,1,2,4,6,7] and seeds [307995,262892,731741,14859,648306,960581] before any runner change, manifest, GPU admission or reservation"
+  run_034:
+    status: PROTOCOL_LOCKED
+    protocol: "experiments/run_034_global_quality_anchor_dev_a/protocol.md"
+    protocol_sha256: "13c062a435519fc0c898887c564e272d3721187a96bccc8c39cf55f90af0b65f"
+    parent_result_commit: "c67a82b"
+    tasks: [0, 1, 2, 4, 6, 7]
+    seeds: [307995, 262892, 731741, 14859, 648306, 960581]
+    profiles: [p2_stage_on_abs_rbf_control, eds_qd_global_quality_anchor_v1]
+    scientific_cells: 12
+    expected_global_attempt_ids: [79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90]
+    global_reservations_before: 78
+    global_reservations_after_science: 90
+    candidate_minimum_successes: 3
+    candidate_minimum_delta_over_control: 1
+    lost_control_success_tasks_allowed: 0
+    allowed_new_files: 2
+    gpu_authorized_before_manifest: false
+    online_episode_attempts_authorized_before_manifest: 0
+    validation_authorized: false
+    formal_authorized: false
+    protocol_decision: IMPLEMENT_DEV_A_RUNNER_TEST_FREEZE_MANIFEST_THEN_HEALTH_ADMISSION
+  next_action: "Implement and test only the two-file Run034 Dev-A runner/audit, commit it, freeze and validate the immutable Dev-A manifest, then perform health and GPU admission before IDs 79-90 can be reserved"

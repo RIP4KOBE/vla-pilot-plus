@@ -1031,3 +1031,15 @@
 - Secret scan：audit-visible Run033 161 files PASS；complete Run033 tree 15,258 files与tracked worktree最新credential exact matches均0。Generic hits仅归档 sklearn bytecode和测试合成fixture，不是credential。
 - Accounting：new scientific device wall `0.3761441666666667 h`；累计 `4.183103444444445/48 h`；global reservations `78/143`；effective online episodes `54`；formal episodes0。
 - Decision：`KEEP_H4_V3_ONLINE_MECHANISM_PASS_AND_AUTHORIZE_DEV_A_PROTOCOL_ONLY`。Dev-A必须先protocol commit，随后才可实现runner/freeze manifest/health/admission。Frozen tasks/seeds `[0,1,2,4,6,7] / [307995,262892,731741,14859,648306,960581]`；candidate需`>=3/6`、相对control至少+1、lost空集及全部硬门PASS。Valid FAIL立即结束v3，不进validation/formal。
+
+#### BF. run_034 paired Dev-A transfer protocol
+
+- Temporal order：Run033 result独立commit `c67a82bfb461a841fb92ed48167a81f5630b7cc4` 后冻结本protocol；当前尚无Dev-A runner change、manifest、health、admission、reservation、GPU/API/model/LIBERO执行。
+- Matrix/isolation：tasks `[0,1,2,4,6,7]`，seeds `[307995,262892,731741,14859,648306,960581]`，paired control/candidate 12 cells；与v3 mechanism/validation、先前v1/v2 split及formal seeds不重叠，揭示后不得反馈调参。
+- Exact profiles：control `p2_stage_on_abs_rbf_control` QD-off；candidate保持Run033 sparse+causal+global anchor1+fallback none；checkpoint/Stage/prompt/perception/env/executor/evaluator与176/176/11 compute不变。
+- Target gates：candidate `>=3/6`；candidate-control `>=+1`；lost control-success tasks `[]`；逐task success/fail/gained/retained/lost/gap-to-five优先报告。Rescue等proxy不能覆盖success gate。
+- Hard gates：6/6 exact metadata/videos/Stage/suite validity；candidate每record 10 activation、1+15/16、176/176/11与完整source/fingerprint/final-selection；至少1 real rescue；control QD-off；disallowed safety空；latency ratio<=1.25；attempt/GPU/artifact/credential/write-boundary PASS。
+- Implementation boundary：protocol commit后只可新增 `scripts/eds_qd_autoresearch_v3_dev_runner.py` 与对应test；不可改existing core/config/runner/test。Runner commit后才可创建immutable Dev-A manifest，bind Run033 audit/result与exact matrix/hashes，`formal_authorized=false`。
+- Transaction：manifest validation -> runtime-only credential -> real health -> fresh two-snapshot GPU0–7 admission -> immediate snapshot -> IDs79–90 reservation/dispatch。最多两张admitted GPU，一卡一worker，不共享/抢占/终止外部process。
+- Budget：before Dev-A effective54、reservations78、GPU `4.183103444444445 h`、recovery 6/19、formal0；science后reservations90/effective66。剩余13 recovery slots仍只用于protocol-first exact-cell infrastructure recovery。
+- Stop：valid FAIL=`CONCLUDE_H4_V3_DEV_A_FAIL_NO_ADOPTION`，不进validation/formal、不产生第四candidate或Run034-driven tuning；PASS只授权另立validation protocol。
