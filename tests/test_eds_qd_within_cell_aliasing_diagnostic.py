@@ -118,6 +118,27 @@ def test_top_two_geometry_statistics_use_reward_order():
     assert result.top_two_direction_distances[0] > 0.7
 
 
+def test_mismatch_summary_does_not_conflate_capacity_one_and_two():
+    summary = diagnostic.summarize_mismatch_counts(
+        [
+            {
+                "capacity_one_mismatches": [],
+                "capacity_two_mismatches": [
+                    "iter4:quality_retention",
+                    "iter5:global_best_retention",
+                    "iter6:capacity_or_duplicate",
+                ],
+            }
+        ]
+    )
+
+    assert summary == {
+        "capacity_one_exact_mismatch_count": 0,
+        "capacity_two_retention_mismatch_count": 2,
+        "capacity_two_integrity_mismatch_count": 1,
+    }
+
+
 def test_manifest_validation_rejects_checksum_mismatch(tmp_path):
     trace = tmp_path / "trace.pt"
     trace.write_bytes(b"trace")

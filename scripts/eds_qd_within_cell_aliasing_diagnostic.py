@@ -547,7 +547,8 @@ def analyze_trace(spec: InputSpec) -> dict[str, Any]:
     direction_distances: list[float] = []
     shape_distances: list[float] = []
     reward_gaps: list[float] = []
-    exact_mismatches: list[str] = []
+    capacity_one_mismatches: list[str] = []
+    capacity_two_mismatches: list[str] = []
     allocations = 0
     sparse_slots = secondary_slots = 0
     coverage_retention: list[float] = []
@@ -625,7 +626,9 @@ def analyze_trace(spec: InputSpec) -> dict[str, Any]:
                         or summary.visit_sum_after != saved_after
                         or summary.collisions != saved_collisions
                     ):
-                        exact_mismatches.append(f"iter{iter_idx}:rebin_{label}")
+                        capacity_one_mismatches.append(
+                            f"iter{iter_idx}:rebin_{label}"
+                        )
 
         visits = torch.bincount(torch.tensor(assigned), minlength=CELL_COUNT)
         cap1.visits += visits
@@ -636,7 +639,7 @@ def analyze_trace(spec: InputSpec) -> dict[str, Any]:
         if iter_idx == -1:
             saved_accounting = qd.get("qd_initial_accounting") or {}
             if len(cap1.entries) != int(qd.get("qd_initial_occupied_cells")):
-                exact_mismatches.append("initial:occupied")
+                capacity_one_mismatches.append("initial:occupied")
         else:
             saved_accounting = {
                 "insertions": qd["qd_archive_insertions_by_iter"][iter_idx],
@@ -645,24 +648,24 @@ def analyze_trace(spec: InputSpec) -> dict[str, Any]:
                 "total": 16,
             }
             if len(cap1.entries) != int(qd["qd_occupied_cells_by_iter"][iter_idx]):
-                exact_mismatches.append(f"iter{iter_idx}:occupied")
+                capacity_one_mismatches.append(f"iter{iter_idx}:occupied")
             if not _maps_equal(
                 _reward_map(cap1), qd["qd_per_cell_elite_reward_by_iter"][iter_idx]
             ):
-                exact_mismatches.append(f"iter{iter_idx}:reward_map")
+                capacity_one_mismatches.append(f"iter{iter_idx}:reward_map")
             saved_best = float(qd["qd_archive_best_reward_by_iter"][iter_idx])
             if cap1.global_best()[2].reward != saved_best:
-                exact_mismatches.append(f"iter{iter_idx}:best_reward")
+                capacity_one_mismatches.append(f"iter{iter_idx}:best_reward")
             saved_visits = torch.tensor(
                 qd["qd_cumulative_cell_visits_by_iter"][iter_idx], dtype=torch.long
             )
             if not torch.equal(cap1.visits, saved_visits):
-                exact_mismatches.append(f"iter{iter_idx}:visits")
+                capacity_one_mismatches.append(f"iter{iter_idx}:visits")
         if any(
             int(saved_accounting.get(key, -1)) != int(getattr(update1, key))
             for key in ("insertions", "replacements", "rejections", "total")
         ):
-            exact_mismatches.append(f"iter{iter_idx}:update_accounting")
+            capacity_one_mismatches.append(f"iter{iter_idx}:update_accounting")
 
         cap1_quality_fingerprints = {
             entry.fingerprint for entry in cap1.quality_entries().values()
@@ -673,15 +676,15 @@ def analyze_trace(spec: InputSpec) -> dict[str, Any]:
             for entry in cell_entries
         }
         if not cap1_quality_fingerprints.issubset(cap2_fingerprints):
-            exact_mismatches.append(f"iter{iter_idx}:quality_retention")
+            capacity_two_mismatches.append(f"iter{iter_idx}:quality_retention")
         if cap1.global_best()[2].fingerprint != cap2.global_best()[2].fingerprint:
-            exact_mismatches.append(f"iter{iter_idx}:global_best_retention")
+            capacity_two_mismatches.append(f"iter{iter_idx}:global_best_retention")
         if any(
             len(cell_entries) > 2
             or len({entry.fingerprint for entry in cell_entries}) != len(cell_entries)
             for cell_entries in cap2.entries.values()
         ):
-            exact_mismatches.append(f"iter{iter_idx}:capacity_or_duplicate")
+            capacity_two_mismatches.append(f"iter{iter_idx}:capacity_or_duplicate")
 
     return {
         "path": str(spec.path),
@@ -700,7 +703,33 @@ def analyze_trace(spec: InputSpec) -> dict[str, Any]:
         "sparse_slots": sparse_slots,
         "secondary_slots": secondary_slots,
         "coverage_retention": coverage_retention,
-        "exact_mismatches": exact_mismatches,
+        "capacity_one_mismatches": capacity_one_mismatches,
+        "capacity_two_mismatches": capacity_two_mismatches,
+    }
+
+
+def summarize_mismatch_counts(trace_results: list[dict[str, Any]]) -> dict[str, int]:
+    capacity_one = sum(
+        len(result["capacity_one_mismatches"]) for result in trace_results
+    )
+    capacity_two_retention = sum(
+        sum(
+            mismatch.endswith(("quality_retention", "global_best_retention"))
+            for mismatch in result["capacity_two_mismatches"]
+        )
+        for result in trace_results
+    )
+    capacity_two_integrity = sum(
+        sum(
+            mismatch.endswith("capacity_or_duplicate")
+            for mismatch in result["capacity_two_mismatches"]
+        )
+        for result in trace_results
+    )
+    return {
+        "capacity_one_exact_mismatch_count": capacity_one,
+        "capacity_two_retention_mismatch_count": capacity_two_retention,
+        "capacity_two_integrity_mismatch_count": capacity_two_integrity,
     }
 
 
@@ -752,7 +781,7 @@ def analyze(
     ]
     sparse_slots = sum(result["sparse_slots"] for result in trace_results)
     secondary_slots = sum(result["secondary_slots"] for result in trace_results)
-    mismatch_count = sum(len(result["exact_mismatches"]) for result in trace_results)
+    mismatch_counts = summarize_mismatch_counts(trace_results)
     metrics = {
         "trace_count": len(trace_results),
         "candidate_stream_count": streams,
@@ -763,7 +792,7 @@ def analyze(
         "top_two_direction_distance_median": _median(direction),
         "top_two_shape_distance_median": _median(shape),
         "top_two_reward_gap_median": _median(reward_gap),
-        "capacity_one_exact_mismatch_count": mismatch_count,
+        **mismatch_counts,
         "allocation_count": sum(result["allocation_count"] for result in trace_results),
         "sparse_slot_count": sparse_slots,
         "secondary_sparse_slot_count": secondary_slots,
@@ -790,7 +819,15 @@ def analyze(
         "top_two_reward_gap_median_at_most_0_02": (
             metrics["top_two_reward_gap_median"] <= 0.02
         ),
-        "capacity_one_exact_replay": mismatch_count == 0,
+        "capacity_one_exact_replay": (
+            mismatch_counts["capacity_one_exact_mismatch_count"] == 0
+        ),
+        "capacity_two_quality_and_global_best_retention": (
+            mismatch_counts["capacity_two_retention_mismatch_count"] == 0
+        ),
+        "capacity_two_capacity_and_fingerprint_integrity": (
+            mismatch_counts["capacity_two_integrity_mismatch_count"] == 0
+        ),
         "secondary_sparse_slot_ratio_at_least_0_20": (
             metrics["secondary_sparse_slot_ratio"] >= 0.20
         ),
