@@ -220,3 +220,103 @@ def test_actual_run_043_parent_is_immutable_clean_pass():
     parent = runner.verified_run_043()
     assert parent["sha256"] == runner.RUN_043_ARTIFACT_SHA256
     assert parent["scientific_payload_sha256"] == runner.RUN_043_PAYLOAD_SHA256
+
+
+def test_recovery_budget_and_execution_identity_are_exact():
+    assert runner.RECOVERY_PROTOCOL_COMMIT == (
+        "5da58a0e0ae1558a5fffaf10e1985515b619ef6f"
+    )
+    assert runner.RECOVERY_PRIOR_GLOBAL_RESERVATIONS == 94
+    assert runner.RECOVERY_GLOBAL_RESERVATION_CAP == 144
+    assert runner.RECOVERY_EXPECTED_GLOBAL_ATTEMPT_IDS == list(range(95, 99))
+    jobs = runner.build_recovery_jobs(runner.MECHANISM_LEVEL, bind=False)
+    assert [
+        (task, seed)
+        for task, seed in zip(
+            jobs[0]["task_ids_filter"], jobs[0]["episode_seeds"], strict=True
+        )
+    ] == [(5, 666847), (7, 87603)]
+
+
+def test_recovery_ledger_appends_ids_95_to_98_without_rewriting_incident(
+    tmp_path, monkeypatch
+):
+    ledger = tmp_path / "ledger.jsonl"
+    runner.reserve_attempts(ledger, _attempt_records())
+    runner.append_dispatch_event(ledger, list(range(91, 95)), [0, 1])
+    runner.append_identity_abort_event(ledger)
+    prefix = ledger.read_bytes()
+    monkeypatch.setattr(
+        runner, "PRE_RECOVERY_LEDGER_SHA256", runner.sha256_path(ledger)
+    )
+
+    records = runner.attempt_records(
+        runner.build_recovery_jobs(runner.MECHANISM_LEVEL)
+    )
+    reserved = runner.reserve_recovery_attempts(ledger, records)
+    assert [row["attempt_id"] for row in reserved] == list(range(95, 99))
+    assert ledger.read_bytes().startswith(prefix)
+
+    state = runner.append_recovery_dispatch_event(
+        ledger, list(range(95, 99)), [2, 3]
+    )
+    assert state["aborted_attempt_ids"] == list(range(91, 95))
+    assert state["active_dispatched_attempt_ids"] == list(range(95, 99))
+    assert state["recovery_dispatched_attempt_ids"] == list(range(95, 99))
+
+
+def test_recovery_run_stops_at_manifest_before_credential_or_admission(monkeypatch):
+    monkeypatch.setattr(
+        runner,
+        "validate_recovery_manifest",
+        lambda: (_ for _ in ()).throw(RuntimeError("recovery manifest blocked")),
+    )
+    monkeypatch.setattr(
+        runner,
+        "validate_credential",
+        lambda: pytest.fail("credential checked before recovery manifest"),
+    )
+    monkeypatch.setattr(
+        runner,
+        "admit_gpus",
+        lambda **kwargs: pytest.fail("GPU admission before recovery manifest"),
+    )
+    with pytest.raises(RuntimeError, match="recovery manifest blocked"):
+        runner.run_recovery_mechanism(gpus="auto", timeout_seconds=10)
+
+
+def test_recovery_attempt_audit_excludes_aborted_ids(monkeypatch):
+    state = {
+        "attempts": [
+            {
+                "attempt_id": attempt_id,
+                "formal_label": label,
+                "task_id": task,
+                "episode_seed": seed,
+            }
+            for attempt_id, (label, task, seed) in zip(
+                range(91, 99),
+                [
+                    ("p2_stage_on_abs_rbf_control", 7, 87603),
+                    ("p2_stage_on_abs_rbf_control", 5, 666847),
+                    ("eds_qd_protected_quality_secondary_v1", 7, 87603),
+                    ("eds_qd_protected_quality_secondary_v1", 5, 666847),
+                    ("p2_stage_on_abs_rbf_control", 5, 666847),
+                    ("p2_stage_on_abs_rbf_control", 7, 87603),
+                    ("eds_qd_protected_quality_secondary_v1", 5, 666847),
+                    ("eds_qd_protected_quality_secondary_v1", 7, 87603),
+                ],
+                strict=True,
+            )
+        ],
+        "dispatched_attempt_ids": list(range(91, 99)),
+        "aborted_attempt_ids": list(range(91, 95)),
+        "active_dispatched_attempt_ids": list(range(95, 99)),
+        "recovery_dispatched_attempt_ids": list(range(95, 99)),
+    }
+    monkeypatch.setattr(runner, "ledger_state", lambda _path: state)
+    audit = runner._attempt_audit()
+    assert audit["passed"] is True
+    assert audit["scientific_attempt_ids"] == list(range(95, 99))
+    assert audit["invalid_aborted_attempt_ids"] == list(range(91, 95))
+    assert audit["global_reserved_count"] == 98

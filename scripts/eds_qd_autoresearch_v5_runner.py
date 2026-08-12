@@ -36,14 +36,18 @@ qd_audit = dev.qd_audit
 MECHANISM_LEVEL = "eds_qd_autoresearch_v5_mechanism"
 BRANCH = "exp/eds-qd-autoresearch-libero-swap-ood"
 PROTOCOL_COMMIT = "0e59987011ed29779bd621a856283c8746a6b5df"
+RECOVERY_PROTOCOL_COMMIT = "5da58a0e0ae1558a5fffaf10e1985515b619ef6f"
 RUN_042_IMPLEMENTATION_COMMIT = "e75516a36b10041b1a652bde8175302c9a7e896a"
 RUN_043_RESULT_COMMIT = "1e1fef41de31bf2742e6176f424b2725a2cf9236"
 EXPERIMENT_ROOT = dev.EXPERIMENT_ROOT
 RUN_ROOT = EXPERIMENT_ROOT / "run_044_protected_quality_lane_online_mechanism"
 OUTPUT_LINK = WORKTREE_ROOT / "outputs"
 MANIFEST_PATH = RUN_ROOT / "manifests/mechanism_manifest.json"
+RECOVERY_MANIFEST_PATH = (
+    RUN_ROOT / "manifests/mechanism_recovery_v2_manifest.json"
+)
 ATTEMPT_LEDGER_PATH = RUN_ROOT / "manifests/episode_attempt_ledger.jsonl"
-AUDIT_PATH = RUN_ROOT / "analysis/mechanism_audit.json"
+AUDIT_PATH = RUN_ROOT / "analysis/mechanism_recovery_v2_audit.json"
 RUN_043_ARTIFACT_PATH = (
     EXPERIMENT_ROOT
     / "run_043_protected_quality_lane_cpu_mechanism/analysis/mechanism_preflight.v1.json"
@@ -71,7 +75,29 @@ MECHANISM_TASKS = [7, 5]
 MECHANISM_SEEDS = [87603, 666847]
 MECHANISM_MAX_CHUNKS = 16
 EXPECTED_GLOBAL_ATTEMPT_IDS = list(range(91, 95))
+ALL_RUN044_ATTEMPT_IDS = list(range(91, 99))
+RECOVERY_EXPECTED_GLOBAL_ATTEMPT_IDS = list(range(95, 99))
+RECOVERY_PRIOR_GLOBAL_RESERVATIONS = 94
+RECOVERY_GLOBAL_RESERVATION_CAP = 144
+RECOVERY_PRIOR_GPU_HOURS = 5.736403166666667
+PRE_RECOVERY_LEDGER_ROW_COUNT = 6
+PRE_RECOVERY_LEDGER_SHA256 = (
+    "447ac12776cc882024450d4e3a9166c46bd3318259ef574c90be5c7e43562371"
+)
+ORIGINAL_MANIFEST_SHA256 = (
+    "b6ae5091344aba325e1d5b698c8d19707e6aaf5aaef43ad5125721e423d1ff97"
+)
+ORIGINAL_MANIFEST_PAYLOAD_SHA256 = (
+    "1f5374857469a8d00be00eb1562fcb8ed8b5b3d0ef11b3f3a08c1256a24773cf"
+)
 IDENTITY_INCIDENT_ROOT = RUN_ROOT / "incidents/invalid_task_seed_ids_91_94"
+IDENTITY_INCIDENT_MANIFEST_PATH = IDENTITY_INCIDENT_ROOT / "archive_manifest.json"
+IDENTITY_INCIDENT_MANIFEST_SHA256 = (
+    "b22ace40178d355fc0146c35b3c9c9e7e2e8d1eb3798f26282ba0e64647d4661"
+)
+IDENTITY_INCIDENT_PAYLOAD_SHA256 = (
+    "5fc0cb554b7cce6965ac0f94a9562e39a88d5b680924731987e74517255e727f"
+)
 EXPECTED_ALGORITHM_HASHES = {
     "core/qd_ed.py": (
         "2246193f87a27dc8568f434e3c9933aa4cf354e770417c62e463f7c565e1247e"
@@ -197,7 +223,7 @@ def build_main_command(
             prepared["task_ids_filter"], prepared["episode_seeds"], strict=True
         )
     ]
-    if requested_pairs != frozen_task_seed_pairs():
+    if requested_pairs not in (frozen_task_seed_pairs(), backend_execution_pairs()):
         raise RuntimeError("Run044 job task/seed pairs differ from freeze")
     execution_seeds = [seed for _, seed in backend_execution_pairs()]
     command.append("main.episode_seed_schedule=" + hydra_value(execution_seeds))
@@ -226,13 +252,18 @@ def build_main_command(
 
 
 def _bind_job(job: dict[str, Any]) -> dict[str, Any]:
-    if MANIFEST_PATH.is_file():
-        if MANIFEST_PATH.stat().st_mode & 0o222:
+    active_manifest = (
+        RECOVERY_MANIFEST_PATH
+        if RECOVERY_MANIFEST_PATH.is_file()
+        else MANIFEST_PATH
+    )
+    if active_manifest.is_file():
+        if active_manifest.stat().st_mode & 0o222:
             raise RuntimeError("Run044 manifest must be immutable")
         job = {
             **job,
-            "manifest_path": str(MANIFEST_PATH.resolve(strict=True)),
-            "manifest_sha256": sha256_path(MANIFEST_PATH),
+            "manifest_path": str(active_manifest.resolve(strict=True)),
+            "manifest_sha256": sha256_path(active_manifest),
         }
     with configured_base():
         return base._bind_p2_execution_context(
@@ -278,6 +309,24 @@ def build_jobs(
     return jobs
 
 
+def build_recovery_jobs(
+    level: str,
+    episodes: int | None = None,
+    *,
+    bind: bool = True,
+    **_: Any,
+) -> list[dict[str, Any]]:
+    jobs = build_jobs(level, episodes, bind=False)
+    execution_pairs = backend_execution_pairs()
+    for job in jobs:
+        job["task_ids_filter"] = [task for task, _ in execution_pairs]
+        job["episode_seeds"] = [seed for _, seed in execution_pairs]
+        job["recovery_frozen_task_seed_pairs"] = [
+            list(pair) for pair in frozen_task_seed_pairs()
+        ]
+    return [_bind_job(job) for job in jobs] if bind else jobs
+
+
 def gpu_probe(gpu: str) -> tuple[str, str]:
     index = int(gpu)
     if index not in ALLOWED_GPU_INDICES:
@@ -306,7 +355,9 @@ def configure_base() -> None:
     base.P2_ALLOWED_GPUS = {str(index) for index in ALLOWED_GPU_INDICES}
     base.P2_REQUIRED_MOUNT = Path("/mnt/data/shared2")
     base.P2_TORCH_HUB_SEED = DINOV2_TORCH_HUB_SEED
-    base.build_jobs = build_jobs
+    base.build_jobs = (
+        build_recovery_jobs if RECOVERY_MANIFEST_PATH.is_file() else build_jobs
+    )
     base.build_main_command = build_main_command
     base._p2_stage_dir = stage_dir
     base._p2_gpu_probe = gpu_probe
@@ -388,6 +439,7 @@ def current_provenance() -> dict[str, Any]:
         "code_commit": head,
         "code_state_sha256": code_state,
         "protocol_commit": PROTOCOL_COMMIT,
+        "recovery_protocol_commit": RECOVERY_PROTOCOL_COMMIT,
         "run_042_implementation_commit": RUN_042_IMPLEMENTATION_COMMIT,
         "run_043_result_commit": RUN_043_RESULT_COMMIT,
     }
@@ -578,6 +630,240 @@ def validate_manifest() -> dict[str, Any]:
     return payload
 
 
+def _immutable_json_identity(
+    path: Path, *, file_sha256: str, payload_sha256: str
+) -> dict[str, Any]:
+    if (
+        not path.is_file()
+        or path.stat().st_mode & 0o222
+        or sha256_path(path) != file_sha256
+    ):
+        raise RuntimeError(f"immutable Run044 evidence mismatch: {path}")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if payload.get("payload_sha256") != payload_sha256:
+        raise RuntimeError(f"Run044 evidence payload mismatch: {path}")
+    if contains_credential(payload):
+        raise RuntimeError(f"Run044 evidence credential scan failed: {path}")
+    return {
+        "path": str(path),
+        "sha256": file_sha256,
+        "payload_sha256": payload_sha256,
+    }
+
+
+def verified_recovery_parent_evidence(
+    ledger_path: Path = ATTEMPT_LEDGER_PATH,
+) -> dict[str, Any]:
+    original_manifest = _immutable_json_identity(
+        MANIFEST_PATH,
+        file_sha256=ORIGINAL_MANIFEST_SHA256,
+        payload_sha256=ORIGINAL_MANIFEST_PAYLOAD_SHA256,
+    )
+    incident = _immutable_json_identity(
+        IDENTITY_INCIDENT_MANIFEST_PATH,
+        file_sha256=IDENTITY_INCIDENT_MANIFEST_SHA256,
+        payload_sha256=IDENTITY_INCIDENT_PAYLOAD_SHA256,
+    )
+    if not ledger_path.is_file():
+        raise RuntimeError("Run044 append-only ledger is missing")
+    lines = ledger_path.read_bytes().splitlines(keepends=True)
+    if len(lines) < PRE_RECOVERY_LEDGER_ROW_COUNT:
+        raise RuntimeError("Run044 ledger is shorter than preserved incident prefix")
+    prefix = b"".join(lines[:PRE_RECOVERY_LEDGER_ROW_COUNT])
+    prefix_sha = sha256_bytes(prefix)
+    if prefix_sha != PRE_RECOVERY_LEDGER_SHA256:
+        raise RuntimeError("Run044 ledger incident prefix was modified")
+    state = ledger_state(ledger_path)
+    if (
+        [int(row["attempt_id"]) for row in state["attempts"][:4]]
+        != EXPECTED_GLOBAL_ATTEMPT_IDS
+        or state["aborted_attempt_ids"] != EXPECTED_GLOBAL_ATTEMPT_IDS
+    ):
+        raise RuntimeError("Run044 original incident ledger state mismatch")
+    return {
+        "original_manifest": original_manifest,
+        "pre_recovery_ledger": {
+            "path": str(ledger_path),
+            "prefix_row_count": PRE_RECOVERY_LEDGER_ROW_COUNT,
+            "prefix_sha256": prefix_sha,
+        },
+        "identity_incident": incident,
+    }
+
+
+def recovery_output_preflight() -> None:
+    paths = [
+        RUN_ROOT / "mechanism__p2_stage_on_abs_rbf_control",
+        RUN_ROOT / "mechanism__eds_qd_protected_quality_secondary_v1",
+        RUN_ROOT / "run_manifest.csv",
+        EXPERIMENT_ROOT
+        / "runner_logs/run_044_protected_quality_lane_online_mechanism",
+        EXPERIMENT_ROOT
+        / "runtime_cache/run_044_protected_quality_lane_online_mechanism",
+        AUDIT_PATH,
+    ]
+    existing = [str(path) for path in paths if path.exists()]
+    if existing:
+        raise RuntimeError("Run044 recovery outputs must be absent: " + "; ".join(existing))
+
+
+def build_recovery_manifest_payload() -> dict[str, Any]:
+    jobs = build_recovery_jobs(MECHANISM_LEVEL, bind=False)
+    payload = {
+        "schema": "eds-qd-autoresearch-v5-mechanism-recovery-manifest-v2",
+        "created_at": now(),
+        "provenance": current_provenance(),
+        "source_fingerprints": source_fingerprints(),
+        "checkpoint_fingerprint": checkpoint_fingerprint(),
+        "libero_input_fingerprint": libero_input_fingerprint(),
+        "runtime_cache_fingerprint": runtime_cache_fingerprint(),
+        "dinov2_seed_fingerprint": dinov2_seed_fingerprint(),
+        "gpu_reference": gpu_reference(),
+        "run_043_artifact": verified_run_043(),
+        "recovery_parent_evidence": verified_recovery_parent_evidence(),
+        "suite": "libero_object_swap",
+        "strict_perturbations": True,
+        "max_episode_steps": 720,
+        "profiles": [
+            {**profile, "profile_fingerprint": profile_fingerprint(profile)}
+            for profile in profiles()
+        ],
+        "mechanism": {
+            "frozen_task_seed_pairs": [
+                list(pair) for pair in frozen_task_seed_pairs()
+            ],
+            "backend_execution_pairs": [
+                list(pair) for pair in backend_execution_pairs()
+            ],
+            "max_chunks": MECHANISM_MAX_CHUNKS,
+            "unique_cells": 4,
+            "candidate_minimum_delta_over_control": 0,
+            "lost_control_success_tasks_allowed": 0,
+            "secondary_activation_required_per_task": True,
+            "jobs": [
+                {
+                    "job_id": job["job_id"],
+                    "formal_label": job["formal_label"],
+                    "execution_pairs": [
+                        [int(task), int(seed)]
+                        for task, seed in zip(
+                            job["task_ids_filter"],
+                            job["episode_seeds"],
+                            strict=True,
+                        )
+                    ],
+                    "config_fingerprint": profile_fingerprint(
+                        next(
+                            profile
+                            for profile in profiles()
+                            if profile["label"] == job["formal_label"]
+                        )
+                    ),
+                    "command_sha256": sha256_bytes(
+                        canonical(build_main_command(job)).encode("utf-8")
+                    ),
+                }
+                for job in jobs
+            ],
+        },
+        "prior_global_reservations": RECOVERY_PRIOR_GLOBAL_RESERVATIONS,
+        "expected_global_attempt_ids": RECOVERY_EXPECTED_GLOBAL_ATTEMPT_IDS,
+        "global_reservation_cap": RECOVERY_GLOBAL_RESERVATION_CAP,
+        "prior_gpu_hours": RECOVERY_PRIOR_GPU_HOURS,
+        "global_gpu_hour_cap": GLOBAL_GPU_HOUR_CAP,
+        "allowed_gpu_indices": sorted(ALLOWED_GPU_INDICES),
+        "dev_a_authorized": False,
+        "validation_authorized": False,
+        "formal_authorized": False,
+        "credential_material_present": False,
+    }
+    payload["payload_sha256"] = sha256_bytes(canonical(payload).encode("utf-8"))
+    if contains_credential(payload):
+        raise RuntimeError("Run044 recovery manifest contains credential material")
+    return payload
+
+
+def freeze_recovery_manifest() -> dict[str, Any]:
+    pause_preflight()
+    storage_preflight()
+    recovery_output_preflight()
+    if RECOVERY_MANIFEST_PATH.exists():
+        raise RuntimeError("Run044 recovery manifest already exists")
+    state = ledger_state(ATTEMPT_LEDGER_PATH)
+    if (
+        [int(row["attempt_id"]) for row in state["attempts"]]
+        != EXPECTED_GLOBAL_ATTEMPT_IDS
+        or state["active_dispatched_attempt_ids"]
+        or state["aborted_attempt_ids"] != EXPECTED_GLOBAL_ATTEMPT_IDS
+    ):
+        raise RuntimeError("Run044 ledger is not at the exact pre-recovery state")
+    payload = build_recovery_manifest_payload()
+    _write_json(RECOVERY_MANIFEST_PATH, payload, immutable=True)
+    return payload
+
+
+def validate_recovery_manifest() -> dict[str, Any]:
+    pause_preflight()
+    if (
+        not RECOVERY_MANIFEST_PATH.is_file()
+        or RECOVERY_MANIFEST_PATH.stat().st_mode & 0o222
+    ):
+        raise RuntimeError("immutable Run044 recovery manifest is required")
+    payload = json.loads(RECOVERY_MANIFEST_PATH.read_text(encoding="utf-8"))
+    stored_sha = payload.get("payload_sha256")
+    unsigned = dict(payload)
+    unsigned.pop("payload_sha256", None)
+    if stored_sha != sha256_bytes(canonical(unsigned).encode("utf-8")):
+        raise RuntimeError("Run044 recovery manifest payload hash mismatch")
+    if payload.get("schema") != "eds-qd-autoresearch-v5-mechanism-recovery-manifest-v2":
+        raise RuntimeError("Run044 recovery manifest schema mismatch")
+    if any(
+        payload.get(field) is not False
+        for field in ("dev_a_authorized", "validation_authorized", "formal_authorized")
+    ):
+        raise RuntimeError("Run044 recovery manifest must forbid later splits")
+    checks = {
+        "provenance": current_provenance(),
+        "source_fingerprints": source_fingerprints(),
+        "checkpoint_fingerprint": checkpoint_fingerprint(),
+        "libero_input_fingerprint": libero_input_fingerprint(),
+        "runtime_cache_fingerprint": runtime_cache_fingerprint(),
+        "dinov2_seed_fingerprint": dinov2_seed_fingerprint(),
+        "gpu_reference": gpu_reference(),
+        "run_043_artifact": verified_run_043(),
+        "recovery_parent_evidence": verified_recovery_parent_evidence(),
+    }
+    for key, expected in checks.items():
+        if payload.get(key) != expected:
+            raise RuntimeError(f"Run044 recovery manifest {key} mismatch")
+    mechanism_payload = payload.get("mechanism", {})
+    if (
+        mechanism_payload.get("frozen_task_seed_pairs")
+        != [list(pair) for pair in frozen_task_seed_pairs()]
+        or mechanism_payload.get("backend_execution_pairs")
+        != [list(pair) for pair in backend_execution_pairs()]
+        or mechanism_payload.get("unique_cells") != 4
+        or mechanism_payload.get("candidate_minimum_delta_over_control") != 0
+        or mechanism_payload.get("lost_control_success_tasks_allowed") != 0
+        or mechanism_payload.get("secondary_activation_required_per_task") is not True
+    ):
+        raise RuntimeError("Run044 recovery matrix/gate mismatch")
+    if (
+        payload.get("prior_global_reservations")
+        != RECOVERY_PRIOR_GLOBAL_RESERVATIONS
+        or payload.get("expected_global_attempt_ids")
+        != RECOVERY_EXPECTED_GLOBAL_ATTEMPT_IDS
+        or payload.get("global_reservation_cap")
+        != RECOVERY_GLOBAL_RESERVATION_CAP
+        or payload.get("prior_gpu_hours") != RECOVERY_PRIOR_GPU_HOURS
+        or payload.get("global_gpu_hour_cap") != GLOBAL_GPU_HOUR_CAP
+    ):
+        raise RuntimeError("Run044 recovery manifest budget mismatch")
+    if contains_credential(payload):
+        raise RuntimeError("Run044 recovery manifest credential scan failed")
+    return payload
+
+
 def validate_credential() -> dict[str, Any]:
     return dev.validate_credential()
 
@@ -595,7 +881,7 @@ def read_ledger(path: Path) -> list[dict[str, Any]]:
 def ledger_state(path: Path) -> dict[str, Any]:
     rows = read_ledger(path)
     attempts = [row for row in rows if row.get("record_type") == "episode_attempt"]
-    if [row.get("attempt_id") for row in attempts] != EXPECTED_GLOBAL_ATTEMPT_IDS[
+    if [row.get("attempt_id") for row in attempts] != ALL_RUN044_ATTEMPT_IDS[
         : len(attempts)
     ]:
         raise RuntimeError("Run044 attempt IDs are not contiguous from 91")
@@ -606,21 +892,28 @@ def ledger_state(path: Path) -> dict[str, Any]:
         raise RuntimeError("Run044 ledger event IDs are not contiguous")
     known = {int(row["attempt_id"]) for row in attempts}
     dispatched: set[int] = set()
+    recovery_dispatched: set[int] = set()
     aborted: set[int] = set()
     for event in events:
         ids = event.get("attempt_ids")
         if (
             event.get("record_type")
-            not in {"phase_dispatch", "dispatch_aborted_invalid_task_seed_identity"}
+            not in {
+                "phase_dispatch",
+                "phase_recovery_dispatch",
+                "dispatch_aborted_invalid_task_seed_identity",
+            }
             or not isinstance(ids, list)
             or not ids
             or not set(ids) <= known
         ):
             raise RuntimeError("invalid Run044 ledger event")
-        if event["record_type"] == "phase_dispatch":
+        if event["record_type"] in {"phase_dispatch", "phase_recovery_dispatch"}:
             if set(ids) & (dispatched | aborted):
                 raise RuntimeError("Run044 attempt dispatched more than once")
             dispatched.update(int(value) for value in ids)
+            if event["record_type"] == "phase_recovery_dispatch":
+                recovery_dispatched.update(int(value) for value in ids)
         else:
             if not set(ids) <= dispatched or set(ids) & aborted:
                 raise RuntimeError("only active Run044 attempts may be aborted")
@@ -631,6 +924,7 @@ def ledger_state(path: Path) -> dict[str, Any]:
         "dispatched_attempt_ids": sorted(dispatched),
         "aborted_attempt_ids": sorted(aborted),
         "active_dispatched_attempt_ids": sorted(dispatched - aborted),
+        "recovery_dispatched_attempt_ids": sorted(recovery_dispatched),
     }
 
 
@@ -673,6 +967,60 @@ def reserve_attempts(path: Path, records: list[dict[str, Any]]) -> list[dict[str
     return prepared
 
 
+def reserve_recovery_attempts(
+    path: Path, records: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    verified_recovery_parent_evidence(path)
+    state = ledger_state(path)
+    if (
+        [int(row["attempt_id"]) for row in state["attempts"]]
+        != EXPECTED_GLOBAL_ATTEMPT_IDS
+        or state["aborted_attempt_ids"] != EXPECTED_GLOBAL_ATTEMPT_IDS
+        or state["active_dispatched_attempt_ids"]
+    ):
+        raise RuntimeError("Run044 ledger is not eligible for exact recovery")
+    if len(records) != 4:
+        raise RuntimeError("Run044 exact recovery requires four reservations")
+    identities = [
+        (
+            row.get("formal_label"),
+            row.get("task_id"),
+            row.get("episode_seed"),
+            row.get("config_fingerprint"),
+        )
+        for row in records
+    ]
+    if len(identities) != len(set(identities)):
+        raise RuntimeError("duplicate Run044 recovery reservation identity")
+    if (
+        RECOVERY_PRIOR_GLOBAL_RESERVATIONS + len(records)
+        > RECOVERY_GLOBAL_RESERVATION_CAP
+    ):
+        raise RuntimeError("Run044 recovery global reservation cap would be exceeded")
+    prepared = [
+        {
+            "attempt_id": RECOVERY_PRIOR_GLOBAL_RESERVATIONS + offset,
+            "record_type": "episode_attempt",
+            "started_at": now(),
+            "recovery_of_attempt_id": EXPECTED_GLOBAL_ATTEMPT_IDS[offset - 1],
+            "recovery_protocol_commit": RECOVERY_PROTOCOL_COMMIT,
+            **row,
+        }
+        for offset, row in enumerate(records, start=1)
+    ]
+    if [row["attempt_id"] for row in prepared] != RECOVERY_EXPECTED_GLOBAL_ATTEMPT_IDS:
+        raise RuntimeError("Run044 recovery attempt IDs differ from 95-98")
+    if any(contains_credential(row) for row in prepared):
+        raise RuntimeError("Run044 recovery attempt records contain credential material")
+    with path.open("a", encoding="utf-8") as handle:
+        for row in prepared:
+            handle.write(canonical(row) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    ledger_state(path)
+    return prepared
+
+
 def append_dispatch_event(
     path: Path, attempt_ids: list[int], gpus: list[int]
 ) -> dict[str, Any]:
@@ -689,6 +1037,42 @@ def append_dispatch_event(
     }
     if contains_credential(event):
         raise RuntimeError("Run044 dispatch event contains credential material")
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(canonical(event) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    return ledger_state(path)
+
+
+def append_recovery_dispatch_event(
+    path: Path, attempt_ids: list[int], gpus: list[int]
+) -> dict[str, Any]:
+    state = ledger_state(path)
+    if attempt_ids != RECOVERY_EXPECTED_GLOBAL_ATTEMPT_IDS:
+        raise RuntimeError("Run044 recovery dispatch requires exact IDs 95-98")
+    if state["recovery_dispatched_attempt_ids"]:
+        raise RuntimeError("Run044 recovery dispatch already recorded")
+    if (
+        [int(row["attempt_id"]) for row in state["attempts"]]
+        != ALL_RUN044_ATTEMPT_IDS
+        or state["aborted_attempt_ids"] != EXPECTED_GLOBAL_ATTEMPT_IDS
+        or state["active_dispatched_attempt_ids"]
+    ):
+        raise RuntimeError("Run044 recovery dispatch ledger state mismatch")
+    event = {
+        "ledger_event_id": 1
+        + sum(
+            row.get("record_type") != "episode_attempt" for row in state["rows"]
+        ),
+        "record_type": "phase_recovery_dispatch",
+        "created_at": now(),
+        "phase": MECHANISM_LEVEL,
+        "attempt_ids": list(attempt_ids),
+        "selected_gpu_indices": list(gpus),
+        "recovery_protocol_commit": RECOVERY_PROTOCOL_COMMIT,
+    }
+    if contains_credential(event):
+        raise RuntimeError("Run044 recovery dispatch contains credential material")
     with path.open("a", encoding="utf-8") as handle:
         handle.write(canonical(event) + "\n")
         handle.flush()
@@ -891,6 +1275,73 @@ def run_mechanism(*, gpus: str, timeout_seconds: int) -> int:
             base._poe_healthcheck = original_healthcheck
 
 
+def run_recovery_mechanism(*, gpus: str, timeout_seconds: int) -> int:
+    manifest = validate_recovery_manifest()
+    storage_preflight()
+    recovery_output_preflight()
+    legacy.validate_runtime_cache(
+        target=RUNTIME_CACHE_DIR, manifest_path=RUNTIME_CACHE_MANIFEST_PATH
+    )
+    validate_credential()
+    with configured_base():
+        if not base._poe_healthcheck():
+            raise RuntimeError("real pre-reservation Stage/Poe health check failed")
+    jobs = build_recovery_jobs(MECHANISM_LEVEL)
+    reference = manifest["gpu_reference"]
+    admission = admit_gpus(
+        reference_peak_vram_mib=float(reference["reference_peak_vram_mib"])
+    )
+    selected = _select_gpus(admission, gpus)
+    immediate = legacy.gpu_snapshot()
+    by_index = {int(item["index"]): item for item in immediate}
+    for gpu in selected:
+        reasons = legacy._gpu_snapshot_failure(
+            by_index.get(int(gpu)),
+            index=int(gpu),
+            required_free=float(reference["required_free_vram_mib"]),
+            allow_external_compute=False,
+        )
+        if reasons:
+            raise RuntimeError(f"GPU {gpu} failed immediate snapshot: {reasons}")
+    admission["dispatch_snapshot"] = immediate
+    admission["selected_gpu_indices"] = [int(value) for value in selected]
+    admission["recovery_protocol_commit"] = RECOVERY_PROTOCOL_COMMIT
+    _write_json(
+        RUN_ROOT
+        / "manifests"
+        / f"gpu_{MECHANISM_LEVEL}_recovery_{int(time.time())}.json",
+        admission,
+    )
+    attempts = reserve_recovery_attempts(
+        ATTEMPT_LEDGER_PATH, attempt_records(jobs)
+    )
+    if [row["attempt_id"] for row in attempts] != RECOVERY_EXPECTED_GLOBAL_ATTEMPT_IDS:
+        raise RuntimeError("Run044 recovery attempt IDs differ from frozen 95-98")
+    append_recovery_dispatch_event(
+        ATTEMPT_LEDGER_PATH,
+        RECOVERY_EXPECTED_GLOBAL_ATTEMPT_IDS,
+        [int(value) for value in selected],
+    )
+    pause_preflight()
+    with configured_base():
+        original_healthcheck = base._poe_healthcheck
+        base._poe_healthcheck = lambda: True
+        try:
+            return base.run_level(
+                MECHANISM_LEVEL,
+                2,
+                ",".join(selected),
+                timeout_seconds,
+                resume=False,
+                cached_functions_dir=str(RUNTIME_CACHE_DIR),
+                offline_vlm=False,
+                manifest_path=str(RECOVERY_MANIFEST_PATH),
+                gpu_poll_interval_s=30.0,
+            )
+        finally:
+            base._poe_healthcheck = original_healthcheck
+
+
 def _finite(value: Any) -> bool:
     return mechanism._finite(value)
 
@@ -1056,6 +1507,18 @@ def _job_evidence(job: dict[str, Any]) -> dict[str, Any]:
         output = base._output_dir(job)
         validity = base._p2_job_validity(job)
     metrics = _read_metrics(job)
+    metadata_path = output / "eds_eval/episode_metadata.jsonl"
+    metadata = base._read_jsonl(metadata_path) if metadata_path.is_file() else []
+    ordered_metadata = sorted(metadata, key=lambda row: row.get("episode_id", -1))
+    actual_pairs = [
+        (row.get("task_id"), row.get("episode_seed")) for row in ordered_metadata
+    ]
+    identity_failures = []
+    if actual_pairs != backend_execution_pairs():
+        identity_failures.append(
+            "metadata task/seed identity mismatch: "
+            f"actual={actual_pairs} expected={backend_execution_pairs()}"
+        )
     outcomes = base._p2_episode_outcomes(output, int(job["episodes"]))
     parsed = base._parse_results_file(output / "results.txt")
     classifications = qd_audit._classify_failures(outcomes, metrics, output)
@@ -1063,8 +1526,17 @@ def _job_evidence(job: dict[str, Any]) -> dict[str, Any]:
         "formal_label": job["formal_label"],
         "label": job["label"],
         "output": str(output),
-        "valid": validity["valid"],
-        "failure_reason": validity["failure_reason"],
+        "valid": validity["valid"] and not identity_failures,
+        "failure_reason": "; ".join(
+            value
+            for value in [validity["failure_reason"], *identity_failures]
+            if value
+        ),
+        "episode_metadata": ordered_metadata,
+        "actual_task_seed_pairs": [list(pair) for pair in actual_pairs],
+        "expected_task_seed_pairs": [
+            list(pair) for pair in backend_execution_pairs()
+        ],
         "success_count": parsed.get("success"),
         "outcomes": {
             str(task): outcomes.get(episode, "unknown")
@@ -1116,37 +1588,56 @@ def _attempt_audit() -> dict[str, Any]:
     state = ledger_state(ATTEMPT_LEDGER_PATH)
     failures = []
     ids = [int(row["attempt_id"]) for row in state["attempts"]]
-    if ids != EXPECTED_GLOBAL_ATTEMPT_IDS:
-        failures.append("Run044 attempt IDs differ from frozen 91-94")
-    if state["dispatched_attempt_ids"] != EXPECTED_GLOBAL_ATTEMPT_IDS:
+    if ids != ALL_RUN044_ATTEMPT_IDS:
+        failures.append("Run044 attempt IDs differ from append-only 91-98")
+    if state["dispatched_attempt_ids"] != ALL_RUN044_ATTEMPT_IDS:
         failures.append("Run044 dispatched attempt IDs mismatch")
+    if state["aborted_attempt_ids"] != EXPECTED_GLOBAL_ATTEMPT_IDS:
+        failures.append("Run044 invalid incident IDs are not exactly aborted 91-94")
+    if (
+        state.get("recovery_dispatched_attempt_ids")
+        != RECOVERY_EXPECTED_GLOBAL_ATTEMPT_IDS
+        or state["active_dispatched_attempt_ids"]
+        != RECOVERY_EXPECTED_GLOBAL_ATTEMPT_IDS
+    ):
+        failures.append("Run044 active scientific attempts are not exact recovery 95-98")
     expected = {
         (job["formal_label"], int(task), int(seed))
-        for job in build_jobs(MECHANISM_LEVEL, bind=False)
+        for job in build_recovery_jobs(MECHANISM_LEVEL, bind=False)
         for task, seed in zip(
             job["task_ids_filter"], job["episode_seeds"], strict=True
         )
     }
+    scientific_attempts = [
+        row
+        for row in state["attempts"]
+        if int(row["attempt_id"]) in RECOVERY_EXPECTED_GLOBAL_ATTEMPT_IDS
+    ]
     actual = {
         (row.get("formal_label"), int(row["task_id"]), int(row["episode_seed"]))
-        for row in state["attempts"]
+        for row in scientific_attempts
     }
     if actual != expected:
-        failures.append("Run044 attempt cells differ from frozen matrix")
-    if PRIOR_GLOBAL_RESERVATIONS + len(state["attempts"]) != 94:
-        failures.append("global reservation accounting is not 94")
+        failures.append("Run044 recovery cells differ from frozen matrix")
+    if RECOVERY_PRIOR_GLOBAL_RESERVATIONS + len(scientific_attempts) != 98:
+        failures.append("global reservation accounting is not 98")
     return {
         "passed": not failures,
-        "new_reserved_count": len(state["attempts"]),
-        "global_reserved_count": PRIOR_GLOBAL_RESERVATIONS + len(state["attempts"]),
+        "new_reserved_count": len(scientific_attempts),
+        "global_reserved_count": RECOVERY_PRIOR_GLOBAL_RESERVATIONS
+        + len(scientific_attempts),
         "attempt_ids": ids,
+        "scientific_attempt_ids": RECOVERY_EXPECTED_GLOBAL_ATTEMPT_IDS,
+        "invalid_aborted_attempt_ids": EXPECTED_GLOBAL_ATTEMPT_IDS,
         "failures": failures,
     }
 
 
 def audit_mechanism() -> dict[str, Any]:
-    manifest = validate_manifest()
-    evidence = [_job_evidence(job) for job in build_jobs(MECHANISM_LEVEL)]
+    manifest = validate_recovery_manifest()
+    evidence = [
+        _job_evidence(job) for job in build_recovery_jobs(MECHANISM_LEVEL)
+    ]
     control = next(
         item for item in evidence if item["formal_label"] == profiles()[0]["label"]
     )
@@ -1204,7 +1695,7 @@ def audit_mechanism() -> dict[str, Any]:
     failures.extend(attempts["failures"])
     status = _status_summary()
     cumulative_gpu_hours = (
-        PRIOR_GPU_HOURS + float(status["gpu_hours"])
+        RECOVERY_PRIOR_GPU_HOURS + float(status["gpu_hours"])
         if _finite(status.get("gpu_hours"))
         else None
     )
@@ -1213,10 +1704,10 @@ def audit_mechanism() -> dict[str, Any]:
     root_credentials = v1.credential_tree_audit(RUN_ROOT)
     failures.extend(root_credentials["failures"])
     payload = {
-        "schema": "eds-qd-autoresearch-v5-mechanism-audit-v1",
+        "schema": "eds-qd-autoresearch-v5-mechanism-recovery-audit-v2",
         "created_at": now(),
-        "manifest_path": str(MANIFEST_PATH),
-        "manifest_sha256": sha256_path(MANIFEST_PATH),
+        "manifest_path": str(RECOVERY_MANIFEST_PATH),
+        "manifest_sha256": sha256_path(RECOVERY_MANIFEST_PATH),
         "manifest_payload_sha256": manifest["payload_sha256"],
         "run_043_artifact": verified_run_043(),
         "jobs": [
@@ -1236,7 +1727,7 @@ def audit_mechanism() -> dict[str, Any]:
         "candidate_to_control_latency_ratio": latency_ratio,
         "attempt_ledger": attempts,
         "status": status,
-        "prior_gpu_hours": PRIOR_GPU_HOURS,
+        "prior_gpu_hours": RECOVERY_PRIOR_GPU_HOURS,
         "cumulative_gpu_hours": cumulative_gpu_hours,
         "run_root_credential_audit": root_credentials,
         "hard_failures": list(dict.fromkeys(failures)),
@@ -1257,10 +1748,15 @@ def main() -> int:
     subparsers.add_parser("print-plan")
     subparsers.add_parser("freeze-manifest")
     subparsers.add_parser("validate-manifest")
+    subparsers.add_parser("freeze-recovery-manifest")
+    subparsers.add_parser("validate-recovery-manifest")
     subparsers.add_parser("archive-identity-incident")
     run_parser = subparsers.add_parser("run-mechanism")
     run_parser.add_argument("--gpus", default="auto")
     run_parser.add_argument("--timeout-seconds", type=int, default=28800)
+    recovery_parser = subparsers.add_parser("run-recovery-mechanism")
+    recovery_parser.add_argument("--gpus", default="auto")
+    recovery_parser.add_argument("--timeout-seconds", type=int, default=28800)
     subparsers.add_parser("audit-mechanism")
     args = parser.parse_args()
     if args.command == "print-plan":
@@ -1274,12 +1770,24 @@ def main() -> int:
         payload = validate_manifest()
         print(json.dumps({"passed": True, "payload_sha256": payload["payload_sha256"]}))
         return 0
+    if args.command == "freeze-recovery-manifest":
+        payload = freeze_recovery_manifest()
+        print(json.dumps({"passed": True, "payload_sha256": payload["payload_sha256"]}))
+        return 0
+    if args.command == "validate-recovery-manifest":
+        payload = validate_recovery_manifest()
+        print(json.dumps({"passed": True, "payload_sha256": payload["payload_sha256"]}))
+        return 0
     if args.command == "archive-identity-incident":
         payload = archive_identity_incident()
         print(json.dumps({"passed": True, "payload_sha256": payload["payload_sha256"]}))
         return 0
     if args.command == "run-mechanism":
         return run_mechanism(gpus=args.gpus, timeout_seconds=args.timeout_seconds)
+    if args.command == "run-recovery-mechanism":
+        return run_recovery_mechanism(
+            gpus=args.gpus, timeout_seconds=args.timeout_seconds
+        )
     if args.command == "audit-mechanism":
         payload = audit_mechanism()
         print(json.dumps({"passed": payload["passed"], "hard_failures": payload["hard_failures"]}))
