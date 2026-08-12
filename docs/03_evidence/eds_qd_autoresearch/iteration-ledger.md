@@ -1095,3 +1095,14 @@
 - Schema defect：17条记录全部是capacity2 candidate的`quality_retention` mismatch，却被同一`exact_mismatches`列表错误汇总为`capacity_one_exact_mismatch_count`。这会错误表达历史重放有效性，但不会改变candidate retention FAIL本身。
 - Protocol-first repair：v1 artifacts保持只读且不覆盖；仅允许analyzer/test把capacity1 replay与capacity2 retention/capacity mismatch分栏，并生成`canonical-v2/replay-v2`。输入、算法counterfactual、threshold、统计和feature exclusions全部不变；v2 FAIL即科学结论，不允许放宽gate。
 - Accounting：仍为0 GPU/API/model/LIBERO/reservation/online/formal；target best/gap仍2/10、3。
+
+#### BL. Run040 valid offline FAIL 与 target-directed outer-loop trigger
+
+- Repair order/tests：protocol-v2 `2182bd5` -> classifier repair `6895ce9`；48/48 tests与py_compile PASS。只拆分capacity1/capacity2结果字段，counterfactual、threshold、input和science均未改变。
+- Validity：capacity1在24 traces、264 streams上精确重放saved archive/rebin/update/reward/visits，mismatch0；capacity2 capacity/fingerprint integrity mismatch0；global Python/Torch RNG不变。
+- Aliasing证据：4,224 candidates中2,750位于碰撞cell，ratio`0.6510417`；1,019 collision cells；top2 direction/shape median `0.361670/0.250086`、reward gap median `0.0126953`。
+- Parent counterfactual：240 allocations、3,600 sparse slots中1,001 secondary，ratio`0.2780556`；coverage retention median1.0；固定16 slots与production sparse semantics通过。
+- Candidate硬失败：17次capacity2 quality-retention mismatch，分布于6 traces、tasks0/3/6/7/9；sole failed gate `capacity_two_quality_and_global_best_retention`，总14/15 PASS。Naive overall top2在causal rebin合并后可能由secondary history挤掉comparator quality lineage，违反不牺牲quality hard gate。
+- Artifacts：canonical-v2/replay-v2 byte-identical、mode0444、20,503 bytes、file SHA `447152db…9b98`、payload `09725a43…7349`；strict credential hits0。V1 artifacts保持未覆盖。
+- Decision：`REJECT_H5_V4_TOP2_RETENTION_FAIL_TRIGGER_OUTER_LOOP`。Alias observations保留，但`qd_within_cell_top2_v1`不得实现或online。下一候选若存在必须versioned protocol-first，将quality lane与secondary lane分离；不得放宽retention gate。
+- Target/accounting：新增GPU/API/model/LIBERO/reservation/online/formal均0；累计仍66 effective episodes、90/143 reservations、5.447063/48 GPUh、formal0；historical best/gap仍2/10、3。

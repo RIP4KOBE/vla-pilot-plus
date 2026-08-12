@@ -134,7 +134,7 @@ hypotheses:
     priority: medium
   - id: H5
     statement: "A single endpoint descriptor and capacity-one archive merge manipulation behaviors whose future value differs by stage or trajectory shape; stage-aware descriptors or limited within-cell plurality will improve behavior retention."
-    status: v4_protocol_active
+    status: aliasing_supported_naive_top2_retention_refuted
     motivation: "Across 24 active-QD traces and 4,224 candidates, 65.10% of candidates are in colliding endpoint-XY cells; same-cell reward top-two direction/shape distance medians are 0.3617/0.2501 with only 0.01270 median reward gap."
     parent: null
     priority: medium
@@ -1001,7 +1001,7 @@ continuation_v4:
     top_two_shape_distance_median: 0.2500861883163452
     top_two_reward_gap_median: 0.0126953125
   run_040:
-    status: V1_SCHEMA_CLASSIFICATION_DEFECT_PROTOCOL_V2_LOCKED
+    status: VALID_OFFLINE_FAIL_NAIVE_TOP2_RETENTION
     protocol: "experiments/run_040_within_cell_aliasing_diagnostic/protocol.md"
     protocol_sha256: "7baa6edeef1e295ebf4ebe7e33089fa00d1bebb755d8d3f8db213df24fcf51f2"
     input_manifest: "experiments/run_040_within_cell_aliasing_diagnostic/input-manifest.json"
@@ -1019,8 +1019,38 @@ continuation_v4:
     v1_schema_defect: "capacity-two quality-retention mismatches were mislabeled as capacity-one exact-replay mismatches"
     repair_protocol: "experiments/run_040_within_cell_aliasing_diagnostic/protocol-v2.md"
     repair_protocol_sha256: "25485e155d8a540b3f6fd491cbb2c2815ad8b848e1e1d52ac5faf1bf3dbd16bb"
+    repair_implementation_commit: "6895ce9"
+    repaired_tests: "48 passed"
+    eligible_trace_count: 24
+    eligible_stream_count: 264
+    candidate_count: 4224
+    colliding_cell_count: 1019
+    candidates_in_colliding_cells: 2750
+    collision_candidate_ratio: 0.6510416666666666
+    top_two_direction_distance_median: 0.3616701662540436
+    top_two_shape_distance_median: 0.2500861983348702
+    top_two_reward_gap_median: 0.0126953125
+    capacity_one_exact_mismatch_count: 0
+    capacity_two_retention_mismatch_count: 17
+    capacity_two_integrity_mismatch_count: 0
+    secondary_sparse_slot_count: 1001
+    sparse_slot_count: 3600
+    secondary_sparse_slot_ratio: 0.27805555555555556
+    xy_cell_coverage_retention_median: 1.0
+    gates: "14/15 PASS"
+    failed_gate: capacity_two_quality_and_global_best_retention
+    v2_artifact_file_sha256: "447152dbc7e0448e7b29082b76117f90f52094d7f0d6f5dfd855a2daa0ea9b98"
+    v2_artifact_payload_sha256: "09725a43b984f0c4c0a43fce01aec8ecf62ea49c30995a7035d0e01e2ffd7349"
+    v2_artifact_mode: "0444"
+    v2_artifact_byte_identity: true
+    credential_matches: 0
+    online_episode_attempts: 0
+    gpu_hours: 0.0
+    analysis: "experiments/run_040_within_cell_aliasing_diagnostic/analysis.md"
+    analysis_sha256: "25298daf50589c396022f2536ff35c9151b194ae464002e6c075fdbe41fdf9ce"
+    decision: REJECT_H5_V4_TOP2_RETENTION_FAIL_TRIGGER_OUTER_LOOP
     artifact_root: "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_040_within_cell_aliasing_diagnostic"
     gpu_authorized: false
     online_episode_attempts_authorized: 0
     core_config_change_authorized: false
-  next_action: "Commit protocol-v2, split mismatch classification only, then generate immutable v2 dual artifacts and conclude Run040"
+  next_action: "Commit Run040 result, then immediately lock a versioned protected-quality-lane successor before any new implementation"
