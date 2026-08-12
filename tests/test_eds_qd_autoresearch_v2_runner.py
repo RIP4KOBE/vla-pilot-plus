@@ -42,7 +42,8 @@ def test_mechanism_matrix_and_profiles_are_exact_and_no_formal():
     assert all(job["max_chunks"] == 16 for job in jobs)
     assert not hasattr(runner, "FORMAL_LEVEL")
     assert runner.MANIFEST_V1_PATH.name == "mechanism_manifest.json"
-    assert runner.MANIFEST_PATH.name == "mechanism_manifest.v2.json"
+    assert runner.MANIFEST_V2_PATH.name == "mechanism_manifest.v2.json"
+    assert runner.MANIFEST_PATH.name == "mechanism_manifest.v3.json"
 
 
 def test_command_contains_candidate_guard_once_and_is_secret_free():
@@ -169,11 +170,36 @@ def test_global_attempt_reservation_starts_at_55_and_caps_globally(tmp_path):
         for index in range(6)
     ]
 
-    reserved = runner.reserve_attempts(tmp_path / "ledger.jsonl", records)
+    ledger = tmp_path / "ledger.jsonl"
+    initial = [
+        {"attempt_id": 55 + index, "record_type": "episode_attempt", **record}
+        for index, record in enumerate(records)
+    ]
+    ledger.write_text(
+        "".join(runner.canonical(record) + "\n" for record in initial),
+        encoding="utf-8",
+    )
+    state = runner.prepare_recovery_ledger(ledger)
+    assert state["void_attempt_ids"] == list(range(55, 61))
 
-    assert [record["attempt_id"] for record in reserved] == list(range(55, 61))
-    with pytest.raises(RuntimeError, match="same-cell"):
-        runner.reserve_attempts(tmp_path / "ledger.jsonl", records)
+    reserved = runner.reserve_attempts(
+        ledger,
+        records,
+        recovery_of_attempt_ids=list(range(55, 61)),
+    )
+
+    assert [record["attempt_id"] for record in reserved] == list(range(61, 67))
+    assert [record["recovery_of_attempt_id"] for record in reserved] == list(
+        range(55, 61)
+    )
+    dispatched = runner.append_global_ledger_event(
+        ledger,
+        {
+            "record_type": "phase_dispatch",
+            "attempt_ids": list(range(61, 67)),
+        },
+    )
+    assert dispatched["dispatched_attempt_ids"] == list(range(61, 67))
 
 
 def test_run_stops_at_manifest_gate_before_credential_or_admission(monkeypatch):
@@ -220,17 +246,29 @@ def test_manifest_payload_forbids_formal_and_binds_six_cells(monkeypatch):
             "payload_sha256": "parent-payload",
         },
     )
+    monkeypatch.setattr(
+        runner,
+        "_verified_parent_manifest_v2",
+        lambda: {
+            "path": "/owned/mechanism_manifest.v2.json",
+            "sha256": runner.MANIFEST_V2_SHA256,
+            "payload_sha256": "parent-v2-payload",
+        },
+    )
 
     payload = runner.build_manifest_payload()
 
     assert payload["formal_authorized"] is False
-    assert payload["schema"] == "eds-qd-autoresearch-v2-mechanism-manifest-v2"
+    assert payload["schema"] == "eds-qd-autoresearch-v2-mechanism-manifest-v3"
     assert payload["parent_manifest_v1"]["sha256"] == runner.MANIFEST_V1_SHA256
+    assert payload["parent_manifest_v2"]["sha256"] == runner.MANIFEST_V2_SHA256
     assert payload["provenance"]["recovery_protocol_commit"] == (
         runner.RECOVERY_PROTOCOL_COMMIT
     )
     assert payload["mechanism"]["unique_cells"] == 6
     assert payload["mechanism"]["tasks"] == [2, 3, 9]
+    assert payload["expected_global_attempt_ids"] == list(range(61, 67))
+    assert payload["void_pre_dispatch_attempt_ids"] == list(range(55, 61))
     assert payload["prior_global_reservations"] == 54
     assert payload["global_reservation_cap"] == 143
     assert payload["payload_sha256"]

@@ -36,6 +36,7 @@ MECHANISM_LEVEL = "eds_qd_autoresearch_v2_mechanism"
 BRANCH = "exp/eds-qd-autoresearch-libero-swap-ood"
 PROTOCOL_COMMIT = "73724cec4d8c60096e5c6baed46274c7098964a3"
 RECOVERY_PROTOCOL_COMMIT = "70678d207d7196f4b6ae9adfb524b67970dce047"
+LEDGER_RECOVERY_PROTOCOL_COMMIT = "27fc65c56347a1ee94353511a1d2cf9da3be65a1"
 HEALTH_INCIDENT_RESULT_COMMIT = "f189621"
 RUN_021_IMPLEMENTATION_COMMIT = "f010e8e4ff1f129e12499b1e0f8d284f505f7455"
 RUN_022_RESULT_COMMIT = "8fde5676fc28ef643c2ccb81ef40707350f7bd32"
@@ -51,7 +52,11 @@ MANIFEST_V1_PATH = RUN_ROOT / "manifests/mechanism_manifest.json"
 MANIFEST_V1_SHA256 = (
     "d51a44042357b129595cc220faeecd5a9029f2424e0b803711a32ed31a8ec718"
 )
-MANIFEST_PATH = RUN_ROOT / "manifests/mechanism_manifest.v2.json"
+MANIFEST_V2_PATH = RUN_ROOT / "manifests/mechanism_manifest.v2.json"
+MANIFEST_V2_SHA256 = (
+    "8e47ebb3ddcdf4f9b3657d5585902b303d35fa2162e597e2faf1b7d87805d2df"
+)
+MANIFEST_PATH = RUN_ROOT / "manifests/mechanism_manifest.v3.json"
 ATTEMPT_LEDGER_PATH = RUN_ROOT / "manifests/episode_attempt_ledger.jsonl"
 AUDIT_PATH = RUN_ROOT / "analysis/mechanism_audit.json"
 RUN_022_ARTIFACT_PATH = (
@@ -76,7 +81,9 @@ PRIOR_GPU_HOURS = 2.934766777777778
 MECHANISM_TASKS = [2, 3, 9]
 MECHANISM_SEEDS = [932032, 615132, 718536]
 MECHANISM_MAX_CHUNKS = 16
-EXPECTED_GLOBAL_ATTEMPT_IDS = list(range(55, 61))
+VOID_GLOBAL_ATTEMPT_IDS = list(range(55, 61))
+EXPECTED_GLOBAL_ATTEMPT_IDS = list(range(61, 67))
+GLOBAL_RESERVATIONS_BEFORE_RECOVERY = 60
 EXPECTED_ALGORITHM_HASHES = {
     "configs/config.yaml": "c5844368c803f97540775365a1d5f3211997e6d77f6a0f0f581ffdf0cad63acc",
     "core/qd_ed.py": "1516bb75c3a5dc3894792d6b8f5daf7f777c48b7d58ea96496da47a986a970b9",
@@ -381,6 +388,7 @@ def current_provenance() -> dict[str, Any]:
         "code_state_sha256": code_state,
         "protocol_commit": PROTOCOL_COMMIT,
         "recovery_protocol_commit": RECOVERY_PROTOCOL_COMMIT,
+        "ledger_recovery_protocol_commit": LEDGER_RECOVERY_PROTOCOL_COMMIT,
         "health_incident_result_commit": HEALTH_INCIDENT_RESULT_COMMIT,
         "run_021_implementation_commit": RUN_021_IMPLEMENTATION_COMMIT,
         "run_022_result_commit": RUN_022_RESULT_COMMIT,
@@ -464,13 +472,37 @@ def _verified_parent_manifest() -> dict[str, Any]:
     }
 
 
+def _verified_parent_manifest_v2() -> dict[str, Any]:
+    if (
+        not MANIFEST_V2_PATH.is_file()
+        or MANIFEST_V2_PATH.stat().st_mode & 0o222
+        or sha256_path(MANIFEST_V2_PATH) != MANIFEST_V2_SHA256
+    ):
+        raise RuntimeError("immutable mechanism manifest v2 identity mismatch")
+    payload = json.loads(MANIFEST_V2_PATH.read_text(encoding="utf-8"))
+    if (
+        payload.get("schema")
+        != "eds-qd-autoresearch-v2-mechanism-manifest-v2"
+        or payload.get("formal_authorized") is not False
+        or payload.get("parent_manifest_v1") != _verified_parent_manifest()
+        or contains_credential(payload)
+    ):
+        raise RuntimeError("mechanism manifest v2 is not a clean frozen parent")
+    return {
+        "path": str(MANIFEST_V2_PATH.resolve(strict=True)),
+        "sha256": MANIFEST_V2_SHA256,
+        "payload_sha256": payload["payload_sha256"],
+    }
+
+
 def build_manifest_payload() -> dict[str, Any]:
     unbound_jobs = build_jobs(MECHANISM_LEVEL, bind=False)
     payload = {
-        "schema": "eds-qd-autoresearch-v2-mechanism-manifest-v2",
+        "schema": "eds-qd-autoresearch-v2-mechanism-manifest-v3",
         "created_at": now(),
         "provenance": current_provenance(),
         "parent_manifest_v1": _verified_parent_manifest(),
+        "parent_manifest_v2": _verified_parent_manifest_v2(),
         "source_fingerprints": source_fingerprints(),
         "checkpoint_fingerprint": checkpoint_fingerprint(),
         "libero_input_fingerprint": libero_input_fingerprint(),
@@ -513,6 +545,10 @@ def build_manifest_payload() -> dict[str, Any]:
         },
         "prior_global_reservations": PRIOR_GLOBAL_RESERVATIONS,
         "expected_global_attempt_ids": EXPECTED_GLOBAL_ATTEMPT_IDS,
+        "void_pre_dispatch_attempt_ids": VOID_GLOBAL_ATTEMPT_IDS,
+        "global_reservations_before_recovery": GLOBAL_RESERVATIONS_BEFORE_RECOVERY,
+        "recovery_slots_consumed": 6,
+        "recovery_slots_remaining": 13,
         "global_reservation_cap": GLOBAL_RESERVATION_CAP,
         "prior_gpu_hours": PRIOR_GPU_HOURS,
         "global_gpu_hour_cap": GLOBAL_GPU_HOUR_CAP,
@@ -541,6 +577,7 @@ def freeze_manifest() -> dict[str, Any]:
     storage_preflight()
     _verified_run_022()
     _verified_parent_manifest()
+    _verified_parent_manifest_v2()
     if MANIFEST_PATH.exists():
         raise RuntimeError("mechanism manifest already exists")
     payload = build_manifest_payload()
@@ -558,7 +595,7 @@ def validate_manifest() -> dict[str, Any]:
     unsigned.pop("payload_sha256", None)
     if stored_sha != sha256_bytes(canonical(unsigned).encode("utf-8")):
         raise RuntimeError("mechanism manifest payload hash mismatch")
-    if payload.get("schema") != "eds-qd-autoresearch-v2-mechanism-manifest-v2":
+    if payload.get("schema") != "eds-qd-autoresearch-v2-mechanism-manifest-v3":
         raise RuntimeError("mechanism manifest schema mismatch")
     if payload.get("formal_authorized") is not False:
         raise RuntimeError("mechanism manifest must forbid formal")
@@ -566,6 +603,8 @@ def validate_manifest() -> dict[str, Any]:
         raise RuntimeError("mechanism manifest provenance mismatch")
     if payload.get("parent_manifest_v1") != _verified_parent_manifest():
         raise RuntimeError("mechanism manifest parent mismatch")
+    if payload.get("parent_manifest_v2") != _verified_parent_manifest_v2():
+        raise RuntimeError("mechanism manifest v2 parent mismatch")
     if payload.get("source_fingerprints") != source_fingerprints():
         raise RuntimeError("mechanism manifest source mismatch")
     if payload.get("mechanism", {}).get("tasks") != MECHANISM_TASKS:
@@ -597,16 +636,106 @@ def read_attempts(path: Path) -> list[dict[str, Any]]:
     ]
 
 
+def global_ledger_state(path: Path) -> dict[str, Any]:
+    records = read_attempts(path)
+    attempts = [
+        row
+        for row in records
+        if row.get("record_type", "episode_attempt") == "episode_attempt"
+    ]
+    ids = [row.get("attempt_id") for row in attempts]
+    if ids != list(range(55, 55 + len(attempts))):
+        raise RuntimeError("run_023 attempt IDs are not contiguous from global offset 55")
+    events = [row for row in records if row not in attempts]
+    if [row.get("ledger_event_id") for row in events] != list(
+        range(1, len(events) + 1)
+    ):
+        raise RuntimeError("run_023 ledger event IDs are not contiguous")
+    known = {int(row["attempt_id"]) for row in attempts}
+    void_ids: set[int] = set()
+    dispatched_ids: set[int] = set()
+    for event in events:
+        record_type = event.get("record_type")
+        event_ids = event.get("attempt_ids")
+        if (
+            record_type not in {"reservation_void", "phase_dispatch"}
+            or not isinstance(event_ids, list)
+            or not event_ids
+            or any(isinstance(value, bool) or not isinstance(value, int) for value in event_ids)
+            or not set(event_ids) <= known
+        ):
+            raise RuntimeError("invalid run_023 ledger event")
+        if record_type == "reservation_void":
+            if set(event_ids) & dispatched_ids:
+                raise RuntimeError("dispatched reservations cannot be voided")
+            void_ids.update(event_ids)
+        else:
+            if set(event_ids) & (void_ids | dispatched_ids):
+                raise RuntimeError("void or dispatched reservations cannot be dispatched")
+            dispatched_ids.update(event_ids)
+    return {
+        "records": records,
+        "attempts": attempts,
+        "void_attempt_ids": sorted(void_ids),
+        "dispatched_attempt_ids": sorted(dispatched_ids),
+    }
+
+
+def append_global_ledger_event(path: Path, event: dict[str, Any]) -> dict[str, Any]:
+    state = global_ledger_state(path)
+    prepared = {
+        "ledger_event_id": 1
+        + sum(
+            row.get("record_type", "episode_attempt") != "episode_attempt"
+            for row in state["records"]
+        ),
+        "created_at": now(),
+        **event,
+    }
+    if contains_credential(prepared):
+        raise RuntimeError("attempt ledger event contains credential material")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(canonical(prepared) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    try:
+        return global_ledger_state(path)
+    except Exception:
+        raise RuntimeError("run_023 ledger event failed post-append validation")
+
+
+def prepare_recovery_ledger(path: Path) -> dict[str, Any]:
+    state = global_ledger_state(path)
+    ids = [int(row["attempt_id"]) for row in state["attempts"]]
+    if ids != VOID_GLOBAL_ATTEMPT_IDS:
+        raise RuntimeError("recovery requires only preserved attempt IDs 55-60")
+    if state["dispatched_attempt_ids"]:
+        raise RuntimeError("preserved attempts unexpectedly reached dispatch")
+    if not state["void_attempt_ids"]:
+        state = append_global_ledger_event(
+            path,
+            {
+                "record_type": "reservation_void",
+                "phase": MECHANISM_LEVEL,
+                "attempt_ids": VOID_GLOBAL_ATTEMPT_IDS,
+                "reason": "pre_dispatch_global_offset_ledger_helper_failure",
+                "protocol_commit": LEDGER_RECOVERY_PROTOCOL_COMMIT,
+            },
+        )
+    if state["void_attempt_ids"] != VOID_GLOBAL_ATTEMPT_IDS:
+        raise RuntimeError("preserved attempts are not exactly void IDs 55-60")
+    return state
+
+
 def reserve_attempts(
     path: Path,
     records: list[dict[str, Any]],
+    *,
+    recovery_of_attempt_ids: list[int] | None = None,
 ) -> list[dict[str, Any]]:
-    existing_records = read_attempts(path)
-    existing = [
-        row
-        for row in existing_records
-        if row.get("record_type", "episode_attempt") == "episode_attempt"
-    ]
+    state = global_ledger_state(path)
+    existing = state["attempts"]
     if PRIOR_GLOBAL_RESERVATIONS + len(existing) + len(records) > GLOBAL_RESERVATION_CAP:
         raise RuntimeError("global episode-attempt hard cap would be exceeded")
 
@@ -619,21 +748,41 @@ def reserve_attempts(
                 "task_id",
                 "episode_seed",
                 "config_fingerprint",
-                "code_state_sha256",
             )
         )
 
-    old_ids = {identity(record) for record in existing}
+    active_existing = [
+        record
+        for record in existing
+        if int(record["attempt_id"]) not in state["void_attempt_ids"]
+    ]
+    old_ids = {identity(record) for record in active_existing}
     new_ids = [identity(record) for record in records]
     if len(new_ids) != len(set(new_ids)):
         raise RuntimeError("duplicate attempt identity in reservation")
     if old_ids & set(new_ids):
         raise RuntimeError("same-cell recovery requires a protocol amendment")
+    if recovery_of_attempt_ids is not None:
+        if recovery_of_attempt_ids != VOID_GLOBAL_ATTEMPT_IDS:
+            raise RuntimeError("recovery must map exactly to void IDs 55-60")
+        parents = {int(record["attempt_id"]): record for record in existing}
+        if any(
+            identity(record) != identity(parents[parent_id])
+            for record, parent_id in zip(
+                records, recovery_of_attempt_ids, strict=True
+            )
+        ):
+            raise RuntimeError("recovery cells differ from void parent identities")
     prepared = [
         {
             "attempt_id": PRIOR_GLOBAL_RESERVATIONS + len(existing) + offset,
             "record_type": "episode_attempt",
             "started_at": now(),
+            **(
+                {"recovery_of_attempt_id": recovery_of_attempt_ids[offset - 1]}
+                if recovery_of_attempt_ids is not None
+                else {}
+            ),
             **record,
         }
         for offset, record in enumerate(records, start=1)
@@ -646,6 +795,7 @@ def reserve_attempts(
             handle.write(canonical(record) + "\n")
         handle.flush()
         os.fsync(handle.fileno())
+    global_ledger_state(path)
     return prepared
 
 
@@ -698,6 +848,7 @@ def run_mechanism(*, gpus: str, timeout_seconds: int) -> int:
         target=RUNTIME_CACHE_DIR,
         manifest_path=RUNTIME_CACHE_MANIFEST_PATH,
     )
+    prepare_recovery_ledger(ATTEMPT_LEDGER_PATH)
     validate_credential()
     with configured_base():
         if not base._poe_healthcheck():
@@ -725,10 +876,14 @@ def run_mechanism(*, gpus: str, timeout_seconds: int) -> int:
         RUN_ROOT / "manifests" / f"gpu_{MECHANISM_LEVEL}_{int(time.time())}.json",
         admission,
     )
-    attempts = reserve_attempts(ATTEMPT_LEDGER_PATH, attempt_records(jobs))
+    attempts = reserve_attempts(
+        ATTEMPT_LEDGER_PATH,
+        attempt_records(jobs),
+        recovery_of_attempt_ids=VOID_GLOBAL_ATTEMPT_IDS,
+    )
     if [record["attempt_id"] for record in attempts] != EXPECTED_GLOBAL_ATTEMPT_IDS:
-        raise RuntimeError("mechanism attempt IDs differ from frozen 55-60")
-    legacy.append_ledger_event(
+        raise RuntimeError("mechanism recovery attempt IDs differ from frozen 61-66")
+    append_global_ledger_event(
         ATTEMPT_LEDGER_PATH,
         {
             "record_type": "phase_dispatch",
@@ -947,12 +1102,18 @@ def _status_summary() -> dict[str, Any]:
 
 
 def _attempt_audit() -> dict[str, Any]:
-    state = legacy.attempt_ledger_state(ATTEMPT_LEDGER_PATH)
-    attempts = state["attempts"]
+    state = global_ledger_state(ATTEMPT_LEDGER_PATH)
+    attempts = [
+        record
+        for record in state["attempts"]
+        if int(record["attempt_id"]) not in state["void_attempt_ids"]
+    ]
     failures: list[str] = []
     ids = [int(record["attempt_id"]) for record in attempts]
     if ids != EXPECTED_GLOBAL_ATTEMPT_IDS:
-        failures.append("attempt IDs differ from frozen 55-60")
+        failures.append("attempt IDs differ from frozen recovery 61-66")
+    if state["void_attempt_ids"] != VOID_GLOBAL_ATTEMPT_IDS:
+        failures.append("void attempt IDs differ from frozen 55-60")
     if state["dispatched_attempt_ids"] != EXPECTED_GLOBAL_ATTEMPT_IDS:
         failures.append("dispatched attempt IDs mismatch")
     expected = {
@@ -966,12 +1127,13 @@ def _attempt_audit() -> dict[str, Any]:
     }
     if actual != expected:
         failures.append("attempt cells differ from frozen matrix")
-    if PRIOR_GLOBAL_RESERVATIONS + len(attempts) != 60:
-        failures.append("global reservation accounting is not 60")
+    if PRIOR_GLOBAL_RESERVATIONS + len(state["attempts"]) != 66:
+        failures.append("global reservation accounting is not 66")
     return {
         "passed": not failures,
-        "new_reserved_count": len(attempts),
-        "global_reserved_count": PRIOR_GLOBAL_RESERVATIONS + len(attempts),
+        "new_reserved_count": len(state["attempts"]),
+        "scientific_recovery_count": len(attempts),
+        "global_reserved_count": PRIOR_GLOBAL_RESERVATIONS + len(state["attempts"]),
         "attempt_ids": ids,
         "failures": failures,
     }
