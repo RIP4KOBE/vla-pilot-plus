@@ -41,6 +41,8 @@ def test_mechanism_matrix_and_profiles_are_exact_and_no_formal():
     assert all(job["episode_seeds"] == [932032, 615132, 718536] for job in jobs)
     assert all(job["max_chunks"] == 16 for job in jobs)
     assert not hasattr(runner, "FORMAL_LEVEL")
+    assert runner.MANIFEST_V1_PATH.name == "mechanism_manifest.json"
+    assert runner.MANIFEST_PATH.name == "mechanism_manifest.v2.json"
 
 
 def test_command_contains_candidate_guard_once_and_is_secret_free():
@@ -196,18 +198,59 @@ def test_run_stops_at_manifest_gate_before_credential_or_admission(monkeypatch):
 
 
 def test_manifest_payload_forbids_formal_and_binds_six_cells(monkeypatch):
-    monkeypatch.setattr(runner, "current_provenance", lambda: {"code_commit": "abc"})
+    monkeypatch.setattr(
+        runner,
+        "current_provenance",
+        lambda: {
+            "code_commit": "abc",
+            "recovery_protocol_commit": runner.RECOVERY_PROTOCOL_COMMIT,
+        },
+    )
     monkeypatch.setattr(runner, "source_fingerprints", lambda: {"core": "hash"})
     monkeypatch.setattr(runner, "checkpoint_fingerprint", lambda: {"aggregate_sha256": "c"})
     monkeypatch.setattr(runner, "libero_input_fingerprint", lambda: {"aggregate_sha256": "l"})
     monkeypatch.setattr(runner, "runtime_cache_fingerprint", lambda: {"aggregate_sha256": "r"})
     monkeypatch.setattr(runner, "gpu_reference", lambda: {"sha256": "g"})
+    monkeypatch.setattr(
+        runner,
+        "_verified_parent_manifest",
+        lambda: {
+            "path": "/owned/mechanism_manifest.json",
+            "sha256": runner.MANIFEST_V1_SHA256,
+            "payload_sha256": "parent-payload",
+        },
+    )
 
     payload = runner.build_manifest_payload()
 
     assert payload["formal_authorized"] is False
+    assert payload["schema"] == "eds-qd-autoresearch-v2-mechanism-manifest-v2"
+    assert payload["parent_manifest_v1"]["sha256"] == runner.MANIFEST_V1_SHA256
+    assert payload["provenance"]["recovery_protocol_commit"] == (
+        runner.RECOVERY_PROTOCOL_COMMIT
+    )
     assert payload["mechanism"]["unique_cells"] == 6
     assert payload["mechanism"]["tasks"] == [2, 3, 9]
     assert payload["prior_global_reservations"] == 54
     assert payload["global_reservation_cap"] == 143
     assert payload["payload_sha256"]
+
+
+def test_parent_manifest_v1_is_immutable_and_exact(monkeypatch, tmp_path):
+    parent = tmp_path / "mechanism_manifest.json"
+    parent.write_text(
+        '{"schema":"eds-qd-autoresearch-v2-mechanism-manifest-v1",'
+        '"formal_authorized":false,"payload_sha256":"parent"}\n',
+        encoding="utf-8",
+    )
+    parent.chmod(0o444)
+    monkeypatch.setattr(runner, "MANIFEST_V1_PATH", parent)
+    monkeypatch.setattr(runner, "MANIFEST_V1_SHA256", runner.sha256_path(parent))
+
+    verified = runner._verified_parent_manifest()
+
+    assert verified["sha256"] == runner.sha256_path(parent)
+    assert verified["payload_sha256"] == "parent"
+    parent.chmod(0o644)
+    with pytest.raises(RuntimeError, match="v1 identity"):
+        runner._verified_parent_manifest()

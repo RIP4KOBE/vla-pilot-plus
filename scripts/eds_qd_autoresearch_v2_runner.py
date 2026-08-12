@@ -35,6 +35,8 @@ import rdt_eds_eval_runner as base
 MECHANISM_LEVEL = "eds_qd_autoresearch_v2_mechanism"
 BRANCH = "exp/eds-qd-autoresearch-libero-swap-ood"
 PROTOCOL_COMMIT = "73724cec4d8c60096e5c6baed46274c7098964a3"
+RECOVERY_PROTOCOL_COMMIT = "70678d207d7196f4b6ae9adfb524b67970dce047"
+HEALTH_INCIDENT_RESULT_COMMIT = "f189621"
 RUN_021_IMPLEMENTATION_COMMIT = "f010e8e4ff1f129e12499b1e0f8d284f505f7455"
 RUN_022_RESULT_COMMIT = "8fde5676fc28ef643c2ccb81ef40707350f7bd32"
 RUN_022_ARTIFACT_SHA256 = (
@@ -45,7 +47,11 @@ EXPERIMENT_ROOT = Path(
 )
 RUN_ROOT = EXPERIMENT_ROOT / "run_023_reward_degenerate_online_mechanism"
 OUTPUT_LINK = WORKTREE_ROOT / "outputs"
-MANIFEST_PATH = RUN_ROOT / "manifests/mechanism_manifest.json"
+MANIFEST_V1_PATH = RUN_ROOT / "manifests/mechanism_manifest.json"
+MANIFEST_V1_SHA256 = (
+    "d51a44042357b129595cc220faeecd5a9029f2424e0b803711a32ed31a8ec718"
+)
+MANIFEST_PATH = RUN_ROOT / "manifests/mechanism_manifest.v2.json"
 ATTEMPT_LEDGER_PATH = RUN_ROOT / "manifests/episode_attempt_ledger.jsonl"
 AUDIT_PATH = RUN_ROOT / "analysis/mechanism_audit.json"
 RUN_022_ARTIFACT_PATH = (
@@ -374,6 +380,8 @@ def current_provenance() -> dict[str, Any]:
         "code_commit": head,
         "code_state_sha256": code_state,
         "protocol_commit": PROTOCOL_COMMIT,
+        "recovery_protocol_commit": RECOVERY_PROTOCOL_COMMIT,
+        "health_incident_result_commit": HEALTH_INCIDENT_RESULT_COMMIT,
         "run_021_implementation_commit": RUN_021_IMPLEMENTATION_COMMIT,
         "run_022_result_commit": RUN_022_RESULT_COMMIT,
     }
@@ -434,12 +442,35 @@ def _verified_run_022() -> dict[str, Any]:
     }
 
 
+def _verified_parent_manifest() -> dict[str, Any]:
+    if (
+        not MANIFEST_V1_PATH.is_file()
+        or MANIFEST_V1_PATH.stat().st_mode & 0o222
+        or sha256_path(MANIFEST_V1_PATH) != MANIFEST_V1_SHA256
+    ):
+        raise RuntimeError("immutable mechanism manifest v1 identity mismatch")
+    payload = json.loads(MANIFEST_V1_PATH.read_text(encoding="utf-8"))
+    if (
+        payload.get("schema")
+        != "eds-qd-autoresearch-v2-mechanism-manifest-v1"
+        or payload.get("formal_authorized") is not False
+        or contains_credential(payload)
+    ):
+        raise RuntimeError("mechanism manifest v1 is not a clean frozen parent")
+    return {
+        "path": str(MANIFEST_V1_PATH.resolve(strict=True)),
+        "sha256": MANIFEST_V1_SHA256,
+        "payload_sha256": payload["payload_sha256"],
+    }
+
+
 def build_manifest_payload() -> dict[str, Any]:
     unbound_jobs = build_jobs(MECHANISM_LEVEL, bind=False)
     payload = {
-        "schema": "eds-qd-autoresearch-v2-mechanism-manifest-v1",
+        "schema": "eds-qd-autoresearch-v2-mechanism-manifest-v2",
         "created_at": now(),
         "provenance": current_provenance(),
+        "parent_manifest_v1": _verified_parent_manifest(),
         "source_fingerprints": source_fingerprints(),
         "checkpoint_fingerprint": checkpoint_fingerprint(),
         "libero_input_fingerprint": libero_input_fingerprint(),
@@ -509,6 +540,7 @@ def freeze_manifest() -> dict[str, Any]:
     pause_preflight()
     storage_preflight()
     _verified_run_022()
+    _verified_parent_manifest()
     if MANIFEST_PATH.exists():
         raise RuntimeError("mechanism manifest already exists")
     payload = build_manifest_payload()
@@ -526,10 +558,14 @@ def validate_manifest() -> dict[str, Any]:
     unsigned.pop("payload_sha256", None)
     if stored_sha != sha256_bytes(canonical(unsigned).encode("utf-8")):
         raise RuntimeError("mechanism manifest payload hash mismatch")
+    if payload.get("schema") != "eds-qd-autoresearch-v2-mechanism-manifest-v2":
+        raise RuntimeError("mechanism manifest schema mismatch")
     if payload.get("formal_authorized") is not False:
         raise RuntimeError("mechanism manifest must forbid formal")
     if payload.get("provenance") != current_provenance():
         raise RuntimeError("mechanism manifest provenance mismatch")
+    if payload.get("parent_manifest_v1") != _verified_parent_manifest():
+        raise RuntimeError("mechanism manifest parent mismatch")
     if payload.get("source_fingerprints") != source_fingerprints():
         raise RuntimeError("mechanism manifest source mismatch")
     if payload.get("mechanism", {}).get("tasks") != MECHANISM_TASKS:
