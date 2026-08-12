@@ -880,3 +880,13 @@
 - Incident record：`experiments/run_023_reward_degenerate_online_mechanism/pre-reservation-health.md`，SHA-256 `779c515a67f0991e381fedad28ceda9b6045a66adb4d77fce06364df0ead00fe`。
 - Interpretation：纯 infrastructure/auth blocker，不是 H2 算法或 task outcome；historical formal best/gap 仍 `2/10 / 3`，六 cell 与所有 gates 不变。
 - Resume：需要 valid process-environment credential。由于本 incident record 会推进 documentation HEAD，恢复前必须 protocol-first versioned manifest/rebind，保留完全相同 runner/core/config/profile/matrix/input/cache/caps 和未使用 IDs；不得改 science。
+
+#### AQ. run_023 recovery protocol v2 lock
+
+- Trigger：用户再次要求继续并提供 replacement credential material；其值、片段、hash/fingerprint 均不进入任何 research record。
+- Secret boundary：当前执行工具没有独立的不序列化 secret/env 注入字段；聊天值不等于进程环境配置。禁止把它拼入 shell command、补丁、文件、manifest、artifact、attempt ledger、文档或 Git。只有从非序列化 runtime environment 读取到凭据时才允许 health。
+- Protocol-first：新增 `experiments/run_023_reward_degenerate_online_mechanism/protocol-v2.md`，严格先于 runner/test 与 manifest-v2 变更。
+- Frozen science：保留 v1 manifest SHA `d51a4404…c718`，runner science、run_021 core/config、run_022 evidence、control/candidate profiles、tasks/seeds、`max_chunks=16`、checkpoint/LIBERO/cache、gates/caps/formal=false 以及未使用 IDs 55–60 全部不变。
+- Authorized plumbing：仅允许修改 dedicated v2 runner/test，引入并验证 immutable `mechanism_manifest.v2.json`，绑定 v1、incident、recovery protocol、implementation HEAD/code-state；v1 必须继续 mode 0444 且 checksum 不变。
+- Transaction：v2 freeze/validation -> non-serialized env credential + real health -> fresh two-snapshot admission -> IDs 55–60 reservation/dispatch。任一 health/admission failure仍为 zero-attempt，不能反馈到算法。
+- Target/budget：historical formal best/gap 仍 `2/10 / 3`；新增 reservation/episode/GPU-hour/validation/formal 均 0。下一步只做 manifest-v2 plumbing 与测试。
