@@ -1067,7 +1067,7 @@ continuation_v5:
   candidate: qd_protected_quality_secondary_v1
   candidate_stack: "capacity-one exact protected quality lane + one non-evicting secondary lane per quality cell + sparse_priority + causal_envelope_v1 + global-quality anchor1; fallback disabled"
   active_experiment: run_041_protected_quality_lane_diagnostic
-  phase: DESIGN_PROTOCOL_PENDING_COMMIT
+  phase: RUN041_PROTOCOL_PENDING_COMMIT
   final_candidate_without_prior_task_gain: true
   pre_v5_effective_online_episodes: 66
   pre_v5_global_reservations: 90
@@ -1087,4 +1087,17 @@ continuation_v5:
   formal_authorized: false
   gpu_authorized: false
   online_episode_attempts_authorized: 0
-  next_action: "Commit v5 design, then lock and execute Run041 protected-lane replay before any core/config implementation"
+  run_041:
+    status: PROTOCOL_LOCKED_BEFORE_IMPLEMENTATION
+    protocol: "experiments/run_041_protected_quality_lane_diagnostic/protocol.md"
+    protocol_sha256: "4950af9b7aba08c60a505ad4f71c26358099f47adebac46ac2280c9a2d0cc5a2"
+    input_manifest_sha256: "2cd1f8249daebbbba69b650b5a61c89c879fa6605177f151bff4edaea7fb96e2"
+    parent_analyzer_sha256: "58771912ddb5578845b6d68f9e17ff92528a093c3c5d161cde634fa60ca644e0"
+    trace_count: 24
+    candidate_stream_count: 264
+    allowed_new_files: 2
+    artifact_root: "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_041_protected_quality_lane_diagnostic"
+    core_config_change_authorized: false
+    gpu_authorized: false
+    online_episode_attempts_authorized: 0
+  next_action: "Commit Run041 protocol, then implement/test its two-file analyzer before any artifacts or core changes"

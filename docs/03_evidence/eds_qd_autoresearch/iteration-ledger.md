@@ -1116,3 +1116,11 @@
 - Fresh split：mechanism `[7,5]/[87603,666847]`；Dev-A `[8,0,4]/[722809,356933,33067]`；validation seeds `[148392,894439,929693,934684,186167,100751,365645,543533,256271,426125]`。formal仍reuse-limited且未授权。
 - Budget/no-progress：仍90/143 reservations、5.447063/48 GPUh；max50 science cells、3 recovery。若v5无task-level gain且无新非重复QD证据，必须全局no-adoption，不得生成第六candidate。
 - Boundary：当前只冻结design/state，无core/config/test/artifact/GPU/API/model/LIBERO/reservation/online/formal change。Protected untracked design继续排除。
+
+#### BN. Run041 protected-quality lane replay protocol
+
+- Temporal/input：v5 design commit `97c0418`先于本protocol。复用Run040 exact 24-trace/264-stream manifest SHA `2cd1f824…96e2`与validated alignment analyzer SHA `58771912…44e0`；所有outcome/success/future/formal/受保护文件继续排除。
+- State machine：quality独立按capacity1 update/rebin/visits运行并对saved telemetry exact replay；secondary每个现有quality cell最多1个、无visits。Initial/update从prior quality+secondary+current candidates中排除new quality后选alternate reward best；rebin只在new quality occupied cells内重选，其他丢弃。
+- Allocation：global anchor/final selection仅quality；production sparse15只读quality cells/visits，cell counts逐allocation与capacity1 identity；cell内stateless round-robin可选secondary。总16、无global RNG变化。
+- Gates：quality/saved/protected identity mismatch0；240 allocation maps exact；secondary不建cell/带visits/evict/anchor/final；secondary sparse ratio>=20%、coverage=1；Run040 alias stats exact复现；双artifact/finite/accounting/secret/write clean。
+- Scope：只允许新增Run041 analyzer/test，implementation commit后才可写owned artifact。当前core/config/GPU/API/model/LIBERO/reservation/online/Dev/validation/formal授权0；累计budget/target不变。
