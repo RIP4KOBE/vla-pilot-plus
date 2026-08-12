@@ -1193,3 +1193,12 @@
 - Rule：v4 continuous-loop第3项与base target discipline触发；v5 state已冻结为last evidence-backed candidate。Deterministic pending decision为`CONCLUDE_NO_ADOPTION_WITHIN_GLOBAL_BUDGET_TARGET_NOT_MET`，禁止第六candidate、Dev-A/validation/formal、rerun或gate relaxation。
 - Protocol scope：Run045只允许在protocol commit后创建owned immutable decision manifest、final report并更新state/log/findings/总账；code/config/test/GPU/API/model/LIBERO/reservation/formal授权均0。
 - Frozen accounting：70 effective episodes、98/144 reservations、6.9468320556/48 GPUh、formal0；historical formal best/gap 2/10、3。结论是target未达成下的no-adoption收敛，不得措辞为success。
+
+#### BW. Global conclusion artifact 与 final report
+
+- Temporal order：Run045 documentation-only protocol commit `a806ce1`先于decision manifest与final report；之后没有任何code/config/test、GPU/API/model/LIBERO、reservation、validation或formal执行。
+- Immutable decision：owned Run045 manifest mode0444、6,638 bytes、SHA `112cc6b19b9ab1970e392f04385ff572a8b8712e362c69c1b27fdd2f5a427d99`，绑定base/v4/v5 designs、protocol/result commits、source hashes、candidate trajectory、Run044 identity/audit/ledger、negative/invalid evidence、budget、credential/write boundary与no-progress basis。
+- Final report：`docs/03_evidence/eds_qd_autoresearch/2026-08-12-eds-qd-autoresearch-final-report.md`，SHA `6cdaf99749a22b984753ca4b300098d00fb94e6a4b66de5077016aaf4fc7a0fb`。
+- Decision：`CONCLUDE_NO_ADOPTION_WITHIN_GLOBAL_BUDGET_TARGET_NOT_MET`。Target未达到；historical formal best/gap保持2/10、3；不adopt任何experimental EDS-QD successor，保留`p2_stage_on_abs_rbf_control`。
+- Final accounting/integrity：70 effective online episodes、98/144 reservations、6.9468320556/48 GPUh、formal0；credential matches0，所有writes仅owned worktree/branch和artifact root，protected untracked design未读/未改/未stage，未干扰外部GPU进程。
+- Reopen boundary：当前冻结研究内next action为空。只有用户另行批准、具有真正新task-linked evidence和fresh leakage-safe splits的new design才能重开；不得使用Run044 outcome进行相邻调参。

@@ -199,3 +199,10 @@ candidate. Cumulative accounting is 70 effective online episodes, 98/144
 reservations and 6.946832/48 GPU-hours; historical formal best/gap remain 2/10
 and 3. The next step is an immutable outer-loop no-adoption conclusion, not more
 mechanism exploration.
+
+The outer-loop conclusion is now immutable. Run045 decision manifest SHA
+`112cc6b19b9ab1970e392f04385ff572a8b8712e362c69c1b27fdd2f5a427d99`
+records `CONCLUDE_NO_ADOPTION_WITHIN_GLOBAL_BUDGET_TARGET_NOT_MET`; final report
+SHA is `6cdaf99749a22b984753ca4b300098d00fb94e6a4b66de5077016aaf4fc7a0fb`.
+The target was not reached, and the study ends with the historical control as
+the recommended operational baseline.
