@@ -954,3 +954,12 @@
 - Baseline：用synthetic archive调用 unchanged production allocator population16，必须 100%等于保存slot map。Candidate：unique global-best dedicated 1 slot + unchanged allocator population15；分别记录dedicated/sparse/total。
 - Gates：>=300 transitions/>=3 tasks；baseline zero-slot overall >=25%且>=2 tasks各>=20%；candidate 1+15/16、zero omission；median occupied-cell coverage retention >=0.85；dual scientific payload byte identity、Torch RNG isolation、credential/write/accounting PASS。
 - Boundary：只允许新增 dedicated script/test；large JSON只写 owned Run030 root。当前 core/config/GPU/API/model/LIBERO/reservation/Dev/validation/formal授权均0；PASS只授权implementation protocol。
+
+#### AX. run_030 allocation reconstruction PASS
+
+- Order/tests：protocol/implementation `96c43db` / `dee49eb`，顺序正确。Analyzer TDD先修复standalone repo import和importlib dataclass registration；二者发生在aggregate input前且不改science。Dedicated + production QD `26 passed`，py_compile PASS。
+- Inputs/validity：5/5 exact files、419 rows checksum/row-count PASS；3,771 possible transitions中3,205 unique-max eligible，566 equal-max按协议排除；覆盖10 tasks。Production allocator baseline 3,205/3,205 exact slot-map identity。
+- Observation：prior global-best cell baseline zero slots `2151/3205 = 0.6711388455538222`；task ratios全部越过门，范围约0.5356–0.8556。该值是allocation defect，不是success estimate。
+- Counterfactual：每 transition dedicated anchor=1、sparse=15、total=16；global-best zero slot 0/3,205；occupied-cell coverage retention median 1.0；Torch global RNG unchanged；9/9 gates PASS。
+- Artifacts：canonical/replay byte-identical、mode0444、6,101,386 bytes、file SHA `cede7bbb823621e5ac21a3b5eb10c7ceb6e4acdf967d63ab5fb61135f472d812`、payload `7f793a70…c880`、credential 0；只写 owned Run030 root。
+- Target/accounting：historical formal best/gap仍 `2/10 / 3`；新增 GPU/API/model/LIBERO/reservation/online/formal均0。Decision `KEEP_H4_V3_DIAGNOSTIC_PASS_AND_AUTHORIZE_IMPLEMENTATION_PROTOCOL_ONLY`；下一步必须先提交 algorithm iteration 3 implementation protocol。

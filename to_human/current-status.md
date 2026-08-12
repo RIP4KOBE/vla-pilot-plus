@@ -1,11 +1,12 @@
-# Current Status — V3 Global-Quality Anchor Design Locked
+# Current Status — Run030 PASS, V3 Implementation Protocol Next
 
-- Project state: `running / versioned_v3_design_locked_pending_run_030_protocol` after explicit user approval.
+- Project state: `running / run_030_pass_pending_quality_anchor_implementation_protocol`.
 - Primary target: LIBERO-PRO `libero_object_swap >=5/10`; historical formal best/gap remain `2/10 / 3`.
-- New evidence: Run023 prior global-best QD cell received zero next-iteration slots in `450/666` comparable transitions (`67.6%`).
+- New evidence: production allocator exactly replayed 3,205 transitions; prior global-best QD cell received zero descendants in `2,151/3,205` (`67.1%`).
 - Single v3 candidate: `qd_global_quality_anchor_v1` — one global-best parent slot plus 15 original sparse-QD slots, fixed `176 search / 176 QD / 11 calls`.
 - Failed v2 exact-zero fallback is disabled; no threshold relaxation, Stage change, second anchor count, or candidate sweep is authorized.
-- Next gate: protocol-first `run_030_global_quality_anchor_diagnostic`, zero GPU/API/LIBERO episodes.
+- Run030 result: 9/9 gates PASS; 1+15 counterfactual reduced global-best omission to 0/3,205 with median cell-coverage retention 1.0.
+- Next gate: protocol-first algorithm-iteration-3 implementation. Run030 itself used zero GPU/API/LIBERO episodes.
 - New split isolation: SHA-derived nonoverlapping mechanism, Dev-A, and validation seeds are frozen in the v3 design.
 - Remaining budget: at most 58 new scientific cells; full path ends at 124/143 reservations and preserves 19 recovery slots; GPU cap remains 48 hours.
 - Current accounting is unchanged: 48 effective online episodes, 66 reservations, `3.747101 GPU-hours`, formal episodes 0.
