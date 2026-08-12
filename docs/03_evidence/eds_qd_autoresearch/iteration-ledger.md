@@ -1185,3 +1185,11 @@
 - Other gates：task noninferiority/retention PASS，safety/fallback/nonfinite/mask/qpos PASS，无disallowed outcome；candidate/control latency P95 `2.730221/2.610942s`，ratio `1.045684<=1.25`；identity/artifact/credential/ledger均PASS。
 - Artifact/accounting：immutable audit mode0444、SHA `57544a82…1cc9`，sole hard failures即上述3个真实zero-parent identities；ledger SHA `ac1a7713…f8d0`，IDs91–94继续aborted/inadmissible、IDs95–98为science，global98/144。Recovery GPU1.210429h、累计6.946832/48h；effective episodes累计70；formal0。
 - Decision：`CONCLUDE_H5_V5_ONLINE_MECHANISM_FAIL_NO_ADOPTION`。不得用1,685 aggregate activations覆盖per-iteration gate，不得Dev-A/validation/formal、rerun、放宽gate或创建第六candidate。下一步只允许result commit后protocol-first outer-loop conclusion。
+
+#### BV. Run045 global no-adoption conclusion protocol
+
+- Trigger：Run044 valid result commit `374b428`后进入outer-loop。V4在offline quality-retention gate淘汰、V5在online `0/2 -> 0/2`且mechanism FAIL；连续两个versioned cycles无任何task-level gain。
+- Evidence interpretation：Run044 1,685 secondary parents/407 of 410 positive iterations是新的mechanism observation，但不是task-linked progress；如此高的activation仍0 success，不能据此为剩余3个zero iteration建立可缩小target gap的新假设。继续保证activation属于proxy-driven adjacent repair。
+- Rule：v4 continuous-loop第3项与base target discipline触发；v5 state已冻结为last evidence-backed candidate。Deterministic pending decision为`CONCLUDE_NO_ADOPTION_WITHIN_GLOBAL_BUDGET_TARGET_NOT_MET`，禁止第六candidate、Dev-A/validation/formal、rerun或gate relaxation。
+- Protocol scope：Run045只允许在protocol commit后创建owned immutable decision manifest、final report并更新state/log/findings/总账；code/config/test/GPU/API/model/LIBERO/reservation/formal授权均0。
+- Frozen accounting：70 effective episodes、98/144 reservations、6.9468320556/48 GPUh、formal0；historical formal best/gap 2/10、3。结论是target未达成下的no-adoption收敛，不得措辞为success。
