@@ -1,17 +1,14 @@
-# Current Status — V2 Cycle Concluded, No Adoption
+# Current Status — V3 Global-Quality Anchor Design Locked
 
-- Project state: `concluded_no_adoption_v2_cycle`; execution disabled at the versioned-redesign boundary.
-- Primary target: LIBERO-PRO `libero_object_swap >=5/10`; not achieved. Historical formal best/gap remain `2/10 / 3` because formal was not authorized or run.
-- V2 result: Run023 control `1/3` (task 9) versus candidate `0/3`; candidate lost task 9.
-- Mechanism result: 74/74 candidate chunks were active QD and 0 used exact-degenerate fallback. The only audit hard failure was `candidate missing fallback record`.
-- Other gates: validity, safety, accounting, artifact, credential, and latency `1.001266x` all PASS.
-- Cross-cycle result: H1 improved partition resolution but validation was 1/10; H2 offline exact-zero evidence did not transfer online. Neither cycle reduced the formal gap.
-- Final accounting: 48 effective online episodes, 66/143 reservations, `3.747101/48 GPU-hours`, formal episodes 0.
-- Immutable Run023 audit: `7f123ecdf3ffb7fbbb881ffebe197ddb2ae8e4b1237233dd2316f6f67e832c54`.
-- Immutable v2 cycle decision manifest: `4010b620976ee8aa26ee05e6655a60c6ec4bc194511698254e9b2eb0bf9f1334`.
-- Decision: `CONCLUDE_NO_ADOPTION_WITHIN_V2_CYCLE_REQUEST_VERSIONED_REDESIGN`.
-- Proposed future direction: QD observation-derived stage-progress quality/final selection or guarded control-success retention; not authorized for execution.
-- Further execution requires a versioned design, new holdout seeds, explicit budget, and explicit user approval.
-- Final report: `docs/03_evidence/eds_qd_autoresearch/2026-08-12-eds-qd-autoresearch-v2-final-report.md`.
-- Full record: `docs/03_evidence/eds_qd_autoresearch/iteration-ledger.md`.
+- Project state: `running / versioned_v3_design_locked_pending_run_030_protocol` after explicit user approval.
+- Primary target: LIBERO-PRO `libero_object_swap >=5/10`; historical formal best/gap remain `2/10 / 3`.
+- New evidence: Run023 prior global-best QD cell received zero next-iteration slots in `450/666` comparable transitions (`67.6%`).
+- Single v3 candidate: `qd_global_quality_anchor_v1` — one global-best parent slot plus 15 original sparse-QD slots, fixed `176 search / 176 QD / 11 calls`.
+- Failed v2 exact-zero fallback is disabled; no threshold relaxation, Stage change, second anchor count, or candidate sweep is authorized.
+- Next gate: protocol-first `run_030_global_quality_anchor_diagnostic`, zero GPU/API/LIBERO episodes.
+- New split isolation: SHA-derived nonoverlapping mechanism, Dev-A, and validation seeds are frozen in the v3 design.
+- Remaining budget: at most 58 new scientific cells; full path ends at 124/143 reservations and preserves 19 recovery slots; GPU cap remains 48 hours.
+- Current accounting is unchanged: 48 effective online episodes, 66 reservations, `3.747101 GPU-hours`, formal episodes 0.
+- V3 design: `docs/01_specs/2026-08-12-eds-qd-autoresearch-v3-global-quality-anchor-design.md`, SHA-256 `0a2ea24763ef824010e462bbb76fa25d0e1b51d7217848f2e58b49153aabb742`.
+- Full append-only record: `docs/03_evidence/eds_qd_autoresearch/iteration-ledger.md`.
 - Protected untracked design remains untouched, unstaged, and uncommitted.

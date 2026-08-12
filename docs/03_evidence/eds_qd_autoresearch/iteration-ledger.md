@@ -935,3 +935,13 @@
 - Final accounting：跨周期 effective online episodes 48；global reservations 66/143；累计 GPU `3.7471009444444445/48` hours；formal episodes 0；Dev-A/B、validation、formal 均未由 Run023 解锁。
 - Integrity：decision manifest 与 Run023 evidence 均位于本研究独占 artifact root；worktree write boundary 保持；protected untracked design 未读、未改、未 stage。Credential 只曾在明确授权的 runtime child environment 中使用，value/fingerprint 未进入 command、worktree、artifact、log、manifest、docs 或 Git；最终扫描要求 zero matches。
 - Stop：state 进入 `concluded_no_adoption_v2_cycle_waiting_versioned_redesign_approval`。后续仅可在明确批准的 versioned design、新 leakage-safe holdout seeds 与 explicit budget 下继续；当前禁止 algorithm/GPU/API/LIBERO/attempt/Dev/validation/formal execution。
+
+#### AV. explicit approval and v3 global-quality anchor design
+
+- Authorization：用户在 v2 停止边界后明确回复“批准”，满足 versioned successor design、新 holdout、explicit budget与用户授权四项恢复条件。State 从 concluded/no-adoption 恢复到 v3 design locked；这不是对 v2 split 的继续调参。
+- Evidence selection：只读预审计 Run023 666 个可比 parent transitions；prior global-best reward cell 下一 iteration 的 slots 为 0 共 450 次，ratio `0.6756756756756757`。Task 2/3/9 分别 `97/189`、`346/450`、`7/27`。Run000 的 4,705 chunks archive-only parent结论进一步支持 global-quality retention gap。
+- Single candidate：`qd_global_quality_anchor_v1`，algorithm iteration 3。每 iteration 固定 1 slot 为 archive global-best parent，剩余 15 使用原 sparse-priority；16 parents 全部正常 renoise/rollout。Causal envelope保留；v2 exact-zero fallback关闭；final selection、Stage、checkpoint、prompt、env、executor、evaluator不变。
+- Compute/target：complete chunk冻结 `176 search / 176 QD / 11 calls`；historical formal best/gap仍 `2/10 / 3`。Allocation observation不等于 success evidence。
+- Isolation：mechanism tasks/seeds `[3,8,9] / [955865,522754,845886]`；Dev-A `[0,1,2,4,6,7] / [307995,262892,731741,14859,648306,960581]`；validation tasks 0..9 / `[733557,563986,984766,598490,834409,827884,504577,82408,891085,7487]`；全部与先前 split/formal 不重叠。
+- Budget：v3 前 48 effective episodes、66 reservations、`3.7471009444444445` GPU-hours、formal 0。新 scientific cap 58；全走完为 124/143，保留 19 recovery；GPU cap仍48 hours。
+- Protocol boundary：design commit 前后均无 core/config change、GPU/API/LIBERO/reservation。下一步只能 protocol-first `run_030_global_quality_anchor_diagnostic` zero-episode checksum-bound reconstruction；PASS只授权implementation protocol。
