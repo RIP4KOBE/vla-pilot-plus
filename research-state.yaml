@@ -5,7 +5,7 @@ project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
   status: running
-  phase: v2_h2_online_mechanism_recovery_protocol_locked_pending_manifest_v2
+  phase: v2_h2_online_mechanism_global_offset_recovery_protocol_locked
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: false
@@ -558,7 +558,7 @@ continuation_v2:
     gpu_hours: 0.0
     decision: KEEP_OFFLINE_MECHANISM_PASS_AND_AUTHORIZE_ONLINE_MECHANISM_PROTOCOL_ONLY
   run_023:
-    status: RECOVERY_PROTOCOL_V2_LOCKED_PENDING_RUNNER_MANIFEST_PLUMBING
+    status: RECOVERY_PROTOCOL_V3_LOCKED_AFTER_RESERVED_NOT_DISPATCHED
     protocol: "experiments/run_023_reward_degenerate_online_mechanism/protocol.md"
     protocol_commit: "73724cec4d8c60096e5c6baed46274c7098964a3"
     runner_implementation_commit: "d3f09b82dcd87ad0cde2038da0200e93287db3b7"
@@ -599,13 +599,30 @@ continuation_v2:
     online_episode_attempts: 0
     recovery_requires_versioned_manifest_rebind: true
     recovery_protocol_v2: "experiments/run_023_reward_degenerate_online_mechanism/protocol-v2.md"
-    recovery_protocol_v2_status: "LOCKED_BEFORE_IMPLEMENTATION"
+    recovery_protocol_v2_status: "COMPLETED_MANIFEST_V2_FROZEN"
     recovery_science_change_authorized: false
     parent_manifest_v1_preserved: true
     parent_manifest_v1_file_sha256: "d51a44042357b129595cc220faeecd5a9029f2424e0b803711a32ed31a8ec718"
-    runtime_secret_injection_status: "CHAT_VALUE_NOT_SERIALIZED_TO_PROCESS_ENVIRONMENT"
+    runtime_secret_injection_status: "EXPLICIT_USER_AUTHORIZED_RUNTIME_ONLY_NO_VALUE_OR_FINGERPRINT_LOGGED"
+    manifest_v2_path: "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_023_reward_degenerate_online_mechanism/manifests/mechanism_manifest.v2.json"
+    manifest_v2_file_sha256: "8e47ebb3ddcdf4f9b3657d5585902b303d35fa2162e597e2faf1b7d87805d2df"
+    manifest_v2_payload_sha256: "4600fe0b8dbbc1b45894100ccc36770b8f5a274a5975ca50ada81f561fbb5185"
+    manifest_v2_implementation_commit: "ac43b87"
+    authorized_runtime_credential_health: PASS
+    pre_dispatch_incident: "legacy ledger helper assumed local ids start at 1 and rejected global ids 55-60"
+    pre_dispatch_incident_class: "INFRASTRUCTURE_FAILURE_RESERVED_NOT_DISPATCHED_ZERO_EPISODES"
+    pre_dispatch_gpu_indices: [2, 5]
+    pre_dispatch_gpu_admission_sha256: "9ff20450a39d98e9a9771cad16688990d57381a432b7677247e55b1fb7a35cbe"
+    pre_dispatch_ledger_prefix_sha256: "6d586f32c840c87a61e3e179b2ab670756e5b734aa88fdc6cf522e5be56247af"
+    pre_dispatch_runtime_log_sha256: "fdd858a0556c97b9808b76e8f15d0deceff3d8d7f482e524553a91cd2433b19c"
+    reserved_not_dispatched_attempt_ids: [55, 56, 57, 58, 59, 60]
+    recovery_protocol_v3: "experiments/run_023_reward_degenerate_online_mechanism/protocol-v3.md"
+    recovery_protocol_v3_status: "LOCKED_BEFORE_LEDGER_MUTATION_AND_REPAIR"
+    authorized_recovery_attempt_ids: [61, 62, 63, 64, 65, 66]
+    recovery_slots_consumed_after_authorized_reservation: 6
+    recovery_slots_remaining_after_authorized_reservation: 13
     health_incident_record: "experiments/run_023_reward_degenerate_online_mechanism/pre-reservation-health.md"
     health_incident_record_sha256: "779c515a67f0991e381fedad28ceda9b6045a66adb4d77fce06364df0ead00fe"
     dev_a_authorized: false
     formal_authorized: false
-  next_action: "Commit recovery protocol v2; then implement/test manifest-v2 plumbing, freeze and validate v2, and run health only after a valid credential is available through a non-serialized process-environment channel"
+  next_action: "Commit recovery protocol v3, implement/test the dedicated global-offset ledger repair, freeze manifest v3, append-only void IDs 55-60, then repeat health/admission before exact-cell recovery IDs 61-66"

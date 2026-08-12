@@ -890,3 +890,14 @@
 - Authorized plumbing：仅允许修改 dedicated v2 runner/test，引入并验证 immutable `mechanism_manifest.v2.json`，绑定 v1、incident、recovery protocol、implementation HEAD/code-state；v1 必须继续 mode 0444 且 checksum 不变。
 - Transaction：v2 freeze/validation -> non-serialized env credential + real health -> fresh two-snapshot admission -> IDs 55–60 reservation/dispatch。任一 health/admission failure仍为 zero-attempt，不能反馈到算法。
 - Target/budget：historical formal best/gap 仍 `2/10 / 3`；新增 reservation/episode/GPU-hour/validation/formal 均 0。下一步只做 manifest-v2 plumbing 与测试。
+
+#### AR. run_023 credential health PASS and global-offset pre-dispatch failure
+
+- Manifest recovery：protocol v2 / implementation 为 `70678d2…` / `ac43b87…`；immutable v2 mode 0444、size 16,341、file SHA `8e47ebb3…d2df`、payload `4600fe0b…5185`。父 v1 SHA `d51a4404…c718` 未变；六 cell、science 与 formal=false 不变。
+- Credential：用户明确授权直接 runtime injection。值仅进入 detached child environment；没有进入 command line、worktree/artifact、manifest、ledger、docs、Git 或 fingerprint。真实 Stage/Poe health PASS。
+- Admission：fresh two-snapshot admission 只允许 idle GPU 2/5；immutable artifact SHA `9ff20450…cbe`。随后精确写入 global IDs 55–60。
+- Failure boundary：在 append `phase_dispatch` 时，legacy helper 把 standalone ledger 的 global offset 55 错判为非 1-based contiguous。没有 phase-dispatch event、worker/model、LIBERO reset、output、metric、video、episode 或 task outcome；`0` GPU execution hours。
+- Preserved evidence：六行 ledger prefix SHA `6d586f32…47af`；immutable runtime log `fdd858a0…b19c`；output files 0；credential scan 0。任务成功增减与失败原因均为 `N/A / no episode`，不能反馈算法。
+- Protocol-first v3：严格在 ledger mutation/runner repair 前冻结。IDs 55–60 将 append-only 标记 `reservation_void`；仅 dedicated v2 runner/test 可增加 global-offset ledger semantics 和 v3 manifest；exact cells 以 recovery IDs 61–66 重跑，并带 `recovery_of_attempt_id`。
+- Budget：当前 global reservations 60/143，scientific executions仍 0；授权 recovery 后为 66/143，消耗 6/19 recovery slots、余 13。historical formal best/gap 仍 `2/10 / 3`，formal 0。
+- Stop：若修复后再次发生 local pre-dispatch code failure，停止 Run023，不授权第三组 reservation；health/admission wait 不消耗 attempt。
