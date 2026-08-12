@@ -5,7 +5,7 @@ project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
   status: running
-  phase: v2_h2_online_mechanism_valid_fail_result_recording
+  phase: outer_loop_cycle_3_conclusion_protocol_locked
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: false
@@ -651,4 +651,11 @@ continuation_v2:
     health_incident_record_sha256: "779c515a67f0991e381fedad28ceda9b6045a66adb4d77fce06364df0ead00fe"
     dev_a_authorized: false
     formal_authorized: false
-  next_action: "Commit the valid Run023 negative result, then perform the required outer-loop conclusion for the exhausted single-candidate v2 design; no Dev-A, validation, or formal execution"
+  next_action: "Freeze cycle-3 decision manifest, final report, and human progress artifacts; then commit the no-adoption reflection and wait at the versioned-redesign authorization boundary"
+  outer_loop_cycle_3:
+    trigger: "Run023 valid online mechanism FAIL; v2 single candidate exhausted"
+    protocol: "experiments/run_023_reward_degenerate_online_mechanism/protocol-v4.md"
+    protocol_status: "LOCKED_BEFORE_DECISION_MANIFEST_AND_REPORT"
+    frozen_decision: CONCLUDE_NO_ADOPTION_WITHIN_V2_CYCLE_REQUEST_VERSIONED_REDESIGN
+    further_execution_authorized: false
+    proposed_future_direction: "QD observation-derived stage-progress quality/final selection or guarded control-success retention"

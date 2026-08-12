@@ -915,3 +915,13 @@
 - Immutable result：audit mode 0444、SHA `7f123ecdf3ffb7fbbb881ffebe197ddb2ae8e4b1237233dd2316f6f67e832c54`，唯一 hard failure `candidate missing fallback record`；attempt ledger `3f445b32…a63c`；run manifest `5a142003…b748`。
 - Interpretation：exact-equality fallback 在真实新 observation 上完全不激活，candidate 反而丢失 control task 9。禁止改成 tolerance sweep 或追加相邻候选。Decision `CONCLUDE_H2_ONLINE_MECHANISM_FAIL_NO_DEV`；Dev-A/B、validation、formal 全部禁止。
 - Next：本 v2 design 的 single candidate 已耗尽；result commit 后必须 outer-loop conclusion。任何后续算法 candidate 都需要 versioned design、新 holdout seeds 与明确授权。
+
+#### AT. outer-loop cycle 3 conclusion protocol
+
+- Trigger：Run023 result commit `00964434d2a5e245758c26f25dbc77e17c182dce` 后，v2 single-candidate promotion FAIL；同 cycle 没有合法 Dev/validation/formal 路径。
+- Protocol-first：`experiments/run_023_reward_degenerate_online_mechanism/protocol-v4.md` 在 decision manifest、final report、progress page 与 reflection 前冻结；授权 online/GPU/API/attempt/algorithm change 均为 0。
+- Cross-cycle evidence：H1 causal envelope 在 mechanism/Dev 有 proxy/gain，但 validation 仅 1/10；H2 offline exact-zero prevalence/identity成立，但 online 74/74 active、0 fallback，且 candidate 0/3 丢失 control task 9。两轮都没有缩小 formal historical gap 3。
+- Observation vs inference：观察到 prospective reward spread 全部严格非零、candidate task 9 proxy并不差但未成功；因此 exact equality 不可用且 reward proxy不能代表 completion。未来 stage-progress quality/retention 仍只是 inference/proposal，尚无授权。
+- Frozen decision：`CONCLUDE_NO_ADOPTION_WITHIN_V2_CYCLE_REQUEST_VERSIONED_REDESIGN`。禁止 tolerance sweep、Run023 seed reuse、second candidate、Dev-A/B、validation、formal。
+- Redesign boundary：仅可提议 EDS+QD scope 内 QD-first 的 observation-derived stage-progress quality/final selection 或 guarded control-success retention；需要 versioned design、新 holdout、明确 budget 与用户授权。
+- Required outputs：immutable v2 cycle decision manifest、final report、progress page、state/log/findings/trajectory/ledger reflection、credential/write-boundary checks与 reflection commit。
