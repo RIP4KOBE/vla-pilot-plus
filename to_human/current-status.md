@@ -1,12 +1,13 @@
-# Current Status — Run031 Implementation Protocol Locked
+# Current Status — Run031 Implementation PASS, CPU Mechanism Protocol Next
 
-- Project state: `running / run_031_implementation_protocol_locked`.
+- Project state: `running / run_031_implementation_pass_pending_cpu_mechanism_protocol`.
 - Primary target: LIBERO-PRO `libero_object_swap >=5/10`; historical formal best/gap remain `2/10 / 3`.
 - New evidence: production allocator exactly replayed 3,205 transitions; prior global-best QD cell received zero descendants in `2,151/3,205` (`67.1%`).
 - Single v3 candidate: `qd_global_quality_anchor_v1` — one global-best parent slot plus 15 original sparse-QD slots, fixed `176 search / 176 QD / 11 calls`.
 - Failed v2 exact-zero fallback is disabled; no threshold relaxation, Stage change, second anchor count, or candidate sweep is authorized.
 - Run030 result: 9/9 gates PASS; 1+15 counterfactual reduced global-best omission to 0/3,205 with median cell-coverage retention 1.0.
-- Next gate: TDD implementation inside the six frozen code/config/test files, followed by a separate implementation commit and CPU integrated mechanism protocol. Run030/Run031 have used zero GPU/API/LIBERO episodes.
+- Run031 result: protocol `4dc55c5` preceded implementation `f453e64`; all 8 implementation gates and 414 QD/RDT/metrics tests passed.
+- Next gate: freeze and run a deterministic CPU integrated mechanism artifact before any online manifest or episode. Run030/Run031 have used zero GPU/API/LIBERO episodes.
 - New split isolation: SHA-derived nonoverlapping mechanism, Dev-A, and validation seeds are frozen in the v3 design.
 - Remaining budget: at most 58 new scientific cells; full path ends at 124/143 reservations and preserves 19 recovery slots; GPU cap remains 48 hours.
 - Current accounting is unchanged: 48 effective online episodes, 66 reservations, `3.747101 GPU-hours`, formal episodes 0.

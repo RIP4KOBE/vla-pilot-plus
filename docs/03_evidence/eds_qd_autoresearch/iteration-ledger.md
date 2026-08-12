@@ -972,3 +972,12 @@
 - Telemetry：单独记录dedicated cell/fingerprint/count、sparse/total slot maps、activation/rescue和两种QD offspring source；不得复用旧EDS generic anchor字段。
 - Gates：anchor0 identity；global-best tie order；candidate 1+15与独立population15 exact equality；omission rescue/no dedup；determinism/global RNG；integrated finite/mask/qpos/archive/final selection；完整chunk `176/176/11`；全量QD/RDT回归。
 - Scope/accounting：只允许3 core + config + 2 tests；GPU/API/model/LIBERO/reservation/online/formal均0。PASS只授权另立CPU integrated mechanism protocol；历史formal best/gap仍2/10、3。
+
+#### AZ. run_031 implementation PASS
+
+- Order/scope：protocol `4dc55c5` -> implementation `f453e64`；变更精确限制为3 core + config + 2 tests，受保护未跟踪方案未读、未改、未stage。
+- TDD/tests：red phase 11个missing-feature预期失败；focused 11 passed；QD+RDT+metrics full regression 414 passed；py_compile/diff/whitelist/credential checks PASS。
+- Semantics：默认/显式0保留旧allocation tensors/order/counts/weights/fingerprints/RNG；显式1按既有global-best顺序prepend dedicated parent，其余与same-seed population15 sparse allocation逐tensor一致。
+- Mechanism：sparse omission时total补为1；sparse已选择best cell时不去重，total=sparse+1。10 iterations每轮16 parents全部进入rollout；source/activation/cell/fingerprint/sparse/rescue telemetry完整。
+- Safety/accounting：fail-closed mode/sampling/bounds/fallback validation、finite/mask/qpos/archive/final global-best regression PASS；complete chunk仍176 search/176 QD/11 calls。
+- Target：这是实现门，不是success evidence。新增GPU/API/model/LIBERO/reservation/online/formal均0；历史best/gap 2/10、3。Decision `KEEP_H4_V3_IMPLEMENTATION_PASS_AND_AUTHORIZE_CPU_MECHANISM_PROTOCOL_ONLY`。
