@@ -989,3 +989,12 @@
 - Gates：candidate精确10次1+15/16；rescue 10/10，overlap sparse+1且不去重；legacy 16 sparse；三者176/176/11、finite/mask/archive/rebin/final-selection/source/RNG PASS；双suite byte identity。
 - Scope/artifact：只允许新增dedicated script/test；canonical/replay仅写owned Run032 analysis，byte-identical、0444、secret-free。core/config/GPU/API/model/LIBERO/reservation/online/formal授权均0。
 - Decision：PASS只授权另立six-cell online mechanism protocol与immutable manifest流程；historical formal best/gap仍2/10、3。
+
+#### BB. run_032 CPU mechanism PASS
+
+- Order/tests：protocol `a252ad1` -> harness implementation `83a9715` -> artifacts；TDD初始唯一failure为script尚不存在，随后dedicated 3/3、full QD/RDT/metrics 417/417、py_compile PASS。
+- Rescue fixture：10/10 activation、10/10 rescue；每轮pre-update global-best sparse=0、total=1。
+- Overlap fixture：10/10 activation、0 rescue；每轮best sparse>0且total=sparse+1，无dedup。Comparator保持anchor/activation/rescue=0和原160 sparse source schema。
+- Integrated gates：三case均10个16-parent rollout batches、176 search/176 QD/11 calls；finite/mask/qpos/archive/rebin/final-selection/source/RNG/hash/secret全部PASS。
+- Artifacts：canonical/replay byte-identical、0444、11,411 bytes、file SHA `31dd437c…e24b`、payload `f147193e…ddf4`、credential 0，仅位于owned Run032 root。
+- Target/accounting：仍非success evidence；新增GPU/API/model/LIBERO/reservation/online/formal均0，historical best/gap仍2/10、3。Decision `KEEP_H4_V3_CPU_MECHANISM_PASS_AND_AUTHORIZE_ONLINE_MECHANISM_PROTOCOL_ONLY`。
