@@ -46,7 +46,9 @@ def test_candidate_command_binds_secondary_mode_and_seed_schedule():
 
     assert "main.eds_config.qd_secondary_lane_mode=protected_reward_v1" in command
     assert "main.eds_config.qd_global_quality_anchor_count=1" in command
-    assert "main.episode_seed_schedule=[87603,666847]" in command
+    assert runner.frozen_task_seed_pairs() == [(7, 87603), (5, 666847)]
+    assert runner.backend_execution_pairs() == [(5, 666847), (7, 87603)]
+    assert "main.episode_seed_schedule=[666847,87603]" in command
     keys = [token.split("=", 1)[0].lstrip("+") for token in command if "=" in token]
     assert len(keys) == len(set(keys))
     assert runner.contains_credential(command) is False
@@ -153,6 +155,10 @@ def test_fresh_ledger_reserves_and_dispatches_exact_ids_91_to_94(tmp_path):
     assert [row["attempt_id"] for row in reserved] == list(range(91, 95))
     state = runner.append_dispatch_event(ledger, list(range(91, 95)), [0, 1])
     assert state["dispatched_attempt_ids"] == list(range(91, 95))
+    state = runner.append_identity_abort_event(ledger)
+    assert state["aborted_attempt_ids"] == list(range(91, 95))
+    assert state["active_dispatched_attempt_ids"] == []
+    assert runner.append_identity_abort_event(ledger) == state
     with pytest.raises(RuntimeError, match="already exists"):
         runner.reserve_attempts(ledger, _attempt_records())
 

@@ -8,6 +8,7 @@ import csv
 import json
 import math
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -70,6 +71,7 @@ MECHANISM_TASKS = [7, 5]
 MECHANISM_SEEDS = [87603, 666847]
 MECHANISM_MAX_CHUNKS = 16
 EXPECTED_GLOBAL_ATTEMPT_IDS = list(range(91, 95))
+IDENTITY_INCIDENT_ROOT = RUN_ROOT / "incidents/invalid_task_seed_ids_91_94"
 EXPECTED_ALGORITHM_HASHES = {
     "core/qd_ed.py": (
         "2246193f87a27dc8568f434e3c9933aa4cf354e770417c62e463f7c565e1247e"
@@ -156,6 +158,21 @@ def profile_fingerprint(profile: dict[str, Any]) -> str:
     return sha256_bytes(canonical(payload).encode("utf-8"))
 
 
+def frozen_task_seed_pairs() -> list[tuple[int, int]]:
+    if len(MECHANISM_TASKS) != len(MECHANISM_SEEDS):
+        raise RuntimeError("Run044 task/seed lengths differ")
+    if len(set(MECHANISM_TASKS)) != len(MECHANISM_TASKS):
+        raise RuntimeError("Run044 task IDs must be unique")
+    return [
+        (int(task), int(seed))
+        for task, seed in zip(MECHANISM_TASKS, MECHANISM_SEEDS, strict=True)
+    ]
+
+
+def backend_execution_pairs() -> list[tuple[int, int]]:
+    return sorted(frozen_task_seed_pairs(), key=lambda item: item[0])
+
+
 def stage_dir(level: Any) -> str:
     if str(level) == MECHANISM_LEVEL:
         return "run_044_protected_quality_lane_online_mechanism"
@@ -174,9 +191,16 @@ def build_main_command(
         command = _BASE_BUILD_MAIN_COMMAND(
             prepared, gpu, timeout_seconds, **kwargs
         )
-    command.append(
-        "main.episode_seed_schedule=" + hydra_value(prepared["episode_seeds"])
-    )
+    requested_pairs = [
+        (int(task), int(seed))
+        for task, seed in zip(
+            prepared["task_ids_filter"], prepared["episode_seeds"], strict=True
+        )
+    ]
+    if requested_pairs != frozen_task_seed_pairs():
+        raise RuntimeError("Run044 job task/seed pairs differ from freeze")
+    execution_seeds = [seed for _, seed in backend_execution_pairs()]
+    command.append("main.episode_seed_schedule=" + hydra_value(execution_seeds))
     command.extend(
         [
             "main.eds_config.initial_diversity_descriptor_mode="
@@ -582,21 +606,31 @@ def ledger_state(path: Path) -> dict[str, Any]:
         raise RuntimeError("Run044 ledger event IDs are not contiguous")
     known = {int(row["attempt_id"]) for row in attempts}
     dispatched: set[int] = set()
+    aborted: set[int] = set()
     for event in events:
         ids = event.get("attempt_ids")
         if (
-            event.get("record_type") != "phase_dispatch"
+            event.get("record_type")
+            not in {"phase_dispatch", "dispatch_aborted_invalid_task_seed_identity"}
             or not isinstance(ids, list)
             or not ids
             or not set(ids) <= known
-            or set(ids) & dispatched
         ):
             raise RuntimeError("invalid Run044 ledger event")
-        dispatched.update(int(value) for value in ids)
+        if event["record_type"] == "phase_dispatch":
+            if set(ids) & (dispatched | aborted):
+                raise RuntimeError("Run044 attempt dispatched more than once")
+            dispatched.update(int(value) for value in ids)
+        else:
+            if not set(ids) <= dispatched or set(ids) & aborted:
+                raise RuntimeError("only active Run044 attempts may be aborted")
+            aborted.update(int(value) for value in ids)
     return {
         "rows": rows,
         "attempts": attempts,
         "dispatched_attempt_ids": sorted(dispatched),
+        "aborted_attempt_ids": sorted(aborted),
+        "active_dispatched_attempt_ids": sorted(dispatched - aborted),
     }
 
 
@@ -660,6 +694,108 @@ def append_dispatch_event(
         handle.flush()
         os.fsync(handle.fileno())
     return ledger_state(path)
+
+
+def append_identity_abort_event(path: Path) -> dict[str, Any]:
+    state = ledger_state(path)
+    if state["aborted_attempt_ids"] == EXPECTED_GLOBAL_ATTEMPT_IDS:
+        return state
+    if (
+        state["dispatched_attempt_ids"] != EXPECTED_GLOBAL_ATTEMPT_IDS
+        or state["aborted_attempt_ids"]
+    ):
+        raise RuntimeError("Run044 identity abort requires exact active IDs 91-94")
+    event = {
+        "ledger_event_id": 1
+        + sum(
+            row.get("record_type") != "episode_attempt" for row in state["rows"]
+        ),
+        "record_type": "dispatch_aborted_invalid_task_seed_identity",
+        "created_at": now(),
+        "phase": MECHANISM_LEVEL,
+        "attempt_ids": list(EXPECTED_GLOBAL_ATTEMPT_IDS),
+        "reason": "backend_sorted_task_filter_reassigned_episode_seed_schedule",
+        "protocol_commit": "5f94fd45ef94594dd21bb1d3bae802fb23a516c9",
+        "scientific_outcomes_admissible": False,
+    }
+    if contains_credential(event):
+        raise RuntimeError("Run044 abort event contains credential material")
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(canonical(event) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    return ledger_state(path)
+
+
+def _incident_file_inventory(root: Path) -> list[dict[str, Any]]:
+    inventory = []
+    for path in sorted(item for item in root.rglob("*") if item.is_file()):
+        relative = path.relative_to(root).as_posix()
+        inventory.append(
+            {
+                "path": relative,
+                "size_bytes": path.stat().st_size,
+                "sha256": sha256_path(path),
+            }
+        )
+    return inventory
+
+
+def archive_identity_incident() -> dict[str, Any]:
+    state = append_identity_abort_event(ATTEMPT_LEDGER_PATH)
+    if state["active_dispatched_attempt_ids"]:
+        raise RuntimeError("Run044 attempts remain active after identity abort")
+    if IDENTITY_INCIDENT_ROOT.exists():
+        raise RuntimeError("Run044 identity incident archive already exists")
+    IDENTITY_INCIDENT_ROOT.mkdir(parents=True)
+    sources = {
+        "control_output": RUN_ROOT / "mechanism__p2_stage_on_abs_rbf_control",
+        "candidate_output": (
+            RUN_ROOT / "mechanism__eds_qd_protected_quality_secondary_v1"
+        ),
+        "run_manifest.csv": RUN_ROOT / "run_manifest.csv",
+        "runner_logs": (
+            EXPERIMENT_ROOT
+            / "runner_logs/run_044_protected_quality_lane_online_mechanism"
+        ),
+        "runtime_cache": (
+            EXPERIMENT_ROOT
+            / "runtime_cache/run_044_protected_quality_lane_online_mechanism"
+        ),
+    }
+    admissions = sorted((RUN_ROOT / "manifests").glob("gpu_*.json"))
+    if len(admissions) != 1:
+        raise RuntimeError("Run044 identity incident requires one admission file")
+    sources["gpu_admission.json"] = admissions[0]
+    if any(not source.exists() for source in sources.values()):
+        missing = [name for name, source in sources.items() if not source.exists()]
+        raise RuntimeError(f"Run044 identity incident sources missing: {missing}")
+    for name, source in sources.items():
+        target = IDENTITY_INCIDENT_ROOT / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(source), str(target))
+    credential_audit = v1.credential_tree_audit(IDENTITY_INCIDENT_ROOT)
+    if credential_audit["passed"] is not True:
+        raise RuntimeError("Run044 identity incident credential scan failed")
+    inventory = _incident_file_inventory(IDENTITY_INCIDENT_ROOT)
+    payload = {
+        "schema": "eds-qd-autoresearch-v5-identity-incident-v1",
+        "created_at": now(),
+        "classification": "invalid_task_seed_identity",
+        "attempt_ids": EXPECTED_GLOBAL_ATTEMPT_IDS,
+        "frozen_pairs": [list(pair) for pair in frozen_task_seed_pairs()],
+        "actual_pairs": [[5, 87603], [7, 666847]],
+        "scientific_outcomes_admissible": False,
+        "ledger_sha256": sha256_path(ATTEMPT_LEDGER_PATH),
+        "credential_match_count": 0,
+        "files": inventory,
+    }
+    payload["payload_sha256"] = sha256_bytes(canonical(payload).encode("utf-8"))
+    if contains_credential(payload):
+        raise RuntimeError("Run044 incident manifest contains credential material")
+    manifest = IDENTITY_INCIDENT_ROOT / "archive_manifest.json"
+    _write_json(manifest, payload, immutable=True)
+    return payload
 
 
 def attempt_records(jobs: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -1121,6 +1257,7 @@ def main() -> int:
     subparsers.add_parser("print-plan")
     subparsers.add_parser("freeze-manifest")
     subparsers.add_parser("validate-manifest")
+    subparsers.add_parser("archive-identity-incident")
     run_parser = subparsers.add_parser("run-mechanism")
     run_parser.add_argument("--gpus", default="auto")
     run_parser.add_argument("--timeout-seconds", type=int, default=28800)
@@ -1135,6 +1272,10 @@ def main() -> int:
         return 0
     if args.command == "validate-manifest":
         payload = validate_manifest()
+        print(json.dumps({"passed": True, "payload_sha256": payload["payload_sha256"]}))
+        return 0
+    if args.command == "archive-identity-incident":
+        payload = archive_identity_incident()
         print(json.dumps({"passed": True, "payload_sha256": payload["payload_sha256"]}))
         return 0
     if args.command == "run-mechanism":
