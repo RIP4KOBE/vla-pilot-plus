@@ -826,3 +826,15 @@
 - Compatibility：default `none`、legacy QD equal-reward fingerprint path、nondegenerate causal-envelope QD、`qd_archive_mode=none` 全部保留。Fallback 无跨 chunk hidden state。
 - Accounting：新增 configured-vs-active/fallback/reward/search-evaluation metrics；fallback QD evaluations 0，但 complete search 176 / score calls 11；active QD complete search/QD evaluations均176。
 - Whitelist：仅 core policy、EDS metrics、config default、`test_rdt_steer.py`；protocol commit 必须早于所有 core/config edits。当前 GPU/API/model/LIBERO/attempt/Dev/Validation/Formal 授权仍为 0。
+
+#### AL. run_021 H2 candidate implementation PASS
+
+- Protocol/implementation：`7afebccaf02d4f0cbb4da2c930e31e4cb267f30e` / `f010e8e4ff1f129e12499b1e0f8d284f505f7455`，顺序正确。Algorithm iteration 2 只增加 `qd_degenerate_fallback_policy=none|control_v1` 与逐 chunk exact-equal reward gate。
+- Core behavior：candidate 在 initial rewards 非空、finite、全部逐位相等时不创建 QD archive，复用原 non-QD EDS parent/final-selection path；下一 chunk 重新判断。无 epsilon、Stage/task/job/outcome/future feature，无额外 model/reward/VLM call。
+- Compatibility：default `none` 的 exact-zero legacy QD path 保留；nondegenerate `control_v1` 与 `none` 的 selected action bit-identical，fingerprint、bounds checksum、visits、initial/per-iter archive snapshots 恒等；`qd_archive_mode=none` 不调用 detector。
+- Accounting：fallback complete chunk 为 search evaluations `176` / score calls `11` / QD evaluations `0`；active QD 为 `176/11/176`。新增 configured-vs-active、policy/used/reason/value 和 search count metrics，可 JSON 序列化。
+- Tests：focused `6 passed`；QD archive/metrics/runner/audit/autoresearch/calibration/full RDTSteer `463 passed in 48.03s`；general EDS eval runner `237 passed in 38.09s`；非重叠总计 700 PASS。py_compile、diff check、四文件 whitelist 和 credential scan PASS。
+- Blobs：policy `890068dd…159e`；metrics `cbe31284…a450`；config `c5844368…acc5e`；tests `632e694a…c5e`。Protected untracked design 保持未读取、未修改、未 stage/commit。
+- Result analysis：`experiments/run_021_reward_degenerate_control_fallback/analysis.md`，SHA-256 `9d2ef19a42b7bfd1df66e1bbae6b2b8af728489db2b01185cd987b74f2792bd3`。
+- Target/budget：这只是 offline implementation evidence，新增 online episode/GPU-hour/reservation/formal 均 0；historical formal best/gap 仍 `2/10 / 3`，不得声称成功率提升。
+- Decision：`KEEP_IMPLEMENTATION_PASS_AND_REQUIRE_PROTOCOL_FIRST_OFFLINE_MECHANISM_PREFLIGHT`。下一步仅可先提交 deterministic exact-zero/nondegenerate mechanism preflight protocol；GPU/API/model/LIBERO/Dev/Validation/Formal 仍未授权。
