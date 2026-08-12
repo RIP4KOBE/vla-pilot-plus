@@ -925,3 +925,13 @@
 - Frozen decision：`CONCLUDE_NO_ADOPTION_WITHIN_V2_CYCLE_REQUEST_VERSIONED_REDESIGN`。禁止 tolerance sweep、Run023 seed reuse、second candidate、Dev-A/B、validation、formal。
 - Redesign boundary：仅可提议 EDS+QD scope 内 QD-first 的 observation-derived stage-progress quality/final selection 或 guarded control-success retention；需要 versioned design、新 holdout、明确 budget 与用户授权。
 - Required outputs：immutable v2 cycle decision manifest、final report、progress page、state/log/findings/trajectory/ledger reflection、credential/write-boundary checks与 reflection commit。
+
+#### AU. v2 cycle final reflection and stop boundary
+
+- Immutable decision：owned artifact `run_023_reward_degenerate_online_mechanism/manifests/cycle_decision_manifest.json`，mode 0444、size 5,721 bytes、SHA-256 `4010b620976ee8aa26ee05e6655a60c6ec4bc194511698254e9b2eb0bf9f1334`；冻结 decision 为 `CONCLUDE_NO_ADOPTION_WITHIN_V2_CYCLE_REQUEST_VERSIONED_REDESIGN`。
+- Final reporting：`docs/03_evidence/eds_qd_autoresearch/2026-08-12-eds-qd-autoresearch-v2-final-report.md` SHA `30931300…73af`；`to_human/current-status.md` SHA `bf8fb4f2…2174`；`to_human/progress-003.html` SHA `b1e9f598…8094`。
+- Target outcome：正式目标 `>=5/10` 未达到。历史 formal best/gap 仍为 `2/10 / 3`；Run023 contemporaneous control/candidate 为 `1/3 / 0/3`，candidate gained `[]`、lost `[9]`，failure 全部仅标记 `timeout without completion`。
+- Mechanism conclusion：candidate 74/74 chunks 走 active QD、fallback 0/74；exact-degenerate predicate 在线未激活。H1 改善 partition resolution 但 validation 只有 1/10；H2 offline defect 在线不转移。不得用 proxy 覆盖 success regression。
+- Final accounting：跨周期 effective online episodes 48；global reservations 66/143；累计 GPU `3.7471009444444445/48` hours；formal episodes 0；Dev-A/B、validation、formal 均未由 Run023 解锁。
+- Integrity：decision manifest 与 Run023 evidence 均位于本研究独占 artifact root；worktree write boundary 保持；protected untracked design 未读、未改、未 stage。Credential 只曾在明确授权的 runtime child environment 中使用，value/fingerprint 未进入 command、worktree、artifact、log、manifest、docs 或 Git；最终扫描要求 zero matches。
+- Stop：state 进入 `concluded_no_adoption_v2_cycle_waiting_versioned_redesign_approval`。后续仅可在明确批准的 versioned design、新 leakage-safe holdout seeds 与 explicit budget 下继续；当前禁止 algorithm/GPU/API/LIBERO/attempt/Dev/validation/formal execution。

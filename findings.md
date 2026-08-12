@@ -111,3 +111,11 @@ The v2 cycle will first quantify this defect with a zero-episode replay. Only if
 `run_023` credential health subsequently passed, but its first reservation transaction exposed a runner-only global-offset ledger defect before dispatch. IDs 55–60 are preserved as reserved-not-dispatched infrastructure records; no task result exists. Protocol v3 authorizes a six-slot exact-cell recovery only after an append-only void event, dedicated ledger repair, tests, and immutable manifest v3.
 
 That exact-cell recovery completed validly. The candidate never triggered fallback in 74 chunks and scored 0/3, while control scored 1/3 on task 9. All other accounting, safety, latency, artifact, and credential gates passed. H2's exact-degenerate fallback candidate is rejected before Dev-A; the v2 cycle has no second-candidate authorization.
+
+## V2 Cycle Conclusion
+
+The v2 cycle concludes with no adopted EDS-QD successor. Run023 is a valid negative mechanism result, not an infrastructure ambiguity: the candidate ran the unchanged active-QD path in all 74 chunks, lost the only contemporaneous control success, and failed the preregistered fallback-observation gate. The historical formal best remains 2/10, so the target gap remains 3; formal evaluation was correctly not run.
+
+Across H1 and H2, geometric archive resolution and exact-zero reward routing were real, measurable QD issues, but neither produced evidence sufficient to approach `>=5/10`. The remaining evidence-supported bottleneck is alignment between QD quality/final selection and observable task progress while retaining control-success behavior. That statement is an outer-loop hypothesis, not an authorized implementation or success claim.
+
+The immutable v2 decision is `CONCLUDE_NO_ADOPTION_WITHIN_V2_CYCLE_REQUEST_VERSIONED_REDESIGN`. Any successor must use a versioned design, fresh leakage-safe holdout seeds, an explicit budget, and explicit approval. Reusing Run023 outcomes for a tolerance sweep, adjacent candidate, Dev, validation, or formal evaluation is prohibited.

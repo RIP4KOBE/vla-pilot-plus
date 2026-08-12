@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EDS-QD Autoresearch — V2 Cycle Conclusion</title>
+  <style>
+    body { max-width: 900px; margin: 40px auto; padding: 0 20px; font: 16px/1.55 system-ui, sans-serif; color: #172033; }
+    h1, h2 { color: #102a56; }
+    .decision { padding: 16px; border-left: 5px solid #b45309; background: #fff7ed; }
+    .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+    .metric { padding: 14px; border: 1px solid #dbe3ef; border-radius: 8px; }
+    .value { font-size: 1.6rem; font-weight: 700; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #dbe3ef; padding: 8px; text-align: left; }
+    code { background: #eef2f7; padding: 2px 5px; }
+  </style>
+</head>
+<body>
+  <h1>EDS-QD Autoresearch: V2 Cycle Conclusion</h1>
+  <p class="decision"><strong>Decision:</strong> <code>CONCLUDE_NO_ADOPTION_WITHIN_V2_CYCLE_REQUEST_VERSIONED_REDESIGN</code></p>
+  <div class="metrics">
+    <div class="metric"><div class="value">2/10</div>historical formal best</div>
+    <div class="metric"><div class="value">3</div>remaining target gap</div>
+    <div class="metric"><div class="value">0/3</div>Run023 candidate</div>
+    <div class="metric"><div class="value">0/74</div>fallback activations</div>
+  </div>
+  <h2>Run023 task result</h2>
+  <table>
+    <tr><th>Profile</th><th>Task 2</th><th>Task 3</th><th>Task 9</th><th>Total</th></tr>
+    <tr><td>EDS control</td><td>fail</td><td>fail</td><td>success</td><td>1/3</td></tr>
+    <tr><td>H2 candidate</td><td>fail</td><td>fail</td><td>fail</td><td>0/3</td></tr>
+  </table>
+  <h2>What was learned</h2>
+  <p>The exact-equality guard was valid offline but inactive prospectively: every candidate chunk had positive reward spread and remained in active QD. The candidate also lost the contemporaneous control success on task 9. Clean overflow, accounting, safety, and latency proxies did not translate into completion.</p>
+  <h2>Budget and boundary</h2>
+  <p>48 effective online episodes, 66/143 reservations, 3.747101/48 GPU-hours, and zero formal episodes. Further execution requires a versioned QD-first design with new holdout seeds, explicit budget, and explicit approval.</p>
+</body>
+</html>
