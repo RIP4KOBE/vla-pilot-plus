@@ -860,3 +860,13 @@
 - Result analysis：`experiments/run_022_reward_degenerate_mechanism_preflight/analysis.md`，SHA-256 `860d282adf9dd591d0df58f490f928e2f6f541430d4ab8cf4b4ad9e94bb89930`。
 - Target/budget：online/GPU/reservation/validation/formal 新增均 0；historical formal best/gap 仍 `2/10 / 3`。Mechanism PASS 不等于 success 提升。
 - Decision：`KEEP_OFFLINE_MECHANISM_PASS_AND_AUTHORIZE_ONLINE_MECHANISM_PROTOCOL_ONLY`。下一步必须先冻结 6 episode paired mechanism matrix、profile/runner/audit semantics、manifest、admission 和预算；Dev-A/B、validation、formal 尚未授权。
+
+#### AO. run_023 online mechanism protocol
+
+- Evidence selection：run_020 的 tasks 2/3/9 分别有 109/97/34 exact-degenerate chunks，owned-v1 为 11/49/2，三者 earliest global step 均 24；在 seed 生成前据此冻结 `max_chunks=16`。该历史统计不进入在线算法。
+- Matrix：control/candidate × tasks `[2,3,9]` × seeds `[932032,615132,718536]`，共 6 unique cells；seeds 来自 v2 `mechanism` SHA rule。Control 是原 `p2_stage_on_abs_rbf_control`；candidate 是 sparse causal-envelope QD + 唯一 H2 `control_v1` guard。
+- Purpose：只检验真实 chunk 同时出现 fallback/active QD、configured-vs-active telemetry、`176/11` compute、selection、安全、latency、artifact；short task success 只记录，不用于 promotion。
+- Implementation boundary：只允许新增 dedicated v2 runner/test；core/config/v1 runner/audit/Stage/prompt/env/executor/evaluator 零修改。Implementation commit 后必须先冻 owned run_023 `mechanism_manifest.json`，绑定全部 code/profile/checkpoint/LIBERO/cache/offline artifact/matrix/caps，mode 0444、credential 0。
+- Transaction：manifest/cache/input/code 验证 -> runtime credential + real health（不记录值）-> two-snapshot admission + immediate snapshot -> 才 reserve global IDs 55–60 -> dispatch。此前 global 54；完成 scientific reservations 为 60/143。
+- Gates：candidate 至少一 fallback 和一 active chunk；fallback `176/11/0` 且 non-QD selection，active `176/11/176` 且 QD selection；control QD off；全 validity/safety/accounting/credential/write-boundary PASS，candidate latency P95 <= control 1.25x。
+- Current authorization：runner/audit implementation 与 manifest freeze only；manifest 前 GPU/attempt=0，Dev-A/B/validation/formal 均未授权。
