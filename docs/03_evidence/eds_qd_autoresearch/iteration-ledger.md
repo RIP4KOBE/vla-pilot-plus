@@ -1086,3 +1086,12 @@
 - Counterfactual：capacity2按reward desc/fingerprint asc每cell保留前二；rebin时old-cell visits跟随其quality entry且总和守恒。Parent仍为一个global anchor + production sparse15 cell counts，cell内以stateless hash起点round-robin，不触碰global RNG。
 - Gates：264 streams、>=3,000 candidates、>=500 collisions；collision ratio>=0.40；top2 direction/shape median>=0.20/0.15且reward gap median<=0.02；quality/global-best retention、capacity/fingerprint/rebin守恒；secondary slots>=20%、coverage retention median>=0.85；双run byte identity及secret/write/accounting clean。
 - Scope：implementation只允许新增analyzer/test两文件；artifact仅在implementation commit后写owned Run040 analysis并0444。当前core/config/GPU/API/model/LIBERO/reservation/Dev/validation/formal授权均0；历史formal best/gap仍2/10、3。
+
+#### BK. Run040 v1 replay 与 result-classification repair protocol
+
+- Implementation/TDD：analyzer commit `4d22541`；red phase为脚本不存在，随后focused 6/6、combined QD/metrics 47/47、py_compile PASS。
+- V1 artifact：双run scientific payload byte-identical，两个文件均mode0444、19,230 bytes、SHA `71cef1fd…5540`。24 traces/264 streams/4,224 candidates均通过输入和RNG gate。
+- V1 observations：collision ratio `0.6510417`；top2 direction/shape median `0.361670/0.250086`；reward gap median `0.0126953`；secondary sparse slot ratio `0.278056`；coverage retention median1.0。上述门均PASS。
+- Schema defect：17条记录全部是capacity2 candidate的`quality_retention` mismatch，却被同一`exact_mismatches`列表错误汇总为`capacity_one_exact_mismatch_count`。这会错误表达历史重放有效性，但不会改变candidate retention FAIL本身。
+- Protocol-first repair：v1 artifacts保持只读且不覆盖；仅允许analyzer/test把capacity1 replay与capacity2 retention/capacity mismatch分栏，并生成`canonical-v2/replay-v2`。输入、算法counterfactual、threshold、统计和feature exclusions全部不变；v2 FAIL即科学结论，不允许放宽gate。
+- Accounting：仍为0 GPU/API/model/LIBERO/reservation/online/formal；target best/gap仍2/10、3。

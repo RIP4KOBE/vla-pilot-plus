@@ -1001,7 +1001,7 @@ continuation_v4:
     top_two_shape_distance_median: 0.2500861883163452
     top_two_reward_gap_median: 0.0126953125
   run_040:
-    status: PROTOCOL_LOCKED_BEFORE_IMPLEMENTATION
+    status: V1_SCHEMA_CLASSIFICATION_DEFECT_PROTOCOL_V2_LOCKED
     protocol: "experiments/run_040_within_cell_aliasing_diagnostic/protocol.md"
     protocol_sha256: "7baa6edeef1e295ebf4ebe7e33089fa00d1bebb755d8d3f8db213df24fcf51f2"
     input_manifest: "experiments/run_040_within_cell_aliasing_diagnostic/input-manifest.json"
@@ -1010,8 +1010,17 @@ continuation_v4:
     candidate_stream_count: 264
     input_size_bytes: 135053624
     allowed_new_files: 2
+    analyzer_implementation_commit: "4d22541"
+    focused_and_qd_metrics_tests: "47 passed"
+    v1_artifact_file_sha256: "71cef1fd1f6a768d363e9349db535cdf9a0fde5c8008eae1e2114a487c555540"
+    v1_artifact_mode: "0444"
+    v1_artifact_byte_identity: true
+    v1_reported_mismatch_count: 17
+    v1_schema_defect: "capacity-two quality-retention mismatches were mislabeled as capacity-one exact-replay mismatches"
+    repair_protocol: "experiments/run_040_within_cell_aliasing_diagnostic/protocol-v2.md"
+    repair_protocol_sha256: "25485e155d8a540b3f6fd491cbb2c2815ad8b848e1e1d52ac5faf1bf3dbd16bb"
     artifact_root: "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_040_within_cell_aliasing_diagnostic"
     gpu_authorized: false
     online_episode_attempts_authorized: 0
     core_config_change_authorized: false
-  next_action: "Commit Run040 protocol, then implement and test the two-file analyzer before creating artifacts"
+  next_action: "Commit protocol-v2, split mismatch classification only, then generate immutable v2 dual artifacts and conclude Run040"
