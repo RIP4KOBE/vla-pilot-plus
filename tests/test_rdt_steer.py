@@ -2193,6 +2193,7 @@ def test_qd_config_defaults_are_legacy_safe_and_match_yaml(stub_steer):
     ]
     expected = {
         "qd_archive_mode": "none",
+        "qd_degenerate_fallback_policy": "none",
         "qd_descriptor": "target_relative_endpoint_xy",
         "qd_grid_shape": (4, 4),
         "qd_cell_capacity": 1,
@@ -2238,6 +2239,7 @@ def _valid_qd_config(**updates):
         "rollout_diversity_control_mode": "fixed",
         "search_schedule_mode": "legacy_linear",
         "qd_archive_mode": "grid_archive",
+        "qd_degenerate_fallback_policy": "none",
         "qd_descriptor": "target_relative_endpoint_xy",
         "qd_grid_shape": [4, 4],
         "qd_cell_capacity": 1,
@@ -2266,6 +2268,343 @@ def test_qd_config_accepts_primary_and_sparse_registered_profiles(stub_steer):
     assert uniform.qd_grid_shape == (4, 4)
     assert uniform.qd_bounds_quantiles == (0.05, 0.95)
     assert sparse.qd_parent_sampling == "sparse_priority"
+
+
+def test_qd_degenerate_fallback_config_is_default_off_and_validated(stub_steer):
+    default = stub_steer._resolve_eds_config_with_reference_defaults({})
+    enabled = stub_steer._resolve_eds_config_with_reference_defaults(
+        _valid_qd_config(qd_degenerate_fallback_policy="control_v1")
+    )
+
+    assert default.qd_degenerate_fallback_policy == "none"
+    assert enabled.qd_degenerate_fallback_policy == "control_v1"
+    with pytest.raises(ValueError, match="qd_degenerate_fallback_policy"):
+        stub_steer._resolve_eds_config_with_reference_defaults(
+            _valid_qd_config(qd_degenerate_fallback_policy="epsilon_guess")
+        )
+
+
+def test_qd_exact_degeneracy_is_threshold_free_and_nonfinite_fails_closed(
+    stub_steer,
+):
+    assert stub_steer._eds_exactly_degenerate_rewards(torch.zeros(16)) == (
+        True,
+        0.0,
+    )
+    assert stub_steer._eds_exactly_degenerate_rewards(
+        torch.full((16,), -0.25)
+    ) == (True, -0.25)
+    almost_equal = torch.zeros(16, dtype=torch.float64)
+    almost_equal[-1] = 1.0e-12
+    assert stub_steer._eds_exactly_degenerate_rewards(almost_equal) == (
+        False,
+        None,
+    )
+    with pytest.raises(ValueError, match="finite"):
+        stub_steer._eds_exactly_degenerate_rewards(
+            torch.tensor([0.0, float("nan")])
+        )
+
+
+def test_qd_exact_degenerate_control_fallback_uses_full_non_qd_search_budget(
+    stub_steer,
+    stub_adapter,
+    monkeypatch,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=16,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    cond = _rollout_cond(stub_steer)
+    initial = torch.zeros(16, 64, 128)
+    initial[:, :, 39] = torch.arange(16, dtype=initial.dtype)[:, None]
+    rollout_call = 0
+
+    def score(samples, **kwargs):
+        rewards = torch.zeros(samples.shape[0], dtype=samples.dtype)
+        return -rewards, {"rewards": rewards}
+
+    def rollout(**kwargs):
+        nonlocal rollout_call
+        rollout_call += 1
+        children = kwargs["noisy_action"].clone()
+        children[:, :, 39] += float(rollout_call) / 100.0
+        costs, info = score(children)
+        return children, costs, info
+
+    monkeypatch.setattr(
+        stub_steer, "_eds_initial_population", lambda **kwargs: initial.clone()
+    )
+    monkeypatch.setattr(stub_steer, "_eds_score_population_as_cost", score)
+    monkeypatch.setattr(
+        stub_steer, "_eds_renoise_reference", lambda samples, steps: samples
+    )
+    monkeypatch.setattr(stub_steer, "_eds_rollout_reference", rollout)
+    monkeypatch.setattr(
+        "core.rdt_policy_steer.QDArchive",
+        lambda **kwargs: pytest.fail("fallback must not construct a QD archive"),
+    )
+    cfg = stub_steer._resolve_eds_config_with_reference_defaults(
+        _valid_qd_config(qd_degenerate_fallback_policy="control_v1")
+    )
+
+    selected = stub_steer._eds_guided_denoise_loop(
+        x_t=torch.zeros_like(initial),
+        cond=cond,
+        keypoints=torch.zeros(1, 3),
+        guidance_fns=None,
+        eds_config=cfg,
+        verbose=False,
+        global_step=24,
+        current_stage=2,
+    )
+    metrics = stub_steer.get_last_eds_metrics()
+
+    assert tuple(selected.shape) == (1, 64, 128)
+    assert rollout_call == 10
+    assert metrics["qd_archive_enabled"] is True
+    assert metrics["qd_archive_active_for_chunk"] is False
+    assert metrics["qd_degenerate_fallback_policy"] == "control_v1"
+    assert metrics["qd_degenerate_fallback_used"] is True
+    assert metrics["qd_degenerate_fallback_reason"] == "initial_rewards_exactly_equal"
+    assert metrics["qd_degenerate_reward_value"] == 0.0
+    assert metrics["qd_evaluation_count"] == 0
+    assert metrics["search_evaluation_count"] == 176
+    assert metrics["score_call_count"] == 11
+    assert metrics["selected_chunk_population_source"] != "qd_archive"
+    assert metrics["qd_selected_action_fingerprint"] is None
+
+
+def test_qd_exact_degenerate_default_none_preserves_legacy_archive_path(
+    stub_steer,
+    stub_adapter,
+    monkeypatch,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=16,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    cond = _rollout_cond(stub_steer)
+    initial = torch.zeros(16, 64, 128)
+    endpoint_values = torch.linspace(-0.06, 0.06, 4)
+    for index in range(16):
+        initial[index, :4, 39] = endpoint_values[index % 4] / 4.0
+        initial[index, :4, 40] = endpoint_values[index // 4] / 4.0
+        initial[index, :, 42] = -float(index)
+
+    def score(samples, **kwargs):
+        rewards = torch.zeros(samples.shape[0], dtype=samples.dtype)
+        return -rewards, {"rewards": rewards}
+
+    monkeypatch.setattr(
+        stub_steer, "_eds_initial_population", lambda **kwargs: initial.clone()
+    )
+    monkeypatch.setattr(stub_steer, "_eds_score_population_as_cost", score)
+    monkeypatch.setattr(
+        stub_steer,
+        "_eds_select_parent_plan",
+        lambda *args, **kwargs: pytest.fail("legacy QD must bypass control selector"),
+    )
+    monkeypatch.setattr(
+        stub_steer, "_eds_renoise_reference", lambda samples, steps: samples
+    )
+    monkeypatch.setattr(
+        stub_steer,
+        "_eds_rollout_reference",
+        lambda **kwargs: (kwargs["noisy_action"], *score(kwargs["noisy_action"])),
+    )
+    cfg = stub_steer._resolve_eds_config_with_reference_defaults(
+        _valid_qd_config(qd_degenerate_fallback_policy="none")
+    )
+
+    stub_steer._eds_guided_denoise_loop(
+        x_t=torch.zeros_like(initial),
+        cond=cond,
+        keypoints=torch.zeros(1, 3),
+        guidance_fns=None,
+        eds_config=cfg,
+        verbose=False,
+        global_step=24,
+        current_stage=2,
+    )
+    metrics = stub_steer.get_last_eds_metrics()
+
+    assert metrics["qd_archive_active_for_chunk"] is True
+    assert metrics["qd_degenerate_fallback_policy"] == "none"
+    assert metrics["qd_degenerate_fallback_used"] is False
+    assert metrics["qd_evaluation_count"] == 176
+    assert metrics["search_evaluation_count"] == 176
+    assert metrics["score_call_count"] == 11
+    assert metrics["selected_chunk_population_source"] == "qd_archive"
+    assert json.loads(json.dumps(metrics))["search_evaluation_count"] == 176
+
+
+def test_qd_nondegenerate_control_fallback_is_fixed_input_identity(
+    stub_steer,
+    stub_adapter,
+    monkeypatch,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=16,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    cond = _rollout_cond(stub_steer)
+    initial = torch.zeros(16, 64, 128)
+    endpoint_values = torch.linspace(-0.06, 0.06, 4)
+    for index in range(16):
+        initial[index, :4, 39] = endpoint_values[index % 4] / 4.0
+        initial[index, :4, 40] = endpoint_values[index // 4] / 4.0
+        initial[index, :, 42] = -float(index)
+    rollout_call = [0]
+
+    def score(samples, **kwargs):
+        costs = samples[:, 0, 42].detach().clone()
+        return costs, {"rewards": -costs}
+
+    def rollout(**kwargs):
+        rollout_call[0] += 1
+        children = kwargs["noisy_action"].clone()
+        children[:, :, 42] -= float(rollout_call[0] * 100)
+        costs, info = score(children)
+        return children, costs, info
+
+    monkeypatch.setattr(
+        stub_steer, "_eds_initial_population", lambda **kwargs: initial.clone()
+    )
+    monkeypatch.setattr(stub_steer, "_eds_score_population_as_cost", score)
+    monkeypatch.setattr(
+        stub_steer, "_eds_renoise_reference", lambda samples, steps: samples
+    )
+    monkeypatch.setattr(stub_steer, "_eds_rollout_reference", rollout)
+
+    def run(policy):
+        rollout_call[0] = 0
+        cfg = stub_steer._resolve_eds_config_with_reference_defaults(
+            _valid_qd_config(qd_degenerate_fallback_policy=policy)
+        )
+        selected = stub_steer._eds_guided_denoise_loop(
+            x_t=torch.zeros_like(initial),
+            cond=cond,
+            keypoints=torch.zeros(1, 3),
+            guidance_fns=None,
+            eds_config=cfg,
+            verbose=False,
+            global_step=24,
+            current_stage=2,
+        )
+        return (
+            selected.clone(),
+            stub_steer.get_last_eds_metrics(),
+            stub_steer.get_last_eds_artifacts(),
+        )
+
+    legacy_selected, legacy_metrics, legacy_artifacts = run("none")
+    candidate_selected, candidate_metrics, candidate_artifacts = run("control_v1")
+
+    torch.testing.assert_close(candidate_selected, legacy_selected, rtol=0.0, atol=0.0)
+    assert candidate_metrics["qd_archive_active_for_chunk"] is True
+    assert candidate_metrics["qd_degenerate_fallback_used"] is False
+    assert candidate_metrics["qd_selected_action_fingerprint"] == legacy_metrics[
+        "qd_selected_action_fingerprint"
+    ]
+    assert candidate_metrics["qd_bounds_checksum_by_iter"] == legacy_metrics[
+        "qd_bounds_checksum_by_iter"
+    ]
+    assert candidate_metrics["qd_cumulative_cell_visits_by_iter"] == legacy_metrics[
+        "qd_cumulative_cell_visits_by_iter"
+    ]
+    assert candidate_metrics["qd_evaluation_count"] == legacy_metrics[
+        "qd_evaluation_count"
+    ] == 176
+    assert candidate_metrics["search_evaluation_count"] == legacy_metrics[
+        "search_evaluation_count"
+    ] == 176
+    assert candidate_metrics["score_call_count"] == legacy_metrics[
+        "score_call_count"
+    ] == 11
+    candidate_initial_archive = candidate_artifacts["qd_initial_archive"]
+    legacy_initial_archive = legacy_artifacts["qd_initial_archive"]
+    assert candidate_initial_archive["iter_idx"] == legacy_initial_archive["iter_idx"]
+    assert candidate_initial_archive["archive"] == legacy_initial_archive["archive"]
+    for field in ("actions", "rewards", "costs", "cell_ids"):
+        torch.testing.assert_close(
+            candidate_initial_archive[field],
+            legacy_initial_archive[field],
+            rtol=0.0,
+            atol=0.0,
+        )
+    assert [item["archive"] for item in candidate_artifacts["qd_archive_by_iter"]] == [
+        item["archive"] for item in legacy_artifacts["qd_archive_by_iter"]
+    ]
+
+
+def test_qd_disabled_ignores_control_fallback_policy(
+    stub_steer,
+    stub_adapter,
+    monkeypatch,
+):
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=4,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    cond = _rollout_cond(stub_steer)
+    initial = torch.zeros(4, 64, 128)
+    initial[:, :, 39] = torch.arange(4, dtype=initial.dtype)[:, None]
+
+    def score(samples, **kwargs):
+        costs = samples[:, 0, 39].detach().clone()
+        return costs, {"rewards": -costs}
+
+    monkeypatch.setattr(
+        stub_steer, "_eds_initial_population", lambda **kwargs: initial.clone()
+    )
+    monkeypatch.setattr(stub_steer, "_eds_score_population_as_cost", score)
+    monkeypatch.setattr(
+        stub_steer,
+        "_eds_exactly_degenerate_rewards",
+        lambda rewards: pytest.fail("QD-disabled path must not inspect fallback"),
+    )
+    monkeypatch.setattr(
+        stub_steer, "_eds_renoise_reference", lambda samples, steps: samples
+    )
+    monkeypatch.setattr(
+        stub_steer,
+        "_eds_rollout_reference",
+        lambda **kwargs: (kwargs["noisy_action"], *score(kwargs["noisy_action"])),
+    )
+    cfg = stub_steer._resolve_eds_config_with_reference_defaults(
+        {
+            "population_size": 4,
+            "cem_iters": 1,
+            "qd_archive_mode": "none",
+            "qd_degenerate_fallback_policy": "control_v1",
+        }
+    )
+
+    stub_steer._eds_guided_denoise_loop(
+        x_t=torch.zeros_like(initial),
+        cond=cond,
+        keypoints=None,
+        guidance_fns=None,
+        eds_config=cfg,
+        verbose=False,
+        global_step=0,
+        current_stage=0,
+    )
+    metrics = stub_steer.get_last_eds_metrics()
+
+    assert metrics["qd_archive_enabled"] is False
+    assert metrics["qd_archive_active_for_chunk"] is False
+    assert metrics["qd_degenerate_fallback_used"] is False
+    assert metrics["search_evaluation_count"] == 8
 
 
 def test_qd_config_accepts_causal_envelope_only_as_registered_bounds_policy(stub_steer):

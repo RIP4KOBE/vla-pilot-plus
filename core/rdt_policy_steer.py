@@ -123,6 +123,7 @@ class _EDSConfig:
     adaptive_early_stop_patience: int = 2
     adaptive_reward_improvement_eps: float = 1e-3
     qd_archive_mode: str = "none"
+    qd_degenerate_fallback_policy: str = "none"
     qd_descriptor: str = "target_relative_endpoint_xy"
     qd_grid_shape: tuple[int, int] = (4, 4)
     qd_cell_capacity: int = 1
@@ -4067,6 +4068,19 @@ class RDTSteer:
             raise ValueError("EDS rewards must be finite")
         return resolved_rewards
 
+    def _eds_exactly_degenerate_rewards(
+        self,
+        rewards: Tensor,
+    ) -> tuple[bool, float | None]:
+        if not torch.is_tensor(rewards) or rewards.ndim != 1 or rewards.numel() == 0:
+            raise ValueError("EDS rewards must be a non-empty 1-D tensor")
+        if not torch.isfinite(rewards).all():
+            raise ValueError("EDS rewards must be finite")
+        first = rewards[:1]
+        if torch.equal(rewards, first.expand_as(rewards)):
+            return True, float(first.detach().cpu().item())
+        return False, None
+
     def _eds_pretest_enabled(self, cfg: _EDSConfig, global_step: int) -> bool:
         pretest = cfg.mechanism_pretest
         if not isinstance(pretest, dict) or not bool(pretest.get("enabled", False)):
@@ -4627,6 +4641,8 @@ class RDTSteer:
         ]
         metrics.direction_rbf_endpoint_scale_m = cfg.direction_rbf_endpoint_scale_m
         metrics.qd_archive_enabled = cfg.qd_archive_mode == "grid_archive"
+        metrics.qd_archive_active_for_chunk = metrics.qd_archive_enabled
+        metrics.qd_degenerate_fallback_policy = cfg.qd_degenerate_fallback_policy
         metrics.qd_descriptor = cfg.qd_descriptor
         metrics.qd_grid_shape = list(cfg.qd_grid_shape)
         metrics.qd_cell_capacity = cfg.qd_cell_capacity
@@ -4741,7 +4757,21 @@ class RDTSteer:
             metrics.shadow_qd_candidate_stream.append(record)
 
         record_shadow_qd_candidates(-1, population, population_rewards)
-        if metrics.qd_archive_enabled:
+        if (
+            metrics.qd_archive_enabled
+            and cfg.qd_degenerate_fallback_policy == "control_v1"
+        ):
+            exactly_degenerate, reward_value = self._eds_exactly_degenerate_rewards(
+                population_rewards
+            )
+            if exactly_degenerate:
+                metrics.qd_archive_active_for_chunk = False
+                metrics.qd_degenerate_fallback_used = True
+                metrics.qd_degenerate_fallback_reason = (
+                    "initial_rewards_exactly_equal"
+                )
+                metrics.qd_degenerate_reward_value = reward_value
+        if metrics.qd_archive_active_for_chunk:
             initial_descriptors = self._eds_qd_descriptor(population, keypoints)
             qd_bounds = self._eds_qd_freeze_bounds(initial_descriptors, cfg)
             qd_initial_bounds = qd_bounds
@@ -4795,6 +4825,9 @@ class RDTSteer:
         max_action_mask_violation = self._eds_action_mask_violation(population, cond)
 
         metrics.score_call_count = initial_score_call_count
+        metrics.search_evaluation_count = (
+            initial_score_call_count * cfg.population_size
+        )
         metrics.population_size_observed = int(population.shape[0])
         metrics.population_shape = list(population.shape)
         metrics.score_shape = list(population_scores.shape)
@@ -5366,6 +5399,7 @@ class RDTSteer:
                 offspring_count,
             )
             metrics.score_call_count += 1
+            metrics.search_evaluation_count += offspring_count
             if controller_decision is not None:
                 applied_steps = _safe_initial_sampler_int(
                     rollout_info.get("rollout_diversity_steps_applied")
@@ -5515,6 +5549,7 @@ class RDTSteer:
                     cfg.population_size,
                 )
                 metrics.score_call_count += 1
+                metrics.search_evaluation_count += cfg.population_size
                 rollout_nonreward_info = {
                     key: value
                     for key, value in rollout_info.items()
@@ -6332,8 +6367,19 @@ class RDTSteer:
                     separators=(",", ":"),
                 ).encode("utf-8")
             ).hexdigest()
-        if qd_archive is not None:
+        if metrics.qd_archive_enabled:
             expected_evaluations = cfg.population_size * (cfg.cem_iters + 1)
+            if metrics.search_evaluation_count != expected_evaluations:
+                raise RuntimeError(
+                    "EDS search evaluation accounting mismatch: "
+                    f"{metrics.search_evaluation_count} != {expected_evaluations}"
+                )
+            if metrics.score_call_count != cfg.cem_iters + 1:
+                raise RuntimeError(
+                    "EDS score-call accounting mismatch: "
+                    f"{metrics.score_call_count} != {cfg.cem_iters + 1}"
+                )
+        if qd_archive is not None:
             if metrics.qd_evaluation_count != expected_evaluations:
                 raise RuntimeError(
                     "QD evaluation accounting mismatch: "
@@ -6983,6 +7029,9 @@ class RDTSteer:
                 "adaptive_reward_improvement_eps",
             ),
             qd_archive_mode=str(cfg.get("qd_archive_mode", "none")),
+            qd_degenerate_fallback_policy=str(
+                cfg.get("qd_degenerate_fallback_policy", "none")
+            ),
             qd_descriptor=str(
                 cfg.get("qd_descriptor", "target_relative_endpoint_xy")
             ),
@@ -7210,6 +7259,10 @@ class RDTSteer:
         _validate_direction_rbf_config(resolved.__dict__)
         if resolved.qd_archive_mode not in {"none", "grid_archive"}:
             raise ValueError("EDS qd_archive_mode must be one of none, grid_archive")
+        if resolved.qd_degenerate_fallback_policy not in {"none", "control_v1"}:
+            raise ValueError(
+                "EDS qd_degenerate_fallback_policy must be none or control_v1"
+            )
         if resolved.qd_descriptor != "target_relative_endpoint_xy":
             raise ValueError(
                 "EDS qd_descriptor must be target_relative_endpoint_xy"

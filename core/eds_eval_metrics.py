@@ -274,6 +274,7 @@ class EDSChunkMetrics:
     temperature: float = 0.0
     eds_enter_count: int = 0
     score_call_count: int = 0
+    search_evaluation_count: int = 0
     resample_count: int = 0
     renoise_count: int = 0
     rollout_count: int = 0
@@ -424,6 +425,11 @@ class EDSChunkMetrics:
     execution_horizon_stage_change: bool = False
     replan_count: int = 0
     qd_archive_enabled: bool = False
+    qd_archive_active_for_chunk: bool = False
+    qd_degenerate_fallback_policy: str = "none"
+    qd_degenerate_fallback_used: bool = False
+    qd_degenerate_fallback_reason: str | None = None
+    qd_degenerate_reward_value: float | None = None
     qd_descriptor: str = "target_relative_endpoint_xy"
     qd_grid_shape: list[int] = field(default_factory=list)
     qd_cell_capacity: int = 1
