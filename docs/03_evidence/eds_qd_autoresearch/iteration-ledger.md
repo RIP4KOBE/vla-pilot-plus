@@ -963,3 +963,12 @@
 - Counterfactual：每 transition dedicated anchor=1、sparse=15、total=16；global-best zero slot 0/3,205；occupied-cell coverage retention median 1.0；Torch global RNG unchanged；9/9 gates PASS。
 - Artifacts：canonical/replay byte-identical、mode0444、6,101,386 bytes、file SHA `cede7bbb823621e5ac21a3b5eb10c7ceb6e4acdf967d63ab5fb61135f472d812`、payload `7f793a70…c880`、credential 0；只写 owned Run030 root。
 - Target/accounting：historical formal best/gap仍 `2/10 / 3`；新增 GPU/API/model/LIBERO/reservation/online/formal均0。Decision `KEEP_H4_V3_DIAGNOSTIC_PASS_AND_AUTHORIZE_IMPLEMENTATION_PROTOCOL_ONLY`；下一步必须先提交 algorithm iteration 3 implementation protocol。
+
+#### AY. run_031 algorithm iteration 3 implementation protocol
+
+- Trigger/order：Run030 result独立提交 `dc3d955` 后才冻结本protocol；在本protocol commit前不允许 core/config/test change。
+- Single change：`qd_global_quality_anchor_count=1` 时先按既有reward/fingerprint/cell规则取global best dedicated parent，再以相同seed tuple运行原allocator的15-slot sparse allocation；不去重，16个parent全部renoise/rollout。
+- Default/fail closed：默认/显式0保持旧allocation科学输出；仅允许0/1，1只在grid archive + sparse priority合法；bool不作为int静默接受。v2 fallback保持关闭。
+- Telemetry：单独记录dedicated cell/fingerprint/count、sparse/total slot maps、activation/rescue和两种QD offspring source；不得复用旧EDS generic anchor字段。
+- Gates：anchor0 identity；global-best tie order；candidate 1+15与独立population15 exact equality；omission rescue/no dedup；determinism/global RNG；integrated finite/mask/qpos/archive/final selection；完整chunk `176/176/11`；全量QD/RDT回归。
+- Scope/accounting：只允许3 core + config + 2 tests；GPU/API/model/LIBERO/reservation/online/formal均0。PASS只授权另立CPU integrated mechanism protocol；历史formal best/gap仍2/10、3。
