@@ -89,3 +89,11 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 `run_000_baseline_replay` ruled out direct compute scaling; `run_001_allocation_ecology_diagnostic` ended invalid; `run_002_partition_diagnostic` supported H1 offline; and `run_010` algorithm iteration 1 passed mechanism/Dev-A/Dev-B but failed validation at 1/10 versus the 5/10 target. The historical formal best remains 2/10 and formal target gap remains 3 because formal was correctly not run; the candidate's observed validation gap is 4. The fixed validation set is now exposed, so outer-loop cycle 2 must conclude this frozen cycle or request a versioned redesign with new holdout seeds.
 
 Outer-loop cycle 2 selected `CONCLUDE_NO_ADOPTION_WITHIN_FROZEN_CYCLE_REQUEST_VERSIONED_REDESIGN`. Execution is disabled; the only proposed future direction is H2 QD quality/replacement/final selection under a new design and holdout, not continued exploration on this cycle.
+
+## Versioned H2 continuation — 2026-08-12
+
+The user explicitly authorized the required redesign, so execution resumed with new leakage-safe Dev-A, Dev-B and validation seeds. The revealed v1 validation remains historical evidence only.
+
+A more concrete H2 failure boundary is now observed. The frozen cached Stage-2 guidance source returns the exact scalar zero and says placement should be handled by the policy. Nevertheless, current QD still maintains an archive: cell-local equal-quality competition and global execution selection reduce to lexicographic action fingerprints. A task-agnostic hash therefore controls actions precisely when reward contains no preference. This is a structural QD quality/selection defect, not evidence that changing Stage recognition is needed.
+
+The v2 cycle will first quantify this defect with a zero-episode replay. Only if exact-degenerate chunks are prevalent, the tie is reproducibly fingerprint-dependent, nondegenerate QD remains unchanged, and the existing control path preserves the 176/11 compute contract may one candidate be implemented: per-chunk fallback from degenerate QD ecology to the existing EDS control selection. No endpoint heuristic, threshold sweep, Stage modification or second candidate is authorized.

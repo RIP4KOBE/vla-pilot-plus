@@ -4,14 +4,14 @@
 project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
-  status: concluded_no_adoption_current_cycle
-  phase: concluded_versioned_redesign_required
+  status: running
+  phase: v2_h2_zero_episode_calibration_protocol_locked
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: false
   approved_for_execution_at: "2026-08-10T15:00:35Z"
-  completed_at: "2026-08-11T04:06:31Z"
-  approval_source: "User explicitly supplied the formal execution prompt for frozen design commit 1aee76489ea8989a832dec49b747239f2db90981"
+  completed_at: null
+  approval_source: "Original execution approval plus explicit 2026-08-12 user instruction to continue autoresearch, satisfying the versioned-redesign approval boundary"
   pause_reason: null
 
 provenance:
@@ -115,8 +115,8 @@ hypotheses:
     priority: high
   - id: H2
     statement: "Reward-only global-best execution and cell-local reward elitism preserve proxy quality that is weakly aligned with stage progress; stage-conditioned quality/selection will improve target progress and retain control-success tasks."
-    status: pending_calibration
-    motivation: "All QD variants had near-zero best-reward deltas while task outcomes ranged from 0/10 to 2/10 and lost control successes."
+    status: active_v2_zero_episode_calibration
+    motivation: "In addition to near-zero reward/task alignment, frozen Stage-2 guidance returns constant zero while QD still replaces and selects elites by task-agnostic fingerprint ties."
     parent: null
     priority: high
   - id: H3
@@ -425,9 +425,9 @@ experiments:
     next_execution_requires_versioned_redesign: true
 
 outer_loop:
-  cycle: 2
-  last_direction: CONCLUDE_NO_ADOPTION_WITHIN_FROZEN_CYCLE_REQUEST_VERSIONED_REDESIGN
-  last_reflection: "H1 mechanism generalized but task success did not; candidate validation 1/10 failed the 5/10 gate. Compute scaling and Stage/guidance transition supplied no viable alternative. Because validation is exposed, any future H2 quality/selection candidate requires a versioned design, new holdout seeds, explicit budget, and user approval."
+  cycle: 3
+  last_direction: PIVOT_TO_VERSIONED_H2_QUALITY_SELECTION_CALIBRATION
+  last_reflection: "The user explicitly re-authorized a versioned redesign. v2 uses new Dev-A/Dev-B/validation seeds and one H2 candidate only; the revealed v1 validation remains historical diagnostic evidence and cannot promote a candidate."
   trigger_after_inner_runs: 5
   no_progress_trigger: 3
 
@@ -436,7 +436,7 @@ continuity:
   scheduled_task_created: false
   loop_enabled: false
   planning_phase_must_not_enable_loop: false
-  execution_authorized: false
+  execution_authorized: true
   pause_sentinel: ".autoresearch/PAUSE"
 
 resources:
@@ -450,7 +450,7 @@ resources:
   gpu_selection_rule: "Any eligible GPU 0-7 after dynamic admission; one worker per GPU; parallelize only independent cells from the same frozen protocol"
 
 workspace:
-  design: "docs/01_specs/2026-08-08-eds-qd-autoresearch-libero-swap-ood-design.md"
+  design: "docs/01_specs/2026-08-12-eds-qd-autoresearch-v2-quality-selection-design.md"
   findings: "findings.md"
   log: "research-log.md"
   literature_dir: "literature/"
@@ -461,3 +461,26 @@ workspace:
   canonical_iteration_ledger: "docs/03_evidence/eds_qd_autoresearch/iteration-ledger.md"
   to_human_dir: "to_human/"
   paper_dir: "paper/"
+
+continuation_v2:
+  approved_at: "2026-08-12"
+  design: "docs/01_specs/2026-08-12-eds-qd-autoresearch-v2-quality-selection-design.md"
+  active_experiment: "run_020_quality_selection_calibration"
+  hypothesis: H2
+  candidate_limit: 1
+  current_candidate: null
+  prior_validation_role: HISTORICAL_REVEALED_DIAGNOSTIC_ONLY
+  old_effective_episodes: 42
+  old_reservations: 54
+  old_gpu_hours: 2.934766777777778
+  global_reservation_cap: 143
+  global_gpu_hour_cap: 48
+  v2_scientific_cell_cap: 70
+  recovery_reserve_after_full_v2: 19
+  new_dev_tasks: [0, 1, 2, 4, 6, 7]
+  new_dev_a_seeds: [800391, 520957, 146970, 28448, 354436, 197646]
+  new_dev_b_seeds: [535679, 62876, 831264, 171158, 322701, 726499]
+  new_validation_tasks: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+  new_validation_seeds: [721508, 998896, 286646, 83688, 350257, 399156, 52579, 878578, 116024, 323195]
+  formal_authorized: false
+  next_action: "Implement and run the zero-episode run_020 diagnostic only; no core algorithm change or GPU episode is authorized by the current protocol"

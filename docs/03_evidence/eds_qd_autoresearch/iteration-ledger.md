@@ -798,3 +798,13 @@
 - Reports：`docs/03_evidence/eds_qd_autoresearch/2026-08-11-eds-qd-autoresearch-final-report.md`，SHA `6bce8c7b…a54858d`；`to_human/progress-002.html`，SHA `3c0efdbd…f294af`。Canonical ledger 本文保留全部算法改动、protocol/result、task-level outcome、failure、GPU、artifact/hash 与 decision。
 - Workspace：所有 code/docs 修改仅当前 branch/worktree；large artifacts 仅 owned root；protected `docs/01_specs/2026-08-10-eds-qd-stage-guidance-transition-design.md` 保持 untracked、未修改、未 stage/commit；历史 worktree/shared2 只读。
 - Final state：`concluded_no_adoption_current_cycle`，GPU/formal execution disabled。未来若要继续，必须显式批准 versioned redesign：新 validation holdout、新预算，并限定 H2 QD quality/replacement/final-selection；不得复用已揭示 validation 做 tuning。
+
+#### AI. 用户恢复授权与 v2 H2 protocol freeze
+
+- 恢复原因：用户于 2026-08-12 明确要求继续 autoresearch，满足 AH 要求的 versioned redesign 用户授权。上一周期停下是 validation `1/10 < 5/10` 后的 protocol-mandated no-formal/leakage stop，不是 GPU、密钥或实现故障。
+- 新设计：`docs/01_specs/2026-08-12-eds-qd-autoresearch-v2-quality-selection-design.md`。旧 validation seeds 仅为 `HISTORICAL_REVEALED_DIAGNOSTIC_ONLY`；新 Dev-A、Dev-B、validation seeds 用冻结 SHA-256 规则生成且与旧 splits/formal 不重叠。
+- H2 证据：`core/qd_ed.py` 在 equal reward 下由 fingerprint tie 决定 replacement/global selection；owned runtime cache 的 Stage-2 guidance 返回 exact zero 并声明 placement 由 policy 完成。当前 QD 因而在无 quality signal 时由 task-agnostic hash 接管 action。
+- 单候选边界：先执行 `run_020_quality_selection_calibration` 零-episode replay；PASS 后最多实现一个 `reward_degenerate_control_fallback_v1`。不加入 endpoint heuristic、threshold sweep、Stage 修改、memory、compute scaling 或第二候选。
+- Promotion：Dev-A/Dev-B 各要求 candidate `>=3/6` 且 paired +1；validation/formal 均要求 `>=5/10`、不低于 control、gained >= lost 和全部硬门。任一 FAIL 立即停止后续 split。
+- 预算：v1 已用 42 effective / 54 reservations / 2.934767 GPU-hours；v2 scientific cells 最多 70，全部执行后 global reservations 124，保留 19 recovery slots；原 143/48 上限不变。
+- 当前授权：只允许 run_020 diagnostic implementation/result；算法修改、GPU、API、LIBERO attempt 和 formal 均未由本 protocol 授权。受保护未跟踪文件保持未读取、未修改、未 stage/commit。
