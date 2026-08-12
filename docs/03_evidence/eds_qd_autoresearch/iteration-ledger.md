@@ -847,3 +847,16 @@
 - Determinism/artifact：两次完整运行 scientific payload byte-identical；canonical/replay 仅写 owned `run_022.../analysis`，mode 0444、identical bytes、credential 0。
 - Whitelist：只允许新增 dedicated script/test；existing core/config/runner/audit/Stage/prompt/历史 artifact/protected design 零修改。当前 online/GPU/API/LIBERO/attempt/Dev/Validation/Formal 授权仍为 0。
 - PASS 仅授权新的六 episode online mechanism protocol；FAIL 则 no-online。任何 schema-only repair 也必须 protocol-first，不能改科学 gates。
+
+#### AN. run_022 offline mechanism preflight PASS
+
+- Protocol/implementation：`cb87d75f7779569889994ae3e2efff64e0942ec7` / `786e7ed1310fb77bc33b2c04b965c50a45173eeb`。Core/config hashes 与 run_021 完全不变。
+- TDD red history：第一次在 scientific case 前因独立脚本缺 repo `sys.path` 停止；第二次在 active-QD hard gate 因 draft decimal float64 carrier 经 archive float32 往返末位不等停止。两者均无 artifact/online/GPU/API/model/LIBERO/attempt；最终使用显式 repo import 与 deterministic binary-exact carrier，保留协议的 float64、initial rewards、seed、cases、threshold 与 gates。
+- Tests：integrated 8-case + sequential probe PASS；dedicated `3 passed in 97.33s`；run_021 focused `6 passed`；QD archive `22 passed`；py_compile PASS。
+- Exact-zero：candidate 与 EDS control selected tensor/fingerprint `01d89d4e…74a3c`、ordered final set `5891b67a…cb82b`、scores/source/RNG 恒等；candidate accounting `176/11/0`。Legacy exact-zero 保持 QD archive selection fingerprint `001564f8…9d261`、final set `03dc76fd…13b4a`、accounting `176/11/176`。
+- Nontrigger identity：`1e-12` near-equal 与 nondegenerate candidate 均不触发，和 legacy QD 的 selected `e13b75b0…f9d4f`、final set `4b0b28a7…d00661`、完整 archive/bounds/visits/accounting/RNG 恒等。
+- State/safety：同一 instance exact-zero 后的下一 nondegenerate chunk 恢复 active QD/176 QD evals；8/8 cases 均 search 176 / calls 11，nonfinite/mask/accounting/monotonicity/selection violations 全 0。
+- Artifact：fixture `78a639ba…979a`；scientific/replay payload `8fd3f06b…c13e`；canonical/replay mode 0444、513,735 bytes、byte-identical file SHA `320fabf54847c77d944ed0ff5bdc2c530331c765d3bcfbef2aa5173c46279bac`；credential 0。只写 owned run_022 root。
+- Result analysis：`experiments/run_022_reward_degenerate_mechanism_preflight/analysis.md`，SHA-256 `860d282adf9dd591d0df58f490f928e2f6f541430d4ab8cf4b4ad9e94bb89930`。
+- Target/budget：online/GPU/reservation/validation/formal 新增均 0；historical formal best/gap 仍 `2/10 / 3`。Mechanism PASS 不等于 success 提升。
+- Decision：`KEEP_OFFLINE_MECHANISM_PASS_AND_AUTHORIZE_ONLINE_MECHANISM_PROTOCOL_ONLY`。下一步必须先冻结 6 episode paired mechanism matrix、profile/runner/audit semantics、manifest、admission 和预算；Dev-A/B、validation、formal 尚未授权。
