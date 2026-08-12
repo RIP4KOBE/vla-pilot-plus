@@ -1006,3 +1006,28 @@
 - Gates：每candidate chunk 10 activation、1+15/16、176/176/11、source/fingerprint/final-selection完整；全candidate至少1 rescue；safety/credential/artifact/write-boundary clean；latency ratio<=1.25；lost control-success tasks=0。
 - Transaction：runner/test commit -> immutable manifest -> real health -> two-snapshot GPU0–7 admission -> fresh IDs67–72 reservation -> dispatch/audit。health/admission前reservation=0；不共享/抢占/终止外部进程。
 - Budget：science后global72/143，prior GPU `3.7471009444444445`，cap48；19 recovery slots保持只用于protocol-first exact-cell infrastructure recovery。PASS仅授权Dev-A protocol；valid FAIL直接no adoption。
+
+#### BD. run_033 pre-episode DINO cache incident and exact-cell recovery
+
+- Initial transaction：runner/test commit `94336b8` 后冻结 parent manifest mode 0444、SHA `8c80cf3f…3820`、payload `ec00206a…9cd`。真实 health 与 fresh admission PASS，选择 GPU 2/4，global IDs 67–72 reservation/dispatch 顺序正确。
+- Failure boundary：两臂都在 `KeypointDetector` 构造时由 `torch.hub.load('facebookresearch/dinov2', ...)` 触发 GitHub validation HTTP 403 `rate limit exceeded`。发生在 episode 0、policy action、EDS-QD search、task interaction之前；metrics/metadata/videos/results均0，因此不能进入任务或机制分母。
+- Root cause：v3 runner 将 `base.P2_TORCH_HUB_SEED` 赋为 `v2.base.P2_TORCH_HUB_SEED`，但两个名字是同一import module，读取时仍为None；已有审计本地DINO seed没有复制到isolated XDG cache。算法/core/config/checkpoint/Stage/env/evaluator没有问题或变更。
+- Preserved evidence：初始 ledger SHA `df5c8055…73a91`；failed run manifest `7ebf4ca4…31f8`；control/candidate logs `b0179476…1a82` / `9bcf23c4…2d1f`；admission `c772bb5b…0068`。失败输出、日志、状态、runtime cache全部移动到owned Run033 incident archive并改为read-only；未删除证据。
+- Protocol-first：recovery protocol `5e3ca984bf3ef8c5167f01820e233d31b6476660` 先于 runner-only repair `e1b4f3e8a75e1a817494f49957425b32ae2152c8`。只把offline DINO seed绑定到v2审计绝对路径，增加append-only aborted/recovery semantics；EDS-QD、matrix、gate不变。
+- Tests：dedicated 16/16；适用v1/v2/v3/QD/RDT/metrics suite 473/473。另3个旧Run022 preflight test只因其明示锁定anchor实现前source hashes而预期不兼容，不作为当前suite失败。
+- Recovery manifest：`mechanism_manifest.v2.json` mode0444、18,212 bytes、file SHA `6364f4a04a49c75d99c695d7bf7e0c186949a20b44c4f44776437b7c019d07e2`、payload `cb9e7b1728b3dcf2215c09f49b2a44dd39fec153a9dd7f2903aa3b34d8f59647`；parent未变。
+- Ledger/budget：append `dispatch_aborted_pre_episode` for 67–72；exact-cell 73–78逐一带 `recovery_of_attempt_id`，fresh health/admission后仍选GPU2/4并dispatch。incident device wall `0.05985833333333333 h`；消耗6/19 recovery slots，余13。任何第二次six-cell recovery均禁止。
+- Credential/write boundary：用户批准的credential只进入child env，不在process args、manifest、ledger、logs、artifact、docs或Git。protected untracked design始终未读、未改、未stage；其他worktree与外部process未修改/终止。
+
+#### BE. run_033 valid online mechanism PASS and target-directed decision
+
+- Validity：recovery control/candidate均exit0，3/3 episode metadata、3 videos、strict suite/perturbation PASS，runner valid=True。只有IDs73–78进入science；IDs67–72保持infrastructure evidence。
+- Task-level：control tasks3/8/9全部fail=`0/3`；candidate task3/8 fail、task9 success=`1/3`。Gained `[9]`、lost `[]`、retained `[]`、candidate-minus-control `+1`。失败仅审计为 `timeout without completion`，不臆测更细原因。
+- Target interpretation：这是直接success progress，但不是正式 `>=5/10`。mechanism subset gap-to-five为4；historical formal best/gap仍`2/10 / 3`，formal 0。不得将1/3外推为5/10或据此正式采用。
+- Anchor mechanism：candidate 110 records全部active grid+causal+sparse+anchor1+fallback none；task3/8/9 records `17/89/4`，activations `170/890/40`，rescues `114/624/13`，总 `1100/751`、rescue rate `0.68272727`。每record满足10 activation、1+15/16、176/176/11、source/fingerprint/final-selection gates。
+- Failure-directed reading：tasks3/8共738 rescues仍timeout，说明rescue count不能替代success；task9以13 rescues成功说明机制可能有用但需跨task transfer验证。禁止anchor count/sparse ratio/threshold sweep；下一步只跑冻结Dev-A。
+- Safety/latency：disallowed safety、nonfinite、mask/qpos、accounting/monotonicity/selection、fallback、credential failures均0。Candidate/control latency P95 `2.818499/2.657710 s`，ratio `1.060499 <= 1.25`。
+- Immutable result：audit mode0444、SHA `b5f4c671d28bcec039f0b3ad6536ab1191fcad6c4f8c843926e66e3612acf96b`、hard failures `[]`；final ledger `b75aeccc…fe6`；run manifest `ed82e32f…cd`；analysis `4b85fd21…43f7`。
+- Secret scan：audit-visible Run033 161 files PASS；complete Run033 tree 15,258 files与tracked worktree最新credential exact matches均0。Generic hits仅归档 sklearn bytecode和测试合成fixture，不是credential。
+- Accounting：new scientific device wall `0.3761441666666667 h`；累计 `4.183103444444445/48 h`；global reservations `78/143`；effective online episodes `54`；formal episodes0。
+- Decision：`KEEP_H4_V3_ONLINE_MECHANISM_PASS_AND_AUTHORIZE_DEV_A_PROTOCOL_ONLY`。Dev-A必须先protocol commit，随后才可实现runner/freeze manifest/health/admission。Frozen tasks/seeds `[0,1,2,4,6,7] / [307995,262892,731741,14859,648306,960581]`；candidate需`>=3/6`、相对control至少+1、lost空集及全部硬门PASS。Valid FAIL立即结束v3，不进validation/formal。

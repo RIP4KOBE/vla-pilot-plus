@@ -1,17 +1,16 @@
-# Current Status — Run033 Online Mechanism Protocol Locked
+# Current Status — Run033 PASS, Dev-A Protocol Authorized
 
-- Project state: `running / run_033_online_mechanism_protocol_locked`.
-- Primary target: LIBERO-PRO `libero_object_swap >=5/10`; historical formal best/gap remain `2/10 / 3`.
-- New evidence: production allocator exactly replayed 3,205 transitions; prior global-best QD cell received zero descendants in `2,151/3,205` (`67.1%`).
-- Single v3 candidate: `qd_global_quality_anchor_v1` — one global-best parent slot plus 15 original sparse-QD slots, fixed `176 search / 176 QD / 11 calls`.
-- Failed v2 exact-zero fallback is disabled; no threshold relaxation, Stage change, second anchor count, or candidate sweep is authorized.
-- Run030 result: 9/9 gates PASS; 1+15 counterfactual reduced global-best omission to 0/3,205 with median cell-coverage retention 1.0.
-- Run031 result: protocol `4dc55c5` preceded implementation `f453e64`; all 8 implementation gates and 414 QD/RDT/metrics tests passed.
-- Run032 result: 10/10 CPU gates and 417 tests passed; rescue 10/10, overlap 0 false rescues, immutable artifact `31dd437c…e24b`.
-- Next gate: implement/test the v3 runner, commit it, freeze the Run033 manifest, then perform real credential health and GPU admission before IDs 67–72 can be reserved. Run030–Run032 used zero GPU/API/LIBERO episodes.
-- New split isolation: SHA-derived nonoverlapping mechanism, Dev-A, and validation seeds are frozen in the v3 design.
-- Remaining budget: at most 58 new scientific cells; full path ends at 124/143 reservations and preserves 19 recovery slots; GPU cap remains 48 hours.
-- Current accounting is unchanged: 48 effective online episodes, 66 reservations, `3.747101 GPU-hours`, formal episodes 0.
-- V3 design: `docs/01_specs/2026-08-12-eds-qd-autoresearch-v3-global-quality-anchor-design.md`, SHA-256 `0a2ea24763ef824010e462bbb76fa25d0e1b51d7217848f2e58b49153aabb742`.
+- Project state: `running / run_033_online_mechanism_pass_dev_a_protocol_authorized`.
+- Primary target: LIBERO-PRO `libero_object_swap >=5/10`; it has not yet been demonstrated. Historical formal best/gap remain `2/10 / 3`; formal episodes remain 0.
+- Run033 paired outcome: control `0/3`, `qd_global_quality_anchor_v1` `1/3`; gained task `[9]`, lost tasks `[]`, direct delta `+1`.
+- Failures: both profiles timed out without completion on tasks 3/8; control also timed out on task 9. Candidate completed task 9. No unsupported finer behavioral label is claimed.
+- Mechanism: 110 candidate records, 1,100 anchor activations and 751 real rescues; all records preserved the frozen 1+15 allocation and `176 search / 176 QD / 11 calls`.
+- Interpretation: 738 rescues across failed tasks 3/8 show rescue frequency is not a success proxy. Promotion is based on the task-9 gain and zero retention loss, not on maximizing rescue count.
+- Hard gates: safety/accounting/final-selection/credential gates all passed; latency ratio `1.060499 <= 1.25`; immutable audit SHA `b5f4c671…f96b` has zero hard failures.
+- Infrastructure: IDs 67–72 are preserved pre-episode DINO-cache failures. Protocol-first runner repair reused the audited offline cache; exact-cell science used IDs 73–78 after fresh health/admission on GPUs 2/4.
+- Accounting: 54 effective online episodes, 78/143 global reservations, 6/19 recovery slots consumed, `4.183103/48 GPU-hours`, formal episodes 0.
+- Credential integrity: latest approved credential exact matches are zero in the full Run033 artifact tree and tracked worktree. It was injected only into child process environment.
+- Next gate: commit a Dev-A protocol before any runner change or reservation. Frozen paired tasks/seeds are `[0,1,2,4,6,7] / [307995,262892,731741,14859,648306,960581]`; candidate must reach `>=3/6`, beat control by at least 1, lose no control-success task, and pass unchanged hard gates.
+- A valid Dev-A failure ends v3 without validation/formal. A PASS authorizes validation protocol only.
 - Full append-only record: `docs/03_evidence/eds_qd_autoresearch/iteration-ledger.md`.
 - Protected untracked design remains untouched, unstaged, and uncommitted.
