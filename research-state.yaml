@@ -1001,9 +1001,17 @@ continuation_v4:
     top_two_shape_distance_median: 0.2500861883163452
     top_two_reward_gap_median: 0.0126953125
   run_040:
-    status: PROTOCOL_PENDING_COMMIT
+    status: PROTOCOL_LOCKED_BEFORE_IMPLEMENTATION
+    protocol: "experiments/run_040_within_cell_aliasing_diagnostic/protocol.md"
+    protocol_sha256: "7baa6edeef1e295ebf4ebe7e33089fa00d1bebb755d8d3f8db213df24fcf51f2"
+    input_manifest: "experiments/run_040_within_cell_aliasing_diagnostic/input-manifest.json"
+    input_manifest_sha256: "2cd1f8249daebbbba69b650b5a61c89c879fa6605177f151bff4edaea7fb96e2"
+    trace_count: 24
+    candidate_stream_count: 264
+    input_size_bytes: 135053624
+    allowed_new_files: 2
     artifact_root: "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_040_within_cell_aliasing_diagnostic"
     gpu_authorized: false
     online_episode_attempts_authorized: 0
     core_config_change_authorized: false
-  next_action: "Commit the v4 design/protocol state, then lock and execute Run040 before any capacity-two implementation"
+  next_action: "Commit Run040 protocol, then implement and test the two-file analyzer before creating artifacts"

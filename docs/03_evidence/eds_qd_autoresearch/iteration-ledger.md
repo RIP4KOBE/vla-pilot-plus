@@ -1077,3 +1077,12 @@
 - Split/budget：mechanism tasks/seeds `[6,3]/[954758,73621]`；Dev-A `[0,2,1]/[680973,206724,451423]`；validation 0..9 seeds `[928691,104910,68735,757179,77810,597813,487873,96375,151261,603029]`。最多50 scientific cells，global最坏`140/143`，GPU cap仍48h，保留3 recovery slots。
 - 连续闭环：任一split FAIL先结束v4 candidate并立即outer-loop，不再自动终止总任务；只在formal `>=5/10`、全局预算无法支持合法promotion、连续两个cycle无task gain且无新证据、用户暂停或外部硬blocker时停止。
 - 边界：本条只创建/冻结v4 design和state transition；尚未修改core/config/test，未创建Run040 artifact，未调用GPU/API/model/LIBERO，未新增reservation/formal episode。Protected untracked design未读、未改、未stage。
+
+#### BJ. Run040 within-cell aliasing reconstruction protocol
+
+- Temporal order：v4 design已先独立提交`a1b2905`；本protocol在analyzer/test和aggregate result之前冻结。
+- 输入：精确24条owned active-QD traces、264 streams、135,053,624 bytes，逐文件path/size/SHA绑定于`input-manifest.json`；只含valid Run023/033/034 candidate traces。Control、stale/incident、video/success label、outcome/future/formal、protected untracked design全部排除。
+- Validity replay：每trace必须为capacity1/4x4 endpoint-XY/causal envelope并含`-1,0..9`各一个stream；stage actions fingerprint、16 candidates/rewards/descriptors/trajectories、active bounds与finite全部一致。Capacity1逐stream重放必须精确匹配saved reward map/occupancy/best/accounting/visits。
+- Counterfactual：capacity2按reward desc/fingerprint asc每cell保留前二；rebin时old-cell visits跟随其quality entry且总和守恒。Parent仍为一个global anchor + production sparse15 cell counts，cell内以stateless hash起点round-robin，不触碰global RNG。
+- Gates：264 streams、>=3,000 candidates、>=500 collisions；collision ratio>=0.40；top2 direction/shape median>=0.20/0.15且reward gap median<=0.02；quality/global-best retention、capacity/fingerprint/rebin守恒；secondary slots>=20%、coverage retention median>=0.85；双run byte identity及secret/write/accounting clean。
+- Scope：implementation只允许新增analyzer/test两文件；artifact仅在implementation commit后写owned Run040 analysis并0444。当前core/config/GPU/API/model/LIBERO/reservation/Dev/validation/formal授权均0；历史formal best/gap仍2/10、3。
