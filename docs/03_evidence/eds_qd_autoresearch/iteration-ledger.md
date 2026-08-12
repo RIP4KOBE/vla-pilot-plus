@@ -1159,3 +1159,12 @@
 - Safety/compute：所有case均10个16-parent rollout、176 search/176 QD/11 score calls；nonfinite、mask、qpos、accounting、monotonicity、secondary invariant及final-selection violation全0；global RNG与双suite byte identity通过。
 - Artifacts：canonical/replay byte-identical、mode0444、33,587 bytes、file SHA `32a46d78…5f3a`、payload `f147b905…c73c`、credential0；仅写owned Run043 root。
 - Decision：`KEEP_H5_V5_CPU_MECHANISM_PASS_AUTHORIZE_ONLINE_MECHANISM_PROTOCOL_ONLY`。这是零episode机制证据，不改变2/10 best或gap3；下一步只允许先独立提交冻结4-cell paired online mechanism protocol，当前GPU/API/LIBERO/reservation/formal授权仍0。
+
+#### BS. Run044 task/seed identity incident、repair 与预算边界
+
+- Order：online protocol `0e59987` -> runner `6bb5e91` -> immutable manifest/health/admission -> IDs91–94 dispatch。Manifest mode0444、file SHA `b6ae5091…ff97`、payload `1f537485…73cf`；admission选GPU2/3且无外部process。
+- Identity invalidity：冻结pairs为`(task7,87603)/(task5,666847)`；backend对`[7,5]`排序后实际metadata为`(task5,87603)/(task7,666847)`。在两job完成前发现；仅终止owned process group并验证显存释放。所有partial metrics/video/outcome一律不可用于task、promotion或H5结论。
+- Preservation：IDs91–94原reservation/dispatch不修改，append `dispatch_aborted_invalid_task_seed_identity`；final ledger SHA `447ac127…2371`。Incident archive 15,938 files/1,116,752,862 bytes，manifest mode0444、file SHA `b22ace40…4661`、payload `5fc0cb55…727f`、credential0。
+- Repair order：protocol-v2 `5f94fd4` -> runner repair `fd1a5f3`；runner现在从冻结task/seed map按backend task顺序生成seed schedule并fail-closed，dedicated9/9、combined runner/audit103/103、py_compile/secret scan PASS。Algorithm/profile/gates不变。
+- Accounting：新增effective scientific episodes0；global reservations94/143；invalid infrastructure GPU约0.28934h，累计约5.73640/48h。Exact paired recovery需4 cells，而冻结v5只剩3 recovery slots，deficit1。
+- Decision：`INVALID_PRESERVE_REPAIR_AND_REQUEST_ONE_ADDITIONAL_RESERVATION_AUTHORITY`。当前GPU/API/LIBERO/reservation/Dev/validation/formal授权全部0；必须用户显式允许global cap由143增至144且仅用于第四个Run044 exact recovery cell，或结束无adoption。Historical formal best/gap仍2/10、3。
