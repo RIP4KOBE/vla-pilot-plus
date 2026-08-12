@@ -251,6 +251,157 @@ def test_archive_rebin_rejects_bad_mapping_without_mutation():
     assert torch.equal(archive.cumulative_visits, visits)
 
 
+def test_default_and_explicit_none_secondary_modes_are_exactly_identical():
+    implicit = QDArchive(grid_shape=(2, 2))
+    explicit = QDArchive(grid_shape=(2, 2), secondary_lane_mode="none")
+    update = {
+        "actions": _actions([1.0, 2.0, 3.0]),
+        "rewards": torch.tensor([1.0, 3.0, 2.0]),
+        "costs": torch.tensor([-1.0, -3.0, -2.0]),
+        "descriptors": torch.tensor([[0.1, 0.1], [0.2, 0.2], [0.9, 0.9]]),
+        "cell_ids": torch.tensor([0, 0, 3]),
+        "source_iter": -1,
+    }
+    assert implicit.update(**update) == explicit.update(**update)
+    assert implicit.snapshot() == explicit.snapshot()
+    assert torch.equal(implicit.cumulative_visits, explicit.cumulative_visits)
+    assert implicit.rebin(torch.tensor([1, 1])) == explicit.rebin(
+        torch.tensor([1, 1])
+    )
+    assert implicit.snapshot() == explicit.snapshot()
+    assert torch.equal(implicit.cumulative_visits, explicit.cumulative_visits)
+
+    allocation_args = {
+        "population_size": 16,
+        "sampling": "sparse_priority",
+        "sparse_exponent": 1.0,
+        "run_seed": 17,
+        "episode": 3,
+        "global_step": 24,
+        "iter_idx": 2,
+        "global_quality_anchor_count": 1,
+    }
+    implicit_allocation = allocate_parent_slots(implicit, **allocation_args)
+    explicit_allocation = allocate_parent_slots(explicit, **allocation_args)
+    for field_name in (
+        "parent_cell_ids",
+        "parent_actions",
+        "parent_rewards",
+        "parent_costs",
+    ):
+        assert torch.equal(
+            getattr(implicit_allocation, field_name),
+            getattr(explicit_allocation, field_name),
+        )
+    for field_name in (
+        "parent_fingerprints",
+        "slot_counts",
+        "weights",
+        "sparse_slot_counts",
+        "global_quality_anchor_count",
+        "global_quality_anchor_cell_id",
+        "global_quality_anchor_fingerprint",
+        "parent_lanes",
+        "secondary_parent_count",
+        "secondary_slot_counts",
+    ):
+        assert getattr(implicit_allocation, field_name) == getattr(
+            explicit_allocation, field_name
+        )
+    assert implicit.secondary_snapshot() == explicit.secondary_snapshot() == []
+
+
+def test_protected_secondary_update_keeps_quality_and_best_distinct_alternate():
+    archive = QDArchive(
+        grid_shape=(2, 2), secondary_lane_mode="protected_reward_v1"
+    )
+    archive.update(
+        actions=_actions([1.0, 2.0, 3.0]),
+        rewards=torch.tensor([1.0, 3.0, 2.0]),
+        costs=torch.tensor([-1.0, -3.0, -2.0]),
+        descriptors=torch.tensor([[0.1, 0.1], [0.2, 0.2], [0.3, 0.3]]),
+        cell_ids=torch.tensor([0, 0, 0]),
+        source_iter=-1,
+    )
+
+    assert archive.entries[0].reward == 3.0
+    assert archive.secondary_entries[0].reward == 2.0
+    assert archive.secondary_entries[0].fingerprint != archive.entries[0].fingerprint
+    assert archive.select_global_best()[1].reward == 3.0
+
+    archive.update(
+        actions=_actions([4.0, 5.0]),
+        rewards=torch.tensor([5.0, 4.0]),
+        costs=torch.tensor([-5.0, -4.0]),
+        descriptors=torch.tensor([[0.2, 0.2], [0.3, 0.3]]),
+        cell_ids=torch.tensor([0, 0]),
+        source_iter=0,
+        parent_cell_ids=torch.tensor([0, 0]),
+    )
+
+    assert archive.entries[0].reward == 5.0
+    assert archive.secondary_entries[0].reward == 4.0
+
+
+def test_protected_secondary_deduplicates_fingerprint_and_allows_no_alternate():
+    archive = QDArchive(
+        grid_shape=(2, 2), secondary_lane_mode="protected_reward_v1"
+    )
+    repeated = _actions([1.0, 1.0])
+    archive.update(
+        actions=repeated,
+        rewards=torch.tensor([2.0, 1.0]),
+        costs=torch.tensor([-2.0, -1.0]),
+        descriptors=torch.tensor([[0.1, 0.1], [0.2, 0.2]]),
+        cell_ids=torch.tensor([0, 0]),
+        source_iter=-1,
+    )
+    assert archive.entries[0].fingerprint == fingerprint_action(repeated[0])
+    assert archive.secondary_entries == {}
+
+    distinct = _actions([2.0, 3.0])
+    archive.update(
+        actions=distinct,
+        rewards=torch.tensor([1.5, 1.5]),
+        costs=torch.tensor([-1.5, -1.5]),
+        descriptors=torch.tensor([[0.3, 0.3], [0.4, 0.4]]),
+        cell_ids=torch.tensor([0, 0]),
+        source_iter=0,
+    )
+    expected = min(fingerprint_action(action) for action in distinct)
+    assert archive.secondary_entries[0].fingerprint == expected
+
+
+def test_protected_secondary_rebin_never_creates_cell_or_moves_visits():
+    archive = QDArchive(
+        grid_shape=(2, 2), secondary_lane_mode="protected_reward_v1"
+    )
+    archive.update(
+        actions=_actions([1.0, 2.0, 3.0, 4.0]),
+        rewards=torch.tensor([4.0, 3.0, 2.0, 1.0]),
+        costs=torch.tensor([-4.0, -3.0, -2.0, -1.0]),
+        descriptors=torch.tensor([[0.1, 0.1], [0.2, 0.2], [0.8, 0.8], [0.9, 0.9]]),
+        cell_ids=torch.tensor([0, 0, 3, 3]),
+        source_iter=-1,
+    )
+    archive.cumulative_visits = torch.tensor([7, 0, 0, 5])
+    quality_before = archive.select_global_best()[1].fingerprint
+
+    summary = archive.rebin(
+        torch.tensor([2, 2]), secondary_target_cell_ids=torch.tensor([1, 2])
+    )
+
+    assert summary.visit_sum_before == summary.visit_sum_after == 12
+    assert summary.secondary_discard_count > 0
+    assert set(archive.secondary_entries).issubset(set(archive.entries))
+    assert archive.cumulative_visits.tolist() == [0, 0, 12, 0]
+    assert archive.select_global_best()[1].fingerprint == quality_before
+    assert all(
+        entry.fingerprint != archive.entries[cell].fingerprint
+        for cell, entry in archive.secondary_entries.items()
+    )
+
+
 def test_exact_reward_tie_keeps_lexicographically_smallest_fingerprint():
     candidates = _actions([11.0, 12.0])
     fingerprints = [fingerprint_action(action) for action in candidates]
@@ -429,6 +580,56 @@ def test_global_quality_anchor_is_one_plus_exact_same_seed_fifteen_sparse_slots(
     assert sum(candidate.slot_counts.values()) == 16
     torch.testing.assert_close(candidate.parent_cell_ids, repeated.parent_cell_ids)
     assert candidate.slot_counts == repeated.slot_counts
+    assert torch.equal(torch.random.get_rng_state(), rng_before)
+
+
+def test_protected_secondary_parent_rotation_preserves_cell_counts_and_rng():
+    archive = QDArchive(
+        grid_shape=(4, 4), secondary_lane_mode="protected_reward_v1"
+    )
+    archive.update(
+        actions=_actions([1.0, 2.0, 3.0, 4.0]),
+        rewards=torch.tensor([4.0, 3.0, 2.0, 1.0]),
+        costs=torch.tensor([-4.0, -3.0, -2.0, -1.0]),
+        descriptors=torch.tensor([[0.0, 0.0]] * 4),
+        cell_ids=torch.tensor([0, 0, 1, 1]),
+        source_iter=-1,
+    )
+    archive.cumulative_visits[:2] = torch.tensor([20, 1])
+    comparator = copy.deepcopy(archive)
+    comparator.secondary_lane_mode = "none"
+    comparator.secondary_entries = {}
+    rng_before = torch.random.get_rng_state().clone()
+
+    baseline = allocate_parent_slots(
+        comparator,
+        population_size=16,
+        sampling="sparse_priority",
+        sparse_exponent=1.0,
+        run_seed=3,
+        episode=2,
+        global_step=8,
+        iter_idx=4,
+        global_quality_anchor_count=1,
+    )
+    candidate = allocate_parent_slots(
+        archive,
+        population_size=16,
+        sampling="sparse_priority",
+        sparse_exponent=1.0,
+        run_seed=3,
+        episode=2,
+        global_step=8,
+        iter_idx=4,
+        global_quality_anchor_count=1,
+    )
+
+    assert candidate.slot_counts == baseline.slot_counts
+    assert candidate.sparse_slot_counts == baseline.sparse_slot_counts
+    assert candidate.global_quality_anchor_fingerprint == baseline.global_quality_anchor_fingerprint
+    assert candidate.secondary_parent_count > 0
+    assert candidate.parent_lanes[0] == "quality_anchor"
+    assert "secondary" in candidate.parent_lanes
     assert torch.equal(torch.random.get_rng_state(), rng_before)
 
 

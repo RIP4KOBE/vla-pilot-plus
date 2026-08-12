@@ -121,6 +121,7 @@ main:
     qd_descriptor: target_relative_endpoint_xy
     qd_grid_shape: [4, 4]
     qd_cell_capacity: 1
+    qd_secondary_lane_mode: none
     qd_parent_sampling: uniform_cells
     qd_global_quality_anchor_count: 0
     qd_sparse_exponent: 1.0

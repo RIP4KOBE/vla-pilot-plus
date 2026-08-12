@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Iterable
 
 import torch
@@ -261,6 +261,7 @@ class QDRebinSummary:
     collisions: int
     visit_sum_before: int
     visit_sum_after: int
+    secondary_discard_count: int = 0
 
 
 @dataclass(frozen=True)
@@ -276,16 +277,32 @@ class QDParentAllocation:
     global_quality_anchor_count: int
     global_quality_anchor_cell_id: int | None
     global_quality_anchor_fingerprint: str | None
+    parent_lanes: tuple[str, ...] = ()
+    secondary_parent_count: int = 0
+    secondary_slot_counts: dict[int, int] = field(default_factory=dict)
 
 
 class QDArchive:
-    def __init__(self, *, grid_shape: tuple[int, int] | list[int]) -> None:
+    def __init__(
+        self,
+        *,
+        grid_shape: tuple[int, int] | list[int],
+        secondary_lane_mode: str = "none",
+    ) -> None:
+        if secondary_lane_mode not in {"none", "protected_reward_v1"}:
+            raise ValueError(
+                "QD secondary lane mode must be none or protected_reward_v1"
+            )
         self.grid_shape = _grid_shape(grid_shape)
         self.cell_count = self.grid_shape[0] * self.grid_shape[1]
+        self.secondary_lane_mode = secondary_lane_mode
         self.entries: dict[int, QDArchiveEntry] = {}
+        self.secondary_entries: dict[int, QDArchiveEntry] = {}
         self.cumulative_visits = torch.zeros(self.cell_count, dtype=torch.long)
         self.accounting_violation_count = 0
         self.elite_monotonicity_violation_count = 0
+        self.secondary_invariant_violation_count = 0
+        self.secondary_rebin_discard_count = 0
         self._next_insert_sequence = 0
 
     @staticmethod
@@ -361,6 +378,27 @@ class QDArchive:
                 }
             )
 
+        secondary_pool: dict[int, list[QDArchiveEntry]] = {}
+        if self.secondary_lane_mode == "protected_reward_v1":
+            for cell, entry in self.entries.items():
+                secondary_pool.setdefault(cell, []).append(entry)
+            for cell, entry in self.secondary_entries.items():
+                secondary_pool.setdefault(cell, []).append(entry)
+            for cell, candidates in grouped.items():
+                for candidate in candidates:
+                    secondary_pool.setdefault(cell, []).append(
+                        QDArchiveEntry(
+                            action=candidate["action"],
+                            reward=float(candidate["reward"]),
+                            cost=float(candidate["cost"]),
+                            descriptor_xy_m=candidate["descriptor"],
+                            fingerprint=str(candidate["fingerprint"]),
+                            source_iter=int(source_iter),
+                            parent_cell_id=candidate["parent_cell_id"],
+                            insert_sequence=-1,
+                        )
+                    )
+
         insertions = replacements = rejections = 0
         for cell in sorted(grouped):
             candidates = sorted(
@@ -397,6 +435,22 @@ class QDArchive:
             else:
                 rejections += len(candidates)
 
+        if self.secondary_lane_mode == "protected_reward_v1":
+            selected_secondary: dict[int, QDArchiveEntry] = {}
+            for cell, quality in sorted(self.entries.items()):
+                alternates = {
+                    entry.fingerprint: entry
+                    for entry in secondary_pool.get(cell, [])
+                    if entry.fingerprint != quality.fingerprint
+                }
+                if alternates:
+                    selected_secondary[cell] = min(
+                        alternates.values(),
+                        key=lambda entry: (-entry.reward, entry.fingerprint),
+                    )
+            self.secondary_entries = selected_secondary
+            self._validate_secondary_invariants()
+
         total = insertions + replacements + rejections
         if total != candidate_count:
             self.accounting_violation_count += 1
@@ -419,7 +473,12 @@ class QDArchive:
         )
         return int(cell), entry
 
-    def rebin(self, target_cell_ids: Tensor) -> QDRebinSummary:
+    def rebin(
+        self,
+        target_cell_ids: Tensor,
+        *,
+        secondary_target_cell_ids: Tensor | None = None,
+    ) -> QDRebinSummary:
         """Move current elites and their cell visits into a new partition."""
         if not torch.is_tensor(target_cell_ids):
             raise ValueError("QD rebin target cell ids must be a torch.Tensor")
@@ -429,6 +488,33 @@ class QDArchive:
             raise ValueError("QD rebin requires one target cell for every archive elite")
         if bool(((targets < 0) | (targets >= self.cell_count)).any().item()):
             raise ValueError("QD rebin target cell id is outside the configured grid")
+        old_secondary_cells = sorted(self.secondary_entries)
+        if self.secondary_lane_mode == "protected_reward_v1":
+            if secondary_target_cell_ids is None or not torch.is_tensor(
+                secondary_target_cell_ids
+            ):
+                raise ValueError(
+                    "QD protected secondary rebin requires secondary target cells"
+                )
+            secondary_targets = secondary_target_cell_ids.detach().to(
+                device="cpu", dtype=torch.long
+            ).reshape(-1)
+            if secondary_targets.numel() != len(old_secondary_cells):
+                raise ValueError(
+                    "QD protected secondary rebin requires one target per secondary"
+                )
+            if bool(
+                ((secondary_targets < 0) | (secondary_targets >= self.cell_count))
+                .any()
+                .item()
+            ):
+                raise ValueError("QD secondary rebin target is outside the grid")
+        else:
+            if secondary_target_cell_ids is not None:
+                raise ValueError(
+                    "QD secondary rebin targets require protected_reward_v1"
+                )
+            secondary_targets = torch.empty(0, dtype=torch.long)
         positive_visit_cells = set(
             torch.nonzero(self.cumulative_visits > 0, as_tuple=False)
             .reshape(-1)
@@ -458,13 +544,86 @@ class QDArchive:
         occupied_after = len(remapped_entries)
         self.entries = remapped_entries
         self.cumulative_visits = remapped_visits
+        secondary_discard_count = 0
+        if self.secondary_lane_mode == "protected_reward_v1":
+            alternate_pool: dict[int, list[QDArchiveEntry]] = {}
+            for target, entries in grouped.items():
+                alternate_pool.setdefault(int(target), []).extend(entries)
+            for old_cell, target in zip(
+                old_secondary_cells, secondary_targets.tolist(), strict=True
+            ):
+                alternate_pool.setdefault(int(target), []).append(
+                    self.secondary_entries[old_cell]
+                )
+            selected_secondary: dict[int, QDArchiveEntry] = {}
+            for cell, quality in sorted(self.entries.items()):
+                alternates = {
+                    entry.fingerprint: entry
+                    for entry in alternate_pool.get(cell, [])
+                    if entry.fingerprint != quality.fingerprint
+                }
+                if alternates:
+                    selected_secondary[cell] = min(
+                        alternates.values(),
+                        key=lambda entry: (-entry.reward, entry.fingerprint),
+                    )
+            retained = {entry.fingerprint for entry in selected_secondary.values()}
+            secondary_discard_count = sum(
+                entry.fingerprint not in retained
+                for entries in alternate_pool.values()
+                for entry in entries
+                if entry.fingerprint
+                not in {quality.fingerprint for quality in self.entries.values()}
+            )
+            self.secondary_entries = selected_secondary
+            self.secondary_rebin_discard_count += secondary_discard_count
+            self._validate_secondary_invariants()
         return QDRebinSummary(
             occupied_before=occupied_before,
             occupied_after=occupied_after,
             collisions=occupied_before - occupied_after,
             visit_sum_before=visit_sum_before,
             visit_sum_after=visit_sum_after,
+            secondary_discard_count=secondary_discard_count,
         )
+
+    def _validate_secondary_invariants(self) -> None:
+        if self.secondary_lane_mode == "none":
+            if self.secondary_entries:
+                self.secondary_invariant_violation_count += 1
+                raise RuntimeError("QD disabled secondary lane contains entries")
+            return
+        if not set(self.secondary_entries).issubset(set(self.entries)) or any(
+            entry.fingerprint == self.entries[cell].fingerprint
+            for cell, entry in self.secondary_entries.items()
+        ):
+            self.secondary_invariant_violation_count += 1
+            raise RuntimeError("QD protected secondary lane invariant violation")
+
+    def secondary_tensors(self) -> tuple[Tensor, Tensor]:
+        cells = sorted(self.secondary_entries)
+        if not cells:
+            return torch.empty(0, 2), torch.empty(0, dtype=torch.long)
+        descriptors = torch.stack(
+            [self.secondary_entries[cell].descriptor_xy_m for cell in cells]
+        )
+        return descriptors, torch.tensor(cells, dtype=torch.long)
+
+    def secondary_snapshot(self) -> list[dict[str, object]]:
+        return [
+            {
+                "cell_id": cell,
+                "reward": entry.reward,
+                "cost": entry.cost,
+                "descriptor_xy_m": entry.descriptor_xy_m.detach().cpu().tolist(),
+                "fingerprint": entry.fingerprint,
+                "source_iter": entry.source_iter,
+                "parent_cell_id": entry.parent_cell_id,
+                "insert_sequence": entry.insert_sequence,
+                "lane": "secondary",
+            }
+            for cell, entry in sorted(self.secondary_entries.items())
+        ]
 
     def elite_tensors(self) -> tuple[Tensor, Tensor, Tensor, Tensor, Tensor]:
         if not self.entries:
@@ -521,6 +680,20 @@ def _local_generator(
     generator = torch.Generator(device="cpu")
     generator.manual_seed(seed)
     return generator
+
+
+def _secondary_rotation_start(
+    *, run_seed: int, episode: int, global_step: int, iter_idx: int, cell: int
+) -> int:
+    material = (
+        f"{int(run_seed)}:{int(episode)}:{int(global_step)}:"
+        f"{int(iter_idx)}:{int(cell)}:protected_reward_v1"
+    )
+    return int.from_bytes(
+        hashlib.sha256(material.encode("ascii")).digest()[:8],
+        byteorder="big",
+        signed=False,
+    ) % 2
 
 
 def allocate_parent_slots(
@@ -608,25 +781,58 @@ def allocate_parent_slots(
         raise RuntimeError(
             f"QD parent allocation mismatch: {len(parent_cells)} != {population_size}"
         )
-    entries = [archive.entries[cell] for cell in parent_cells]
-    action_device = entries[0].action.device
+    parent_entries: list[QDArchiveEntry] = []
+    parent_lanes: list[str] = []
+    secondary_slot_counts = {cell: 0 for cell in occupied}
+    sparse_offsets = {cell: 0 for cell in occupied}
+    for parent_index, cell in enumerate(parent_cells):
+        if global_quality_anchor_count == 1 and parent_index == 0:
+            parent_entries.append(archive.entries[cell])
+            parent_lanes.append("quality_anchor")
+            continue
+        secondary = archive.secondary_entries.get(cell)
+        use_secondary = False
+        if (
+            archive.secondary_lane_mode == "protected_reward_v1"
+            and secondary is not None
+        ):
+            start = _secondary_rotation_start(
+                run_seed=run_seed,
+                episode=episode,
+                global_step=global_step,
+                iter_idx=iter_idx,
+                cell=cell,
+            )
+            use_secondary = (start + sparse_offsets[cell]) % 2 == 1
+        sparse_offsets[cell] += 1
+        if use_secondary:
+            parent_entries.append(secondary)
+            parent_lanes.append("secondary")
+            secondary_slot_counts[cell] += 1
+        else:
+            parent_entries.append(archive.entries[cell])
+            parent_lanes.append("quality")
+    action_device = parent_entries[0].action.device
     parent_cell_ids = torch.tensor(
         parent_cells, device=action_device, dtype=torch.long
     )
     return QDParentAllocation(
         parent_cell_ids=parent_cell_ids,
-        parent_actions=torch.stack([entry.action for entry in entries]),
+        parent_actions=torch.stack([entry.action for entry in parent_entries]),
         parent_rewards=torch.tensor(
-            [entry.reward for entry in entries], device=action_device
+            [entry.reward for entry in parent_entries], device=action_device
         ),
         parent_costs=torch.tensor(
-            [entry.cost for entry in entries], device=action_device
+            [entry.cost for entry in parent_entries], device=action_device
         ),
-        parent_fingerprints=tuple(entry.fingerprint for entry in entries),
+        parent_fingerprints=tuple(entry.fingerprint for entry in parent_entries),
         slot_counts={cell: int(slot_counts[cell]) for cell in occupied},
         weights={cell: float(raw_weights[cell]) for cell in occupied},
         sparse_slot_counts=sparse_slot_counts,
         global_quality_anchor_count=global_quality_anchor_count,
         global_quality_anchor_cell_id=anchor_cell,
         global_quality_anchor_fingerprint=anchor_fingerprint,
+        parent_lanes=tuple(parent_lanes),
+        secondary_parent_count=sum(secondary_slot_counts.values()),
+        secondary_slot_counts=secondary_slot_counts,
     )

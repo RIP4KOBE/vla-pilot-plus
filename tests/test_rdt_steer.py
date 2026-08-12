@@ -2197,6 +2197,7 @@ def test_qd_config_defaults_are_legacy_safe_and_match_yaml(stub_steer):
         "qd_descriptor": "target_relative_endpoint_xy",
         "qd_grid_shape": (4, 4),
         "qd_cell_capacity": 1,
+        "qd_secondary_lane_mode": "none",
         "qd_parent_sampling": "uniform_cells",
         "qd_global_quality_anchor_count": 0,
         "qd_sparse_exponent": 1.0,
@@ -2244,6 +2245,7 @@ def _valid_qd_config(**updates):
         "qd_descriptor": "target_relative_endpoint_xy",
         "qd_grid_shape": [4, 4],
         "qd_cell_capacity": 1,
+        "qd_secondary_lane_mode": "none",
         "qd_parent_sampling": "uniform_cells",
         "qd_global_quality_anchor_count": 0,
         "qd_sparse_exponent": 1.0,
@@ -2283,6 +2285,27 @@ def test_qd_config_accepts_only_frozen_global_quality_anchor_candidate(stub_stee
 
     assert candidate.qd_global_quality_anchor_count == 1
     assert candidate.qd_parent_sampling == "sparse_priority"
+
+
+def test_qd_config_accepts_only_frozen_protected_secondary_candidate(stub_steer):
+    candidate = stub_steer._resolve_eds_config_with_reference_defaults(
+        _valid_qd_config(
+            qd_parent_sampling="sparse_priority",
+            qd_global_quality_anchor_count=1,
+            qd_bounds_update_policy="causal_envelope_v1",
+            qd_secondary_lane_mode="protected_reward_v1",
+        )
+    )
+    assert candidate.qd_secondary_lane_mode == "protected_reward_v1"
+
+    with pytest.raises(ValueError, match="qd_secondary_lane_mode"):
+        stub_steer._resolve_eds_config_with_reference_defaults(
+            _valid_qd_config(qd_secondary_lane_mode="top2")
+        )
+    with pytest.raises(ValueError, match="qd_secondary_lane_mode"):
+        stub_steer._resolve_eds_config_with_reference_defaults(
+            _valid_qd_config(qd_secondary_lane_mode="protected_reward_v1")
+        )
 
 
 @pytest.mark.parametrize("value", [True, -1, 2])
@@ -6289,12 +6312,16 @@ def test_qd_loop_bypasses_legacy_selector_preserves_archive_and_selects_global_b
     assert artifacts["qd_bounds_xy_m"] == metrics["qd_bounds_xy_m"]
 
 
-@pytest.mark.parametrize("quality_anchor_count", [0, 1])
+@pytest.mark.parametrize(
+    ("quality_anchor_count", "secondary_lane_mode"),
+    [(0, "none"), (1, "none"), (1, "protected_reward_v1")],
+)
 def test_qd_causal_envelope_expands_rebins_preserves_visits_and_call_budget(
     stub_steer,
     stub_adapter,
     monkeypatch,
     quality_anchor_count,
+    secondary_lane_mode,
 ):
     from core.qd_ed import fingerprint_action
 
@@ -6345,6 +6372,7 @@ def test_qd_causal_envelope_expands_rebins_preserves_visits_and_call_budget(
             qd_parent_sampling="sparse_priority",
             qd_global_quality_anchor_count=quality_anchor_count,
             qd_bounds_update_policy="causal_envelope_v1",
+            qd_secondary_lane_mode=secondary_lane_mode,
         )
     )
 
@@ -6394,6 +6422,7 @@ def test_qd_causal_envelope_expands_rebins_preserves_visits_and_call_budget(
     )
     assert artifacts["qd_final_bounds_xy_m"] == metrics["qd_bounds_xy_m_by_iter"][-1]
     assert metrics["qd_global_quality_anchor_count"] == quality_anchor_count
+    assert metrics["qd_secondary_lane_mode"] == secondary_lane_mode
     assert len(metrics["qd_sparse_parent_slots_by_cell_by_iter"]) == 10
     assert all(
         sum(allocation.values()) == 16 - quality_anchor_count
@@ -6416,13 +6445,31 @@ def test_qd_causal_envelope_expands_rebins_preserves_visits_and_call_budget(
             for fingerprint in metrics["qd_global_quality_anchor_fingerprint_by_iter"]
         )
         assert len(metrics["qd_global_quality_anchor_rescued_by_iter"]) == 10
-        assert metrics["parent_count_by_source"] == {
-            "elite": 0,
-            "anchor_offspring": 0,
-            "weighted_offspring": 0,
-            "qd_global_quality_anchor_offspring": 10,
-            "qd_archive_offspring": 150,
-        }
+        if secondary_lane_mode == "protected_reward_v1":
+            assert metrics["qd_secondary_parent_activation_count"] > 0
+            assert sum(metrics["qd_secondary_parent_count_by_iter"]) == metrics[
+                "qd_secondary_parent_activation_count"
+            ]
+            assert metrics["parent_count_by_source"][
+                "qd_global_quality_anchor_offspring"
+            ] == 10
+            assert metrics["parent_count_by_source"][
+                "qd_secondary_lane_offspring"
+            ] > 0
+            assert (
+                metrics["parent_count_by_source"]["qd_archive_offspring"]
+                + metrics["parent_count_by_source"]["qd_secondary_lane_offspring"]
+                == 150
+            )
+            assert metrics["qd_secondary_invariant_violation_count"] == 0
+        else:
+            assert metrics["parent_count_by_source"] == {
+                "elite": 0,
+                "anchor_offspring": 0,
+                "weighted_offspring": 0,
+                "qd_global_quality_anchor_offspring": 10,
+                "qd_archive_offspring": 150,
+            }
     else:
         assert metrics["qd_global_quality_anchor_cell_by_iter"] == [None] * 10
         assert metrics["qd_global_quality_anchor_fingerprint_by_iter"] == [None] * 10

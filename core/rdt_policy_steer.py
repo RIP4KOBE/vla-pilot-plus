@@ -127,6 +127,7 @@ class _EDSConfig:
     qd_descriptor: str = "target_relative_endpoint_xy"
     qd_grid_shape: tuple[int, int] = (4, 4)
     qd_cell_capacity: int = 1
+    qd_secondary_lane_mode: str = "none"
     qd_parent_sampling: str = "uniform_cells"
     qd_global_quality_anchor_count: int = 0
     qd_sparse_exponent: float = 1.0
@@ -4648,6 +4649,7 @@ class RDTSteer:
         metrics.qd_descriptor = cfg.qd_descriptor
         metrics.qd_grid_shape = list(cfg.qd_grid_shape)
         metrics.qd_cell_capacity = cfg.qd_cell_capacity
+        metrics.qd_secondary_lane_mode = cfg.qd_secondary_lane_mode
         metrics.qd_parent_sampling = cfg.qd_parent_sampling
         metrics.qd_global_quality_anchor_count = (
             cfg.qd_global_quality_anchor_count
@@ -4783,7 +4785,10 @@ class RDTSteer:
             initial_cell_ids, initial_overflow = self._eds_qd_cell_ids(
                 initial_descriptors, qd_bounds, cfg
             )
-            qd_archive = QDArchive(grid_shape=cfg.qd_grid_shape)
+            qd_archive = QDArchive(
+                grid_shape=cfg.qd_grid_shape,
+                secondary_lane_mode=cfg.qd_secondary_lane_mode,
+            )
             qd_update_start = time.perf_counter()
             initial_update = qd_archive.update(
                 actions=population,
@@ -4825,6 +4830,10 @@ class RDTSteer:
                 "costs": initial_costs.detach().cpu(),
                 "cell_ids": initial_cells.detach().cpu(),
             }
+            if cfg.qd_secondary_lane_mode == "protected_reward_v1":
+                qd_initial_artifact["secondary_archive"] = (
+                    qd_archive.secondary_snapshot()
+                )
         adaptive_diversity_reference = metrics.initial_eef_diversity_final
         initial_best_idx = int(torch.argmin(population_scores).item())
         max_action_mask_violation = self._eds_action_mask_violation(population, cond)
@@ -5048,10 +5057,14 @@ class RDTSteer:
                     device=population.device
                 )
                 anchor_count = allocation.global_quality_anchor_count
-                sparse_count = cfg.population_size - anchor_count
-                chunk_population_sources = (
-                    ("qd_global_quality_anchor",) * anchor_count
-                    + ("qd_archive",) * sparse_count
+                lane_to_population_source = {
+                    "quality_anchor": "qd_global_quality_anchor",
+                    "quality": "qd_archive",
+                    "secondary": "qd_secondary_lane",
+                }
+                chunk_population_sources = tuple(
+                    lane_to_population_source[lane]
+                    for lane in allocation.parent_lanes
                 )
                 occupied_count = len(qd_archive.entries)
                 covered_count = sum(
@@ -5089,6 +5102,32 @@ class RDTSteer:
                 metrics.qd_global_quality_anchor_rescued_by_iter.append(anchor_rescued)
                 metrics.qd_global_quality_anchor_activation_count += anchor_count
                 metrics.qd_global_quality_anchor_rescue_count += int(anchor_rescued)
+                metrics.qd_secondary_parent_count_by_iter.append(
+                    int(allocation.secondary_parent_count)
+                )
+                metrics.qd_secondary_parent_ratio_by_iter.append(
+                    float(allocation.secondary_parent_count / cfg.population_size)
+                )
+                metrics.qd_secondary_parent_fingerprints_by_iter.append(
+                    [
+                        fingerprint
+                        for fingerprint, lane in zip(
+                            allocation.parent_fingerprints,
+                            allocation.parent_lanes,
+                            strict=True,
+                        )
+                        if lane == "secondary"
+                    ]
+                )
+                metrics.qd_secondary_parent_slots_by_cell_by_iter.append(
+                    {
+                        str(cell): int(count)
+                        for cell, count in allocation.secondary_slot_counts.items()
+                    }
+                )
+                metrics.qd_secondary_parent_activation_count += int(
+                    allocation.secondary_parent_count
+                )
                 metrics.qd_parent_weights_by_cell_by_iter.append(
                     {
                         str(cell): float(weight)
@@ -5107,14 +5146,21 @@ class RDTSteer:
                     dtype=torch.long,
                 )
                 selection_kind = f"qd_{cfg.qd_parent_sampling}"
-                offspring_sources = (
-                    ("qd_global_quality_anchor_offspring",) * anchor_count
-                    + ("qd_archive_offspring",) * sparse_count
+                offspring_sources = tuple(
+                    f"{source}_offspring" for source in chunk_population_sources
                 )
-                parent_selection_kinds = (
-                    ["qd_global_quality_anchor"] * anchor_count
-                    + [selection_kind] * sparse_count
-                )
+                parent_selection_kinds = [
+                    (
+                        "qd_global_quality_anchor"
+                        if lane == "quality_anchor"
+                        else (
+                            "qd_secondary_lane"
+                            if lane == "secondary"
+                            else selection_kind
+                        )
+                    )
+                    for lane in allocation.parent_lanes
+                ]
                 qd_parent_count_by_source = {
                     "elite": 0,
                     "anchor_offspring": 0,
@@ -5124,7 +5170,14 @@ class RDTSteer:
                     qd_parent_count_by_source[
                         "qd_global_quality_anchor_offspring"
                     ] = anchor_count
-                qd_parent_count_by_source["qd_archive_offspring"] = sparse_count
+                quality_count = sum(
+                    lane == "quality" for lane in allocation.parent_lanes
+                )
+                qd_parent_count_by_source["qd_archive_offspring"] = quality_count
+                if allocation.secondary_parent_count:
+                    qd_parent_count_by_source["qd_secondary_lane_offspring"] = int(
+                        allocation.secondary_parent_count
+                    )
                 plan = EDSParentPlan(
                     elite_indices=torch.empty(
                         0, device=population.device, dtype=torch.long
@@ -5621,6 +5674,7 @@ class RDTSteer:
                 )
                 bounds_expanded = False
                 rebin_collisions = 0
+                secondary_rebin_discard_count = 0
                 rebin_visit_sum_before = int(
                     qd_archive.cumulative_visits.sum().detach().cpu().item()
                 )
@@ -5634,10 +5688,27 @@ class RDTSteer:
                         rebinned_cell_ids, _ = self._eds_qd_cell_ids(
                             archive_descriptors, expanded_bounds, cfg
                         )
-                        rebin_summary = qd_archive.rebin(rebinned_cell_ids)
+                        if cfg.qd_secondary_lane_mode == "protected_reward_v1":
+                            secondary_descriptors, _ = (
+                                qd_archive.secondary_tensors()
+                            )
+                            secondary_rebinned_cell_ids, _ = self._eds_qd_cell_ids(
+                                secondary_descriptors, expanded_bounds, cfg
+                            )
+                            rebin_summary = qd_archive.rebin(
+                                rebinned_cell_ids,
+                                secondary_target_cell_ids=(
+                                    secondary_rebinned_cell_ids
+                                ),
+                            )
+                        else:
+                            rebin_summary = qd_archive.rebin(rebinned_cell_ids)
                         rebin_collisions = rebin_summary.collisions
                         rebin_visit_sum_before = rebin_summary.visit_sum_before
                         rebin_visit_sum_after = rebin_summary.visit_sum_after
+                        secondary_rebin_discard_count = (
+                            rebin_summary.secondary_discard_count
+                        )
                         qd_bounds = expanded_bounds
                         metrics.qd_bounds_expansion_count += 1
                 child_cell_ids, child_overflow = self._eds_qd_cell_ids(
@@ -5685,6 +5756,9 @@ class RDTSteer:
                 metrics.qd_archive_rebin_visit_sum_after_by_iter.append(
                     int(rebin_visit_sum_after)
                 )
+                metrics.qd_secondary_rebin_discard_count_by_iter.append(
+                    int(secondary_rebin_discard_count)
+                )
                 raw_overflow_count = int(
                     raw_initial_overflow.sum().detach().cpu().item()
                 )
@@ -5708,6 +5782,9 @@ class RDTSteer:
                     entry.reward for entry in qd_archive.entries.values()
                 ]
                 metrics.qd_occupied_cells_by_iter.append(occupied_count)
+                metrics.qd_secondary_occupied_cells_by_iter.append(
+                    len(qd_archive.secondary_entries)
+                )
                 metrics.qd_coverage_ratio_by_iter.append(
                     float(occupied_count / qd_archive.cell_count)
                 )
@@ -5765,6 +5842,12 @@ class RDTSteer:
                 metrics.qd_elite_monotonicity_violation_count = (
                     qd_archive.elite_monotonicity_violation_count
                 )
+                metrics.qd_secondary_rebin_discard_count = (
+                    qd_archive.secondary_rebin_discard_count
+                )
+                metrics.qd_secondary_invariant_violation_count = (
+                    qd_archive.secondary_invariant_violation_count
+                )
                 (
                     qd_artifact_actions,
                     qd_artifact_rewards,
@@ -5772,21 +5855,24 @@ class RDTSteer:
                     _,
                     qd_artifact_cells,
                 ) = qd_archive.elite_tensors()
-                qd_archive_artifacts.append(
-                    {
-                        "iter_idx": i,
-                        "archive": qd_archive.snapshot(),
-                        "actions": self._decode_visualization_action_candidates(
-                            qd_artifact_actions
-                        ).detach().cpu(),
-                        "rewards": qd_artifact_rewards.detach().cpu(),
-                        "costs": qd_artifact_costs.detach().cpu(),
-                        "cell_ids": qd_artifact_cells.detach().cpu(),
-                        "parent_slots_by_cell": dict(
-                            metrics.qd_parent_slots_by_cell_by_iter[-1]
-                        ),
-                    }
-                )
+                qd_archive_artifact = {
+                    "iter_idx": i,
+                    "archive": qd_archive.snapshot(),
+                    "actions": self._decode_visualization_action_candidates(
+                        qd_artifact_actions
+                    ).detach().cpu(),
+                    "rewards": qd_artifact_rewards.detach().cpu(),
+                    "costs": qd_artifact_costs.detach().cpu(),
+                    "cell_ids": qd_artifact_cells.detach().cpu(),
+                    "parent_slots_by_cell": dict(
+                        metrics.qd_parent_slots_by_cell_by_iter[-1]
+                    ),
+                }
+                if cfg.qd_secondary_lane_mode == "protected_reward_v1":
+                    qd_archive_artifact["secondary_archive"] = (
+                        qd_archive.secondary_snapshot()
+                    )
+                qd_archive_artifacts.append(qd_archive_artifact)
 
             if trace_enabled:
                 if i == 0:
@@ -6433,6 +6519,7 @@ class RDTSteer:
                 metrics.qd_accounting_violation_count
                 or metrics.qd_elite_monotonicity_violation_count
                 or metrics.qd_final_selection_mismatch_count
+                or metrics.qd_secondary_invariant_violation_count
             ):
                 raise RuntimeError("QD archive hard-gate violation")
 
@@ -7087,6 +7174,9 @@ class RDTSteer:
             qd_cell_capacity=_parse_eds_int(
                 cfg.get("qd_cell_capacity", 1), "qd_cell_capacity"
             ),
+            qd_secondary_lane_mode=str(
+                cfg.get("qd_secondary_lane_mode", "none")
+            ),
             qd_parent_sampling=str(
                 cfg.get("qd_parent_sampling", "uniform_cells")
             ),
@@ -7319,6 +7409,13 @@ class RDTSteer:
             raise ValueError("EDS qd_grid_shape is not a preregistered square grid")
         if resolved.qd_cell_capacity != 1:
             raise ValueError("EDS qd_cell_capacity must be 1")
+        if resolved.qd_secondary_lane_mode not in {
+            "none",
+            "protected_reward_v1",
+        }:
+            raise ValueError(
+                "EDS qd_secondary_lane_mode must be none or protected_reward_v1"
+            )
         if resolved.qd_parent_sampling not in {
             "uniform_cells",
             "sparse_priority",
@@ -7339,6 +7436,19 @@ class RDTSteer:
             raise ValueError(
                 "EDS qd_global_quality_anchor_count=1 requires grid_archive, "
                 "sparse_priority, causal_envelope_v1, and fallback none"
+            )
+        if resolved.qd_secondary_lane_mode == "protected_reward_v1" and (
+            resolved.qd_archive_mode != "grid_archive"
+            or resolved.qd_cell_capacity != 1
+            or resolved.qd_parent_sampling != "sparse_priority"
+            or resolved.qd_global_quality_anchor_count != 1
+            or resolved.qd_bounds_update_policy != "causal_envelope_v1"
+            or resolved.qd_degenerate_fallback_policy != "none"
+        ):
+            raise ValueError(
+                "EDS qd_secondary_lane_mode=protected_reward_v1 requires "
+                "grid_archive, capacity 1, sparse_priority, global quality "
+                "anchor 1, causal_envelope_v1, and fallback none"
             )
         if resolved.qd_sparse_exponent != 1.0:
             raise ValueError("EDS qd_sparse_exponent must be 1.0")

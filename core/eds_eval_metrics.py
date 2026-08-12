@@ -433,6 +433,7 @@ class EDSChunkMetrics:
     qd_descriptor: str = "target_relative_endpoint_xy"
     qd_grid_shape: list[int] = field(default_factory=list)
     qd_cell_capacity: int = 1
+    qd_secondary_lane_mode: str = "none"
     qd_parent_sampling: str = "uniform_cells"
     qd_global_quality_anchor_count: int = 0
     qd_bounds_update_policy: str = "fixed_initial"
@@ -445,6 +446,8 @@ class EDSChunkMetrics:
     qd_archive_rebin_collisions_by_iter: list[int] = field(default_factory=list)
     qd_archive_rebin_visit_sum_before_by_iter: list[int] = field(default_factory=list)
     qd_archive_rebin_visit_sum_after_by_iter: list[int] = field(default_factory=list)
+    qd_secondary_rebin_discard_count_by_iter: list[int] = field(default_factory=list)
+    qd_secondary_rebin_discard_count: int = 0
     qd_raw_initial_bounds_overflow_count_by_iter: list[int] = field(default_factory=list)
     qd_raw_initial_bounds_overflow_ratio_by_iter: list[float] = field(default_factory=list)
     qd_fixed_initial_within_cell_endpoint_sse_by_iter: list[float] = field(default_factory=list)
@@ -477,6 +480,17 @@ class EDSChunkMetrics:
     qd_global_quality_anchor_rescued_by_iter: list[bool] = field(default_factory=list)
     qd_global_quality_anchor_activation_count: int = 0
     qd_global_quality_anchor_rescue_count: int = 0
+    qd_secondary_occupied_cells_by_iter: list[int] = field(default_factory=list)
+    qd_secondary_parent_count_by_iter: list[int] = field(default_factory=list)
+    qd_secondary_parent_ratio_by_iter: list[float] = field(default_factory=list)
+    qd_secondary_parent_fingerprints_by_iter: list[list[str]] = field(
+        default_factory=list
+    )
+    qd_secondary_parent_slots_by_cell_by_iter: list[dict[str, int]] = field(
+        default_factory=list
+    )
+    qd_secondary_parent_activation_count: int = 0
+    qd_secondary_invariant_violation_count: int = 0
     qd_selected_cell: int | None = None
     qd_selected_reward: float | None = None
     qd_selected_action_fingerprint: str | None = None
