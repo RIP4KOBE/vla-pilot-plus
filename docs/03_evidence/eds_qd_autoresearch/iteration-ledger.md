@@ -808,3 +808,13 @@
 - Promotion：Dev-A/Dev-B 各要求 candidate `>=3/6` 且 paired +1；validation/formal 均要求 `>=5/10`、不低于 control、gained >= lost 和全部硬门。任一 FAIL 立即停止后续 split。
 - 预算：v1 已用 42 effective / 54 reservations / 2.934767 GPU-hours；v2 scientific cells 最多 70，全部执行后 global reservations 124，保留 19 recovery slots；原 143/48 上限不变。
 - 当前授权：只允许 run_020 diagnostic implementation/result；算法修改、GPU、API、LIBERO attempt 和 formal 均未由本 protocol 授权。受保护未跟踪文件保持未读取、未修改、未 stage/commit。
+
+#### AJ. run_020 H2 zero-episode calibration PASS
+
+- Protocol/implementation：`a0b4cada663c9efa1f611177c2710f84509bc9d7` / `174630302cbfa6668292bc566c54d3e738159e27`。新增诊断 tests `7 passed`；原 QD archive/runner/audit `60 passed`。
+- Raw prevalence：50 metrics files、7,080 valid/unique QD rows；473 exact-zero final archive-quality chunks，tasks 0–9 全覆盖；historical 411、owned v1 62；retrospective fail/success 468/5。Success 分层只用于避免过度结论，不能作为在线 feature。
+- Guidance/code：Stage-2 source SHA `ca058cc1…03f84`，AST exact-zero PASS；core policy SHA `b8806d7a…c1ff2`，existing non-QD control branch/fixed iteration loop PASS，候选 projected compute 176 evaluations / 11 score calls。
+- Trace replay：44/44 recorded reward/fingerprint selections reproduced；44/44 nondegenerate selections preserved；equalized quality 下 changing fingerprint tie direction 在 44/44 改变 action，而 reverse input order 在 44/44 不改变 smallest-fingerprint winner。结论是 tie task-agnostic/hash-dependent，不是 input-order bug。
+- Determinism/artifact：canonical/replay mode 0444、size 505,982、共同 file SHA `56c05f906528de78d720d99366b8db39e7ec84518968c8ec01cb9508ceb31034`；payload SHA `62ec4622…baa87`；credential matches 0。
+- Budget/target：online attempts 0、GPU-hours 0；historical formal best/gap 仍 `2/10 / 3`。Proxy PASS 不代表成功率已提高。
+- Decision：`KEEP_H2_CALIBRATION_PASS_AND_AUTHORIZE_ONE_QD1_PROTOCOL`。下一步必须先冻结 `reward_degenerate_control_fallback_v1` implementation protocol；当前尚无 core/config 修改，GPU/LIBERO/formal 仍未授权。
