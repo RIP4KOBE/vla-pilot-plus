@@ -26,7 +26,8 @@ def test_online_matrix_profiles_and_budget_are_exact():
 
     assert runner.MECHANISM_TASKS == [3, 8, 9]
     assert runner.MECHANISM_SEEDS == [955865, 522754, 845886]
-    assert runner.EXPECTED_GLOBAL_ATTEMPT_IDS == list(range(67, 73))
+    assert runner.INITIAL_GLOBAL_ATTEMPT_IDS == list(range(67, 73))
+    assert runner.EXPECTED_GLOBAL_ATTEMPT_IDS == list(range(73, 79))
     assert control["label"] == "p2_stage_on_abs_rbf_control"
     assert control["qd_archive_mode"] == "none"
     assert candidate["label"] == "eds_qd_global_quality_anchor_v1"
@@ -174,6 +175,57 @@ def test_fresh_attempt_ledger_reserves_exact_ids_67_to_72(tmp_path):
         runner.reserve_attempts(ledger, records)
 
 
+def test_exact_cell_recovery_aborts_initial_dispatch_and_reserves_73_to_78(
+    tmp_path, monkeypatch
+):
+    jobs = runner.build_jobs(runner.MECHANISM_LEVEL, bind=False)
+    records = []
+    for job in jobs:
+        for task, seed in zip(job["task_ids_filter"], job["episode_seeds"], strict=True):
+            records.append(
+                {
+                    "phase": runner.MECHANISM_LEVEL,
+                    "formal_label": job["formal_label"],
+                    "task_id": task,
+                    "episode_seed": seed,
+                    "config_fingerprint": "fp",
+                    "code_state_sha256": "initial",
+                }
+            )
+    ledger = tmp_path / "ledger.jsonl"
+    runner.reserve_attempts(ledger, records)
+    runner.append_dispatch_event(ledger, list(range(67, 73)), [0, 1])
+    monkeypatch.setattr(runner, "INITIAL_LEDGER_SHA256", runner.sha256_path(ledger))
+
+    state = runner.prepare_recovery_ledger(ledger)
+    assert state["aborted_attempt_ids"] == list(range(67, 73))
+    assert state["active_dispatched_attempt_ids"] == []
+
+    recovery = [dict(row, code_state_sha256="repaired") for row in records]
+    reserved = runner.reserve_attempts(
+        ledger,
+        recovery,
+        recovery_of_attempt_ids=list(range(67, 73)),
+    )
+    assert [row["attempt_id"] for row in reserved] == list(range(73, 79))
+    assert [row["recovery_of_attempt_id"] for row in reserved] == list(range(67, 73))
+    state = runner.append_dispatch_event(ledger, list(range(73, 79)), [2, 3])
+    assert state["active_dispatched_attempt_ids"] == list(range(73, 79))
+    with pytest.raises(RuntimeError, match="already been reserved"):
+        runner.reserve_attempts(
+            ledger,
+            recovery,
+            recovery_of_attempt_ids=list(range(67, 73)),
+        )
+
+
+def test_configure_base_uses_audited_offline_dinov2_seed():
+    with runner.configured_base():
+        assert runner.base.P2_TORCH_HUB_SEED == runner.DINOV2_TORCH_HUB_SEED
+        assert (runner.base.P2_TORCH_HUB_SEED / "facebookresearch_dinov2_main/hubconf.py").is_file()
+        assert (runner.base.P2_TORCH_HUB_SEED / "checkpoints/dinov2_vitb14_pretrain.pth").is_file()
+
+
 def test_task_retention_reports_gained_lost_and_gap():
     summary = runner.task_success_summary(
         {"3": "success", "8": "fail", "9": "fail"},
@@ -228,6 +280,14 @@ def test_manifest_payload_binds_anchor_matrix_budget_and_forbids_formal(monkeypa
             "scientific_payload_sha256": runner.RUN_032_PAYLOAD_SHA256,
         },
     )
+    monkeypatch.setattr(
+        runner,
+        "verified_incident_evidence",
+        lambda: {
+            "classification": "pre_episode_dinov2_cache_infrastructure",
+            "initial_attempt_ids": list(range(67, 73)),
+        },
+    )
 
     payload = runner.build_manifest_payload()
 
@@ -235,8 +295,10 @@ def test_manifest_payload_binds_anchor_matrix_budget_and_forbids_formal(monkeypa
     assert payload["mechanism"]["tasks"] == [3, 8, 9]
     assert payload["mechanism"]["seeds"] == [955865, 522754, 845886]
     assert payload["mechanism"]["unique_cells"] == 6
-    assert payload["expected_global_attempt_ids"] == list(range(67, 73))
+    assert payload["initial_aborted_attempt_ids"] == list(range(67, 73))
+    assert payload["expected_global_attempt_ids"] == list(range(73, 79))
     assert payload["prior_global_reservations"] == 66
     assert payload["recovery_reserve"] == 19
+    assert payload["recovery_slots_consumed"] == 6
     assert payload["credential_material_present"] is False
     assert runner.contains_credential(payload) is False

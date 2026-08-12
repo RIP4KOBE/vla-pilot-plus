@@ -33,6 +33,7 @@ base = v2.base
 MECHANISM_LEVEL = "eds_qd_autoresearch_v3_mechanism"
 BRANCH = "exp/eds-qd-autoresearch-libero-swap-ood"
 PROTOCOL_COMMIT = "bdb1b161622e6289ebbd918c5ddc9f87dacc9655"
+RECOVERY_PROTOCOL_COMMIT = "5e3ca984bf3ef8c5167f01820e233d31b6476660"
 RUN_031_IMPLEMENTATION_COMMIT = "f453e645828d8076d72eee70c84669b385573b70"
 RUN_032_RESULT_COMMIT = "1a29142"
 RUN_032_ARTIFACT_SHA256 = (
@@ -46,9 +47,14 @@ EXPERIMENT_ROOT = Path(
 )
 RUN_ROOT = EXPERIMENT_ROOT / "run_033_global_quality_anchor_online_mechanism"
 OUTPUT_LINK = WORKTREE_ROOT / "outputs"
-MANIFEST_PATH = RUN_ROOT / "manifests/mechanism_manifest.json"
+PARENT_MANIFEST_PATH = RUN_ROOT / "manifests/mechanism_manifest.json"
+PARENT_MANIFEST_SHA256 = (
+    "8c80cf3f898f694f9c18356e646e48510c962f331ab73754eb21fc2b8fcd3820"
+)
+MANIFEST_PATH = RUN_ROOT / "manifests/mechanism_manifest.v2.json"
 ATTEMPT_LEDGER_PATH = RUN_ROOT / "manifests/episode_attempt_ledger.jsonl"
 AUDIT_PATH = RUN_ROOT / "analysis/mechanism_audit.json"
+INCIDENT_ROOT = RUN_ROOT / "incidents/pre_episode_dinov2_cache_ids_67_72"
 RUN_032_ARTIFACT_PATH = (
     EXPERIMENT_ROOT
     / "run_032_global_quality_anchor_cpu_mechanism/analysis/mechanism_preflight.v1.json"
@@ -63,12 +69,40 @@ ALLOWED_GPU_INDICES = set(range(8))
 PRIOR_GLOBAL_RESERVATIONS = 66
 GLOBAL_RESERVATION_CAP = 143
 GLOBAL_GPU_HOUR_CAP = 48.0
-PRIOR_GPU_HOURS = 3.7471009444444445
+PRE_EPISODE_INFRASTRUCTURE_GPU_HOURS = 0.05985833333333333
+PRIOR_GPU_HOURS = 3.806959277777778
 RECOVERY_RESERVE = 19
+RECOVERY_SLOTS_CONSUMED = 6
 MECHANISM_TASKS = [3, 8, 9]
 MECHANISM_SEEDS = [955865, 522754, 845886]
 MECHANISM_MAX_CHUNKS = 16
-EXPECTED_GLOBAL_ATTEMPT_IDS = list(range(67, 73))
+INITIAL_GLOBAL_ATTEMPT_IDS = list(range(67, 73))
+EXPECTED_GLOBAL_ATTEMPT_IDS = list(range(73, 79))
+ALL_RUN_ATTEMPT_IDS = INITIAL_GLOBAL_ATTEMPT_IDS + EXPECTED_GLOBAL_ATTEMPT_IDS
+DINOV2_TORCH_HUB_SEED = (
+    Path("/mnt/data/shared2/zhuoli/output/p2_direction_normalized_rbf")
+    / "runtime_cache/formal/p2_stage_on_dirnorm_rbf_global_w0_e025/xdg/torch/hub"
+)
+INCIDENT_EVIDENCE_SHA256 = {
+    "run_manifest.csv": (
+        "7ebf4ca4a12b40e61131e8066984267e5a764141925680c5e1f33a1ae34b31f8"
+    ),
+    "runner_logs/mechanism__p2_stage_on_abs_rbf_control.log": (
+        "b0179476df89dcc27bddcb015de320f766371ea3b842adf7f514c282155f1a82"
+    ),
+    "runner_logs/mechanism__eds_qd_global_quality_anchor_v1.log": (
+        "9bcf23c45e3272705fa28c32468f5c36b79736dc0f895a7ad5fa2652e6b22d1f"
+    ),
+}
+INITIAL_LEDGER_SHA256 = (
+    "df5c8055f2a7c6d40df0a0ac3d6bd5746ec5d61c08af7233b2e9101ecd473a91"
+)
+INITIAL_ADMISSION_PATH = (
+    RUN_ROOT / "manifests/gpu_eds_qd_autoresearch_v3_mechanism_1786519400.json"
+)
+INITIAL_ADMISSION_SHA256 = (
+    "c772bb5b4f97b90f02ca9d568aa625e70118ce0d2bdebe1eb8f7c3ac25280068"
+)
 EXPECTED_ALGORITHM_HASHES = {
     "configs/config.yaml": "f8a9f07d52ea69ee3a69202ab5b89b4214353208ec27961ebcaef9b3d5b02d57",
     "core/qd_ed.py": "4a43cc2db1f1f87eaabf2146058347f119f6059beb4bdf2e67e36f9b6680b653",
@@ -285,7 +319,7 @@ def configure_base() -> None:
     base.P2_LEVELS = set(base.P2_LEVELS) | {MECHANISM_LEVEL}
     base.P2_ALLOWED_GPUS = {str(index) for index in ALLOWED_GPU_INDICES}
     base.P2_REQUIRED_MOUNT = Path("/mnt/data/shared2")
-    base.P2_TORCH_HUB_SEED = v2.base.P2_TORCH_HUB_SEED
+    base.P2_TORCH_HUB_SEED = DINOV2_TORCH_HUB_SEED
     base.build_jobs = build_jobs
     base.build_main_command = build_main_command
     base._p2_stage_dir = stage_dir
@@ -361,6 +395,7 @@ def current_provenance() -> dict[str, Any]:
         "code_commit": head,
         "code_state_sha256": code_state,
         "protocol_commit": PROTOCOL_COMMIT,
+        "recovery_protocol_commit": RECOVERY_PROTOCOL_COMMIT,
         "run_031_implementation_commit": RUN_031_IMPLEMENTATION_COMMIT,
         "run_032_result_commit": RUN_032_RESULT_COMMIT,
     }
@@ -413,10 +448,54 @@ def verified_run_032() -> dict[str, Any]:
     }
 
 
+def verified_incident_evidence() -> dict[str, Any]:
+    if (
+        not PARENT_MANIFEST_PATH.is_file()
+        or PARENT_MANIFEST_PATH.stat().st_mode & 0o222
+        or sha256_path(PARENT_MANIFEST_PATH) != PARENT_MANIFEST_SHA256
+    ):
+        raise RuntimeError("Run033 parent manifest identity mismatch")
+    files = {}
+    for relative, expected in INCIDENT_EVIDENCE_SHA256.items():
+        path = INCIDENT_ROOT / relative
+        if (
+            not path.is_file()
+            or path.stat().st_mode & 0o222
+            or sha256_path(path) != expected
+        ):
+            raise RuntimeError(f"Run033 incident evidence mismatch: {relative}")
+        files[relative] = expected
+    if (
+        not INITIAL_ADMISSION_PATH.is_file()
+        or INITIAL_ADMISSION_PATH.stat().st_mode & 0o222
+        or sha256_path(INITIAL_ADMISSION_PATH) != INITIAL_ADMISSION_SHA256
+    ):
+        raise RuntimeError("Run033 initial GPU admission identity mismatch")
+    credential_audit = v1.credential_tree_audit(INCIDENT_ROOT)
+    if credential_audit["passed"] is not True:
+        raise RuntimeError("Run033 incident archive credential scan failed")
+    return {
+        "classification": "pre_episode_dinov2_cache_infrastructure",
+        "initial_attempt_ids": INITIAL_GLOBAL_ATTEMPT_IDS,
+        "initial_ledger_sha256": INITIAL_LEDGER_SHA256,
+        "parent_manifest_path": str(PARENT_MANIFEST_PATH),
+        "parent_manifest_sha256": PARENT_MANIFEST_SHA256,
+        "admission_path": str(INITIAL_ADMISSION_PATH),
+        "admission_sha256": INITIAL_ADMISSION_SHA256,
+        "archive_root": str(INCIDENT_ROOT),
+        "files": files,
+        "metrics_records": 0,
+        "episode_metadata_records": 0,
+        "videos": 0,
+        "gpu_hours": PRE_EPISODE_INFRASTRUCTURE_GPU_HOURS,
+        "credential_match_count": 0,
+    }
+
+
 def build_manifest_payload() -> dict[str, Any]:
     jobs = build_jobs(MECHANISM_LEVEL, bind=False)
     payload = {
-        "schema": "eds-qd-autoresearch-v3-mechanism-manifest-v1",
+        "schema": "eds-qd-autoresearch-v3-mechanism-manifest-v2",
         "created_at": now(),
         "provenance": current_provenance(),
         "source_fingerprints": source_fingerprints(),
@@ -425,6 +504,7 @@ def build_manifest_payload() -> dict[str, Any]:
         "runtime_cache_fingerprint": runtime_cache_fingerprint(),
         "gpu_reference": gpu_reference(),
         "run_032_artifact": verified_run_032(),
+        "recovery_incident": verified_incident_evidence(),
         "suite": "libero_object_swap",
         "strict_perturbations": True,
         "max_episode_steps": 720,
@@ -456,11 +536,15 @@ def build_manifest_payload() -> dict[str, Any]:
             ],
         },
         "prior_global_reservations": PRIOR_GLOBAL_RESERVATIONS,
+        "initial_aborted_attempt_ids": INITIAL_GLOBAL_ATTEMPT_IDS,
         "expected_global_attempt_ids": EXPECTED_GLOBAL_ATTEMPT_IDS,
+        "global_reservations_before_recovery": 72,
         "global_reservation_cap": GLOBAL_RESERVATION_CAP,
         "prior_gpu_hours": PRIOR_GPU_HOURS,
+        "pre_episode_infrastructure_gpu_hours": PRE_EPISODE_INFRASTRUCTURE_GPU_HOURS,
         "global_gpu_hour_cap": GLOBAL_GPU_HOUR_CAP,
         "recovery_reserve": RECOVERY_RESERVE,
+        "recovery_slots_consumed": RECOVERY_SLOTS_CONSUMED,
         "allowed_gpu_indices": sorted(ALLOWED_GPU_INDICES),
         "formal_authorized": False,
         "credential_material_present": False,
@@ -479,6 +563,8 @@ def freeze_manifest() -> dict[str, Any]:
     pause_preflight()
     storage_preflight()
     verified_run_032()
+    prepare_recovery_ledger(ATTEMPT_LEDGER_PATH)
+    verified_incident_evidence()
     if MANIFEST_PATH.exists():
         raise RuntimeError("Run033 mechanism manifest already exists")
     payload = build_manifest_payload()
@@ -496,7 +582,7 @@ def validate_manifest() -> dict[str, Any]:
     unsigned.pop("payload_sha256", None)
     if stored_sha != sha256_bytes(canonical(unsigned).encode("utf-8")):
         raise RuntimeError("Run033 manifest payload hash mismatch")
-    if payload.get("schema") != "eds-qd-autoresearch-v3-mechanism-manifest-v1":
+    if payload.get("schema") != "eds-qd-autoresearch-v3-mechanism-manifest-v2":
         raise RuntimeError("Run033 manifest schema mismatch")
     if payload.get("formal_authorized") is not False:
         raise RuntimeError("Run033 manifest must forbid formal")
@@ -506,6 +592,8 @@ def validate_manifest() -> dict[str, Any]:
         raise RuntimeError("Run033 manifest source mismatch")
     if payload.get("run_032_artifact") != verified_run_032():
         raise RuntimeError("Run033 manifest Run032 mismatch")
+    if payload.get("recovery_incident") != verified_incident_evidence():
+        raise RuntimeError("Run033 manifest incident mismatch")
     if payload.get("checkpoint_fingerprint") != checkpoint_fingerprint():
         raise RuntimeError("Run033 manifest checkpoint mismatch")
     if payload.get("libero_input_fingerprint") != libero_input_fingerprint():
@@ -529,12 +617,18 @@ def validate_manifest() -> dict[str, Any]:
         raise RuntimeError("Run033 manifest matrix mismatch")
     if (
         payload.get("prior_global_reservations") != PRIOR_GLOBAL_RESERVATIONS
+        or payload.get("initial_aborted_attempt_ids")
+        != INITIAL_GLOBAL_ATTEMPT_IDS
         or payload.get("expected_global_attempt_ids")
         != EXPECTED_GLOBAL_ATTEMPT_IDS
+        or payload.get("global_reservations_before_recovery") != 72
         or payload.get("global_reservation_cap") != GLOBAL_RESERVATION_CAP
         or payload.get("prior_gpu_hours") != PRIOR_GPU_HOURS
+        or payload.get("pre_episode_infrastructure_gpu_hours")
+        != PRE_EPISODE_INFRASTRUCTURE_GPU_HOURS
         or payload.get("global_gpu_hour_cap") != GLOBAL_GPU_HOUR_CAP
         or payload.get("recovery_reserve") != RECOVERY_RESERVE
+        or payload.get("recovery_slots_consumed") != RECOVERY_SLOTS_CONSUMED
     ):
         raise RuntimeError("Run033 manifest budget mismatch")
     if contains_credential(payload):
@@ -563,7 +657,7 @@ def ledger_state(path: Path) -> dict[str, Any]:
     records = read_ledger(path)
     attempts = [row for row in records if row.get("record_type") == "episode_attempt"]
     ids = [row.get("attempt_id") for row in attempts]
-    if ids != EXPECTED_GLOBAL_ATTEMPT_IDS[: len(ids)]:
+    if ids != ALL_RUN_ATTEMPT_IDS[: len(ids)]:
         raise RuntimeError("Run033 attempt IDs are not contiguous from 67")
     events = [row for row in records if row.get("record_type") != "episode_attempt"]
     if [row.get("ledger_event_id") for row in events] != list(
@@ -572,28 +666,102 @@ def ledger_state(path: Path) -> dict[str, Any]:
         raise RuntimeError("Run033 ledger event IDs are not contiguous")
     known = {int(row["attempt_id"]) for row in attempts}
     dispatched: set[int] = set()
+    aborted: set[int] = set()
     for event in events:
+        event_ids = event.get("attempt_ids")
         if (
-            event.get("record_type") != "phase_dispatch"
-            or not isinstance(event.get("attempt_ids"), list)
-            or not set(event["attempt_ids"]) <= known
-            or set(event["attempt_ids"]) & dispatched
+            event.get("record_type")
+            not in {"phase_dispatch", "dispatch_aborted_pre_episode"}
+            or not isinstance(event_ids, list)
+            or not event_ids
+            or any(isinstance(value, bool) or not isinstance(value, int) for value in event_ids)
+            or not set(event_ids) <= known
         ):
             raise RuntimeError("invalid Run033 ledger event")
-        dispatched.update(int(value) for value in event["attempt_ids"])
+        if event["record_type"] == "phase_dispatch":
+            if set(event_ids) & (dispatched | aborted):
+                raise RuntimeError("Run033 attempt dispatched more than once")
+            dispatched.update(event_ids)
+        else:
+            if not set(event_ids) <= dispatched or set(event_ids) & aborted:
+                raise RuntimeError("only dispatched Run033 attempts may be aborted")
+            aborted.update(event_ids)
     return {
         "records": records,
         "attempts": attempts,
         "dispatched_attempt_ids": sorted(dispatched),
+        "aborted_attempt_ids": sorted(aborted),
+        "active_dispatched_attempt_ids": sorted(dispatched - aborted),
     }
 
 
-def reserve_attempts(path: Path, records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def append_ledger_event(path: Path, event: dict[str, Any]) -> dict[str, Any]:
     state = ledger_state(path)
-    if state["records"]:
-        raise RuntimeError("Run033 ledger already contains reservations")
+    prepared = {
+        "ledger_event_id": 1
+        + sum(row.get("record_type") != "episode_attempt" for row in state["records"]),
+        "created_at": now(),
+        **event,
+    }
+    if contains_credential(prepared):
+        raise RuntimeError("Run033 ledger event contains credential material")
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(canonical(prepared) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    return ledger_state(path)
+
+
+def prepare_recovery_ledger(path: Path) -> dict[str, Any]:
+    state = ledger_state(path)
+    ids = [int(row["attempt_id"]) for row in state["attempts"]]
+    if ids != INITIAL_GLOBAL_ATTEMPT_IDS:
+        if ids == ALL_RUN_ATTEMPT_IDS and state["aborted_attempt_ids"] == INITIAL_GLOBAL_ATTEMPT_IDS:
+            return state
+        raise RuntimeError("Run033 recovery requires preserved IDs 67-72")
+    if state["dispatched_attempt_ids"] != INITIAL_GLOBAL_ATTEMPT_IDS:
+        raise RuntimeError("Run033 initial attempts were not exactly dispatched")
+    if not state["aborted_attempt_ids"]:
+        if sha256_path(path) != INITIAL_LEDGER_SHA256:
+            raise RuntimeError("Run033 initial ledger evidence hash mismatch")
+        state = append_ledger_event(
+            path,
+            {
+                "record_type": "dispatch_aborted_pre_episode",
+                "phase": MECHANISM_LEVEL,
+                "attempt_ids": INITIAL_GLOBAL_ATTEMPT_IDS,
+                "reason": "pre_episode_dinov2_cache_infrastructure",
+                "protocol_commit": RECOVERY_PROTOCOL_COMMIT,
+            },
+        )
+    if (
+        state["aborted_attempt_ids"] != INITIAL_GLOBAL_ATTEMPT_IDS
+        or state["active_dispatched_attempt_ids"]
+    ):
+        raise RuntimeError("Run033 initial abort state mismatch")
+    return state
+
+
+def reserve_attempts(
+    path: Path,
+    records: list[dict[str, Any]],
+    *,
+    recovery_of_attempt_ids: list[int] | None = None,
+) -> list[dict[str, Any]]:
+    state = ledger_state(path)
     if len(records) != 6:
         raise RuntimeError("Run033 requires exactly six reservation records")
+    if recovery_of_attempt_ids is None:
+        if state["records"]:
+            raise RuntimeError("Run033 ledger already contains reservations")
+        expected_ids = INITIAL_GLOBAL_ATTEMPT_IDS
+    else:
+        if recovery_of_attempt_ids != INITIAL_GLOBAL_ATTEMPT_IDS:
+            raise RuntimeError("Run033 recovery must map exactly to IDs 67-72")
+        state = prepare_recovery_ledger(path)
+        if [int(row["attempt_id"]) for row in state["attempts"]] != INITIAL_GLOBAL_ATTEMPT_IDS:
+            raise RuntimeError("Run033 recovery has already been reserved")
+        expected_ids = EXPECTED_GLOBAL_ATTEMPT_IDS
     identities = [
         (
             row.get("formal_label"),
@@ -605,13 +773,27 @@ def reserve_attempts(path: Path, records: list[dict[str, Any]]) -> list[dict[str
     ]
     if len(identities) != len(set(identities)):
         raise RuntimeError("duplicate Run033 reservation identity")
-    if PRIOR_GLOBAL_RESERVATIONS + len(records) > GLOBAL_RESERVATION_CAP:
+    if PRIOR_GLOBAL_RESERVATIONS + len(state["attempts"]) + len(records) > GLOBAL_RESERVATION_CAP:
         raise RuntimeError("global episode-attempt cap would be exceeded")
+    if recovery_of_attempt_ids is not None:
+        parents = {
+            int(row["attempt_id"]): row for row in state["attempts"]
+        }
+        for row, parent_id in zip(records, recovery_of_attempt_ids, strict=True):
+            parent = parents[parent_id]
+            keys = ("phase", "formal_label", "task_id", "episode_seed", "config_fingerprint")
+            if tuple(row.get(key) for key in keys) != tuple(parent.get(key) for key in keys):
+                raise RuntimeError("Run033 recovery cells differ from initial identities")
     prepared = [
         {
-            "attempt_id": PRIOR_GLOBAL_RESERVATIONS + offset,
+            "attempt_id": PRIOR_GLOBAL_RESERVATIONS + len(state["attempts"]) + offset,
             "record_type": "episode_attempt",
             "started_at": now(),
+            **(
+                {"recovery_of_attempt_id": recovery_of_attempt_ids[offset - 1]}
+                if recovery_of_attempt_ids is not None
+                else {}
+            ),
             **record,
         }
         for offset, record in enumerate(records, start=1)
@@ -619,12 +801,14 @@ def reserve_attempts(path: Path, records: list[dict[str, Any]]) -> list[dict[str
     if any(contains_credential(row) for row in prepared):
         raise RuntimeError("Run033 attempt records contain credential material")
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("x", encoding="utf-8") as handle:
+    with path.open("x" if not state["records"] else "a", encoding="utf-8") as handle:
         for row in prepared:
             handle.write(canonical(row) + "\n")
         handle.flush()
         os.fsync(handle.fileno())
     ledger_state(path)
+    if [row["attempt_id"] for row in prepared] != expected_ids:
+        raise RuntimeError("Run033 reserved attempt IDs mismatch")
     return prepared
 
 
@@ -634,23 +818,17 @@ def append_dispatch_event(
     selected_gpu_indices: list[int],
 ) -> dict[str, Any]:
     state = ledger_state(path)
-    if state["dispatched_attempt_ids"]:
+    if set(attempt_ids) & set(state["dispatched_attempt_ids"]):
         raise RuntimeError("Run033 dispatch already recorded")
-    event = {
-        "ledger_event_id": 1,
+    return append_ledger_event(
+        path,
+        {
         "record_type": "phase_dispatch",
-        "created_at": now(),
         "phase": MECHANISM_LEVEL,
         "attempt_ids": list(attempt_ids),
         "selected_gpu_indices": list(selected_gpu_indices),
-    }
-    if contains_credential(event):
-        raise RuntimeError("Run033 dispatch event contains credential material")
-    with path.open("a", encoding="utf-8") as handle:
-        handle.write(canonical(event) + "\n")
-        handle.flush()
-        os.fsync(handle.fileno())
-    return ledger_state(path)
+        },
+    )
 
 
 def attempt_records(jobs: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -698,6 +876,7 @@ def run_mechanism(*, gpus: str, timeout_seconds: int) -> int:
         target=RUNTIME_CACHE_DIR,
         manifest_path=RUNTIME_CACHE_MANIFEST_PATH,
     )
+    prepare_recovery_ledger(ATTEMPT_LEDGER_PATH)
     validate_credential()
     with configured_base():
         if not base._poe_healthcheck():
@@ -725,9 +904,13 @@ def run_mechanism(*, gpus: str, timeout_seconds: int) -> int:
         RUN_ROOT / "manifests" / f"gpu_{MECHANISM_LEVEL}_{int(time.time())}.json",
         admission,
     )
-    attempts = reserve_attempts(ATTEMPT_LEDGER_PATH, attempt_records(jobs))
+    attempts = reserve_attempts(
+        ATTEMPT_LEDGER_PATH,
+        attempt_records(jobs),
+        recovery_of_attempt_ids=INITIAL_GLOBAL_ATTEMPT_IDS,
+    )
     if [row["attempt_id"] for row in attempts] != EXPECTED_GLOBAL_ATTEMPT_IDS:
-        raise RuntimeError("Run033 attempt IDs differ from frozen 67-72")
+        raise RuntimeError("Run033 recovery attempt IDs differ from frozen 73-78")
     append_dispatch_event(
         ATTEMPT_LEDGER_PATH,
         EXPECTED_GLOBAL_ATTEMPT_IDS,
@@ -1000,11 +1183,18 @@ def _status_summary() -> dict[str, Any]:
 def _attempt_audit() -> dict[str, Any]:
     state = ledger_state(ATTEMPT_LEDGER_PATH)
     failures = []
-    ids = [int(row["attempt_id"]) for row in state["attempts"]]
+    attempts = [
+        row
+        for row in state["attempts"]
+        if int(row["attempt_id"]) in EXPECTED_GLOBAL_ATTEMPT_IDS
+    ]
+    ids = [int(row["attempt_id"]) for row in attempts]
     if ids != EXPECTED_GLOBAL_ATTEMPT_IDS:
-        failures.append("attempt IDs differ from frozen 67-72")
-    if state["dispatched_attempt_ids"] != EXPECTED_GLOBAL_ATTEMPT_IDS:
-        failures.append("dispatched attempt IDs mismatch")
+        failures.append("recovery attempt IDs differ from frozen 73-78")
+    if state["aborted_attempt_ids"] != INITIAL_GLOBAL_ATTEMPT_IDS:
+        failures.append("initial aborted attempt IDs differ from frozen 67-72")
+    if state["active_dispatched_attempt_ids"] != EXPECTED_GLOBAL_ATTEMPT_IDS:
+        failures.append("active recovery dispatch IDs mismatch")
     expected = {
         (job["formal_label"], int(task), int(seed))
         for job in build_jobs(MECHANISM_LEVEL, bind=False)
@@ -1012,12 +1202,21 @@ def _attempt_audit() -> dict[str, Any]:
     }
     actual = {
         (row.get("formal_label"), int(row["task_id"]), int(row["episode_seed"]))
-        for row in state["attempts"]
+        for row in attempts
     }
     if actual != expected:
         failures.append("attempt cells differ from frozen matrix")
+    if any(
+        int(row.get("recovery_of_attempt_id", -1)) != parent_id
+        for row, parent_id in zip(attempts, INITIAL_GLOBAL_ATTEMPT_IDS, strict=True)
+    ):
+        failures.append("recovery parent mapping differs from frozen 67-72")
+    if PRIOR_GLOBAL_RESERVATIONS + len(state["attempts"]) != 78:
+        failures.append("global reservation accounting is not 78")
     return {
         "passed": not failures,
+        "initial_aborted_count": len(state["aborted_attempt_ids"]),
+        "scientific_recovery_count": len(attempts),
         "new_reserved_count": len(state["attempts"]),
         "global_reserved_count": PRIOR_GLOBAL_RESERVATIONS + len(state["attempts"]),
         "attempt_ids": ids,
