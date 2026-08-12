@@ -981,3 +981,11 @@
 - Mechanism：sparse omission时total补为1；sparse已选择best cell时不去重，total=sparse+1。10 iterations每轮16 parents全部进入rollout；source/activation/cell/fingerprint/sparse/rescue telemetry完整。
 - Safety/accounting：fail-closed mode/sampling/bounds/fallback validation、finite/mask/qpos/archive/final global-best regression PASS；complete chunk仍176 search/176 QD/11 calls。
 - Target：这是实现门，不是success evidence。新增GPU/API/model/LIBERO/reservation/online/formal均0；历史best/gap 2/10、3。Decision `KEEP_H4_V3_IMPLEMENTATION_PASS_AND_AUTHORIZE_CPU_MECHANISM_PROTOCOL_ONLY`。
+
+#### BA. run_032 CPU integrated mechanism protocol
+
+- Order：Run031 protocol/implementation/result `4dc55c5 -> f453e64 -> fe1a06b` 完成后冻结；artifact只能在新harness implementation commit之后创建。
+- Fixtures：candidate_rescue以13/1/1/1 visits让global-best sparse count每轮为0；candidate_overlap以4/4/4/4确保best sparse count>0；legacy fixture只把anchor count改为0。三者均跑真实RDTSteer QD loop十轮。
+- Gates：candidate精确10次1+15/16；rescue 10/10，overlap sparse+1且不去重；legacy 16 sparse；三者176/176/11、finite/mask/archive/rebin/final-selection/source/RNG PASS；双suite byte identity。
+- Scope/artifact：只允许新增dedicated script/test；canonical/replay仅写owned Run032 analysis，byte-identical、0444、secret-free。core/config/GPU/API/model/LIBERO/reservation/online/formal授权均0。
+- Decision：PASS只授权另立six-cell online mechanism protocol与immutable manifest流程；historical formal best/gap仍2/10、3。
