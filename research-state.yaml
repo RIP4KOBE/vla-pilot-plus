@@ -4,14 +4,15 @@
 project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
-  status: concluded_no_adoption_v3_target_not_met
-  phase: concluded
+  status: active_v4_within_cell_plurality
+  phase: outer_loop_v4_protocol
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: false
   approved_for_execution_at: "2026-08-10T15:00:35Z"
-  completed_at: "2026-08-12T08:59:09Z"
-  approval_source: "Original approval, v2 approval, and explicit user approval after the v2 versioned-redesign boundary on 2026-08-12"
+  completed_at: null
+  resumed_v4_at: "2026-08-12"
+  approval_source: "Original execution approval, explicit v2/v3 approval, and user's post-v3 instruction to continue autonomous closed-loop iteration on 2026-08-12"
   pause_reason: null
 
 provenance:
@@ -133,8 +134,8 @@ hypotheses:
     priority: medium
   - id: H5
     statement: "A single endpoint descriptor and capacity-one archive merge manipulation behaviors whose future value differs by stage or trajectory shape; stage-aware descriptors or limited within-cell plurality will improve behavior retention."
-    status: pending_aliasing_audit
-    motivation: "The current descriptor omits Z, direction, gripper, trajectory shape, stage, and cross-chunk history."
+    status: v4_protocol_active
+    motivation: "Across 24 active-QD traces and 4,224 candidates, 65.10% of candidates are in colliding endpoint-XY cells; same-cell reward top-two direction/shape distance medians are 0.3617/0.2501 with only 0.01270 median reward gap."
     parent: null
     priority: medium
 
@@ -425,18 +426,18 @@ experiments:
     next_execution_requires_versioned_redesign: true
 
 outer_loop:
-  cycle: 4
-  last_direction: CONCLUDE_NO_ADOPTION_WITHIN_V3_CYCLE_TARGET_NOT_MET
-  last_reflection: "H4-v3 repaired global-best lineage omission and gained task 9 in Run033, but frozen Dev-A was 0/6 for both control and candidate despite 425 rescues. The target did not improve, so the single-candidate v3 cycle concludes without validation or formal evaluation."
+  cycle: 5
+  last_direction: DEEPEN_QD_WITHIN_CELL_BEHAVIOR_RETENTION
+  last_reflection: "The v3 candidate ended, but the user reauthorized continued autonomous outer-loop work. Read-only replay shows capacity-one endpoint-XY aliasing discards reward-near yet trajectory-distinct candidates; v4 tests a single capacity-two quality-plurality successor without adding compute."
   trigger_after_inner_runs: 5
   no_progress_trigger: 3
 
 continuity:
   user_consent_for_future_execution: true
   scheduled_task_created: false
-  loop_enabled: false
+  loop_enabled: true
   planning_phase_must_not_enable_loop: false
-  execution_authorized: false
+  execution_authorized: true
   pause_sentinel: ".autoresearch/PAUSE"
 
 resources:
@@ -450,7 +451,8 @@ resources:
   gpu_selection_rule: "Any eligible GPU 0-7 after dynamic admission; one worker per GPU; parallelize only independent cells from the same frozen protocol"
 
 workspace:
-  design: "docs/01_specs/2026-08-12-eds-qd-autoresearch-v2-quality-selection-design.md"
+  design: "docs/01_specs/2026-08-12-eds-qd-autoresearch-v4-within-cell-plurality-design.md"
+  design_sha256: "c33f9810661f7c56f275f1b5f9082a487f4f5c48e106c1de5bf3227808f2498c"
   findings: "findings.md"
   log: "research-log.md"
   literature_dir: "literature/"
@@ -953,3 +955,55 @@ continuation_v3:
     validation_episode_count_v3: 0
     runtime_credential_value_recorded: false
     runtime_credential_fingerprint_recorded: false
+
+continuation_v4:
+  approved_at: "2026-08-12"
+  approval: "User explicitly requested continued autonomous closed-loop iteration after the v3 cycle conclusion"
+  design: "docs/01_specs/2026-08-12-eds-qd-autoresearch-v4-within-cell-plurality-design.md"
+  design_sha256: "c33f9810661f7c56f275f1b5f9082a487f4f5c48e106c1de5bf3227808f2498c"
+  parent_commit: "01a8da96dca89ce07728a458f60f09ebfc9ae325"
+  parent_decision_manifest_sha256: "5363af6996404c573f989c6c729d64a0f2c89a48a365e1e271b508654cec75a8"
+  hypothesis: H5-v4
+  algorithm_iteration: 4
+  candidate_limit: 1
+  candidate: qd_within_cell_top2_v1
+  candidate_stack: "sparse_priority + causal_envelope_v1 + global-quality anchor1 + endpoint-XY cell capacity2 top-reward elites + stateless within-cell lineage rotation; v2 fallback disabled"
+  active_experiment: run_040_within_cell_aliasing_diagnostic
+  phase: DESIGN_PROTOCOL_PENDING_COMMIT
+  pre_v4_effective_online_episodes: 66
+  pre_v4_global_reservations: 90
+  pre_v4_gpu_hours: 5.447063166666667
+  global_reservation_cap: 143
+  global_gpu_hour_cap: 48
+  v4_scientific_cell_cap: 50
+  infrastructure_recovery_reserve: 3
+  online_mechanism_tasks: [6, 3]
+  online_mechanism_seeds: [954758, 73621]
+  dev_a_tasks: [0, 2, 1]
+  dev_a_seeds: [680973, 206724, 451423]
+  validation_tasks: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+  validation_seeds: [928691, 104910, 68735, 757179, 77810, 597813, 487873, 96375, 151261, 603029]
+  formal_tasks: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+  formal_seeds: [44, 235, 43, 546, 6, 621, 197, 87, 151, 548]
+  formal_authorized: false
+  gpu_authorized: false
+  online_episode_attempts_authorized: 0
+  preaudit:
+    active_qd_traces: 24
+    candidate_streams: 264
+    candidates: 4224
+    colliding_cells: 1019
+    candidates_in_colliding_cells: 2750
+    collision_candidate_ratio: 0.6510416666666666
+    quality_to_farthest_direction_distance_median: 0.4642009437084198
+    quality_to_farthest_shape_distance_median: 0.3228413164615631
+    top_two_direction_distance_median: 0.3616701662540436
+    top_two_shape_distance_median: 0.2500861883163452
+    top_two_reward_gap_median: 0.0126953125
+  run_040:
+    status: PROTOCOL_PENDING_COMMIT
+    artifact_root: "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_040_within_cell_aliasing_diagnostic"
+    gpu_authorized: false
+    online_episode_attempts_authorized: 0
+    core_config_change_authorized: false
+  next_action: "Commit the v4 design/protocol state, then lock and execute Run040 before any capacity-two implementation"

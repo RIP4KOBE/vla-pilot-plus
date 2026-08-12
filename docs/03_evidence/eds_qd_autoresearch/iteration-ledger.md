@@ -1067,3 +1067,13 @@
 - Final accounting：effective online episodes66；global reservations90/143；recovery6/19、余13；GPU `5.447063166666667/48 h`；v3 validation0；formal0。剩余预算不会在已结论周期中继续消耗。
 - Integrity：credential value/fingerprint均未记录；decision manifest不含credential material；complete Run034 tree与tracked worktree exact secret scan为0。Protected untracked design始终排除；所有代码/文档修改仅在owned worktree/branch，大型产物仅在owned artifact root。
 - Continuation boundary：当前不授权任何执行。未来只能在用户明确批准的新versioned design、新leakage-safe splits和显式预算下开始；Run034任务/seed仅可作为revealed historical evidence，不得同周期调参复用。
+
+#### BI. v4 resume、capacity-one aliasing 预审计与 versioned design
+
+- 授权/纠偏：用户在v3结论后明确要求继续自主闭环。Run034 stop rule只结束v3 candidate，不能再被解释为整个`>=5/10`目标的永久终点；project从`concluded`恢复为`active_v4_within_cell_plurality`。
+- 排除方向：H1 bounds改善未转化、H2 fallback未激活、H4 anchor在Dev-A `0/6`；历史Direction-RBF最高3/10且丢control tasks，简单reward/distance/progress特征对success排序接近随机。因此禁止继续bounds/fallback/anchor count/search budget/Stage/全局direction sweep。
+- 只读预审计：24条active-QD traces、264 streams、4,224 candidates；2,750 candidates位于碰撞cell，占`0.6510416667`。1,019个碰撞cell中，quality-to-farthest direction/shape distance median `0.464201/0.322841`；reward top-two仍为`0.361670/0.250086`，reward gap median仅`0.0126953`。
+- 新假设：H5-v4认为`target-relative endpoint XY + capacity1`提前合并reward接近但approach trajectory不同的lineages。唯一候选`qd_within_cell_top2_v1`保留每cell reward前二、在15个sparse slots内stateless轮换，继续使用v3一个global-quality anchor；final global reward best与176/176/11不变。
+- Split/budget：mechanism tasks/seeds `[6,3]/[954758,73621]`；Dev-A `[0,2,1]/[680973,206724,451423]`；validation 0..9 seeds `[928691,104910,68735,757179,77810,597813,487873,96375,151261,603029]`。最多50 scientific cells，global最坏`140/143`，GPU cap仍48h，保留3 recovery slots。
+- 连续闭环：任一split FAIL先结束v4 candidate并立即outer-loop，不再自动终止总任务；只在formal `>=5/10`、全局预算无法支持合法promotion、连续两个cycle无task gain且无新证据、用户暂停或外部硬blocker时停止。
+- 边界：本条只创建/冻结v4 design和state transition；尚未修改core/config/test，未创建Run040 artifact，未调用GPU/API/model/LIBERO，未新增reservation/formal episode。Protected untracked design未读、未改、未stage。
