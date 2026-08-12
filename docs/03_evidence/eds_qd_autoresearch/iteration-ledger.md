@@ -818,3 +818,11 @@
 - Determinism/artifact：canonical/replay mode 0444、size 505,982、共同 file SHA `56c05f906528de78d720d99366b8db39e7ec84518968c8ec01cb9508ceb31034`；payload SHA `62ec4622…baa87`；credential matches 0。
 - Budget/target：online attempts 0、GPU-hours 0；historical formal best/gap 仍 `2/10 / 3`。Proxy PASS 不代表成功率已提高。
 - Decision：`KEEP_H2_CALIBRATION_PASS_AND_AUTHORIZE_ONE_QD1_PROTOCOL`。下一步必须先冻结 `reward_degenerate_control_fallback_v1` implementation protocol；当前尚无 core/config 修改，GPU/LIBERO/formal 仍未授权。
+
+#### AK. run_021 H2 candidate implementation protocol
+
+- Parent：run_020 result `3065fad8f248292aeb680d4b8b93d212f01d799b` / artifact `56c05f90…1034`。Algorithm iteration 2 只增加 H2 exact-degenerate fallback，H1 causal-envelope substrate 不变。
+- Rule：initial population reward validation 后，`grid_archive + control_v1 + all rewards exactly equal` 才逐 chunk 禁用 QD archive ecology并复用 existing non-QD EDS path；无 epsilon/Stage/task/job/outcome/future-state feature。
+- Compatibility：default `none`、legacy QD equal-reward fingerprint path、nondegenerate causal-envelope QD、`qd_archive_mode=none` 全部保留。Fallback 无跨 chunk hidden state。
+- Accounting：新增 configured-vs-active/fallback/reward/search-evaluation metrics；fallback QD evaluations 0，但 complete search 176 / score calls 11；active QD complete search/QD evaluations均176。
+- Whitelist：仅 core policy、EDS metrics、config default、`test_rdt_steer.py`；protocol commit 必须早于所有 core/config edits。当前 GPU/API/model/LIBERO/attempt/Dev/Validation/Formal 授权仍为 0。
