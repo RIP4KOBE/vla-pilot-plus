@@ -1124,3 +1124,12 @@
 - Allocation：global anchor/final selection仅quality；production sparse15只读quality cells/visits，cell counts逐allocation与capacity1 identity；cell内stateless round-robin可选secondary。总16、无global RNG变化。
 - Gates：quality/saved/protected identity mismatch0；240 allocation maps exact；secondary不建cell/带visits/evict/anchor/final；secondary sparse ratio>=20%、coverage=1；Run040 alias stats exact复现；双artifact/finite/accounting/secret/write clean。
 - Scope：只允许新增Run041 analyzer/test，implementation commit后才可写owned artifact。当前core/config/GPU/API/model/LIBERO/reservation/online/Dev/validation/formal授权0；累计budget/target不变。
+
+#### BO. Run041 protected-quality replay PASS
+
+- Order/tests：protocol `7a67a56` -> analyzer `04fc67a` -> artifacts；red phase脚本不存在，随后focused3/3、combined Run040/QD/metrics 51/51、py_compile PASS。
+- Exact identity：24 traces/264 streams/4,224 candidates；capacity1 saved mismatch0，protected quality fingerprint/reward/cell/visits/global-best mismatch0；240 allocation/anchor/final mismatch0；secondary role violation0。
+- Behavior retention：3,471 quality-cell snapshots中2,613有secondary；3,600 sparse slots中1,040选择secondary，ratio`0.2888889`；coverage retention median1.0。Run040 collision/top2 metrics逐值复现。
+- Artifacts：canonical/replay byte-identical、mode0444、24,017 bytes、file SHA `7eb5032d…3e89`、payload `6acc6976…4596`、strict credential0；所有write均在owned Run041 root。
+- Decision：`KEEP_H5_V5_OFFLINE_PASS_AUTHORIZE_IMPLEMENTATION_PROTOCOL_ONLY`。这是mechanism consistency，不是success evidence；必须另立core implementation protocol并TDD，不能直接online。
+- Accounting：新增GPU/API/model/LIBERO/reservation/online/formal为0；累计仍66 episodes、90/143 reservations、5.447063/48 GPUh、formal0；best/gap 2/10、3。
