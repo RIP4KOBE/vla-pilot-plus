@@ -1168,3 +1168,11 @@
 - Repair order：protocol-v2 `5f94fd4` -> runner repair `fd1a5f3`；runner现在从冻结task/seed map按backend task顺序生成seed schedule并fail-closed，dedicated9/9、combined runner/audit103/103、py_compile/secret scan PASS。Algorithm/profile/gates不变。
 - Accounting：新增effective scientific episodes0；global reservations94/143；invalid infrastructure GPU约0.28934h，累计约5.73640/48h。Exact paired recovery需4 cells，而冻结v5只剩3 recovery slots，deficit1。
 - Decision：`INVALID_PRESERVE_REPAIR_AND_REQUEST_ONE_ADDITIONAL_RESERVATION_AUTHORITY`。当前GPU/API/LIBERO/reservation/Dev/validation/formal授权全部0；必须用户显式允许global cap由143增至144且仅用于第四个Run044 exact recovery cell，或结束无adoption。Historical formal best/gap仍2/10、3。
+
+#### BT. Run044 exact recovery +1 cap authorization 与 protocol v3
+
+- 用户授权：明确批准此前唯一请求；global reservation cap由143增至144，新增的一个名额只能用于Run044第四个exact recovery cell。GPU cap仍48h，formal仍0/未授权，所有scientific/promotion gate不变。
+- Exact recovery：固定IDs95–98，精确重复control/candidate × `(task7,87603)/(task5,666847)`四cells；backend command seed顺序固定为`[666847,87603]`并按metadata task identity fail-closed。IDs91–94继续aborted/inadmissible。
+- Protocol-first：新增`protocol-v3.md`只授权修改v5 runner/test并创建新的immutable recovery manifest；original manifest、append-only ledger既有行和incident archive均不可覆盖。Runner/test commit与manifest/health/admission必须先于reservation/GPU/API/LIBERO。
+- Accounting：当前仍94 reservations、66 effective episodes、约5.73640/48 GPUh；protocol阶段新增reservation/episode/GPU/formal均0。恢复成功预期变为98/144，之后不再授权Run044 retry。
+- Target：historical formal best/gap仍2/10、3；此次授权仅解除基础设施预算block，不构成算法成功或Dev-A授权。
