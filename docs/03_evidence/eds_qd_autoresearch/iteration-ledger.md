@@ -1043,3 +1043,16 @@
 - Transaction：manifest validation -> runtime-only credential -> real health -> fresh two-snapshot GPU0–7 admission -> immediate snapshot -> IDs79–90 reservation/dispatch。最多两张admitted GPU，一卡一worker，不共享/抢占/终止外部process。
 - Budget：before Dev-A effective54、reservations78、GPU `4.183103444444445 h`、recovery 6/19、formal0；science后reservations90/effective66。剩余13 recovery slots仍只用于protocol-first exact-cell infrastructure recovery。
 - Stop：valid FAIL=`CONCLUDE_H4_V3_DEV_A_FAIL_NO_ADOPTION`，不进validation/formal、不产生第四candidate或Run034-driven tuning；PASS只授权另立validation protocol。
+
+#### BG. run_034 valid Dev-A target FAIL and v3 stop
+
+- Temporal/scope：protocol `fa51d5db5133602ab8e19cb8215b0d96c2b11de6` -> dedicated runner/test implementation `567014add4e08e053fead92297aa9b74ef370c8c` -> immutable manifest -> health/admission -> reservation/dispatch。新增文件严格只有冻结的runner/test；dedicated 11/11、applicable regression 484/484；core/config/Run033 hashes保持不变。Protected untracked design未读、未改、未stage。
+- Manifest/transaction：Dev-A manifest mode0444、SHA `206911d750000f41aeed6e1739fb315b35a21f8f5b1dd78327eca5b32628601f`、payload `94d4a686…2265`。健康检查与two-snapshot admission通过，使用GPU2/4；IDs79–90逐一reservation后dispatch，attempt gate 12/12 PASS，未共享、抢占或终止外部进程。
+- Task-level：control/candidate在tasks `[0,1,2,4,6,7]`全部fail，`0/6 -> 0/6`，delta0，gained/retained/lost均`[]`。所有12 cells exit0、valid=True、6/6 metadata/videos、strict suite/perturbations PASS；每个失败只标记 `timeout without completion`，不从视频或proxy臆测更细原因。
+- Target gates：candidate绝对门 `0 < 3/6` FAIL；相对门 `0 < +1` FAIL；retention门因control无success而空集PASS。Dev-A diagnostic gap-to-five为5；historical formal best/gap仍`2/10 / 3`，formal0。Audit hard failures仅为 `candidate Dev-A success count is below 3/6` 与 `candidate Dev-A improvement is below +1`。
+- Mechanism：candidate 106 records、1,060 activations、425 real rescues，rescue rate `0.4009433962`。Task0/1/2/4/6/7 records `3/18/16/58/6/5`，rescues `16/113/74/175/20/27`。每record通过10 activation、exact 1+15/16、176/176/11、source/fingerprint/final-selection；control 124 records QD-off。425 rescues仍0 success，明确否定将rescue作为success surrogate。
+- Safety/latency/artifact：nonfinite、mask、qpos、fallback、disallowed safety均0。Candidate/control latency P95 `3.060999/2.907224 s`，ratio `1.052894 <= 1.25`。Artifact inventory control/candidate `940/1084` files，aggregate SHA `32c8daa9…75e2` / `97666bb5…ecbb`。
+- Immutable result：audit mode0444、SHA `2e590656dd60a18a17bf45ff7a2e1e9209daaaa34980a5d686b9d6f8879a0e68`；attempt ledger `db07734c…24da`；GPU admission `4f89f393…359f`；run manifest `9e39ee02…3342`；analysis `b8f94f6c…c4c3`。
+- Credential/write boundary：audit scan 253 files PASS；complete Run034 tree与tracked worktree latest credential exact matches均0；generic tracked唯一命中为synthetic test fixture。Secret仅通过已授权child env注入，未记录value/fingerprint。
+- Accounting：Run034 scientific device wall `1.2639597222222223 h`；累计 `5.447063166666667/48 h`；global reservations `90/143`；effective online episodes66；recovery仍6/19、余13；formal episodes0。
+- Decision：`CONCLUDE_H4_V3_DEV_A_FAIL_NO_ADOPTION`。Run033 task9的单点增益未跨冻结Dev-A迁移；valid FAIL按协议立即停止v3。禁止validation/formal、第四candidate、anchor count/sparse ratio/threshold/seed/task sweep和Run034 outcome-driven tuning。下一步只能protocol-first outer-loop conclusion与final report，不授权新算法或在线执行。

@@ -5,7 +5,7 @@ project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
   status: running
-  phase: run_034_dev_a_protocol_locked
+  phase: run_034_dev_a_valid_target_fail_outer_reflection_pending
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: false
@@ -127,7 +127,7 @@ hypotheses:
     priority: high
   - id: H4
     statement: "Uniform or inverse-visitation allocation over nearly saturated cells spends offspring on low-value niches; an explicit exploit/explore budget with quality guards will improve best-task progress at fixed 176 evaluations per complete chunk."
-    status: v3_dev_a_protocol_locked
+    status: v3_dev_a_target_refuted_cycle_conclusion_pending
     motivation: "Sparse gains one new task but loses two control tasks; uniform primary loses all three control successes."
     parent: null
     priority: medium
@@ -688,7 +688,7 @@ continuation_v3:
   candidate: qd_global_quality_anchor_v1
   candidate_stack: "sparse_priority + causal_envelope_v1 + exactly one global-quality parent anchor; v2 fallback disabled"
   active_experiment: run_034_global_quality_anchor_dev_a
-  phase: RUN_034_DEV_A_PROTOCOL_LOCKED
+  phase: RUN_034_DEV_A_VALID_TARGET_FAIL_OUTER_REFLECTION_PENDING
   pre_v3_effective_online_episodes: 48
   pre_v3_global_reservations: 66
   pre_v3_gpu_hours: 3.7471009444444445
@@ -698,9 +698,9 @@ continuation_v3:
   infrastructure_recovery_reserve: 19
   recovery_slots_consumed: 6
   recovery_slots_remaining: 13
-  effective_online_episodes: 54
-  global_reservations: 78
-  cumulative_gpu_hours: 4.183103444444445
+  effective_online_episodes: 66
+  global_reservations: 90
+  cumulative_gpu_hours: 5.447063166666667
   online_mechanism_tasks: [3, 8, 9]
   online_mechanism_seeds: [955865, 522754, 845886]
   dev_a_tasks: [0, 1, 2, 4, 6, 7]
@@ -868,7 +868,7 @@ continuation_v3:
     dev_a_authorized: true
     formal_authorized: false
   run_034:
-    status: PROTOCOL_LOCKED
+    status: VALID_DEV_A_TARGET_FAIL_NO_VALIDATION_NO_FORMAL
     protocol: "experiments/run_034_global_quality_anchor_dev_a/protocol.md"
     protocol_sha256: "13c062a435519fc0c898887c564e272d3721187a96bccc8c39cf55f90af0b65f"
     parent_result_commit: "c67a82b"
@@ -883,9 +883,50 @@ continuation_v3:
     candidate_minimum_delta_over_control: 1
     lost_control_success_tasks_allowed: 0
     allowed_new_files: 2
+    protocol_commit: "fa51d5db5133602ab8e19cb8215b0d96c2b11de6"
+    runner_implementation_commit: "567014add4e08e053fead92297aa9b74ef370c8c"
+    dedicated_tests: "11 passed"
+    applicable_regression_tests: "484 passed"
+    manifest_path: "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_034_global_quality_anchor_dev_a/manifests/dev_a_manifest.json"
+    manifest_file_sha256: "206911d750000f41aeed6e1739fb315b35a21f8f5b1dd78327eca5b32628601f"
+    manifest_payload_sha256: "94d4a6867cef68fcefb4facda93c8f0e6a376cb97952ba194836b011d1052265"
+    manifest_mode: "0444"
+    admitted_gpus: [2, 4]
+    attempt_ids: [79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90]
+    control_success_count: 0
+    control_success_tasks: []
+    candidate_success_count: 0
+    candidate_success_tasks: []
+    candidate_gained_tasks: []
+    candidate_retained_tasks: []
+    candidate_lost_tasks: []
+    candidate_minus_control: 0
+    candidate_gap_to_five_on_dev_a: 5
+    failure_class_by_task:
+      control: {0: "timeout without completion", 1: "timeout without completion", 2: "timeout without completion", 4: "timeout without completion", 6: "timeout without completion", 7: "timeout without completion"}
+      candidate: {0: "timeout without completion", 1: "timeout without completion", 2: "timeout without completion", 4: "timeout without completion", 6: "timeout without completion", 7: "timeout without completion"}
+    candidate_metric_records: 106
+    candidate_anchor_activations: 1060
+    candidate_anchor_rescues: 425
+    candidate_anchor_rescue_rate: 0.4009433962264151
+    candidate_to_control_latency_ratio: 1.0528941297521386
+    disallowed_safety_outcomes: 0
+    new_scientific_gpu_hours: 1.2639597222222223
+    cumulative_gpu_hours: 5.447063166666667
+    effective_online_episode_attempts: 66
+    final_attempt_ledger_sha256: "db07734c1869b10ec29ed735f977be00a7491477871566570a207a060f2224da"
+    gpu_admission_sha256: "4f89f3933ffe26448759c235ce26e6cef103db3ecbcb02540d08ec9506f9359f"
+    final_run_manifest_sha256: "9e39ee02bc23b7fa437db0c93ee30cdd586a971fdd66916f0134531c84953342"
+    final_audit_path: "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_034_global_quality_anchor_dev_a/analysis/dev_a_audit.json"
+    final_audit_sha256: "2e590656dd60a18a17bf45ff7a2e1e9209daaaa34980a5d686b9d6f8879a0e68"
+    final_audit_hard_failures: ["candidate Dev-A success count is below 3/6", "candidate Dev-A improvement is below +1"]
+    credential_exact_matches: 0
+    analysis: "experiments/run_034_global_quality_anchor_dev_a/analysis.md"
+    analysis_sha256: "b8f94f6c27daa4d35130275dde62adac8d2bcccccf326835808fb30a47d1c4c3"
+    decision: CONCLUDE_H4_V3_DEV_A_FAIL_NO_ADOPTION
     gpu_authorized_before_manifest: false
     online_episode_attempts_authorized_before_manifest: 0
     validation_authorized: false
     formal_authorized: false
     protocol_decision: IMPLEMENT_DEV_A_RUNNER_TEST_FREEZE_MANIFEST_THEN_HEALTH_ADMISSION
-  next_action: "Implement and test only the two-file Run034 Dev-A runner/audit, commit it, freeze and validate the immutable Dev-A manifest, then perform health and GPU admission before IDs 79-90 can be reserved"
+  next_action: "Commit the valid Run034 negative result, then freeze an outer-loop conclusion protocol before writing the v3 decision manifest and final report; no further algorithm, GPU, API, LIBERO, Dev, validation, or formal execution is authorized"

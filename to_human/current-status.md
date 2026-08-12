@@ -1,17 +1,15 @@
-# Current Status — Run034 Dev-A Protocol Locked
+# Current Status — Run034 Dev-A Valid Target Failure
 
-- Project state: `running / run_034_dev_a_protocol_locked`.
-- Primary target: LIBERO-PRO `libero_object_swap >=5/10`; it has not yet been demonstrated. Historical formal best/gap remain `2/10 / 3`; formal episodes remain 0.
-- Run033 paired outcome: control `0/3`, `qd_global_quality_anchor_v1` `1/3`; gained task `[9]`, lost tasks `[]`, direct delta `+1`.
-- Failures: both profiles timed out without completion on tasks 3/8; control also timed out on task 9. Candidate completed task 9. No unsupported finer behavioral label is claimed.
-- Mechanism: 110 candidate records, 1,100 anchor activations and 751 real rescues; all records preserved the frozen 1+15 allocation and `176 search / 176 QD / 11 calls`.
-- Interpretation: 738 rescues across failed tasks 3/8 show rescue frequency is not a success proxy. Promotion is based on the task-9 gain and zero retention loss, not on maximizing rescue count.
-- Hard gates: safety/accounting/final-selection/credential gates all passed; latency ratio `1.060499 <= 1.25`; immutable audit SHA `b5f4c671…f96b` has zero hard failures.
-- Infrastructure: IDs 67–72 are preserved pre-episode DINO-cache failures. Protocol-first runner repair reused the audited offline cache; exact-cell science used IDs 73–78 after fresh health/admission on GPUs 2/4.
-- Accounting: 54 effective online episodes, 78/143 global reservations, 6/19 recovery slots consumed, `4.183103/48 GPU-hours`, formal episodes 0.
-- Credential integrity: latest approved credential exact matches are zero in the full Run033 artifact tree and tracked worktree. It was injected only into child process environment.
-- Dev-A protocol is now frozen before implementation. Paired tasks/seeds are `[0,1,2,4,6,7] / [307995,262892,731741,14859,648306,960581]`; candidate must reach `>=3/6`, beat control by at least 1, lose no control-success task, and pass unchanged hard gates.
-- Next gate: implement/test only the dedicated Dev-A runner and audit, commit them, freeze the immutable manifest, then perform real health and GPU admission before IDs 79–90 may be reserved. No GPU/API/reservation is currently authorized.
-- A valid Dev-A failure ends v3 without validation/formal. A PASS authorizes validation protocol only.
+- Project state: `running / run_034_dev_a_valid_target_fail_outer_reflection_pending`; algorithm and online execution are stopped.
+- Primary target: LIBERO-PRO `libero_object_swap >=5/10` was not demonstrated. Historical formal best remains `2/10`, target gap 3, and formal episodes remain 0.
+- Run034 paired outcome: control `0/6`, `qd_global_quality_anchor_v1` `0/6` on tasks `[0,1,2,4,6,7]`; delta 0; gained/retained/lost tasks are all empty.
+- All twelve episodes were valid and exited 0. Every task failure is conservatively classified `timeout without completion`; no finer unsupported cause is claimed.
+- Target gates failed: candidate `0 < 3/6` and improvement `0 < +1`. Audit SHA `2e590656…0e68` contains only those two hard failures.
+- Mechanism gates passed: 106 candidate records, 1,060 anchor activations, 425 real rescues, exact `1+15` allocation and `176 search / 176 QD / 11 calls` throughout. Rescue activity did not transfer to a task success.
+- Safety/accounting/credential gates passed; latency ratio is `1.052894 <= 1.25`. Latest approved credential exact matches are zero in the complete Run034 artifact tree and tracked worktree.
+- Immutable manifest SHA is `206911d7…01f`; exact attempt IDs 79–90 ran after admission on GPUs 2/4. No recovery was required.
+- Accounting: 66 effective online episodes, 90/143 global reservations, 6/19 recovery slots consumed, `5.447063/48 GPU-hours`, formal episodes 0.
+- Frozen stop rule applies: no validation, formal evaluation, fourth candidate, anchor-count/sparse-ratio/threshold sweep, or Run034-driven tuning is authorized.
+- Next action: commit the Run034 result, then freeze an outer-loop conclusion protocol before creating the v3 decision manifest and final report. This next action authorizes documentation only, not algorithm or online execution.
 - Full append-only record: `docs/03_evidence/eds_qd_autoresearch/iteration-ledger.md`.
 - Protected untracked design remains untouched, unstaged, and uncommitted.
