@@ -998,3 +998,11 @@
 - Integrated gates：三case均10个16-parent rollout batches、176 search/176 QD/11 calls；finite/mask/qpos/archive/rebin/final-selection/source/RNG/hash/secret全部PASS。
 - Artifacts：canonical/replay byte-identical、0444、11,411 bytes、file SHA `31dd437c…e24b`、payload `f147193e…ddf4`、credential 0，仅位于owned Run032 root。
 - Target/accounting：仍非success evidence；新增GPU/API/model/LIBERO/reservation/online/formal均0，historical best/gap仍2/10、3。Decision `KEEP_H4_V3_CPU_MECHANISM_PASS_AND_AUTHORIZE_ONLINE_MECHANISM_PROTOCOL_ONLY`。
+
+#### BC. run_033 six-cell online mechanism protocol
+
+- Matrix：paired tasks `[3,8,9]`，seeds `[955865,522754,845886]`，control `p2_stage_on_abs_rbf_control` vs candidate `eds_qd_global_quality_anchor_v1`，max_chunks16，共6 scientific cells。
+- Candidate exact：sparse + causal envelope + anchor count1 + fallback none；禁止第二anchor/threshold/fallback/horizon/Stage/selection变化。
+- Gates：每candidate chunk 10 activation、1+15/16、176/176/11、source/fingerprint/final-selection完整；全candidate至少1 rescue；safety/credential/artifact/write-boundary clean；latency ratio<=1.25；lost control-success tasks=0。
+- Transaction：runner/test commit -> immutable manifest -> real health -> two-snapshot GPU0–7 admission -> fresh IDs67–72 reservation -> dispatch/audit。health/admission前reservation=0；不共享/抢占/终止外部进程。
+- Budget：science后global72/143，prior GPU `3.7471009444444445`，cap48；19 recovery slots保持只用于protocol-first exact-cell infrastructure recovery。PASS仅授权Dev-A protocol；valid FAIL直接no adoption。
