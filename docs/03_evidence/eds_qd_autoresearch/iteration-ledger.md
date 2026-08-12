@@ -1056,3 +1056,14 @@
 - Credential/write boundary：audit scan 253 files PASS；complete Run034 tree与tracked worktree latest credential exact matches均0；generic tracked唯一命中为synthetic test fixture。Secret仅通过已授权child env注入，未记录value/fingerprint。
 - Accounting：Run034 scientific device wall `1.2639597222222223 h`；累计 `5.447063166666667/48 h`；global reservations `90/143`；effective online episodes66；recovery仍6/19、余13；formal episodes0。
 - Decision：`CONCLUDE_H4_V3_DEV_A_FAIL_NO_ADOPTION`。Run033 task9的单点增益未跨冻结Dev-A迁移；valid FAIL按协议立即停止v3。禁止validation/formal、第四candidate、anchor count/sparse ratio/threshold/seed/task sweep和Run034 outcome-driven tuning。下一步只能protocol-first outer-loop conclusion与final report，不授权新算法或在线执行。
+
+#### BH. v3 outer-loop conclusion and immutable freeze
+
+- Temporal order：Run034 result独立commit `79a2de70bfad50e0d4cb597a844bc85c2965b82f` 后，先冻结documentation-only conclusion protocol `858c04696931f362fe3c4e04f7f44285c80e851d`，SHA `979b8618…7f42`；随后才创建decision manifest和final report。Protocol明确禁止任何code/config/test、candidate、GPU/API/LIBERO、reservation、recovery、validation或formal执行。
+- Cross-cycle synthesis：H1改善partition resolution但validation仅1/10；H2 exact-degenerate fallback离线成立但online未触发且丢control task9；H4-v3修复global-best lineage omission并在Run033获得task9，但Run034 frozen Dev-A为`0/6 -> 0/6`。三轮均未缩小historical formal gap。
+- Primary objective：`>=5/10`未达成；historical formal best/gap保持`2/10 / 3`。V3 validation/formal episodes均0，不将mechanism proxy冒充正式成功率。
+- Frozen decision：`CONCLUDE_NO_ADOPTION_WITHIN_V3_CYCLE_TARGET_NOT_MET`。Decision manifest mode0444、7,542 bytes、SHA `5363af6996404c573f989c6c729d64a0f2c89a48a365e1e271b508654cec75a8`，绑定v3 design、source fingerprints、Run030–034 evidence、task results、budget、write/credential boundary与future authorization=false。
+- Final report/status：v3 report `docs/03_evidence/eds_qd_autoresearch/2026-08-12-eds-qd-autoresearch-v3-final-report.md` SHA `94ac83651d2f4ba21ee2032d29dc2073236dece53d06a99e6cea6a6243adb484`；current status SHA `c371b12e…9538`。
+- Final accounting：effective online episodes66；global reservations90/143；recovery6/19、余13；GPU `5.447063166666667/48 h`；v3 validation0；formal0。剩余预算不会在已结论周期中继续消耗。
+- Integrity：credential value/fingerprint均未记录；decision manifest不含credential material；complete Run034 tree与tracked worktree exact secret scan为0。Protected untracked design始终排除；所有代码/文档修改仅在owned worktree/branch，大型产物仅在owned artifact root。
+- Continuation boundary：当前不授权任何执行。未来只能在用户明确批准的新versioned design、新leakage-safe splits和显式预算下开始；Run034任务/seed仅可作为revealed historical evidence，不得同周期调参复用。

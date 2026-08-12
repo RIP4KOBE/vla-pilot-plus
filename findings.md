@@ -141,3 +141,9 @@ V3 freezes one candidate: reserve exactly one of 16 QD parent slots for the curr
 `run_034` refutes cross-task transfer of the single global-quality-anchor candidate at the frozen Dev-A gate. Control and candidate both scored `0/6` on tasks `[0,1,2,4,6,7]`; every episode timed out without completion. The candidate nevertheless activated the anchor 1,060 times and rescued 425 sparse omissions across 106 valid records, with exact 176/176/11 accounting, clean safety and a 1.052894 latency ratio. Thus the intervention reliably changes QD lineage allocation but does not supply a general task-completion advantage. Its Run033 task-9 gain was isolated and cannot justify validation, formal evaluation, anchor-count tuning, or another v3 candidate.
 
 The v3 task-level evidence is now internally consistent with the primary objective rule: one positive `0/3 -> 1/3` mechanism result was promoted once, then the unseen six-task gate returned `0/6 -> 0/6`. The target remains unachieved; historical formal best is still `2/10`, target gap 3, and formal episodes remain zero. V3 must conclude no adoption under its frozen no-progress rule.
+
+## V3 Cycle Conclusion
+
+The immutable v3 decision is `CONCLUDE_NO_ADOPTION_WITHIN_V3_CYCLE_TARGET_NOT_MET`. One dedicated global-quality parent repairs a pervasive sparse-allocation lineage omission without increasing compute, but Dev-A shows that lineage retention alone is not sufficient for task completion. V3 ends after 66 effective online episodes, 90 reservations and 5.447063 GPU-hours, with no v3 validation or formal episode.
+
+No same-cycle candidate remains. Any future design must treat Run034 as revealed historical evidence and cannot tune on its tasks/seeds. The remaining evidence-supported diagnosis is that archive reward/final selection is weakly aligned with observable manipulation progress; pursuing it requires a new versioned, QD-first EDS+QD design and explicit approval rather than continuation of v3.
