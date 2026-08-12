@@ -434,6 +434,7 @@ class EDSChunkMetrics:
     qd_grid_shape: list[int] = field(default_factory=list)
     qd_cell_capacity: int = 1
     qd_parent_sampling: str = "uniform_cells"
+    qd_global_quality_anchor_count: int = 0
     qd_bounds_update_policy: str = "fixed_initial"
     qd_bounds_xy_m: list[list[float]] = field(default_factory=list)
     qd_bounds_source_initial_checksum: str | None = None
@@ -466,9 +467,16 @@ class EDSChunkMetrics:
     qd_archive_best_reward_by_iter: list[float] = field(default_factory=list)
     qd_archive_mean_elite_reward_by_iter: list[float] = field(default_factory=list)
     qd_parent_slots_by_cell_by_iter: list[dict[str, int]] = field(default_factory=list)
+    qd_sparse_parent_slots_by_cell_by_iter: list[dict[str, int]] = field(default_factory=list)
     qd_parent_weights_by_cell_by_iter: list[dict[str, float]] = field(default_factory=list)
     qd_parent_covered_cell_ratio_by_iter: list[float] = field(default_factory=list)
     qd_parent_cell_unique_ratio_by_iter: list[float] = field(default_factory=list)
+    qd_global_quality_anchor_cell_by_iter: list[int | None] = field(default_factory=list)
+    qd_global_quality_anchor_fingerprint_by_iter: list[str | None] = field(default_factory=list)
+    qd_global_quality_anchor_sparse_slot_count_by_iter: list[int] = field(default_factory=list)
+    qd_global_quality_anchor_rescued_by_iter: list[bool] = field(default_factory=list)
+    qd_global_quality_anchor_activation_count: int = 0
+    qd_global_quality_anchor_rescue_count: int = 0
     qd_selected_cell: int | None = None
     qd_selected_reward: float | None = None
     qd_selected_action_fingerprint: str | None = None

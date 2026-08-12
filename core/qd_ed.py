@@ -272,6 +272,10 @@ class QDParentAllocation:
     parent_fingerprints: tuple[str, ...]
     slot_counts: dict[int, int]
     weights: dict[int, float]
+    sparse_slot_counts: dict[int, int]
+    global_quality_anchor_count: int
+    global_quality_anchor_cell_id: int | None
+    global_quality_anchor_fingerprint: str | None
 
 
 class QDArchive:
@@ -529,11 +533,23 @@ def allocate_parent_slots(
     episode: int,
     global_step: int,
     iter_idx: int,
+    global_quality_anchor_count: int = 0,
 ) -> QDParentAllocation:
     if isinstance(population_size, bool) or not isinstance(population_size, int) or population_size <= 0:
         raise ValueError("QD population size must be a positive integer")
     if sampling not in {"uniform_cells", "sparse_priority"}:
         raise ValueError("QD parent sampling must be uniform_cells or sparse_priority")
+    if (
+        isinstance(global_quality_anchor_count, bool)
+        or not isinstance(global_quality_anchor_count, int)
+        or global_quality_anchor_count not in {0, 1}
+    ):
+        raise ValueError("QD global quality anchor count must be 0 or 1")
+    if global_quality_anchor_count == 1 and sampling != "sparse_priority":
+        raise ValueError("QD global quality anchor count 1 requires sparse_priority")
+    sparse_population_size = population_size - global_quality_anchor_count
+    if sparse_population_size <= 0:
+        raise ValueError("QD global quality anchor count must be less than population size")
     sparse_exponent = float(sparse_exponent)
     if not math.isfinite(sparse_exponent) or sparse_exponent <= 0.0:
         raise ValueError("QD sparse exponent must be finite and positive")
@@ -550,7 +566,7 @@ def allocate_parent_slots(
     tie_rank = {occupied[offset]: rank for rank, offset in enumerate(permutation)}
 
     if sampling == "uniform_cells":
-        base, remainder = divmod(population_size, len(occupied))
+        base, remainder = divmod(sparse_population_size, len(occupied))
         slot_counts = {cell: base for cell in occupied}
         for offset in permutation[:remainder]:
             slot_counts[occupied[offset]] += 1
@@ -563,10 +579,11 @@ def allocate_parent_slots(
         }
         weight_sum = sum(raw_weights.values())
         exact = {
-            cell: population_size * raw_weights[cell] / weight_sum for cell in occupied
+            cell: sparse_population_size * raw_weights[cell] / weight_sum
+            for cell in occupied
         }
         slot_counts = {cell: int(math.floor(exact[cell])) for cell in occupied}
-        remainder = population_size - sum(slot_counts.values())
+        remainder = sparse_population_size - sum(slot_counts.values())
         ranked = sorted(
             occupied,
             key=lambda cell: (-(exact[cell] - slot_counts[cell]), tie_rank[cell]),
@@ -574,9 +591,19 @@ def allocate_parent_slots(
         for cell in ranked[:remainder]:
             slot_counts[cell] += 1
 
-    parent_cells = [
+    sparse_slot_counts = {cell: int(slot_counts[cell]) for cell in occupied}
+    sparse_parent_cells = [
         cell for cell in occupied for _ in range(int(slot_counts[cell]))
     ]
+    anchor_cell: int | None = None
+    anchor_fingerprint: str | None = None
+    if global_quality_anchor_count == 1:
+        anchor_cell, anchor_entry = archive.select_global_best()
+        anchor_fingerprint = anchor_entry.fingerprint
+        parent_cells = [anchor_cell, *sparse_parent_cells]
+        slot_counts[anchor_cell] += 1
+    else:
+        parent_cells = sparse_parent_cells
     if len(parent_cells) != population_size:
         raise RuntimeError(
             f"QD parent allocation mismatch: {len(parent_cells)} != {population_size}"
@@ -598,4 +625,8 @@ def allocate_parent_slots(
         parent_fingerprints=tuple(entry.fingerprint for entry in entries),
         slot_counts={cell: int(slot_counts[cell]) for cell in occupied},
         weights={cell: float(raw_weights[cell]) for cell in occupied},
+        sparse_slot_counts=sparse_slot_counts,
+        global_quality_anchor_count=global_quality_anchor_count,
+        global_quality_anchor_cell_id=anchor_cell,
+        global_quality_anchor_fingerprint=anchor_fingerprint,
     )

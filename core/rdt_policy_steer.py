@@ -128,6 +128,7 @@ class _EDSConfig:
     qd_grid_shape: tuple[int, int] = (4, 4)
     qd_cell_capacity: int = 1
     qd_parent_sampling: str = "uniform_cells"
+    qd_global_quality_anchor_count: int = 0
     qd_sparse_exponent: float = 1.0
     qd_bounds_quantiles: tuple[float, float] = (0.05, 0.95)
     qd_bounds_expand_fraction: float = 0.10
@@ -4597,6 +4598,7 @@ class RDTSteer:
             episode=episode,
             global_step=global_step,
             iter_idx=iter_idx,
+            global_quality_anchor_count=cfg.qd_global_quality_anchor_count,
         )
 
     def _eds_guided_denoise_loop(
@@ -4647,6 +4649,9 @@ class RDTSteer:
         metrics.qd_grid_shape = list(cfg.qd_grid_shape)
         metrics.qd_cell_capacity = cfg.qd_cell_capacity
         metrics.qd_parent_sampling = cfg.qd_parent_sampling
+        metrics.qd_global_quality_anchor_count = (
+            cfg.qd_global_quality_anchor_count
+        )
         metrics.qd_bounds_update_policy = cfg.qd_bounds_update_policy
         metrics.shadow_qd_observer_enabled = bool(cfg.qd_metrics_observer)
         artifact_iters: list[dict] = []
@@ -5042,7 +5047,12 @@ class RDTSteer:
                 qd_parent_cell_ids = allocation.parent_cell_ids.to(
                     device=population.device
                 )
-                chunk_population_sources = ("qd_archive",) * cfg.population_size
+                anchor_count = allocation.global_quality_anchor_count
+                sparse_count = cfg.population_size - anchor_count
+                chunk_population_sources = (
+                    ("qd_global_quality_anchor",) * anchor_count
+                    + ("qd_archive",) * sparse_count
+                )
                 occupied_count = len(qd_archive.entries)
                 covered_count = sum(
                     int(count > 0) for count in allocation.slot_counts.values()
@@ -5056,6 +5066,29 @@ class RDTSteer:
                         for cell, count in allocation.slot_counts.items()
                     }
                 )
+                metrics.qd_sparse_parent_slots_by_cell_by_iter.append(
+                    {
+                        str(cell): int(count)
+                        for cell, count in allocation.sparse_slot_counts.items()
+                    }
+                )
+                anchor_cell = allocation.global_quality_anchor_cell_id
+                anchor_sparse_count = (
+                    int(allocation.sparse_slot_counts[anchor_cell])
+                    if anchor_cell is not None
+                    else 0
+                )
+                anchor_rescued = bool(anchor_cell is not None and anchor_sparse_count == 0)
+                metrics.qd_global_quality_anchor_cell_by_iter.append(anchor_cell)
+                metrics.qd_global_quality_anchor_fingerprint_by_iter.append(
+                    allocation.global_quality_anchor_fingerprint
+                )
+                metrics.qd_global_quality_anchor_sparse_slot_count_by_iter.append(
+                    anchor_sparse_count
+                )
+                metrics.qd_global_quality_anchor_rescued_by_iter.append(anchor_rescued)
+                metrics.qd_global_quality_anchor_activation_count += anchor_count
+                metrics.qd_global_quality_anchor_rescue_count += int(anchor_rescued)
                 metrics.qd_parent_weights_by_cell_by_iter.append(
                     {
                         str(cell): float(weight)
@@ -5074,13 +5107,30 @@ class RDTSteer:
                     dtype=torch.long,
                 )
                 selection_kind = f"qd_{cfg.qd_parent_sampling}"
+                offspring_sources = (
+                    ("qd_global_quality_anchor_offspring",) * anchor_count
+                    + ("qd_archive_offspring",) * sparse_count
+                )
+                parent_selection_kinds = (
+                    ["qd_global_quality_anchor"] * anchor_count
+                    + [selection_kind] * sparse_count
+                )
+                qd_parent_count_by_source = {
+                    "elite": 0,
+                    "anchor_offspring": 0,
+                    "weighted_offspring": 0,
+                }
+                if anchor_count:
+                    qd_parent_count_by_source[
+                        "qd_global_quality_anchor_offspring"
+                    ] = anchor_count
+                qd_parent_count_by_source["qd_archive_offspring"] = sparse_count
                 plan = EDSParentPlan(
                     elite_indices=torch.empty(
                         0, device=population.device, dtype=torch.long
                     ),
                     offspring_parent_indices=identity_indices,
-                    offspring_sources=("qd_archive_offspring",)
-                    * cfg.population_size,
+                    offspring_sources=offspring_sources,
                     info={
                         "selection_beta": None,
                         "selection_ess": None,
@@ -5100,15 +5150,9 @@ class RDTSteer:
                         "parent_mode_coverage": float(
                             covered_count / occupied_count
                         ),
-                        "parent_count_by_source": {
-                            "elite": 0,
-                            "anchor_offspring": 0,
-                            "weighted_offspring": 0,
-                            "qd_archive_offspring": cfg.population_size,
-                        },
+                        "parent_count_by_source": qd_parent_count_by_source,
                         "parent_probabilities": [None] * cfg.population_size,
-                        "parent_selection_kinds": [selection_kind]
-                        * cfg.population_size,
+                        "parent_selection_kinds": parent_selection_kinds,
                     },
                 )
             else:
@@ -7046,6 +7090,10 @@ class RDTSteer:
             qd_parent_sampling=str(
                 cfg.get("qd_parent_sampling", "uniform_cells")
             ),
+            qd_global_quality_anchor_count=_parse_eds_int(
+                cfg.get("qd_global_quality_anchor_count", 0),
+                "qd_global_quality_anchor_count",
+            ),
             qd_sparse_exponent=_parse_eds_float(
                 cfg.get("qd_sparse_exponent", 1.0), "qd_sparse_exponent"
             ),
@@ -7277,6 +7325,20 @@ class RDTSteer:
         }:
             raise ValueError(
                 "EDS qd_parent_sampling must be uniform_cells or sparse_priority"
+            )
+        if resolved.qd_global_quality_anchor_count not in {0, 1}:
+            raise ValueError(
+                "EDS qd_global_quality_anchor_count must be 0 or 1"
+            )
+        if resolved.qd_global_quality_anchor_count == 1 and (
+            resolved.qd_archive_mode != "grid_archive"
+            or resolved.qd_parent_sampling != "sparse_priority"
+            or resolved.qd_bounds_update_policy != "causal_envelope_v1"
+            or resolved.qd_degenerate_fallback_policy != "none"
+        ):
+            raise ValueError(
+                "EDS qd_global_quality_anchor_count=1 requires grid_archive, "
+                "sparse_priority, causal_envelope_v1, and fallback none"
             )
         if resolved.qd_sparse_exponent != 1.0:
             raise ValueError("EDS qd_sparse_exponent must be 1.0")

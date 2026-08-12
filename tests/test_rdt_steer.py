@@ -2198,6 +2198,7 @@ def test_qd_config_defaults_are_legacy_safe_and_match_yaml(stub_steer):
         "qd_grid_shape": (4, 4),
         "qd_cell_capacity": 1,
         "qd_parent_sampling": "uniform_cells",
+        "qd_global_quality_anchor_count": 0,
         "qd_sparse_exponent": 1.0,
         "qd_bounds_quantiles": (0.05, 0.95),
         "qd_bounds_expand_fraction": 0.10,
@@ -2244,6 +2245,7 @@ def _valid_qd_config(**updates):
         "qd_grid_shape": [4, 4],
         "qd_cell_capacity": 1,
         "qd_parent_sampling": "uniform_cells",
+        "qd_global_quality_anchor_count": 0,
         "qd_sparse_exponent": 1.0,
         "qd_bounds_quantiles": [0.05, 0.95],
         "qd_bounds_expand_fraction": 0.10,
@@ -2268,6 +2270,58 @@ def test_qd_config_accepts_primary_and_sparse_registered_profiles(stub_steer):
     assert uniform.qd_grid_shape == (4, 4)
     assert uniform.qd_bounds_quantiles == (0.05, 0.95)
     assert sparse.qd_parent_sampling == "sparse_priority"
+
+
+def test_qd_config_accepts_only_frozen_global_quality_anchor_candidate(stub_steer):
+    candidate = stub_steer._resolve_eds_config_with_reference_defaults(
+        _valid_qd_config(
+            qd_parent_sampling="sparse_priority",
+            qd_global_quality_anchor_count=1,
+            qd_bounds_update_policy="causal_envelope_v1",
+        )
+    )
+
+    assert candidate.qd_global_quality_anchor_count == 1
+    assert candidate.qd_parent_sampling == "sparse_priority"
+
+
+@pytest.mark.parametrize("value", [True, -1, 2])
+def test_qd_config_rejects_invalid_global_quality_anchor_count(stub_steer, value):
+    with pytest.raises(ValueError, match="qd_global_quality_anchor_count"):
+        stub_steer._resolve_eds_config_with_reference_defaults(
+            _valid_qd_config(
+                qd_parent_sampling="sparse_priority",
+                qd_global_quality_anchor_count=value,
+            )
+        )
+
+
+def test_qd_global_quality_anchor_requires_grid_sparse_priority(stub_steer):
+    with pytest.raises(ValueError, match="qd_global_quality_anchor_count"):
+        stub_steer._resolve_eds_config_with_reference_defaults(
+            _valid_qd_config(qd_global_quality_anchor_count=1)
+        )
+    with pytest.raises(ValueError, match="qd_global_quality_anchor_count"):
+        stub_steer._resolve_eds_config_with_reference_defaults(
+            {"qd_global_quality_anchor_count": 1}
+        )
+    with pytest.raises(ValueError, match="qd_global_quality_anchor_count"):
+        stub_steer._resolve_eds_config_with_reference_defaults(
+            _valid_qd_config(
+                qd_parent_sampling="sparse_priority",
+                qd_global_quality_anchor_count=1,
+                qd_bounds_update_policy="fixed_initial",
+            )
+        )
+    with pytest.raises(ValueError, match="qd_global_quality_anchor_count"):
+        stub_steer._resolve_eds_config_with_reference_defaults(
+            _valid_qd_config(
+                qd_parent_sampling="sparse_priority",
+                qd_global_quality_anchor_count=1,
+                qd_bounds_update_policy="causal_envelope_v1",
+                qd_degenerate_fallback_policy="control_v1",
+            )
+        )
 
 
 def test_qd_degenerate_fallback_config_is_default_off_and_validated(stub_steer):
@@ -6235,10 +6289,12 @@ def test_qd_loop_bypasses_legacy_selector_preserves_archive_and_selects_global_b
     assert artifacts["qd_bounds_xy_m"] == metrics["qd_bounds_xy_m"]
 
 
+@pytest.mark.parametrize("quality_anchor_count", [0, 1])
 def test_qd_causal_envelope_expands_rebins_preserves_visits_and_call_budget(
     stub_steer,
     stub_adapter,
     monkeypatch,
+    quality_anchor_count,
 ):
     from core.qd_ed import fingerprint_action
 
@@ -6256,6 +6312,7 @@ def test_qd_causal_envelope_expands_rebins_preserves_visits_and_call_budget(
         initial[index, :4, 40] = initial_values[index // 4] / 4.0
         initial[index, :, 42] = -float(index)
     rollout_call = 0
+    rollout_batch_sizes = []
 
     def score(samples, **kwargs):
         costs = samples[:, 0, 42].detach().clone()
@@ -6264,6 +6321,7 @@ def test_qd_causal_envelope_expands_rebins_preserves_visits_and_call_budget(
     def rollout(**kwargs):
         nonlocal rollout_call
         rollout_call += 1
+        rollout_batch_sizes.append(int(kwargs["noisy_action"].shape[0]))
         children = kwargs["noisy_action"].clone()
         scale = 0.12 * rollout_call
         endpoint_values = torch.linspace(-scale, scale, 4)
@@ -6285,6 +6343,7 @@ def test_qd_causal_envelope_expands_rebins_preserves_visits_and_call_budget(
     cfg = stub_steer._resolve_eds_config_with_reference_defaults(
         _valid_qd_config(
             qd_parent_sampling="sparse_priority",
+            qd_global_quality_anchor_count=quality_anchor_count,
             qd_bounds_update_policy="causal_envelope_v1",
         )
     )
@@ -6303,6 +6362,7 @@ def test_qd_causal_envelope_expands_rebins_preserves_visits_and_call_budget(
     artifacts = stub_steer.get_last_eds_artifacts()
 
     assert rollout_call == 10
+    assert rollout_batch_sizes == [16] * 10
     assert metrics["qd_bounds_update_policy"] == "causal_envelope_v1"
     assert metrics["qd_bounds_expansion_count"] > 0
     assert any(metrics["qd_bounds_expanded_by_iter"])
@@ -6323,6 +6383,7 @@ def test_qd_causal_envelope_expands_rebins_preserves_visits_and_call_budget(
         for value in metrics["qd_partition_resolution_improvement_by_iter"]
     )
     assert metrics["qd_evaluation_count"] == 176
+    assert metrics["search_evaluation_count"] == 176
     assert metrics["score_call_count"] == 11
     assert metrics["qd_accounting_violation_count"] == 0
     assert metrics["qd_final_selection_mismatch_count"] == 0
@@ -6332,6 +6393,40 @@ def test_qd_causal_envelope_expands_rebins_preserves_visits_and_call_budget(
         == metrics["qd_global_best_action_fingerprint"]
     )
     assert artifacts["qd_final_bounds_xy_m"] == metrics["qd_bounds_xy_m_by_iter"][-1]
+    assert metrics["qd_global_quality_anchor_count"] == quality_anchor_count
+    assert len(metrics["qd_sparse_parent_slots_by_cell_by_iter"]) == 10
+    assert all(
+        sum(allocation.values()) == 16 - quality_anchor_count
+        for allocation in metrics["qd_sparse_parent_slots_by_cell_by_iter"]
+    )
+    assert all(
+        sum(allocation.values()) == 16
+        for allocation in metrics["qd_parent_slots_by_cell_by_iter"]
+    )
+    assert metrics["qd_global_quality_anchor_activation_count"] == (
+        10 * quality_anchor_count
+    )
+    if quality_anchor_count:
+        assert all(
+            cell is not None
+            for cell in metrics["qd_global_quality_anchor_cell_by_iter"]
+        )
+        assert all(
+            fingerprint
+            for fingerprint in metrics["qd_global_quality_anchor_fingerprint_by_iter"]
+        )
+        assert len(metrics["qd_global_quality_anchor_rescued_by_iter"]) == 10
+        assert metrics["parent_count_by_source"] == {
+            "elite": 0,
+            "anchor_offspring": 0,
+            "weighted_offspring": 0,
+            "qd_global_quality_anchor_offspring": 10,
+            "qd_archive_offspring": 150,
+        }
+    else:
+        assert metrics["qd_global_quality_anchor_cell_by_iter"] == [None] * 10
+        assert metrics["qd_global_quality_anchor_fingerprint_by_iter"] == [None] * 10
+        assert metrics["qd_global_quality_anchor_rescue_count"] == 0
 
 
 def test_qd_grid5_final_archive_larger_than_population_tracks_selected_source(

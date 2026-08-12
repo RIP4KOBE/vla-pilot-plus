@@ -335,6 +335,153 @@ def test_sparse_parent_slots_follow_inverse_visitation_largest_remainder():
     assert allocation.slot_counts[0] >= allocation.slot_counts[1] >= allocation.slot_counts[2]
 
 
+def test_global_quality_anchor_zero_is_exact_legacy_allocation():
+    archive = _occupied_archive(6)
+    archive.cumulative_visits[:6] = torch.tensor([1, 3, 7, 15, 31, 63])
+
+    legacy = allocate_parent_slots(
+        archive,
+        population_size=16,
+        sampling="sparse_priority",
+        sparse_exponent=1.0,
+        run_seed=9,
+        episode=8,
+        global_step=24,
+        iter_idx=3,
+    )
+    explicit_zero = allocate_parent_slots(
+        archive,
+        population_size=16,
+        sampling="sparse_priority",
+        sparse_exponent=1.0,
+        run_seed=9,
+        episode=8,
+        global_step=24,
+        iter_idx=3,
+        global_quality_anchor_count=0,
+    )
+
+    torch.testing.assert_close(explicit_zero.parent_cell_ids, legacy.parent_cell_ids)
+    torch.testing.assert_close(explicit_zero.parent_actions, legacy.parent_actions)
+    torch.testing.assert_close(explicit_zero.parent_rewards, legacy.parent_rewards)
+    torch.testing.assert_close(explicit_zero.parent_costs, legacy.parent_costs)
+    assert explicit_zero.parent_fingerprints == legacy.parent_fingerprints
+    assert explicit_zero.slot_counts == legacy.slot_counts
+    assert explicit_zero.weights == legacy.weights
+    assert explicit_zero.sparse_slot_counts == legacy.slot_counts
+    assert explicit_zero.global_quality_anchor_count == 0
+    assert explicit_zero.global_quality_anchor_cell_id is None
+    assert explicit_zero.global_quality_anchor_fingerprint is None
+
+
+def test_global_quality_anchor_is_one_plus_exact_same_seed_fifteen_sparse_slots():
+    archive = _occupied_archive(4)
+    archive.cumulative_visits[:4] = torch.tensor([0, 3, 7, 10_000])
+    rng_before = torch.random.get_rng_state().clone()
+
+    sparse_fifteen = allocate_parent_slots(
+        archive,
+        population_size=15,
+        sampling="sparse_priority",
+        sparse_exponent=1.0,
+        run_seed=11,
+        episode=7,
+        global_step=48,
+        iter_idx=4,
+    )
+    candidate = allocate_parent_slots(
+        archive,
+        population_size=16,
+        sampling="sparse_priority",
+        sparse_exponent=1.0,
+        run_seed=11,
+        episode=7,
+        global_step=48,
+        iter_idx=4,
+        global_quality_anchor_count=1,
+    )
+    repeated = allocate_parent_slots(
+        archive,
+        population_size=16,
+        sampling="sparse_priority",
+        sparse_exponent=1.0,
+        run_seed=11,
+        episode=7,
+        global_step=48,
+        iter_idx=4,
+        global_quality_anchor_count=1,
+    )
+
+    best_cell, best_entry = archive.select_global_best()
+    assert best_cell == 3
+    assert candidate.global_quality_anchor_count == 1
+    assert candidate.global_quality_anchor_cell_id == best_cell
+    assert candidate.global_quality_anchor_fingerprint == best_entry.fingerprint
+    assert candidate.parent_cell_ids[0].item() == best_cell
+    assert candidate.parent_fingerprints[0] == best_entry.fingerprint
+    torch.testing.assert_close(candidate.parent_cell_ids[1:], sparse_fifteen.parent_cell_ids)
+    torch.testing.assert_close(candidate.parent_actions[1:], sparse_fifteen.parent_actions)
+    assert candidate.parent_fingerprints[1:] == sparse_fifteen.parent_fingerprints
+    assert candidate.sparse_slot_counts == sparse_fifteen.slot_counts
+    assert candidate.sparse_slot_counts[best_cell] == 0
+    assert candidate.slot_counts[best_cell] == 1
+    assert sum(candidate.sparse_slot_counts.values()) == 15
+    assert sum(candidate.slot_counts.values()) == 16
+    torch.testing.assert_close(candidate.parent_cell_ids, repeated.parent_cell_ids)
+    assert candidate.slot_counts == repeated.slot_counts
+    assert torch.equal(torch.random.get_rng_state(), rng_before)
+
+
+def test_global_quality_anchor_uses_fingerprint_then_cell_ties_without_deduplication():
+    shared_action = _actions([7.0])[0]
+    archive = QDArchive(grid_shape=(2, 2))
+    archive.update(
+        actions=torch.stack([shared_action, shared_action]),
+        rewards=torch.tensor([5.0, 5.0]),
+        costs=torch.tensor([-5.0, -5.0]),
+        descriptors=torch.tensor([[0.9, 0.9], [0.1, 0.1]]),
+        cell_ids=torch.tensor([3, 0]),
+        source_iter=-1,
+    )
+
+    allocation = allocate_parent_slots(
+        archive,
+        population_size=16,
+        sampling="sparse_priority",
+        sparse_exponent=1.0,
+        run_seed=5,
+        episode=1,
+        global_step=24,
+        iter_idx=2,
+        global_quality_anchor_count=1,
+    )
+
+    assert archive.entries[0].fingerprint == archive.entries[3].fingerprint
+    assert archive.select_global_best()[0] == 0
+    assert allocation.global_quality_anchor_cell_id == 0
+    assert allocation.sparse_slot_counts[0] > 0
+    assert allocation.slot_counts[0] == allocation.sparse_slot_counts[0] + 1
+    assert allocation.parent_cell_ids[0].item() == 0
+    assert allocation.parent_cell_ids.tolist().count(0) == allocation.slot_counts[0]
+
+
+@pytest.mark.parametrize("anchor_count", [True, -1, 2])
+def test_global_quality_anchor_count_fails_closed(anchor_count):
+    archive = _occupied_archive(2)
+    with pytest.raises(ValueError, match="global quality anchor count"):
+        allocate_parent_slots(
+            archive,
+            population_size=16,
+            sampling="sparse_priority",
+            sparse_exponent=1.0,
+            run_seed=0,
+            episode=0,
+            global_step=0,
+            iter_idx=0,
+            global_quality_anchor_count=anchor_count,
+        )
+
+
 @pytest.mark.parametrize("cell_count", [1, 16])
 def test_parent_allocation_degenerate_occupied_counts_are_finite(cell_count):
     archive = _occupied_archive(cell_count)
