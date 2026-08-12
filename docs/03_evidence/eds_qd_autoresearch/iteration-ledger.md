@@ -838,3 +838,12 @@
 - Result analysis：`experiments/run_021_reward_degenerate_control_fallback/analysis.md`，SHA-256 `9d2ef19a42b7bfd1df66e1bbae6b2b8af728489db2b01185cd987b74f2792bd3`。
 - Target/budget：这只是 offline implementation evidence，新增 online episode/GPU-hour/reservation/formal 均 0；historical formal best/gap 仍 `2/10 / 3`，不得声称成功率提升。
 - Decision：`KEEP_IMPLEMENTATION_PASS_AND_REQUIRE_PROTOCOL_FIRST_OFFLINE_MECHANISM_PREFLIGHT`。下一步仅可先提交 deterministic exact-zero/nondegenerate mechanism preflight protocol；GPU/API/model/LIBERO/Dev/Validation/Formal 仍未授权。
+
+#### AM. run_022 offline mechanism preflight protocol
+
+- Parent order：run_021 protocol/implementation/result 为 `7afebcc…` / `f010e8e…` / `7d131fd…`。Run_022 不改变 algorithm iteration 2 的 core/config blobs。
+- Fixture：冻结 float64 `(16,64,128)` population、4x4 endpoint layout、seed `22022` 与十个 deterministic rollouts；integrated loop 运行 candidate/control/legacy QD 的 exact-zero、equal-negative、`1e-12` near-equal 与 nondegenerate cases。
+- Gates：exact-equal candidate 必须与同输入 EDS control 的 selected/final/RNG 恒等且 `176/11/0`；legacy exact-zero 必须保留 archive/fingerprint path `176/11/176`；near-equal/nondegenerate candidate 与 legacy 的 action/archive/bounds/visits/RNG 完全恒等；全部 safety/accounting PASS。
+- Determinism/artifact：两次完整运行 scientific payload byte-identical；canonical/replay 仅写 owned `run_022.../analysis`，mode 0444、identical bytes、credential 0。
+- Whitelist：只允许新增 dedicated script/test；existing core/config/runner/audit/Stage/prompt/历史 artifact/protected design 零修改。当前 online/GPU/API/LIBERO/attempt/Dev/Validation/Formal 授权仍为 0。
+- PASS 仅授权新的六 episode online mechanism protocol；FAIL 则 no-online。任何 schema-only repair 也必须 protocol-first，不能改科学 gates。
