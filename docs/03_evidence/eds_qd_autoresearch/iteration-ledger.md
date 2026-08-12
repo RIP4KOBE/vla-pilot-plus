@@ -1143,3 +1143,19 @@
 - Telemetry：mode、secondary occupancy/parents/ratio/fingerprint/cells/activation/rebin discard/invariant violation、source labels；既有quality/anchor/final telemetry保持authoritative。
 - Gates：none identity、fail-closed config、update/rebin/duplicate/no-alt、allocation/anchor/final/source/RNG、integrated secondary activation与176/176/11、安全/accounting、全量适用回归。
 - Authorization：当前GPU/API/model/LIBERO/reservation/online/Dev/validation/formal全部0；PASS只可另立CPU mechanism protocol。
+
+#### BQ. Run042 protected-quality lane implementation PASS
+
+- Order/scope：protocol `d92311d`先于implementation `e75516a`；修改严格限制于冻结的3个core、config和2个test文件，protected untracked design保持未读/未改/未stage。
+- TDD/results：先得到8个预期missing-feature failure；随后QD focused 79/79、完整QD/RDT 408/408、diff check及credential scan PASS。Default/explicit none identity、fail-closed profile、duplicate/no-alternate、rebin quality/visits、stateless RNG、source telemetry、final quality-only execution均通过。
+- Integrated contract：protected模式只在grid+capacity1+sparse+causal+anchor1+fallback none合法；quality lane保持原capacity1权威状态，secondary不携带visits/occupancy/global-best/final execution；所有parent正常rollout且完整chunk仍176/176/11。
+- Decision：`KEEP_H5_V5_IMPLEMENTATION_PASS_AUTHORIZE_CPU_MECHANISM_PROTOCOL_ONLY`。新增GPU/API/model/LIBERO/reservation/online/formal均0；historical best/gap保持2/10、3。
+
+#### BR. Run043 integrated CPU mechanism PASS
+
+- Temporal order：Run043 protocol `d37da30`先于harness `aed3b75`，artifact只在harness commit后生成；algorithm/config hashes fail-closed。全适用回归424/424与py_compile PASS。
+- Protected activation：expanding/stable两case每iteration均4个secondary cells，各10轮累计72个secondary parents；source totals均为10 global-quality anchor、78 quality sparse、72 secondary sparse。Mode-none comparator secondary occupancy/parents/activation全0，sources为10 anchor+150 archive。
+- Quality identity：expanding candidate与comparator的bounds/checksum/rebin visits/occupancy/cumulative visits/per-cell reward/parent cell counts/global best/final fingerprint/reward/execution source逐项相同。Expanding bounds扩张6次，stable为0；所有rebin visit sums守恒。
+- Safety/compute：所有case均10个16-parent rollout、176 search/176 QD/11 score calls；nonfinite、mask、qpos、accounting、monotonicity、secondary invariant及final-selection violation全0；global RNG与双suite byte identity通过。
+- Artifacts：canonical/replay byte-identical、mode0444、33,587 bytes、file SHA `32a46d78…5f3a`、payload `f147b905…c73c`、credential0；仅写owned Run043 root。
+- Decision：`KEEP_H5_V5_CPU_MECHANISM_PASS_AUTHORIZE_ONLINE_MECHANISM_PROTOCOL_ONLY`。这是零episode机制证据，不改变2/10 best或gap3；下一步只允许先独立提交冻结4-cell paired online mechanism protocol，当前GPU/API/LIBERO/reservation/formal授权仍0。

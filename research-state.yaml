@@ -5,7 +5,7 @@ project:
   title: "EDS-QD Autoresearch for LIBERO Object-Swap OOD"
   question: "Can a mechanism-grounded, compute-accounted successor to the audited EDS-QD baseline reach at least 5/10 valid successes on frozen LIBERO-PRO libero_object_swap without evaluation leakage or safety regression?"
   status: active_v5_protected_quality_lane
-  phase: outer_loop_v5_protocol
+  phase: run043_cpu_mechanism_pass_online_protocol_pending
   started: "2026-08-08"
   domain: "vision-language-action inference-time search and quality-diversity"
   planning_only: false
@@ -134,7 +134,7 @@ hypotheses:
     priority: medium
   - id: H5
     statement: "A single endpoint descriptor and capacity-one archive merge manipulation behaviors whose future value differs by stage or trajectory shape; stage-aware descriptors or limited within-cell plurality will improve behavior retention."
-    status: aliasing_supported_naive_top2_retention_refuted
+    status: protected_lane_implemented_cpu_mechanism_pass_online_pending
     motivation: "Across 24 active-QD traces and 4,224 candidates, 65.10% of candidates are in colliding endpoint-XY cells; same-cell reward top-two direction/shape distance medians are 0.3617/0.2501 with only 0.01270 median reward gap."
     parent: null
     priority: medium
@@ -147,7 +147,7 @@ experiments:
   best_value: null
   target_success_count: 5
   current_target_gap_from_historical_best_qd: 3
-  total_runs: 7
+  total_runs: 17
   trajectory_path: "data/experiment-trajectory.jsonl"
   trajectory:
     - id: run_000_baseline_replay
@@ -1066,8 +1066,8 @@ continuation_v5:
   candidate_limit: 1
   candidate: qd_protected_quality_secondary_v1
   candidate_stack: "capacity-one exact protected quality lane + one non-evicting secondary lane per quality cell + sparse_priority + causal_envelope_v1 + global-quality anchor1; fallback disabled"
-  active_experiment: run_041_protected_quality_lane_diagnostic
-  phase: RUN042_IMPLEMENTATION_PROTOCOL_PENDING_COMMIT
+  active_experiment: run_043_protected_quality_lane_cpu_mechanism
+  phase: RUN044_ONLINE_MECHANISM_PROTOCOL_PENDING_COMMIT
   final_candidate_without_prior_task_gain: true
   pre_v5_effective_online_episodes: 66
   pre_v5_global_reservations: 90
@@ -1126,10 +1126,12 @@ continuation_v5:
     gpu_authorized: false
     online_episode_attempts_authorized: 0
   run_042:
-    status: PROTOCOL_LOCKED_BEFORE_IMPLEMENTATION
+    status: IMPLEMENTATION_PASS
     protocol: "experiments/run_042_protected_quality_lane_implementation/protocol.md"
     protocol_sha256: "7125aa543199980ed237403034ac4992e6844d3b576bf10c9c31d274c4c38406"
     parent_result_commit: "f1d16cc"
+    protocol_commit: "d92311d"
+    implementation_commit: "e75516a36b10041b1a652bde8175302c9a7e896a"
     allowed_core_files: 3
     allowed_config_files: 1
     allowed_test_files: 2
@@ -1138,4 +1140,41 @@ continuation_v5:
     online_episode_attempts_authorized: 0
     candidate_secondary_lane_mode: protected_reward_v1
     compute_contract: "176 search / 176 QD / 11 score calls"
-  next_action: "Commit Run042 protocol, then implement exactly the six-file TDD change and run full applicable regression"
+    focused_qd_tests: "79 passed"
+    full_applicable_regression: "408 passed"
+    py_compile: PASS
+    diff_check: PASS
+    credential_matches: 0
+    decision: KEEP_H5_V5_IMPLEMENTATION_PASS_AUTHORIZE_CPU_MECHANISM_PROTOCOL_ONLY
+  run_043:
+    status: PASS
+    protocol: "experiments/run_043_protected_quality_lane_cpu_mechanism/protocol.md"
+    protocol_commit: "d37da30"
+    harness_implementation_commit: "aed3b75"
+    algorithm_iteration: 5
+    algorithm_change_authorized: false
+    gpu_authorized: false
+    online_episode_attempts_authorized: 0
+    dedicated_tests: "3 passed"
+    full_applicable_regression: "424 passed"
+    py_compile: PASS
+    gates: "10/10 PASS"
+    protected_secondary_parent_activations_per_case: 72
+    protected_secondary_occupied_cells_per_iter: 4
+    candidate_expanding_bounds_expansion_count: 6
+    candidate_stable_bounds_expansion_count: 0
+    comparator_quality_identity: PASS
+    compute_contract: "176 search / 176 QD / 11 score calls"
+    artifact_root: "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_043_protected_quality_lane_cpu_mechanism"
+    artifact_file_sha256: "32a46d78aa467efdbe4564e0cdaccb90dadaae2e8f8dca18629a1de93ff15f3a"
+    artifact_payload_sha256: "f147b905b68d28c8168642fba0b7470753d5daf9bb91535f8d112ac0498dc73c"
+    artifact_size_bytes: 33587
+    artifact_mode: "0444"
+    artifact_byte_identity: true
+    credential_matches: 0
+    online_episode_attempts: 0
+    gpu_hours: 0.0
+    analysis: "experiments/run_043_protected_quality_lane_cpu_mechanism/analysis.md"
+    analysis_sha256: "8c338d4b56670216c60011514c5e86dc5500b72fb011d7dee1aba62916be7be1"
+    decision: KEEP_H5_V5_CPU_MECHANISM_PASS_AUTHORIZE_ONLINE_MECHANISM_PROTOCOL_ONLY
+  next_action: "Commit Run042/Run043 results, then lock Run044 four-cell online mechanism protocol before runner, manifest, health, admission, reservation or GPU/API/LIBERO execution"

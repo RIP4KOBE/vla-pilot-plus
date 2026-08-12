@@ -20,6 +20,17 @@ Run040 validated the capacity-one replay (zero mismatch) and the aliasing/alloca
 
 Run041 confirms that role separation resolves the exact Run040 failure without changing cell ecology or compute. Across all 264 streams the protected quality lane exactly matches capacity one, while a non-evicting secondary exists in 2,613/3,471 quality-cell snapshots and receives 28.89% of sparse parent slots. All 240 cell allocations, anchors and final quality selections remain comparator-identical. This justifies implementation testing, but supplies no environment-success evidence yet.
 
+Run042/043 close the implementation and integrated-CPU risk. The default-off
+implementation passed 408 applicable tests; the frozen Run043 harness then
+passed ten mechanism gates and 424 full applicable regressions. In each protected
+fixture, four secondary cells remained active at every iteration and supplied 72
+of 150 sparse parents, while the expanding protected run and mode-none comparator
+were identical on every authoritative quality, allocation and final-execution
+field. Thus protected within-cell behavior can enter offspring generation without
+changing quality elitism or the 176/176/11 compute contract. This remains zero-
+episode mechanism evidence; only the frozen paired online mechanism split can
+show whether it shrinks the task-success gap.
+
 The `run_000_baseline_replay` machine replay adds a stronger ecology boundary. Across 4,705 QD chunks from 27 original and budget-study metrics files, every chunk reported zero direct elite carryover and archive-only parent selection; the accumulated parent counts were 3,281,360 archive offspring and zero direct elites. The configured `num_elites` is a no-op in the non-CEM QD branch. Thus the current QD process has cell-local reward elitism but no explicit population budget reserved for globally strong lineages.
 
 `run_001_allocation_ecology_diagnostic` is invalid and supplies no reward-inheritance conclusion. The audit exposed three telemetry semantics that must not be conflated: parent ranks apply to population occurrences rather than unique cells; parent slot maps are pre-update while same-index coverage is post-update; and sparse-priority can assign zero slots to occupied cells. After two infrastructure attempts the preregistered stop rule ended repair. H4 remains unresolved and is not authorized for online evaluation in this cycle.
@@ -48,6 +59,7 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 - `run_010` Dev-A: immutable v2 audit PASS (`9c6d3ece…9fa9`); candidate 1/4 vs control 0/4, gained task 9, lost none; 4/4 tasks support the partition mechanism and all safety/accounting/latency gates pass. Dev-B confirmation is required.
 - `run_010` Dev-B: immutable audit PASS (`7a73b3ae…f64f`); candidate 2/4 vs control 0/4, gained tasks 5/8, lost none; pooled Dev-A+Dev-B gain +3; 4/4 mechanism support and all hard gates pass. A new validation protocol is authorized.
 - `run_010` validation: immutable audit valid/target-FAIL (`3f72d025…0774`); candidate 1/10 (task 0) vs control 0/10; gained task 0, lost none; 10/10 mechanism support, post-overflow 0, latency 1.0922x, clean safety/accounting/credential, cumulative 2.9348 GPU-hours. Formal is forbidden.
+- `run_043`: 10/10 CPU mechanism gates, protected secondary activation 72/150 sparse parents in both candidate fixtures, exact expanding-fixture quality identity versus mode-none, 176/176/11, 424 regressions, dual-artifact SHA `32a46d78…5f3a`, and zero online/GPU use.
 
 ## Patterns and Insights
 
@@ -71,6 +83,11 @@ Direct compute scaling is no longer an active direction. The 18 valid budget con
 18. Integrated synthetic execution confirms the guard is a true per-chunk switch rather than persistent mode state: exact-zero output is identical to the existing EDS control including RNG, while a following nondegenerate chunk reactivates the unchanged QD archive. This closes offline integration risk but still supplies no task-success estimate.
 19. A run-local ledger cannot reuse the legacy helper when scientific IDs are globally offset: its hard-coded 1..N validation fails after valid IDs 55–60 are reserved. This is a pre-dispatch accounting defect, not H2 evidence; recovery must preserve and void the original reservations append-only before using dedicated global-offset semantics.
 20. Retrospective exact-zero reward prevalence did not transfer prospectively: all 74 candidate chunks across tasks 2/3/9 had strictly positive reward spread, so the exact-equality guard never activated. Meanwhile unchanged active QD lost the contemporaneous control success on task 9 (0/3 vs 1/3). Exact equality is therefore not a viable online routing predicate for this candidate; tolerance tuning would be a new threshold search, not a repair.
+21. Role separation is sufficient to retain same-cell plurality without changing
+    the capacity-one quality path: protected secondary parents can occupy nearly
+    half of sparse slots in an integrated loop while quality bounds, visits,
+    allocation counts and final execution remain comparator-identical. Whether
+    those descendants improve manipulation success is now the sole open gate.
 
 ## Lessons and Constraints
 
