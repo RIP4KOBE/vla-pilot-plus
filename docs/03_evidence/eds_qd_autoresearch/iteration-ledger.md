@@ -1106,3 +1106,13 @@
 - Artifacts：canonical-v2/replay-v2 byte-identical、mode0444、20,503 bytes、file SHA `447152db…9b98`、payload `09725a43…7349`；strict credential hits0。V1 artifacts保持未覆盖。
 - Decision：`REJECT_H5_V4_TOP2_RETENTION_FAIL_TRIGGER_OUTER_LOOP`。Alias observations保留，但`qd_within_cell_top2_v1`不得实现或online。下一候选若存在必须versioned protocol-first，将quality lane与secondary lane分离；不得放宽retention gate。
 - Target/accounting：新增GPU/API/model/LIBERO/reservation/online/formal均0；累计仍66 effective episodes、90/143 reservations、5.447063/48 GPUh、formal0；historical best/gap仍2/10、3。
+
+#### BM. v5 protected-quality secondary-lane versioned design
+
+- Parent/result order：Run040 result已独立commit `9e3d855`。Outer-loop保留alias/activation证据但拒绝overall top2；不放宽17次retention FAIL。
+- H5-v5：quality lane逐update/rebin/visits精确复现capacity1；每个已有quality cell最多一个secondary，来自未成为quality的旧/新lineage，不能建立cell、携带visits、挤掉quality或直接final execution。
+- Allocation/compute：global anchor仍取quality；production sparse15的cell counts与capacity1 exact identity；cell内stateless round-robin。总16 parents、176/176/11不变，所有parents仍renoise/rollout。
+- Run041门：24 traces/264 streams capacity1与protected quality/allocation identity；retention/integrity mismatch0；secondary sparse activation>=20%；collision/top2 evidence复现；双artifact/RNG/secret/write clean。PASS才允许implementation protocol。
+- Fresh split：mechanism `[7,5]/[87603,666847]`；Dev-A `[8,0,4]/[722809,356933,33067]`；validation seeds `[148392,894439,929693,934684,186167,100751,365645,543533,256271,426125]`。formal仍reuse-limited且未授权。
+- Budget/no-progress：仍90/143 reservations、5.447063/48 GPUh；max50 science cells、3 recovery。若v5无task-level gain且无新非重复QD证据，必须全局no-adoption，不得生成第六candidate。
+- Boundary：当前只冻结design/state，无core/config/test/artifact/GPU/API/model/LIBERO/reservation/online/formal change。Protected untracked design继续排除。
