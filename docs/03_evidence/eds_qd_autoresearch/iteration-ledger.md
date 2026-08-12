@@ -901,3 +901,17 @@
 - Protocol-first v3：严格在 ledger mutation/runner repair 前冻结。IDs 55–60 将 append-only 标记 `reservation_void`；仅 dedicated v2 runner/test 可增加 global-offset ledger semantics 和 v3 manifest；exact cells 以 recovery IDs 61–66 重跑，并带 `recovery_of_attempt_id`。
 - Budget：当前 global reservations 60/143，scientific executions仍 0；授权 recovery 后为 66/143，消耗 6/19 recovery slots、余 13。historical formal best/gap 仍 `2/10 / 3`，formal 0。
 - Stop：若修复后再次发生 local pre-dispatch code failure，停止 Run023，不授权第三组 reservation；health/admission wait 不消耗 attempt。
+
+#### AS. run_023 valid online mechanism FAIL and no-Dev decision
+
+- Recovery implementation：protocol/implementation `27fc65c56347a1ee94353511a1d2cf9da3be65a1` / `6374e23a5073f0708ee4345935df024207740258`。Dedicated/global-offset tests + v1 runner/QD `51 passed`；H2 focused test `1 passed`；四个 core/config SHA 与 run_021 冻结值完全一致。
+- Manifest v3：mode 0444、17,002 bytes，file SHA `9429fe7420cfb613565fd83ee537e37fba5c3cd43093bc38f0bc1c7087d8793a`、payload `6160bf2d6f4fcf9c53a0613016dc0cc33efe2246870f38257a5550133a15399c`；v1/v2 `d51a4404…c718` / `8e47ebb…d2df` 保持不变。
+- Execution：real health PASS 后 fresh admission 选择 GPU 2/5；IDs 55–60 append-only void，exact-cell recovery IDs 61–66 带 parent mapping 并 dispatch。Control/candidate 均 exit 0、3/3 metadata、3 videos、strict perturbation/suite valid。
+- Task-level：control tasks 2/3 fail、task 9 success，合计 `1/3`；candidate tasks 2/3/9 全 fail，合计 `0/3`。Candidate gained `[]`、lost `[9]`。全部 failure 只分类为 `timeout without completion`，不臆测 finer cause。
+- Candidate mechanism：task 2/3/9 分别 `21/50/3` chunks，fallback 全为 0，active-QD 为 `21/50/3`；74/74 active。最低 reward spread 分别 `0.0135803/0.0122940/0.0351257`，均非 exact zero。Online prospective observation 不支持 run_020 retrospective exact-zero prevalence。
+- Compute/accounting：candidate 每 chunk `176 search / 176 QD / 11 calls`；control `176/0/11`。Candidate post-envelope overflow恒为 0，finite resolution median约 `0.6400/0.5741/0.6576`，但这些 proxy 不能覆盖 missing fallback 与 task 9 regression。
+- Safety/latency/artifact：disallowed safety、nonfinite、mask/qpos、accounting/monotonicity/selection、Stage/service fallback、credential matches均 0；candidate/control latency P95 `2.98266/2.97889 s`，ratio `1.001266 <= 1.25`；root credential audit 145 files PASS。
+- Budget：Run023 `0.812334` GPU-hours，累计 `3.747101/48`；global reservations `66/143`；recovery reserve消耗 6/19、余 13；valid online episodes 6。Formal 0，historical formal best/gap 仍 `2/10 / 3`。
+- Immutable result：audit mode 0444、SHA `7f123ecdf3ffb7fbbb881ffebe197ddb2ae8e4b1237233dd2316f6f67e832c54`，唯一 hard failure `candidate missing fallback record`；attempt ledger `3f445b32…a63c`；run manifest `5a142003…b748`。
+- Interpretation：exact-equality fallback 在真实新 observation 上完全不激活，candidate 反而丢失 control task 9。禁止改成 tolerance sweep 或追加相邻候选。Decision `CONCLUDE_H2_ONLINE_MECHANISM_FAIL_NO_DEV`；Dev-A/B、validation、formal 全部禁止。
+- Next：本 v2 design 的 single candidate 已耗尽；result commit 后必须 outer-loop conclusion。任何后续算法 candidate 都需要 versioned design、新 holdout seeds 与明确授权。
