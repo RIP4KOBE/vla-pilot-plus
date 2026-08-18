@@ -22,6 +22,7 @@ diffusion:
 # ============================================================
 pi05:
   pretrained_path: lerobot/pi05_libero_finetuned_v044
+  tokenizer_path: null  # Optional local tokenizer directory for offline/server runs
   num_inference_steps: 10
   action_chunk_horizon: 10
 

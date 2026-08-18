@@ -110,6 +110,12 @@ class Main:
         """
         self.cfg = cfg
         self.config = cfg.main  # Shortcut to main config section
+        from mode_gate.config import ModeGateConfig
+
+        raw_mode_gate_config = OmegaConf.to_container(
+            cfg.get("mode_gate", {}), resolve=True
+        )
+        self.mode_gate_config = ModeGateConfig.from_mapping(raw_mode_gate_config)
 
         # Log the resolved configuration
         log.info(f"Configuration:\n{OmegaConf.to_yaml(cfg, resolve=True)[:500]}...")
@@ -207,6 +213,11 @@ class Main:
             preprocessor_overrides = {
                 "device_processor": {"device": str(self.policy.config.device)},
             }
+            local_tokenizer_path = type_config.get("tokenizer_path", None)
+            if local_tokenizer_path:
+                preprocessor_overrides["tokenizer_processor"] = {
+                    "tokenizer_name": str(local_tokenizer_path),
+                }
             self.policy_preprocessor, self.policy_postprocessor = make_pre_post_processors(
                 policy_cfg=self.policy.config,
                 pretrained_path=pretrained_path,
@@ -216,7 +227,11 @@ class Main:
         self.policy.post_init(
             adapter=self.adapter,
             postprocessor=self.policy_postprocessor,
-            sample_batch_size=self.config.get('sample_batch_size', 1),
+            sample_batch_size=(
+                self.mode_gate_config.sample_count
+                if self.mode_gate_config.enabled
+                else self.config.get('sample_batch_size', 1)
+            ),
             policy_config=policy_config.get(policy_type, {}),
         )
 
@@ -232,6 +247,7 @@ class Main:
 
         # Initialize components
         self._init_components(cfg)
+        self._init_mode_gate()
 
         # Reset environment and policy
         # self.adapter.reset()
@@ -320,16 +336,158 @@ class Main:
 
         self.cached_functions_dir = self.config.get('cached_functions_dir', None)
 
+    def _init_mode_gate(self) -> None:
+        """Initialize the opt-in gate without touching steering internals."""
+        self.mode_gate_controller = None
+        if not self.mode_gate_config.enabled:
+            return
+
+        from mode_gate.agents import PlannerAgent, VerifierAgent
+        from mode_gate.cards import ModeCardRenderer, adapter_camera_projector
+        from mode_gate.controller import ModeGateController
+        from mode_gate.gate import TrajectoryModeGate
+        from mode_gate.projectors import (
+            CalvinTrajectoryProjector,
+            LiberoTrajectoryProjector,
+        )
+
+        if self.backend == "calvin":
+            projector = CalvinTrajectoryProjector(self.adapter)
+        elif self.backend == "libero":
+            projector = LiberoTrajectoryProjector(self.adapter)
+        else:
+            raise ValueError(
+                f"mode_gate supports only CALVIN and LIBERO, got {self.backend!r}"
+            )
+
+        renderer = ModeCardRenderer(adapter_camera_projector(self.adapter))
+        gate = TrajectoryModeGate(self.mode_gate_config, projector, renderer)
+        planner = PlannerAgent(
+            model=self.mode_gate_config.planner_model,
+            reasoning_effort=self.mode_gate_config.planner_reasoning_effort,
+        )
+        verifier = VerifierAgent(
+            model=self.mode_gate_config.verifier_model,
+            thinking_level=self.mode_gate_config.verifier_thinking_level,
+        )
+        self.mode_gate_controller = ModeGateController(
+            self.mode_gate_config,
+            gate,
+            planner,
+            verifier,
+        )
+        # Exact-model access is checked only when the opt-in feature is enabled.
+        self.mode_gate_controller.preflight()
+        log.info("Trajectory mode gate initialized and provider preflight passed")
+
     def _get_policy_observation(self) -> dict:
         """Get observation in policy expected format (backend-agnostic)."""
+        configured_sample_count = (
+            self.mode_gate_config.sample_count
+            if self.mode_gate_config.enabled
+            else self.config.get('sample_batch_size', None)
+        )
         sample_num = policy_observation_sample_num(
             self.policy_type,
-            self.config.get('sample_batch_size', None),
+            configured_sample_count,
         )
         observation = self.adapter.get_policy_observation(sample_num=sample_num)
 
         processed_observation = self.policy_preprocessor(observation)
         return processed_observation
+
+    def _run_mode_gate(
+        self,
+        *,
+        sample_policy: Callable[[], Any],
+        episode: int,
+        episode_dir: str,
+        global_step: int,
+        current_stage: int,
+    ) -> Any | None:
+        """Run one fixed-context session before any candidate action executes."""
+        import hashlib
+        from dataclasses import asdict
+        from pathlib import Path
+
+        from mode_gate.black_box import BlackBoxSample, OneShotSteeringBlackBox
+        from mode_gate.types import ControllerStatus, GateContext
+
+        observation_image = np.asarray(self.adapter.get_vlm_image())
+        instruction = self.adapter.get_task_description()
+        stage_label = str(current_stage)
+        stage_descriptions = getattr(self, "stage_descriptions", "")
+        for line in str(stage_descriptions).splitlines():
+            if line.lower().startswith(f"stage {current_stage}:"):
+                stage_label = line
+                break
+        fingerprint = hashlib.sha256()
+        fingerprint.update(observation_image.tobytes())
+        fingerprint.update(str(instruction).encode("utf-8"))
+        fingerprint.update(stage_label.encode("utf-8"))
+        context_id = (
+            f"episode-{episode + 1:03d}-step-{global_step:05d}-"
+            f"stage-{current_stage}-{fingerprint.hexdigest()[:10]}"
+        )
+        context = GateContext(
+            context_id=context_id,
+            observation_image=observation_image,
+            task_instruction=instruction,
+            task_stage=stage_label,
+            metadata={
+                "backend": self.backend,
+                "episode": episode + 1,
+                "global_step": global_step,
+            },
+        )
+        action_info = self.adapter.get_action_space_info()
+
+        def sample_black_box(
+            fixed_context: GateContext,
+            count: int,
+        ) -> BlackBoxSample:
+            del fixed_context, count
+            execution_action_chunk = sample_policy()
+            candidates = _get_visualization_action_chunk(
+                self.policy,
+                self.adapter,
+                execution_action_chunk,
+            )
+            return BlackBoxSample(
+                candidates=candidates,
+                execution_action_chunk=execution_action_chunk,
+                is_complete=True,
+            )
+
+        black_box = OneShotSteeringBlackBox(
+            self.mode_gate_config.sample_count,
+            sample_black_box,
+            action_space=str(action_info.get("type", "environment_action")),
+            coordinate_frame="world",
+        )
+        result = self.mode_gate_controller.run(
+            context,
+            black_box,
+            Path(episode_dir) / self.mode_gate_config.output_subdir,
+        )
+        if result.status is ControllerStatus.STEERING_COMPLETE:
+            return result.execution_action_chunk
+        if result.status is ControllerStatus.REQUEST_EXPANSION:
+            request_path = Path(episode_dir) / "mode_gate_expansion_request.json"
+            request_path.write_text(
+                json.dumps(
+                    asdict(result.expansion_request),
+                    ensure_ascii=False,
+                    indent=2,
+                    default=str,
+                ),
+                encoding="utf-8",
+            )
+            log.warning(
+                f"Mode gate requested expansion; evidence saved to {request_path}"
+            )
+            return None
+        raise RuntimeError(f"Mode gate aborted: {result.error}")
 
     def perform_task_for_episode(self, episode_dir: str):
         """Prepare for each episode (keypoint detection, guidance generation, etc.)"""
@@ -672,30 +830,79 @@ class Main:
             sigmoid_k = self.config.get("sigmoid_k", 12.0)
             sigmoid_x0 = self.config.get("sigmoid_x0", 0.7)
 
-            action_chunk = self.policy.select_action(
-                observation,
-                generate_new_chunk=generate_new_chunk,
-                use_guidance=use_guidance,
-                keypoints=keypoints,
-                guidance_fns=current_guidance_fns,
-                guide_scale=guide_scale,
-                sigmoid_k=sigmoid_k,
-                sigmoid_x0=sigmoid_x0,
-                start_ratio=self.config.get("start_ratio", None),
-                use_diversity=self.config.get("use_diversity", True),
-                diversity_scale=self.config.get("diversity_scale", 10.0),
-                MCMC_steps=self.config.get("MCMC_steps", 4),
-                verbose=True,
-                use_fkd=self.config.get("use_fkd", False),
-                fkd_config=OmegaConf.to_container(self.config.get("fkd", {}), resolve=True) if self.config.get("fkd") else None,
-                global_step=global_steps,
-                current_stage=current_stage,
-            )
+            def sample_policy() -> Any:
+                sampled_chunk = self.policy.select_action(
+                    observation,
+                    generate_new_chunk=generate_new_chunk,
+                    use_guidance=use_guidance,
+                    keypoints=keypoints,
+                    guidance_fns=current_guidance_fns,
+                    guide_scale=guide_scale,
+                    sigmoid_k=sigmoid_k,
+                    sigmoid_x0=sigmoid_x0,
+                    start_ratio=self.config.get("start_ratio", None),
+                    use_diversity=self.config.get("use_diversity", True),
+                    diversity_scale=self.config.get("diversity_scale", 10.0),
+                    MCMC_steps=self.config.get("MCMC_steps", 4),
+                    verbose=True,
+                    use_fkd=self.config.get("use_fkd", False),
+                    fkd_config=(
+                        OmegaConf.to_container(
+                            self.config.get("fkd", {}), resolve=True
+                        )
+                        if self.config.get("fkd")
+                        else None
+                    ),
+                    global_step=global_steps,
+                    current_stage=current_stage,
+                )
+                if hasattr(self.adapter, 'env_postprocessor'):
+                    transition = self.adapter.env_postprocessor(
+                        {"action": sampled_chunk}
+                    )
+                    sampled_chunk = transition["action"]
+                return sampled_chunk
 
-            if hasattr(self.adapter, 'env_postprocessor'):
-                action_transition = {"action": action_chunk}
-                action_transition = self.adapter.env_postprocessor(action_transition)
-                action_chunk = action_transition["action"]
+            if (
+                self.mode_gate_controller is not None
+                and generate_new_chunk
+                and use_guidance
+            ):
+                action_chunk = self._run_mode_gate(
+                    sample_policy=sample_policy,
+                    episode=episode,
+                    episode_dir=episode_dir,
+                    global_step=global_steps,
+                    current_stage=current_stage,
+                )
+                if action_chunk is None:
+                    # Expansion execution is intentionally outside this change.
+                    # Save the complete no-action episode before returning.
+                    image = np.array(self.adapter.get_vlm_image())
+                    image_with_status = add_text_to_image(
+                        image,
+                        [
+                            f"Step:{global_steps} Stage:{current_stage}",
+                            "Mode gate: REQUEST_EXPANSION",
+                            "No candidate action executed",
+                        ],
+                    )
+                    self.video_recorder.add_frame(
+                        self.adapter.vlm_camera,
+                        image_with_status,
+                    )
+                    video_path = os.path.join(
+                        episode_dir,
+                        f"episode_{episode + 1}_mode_gate_expansion",
+                    )
+                    self.video_recorder.save_video(
+                        save_path=video_path,
+                        success=False,
+                        behavior_name="mode_gate_expansion",
+                    )
+                    return
+            else:
+                action_chunk = sample_policy()
 
             # Get image and add status overlay
             if self.config.get("debug_draw_trajectory", False):

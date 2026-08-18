@@ -5,6 +5,28 @@ from omegaconf import OmegaConf
 import torch
 
 
+def test_mode_gate_expansion_branch_saves_terminal_video():
+    source = (Path(__file__).resolve().parents[1] / "main.py").read_text()
+
+    assert "Mode gate: REQUEST_EXPANSION" in source
+    assert "episode_{episode + 1}_mode_gate_expansion" in source
+    assert "self.video_recorder.save_video" in source
+
+
+def test_optional_local_tokenizer_is_forwarded_as_processor_override():
+    source = (Path(__file__).resolve().parents[1] / "main.py").read_text()
+
+    assert 'type_config.get("tokenizer_path", None)' in source
+    assert 'preprocessor_overrides["tokenizer_processor"]' in source
+
+
+def test_mode_gate_context_uses_current_vlm_stage_description():
+    source = (Path(__file__).resolve().parents[1] / "main.py").read_text()
+
+    assert 'line.lower().startswith(f"stage {current_stage}:")' in source
+    assert "task_stage=stage_label" in source
+
+
 def test_init_components_skips_vlm_when_guidance_disabled(monkeypatch, tmp_path):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     import main

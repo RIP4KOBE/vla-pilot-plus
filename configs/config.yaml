@@ -63,6 +63,27 @@ experiment:
     - ${backend.backend}
 
 # ============================================================
+# Black-box Steering Trajectory Mode Gate (opt-in)
+# ============================================================
+mode_gate:
+  enabled: false
+  sample_count: 40
+  max_rounds: 5
+  phase_points: 8
+  max_components: 4
+  pca_dims: 8
+  seed: ${seed}
+  gmm_n_init: 5
+  gmm_reg_covar: 1.0e-5
+  gmm_max_iter: 200
+  verifier_workers: 4
+  planner_model: gpt-5.6-sol
+  planner_reasoning_effort: high
+  verifier_model: gemini-robotics-er-2-preview
+  verifier_thinking_level: high
+  output_subdir: mode_gate
+
+# ============================================================
 # Hydra Settings
 # ============================================================
 hydra:
