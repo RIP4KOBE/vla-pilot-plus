@@ -140,6 +140,9 @@ def test_gmm_retains_low_mass_mode_and_uses_real_unique_representatives():
     np.testing.assert_array_equal(first.labels, second.labels)
     assert len(first.modes) >= 2
     assert any(mode.weight < 0.25 for mode in first.modes)
+    assert [mode.weight for mode in first.modes] == sorted(
+        (mode.weight for mode in first.modes), reverse=True
+    )
     for mode in first.modes:
         representatives = list(mode.representative_indices.values())
         assert len(representatives) == 3
@@ -158,6 +161,23 @@ def test_all_gmm_failures_degrade_to_empirical_mode(monkeypatch):
     assert result.fit_degraded is True
     assert len(result.modes) == 1
     assert result.modes[0].weight == 1.0
+    assert len(set(result.modes[0].representative_indices.values())) == 3
+
+
+def test_total_fkd_ancestor_collapse_degrades_to_one_empirical_mode():
+    descriptors = np.zeros((40, 79), dtype=np.float64)
+    ancestors = np.zeros(40, dtype=np.int64)
+    result = TrajectoryModeFitter(max_components=4, pca_dims=8).fit(
+        descriptors,
+        ancestor_ids=ancestors,
+    )
+
+    assert result.fit_degraded is True
+    assert result.metadata["unique_ancestor_count"] == 1
+    assert "insufficient unique ancestors" in result.metadata["fallback_reason"]
+    assert len(result.modes) == 1
+    assert result.modes[0].weight == 1.0
+    assert result.modes[0].unique_ancestor_count == 1
     assert len(set(result.modes[0].representative_indices.values())) == 3
 
 
@@ -205,4 +225,3 @@ def test_gate_writes_four_panel_fallback_mode_cards(tmp_path):
     assert evidence.modes
     assert all(mode.projection_unavailable for mode in evidence.modes)
     assert all(mode.card_path.exists() for mode in evidence.modes)
-

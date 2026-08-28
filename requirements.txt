@@ -44,6 +44,7 @@ executing==2.2.1
 Farama-Notifications==0.0.4
 fast_kinematics==0.2.2
 fastjsonschema==2.21.2
+fastapi==0.116.1
 filelock==3.20.0
 fonttools==4.60.1
 freetype-py==2.5.1
@@ -225,6 +226,7 @@ tzdata==2025.2
 urdfpy==0.0.22
 uritemplate==4.2.0
 urllib3==2.5.0
+uvicorn[standard]==0.35.0
 wandb==0.21.4
 wcwidth==0.2.14
 wheel==0.45.1

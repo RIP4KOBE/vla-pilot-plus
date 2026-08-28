@@ -25,6 +25,13 @@ seed: 0
 # ============================================================
 main:
   episode_num: 10  # if using libero, need to be divisible by the number of tasks in the suite(i.e. libero_goal_task has 10 tasks, so episode_num should be divisible by 10)
+  # Formal evaluation overrides. Null preserves the normal stochastic loop.
+  init_state_id: null
+  env_seed: null
+  policy_seed: null
+  # Formal audit sets this true so invalid episodes exit nonzero and never
+  # become ordinary task failures or verifier labels.
+  fail_on_episode_error: false
   max_episode_steps: 240        # Max steps per episode (calvin.yaml references this via interpolation)
   output_dir: ${hydra:run.dir}
   cached_functions_dir: null
@@ -67,21 +74,54 @@ experiment:
 # ============================================================
 mode_gate:
   enabled: false
+  schema_version: mode-gate-v2
   sample_count: 40
+  chunk_horizon: 10
+  stagnation_window: 3
+  retry_budget: 4
+  # Deterministic exploration only overrides a head-predicted EXPANSION to obtain
+  # factual retry labels; the realized propensity is logged for IPW.
+  exploration_epsilon: 0.10
+  controller_mode: learned_verifier
+  # Non-empty only for explicitly named baseline experiments. These values
+  # never enter registry active.json or production deployment revisions.
+  baseline_kind: ""
+  baseline_budget: 4
+  baseline_minimum_modes: 2
+  baseline_threshold: 0.5
+  baseline_expansion_rate: 0.0
+  baseline_seed: 20260825
+  baseline_opportunity_bank: ""
   max_rounds: 5
   phase_points: 8
+  keypoint_limit: 8
   max_components: 4
   pca_dims: 8
   seed: ${seed}
   gmm_n_init: 5
   gmm_reg_covar: 1.0e-5
-  gmm_max_iter: 200
+  gmm_max_iter: 500
+  min_mode_mass: 0.05
+  min_unique_ancestors: 2
   verifier_workers: 4
-  planner_model: gpt-5.6-sol
+  planner_model: gemini-robotics-er-2-preview
+  planner_timeout_seconds: 60.0
+  planner_max_retries: 2
+  planner_prompt_version: mode-scorer-v3
   planner_reasoning_effort: high
-  verifier_model: gemini-robotics-er-2-preview
+  verifier_model: learned-binary-v1
   verifier_thinking_level: high
   output_subdir: mode_gate
+  theta0_checkpoint: /shared/hengyil6/vls/models/pi05_libero_finetuned_v044
+  registry_root: /shared/hengyil6/vls/self_improve/registry
+  incident_root: /shared/hengyil6/vls/self_improve/incidents
+  snapshot_root: /shared/hengyil6/vls/self_improve/snapshots
+  slow_loop_root: /shared/hengyil6/vls/self_improve/slow_loop
+  retry_schedule:
+    - [1.00, 1.00]
+    - [1.15, 1.10]
+    - [1.30, 1.25]
+    - [1.50, 1.40]
 
 # ============================================================
 # Hydra Settings

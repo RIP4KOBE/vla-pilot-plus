@@ -19,6 +19,7 @@ import numpy as np
 import torch
 import cv2
 import matplotlib.pyplot as plt
+from pathlib import Path
 from typing import Optional, Dict, Tuple, List
 from torch.nn.functional import interpolate
 from kmeans_pytorch import kmeans
@@ -110,14 +111,41 @@ class KeypointDetector:
             self._load_dinov2('dinov2_vits14')
 
     def _load_dinov2(self, model_name: str):
-        """Load DINOv2 model from torch.hub."""
+        """Load DINOv2 from frozen local source and weights only."""
         logger.info(f"Loading DINOv2 model: {model_name}")
         self.feature_extractor_type = 'dinov2'
         self.patch_size = 14  # DINOv2 uses patch size 14
+
+        repo_value = self.config.get('dinov2_repo_path')
+        weights_value = self.config.get('dinov2_weights_path')
+        if not repo_value or not weights_value:
+            raise RuntimeError(
+                "DINOv2 requires frozen dinov2_repo_path and "
+                "dinov2_weights_path; runtime downloads are disabled"
+            )
+        repo_path = Path(str(repo_value)).expanduser().resolve()
+        weights_path = Path(str(weights_value)).expanduser().resolve()
+        if not (repo_path / 'hubconf.py').is_file():
+            raise FileNotFoundError(f"frozen DINOv2 source is missing: {repo_path}")
+        if not weights_path.is_file():
+            raise FileNotFoundError(f"frozen DINOv2 weights are missing: {weights_path}")
+
         self.dino_model = torch.hub.load(
-            'facebookresearch/dinov2',
-            model_name
-        ).eval().to(self.device)
+            str(repo_path),
+            model_name,
+            source='local',
+            pretrained=False,
+        )
+        state_dict = torch.load(
+            weights_path,
+            map_location='cpu',
+            weights_only=True,
+            mmap=True,
+        )
+        if not isinstance(state_dict, dict) or not state_dict:
+            raise ValueError(f"invalid DINOv2 state dict: {weights_path}")
+        self.dino_model.load_state_dict(state_dict, strict=True)
+        self.dino_model = self.dino_model.eval().to(self.device)
         logger.info(f"DINOv2 model loaded: {model_name}")
 
     def _load_dinov3(self, model_name: str):
@@ -645,5 +673,4 @@ class KeypointDetector:
         )
         
         return keypoints, projected, mask_ids, dino_vis
-
 

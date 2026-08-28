@@ -3,7 +3,9 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
+import pytest
 
+from core.gemini_grounder import GeminiGrounder, GeminiStageRecognizer
 from mode_gate.agents import PlannerAgent, VerifierAgent
 from mode_gate.types import (
     ActionChunkBatch,
@@ -143,6 +145,11 @@ class _Interactions:
         return SimpleNamespace(output_text=json.dumps(self.payload))
 
 
+class _FailingInteractions:
+    def create(self, **kwargs):
+        raise TimeoutError("provider timeout")
+
+
 def test_verifier_uses_google_interactions_high_thinking_and_real_chunks(tmp_path):
     context, evidence, mode = _history(tmp_path)
     payload = {
@@ -171,3 +178,62 @@ def test_verifier_uses_google_interactions_high_thinking_and_real_chunks(tmp_pat
     assert request["response_format"]["mime_type"] == "application/json"
     assert [item["type"] for item in request["input"]] == ["text", "image"]
     assert "action_chunk" in request["input"][0]["text"]
+
+
+def test_legacy_visual_grounding_paths_are_frozen_to_robotics_interactions():
+    image = np.zeros((32, 48, 3), dtype=np.uint8)
+    grounding_client = SimpleNamespace(
+        interactions=_Interactions(
+            {
+                "detections": [
+                    {"label": "black bowl", "box_2d": [100, 200, 600, 800]}
+                ]
+            }
+        )
+    )
+    grounder = GeminiGrounder(
+        {
+            "model": "gemini-robotics-er-2-preview",
+            "client": grounding_client,
+        }
+    )
+    detections = grounder.detect_objects(image, ["black bowl"])
+    assert detections[0]["box_pixel"] == [3, 9, 19, 38]
+    request = grounding_client.interactions.kwargs
+    assert request["model"] == "gemini-robotics-er-2-preview"
+    assert request["store"] is False
+    assert [item["type"] for item in request["input"]] == ["text", "image"]
+    assert request["response_format"]["schema"]["required"] == ["detections"]
+
+    stage_client = SimpleNamespace(
+        interactions=_Interactions(
+            {"stage_num": 2, "need_guidance": False, "evidence": "object placed"}
+        )
+    )
+    recognizer = GeminiStageRecognizer(
+        {
+            "model": "gemini-robotics-er-2-preview",
+            "client": stage_client,
+        }
+    )
+    stage, guidance = recognizer.identify_stage_and_guidance(
+        image,
+        "place the bowl",
+        "1 approach; 2 placed",
+        num_stages=2,
+    )
+    assert (stage, guidance) == (2, False)
+    assert stage_client.interactions.kwargs["model"] == "gemini-robotics-er-2-preview"
+
+
+def test_legacy_visual_paths_fail_closed_on_provider_or_model_error():
+    image = np.zeros((8, 8, 3), dtype=np.uint8)
+    client = SimpleNamespace(interactions=_FailingInteractions())
+    grounder = GeminiGrounder(
+        {"model": "gemini-robotics-er-2-preview", "client": client}
+    )
+    with pytest.raises(TimeoutError, match="provider timeout"):
+        grounder.detect_objects(image, ["bowl"])
+
+    with pytest.raises(ValueError, match="frozen"):
+        GeminiStageRecognizer({"model": "gemini-2.5-flash", "client": client})

@@ -21,8 +21,8 @@ diffusion:
 # PI05 Policy (for LIBERO)
 # ============================================================
 pi05:
-  pretrained_path: lerobot/pi05_libero_finetuned_v044
-  tokenizer_path: null  # Optional local tokenizer directory for offline/server runs
+  pretrained_path: /shared/hengyil6/vls/models/pi05_libero_finetuned_v044
+  tokenizer_path: /shared/hengyil6/vls/models/paligemma-tokenizer
   num_inference_steps: 10
   action_chunk_horizon: 10
 

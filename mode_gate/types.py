@@ -26,6 +26,173 @@ class ControllerStatus(str, Enum):
     ABORTED = "ABORTED"
 
 
+class ControllerRoute(str, Enum):
+    """Externally visible route selected by the v2 controller."""
+
+    EXECUTE = "EXECUTE"
+    RESTEER = "RE-STEER"
+    EXPAND = "EXPANSION"
+    ABORT = "ABORT"
+
+
+class FailureTrigger(str, Enum):
+    STAGNATION = "STAGNATION"
+    CONTACT = "CONTACT"
+    NO_SAFE_MODE = "NO_SAFE_MODE"
+    TIMEOUT = "TIMEOUT"
+
+
+class ControllerPhase(str, Enum):
+    NORMAL_SAMPLE = "NORMAL_SAMPLE"
+    ABSTRACT = "ABSTRACT"
+    SCORE = "SCORE"
+    EXECUTE = "EXECUTE"
+    OBSERVE = "OBSERVE"
+    NORMAL_CONTINUE = "NORMAL_CONTINUE"
+    VERIFICATION_DUE = "VERIFICATION_DUE"
+    FRESH_SAMPLE = "FRESH_SAMPLE"
+    VERIFY = "VERIFY"
+    RESTEER_EXECUTE = "RESTEER_EXECUTE"
+    EXPAND = "EXPAND"
+    ABORT = "ABORT"
+
+
+@dataclass(frozen=True)
+class ProgressEvidence:
+    stage_id: str
+    advanced: bool
+    confidence: float
+    source: str
+    task_success: bool = False
+    reward_improved: bool = False
+
+    def __post_init__(self) -> None:
+        if not 0.0 <= float(self.confidence) <= 1.0:
+            raise ValueError("progress confidence must be in [0, 1]")
+        if not self.source:
+            raise ValueError("progress source must be non-empty")
+
+
+@dataclass(frozen=True)
+class SamplingCondition:
+    seed: int
+    retry_index: int
+    guide_mult: float = 1.0
+    diversity_mult: float = 1.0
+
+    def __post_init__(self) -> None:
+        if self.retry_index < 0:
+            raise ValueError("retry_index must be non-negative")
+        if self.guide_mult <= 0 or self.diversity_mult < 0:
+            raise ValueError("sampling multipliers are out of range")
+
+
+@dataclass(frozen=True)
+class SamplingDiagnostics:
+    ess_history: Sequence[float]
+    ancestor_ids: Sequence[int]
+    ess_ratio: float
+    unique_ratio: float
+    resample_indices: Sequence[Sequence[int]] = field(default_factory=tuple)
+
+    def __post_init__(self) -> None:
+        ancestors = tuple(int(value) for value in self.ancestor_ids)
+        if not ancestors:
+            raise ValueError("ancestor_ids must be non-empty")
+        if not 0.0 <= float(self.ess_ratio) <= 1.0:
+            raise ValueError("ess_ratio must be in [0, 1]")
+        if not 0.0 <= float(self.unique_ratio) <= 1.0:
+            raise ValueError("unique_ratio must be in [0, 1]")
+        if any(not np.isfinite(float(value)) for value in self.ess_history):
+            raise ValueError("ess_history contains non-finite values")
+        object.__setattr__(self, "ancestor_ids", ancestors)
+
+
+@dataclass(frozen=True)
+class SelectedExecution:
+    mode_id: str
+    sample_index: int
+    sample_id: str
+
+    def __post_init__(self) -> None:
+        if not self.mode_id or not self.sample_id or self.sample_index < 0:
+            raise ValueError("invalid selected execution")
+
+
+@dataclass(frozen=True)
+class GeometryEvidence:
+    mode_id: str
+    collision_risk: float
+    reachability: float
+    grasp_plausibility: float
+    hard_safety_veto: bool
+    veto_reason: str | None = None
+    method: str = "ee_proxy_v1"
+
+    def __post_init__(self) -> None:
+        for name in ("collision_risk", "reachability", "grasp_plausibility"):
+            value = float(getattr(self, name))
+            if not 0.0 <= value <= 1.0:
+                raise ValueError(f"{name} must be in [0, 1]")
+        if self.hard_safety_veto and not self.veto_reason:
+            raise ValueError("hard safety veto requires a reason")
+
+
+@dataclass(frozen=True)
+class SemanticModeScore:
+    mode_id: str
+    semantic_score: float
+    reason: str
+    predicted_failure_types: Sequence[str] = field(default_factory=tuple)
+
+    def __post_init__(self) -> None:
+        if not 0.0 <= float(self.semantic_score) <= 1.0:
+            raise ValueError("semantic_score must be in [0, 1]")
+
+
+@dataclass(frozen=True)
+class SemanticPlan:
+    mode_scores: Sequence[SemanticModeScore]
+    required_trajectory_pattern: str
+    observed_stage_id: str
+    stage_confidence: float
+    model: str
+    prompt_version: str
+    raw_response: Mapping[str, Any] = field(default_factory=dict, repr=False)
+
+    def __post_init__(self) -> None:
+        ids = [item.mode_id for item in self.mode_scores]
+        if not ids or len(ids) != len(set(ids)):
+            raise ValueError("semantic plan must contain unique mode IDs")
+        if not 0.0 <= float(self.stage_confidence) <= 1.0:
+            raise ValueError("stage_confidence must be in [0, 1]")
+
+
+@dataclass(frozen=True)
+class DecisionSnapshot:
+    """Immutable pointer to an exact post-failure replay state.
+
+    Large simulator/RGB/RNG payloads live in checksummed sidecars.  The JSONL
+    decision record contains this small manifest so it can be appended and
+    fsynced immediately.
+    """
+
+    snapshot_id: str
+    policy_id: str
+    simulator_state_path: Path
+    controller_state: Mapping[str, Any]
+    rng_state_path: Path
+    provenance: Mapping[str, Any]
+    snapshot_hash: str
+    observation_hash: str
+
+    def __post_init__(self) -> None:
+        if not self.snapshot_id or not self.policy_id:
+            raise ValueError("snapshot_id and policy_id must be non-empty")
+        if len(self.snapshot_hash) < 16 or len(self.observation_hash) < 16:
+            raise ValueError("snapshot and observation hashes are required")
+
+
 @dataclass(frozen=True)
 class GateContext:
     context_id: str
@@ -174,6 +341,7 @@ class RoundEvidence:
     modes: Sequence[ModeEvidence]
     fit_degraded: bool
     fit_metadata: Mapping[str, Any]
+    sampling_diagnostics: SamplingDiagnostics | None = None
 
 
 @dataclass(frozen=True)
@@ -227,4 +395,3 @@ class ControllerResult:
     expansion_request: ExpansionRequest | None = None
     rounds: int = 0
     error: str | None = None
-

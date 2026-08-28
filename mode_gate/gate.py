@@ -11,7 +11,13 @@ from .config import ModeGateConfig
 from .features import TrajectoryDescriptorEncoder
 from .mixture import TrajectoryModeFitter
 from .protocols import TrajectoryProjector
-from .types import ActionChunkBatch, GateContext, ModeEvidence, RoundEvidence
+from .types import (
+    ActionChunkBatch,
+    GateContext,
+    ModeEvidence,
+    RoundEvidence,
+    SamplingDiagnostics,
+)
 
 
 class TrajectoryModeGate:
@@ -24,7 +30,9 @@ class TrajectoryModeGate:
         self.config = config
         self.projector = projector
         self.renderer = renderer
-        self.encoder = TrajectoryDescriptorEncoder(config.phase_points)
+        self.encoder = TrajectoryDescriptorEncoder(
+            config.phase_points, keypoint_limit=config.keypoint_limit
+        )
         self.fitter = TrajectoryModeFitter(
             max_components=config.max_components,
             pca_dims=config.pca_dims,
@@ -32,6 +40,8 @@ class TrajectoryModeGate:
             n_init=config.gmm_n_init,
             reg_covar=config.gmm_reg_covar,
             max_iter=config.gmm_max_iter,
+            min_mode_mass=config.min_mode_mass,
+            min_unique_ancestors=config.min_unique_ancestors,
         )
 
     def analyze(
@@ -48,8 +58,25 @@ class TrajectoryModeGate:
                 f"got {batch.sample_count}"
             )
         trajectories = self.projector.project(batch, context)
-        descriptor_batch = self.encoder.encode(trajectories)
-        fit = self.fitter.fit(descriptor_batch.descriptors)
+        descriptor_batch = self.encoder.encode(
+            trajectories,
+            task_keypoints=batch.metadata.get("task_keypoints"),
+        )
+        diagnostics = _sampling_diagnostics(batch)
+        particle_mass = batch.metadata.get("particle_mass")
+        fit = self.fitter.fit(
+            descriptor_batch.descriptors,
+            ancestor_ids=(
+                np.asarray(diagnostics.ancestor_ids, dtype=np.int64)
+                if diagnostics is not None
+                else None
+            ),
+            particle_mass=(
+                np.asarray(particle_mass, dtype=np.float64)
+                if particle_mass is not None
+                else None
+            ),
+        )
 
         modes = []
         for fitted in fit.modes:
@@ -89,6 +116,7 @@ class TrajectoryModeGate:
                     else 0.0
                 ),
                 "representative_backfill": fitted.representative_backfill,
+                "unique_ancestor_count": fitted.unique_ancestor_count,
             }
             modes.append(
                 ModeEvidence(
@@ -120,5 +148,24 @@ class TrajectoryModeGate:
             modes=tuple(modes),
             fit_degraded=fit.fit_degraded,
             fit_metadata=fit.metadata,
+            sampling_diagnostics=diagnostics,
         )
 
+
+def _sampling_diagnostics(batch: ActionChunkBatch) -> SamplingDiagnostics | None:
+    raw = batch.metadata.get("sampling_diagnostics")
+    if raw is None:
+        return None
+    if isinstance(raw, SamplingDiagnostics):
+        diagnostics = raw
+    else:
+        diagnostics = SamplingDiagnostics(
+            ess_history=tuple(raw.get("ess_history", ())),
+            ancestor_ids=tuple(raw["ancestor_ids"]),
+            ess_ratio=float(raw["ess_ratio"]),
+            unique_ratio=float(raw["unique_ratio"]),
+            resample_indices=tuple(tuple(item) for item in raw.get("resample_indices", ())),
+        )
+    if len(diagnostics.ancestor_ids) != batch.sample_count:
+        raise ValueError("sampling diagnostics ancestor count does not match batch")
+    return diagnostics

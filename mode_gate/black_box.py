@@ -103,3 +103,6 @@ def _as_numpy_actions(value: Any) -> np.ndarray:
     if actions.ndim != 3:
         raise ValueError(f"candidate actions must have shape (N, H, A), got {actions.shape}")
     return actions
+
+
+as_numpy_actions = _as_numpy_actions
