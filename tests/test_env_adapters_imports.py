@@ -310,7 +310,7 @@ env = adapter.LiberoEnv.__new__(adapter.LiberoEnv)
 fake = FakeEnv()
 env._env = fake
 env.init_states = True
-env._init_states = ["state-0"]
+env._init_states = ["state-0", "state-1"]
 env._init_state_id = 0
 env.num_steps_wait = 3
 formatted_raw_obs = []
@@ -321,11 +321,11 @@ def format_raw_obs(raw_obs):
 
 env._format_raw_obs = format_raw_obs
 
-observation, info = env.reset(seed=123)
+observation, info = env.reset(seed=123, init_state_id=1)
 
 assert fake.calls == [
     "reset",
-    ("set_init_state", "state-0"),
+    ("set_init_state", "state-1"),
     ("step", (0, 0, 0, 0, 0, 0, 0)),
     ("step", (0, 0, 0, 0, 0, 0, 0)),
     ("step", (0, 0, 0, 0, 0, 0, 0)),
@@ -333,6 +333,7 @@ assert fake.calls == [
 assert formatted_raw_obs == ["step_obs_3"]
 assert observation == {"formatted": "step_obs_3"}
 assert info == {"is_success": False}
+assert env._init_state_id == 1
 '''
     result = _run_python(script)
 
@@ -619,6 +620,9 @@ assert captured["kwargs"] == {
     "visualization_height": 641,
     "num_steps_wait": 5,
     "max_episode_steps": 600,
+    "auto_reset": False,
+    "render_gpu_device_id": -1,
+    "camera_depths": True,
 }
 '''
     result = _run_python(script)
@@ -670,6 +674,35 @@ assert env._max_episode_steps == 600
     result = _run_python(script)
 
     assert result.returncode == 0, result.stderr
+
+
+def test_libero_internal_horizon_matches_adapter_timeout():
+    source = (
+        Path(__file__).resolve().parents[1]
+        / "core"
+        / "env_adapters"
+        / "libero_adapter.py"
+    ).read_text(encoding="utf-8")
+    method = source.split("    def _make_envs_task", 1)[1].split(
+        "    def _extract_language_from_bddl", 1
+    )[0]
+    assert '"horizon": self._max_episode_steps' in method
+    assert '"ignore_done": False' in method
+
+
+def test_libero_raw_observation_is_read_only():
+    source = (
+        Path(__file__).resolve().parents[1]
+        / "core"
+        / "env_adapters"
+        / "libero_adapter.py"
+    ).read_text(encoding="utf-8")
+    method = source.split("    def _get_raw_obs(self) -> dict:", 1)[1].split(
+        "    def get_ee_pose(self)", 1
+    )[0]
+
+    assert "_get_observations" in method
+    assert ".step(" not in method
 
 
 def test_libero_backend_config_defaults_match_eval_parity():

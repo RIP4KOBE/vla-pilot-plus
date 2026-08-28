@@ -119,6 +119,12 @@ class FKD:
         )
         # Product of potentials, used to correct MAX / ADD / RT at the end
         self.product_of_potentials = torch.ones(self.num_particles).to(self.device)
+        self.ancestor_ids = torch.arange(
+            self.num_particles, device=self.device, dtype=torch.long
+        )
+        self.ess_history: list[float] = []
+        self.resample_indices_history: list[list[int]] = []
+        self.resample_timesteps: list[int] = []
 
         # Incremental check
         self._last_idx_sampled = -1
@@ -276,10 +282,32 @@ class FKD:
         
 
         # Decide whether to resample based on ESS (if adaptive resampling is enabled)
+        # ESS is mathematically bounded by the particle count.  Compute this
+        # tiny reduction in float64 even while PI0.5 is running under CUDA
+        # autocast: float32/bfloat16 round-off can otherwise produce a value
+        # just above N, which then becomes an invalid verifier feature.
+        weights64 = w.to(dtype=torch.float64)
+        total_weight = weights64.sum()
+        if not bool(torch.isfinite(total_weight)) or float(total_weight) <= 0.0:
+            raise FloatingPointError("FKD weights have no finite positive mass")
+        normalized_w = weights64 / total_weight
+        ess_denominator = normalized_w.square().sum()
+        if not bool(torch.isfinite(ess_denominator)) or float(ess_denominator) <= 0.0:
+            raise FloatingPointError("FKD ESS denominator is not finite and positive")
+        raw_ess = 1.0 / ess_denominator
+        tolerance = max(1e-9, self.num_particles * 1e-9)
+        if (
+            float(raw_ess) < 1.0 - tolerance
+            or float(raw_ess) > float(self.num_particles) + tolerance
+        ):
+            raise FloatingPointError(
+                "FKD ESS invariant violated: "
+                f"ess={float(raw_ess):.17g}, particles={self.num_particles}"
+            )
+        ess = raw_ess.clamp(1.0, float(self.num_particles))
+        self.ess_history.append(float(ess.detach().cpu()))
         do_resample = True
         if self.adaptive_resampling or at_terminal_sample:
-            normalized_w = w / w.sum()
-            ess = 1.0 / (normalized_w.pow(2).sum() + 1e-12)
             if ess >= 0.5 * self.num_particles and not at_terminal_sample:
                 # Effective sample size is sufficient, no forced resampling
                 do_resample = False
@@ -288,6 +316,8 @@ class FKD:
             indices = torch.multinomial(
                 w, num_samples=self.num_particles, replacement=True
             )
+            self.resample_indices_history.append(indices.detach().cpu().tolist())
+            self.resample_timesteps.append(sampling_t)
             resampled_xt = _list_tensor_index(xt, indices)
             self.population_rs = rs_candidates[indices]
             resampled_x0 = _list_tensor_index(population_samples, indices)
@@ -295,6 +325,7 @@ class FKD:
             self.product_of_potentials = (
                 self.product_of_potentials[indices] * w[indices]
             )
+            self.ancestor_ids = self.ancestor_ids[indices]
         else:
             # No resampling, only update history reward
             resampled_xt = xt
@@ -309,10 +340,28 @@ class FKD:
             resampled_x0 = _list_tensor_index(resampled_x0, sort_indices)
             self.population_rs = self.population_rs[sort_indices]
             self.product_of_potentials = self.product_of_potentials[sort_indices]
+            self.ancestor_ids = self.ancestor_ids[sort_indices]
 
         return resampled_xt, resampled_x0
 
+    def diagnostics(self) -> dict:
+        unique = int(torch.unique(self.ancestor_ids).numel())
+        final_ess = self.ess_history[-1] if self.ess_history else float(self.num_particles)
+        ess_ratio = float(final_ess / max(1, self.num_particles))
+        if not np.isfinite(ess_ratio) or ess_ratio < -1e-9 or ess_ratio > 1.0 + 1e-9:
+            raise FloatingPointError(
+                "FKD diagnostic ESS ratio invariant violated: "
+                f"ratio={ess_ratio:.17g}, ess={final_ess:.17g}, "
+                f"particles={self.num_particles}"
+            )
+        return {
+            "ess_history": list(self.ess_history),
+            "ancestor_ids": self.ancestor_ids.detach().cpu().tolist(),
+            "ess_ratio": float(np.clip(ess_ratio, 0.0, 1.0)),
+            "unique_ratio": float(unique / max(1, self.num_particles)),
+            "resample_indices": list(self.resample_indices_history),
+            "resample_timesteps": list(self.resample_timesteps),
+        }
+
 
 __all__ = ["FKD", "PotentialType"]
-
-

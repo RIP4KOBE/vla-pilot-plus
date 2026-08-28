@@ -106,7 +106,7 @@ class CalvinAdapter(BaseEnvAdapter):
         """
         Get end-effector pose in world frame.
         """
-        return self.get_ee_pose().to_world_pose()
+        return self._robot_base_pose * self.get_ee_pose()
     
     def get_joint_positions(self) -> np.ndarray:
         """
@@ -158,13 +158,20 @@ class CalvinAdapter(BaseEnvAdapter):
         
         # Get starting position as tensor
         start_pos = torch.tensor(
-            self.get_ee_pose().position, 
+            self.get_ee_pose_world().position,
             device=device, 
             dtype=dtype
         )
         
         # Compute delta positions (T, 3) - this preserves gradient
-        delta_positions = action_sequence[:, :3] * self.ACTION_SCALE_POS
+        base_rotation = torch.tensor(
+            self._robot_base_pose.to_rotation_matrix(),
+            device=device,
+            dtype=dtype,
+        )
+        delta_positions = (
+            action_sequence[:, :3] * self.ACTION_SCALE_POS
+        ) @ base_rotation.T
         
         # Cumulative sum of deltas - differentiable operation
         cumsum_deltas = torch.cumsum(delta_positions, dim=0)  # (T, 3)
@@ -889,5 +896,4 @@ class CalvinAdapter(BaseEnvAdapter):
     def get_task_description(self) -> str:
         """Alias for get_instruction() — satisfies main.py's backend-agnostic interface."""
         return self.get_instruction()
-
 

@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 import logging
+import hashlib
 import os
 import sys
 import yaml
@@ -125,6 +126,11 @@ from libero.libero import benchmark, get_libero_path
 import libero.libero as _libero_module
 from libero.libero.envs import OffScreenRenderEnv
 
+if os.environ.get("MUJOCO_GL", "").lower() == "egl":
+    from patches.robosuite_egl import apply_robosuite_egl_compat
+
+    apply_robosuite_egl_compat()
+
 
 # vls
 from .base_adapter import BaseEnvAdapter, Pose3D, CameraParams, TrackedObject, InteractableObject
@@ -134,6 +140,148 @@ from .base_adapter import BaseEnvAdapter, Pose3D, CameraParams, TrackedObject, I
 from utils.logging_utils import SteerLogger
 # Create logger instance
 log = SteerLogger("LiberoAdapter")
+
+
+# MuJoCo keeps randomized fixture placement and several domain parameters on
+# ``MjModel`` rather than ``MjData``. A flattened/qpos/qvel snapshot therefore
+# is not sufficient for exact cross-process replay: a freshly constructed
+# LIBERO-PRO environment can have identical data state but different static
+# fixture poses. Keep this list explicit so topology/derived arrays are never
+# overwritten accidentally.
+_MUJOCO_MODEL_REPLAY_FIELDS = (
+    "body_pos",
+    "body_quat",
+    "body_ipos",
+    "body_iquat",
+    "body_mass",
+    "body_inertia",
+    "jnt_pos",
+    "jnt_axis",
+    "jnt_range",
+    "jnt_stiffness",
+    "dof_damping",
+    "dof_frictionloss",
+    "dof_armature",
+    "geom_pos",
+    "geom_quat",
+    "geom_size",
+    "geom_friction",
+    "geom_solmix",
+    "geom_solref",
+    "geom_solimp",
+    "geom_margin",
+    "geom_gap",
+    "geom_rgba",
+    "site_pos",
+    "site_quat",
+    "site_size",
+    "site_rgba",
+    "cam_pos",
+    "cam_quat",
+    "cam_fovy",
+    "light_pos",
+    "light_dir",
+    "light_ambient",
+    "light_diffuse",
+    "light_specular",
+    "actuator_dynprm",
+    "actuator_gainprm",
+    "actuator_biasprm",
+    "actuator_gear",
+    "actuator_ctrlrange",
+    "actuator_forcerange",
+    "eq_data",
+    "eq_solref",
+    "eq_solimp",
+    "eq_active",
+    "mat_rgba",
+    "mat_emission",
+    "mat_specular",
+    "mat_shininess",
+    "mat_reflectance",
+    "mat_texrepeat",
+    "mat_texuniform",
+    "mat_texid",
+)
+_MUJOCO_MODEL_REQUIRED_FIELDS = frozenset({"body_pos", "body_quat"})
+_MUJOCO_MODEL_INVENTORY_KEY = "model__captured_fields_json"
+
+
+def _capture_mujoco_model_state(
+    model: Any,
+    destination: Dict[str, np.ndarray],
+) -> None:
+    """Capture writable model inputs needed for exact cross-process replay."""
+
+    import json
+
+    captured: list[str] = []
+    for name in _MUJOCO_MODEL_REPLAY_FIELDS:
+        if not hasattr(model, name):
+            continue
+        value = np.asarray(getattr(model, name))
+        if value.dtype == object:
+            raise TypeError(f"unsupported MuJoCo model field dtype: {name}")
+        destination[f"model__{name}"] = value.copy()
+        captured.append(name)
+    missing = sorted(_MUJOCO_MODEL_REQUIRED_FIELDS - set(captured))
+    if missing:
+        raise RuntimeError(
+            "MuJoCo model is missing exact-replay fields: " + ", ".join(missing)
+        )
+    encoded = json.dumps(captured, separators=(",", ":")).encode("utf-8")
+    destination[_MUJOCO_MODEL_INVENTORY_KEY] = np.frombuffer(
+        encoded, dtype=np.uint8
+    ).copy()
+
+
+def _restore_mujoco_model_state(
+    model: Any,
+    state: Mapping[str, np.ndarray],
+) -> None:
+    """Restore captured model inputs, rejecting legacy/incompatible state."""
+
+    import json
+
+    if _MUJOCO_MODEL_INVENTORY_KEY not in state:
+        raise ValueError(
+            "LIBERO snapshot predates MuJoCo model-state capture and cannot be "
+            "used for exact cross-process replay"
+        )
+    encoded = bytes(
+        np.asarray(state[_MUJOCO_MODEL_INVENTORY_KEY], dtype=np.uint8)
+    ).decode("utf-8")
+    fields = json.loads(encoded)
+    if (
+        not isinstance(fields, list)
+        or len(fields) != len(set(fields))
+        or any(not isinstance(name, str) for name in fields)
+    ):
+        raise ValueError("snapshot MuJoCo model inventory is malformed")
+    unknown = sorted(set(fields) - set(_MUJOCO_MODEL_REPLAY_FIELDS))
+    missing = sorted(_MUJOCO_MODEL_REQUIRED_FIELDS - set(fields))
+    if unknown or missing:
+        raise ValueError(
+            "snapshot MuJoCo model inventory is incompatible; "
+            f"unknown={unknown}, missing={missing}"
+        )
+    for name in fields:
+        key = f"model__{name}"
+        if key not in state or not hasattr(model, name):
+            raise ValueError(f"snapshot MuJoCo model field disappeared: {name}")
+        current = np.asarray(getattr(model, name))
+        stored = np.asarray(state[key])
+        if current.shape != stored.shape or current.dtype != stored.dtype:
+            raise ValueError(
+                f"snapshot MuJoCo model field mismatch for {name}: "
+                f"expected {current.shape}/{current.dtype}, "
+                f"got {stored.shape}/{stored.dtype}"
+            )
+        if not current.flags.writeable:
+            raise ValueError(f"MuJoCo model field is not writable: {name}")
+        current[...] = stored
+        if not np.array_equal(current, stored, equal_nan=True):
+            raise ValueError(f"MuJoCo model field failed to restore: {name}")
 
 
 
@@ -158,6 +306,108 @@ def _convert_nested_dict(d, add_batch_dim: bool = True):
     return result
 
 
+def _capture_runtime_fields(
+    owner: Any,
+    *,
+    prefix: str,
+    destination: Dict[str, np.ndarray],
+) -> None:
+    """Capture numeric Python-side simulator state without pickle payloads."""
+
+    import json
+
+    none_names: list[str] = []
+    for name, value in vars(owner).items():
+        key = f"{prefix}__{name}"
+        if value is None:
+            none_names.append(name)
+        elif isinstance(value, np.ndarray) and value.dtype != object:
+            destination[key] = value.copy()
+        elif isinstance(value, (bool, int, float, np.generic)):
+            destination[key] = np.asarray([value])
+    encoded = json.dumps(sorted(none_names)).encode("utf-8")
+    destination[f"{prefix}__none_names_json"] = np.frombuffer(
+        encoded, dtype=np.uint8
+    ).copy()
+
+
+def _restore_runtime_fields(
+    owner: Any,
+    state: Mapping[str, np.ndarray],
+    *,
+    prefix: str,
+) -> None:
+    """Restore fields captured by :func:`_capture_runtime_fields`."""
+
+    import json
+
+    none_key = f"{prefix}__none_names_json"
+    if none_key in state:
+        encoded = bytes(np.asarray(state[none_key], dtype=np.uint8)).decode("utf-8")
+        for name in json.loads(encoded):
+            if hasattr(owner, name):
+                setattr(owner, name, None)
+
+    field_prefix = f"{prefix}__"
+    for key, stored in state.items():
+        if not key.startswith(field_prefix) or key == none_key:
+            continue
+        name = key[len(field_prefix) :]
+        if not hasattr(owner, name):
+            raise ValueError(f"snapshot runtime field disappeared: {prefix}.{name}")
+        current = getattr(owner, name)
+        value = np.asarray(stored)
+        if isinstance(current, np.ndarray):
+            # Some Robosuite fields (notably gripper.current_action) change
+            # shape after their first control call.  Restoring the captured
+            # array object is the correct pre-call state in that case.
+            setattr(owner, name, value.copy())
+        elif isinstance(current, (bool, int, float, np.generic)):
+            scalar = value.reshape(-1)[0].item()
+            setattr(owner, name, type(current)(scalar))
+        elif current is None:
+            # The field was numeric when captured and became None later.  Use a
+            # detached array so replay cannot mutate the stored sidecar value.
+            setattr(owner, name, value.copy())
+        else:
+            raise ValueError(f"unsupported runtime field type: {prefix}.{name}")
+
+
+def _clone_runtime_value(value: Any) -> Any:
+    """Clone adapter cache state for the checksummed runtime sidecar."""
+
+    import copy
+
+    if isinstance(value, torch.Tensor):
+        return value.detach().cpu().clone()
+    if isinstance(value, np.ndarray):
+        return value.copy()
+    if isinstance(value, Mapping):
+        return {key: _clone_runtime_value(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_clone_runtime_value(item) for item in value]
+    if isinstance(value, tuple):
+        return tuple(_clone_runtime_value(item) for item in value)
+    return copy.deepcopy(value)
+
+
+def _file_sha256(path: str | Path) -> str:
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _optional_file_sha256(path: str | Path | None) -> str:
+    """Hash real suite resources while allowing dependency-isolation test doubles."""
+
+    if not path:
+        return ""
+    resolved = Path(path)
+    return _file_sha256(resolved) if resolved.is_file() else ""
+
+
 # LIBERO_PRO perturbation module
 perturbation_module = None
 PERTURBATION_AVAILABLE = False
@@ -169,6 +419,13 @@ try:
         perturbation_module = importlib.util.module_from_spec(spec)
         sys.modules['perturbation'] = perturbation_module  # Add to sys.modules
         spec.loader.exec_module(perturbation_module)
+        from patches.libero_pro import (
+            DEFAULT_LIBERO_PRO_SEED,
+            normalize_libero_pro_seed,
+            patch_environment_seed,
+        )
+
+        patch_environment_seed(perturbation_module)
         PERTURBATION_AVAILABLE = True
         log.info(f"Loaded perturbation module from {_perturbation_path}")
     else:
@@ -238,6 +495,166 @@ def _parse_perturbation_type(suite_name: str) -> tuple[str, dict[str, bool]]:
     return base_suite, flags
 
 
+def _validate_libero_pro_resource_pair(
+    bddl_dir: Path,
+    init_dir: Path,
+    *,
+    expected_init_states: int = 50,
+) -> dict[str, Any]:
+    """Fail closed unless a LIBERO-PRO BDDL/init pair is complete."""
+
+    bddl_names = {path.stem for path in bddl_dir.glob("*.bddl")}
+    init_paths = sorted(init_dir.glob("*.pruned_init"))
+    init_names = {
+        path.name[: -len(".pruned_init")]
+        for path in init_paths
+    }
+    if not bddl_names:
+        raise RuntimeError(f"LIBERO-PRO resource has no BDDL tasks: {bddl_dir}")
+    if bddl_names != init_names:
+        missing = sorted(bddl_names - init_names)
+        extra = sorted(init_names - bddl_names)
+        raise RuntimeError(
+            "LIBERO-PRO BDDL/init task mismatch: "
+            f"missing_init={missing}, extra_init={extra}"
+        )
+    counts: dict[str, int] = {}
+    for path in init_paths:
+        states = torch.load(path, weights_only=False)  # nosec B614
+        try:
+            count = len(states)
+        except TypeError as exc:
+            raise RuntimeError(f"invalid LIBERO-PRO init-state payload: {path}") from exc
+        counts[path.name] = int(count)
+        if count != expected_init_states:
+            raise RuntimeError(
+                f"LIBERO-PRO init-state count mismatch for {path}: "
+                f"expected {expected_init_states}, got {count}"
+            )
+    return {
+        "task_count": len(bddl_names),
+        "init_state_count_per_task": expected_init_states,
+    }
+
+
+def _materialize_single_axis_perturbation(
+    *,
+    base_suite: str,
+    target_suite: str,
+    configs: Mapping[str, Any],
+    target_bddl_dir: Path,
+    target_init_dir: Path,
+) -> None:
+    """Generate one registered LIBERO-PRO suite without upstream `_temp` leakage.
+
+    The pinned generator hard-codes both a stale script path and an `_temp`
+    output directory.  Build both resources in an isolated staging directory,
+    validate all 50 states per task, and publish the registered suffix as one
+    best-effort transaction instead of mutating the third-party submodule.
+    """
+
+    import shutil
+    import subprocess
+    import tempfile
+
+    if perturbation_module is None:
+        raise RuntimeError("LIBERO-PRO perturbation module is unavailable")
+    if target_bddl_dir.exists() or target_init_dir.exists():
+        if target_bddl_dir.is_dir() and target_init_dir.is_dir():
+            _validate_libero_pro_resource_pair(target_bddl_dir, target_init_dir)
+            return
+        raise RuntimeError(
+            "refusing to overwrite a partial LIBERO-PRO resource pair: "
+            f"bddl={target_bddl_dir.exists()}, init={target_init_dir.exists()}"
+        )
+
+    input_dir = Path(str(configs["bddl_files_path"]))
+    generator = Path(__file__).resolve().parents[2] / "scripts" / "libero_pro_init_worker.py"
+    if not input_dir.is_dir():
+        raise FileNotFoundError(f"LIBERO-PRO base BDDL directory missing: {input_dir}")
+    if not generator.is_file():
+        raise FileNotFoundError(f"LIBERO-PRO init generator missing: {generator}")
+
+    flags = perturbation_module.PerturbFlags(
+        use_environment=bool(configs.get("use_environment", False)),
+        use_swap=bool(configs.get("use_swap", False)),
+        use_object=bool(configs.get("use_object", False)),
+        use_language=bool(configs.get("use_language", False)),
+        use_task=bool(configs.get("use_task", False)),
+    )
+    pipeline = perturbation_module.BDDLCombinedPerturbator(
+        configs=dict(configs.get("ood_task_configs", {}))
+    )
+    seed = normalize_libero_pro_seed(configs.get("seed", DEFAULT_LIBERO_PRO_SEED))
+    staging_root = Path(
+        tempfile.mkdtemp(
+            prefix=f".{target_suite}.staging-",
+            dir=str(target_bddl_dir.parent),
+        )
+    )
+    staged_bddl = staging_root / "bddl"
+    staged_init = staging_root / "init"
+    staged_bddl.mkdir()
+    staged_init.mkdir()
+    published_bddl = False
+    try:
+        inputs = sorted(input_dir.glob("*.bddl"))
+        if not inputs:
+            raise RuntimeError(f"LIBERO-PRO base suite has no BDDL files: {input_dir}")
+        for source in inputs:
+            content = source.read_text(encoding="utf-8")
+            transformed = pipeline.perturb_content(
+                content=content,
+                task_suite_name=base_suite,
+                task_name=source.stem,
+                flags=flags,
+                seed=seed,
+            )
+            (staged_bddl / source.name).write_text(transformed, encoding="utf-8")
+
+        egl_device_id = int(
+            configs.get(
+                "render_gpu_device_id",
+                os.environ.get("VLS_EGL_DEVICE_ID", "8"),
+            )
+        )
+        for bddl_file in sorted(staged_bddl.glob("*.bddl")):
+            task_digest = hashlib.sha256(
+                f"{target_suite}\0{bddl_file.stem}".encode("utf-8")
+            ).digest()
+            task_seed = (
+                int(seed or 0) + int.from_bytes(task_digest[:4], "big")
+            ) % (2**32)
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(generator),
+                    "--bddl-file",
+                    str(bddl_file),
+                    "--output-file",
+                    str(staged_init / f"{bddl_file.stem}.pruned_init"),
+                    "--num-inits",
+                    "50",
+                    "--seed",
+                    str(task_seed),
+                    "--egl-device-id",
+                    str(egl_device_id),
+                ],
+                check=True,
+                env=os.environ.copy(),
+            )
+        _validate_libero_pro_resource_pair(staged_bddl, staged_init)
+        os.replace(staged_bddl, target_bddl_dir)
+        published_bddl = True
+        os.replace(staged_init, target_init_dir)
+    except BaseException:
+        if published_bddl and target_bddl_dir.exists() and not staged_bddl.exists():
+            os.replace(target_bddl_dir, staged_bddl)
+        raise
+    finally:
+        shutil.rmtree(staging_root, ignore_errors=True)
+
+
 def _apply_perturbations(suite_name: str) -> tuple[str, bool]:
     """
     Apply OOD perturbations to create perturbed BDDL and init files if needed.
@@ -275,6 +692,15 @@ def _apply_perturbations(suite_name: str) -> tuple[str, bool]:
 
     # Update configs with perturbation flags
     configs.update(flags)
+    # The pinned LIBERO-PRO generator has a broken missing-value default of
+    # ``int`` despite documenting 28.  Always pass the seed explicitly so all
+    # generated BDDL/init-state resources are deterministic.
+    configs["seed"] = normalize_libero_pro_seed(
+        configs.get("seed", DEFAULT_LIBERO_PRO_SEED)
+    )
+    configs["script_path"] = str(
+        LIBERO_PRO_PATH / "notebooks" / "generate_init_states.py"
+    )
 
     # Set paths relative to base suite
     bddl_base = Path(get_libero_path("bddl_files"))
@@ -361,10 +787,20 @@ def _apply_perturbations(suite_name: str) -> tuple[str, bool]:
             log.info(f"   BDDL path: {perturbed_bddl_path} (exists: {perturbed_bddl_path.exists()})")
             log.info(f"   Init path: {perturbed_init_path} (exists: {perturbed_init_path.exists()})")
 
-            if not perturbed_init_path.exists():
+            if not perturbed_bddl_path.exists() or not perturbed_init_path.exists():
                 log.info(f"Generating perturbed environment: {perturbed_suite_name}")
-                perturbation_module.create_env(configs=configs)
+                _materialize_single_axis_perturbation(
+                    base_suite=base_suite,
+                    target_suite=perturbed_suite_name,
+                    configs=configs,
+                    target_bddl_dir=perturbed_bddl_path,
+                    target_init_dir=perturbed_init_path,
+                )
             else:
+                _validate_libero_pro_resource_pair(
+                    perturbed_bddl_path,
+                    perturbed_init_path,
+                )
                 log.info(f"Perturbed environment already exists: {perturbed_suite_name}")
 
             # Determine if this perturbation type changes language
@@ -541,6 +977,9 @@ class LiberoEnv(gym.Env):
         num_steps_wait: int = 10,
         read_language_from_bddl: bool = False,
         max_episode_steps: int | None = None,
+        auto_reset: bool = False,
+        render_gpu_device_id: int = -1,
+        camera_depths: bool = True,
     ):
         super().__init__()
         self.task_id = task_id
@@ -572,17 +1011,42 @@ class LiberoEnv(gym.Env):
 
         self.episode_index = episode_index
         self.read_language_from_bddl = read_language_from_bddl
+        self.auto_reset = bool(auto_reset)
+        self.render_gpu_device_id = int(render_gpu_device_id)
+        self.camera_depths = bool(camera_depths)
+        suite_tasks = getattr(task_suite, "tasks", None)
+        if suite_tasks is not None:
+            task_record = suite_tasks[self.task_id]
+            self.init_states_file = str(
+                _resolve_libero_resource(
+                    "init_states",
+                    task_record.problem_folder,
+                    task_record.init_states_file,
+                )
+            )
+        elif self.init_states:
+            raise ValueError("init-state rollout requires suite task metadata")
+        else:
+            # Import/isolation tests can replace the suite and environment with
+            # minimal doubles.  Production LIBERO suites always take the branch
+            # above, so exact replay still receives a non-empty file and digest.
+            self.init_states_file = ""
         # Load once and keep
         self._init_states = get_task_init_states(task_suite, self.task_id) if self.init_states else None
         self._init_state_id = self.episode_index  # tie each sub-env to a fixed init state
 
-        self._env = self._make_envs_task(task_suite, self.task_id)
         default_steps = 500
         self._max_episode_steps = (
             int(max_episode_steps)
             if max_episode_steps is not None
             else TASK_SUITE_MAX_STEPS.get(task_suite_name, default_steps)
         )
+        self._env = self._make_envs_task(task_suite, self.task_id)
+        self._last_raw_obs: dict[str, Any] | None = None
+        self.bddl_sha256 = _optional_file_sha256(
+            getattr(self, "bddl_file_name", None)
+        )
+        self.init_states_sha256 = _optional_file_sha256(self.init_states_file)
 
         images = {}
         for cam in self.camera_name:
@@ -657,6 +1121,7 @@ class LiberoEnv(gym.Env):
         task = task_suite.get_task(task_id)
         self.task = task.name
         task_bddl_file = str(_resolve_libero_resource("bddl_files", task.problem_folder, task.bddl_file))
+        self.bddl_file_name = task_bddl_file
 
         # Only read language from BDDL if perturbation type changes language (task or language perturbations)
         if self.read_language_from_bddl:
@@ -675,7 +1140,14 @@ class LiberoEnv(gym.Env):
             "bddl_file_name": task_bddl_file,
             "camera_heights": self.observation_height,
             "camera_widths": self.observation_width,
-            "camera_depths": True
+            "camera_depths": self.camera_depths,
+            "render_gpu_device_id": self.render_gpu_device_id,
+            # Keep robosuite's internal terminal horizon identical to the
+            # adapter/controller timeout.  Otherwise the underlying env stops
+            # at its hard-coded 1000 steps even when a caller explicitly asks
+            # for a longer human-teleoperation episode.
+            "horizon": self._max_episode_steps,
+            "ignore_done": False,
         }
         env = OffScreenRenderEnv(**env_args)
         env.reset()
@@ -744,8 +1216,17 @@ class LiberoEnv(gym.Env):
 
         return observation
 
-    def reset(self, seed=None, **kwargs):
+    def reset(self, seed=None, init_state_id: int | None = None, **kwargs):
         super().reset(seed=seed)
+        if init_state_id is not None:
+            requested = int(init_state_id)
+            if not self.init_states or self._init_states is None:
+                raise ValueError("this LIBERO environment has no init-state catalog")
+            if not 0 <= requested < len(self._init_states):
+                raise ValueError(
+                    f"init_state_id {requested} out of range [0, {len(self._init_states) - 1}]"
+                )
+            self._init_state_id = requested
         self._env.seed(seed)
         raw_obs = self._env.reset()
         if self.init_states and self._init_states is not None:
@@ -756,6 +1237,7 @@ class LiberoEnv(gym.Env):
         # Increasing this value can improve determinism and reproducibility across resets.
         for _ in range(self.num_steps_wait):
             raw_obs, _, _, _ = self._env.step(get_libero_dummy_action())
+        self._last_raw_obs = raw_obs
         observation = self._format_raw_obs(raw_obs)
         info = {"is_success": False}
         return observation, info
@@ -767,6 +1249,7 @@ class LiberoEnv(gym.Env):
                 f"but got shape {action.shape} with ndim={action.ndim}"
             )
         raw_obs, reward, done, info = self._env.step(action)
+        self._last_raw_obs = raw_obs
 
         is_success = self._env.check_success()
         terminated = done or is_success
@@ -786,7 +1269,8 @@ class LiberoEnv(gym.Env):
                 "done": bool(done),
                 "success": bool(is_success),
             }
-            self.reset()
+            if self.auto_reset:
+                self.reset()
         truncated = False
         return observation, reward, terminated, truncated, info
 
@@ -805,6 +1289,9 @@ def create_libero_envs(
     visualization_height: int = 480,
     num_steps_wait: int = 10,
     max_episode_steps: int | None = None,
+    auto_reset: bool = False,
+    render_gpu_device_id: int = -1,
+    camera_depths: bool = True,
 ) -> List["LiberoEnv"]:
     """
     Create vectorized LIBERO-PRO environments with a consistent return shape.
@@ -880,6 +1367,9 @@ def create_libero_envs(
             num_steps_wait=num_steps_wait,
             read_language_from_bddl=read_language_from_bddl,
             max_episode_steps=max_episode_steps,
+            auto_reset=auto_reset,
+            render_gpu_device_id=render_gpu_device_id,
+            camera_depths=camera_depths,
         )
         out.append(env)
         log.info(f"Built env | suite={actual_suite_name} | task_id={tid}")
@@ -902,6 +1392,9 @@ class LiberoAdapter(BaseEnvAdapter):
             visualization_height=env_config.get("visualization_height", 480),
             num_steps_wait=env_config.get("num_steps_wait", 10),
             max_episode_steps=env_config.get("max_episode_steps"),
+            auto_reset=env_config.get("auto_reset", False),
+            render_gpu_device_id=env_config.get("render_gpu_device_id", -1),
+            camera_depths=env_config.get("camera_depths", True),
         )
 
         # LIBERO-PRO related attributes
@@ -918,6 +1411,7 @@ class LiberoAdapter(BaseEnvAdapter):
         # Cache for robot state and observations
         self._last_obs = None
         self._robot_state = None
+        self._last_goal_predicate_count: int | None = None
 
         env_preprocessor_steps: list[ProcessorStep] = []
         env_postprocessor_steps: list[ProcessorStep] = []
@@ -1039,6 +1533,61 @@ class LiberoAdapter(BaseEnvAdapter):
 
         return obs
 
+    def get_teleop_observation(
+        self,
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """Return the pinned T2 dual-camera/state contract without stepping."""
+
+        raw = self._get_cached_teleop_raw_obs()
+
+        def image(name: str) -> np.ndarray:
+            value = np.asarray(raw[name], dtype=np.uint8)
+            if value.shape != (256, 256, 3):
+                import cv2
+
+                value = cv2.resize(value, (256, 256), interpolation=cv2.INTER_AREA)
+            return np.ascontiguousarray(value)
+
+        joints = np.asarray(raw["robot0_joint_pos"], dtype=np.float32).reshape(-1)
+        gripper = np.asarray(raw["robot0_gripper_qpos"], dtype=np.float32).reshape(-1)
+        if joints.shape != (7,) or gripper.size == 0:
+            raise ValueError("LIBERO teleop requires 7 joints and gripper state")
+        state = np.concatenate(
+            [joints, np.asarray([float(gripper.mean())], dtype=np.float32)]
+        )
+        return (
+            image("agentview_image"),
+            image("robot0_eye_in_hand_image"),
+            state,
+            self.get_ee_pose_world().position.astype(np.float32),
+        )
+
+    def get_teleop_preview_observation(self) -> tuple[np.ndarray, np.ndarray]:
+        """Return cached native-resolution camera frames for the human UI.
+
+        These frames are display-only.  ``get_teleop_observation`` remains the
+        frozen 256x256 LeRobot data contract used by :class:`DemoWriter`.
+        Reading the cache also avoids a second MuJoCo render after every key.
+        """
+
+        raw = self._get_cached_teleop_raw_obs()
+
+        def image(name: str) -> np.ndarray:
+            value = np.asarray(raw[name], dtype=np.uint8)
+            if value.ndim != 3 or value.shape[2] != 3:
+                raise ValueError(f"teleop preview {name} must be HWC RGB")
+            return np.ascontiguousarray(value)
+
+        return image("agentview_image"), image("robot0_eye_in_hand_image")
+
+    def _get_cached_teleop_raw_obs(self) -> dict[str, Any]:
+        environment = self._env[self.current_task_idx]
+        raw = getattr(environment, "_last_raw_obs", None)
+        if raw is None:
+            raw = self._get_raw_obs()
+            environment._last_raw_obs = raw
+        return raw
+
     def get_task_description(self) -> str:
         """Get the task description for the current task."""
         return self._env[self.current_task_idx].task_description
@@ -1050,14 +1599,13 @@ class LiberoAdapter(BaseEnvAdapter):
         return self._env[self.current_task_idx]._env
 
     def _get_raw_obs(self) -> dict:
-        """Get raw observations from robosuite environment."""
+        """Read raw observations without advancing the simulator."""
         robosuite_env = self._get_current_robosuite_env()
-        # Step with zero action to get fresh observation
-        action = np.zeros(7)
-        raw_obs, _, _, _ = robosuite_env.step(action)
-        # Reset back to maintain state
-        # Note: This is a workaround since robosuite doesn't expose observations directly
-        return raw_obs
+        observation_env = getattr(robosuite_env, "env", robosuite_env)
+        get_observations = getattr(observation_env, "_get_observations", None)
+        if not callable(get_observations):
+            raise RuntimeError("LIBERO environment cannot produce a read-only observation")
+        return get_observations()
 
     def get_ee_pose(self) -> Pose3D:
         """
@@ -1114,15 +1662,22 @@ class LiberoAdapter(BaseEnvAdapter):
         Returns:
             Gripper opening width (0 = closed, positive = open)
         """
+        raw = self._get_cached_teleop_raw_obs()
+        observed = np.asarray(raw.get("robot0_gripper_qpos", ()), dtype=np.float64)
+        if observed.size:
+            return float(observed.sum())
+
         robosuite_env = self._get_current_robosuite_env()
         robot = robosuite_env.robots[0]
-        # Get gripper joints from simulation
-        gripper = robot.gripper
-        # Get gripper joint positions (typically has left_finger and right_finger)
-        gripper_joint_ids = [robosuite_env.sim.model.joint_name2id(joint) for joint in gripper.joints]
-        gripper_qpos = [robosuite_env.sim.data.qpos[jid] for jid in gripper_joint_ids]
-        # Return sum as opening width (both fingers contribute)
-        return sum(gripper_qpos)
+        names = tuple(getattr(robot.gripper, "joints", ()) or ())
+        values = []
+        for name in names:
+            joint_id = int(robosuite_env.sim.model.joint_name2id(name))
+            qpos_address = int(robosuite_env.sim.model.jnt_qposadr[joint_id])
+            values.append(float(robosuite_env.sim.data.qpos[qpos_address]))
+        if not values:
+            raise RuntimeError("LIBERO gripper state is unavailable")
+        return float(sum(values))
 
     # ==================== Camera & Perception ====================
 
@@ -1590,6 +2145,230 @@ class LiberoAdapter(BaseEnvAdapter):
 
         return trajectory
 
+    def capture_simulator_state(self) -> Dict[str, np.ndarray]:
+        """Capture an exact MuJoCo decision state without stepping the env."""
+        import json
+
+        robosuite_env = self._get_current_robosuite_env()
+        sim = robosuite_env.sim
+        state: Dict[str, np.ndarray] = {
+            "qpos": np.asarray(sim.data.qpos).copy(),
+            "qvel": np.asarray(sim.data.qvel).copy(),
+            "time": np.asarray([float(sim.data.time)], dtype=np.float64),
+            "episode_step": np.asarray([self.episode_step], dtype=np.int64),
+            "current_task_idx": np.asarray([self.current_task_idx], dtype=np.int64),
+            "current_episode_idx": np.asarray([self.current_episode_idx], dtype=np.int64),
+            "task_id_catalog": np.asarray(
+                [environment.task_id for environment in self._env], dtype=np.int64
+            ),
+            "init_state_id": np.asarray(
+                [self._env[self.current_task_idx]._init_state_id], dtype=np.int64
+            ),
+        }
+        get_state = getattr(sim, "get_state", None)
+        if callable(get_state):
+            full_state = get_state()
+            flatten = getattr(full_state, "flatten", None)
+            flattened = flatten() if callable(flatten) else np.asarray(full_state)
+            state["flattened_sim_state"] = np.asarray(flattened).copy()
+        if getattr(sim.data, "act", None) is not None:
+            state["act"] = np.asarray(sim.data.act).copy()
+        if getattr(sim.data, "mocap_pos", None) is not None:
+            state["mocap_pos"] = np.asarray(sim.data.mocap_pos).copy()
+        if getattr(sim.data, "mocap_quat", None) is not None:
+            state["mocap_quat"] = np.asarray(sim.data.mocap_quat).copy()
+        _capture_mujoco_model_state(sim.model, state)
+        raw_environment = getattr(robosuite_env, "env", robosuite_env)
+        _capture_runtime_fields(
+            raw_environment,
+            prefix="robosuite_env",
+            destination=state,
+        )
+        robot = robosuite_env.robots[0]
+        _capture_runtime_fields(robot, prefix="robot", destination=state)
+        _capture_runtime_fields(
+            robot.controller,
+            prefix="controller",
+            destination=state,
+        )
+        _capture_runtime_fields(
+            robot.gripper,
+            prefix="gripper",
+            destination=state,
+        )
+        environment = self._env[self.current_task_idx]
+        rng = getattr(environment, "np_random", None)
+        if rng is not None and hasattr(rng, "bit_generator"):
+            encoded = json.dumps(rng.bit_generator.state, sort_keys=True).encode("utf-8")
+            state["env_rng_json"] = np.frombuffer(encoded, dtype=np.uint8).copy()
+        return state
+
+    def capture_runtime_state(self) -> Dict[str, Any]:
+        """Capture the exact cached observation consumed by the policy."""
+
+        return {
+            "last_obs": _clone_runtime_value(self._last_obs),
+            "robot_state": _clone_runtime_value(self._robot_state),
+            "last_goal_predicate_count": self._last_goal_predicate_count,
+        }
+
+    def restore_runtime_state(self, state: Mapping[str, Any]) -> None:
+        """Restore cached policy inputs after simulator reconstruction."""
+
+        if not state:
+            return
+        self._last_obs = _clone_runtime_value(state.get("last_obs"))
+        self._robot_state = _clone_runtime_value(state.get("robot_state"))
+        value = state.get("last_goal_predicate_count")
+        self._last_goal_predicate_count = None if value is None else int(value)
+
+    def get_progress_predicate(self) -> Dict[str, Any]:
+        """Return exact monotonic progress when BDDL goal clauses advance.
+
+        Many LIBERO tasks expose only the final clause.  In that case this
+        method intentionally returns no confident stage until the clause
+        becomes true, allowing the controller to use its Gemini/relation
+        fallback instead of treating a sparse predicate as proof of
+        stagnation.
+        """
+
+        wrapper = self._get_current_robosuite_env()
+        environment = getattr(wrapper, "env", wrapper)
+        parsed = getattr(environment, "parsed_problem", None)
+        evaluate = getattr(environment, "_eval_predicate", None)
+        if not isinstance(parsed, Mapping) or not callable(evaluate):
+            return {
+                "stage_id": None,
+                "advanced": None,
+                "source": "no_bddl_goal_predicates",
+            }
+        goal_states = tuple(parsed.get("goal_state", ()))
+        if not goal_states:
+            return {
+                "stage_id": None,
+                "advanced": None,
+                "source": "empty_bddl_goal_predicates",
+            }
+        values = tuple(bool(evaluate(state)) for state in goal_states)
+        completed = sum(values)
+        previous = self._last_goal_predicate_count
+        advanced = previous is not None and completed > previous
+        self._last_goal_predicate_count = completed
+        return {
+            "stage_id": (
+                f"bddl-goals:{completed}/{len(values)}" if advanced else None
+            ),
+            "advanced": True if advanced else None,
+            "completed_count": completed,
+            "goal_count": len(values),
+            "predicate_vector": values,
+            "task_success": completed == len(values),
+            "source": "bddl_goal_predicates",
+        }
+
+    def restore_simulator_state(self, state: Mapping[str, np.ndarray]) -> None:
+        """Restore a captured decision state and refresh cached observations."""
+        import json
+
+        task_index = int(np.asarray(state["current_task_idx"]).reshape(-1)[0])
+        expected_catalog = np.asarray(
+            [environment.task_id for environment in self._env], dtype=np.int64
+        )
+        saved_catalog = np.asarray(state.get("task_id_catalog", expected_catalog))
+        if not np.array_equal(saved_catalog, expected_catalog):
+            raise ValueError(
+                "snapshot task catalog mismatch; recreate the adapter with the original task filter"
+            )
+        if not 0 <= task_index < len(self._env):
+            raise ValueError(f"snapshot task index is out of range: {task_index}")
+        self.current_task_idx = task_index
+        robosuite_env = self._get_current_robosuite_env()
+        sim = robosuite_env.sim
+        qpos = np.asarray(state["qpos"])
+        qvel = np.asarray(state["qvel"])
+        if qpos.shape != np.asarray(sim.data.qpos).shape:
+            raise ValueError("snapshot qpos shape mismatch")
+        if qvel.shape != np.asarray(sim.data.qvel).shape:
+            raise ValueError("snapshot qvel shape mismatch")
+        set_flattened = getattr(sim, "set_state_from_flattened", None)
+        if "flattened_sim_state" in state and callable(set_flattened):
+            set_flattened(np.asarray(state["flattened_sim_state"]))
+        else:
+            sim.data.qpos[:] = qpos
+            sim.data.qvel[:] = qvel
+            sim.data.time = float(np.asarray(state["time"]).reshape(-1)[0])
+            if "act" in state and getattr(sim.data, "act", None) is not None:
+                sim.data.act[:] = np.asarray(state["act"])
+            if "mocap_pos" in state and getattr(sim.data, "mocap_pos", None) is not None:
+                sim.data.mocap_pos[:] = np.asarray(state["mocap_pos"])
+            if "mocap_quat" in state and getattr(sim.data, "mocap_quat", None) is not None:
+                sim.data.mocap_quat[:] = np.asarray(state["mocap_quat"])
+        # Static fixture placements and domain parameters live on MjModel and
+        # are not part of MuJoCo's flattened data state. Restore them before
+        # forward() so derived body/geom transforms match the captured scene.
+        _restore_mujoco_model_state(sim.model, state)
+        sim.forward()
+        raw_environment = getattr(robosuite_env, "env", robosuite_env)
+        _restore_runtime_fields(raw_environment, state, prefix="robosuite_env")
+        robot = robosuite_env.robots[0]
+        _restore_runtime_fields(robot, state, prefix="robot")
+        _restore_runtime_fields(robot.controller, state, prefix="controller")
+        _restore_runtime_fields(robot.gripper, state, prefix="gripper")
+        self.episode_step = int(np.asarray(state["episode_step"]).reshape(-1)[0])
+        self.current_episode_idx = int(
+            np.asarray(state["current_episode_idx"]).reshape(-1)[0]
+        )
+        environment = self._env[self.current_task_idx]
+        if "init_state_id" in state:
+            environment._init_state_id = int(
+                np.asarray(state["init_state_id"]).reshape(-1)[0]
+            )
+        if "env_rng_json" in state:
+            rng = getattr(environment, "np_random", None)
+            if rng is not None and hasattr(rng, "bit_generator"):
+                decoded = bytes(np.asarray(state["env_rng_json"], dtype=np.uint8)).decode(
+                    "utf-8"
+                )
+                rng.bit_generator.state = json.loads(decoded)
+        observation_env = getattr(robosuite_env, "env", robosuite_env)
+        get_observations = getattr(observation_env, "_get_observations", None)
+        if not callable(get_observations):
+            raise RuntimeError("restored LIBERO environment cannot produce observations")
+        raw_obs = get_observations()
+        environment._last_raw_obs = raw_obs
+        self._last_obs = environment._format_raw_obs(raw_obs)
+        np.testing.assert_allclose(np.asarray(sim.data.qpos), qpos, rtol=0.0, atol=1e-10)
+        np.testing.assert_allclose(np.asarray(sim.data.qvel), qvel, rtol=0.0, atol=1e-10)
+
+    def restore_flattened_simulator_state(self, flattened: np.ndarray) -> None:
+        """Restore one HDF5 replay state for deterministic demo validation."""
+
+        robosuite_env = self._get_current_robosuite_env()
+        setter = getattr(robosuite_env.sim, "set_state_from_flattened", None)
+        if not callable(setter):
+            raise RuntimeError("LIBERO simulator cannot restore a flattened state")
+        setter(np.asarray(flattened, dtype=np.float64))
+        robosuite_env.sim.forward()
+        raw_obs = self._get_raw_obs()
+        self._env[self.current_task_idx]._last_raw_obs = raw_obs
+        self._last_obs = self._env[self.current_task_idx]._format_raw_obs(raw_obs)
+
+    def has_forbidden_contact(self) -> bool:
+        """Report configured forbidden contacts; normal grasp contacts are ignored."""
+        forbidden = set(self._env_config.get("forbidden_geom_names", []))
+        if not forbidden:
+            return False
+        sim = self._get_current_robosuite_env().sim
+        for index in range(int(sim.data.ncon)):
+            contact = sim.data.contact[index]
+            names = {
+                sim.model.geom_id2name(int(contact.geom1)),
+                sim.model.geom_id2name(int(contact.geom2)),
+            }
+            if forbidden.intersection(name for name in names if name is not None):
+                return True
+        return False
+
     def unnormalize_action(self, action: np.ndarray) -> np.ndarray:
         """
         Unnormalize action from normalized to actual delta values.
@@ -1631,6 +2410,47 @@ class LiberoAdapter(BaseEnvAdapter):
 
         return observation, reward, terminated, truncated, info
 
+    def step_teleop(self, action: torch.Tensor) -> Tuple[Dict, float, bool, bool, Dict]:
+        """Step T2 without materializing unused policy image tensors.
+
+        Robosuite already returns the two RGB arrays needed by ``DemoWriter``.
+        The normal policy path additionally converts both 512px images into
+        batched float tensors on every action, even though browser teleop never
+        consumes them.  Avoiding that conversion keeps simulator semantics and
+        raw observations identical while shortening the interactive hot path.
+        """
+
+        transition = self.env_postprocessor({"action": action})
+        processed = transition["action"].clone()
+        processed[-1] = 1 if processed[-1] > 0 else -1
+        action_numpy = processed.float().to("cpu").numpy()
+        current_env = self._env[self.current_task_idx]
+        raw_obs, reward, done, info = current_env._env.step(action_numpy)
+        current_env._last_raw_obs = raw_obs
+        success = bool(current_env._env.check_success())
+        terminated = bool(done or success)
+        self.episode_step += 1
+        truncated = self.episode_step >= current_env._max_episode_steps
+        info = dict(info or {})
+        info.update(
+            {
+                "task": current_env.task,
+                "task_id": current_env.task_id,
+                "done": bool(done),
+                "success": success,
+                "task_idx": self.current_task_idx,
+                "task_description": getattr(current_env, "task_description", ""),
+            }
+        )
+        if terminated:
+            info["final_info"] = {
+                "task": current_env.task,
+                "task_id": current_env.task_id,
+                "done": bool(done),
+                "success": success,
+            }
+        return {}, float(reward), terminated, bool(truncated), info
+
     def reset(self, **kwargs) -> Tuple[Dict, Dict]:
         """
         Reset the current LIBERO-PRO environment.
@@ -1653,6 +2473,7 @@ class LiberoAdapter(BaseEnvAdapter):
 
         # Reset episode step counter
         self.episode_step = 0
+        self._last_goal_predicate_count = None
 
         # Get current environment and reset it
         current_env = self._env[self.current_task_idx]
@@ -1672,8 +2493,50 @@ class LiberoAdapter(BaseEnvAdapter):
         info['task_description'] = getattr(current_env, 'task_description', '')
         info['task_name'] = getattr(current_env, 'task', '')
         info['episode_idx'] = self.current_episode_idx
+        info['init_state_id'] = int(getattr(current_env, '_init_state_id', -1))
 
         return obs, info
+
+    def set_init_state_id(self, init_state_id: int) -> None:
+        """Select an exact catalog init state for the next reset."""
+
+        current = self._env[self.current_task_idx]
+        if not current.init_states or current._init_states is None:
+            raise ValueError("current LIBERO task has no init-state catalog")
+        requested = int(init_state_id)
+        if not 0 <= requested < len(current._init_states):
+            raise ValueError(
+                f"init_state_id {requested} out of range [0, {len(current._init_states) - 1}]"
+            )
+        current._init_state_id = requested
+
+    def get_context_provenance(self) -> Dict[str, Any]:
+        """Return stable policy/verifier grouping fields for the current cell."""
+
+        current = self._env[self.current_task_idx]
+        base_suite, flags = _parse_perturbation_type(str(self.suite_name))
+        active_flags = sorted(name for name, enabled in flags.items() if enabled)
+        variant = "+".join(active_flags) if active_flags else "base"
+        return {
+            # Protocol keys always use the formal base suite plus an explicit
+            # perturbation variant.  Keeping the composed runtime suite in the
+            # same field would make frozen-manifest lookup impossible.
+            "suite": str(base_suite),
+            "runtime_suite": str(self.suite_name),
+            "base_suite": str(base_suite),
+            "task_id": str(getattr(current, "task", current.task_id)),
+            "task_index": int(current.task_id),
+            "task_name": str(getattr(current, "task", "")),
+            "perturbation_variant": variant,
+            "init_state_id": str(getattr(current, "_init_state_id", -1)),
+            "episode_id": str(self.current_episode_idx),
+            "bddl_file": str(getattr(current, "bddl_file_name", "")),
+            "bddl_sha256": str(getattr(current, "bddl_sha256", "")),
+            "init_states_file": str(getattr(current, "init_states_file", "")),
+            "init_states_sha256": str(
+                getattr(current, "init_states_sha256", "")
+            ),
+        }
 
     def get_obs(self) -> Dict:
         """Get current observation."""

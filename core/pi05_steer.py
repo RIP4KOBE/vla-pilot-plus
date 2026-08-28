@@ -10,6 +10,7 @@ to add steering capabilities.
 from collections import deque
 from collections.abc import Callable
 from typing import List, Optional, Union
+import math
 import numpy as np
 import torch
 from torch import Tensor
@@ -41,6 +42,7 @@ class PI05PolicySteer(PI05Policy):
         self._stage_init_reward = None
         self._last_normalized_reward = 0.0
         self._last_scale = 0.0
+        self._last_sampling_diagnostics = None
     
     def post_init(
         self,
@@ -62,10 +64,33 @@ class PI05PolicySteer(PI05Policy):
         self._stage_init_reward = None
         self._last_normalized_reward = 0.0
         self._last_scale = 0.0
+        self._last_sampling_diagnostics = None
     
     def reset_stage(self):
         """Reset stage-specific state (call when stage changes)."""
         self._stage_init_reward = None
+
+    def capture_runtime_state(self) -> dict:
+        """State required for exact post-failure counterfactual replay."""
+        return {
+            "cached_action_chunk": (
+                None
+                if self._cached_action_chunk is None
+                else self._cached_action_chunk.detach().cpu()
+            ),
+            "stage_init_reward": self._stage_init_reward,
+            "last_normalized_reward": self._last_normalized_reward,
+            "last_scale": self._last_scale,
+        }
+
+    def restore_runtime_state(self, state: dict) -> None:
+        chunk = state.get("cached_action_chunk")
+        self._cached_action_chunk = (
+            None if chunk is None else chunk.to(self.config.device)
+        )
+        self._stage_init_reward = state.get("stage_init_reward")
+        self._last_normalized_reward = float(state.get("last_normalized_reward", 0.0))
+        self._last_scale = float(state.get("last_scale", 0.0))
     
     def get_normalized_reward(self) -> float:
         """Get last normalized reward (0=start, 1=reached target)."""
@@ -74,6 +99,9 @@ class PI05PolicySteer(PI05Policy):
     def get_last_scale(self) -> float:
         """Get last guidance scale used."""
         return self._last_scale
+
+    def get_last_sampling_diagnostics(self) -> Optional[dict]:
+        return self._last_sampling_diagnostics
 
     @torch.no_grad()
     def select_action(
@@ -285,6 +313,18 @@ class PI05PolicySteer(PI05Policy):
             time = time + dt
             step_idx += 1
 
+        if fkd is not None:
+            self._last_sampling_diagnostics = fkd.diagnostics()
+        else:
+            self._last_sampling_diagnostics = {
+                "ess_history": [],
+                "ancestor_ids": list(range(bsize)),
+                "ess_ratio": 1.0,
+                "unique_ratio": 1.0,
+                "resample_indices": [],
+                "resample_timesteps": [],
+            }
+
         # Use the final reward of the first chunk as baseline for normalization
         if reward_history and self._stage_init_reward is None:
             final_reward = reward_history[-1][1]  # Last step's reward
@@ -314,15 +354,27 @@ class PI05PolicySteer(PI05Policy):
                     rewards.append(0.0)
             return torch.tensor(rewards, device=device, dtype=torch.float32)
         
+        # FKD consumes scheduler indices.  Passing float flow times and casting
+        # them to integers collapses most steps to zero and silently disables
+        # real resampling.
+        first_guided_step = int(
+            max(
+                0,
+                min(
+                    num_steps,
+                    math.ceil((1.0 - float(start_time)) * num_steps - 1e-9),
+                ),
+            )
+        )
         return FKD(
             potential_type=fkd_config.get('potential_type', 'max'),
             lmbda=fkd_config.get('lmbda', 10.0),
             num_particles=bsize,
             adaptive_resampling=fkd_config.get('adaptive_resampling', True),
             resample_frequency=fkd_config.get('resample_frequency', 5),
-            resampling_t_start=int(start_time * num_steps),
+            resampling_t_start=first_guided_step,
             resampling_t_end=num_steps,
-            timesteps=torch.linspace(1.0, 0.0, num_steps + 1, device=device),
+            timesteps=list(range(num_steps + 1)),
             reward_fn=reward_fn,
             reward_min_value=float('-inf'),
             device=device,
@@ -332,10 +384,20 @@ class PI05PolicySteer(PI05Policy):
         """Convert action sample to 3D EE trajectory."""
         if self._adapter is None or self._postprocessor is None:
             raise RuntimeError("Call post_init() first")
-        
-        device, dtype = sample.device, sample.dtype
-        actions = self._postprocessor(sample).to(device, dtype)
-        batch_size = sample.shape[0]
+        if sample.ndim != 3 or sample.shape[-1] < self._original_action_dim:
+            raise ValueError(
+                "PI0.5 trajectory projection expects [batch, time, action_dim] "
+                f"with at least {self._original_action_dim} channels, got {tuple(sample.shape)}"
+            )
+
+        # PI0.5 denoises in max_action_dim=32, while the frozen LIBERO action
+        # postprocessor is seven-dimensional. FKD passes the full latent here,
+        # so truncate before inverse normalization rather than relying on each
+        # caller to remember the policy's environment action width.
+        environment_sample = sample[..., :self._original_action_dim]
+        device, dtype = environment_sample.device, environment_sample.dtype
+        actions = self._postprocessor(environment_sample).to(device, dtype)
+        batch_size = environment_sample.shape[0]
 
         action_transition = {"action": actions}
         if hasattr(self._adapter, 'env_postprocessor'):

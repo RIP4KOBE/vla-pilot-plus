@@ -1,0 +1,14 @@
+{
+  "schema_version": "vls-perception-assets-v1",
+  "dinov2": {
+    "model": "dinov2_vitb14",
+    "source_repository": "facebookresearch/dinov2",
+    "weights_url": "https://dl.fbaipublicfiles.com/dinov2/dinov2_vitb14/dinov2_vitb14_pretrain.pth",
+    "repo_path": "/shared/hengyil6/vls/cache/torch/hub/facebookresearch_dinov2_main",
+    "repo_sha256": "faff1743dcb7dfd492d1312bbbdc229f9f462161611aec4a810418353204adf5",
+    "weights_path": "/shared/hengyil6/vls/cache/torch/hub/checkpoints/dinov2_vitb14_pretrain.pth",
+    "weights_sha256": "0b8b82f85de91b424aded121c7e1dcc2b7bc6d0adeea651bf73a13307fad8c73",
+    "weights_bytes": 346378731,
+    "state_dict_keys": 175
+  }
+}

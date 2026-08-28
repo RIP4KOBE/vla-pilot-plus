@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
-"""
-Gemini Grounder - Uses Poe's OpenAI-compatible API to call Gemini models
-for object detection (grounding) and stage recognition.
+"""Gemini Robotics visual grounding and stage recognition.
 
-No google-generativeai dependency required — uses the openai client with
-base_url pointing to Poe (or any other OpenAI-compatible proxy).
+Both visual paths use Google's official Interactions API.  They intentionally
+share the exact model used by the mode semantic planner so formal rollouts
+cannot silently fall back to a generic Gemini model or an unconfigured
+OpenAI-compatible endpoint.
 """
 
 import numpy as np
 import json
 import base64
 import os
-import re
 import io
 from typing import List, Dict, Tuple, Optional
 from PIL import Image
-from openai import OpenAI
 
 from utils.logging_utils import SteerLogger
 
@@ -32,21 +30,73 @@ def _image_to_base64(rgb: np.ndarray) -> str:
     return base64.b64encode(buf.getvalue()).decode("utf-8")
 
 
-def _make_client(config: dict) -> OpenAI:
-    api_key = config.get("api_key") or os.environ.get("GOOGLE_API_KEY") or os.environ.get("OPENAI_API_KEY")
-    base_url = config.get("base_url") or os.environ.get("OPENAI_BASE_URL")
-    return OpenAI(api_key=api_key, base_url=base_url)
+ROBOTICS_MODEL = "gemini-robotics-er-2-preview"
+
+
+def _make_client(config: dict):
+    injected = config.get("client")
+    if injected is not None:
+        return injected
+    api_key = (
+        config.get("api_key")
+        or os.environ.get("MODE_GATE_GEMINI_API_KEY")
+        or os.environ.get("GOOGLE_API_KEY")
+    )
+    if not api_key:
+        raise RuntimeError("GOOGLE_API_KEY is required for Gemini Robotics grounding")
+    from google import genai
+    from google.genai import types
+
+    return genai.Client(
+        api_key=api_key,
+        http_options=types.HttpOptions(timeout=60_000),
+    )
+
+
+def _interaction_json(client, *, model: str, prompt: str, images: list[np.ndarray], schema: dict) -> object:
+    content = [{"type": "text", "text": prompt}]
+    for image in images:
+        content.append(
+            {
+                "type": "image",
+                "data": _image_to_base64(image),
+                "mime_type": "image/png",
+            }
+        )
+    interaction = client.interactions.create(
+        model=model,
+        system_instruction=(
+            "You are a robot visual-grounding module. Use only the supplied "
+            "images and task text. Return exactly the requested strict JSON."
+        ),
+        input=content,
+        response_format={
+            "type": "text",
+            "mime_type": "application/json",
+            "schema": schema,
+        },
+        generation_config={"thinking_level": "high"},
+        store=False,
+    )
+    output_text = getattr(interaction, "output_text", None)
+    if not output_text:
+        raise ValueError("Gemini Robotics interaction returned no output_text")
+    return json.loads(output_text)
 
 
 class GeminiGrounder:
-    """
-    Detect objects via Gemini visual grounding through an OpenAI-compatible API.
-    Returns bounding boxes in [y_min, x_min, y_max, x_max] normalized to 0-1000.
+    """Detect objects with Gemini Robotics through the Interactions API.
+
+    Bounding boxes use ``[y_min, x_min, y_max, x_max]`` normalized to 0-1000.
+    Provider failures propagate so the controller can record a retryable abort;
+    they must never be converted into an empty scene or an expansion decision.
     """
 
     def __init__(self, config: dict):
         self.config = config
-        self.model = config.get("model", "gemini-2.5-flash")
+        self.model = config.get("model", ROBOTICS_MODEL)
+        if self.model != ROBOTICS_MODEL:
+            raise ValueError(f"GeminiGrounder is frozen to {ROBOTICS_MODEL}")
         self.client = _make_client(config)
         logger.info(f"GeminiGrounder initialized with model: {self.model}")
 
@@ -55,38 +105,54 @@ class GeminiGrounder:
         objects_str = ", ".join(object_names)
         prompt = (
             f"Detect these objects in the image and return bounding boxes: {objects_str}\n\n"
-            "Return a JSON array where each object has:\n"
+            'Return one JSON object with a "detections" array. Each detection has:\n'
             '- "label": the object name\n'
             '- "box_2d": [y_min, x_min, y_max, x_max] normalized to 0-1000\n\n'
-            'Example: [{"label": "drawer handle", "box_2d": [500, 200, 600, 400]}]\n\n'
-            "Only return the JSON array, no other text. If an object is not found, omit it."
+            'Example: {"detections": [{"label": "drawer handle", '
+            '"box_2d": [500, 200, 600, 400]}]}\n\n'
+            "Return only that JSON object. If an object is not found, omit its detection."
         )
 
-        b64 = _image_to_base64(rgb)
         try:
-            resp = self.client.chat.completions.create(
+            payload = _interaction_json(
+                self.client,
                 model=self.model,
-                messages=[{
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": prompt},
-                        {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}},
-                    ],
-                }],
-                max_tokens=512,
-                temperature=0.0,
+                prompt=prompt,
+                images=[rgb],
+                schema={
+                    "type": "object",
+                    "additionalProperties": False,
+                    "properties": {
+                        "detections": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": False,
+                                "properties": {
+                                    "label": {"type": "string"},
+                                    "box_2d": {
+                                        "type": "array",
+                                        "items": {"type": "number"},
+                                        "minItems": 4,
+                                        "maxItems": 4,
+                                    },
+                                },
+                                "required": ["label", "box_2d"],
+                            },
+                        }
+                    },
+                    "required": ["detections"],
+                },
             )
-            text = resp.choices[0].message.content.strip()
-
-            # Strip markdown fences if present
-            if "```json" in text:
-                text = text.split("```json")[1].split("```")[0]
-            elif "```" in text:
-                text = text.split("```")[1].split("```")[0]
-
-            detections = json.loads(text)
+            detections = payload["detections"]
             for det in detections:
                 box = det["box_2d"]
+                if len(box) != 4 or not all(np.isfinite(float(value)) for value in box):
+                    raise ValueError(f"invalid Gemini bounding box: {box!r}")
+                box = [min(1000.0, max(0.0, float(value))) for value in box]
+                if box[2] <= box[0] or box[3] <= box[1]:
+                    raise ValueError(f"degenerate Gemini bounding box: {box!r}")
+                det["box_2d"] = box
                 det["box_pixel"] = [
                     int(box[0] * H / 1000),
                     int(box[1] * W / 1000),
@@ -97,7 +163,7 @@ class GeminiGrounder:
             return detections
         except Exception as e:
             logger.error(f"Gemini detection failed: {e}")
-            return []
+            raise
 
     def detect_to_segmentation(
         self, rgb: np.ndarray, object_names: List[str]
@@ -132,14 +198,13 @@ def create_gemini_grounder(config: dict) -> GeminiGrounder:
 
 
 class GeminiStageRecognizer:
-    """
-    Use Gemini (via OpenAI-compatible API) to identify the current task stage
-    and decide whether guidance is needed.
-    """
+    """Identify task stage with Gemini Robotics via the Interactions API."""
 
     def __init__(self, config: dict):
         self.config = config
-        self.model = config.get("model", "gemini-2.5-flash")
+        self.model = config.get("model", ROBOTICS_MODEL)
+        if self.model != ROBOTICS_MODEL:
+            raise ValueError(f"GeminiStageRecognizer is frozen to {ROBOTICS_MODEL}")
         self.client = _make_client(config)
 
         template_path = config.get("stage_template_path")
@@ -172,47 +237,40 @@ class GeminiStageRecognizer:
             keypoint_info=keypoint_info,
         )
 
-        content = [{"type": "text", "text": prompt}]
+        images = []
         if init_img_with_keypoints is not None:
-            content.append({"type": "text", "text": "**Initial Image (with keypoints):**"})
-            content.append({
-                "type": "image_url",
-                "image_url": {"url": f"data:image/png;base64,{_image_to_base64(init_img_with_keypoints)}"},
-            })
-        content.append({"type": "text", "text": "**Current Image:**"})
-        content.append({
-            "type": "image_url",
-            "image_url": {"url": f"data:image/png;base64,{_image_to_base64(current_rgb)}"},
-        })
+            prompt += "\nThe first image is the initial image with keypoints."
+            images.append(init_img_with_keypoints)
+        prompt += "\nThe final image is the current observation."
+        images.append(current_rgb)
 
-        stage_num, need_guidance = 1, True
         try:
-            resp = self.client.chat.completions.create(
+            payload = _interaction_json(
+                self.client,
                 model=self.model,
-                messages=[{"role": "user", "content": content}],
-                max_tokens=256,
-                temperature=0.0,
+                prompt=prompt,
+                images=images,
+                schema={
+                    "type": "object",
+                    "additionalProperties": False,
+                    "properties": {
+                        "stage_num": {"type": "integer", "minimum": 1},
+                        "need_guidance": {"type": "boolean"},
+                        "evidence": {"type": "string"},
+                    },
+                    "required": ["stage_num", "need_guidance", "evidence"],
+                },
             )
-            output = resp.choices[0].message.content.strip()
-
-            m = re.search(r"stage\s+(\d+)", output.lower())
-            if m:
-                stage_num = int(m.group(1))
-                if num_stages:
-                    stage_num = min(stage_num, num_stages)
-
-            m = re.search(r"guidance:\s*(yes|no)", output.lower())
-            if m:
-                need_guidance = m.group(1) == "yes"
-
-            evidence = ""
-            m = re.search(r"evidence:\s*(.+)", output, re.IGNORECASE)
-            if m:
-                evidence = m.group(1).strip()
+            stage_num = int(payload["stage_num"])
+            if num_stages:
+                stage_num = min(stage_num, num_stages)
+            need_guidance = bool(payload["need_guidance"])
+            evidence = str(payload["evidence"]).strip()
 
             logger.info(f"[Gemini] Stage:{stage_num} Guide:{'ON' if need_guidance else 'OFF'} | {evidence[:80]}")
         except Exception as e:
             logger.error(f"Gemini stage recognition failed: {e}")
+            raise
 
         return stage_num, need_guidance
 
