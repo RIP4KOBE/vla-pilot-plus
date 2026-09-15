@@ -1,23 +1,22 @@
 #!/usr/bin/env python3
-"""Gemini Robotics visual grounding and stage recognition.
+"""Visual grounding/stage contracts backed by the Codex account planner.
 
-Both visual paths use Google's official Interactions API.  They intentionally
-share the exact model used by the mode semantic planner so formal rollouts
-cannot silently fall back to a generic Gemini model or an unconfigured
-OpenAI-compatible endpoint.
+Legacy class/config names remain readable; production makes no Gemini calls.
 """
 
 import numpy as np
 import json
 import base64
+import hashlib
 import os
 import io
 from typing import List, Dict, Tuple, Optional
 from PIL import Image
 
 from utils.logging_utils import SteerLogger
+from mode_gate.semantic_planner import _ProviderCallBudget
 
-logger = SteerLogger("GeminiGrounder")
+logger = SteerLogger("AccountVisualPlanner")
 
 
 def _image_to_base64(rgb: np.ndarray) -> str:
@@ -30,30 +29,28 @@ def _image_to_base64(rgb: np.ndarray) -> str:
     return base64.b64encode(buf.getvalue()).decode("utf-8")
 
 
-ROBOTICS_MODEL = "gemini-robotics-er-2-preview"
+ROBOTICS_MODEL = "gpt-6-astra"
 
 
 def _make_client(config: dict):
     injected = config.get("client")
     if injected is not None:
         return injected
-    api_key = (
-        config.get("api_key")
-        or os.environ.get("MODE_GATE_GEMINI_API_KEY")
-        or os.environ.get("GOOGLE_API_KEY")
-    )
-    if not api_key:
-        raise RuntimeError("GOOGLE_API_KEY is required for Gemini Robotics grounding")
-    from google import genai
-    from google.genai import types
-
-    return genai.Client(
-        api_key=api_key,
-        http_options=types.HttpOptions(timeout=60_000),
-    )
+    from mode_gate.planner_account import CodexPlannerClient
+    return CodexPlannerClient()
 
 
-def _interaction_json(client, *, model: str, prompt: str, images: list[np.ndarray], schema: dict) -> object:
+def _interaction_json(
+    client,
+    *,
+    model: str,
+    prompt: str,
+    images: list[np.ndarray],
+    schema: dict,
+    thinking_level: str = "medium",
+    provider_budget: _ProviderCallBudget | None = None,
+    purpose: str = "gemini_visual",
+) -> object:
     content = [{"type": "text", "text": prompt}]
     for image in images:
         content.append(
@@ -62,6 +59,16 @@ def _interaction_json(client, *, model: str, prompt: str, images: list[np.ndarra
                 "data": _image_to_base64(image),
                 "mime_type": "image/png",
             }
+        )
+    if provider_budget is not None:
+        provider_budget.reserve(
+            model=model,
+            prompt_version=f"{purpose}-v1",
+            cache_key=hashlib.sha256(
+                (prompt + "\0" + str(len(images))).encode()
+            ).hexdigest(),
+            attempt=0,
+            purpose=purpose,
         )
     interaction = client.interactions.create(
         model=model,
@@ -75,12 +82,14 @@ def _interaction_json(client, *, model: str, prompt: str, images: list[np.ndarra
             "mime_type": "application/json",
             "schema": schema,
         },
-        generation_config={"thinking_level": "high"},
+        generation_config={"thinking_level": thinking_level},
         store=False,
     )
     output_text = getattr(interaction, "output_text", None)
     if not output_text:
         raise ValueError("Gemini Robotics interaction returned no output_text")
+    if getattr(interaction, "planner_metadata", None) is not None:
+        client.last_planner_metadata = interaction.planner_metadata
     return json.loads(output_text)
 
 
@@ -95,10 +104,27 @@ class GeminiGrounder:
     def __init__(self, config: dict):
         self.config = config
         self.model = config.get("model", ROBOTICS_MODEL)
-        if self.model != ROBOTICS_MODEL:
-            raise ValueError(f"GeminiGrounder is frozen to {ROBOTICS_MODEL}")
+        self.thinking_level = str(config.get("thinking_level", "ultra" if self.model == ROBOTICS_MODEL else "medium"))
+        self.provider_budget = _ProviderCallBudget(
+            max_calls=int(config.get("max_provider_calls", 0)),
+            ledger_path=config.get("call_ledger_path"),
+        )
+        if self.model != ROBOTICS_MODEL and not (config.get("client") is not None and self.model == "gemini-robotics-er-2-preview"):
+            raise ValueError(
+                f"fixed_budget_10 GeminiGrounder requires {ROBOTICS_MODEL}"
+            )
         self.client = _make_client(config)
-        logger.info(f"GeminiGrounder initialized with model: {self.model}")
+        logger.info(f"Visual grounder initialized with model: {self.model}")
+
+    def reconfigure_provider_call_budget(
+        self, *, max_provider_calls: int, call_ledger_path: str
+    ) -> None:
+        """Switch run-local accounting without recreating the warm client."""
+
+        self.provider_budget = _ProviderCallBudget(
+            max_calls=int(max_provider_calls),
+            ledger_path=call_ledger_path,
+        )
 
     def detect_objects(self, rgb: np.ndarray, object_names: List[str]) -> List[Dict]:
         H, W = rgb.shape[:2]
@@ -143,6 +169,9 @@ class GeminiGrounder:
                     },
                     "required": ["detections"],
                 },
+                thinking_level=self.thinking_level,
+                provider_budget=self.provider_budget,
+                purpose="gemini_grounding",
             )
             detections = payload["detections"]
             for det in detections:
@@ -203,8 +232,15 @@ class GeminiStageRecognizer:
     def __init__(self, config: dict):
         self.config = config
         self.model = config.get("model", ROBOTICS_MODEL)
-        if self.model != ROBOTICS_MODEL:
-            raise ValueError(f"GeminiStageRecognizer is frozen to {ROBOTICS_MODEL}")
+        self.thinking_level = str(config.get("thinking_level", "ultra" if self.model == ROBOTICS_MODEL else "medium"))
+        self.provider_budget = _ProviderCallBudget(
+            max_calls=int(config.get("max_provider_calls", 0)),
+            ledger_path=config.get("call_ledger_path"),
+        )
+        if self.model != ROBOTICS_MODEL and not (config.get("client") is not None and self.model == "gemini-robotics-er-2-preview"):
+            raise ValueError(
+                f"fixed_budget_10 GeminiStageRecognizer requires {ROBOTICS_MODEL}"
+            )
         self.client = _make_client(config)
 
         template_path = config.get("stage_template_path")
@@ -214,7 +250,17 @@ class GeminiStageRecognizer:
         with open(template_path, "r") as f:
             self.prompt_template = f.read()
 
-        logger.info(f"GeminiStageRecognizer initialized with model: {self.model}")
+        logger.info(f"Stage recognizer initialized with model: {self.model}")
+
+    def reconfigure_provider_call_budget(
+        self, *, max_provider_calls: int, call_ledger_path: str
+    ) -> None:
+        """Switch run-local accounting without recreating the warm client."""
+
+        self.provider_budget = _ProviderCallBudget(
+            max_calls=int(max_provider_calls),
+            ledger_path=call_ledger_path,
+        )
 
     def identify_stage_and_guidance(
         self,
@@ -260,6 +306,9 @@ class GeminiStageRecognizer:
                     },
                     "required": ["stage_num", "need_guidance", "evidence"],
                 },
+                thinking_level=self.thinking_level,
+                provider_budget=self.provider_budget,
+                purpose="gemini_stage_recognition",
             )
             stage_num = int(payload["stage_num"])
             if num_stages:
@@ -267,9 +316,9 @@ class GeminiStageRecognizer:
             need_guidance = bool(payload["need_guidance"])
             evidence = str(payload["evidence"]).strip()
 
-            logger.info(f"[Gemini] Stage:{stage_num} Guide:{'ON' if need_guidance else 'OFF'} | {evidence[:80]}")
+            logger.info(f"[Account planner] Stage:{stage_num} Guide:{'ON' if need_guidance else 'OFF'} | {evidence[:80]}")
         except Exception as e:
-            logger.error(f"Gemini stage recognition failed: {e}")
+            logger.error(f"Account stage recognition failed: {e}")
             raise
 
         return stage_num, need_guidance

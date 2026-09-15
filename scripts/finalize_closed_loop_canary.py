@@ -19,6 +19,10 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from mode_gate.eval_manifest import validate_libero_pro_manifest  # noqa: E402
+from mode_gate.experiment_contract import (  # noqa: E402
+    FIXED_BUDGET_50_CONTRACT,
+    label_contract_payload,
+)
 from mode_gate.incidents import IncidentMemory  # noqa: E402
 from mode_gate.io_utils import atomic_write_json  # noqa: E402
 from mode_gate.registry import PolicyRegistry  # noqa: E402
@@ -52,7 +56,7 @@ def _verifier_fallback(incidents: Path, policy_id: str) -> dict:
         )
     except (FileNotFoundError, ValueError) as exc:
         return {
-            "schema_version": "verifier-training-result-v1",
+            "schema_version": "verifier-training-result-v2",
             "policy_id": policy_id,
             "verifier_id": None,
             "artifact_root": None,
@@ -64,70 +68,44 @@ def _verifier_fallback(incidents: Path, policy_id: str) -> dict:
                 ],
             },
             "observed_contexts": 0,
-            "required_contexts": {
-                "train": config.min_train_contexts,
-                "calibration": config.min_calibration_contexts,
-                "test": config.min_test_contexts,
-            },
-            "controller_mode": "fixed_budget_4",
+            "training_selection": "Planner-selected; no fixed quota",
+            "controller_mode": "fixed_budget_50",
+            "label_version": FIXED_BUDGET_50_CONTRACT.label_version,
+            "label_config": label_contract_payload(FIXED_BUDGET_50_CONTRACT),
         }
 
     split_counts = {
         split: {
             "contexts": sum(item.split == split for item in examples),
             "strong_contexts": sum(
-                item.split == split and not item.weak for item in examples
+                item.split == split for item in examples
             ),
             "expansion_side": sum(
-                item.split == split and not item.weak and item.target_class == 1
+                item.split == split and item.target_class == 1
                 for item in examples
             ),
             "resteer_side": sum(
-                item.split == split and not item.weak and item.p_expansion < 0.5
+                item.split == split and item.target_class == 0
                 for item in examples
             ),
         }
         for split in ("train", "calibration", "test")
     }
-    requirements = {
-        "train": (config.min_train_contexts, config.min_train_each_side),
-        "calibration": (
-            config.min_calibration_contexts,
-            config.min_calibration_each_side,
-        ),
-        "test": (config.min_test_contexts, config.min_test_expansion_contexts),
-    }
-    reasons = []
-    for split, (minimum, each_side) in requirements.items():
-        counts = split_counts[split]
-        if counts["strong_contexts"] < minimum:
-            reasons.append(
-                f"{split} strong contexts {counts['strong_contexts']} < {minimum}"
-            )
-        if split != "test":
-            for side in ("expansion_side", "resteer_side"):
-                if counts[side] < each_side:
-                    reasons.append(
-                        f"{split} {side} {counts[side]} < {each_side}"
-                    )
-        elif counts["expansion_side"] < each_side:
-            reasons.append(
-                f"test expansion contexts {counts['expansion_side']} < {each_side}"
-            )
-    if not reasons:
-        reasons.append(
-            "canary finalizer never deploys an untrained verifier; run the frozen "
-            "ablation trainer before learned-verifier promotion"
-        )
+    reasons = [
+        "canary finalizer never deploys an untrained verifier; run the "
+        "fixed_budget_50 ablation trainer before learned-verifier promotion"
+    ]
     return {
-        "schema_version": "verifier-training-result-v1",
+        "schema_version": "verifier-training-result-v2",
         "policy_id": policy_id,
         "verifier_id": None,
         "artifact_root": None,
         "gate": {"passed": False, "reasons": reasons},
         "observed_contexts": len(examples),
         "split_counts": split_counts,
-        "controller_mode": "fixed_budget_4",
+        "controller_mode": "fixed_budget_50",
+        "label_version": FIXED_BUDGET_50_CONTRACT.label_version,
+        "label_config": label_contract_payload(FIXED_BUDGET_50_CONTRACT),
     }
 
 
@@ -222,7 +200,7 @@ def main() -> int:
         candidate_deployment = registry.promote(
             policy_id=args.candidate_id,
             verifier_id=None,
-            controller_mode="fixed_budget_4",
+            controller_mode="fixed_budget_50",
             manifest_hash=manifest_hash,
             expected_revision=current.deployment_revision,
             reason="closed_loop_canary_raw_trigger_pass_verifier_fallback",

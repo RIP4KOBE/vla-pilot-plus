@@ -14,6 +14,7 @@ from .io_utils import atomic_write_json
 
 V2_LANGUAGE_ONLY = "v2_language_only"
 RETAIN_UNIFORM = "retain_uniform"
+PLANNER_UNIFORM = "planner_uniform"
 
 
 @dataclass(frozen=True)
@@ -23,7 +24,7 @@ class DeltaLineageEntry:
     alpha_v: float = 1.0
     alpha_l: float = 1.0
     alpha_a: float = 1.0
-    merge_method: str = V2_LANGUAGE_ONLY
+    merge_method: str = PLANNER_UNIFORM
 
     def __post_init__(self) -> None:
         if not self.delta_id:
@@ -34,9 +35,9 @@ class DeltaLineageEntry:
         if self.merge_method == V2_LANGUAGE_ONLY:
             if self.alpha_v != 1.0 or self.alpha_a != 1.0:
                 raise ValueError("v2 fixes alpha_v=alpha_a=1")
-        elif self.merge_method == RETAIN_UNIFORM:
+        elif self.merge_method in {RETAIN_UNIFORM, PLANNER_UNIFORM}:
             if not self.alpha_v == self.alpha_l == self.alpha_a:
-                raise ValueError("RETAIN requires one uniform alpha for all groups")
+                raise ValueError("one uniform alpha is required for all three modules")
         else:
             raise ValueError(f"unsupported merge_method {self.merge_method!r}")
         if not Path(self.path).exists():
@@ -59,14 +60,14 @@ def compose_expansion_candidates(
     new_delta_id: str,
     new_delta_path: Path,
     output_root: Path,
-    alpha_l_values: Sequence[float] = (0.2, 0.4, 0.6, 0.8),
+    alpha_l_values: Sequence[float],
 ) -> dict[str, Any]:
     accepted = tuple(accepted_lineage)
     if new_delta_id in {item.delta_id for item in accepted}:
         raise ValueError("new expansion delta already appears in accepted lineage")
     alphas = tuple(sorted({round(float(value), 8) for value in alpha_l_values}))
-    if alphas != (0.2, 0.4, 0.6, 0.8):
-        raise ValueError("expansion candidate grid is frozen at 0.2/0.4/0.6/0.8")
+    if not alphas or any(not 0 <= a <= 1 for a in alphas):
+        raise ValueError("Planner must choose finite merge coefficients in [0,1]")
     base = [asdict(item) for item in accepted]
     return _compose_grid(
         theta0_checkpoint=theta0_checkpoint,
@@ -76,7 +77,7 @@ def compose_expansion_candidates(
         target_delta_path=Path(new_delta_path),
         target_alphas=alphas,
         candidate_kind="EXPANSION",
-        target_merge_method=V2_LANGUAGE_ONLY,
+        target_merge_method=PLANNER_UNIFORM,
         output_root=output_root,
     )
 
@@ -118,47 +119,18 @@ def compose_retain_expansion_candidates(
     )
 
 
-def compose_reuse_candidates(
-    *,
-    theta0_checkpoint: Path,
-    parent_policy_id: str,
-    accepted_lineage: Sequence[DeltaLineageEntry],
-    target_delta_id: str,
-    output_root: Path,
-    increments: Sequence[float] = (0.15, 0.30, 0.50),
-) -> dict[str, Any]:
-    accepted = tuple(accepted_lineage)
-    matches = [item for item in accepted if item.delta_id == target_delta_id]
-    if len(matches) != 1:
-        raise KeyError(f"expected one REUSE delta {target_delta_id!r}")
-    target = matches[0]
-    if target.merge_method != V2_LANGUAGE_ONLY:
-        raise ValueError("signature REUSE is undefined for RETAIN-uniform lineage")
-    if 1.0 - target.alpha_l < 0.15 - 1e-12:
-        raise ValueError("REUSE target has less than 0.15 language-alpha headroom")
-    target_alphas = tuple(
-        sorted(
-            {
-                round(min(1.0, target.alpha_l + float(increment)), 8)
-                for increment in increments
-                if min(1.0, target.alpha_l + float(increment)) > target.alpha_l
-            }
-        )
-    )
-    if not target_alphas:
-        raise ValueError("REUSE produced no distinct alpha candidates")
-    base = [asdict(item) for item in accepted]
-    return _compose_grid(
-        theta0_checkpoint=theta0_checkpoint,
-        parent_policy_id=parent_policy_id,
-        base_lineage=base,
-        target_delta_id=target.delta_id,
-        target_delta_path=Path(target.path),
-        target_alphas=target_alphas,
-        candidate_kind="REUSE",
-        target_merge_method=V2_LANGUAGE_ONLY,
-        output_root=output_root,
-    )
+
+
+def compose_selected_remedy(*, theta0_checkpoint, parent_policy_id, accepted_lineage,
+                           target_delta_id, target_delta_path, alpha_l_values, output_root):
+    """Rebuild the Planner-selected historical delta against the current lineage."""
+    alphas = tuple(sorted(set(float(x) for x in alpha_l_values)))
+    if not alphas or any(not 0 <= x <= 1 for x in alphas):
+        raise ValueError("invalid Planner merge coefficient")
+    return _compose_grid(theta0_checkpoint=Path(theta0_checkpoint), parent_policy_id=parent_policy_id,
+        base_lineage=[asdict(x) for x in accepted_lineage], target_delta_id=target_delta_id,
+        target_delta_path=Path(target_delta_path), target_alphas=alphas,
+        candidate_kind="REUSE", target_merge_method=PLANNER_UNIFORM, output_root=Path(output_root))
 
 
 def _compose_grid(
@@ -195,14 +167,14 @@ def _compose_grid(
     attempt_hash = _digest(input_value)
     candidates = []
     for alpha_l in target_alphas:
-        if target_merge_method == RETAIN_UNIFORM:
+        if target_merge_method in {RETAIN_UNIFORM, PLANNER_UNIFORM}:
             target_entry = DeltaLineageEntry(
                 delta_id=target_delta_id,
                 path=str(target_delta_path),
                 alpha_v=float(alpha_l),
                 alpha_l=float(alpha_l),
                 alpha_a=float(alpha_l),
-                merge_method=RETAIN_UNIFORM,
+                merge_method=target_merge_method,
             )
         else:
             target_entry = DeltaLineageEntry(
@@ -217,7 +189,7 @@ def _compose_grid(
                 for item in entries
             ]
             if not any(item.delta_id == target_delta_id for item in entries):
-                raise ValueError("REUSE target disappeared from accepted lineage")
+                lineage.append(target_entry)
         else:
             lineage = [*entries, target_entry]
         candidate_input = {
@@ -254,7 +226,7 @@ def _compose_grid(
                 [(Path(item.path), item.alpha_map) for item in lineage],
                 checkpoint_path,
                 allow_uniform_alpha=any(
-                    item.merge_method == RETAIN_UNIFORM for item in lineage
+                    item.merge_method in {RETAIN_UNIFORM, PLANNER_UNIFORM} for item in lineage
                 ),
             )
             digest = checkpoint_digest(checkpoint_path)
@@ -300,10 +272,11 @@ def _digest(value: Mapping[str, Any]) -> str:
 
 
 __all__ = [
+    "PLANNER_UNIFORM",
     "DeltaLineageEntry",
     "compose_expansion_candidates",
     "compose_retain_expansion_candidates",
-    "compose_reuse_candidates",
+    "compose_selected_remedy",
     "RETAIN_UNIFORM",
     "V2_LANGUAGE_ONLY",
 ]

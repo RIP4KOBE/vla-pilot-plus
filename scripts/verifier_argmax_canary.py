@@ -8,11 +8,11 @@ from pathlib import Path
 
 import numpy as np
 
-from mode_gate.io_utils import atomic_write_json
+from mode_gate.io_utils import atomic_write_json, sha256_file
 from mode_gate.types import ControllerRoute
 from mode_gate.verifier import (
     DeployedVerifierPredictor,
-    ModeVerifierInput,
+    CandidateVerifierInput,
     PlattCalibrator,
     save_verifier_input,
 )
@@ -23,17 +23,13 @@ from mode_gate.verifier_training import (
 )
 
 
-def _input(value: float) -> ModeVerifierInput:
-    return ModeVerifierInput(
+def _input(value: float) -> CandidateVerifierInput:
+    return CandidateVerifierInput(
         scene_feature=np.full(2048, value, dtype=np.float32),
-        mode_ee_features=np.full((2, 20), value, dtype=np.float32),
-        geometry_features=np.asarray(
-            [[value, 1.0 - value, value], [1.0 - value, value, 1.0 - value]],
-            dtype=np.float32,
-        ),
-        semantic_features=np.asarray([[value], [1.0 - value]], dtype=np.float32),
-        mode_weights=np.asarray([0.6, 0.4], dtype=np.float32),
-        global_features=np.full(7, value, dtype=np.float32),
+        candidate_trajectories=np.full((2, 11, 15), value, dtype=np.float32),
+        executed_history=np.zeros((0, 15), dtype=np.float32),
+        remaining_budget=50, retry_budget=50, candidate_ids=("c0", "c1"),
+        backbone_id="synthetic-v44-canary-not-for-deployment",
     )
 
 
@@ -41,11 +37,11 @@ def run(output_root: Path) -> dict[str, object]:
     output_root = Path(output_root).resolve()
     feature_root = output_root / "features"
     examples: list[VerifierExample] = []
-    items: list[ModeVerifierInput] = []
-    splits = ("train",) * 8 + ("calibration",) * 4 + ("test",) * 4
+    items: list[CandidateVerifierInput] = []
+    splits = ("train",) * 8 + ("test",) * 4
     for index, split in enumerate(splits):
         expansion = bool(index % 2)
-        item = _input(float(expansion))
+        item = _input(float(expansion) + index * 0.001)
         items.append(item)
         feature_path = feature_root / f"context-{index:02d}.npz"
         save_verifier_input(
@@ -61,11 +57,10 @@ def run(output_root: Path) -> dict[str, object]:
                 split=split,
                 feature_path=str(feature_path),
                 source="audit",
-                successes=0 if expansion else 16,
-                trials=16,
+                target_class=int(expansion), annotation_id=f"synthetic-{index}",
+                feature_sha256=sha256_file(feature_path),
+                episode_id=f"synthetic-episode-{index}", snapshot_hash=f"snapshot-{index}",
                 weight=1.0,
-                weak=False,
-                behavior_propensity=1.0,
             )
         )
 
@@ -78,14 +73,6 @@ def run(output_root: Path) -> dict[str, object]:
             max_epochs=12,
             patience=4,
             batch_size=4,
-            bootstrap_samples=20,
-            min_train_contexts=8,
-            min_train_each_side=4,
-            min_calibration_contexts=4,
-            min_calibration_each_side=2,
-            min_test_contexts=4,
-            min_test_expansion_contexts=2,
-            max_ece=1.0,
             device="cpu",
         ),
     )

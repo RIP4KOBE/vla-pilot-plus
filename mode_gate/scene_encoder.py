@@ -258,6 +258,9 @@ class Pi05PrefixFeatureSource:
         self, batch: dict[str, Any], *, selection: str
     ) -> MaskedHiddenStates:
         import torch
+        if any(parameter.requires_grad for parameter in self.policy.parameters()):
+            raise RuntimeError("v44 scene backbone must remain frozen for its entire lifetime")
+        self.policy.eval()
         from lerobot.utils.constants import (
             OBS_LANGUAGE_ATTENTION_MASK,
             OBS_LANGUAGE_TOKENS,

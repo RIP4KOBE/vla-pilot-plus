@@ -6,7 +6,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any, Iterator, Sequence
 
 import fcntl
 
@@ -71,6 +71,43 @@ class AtomicJsonl:
                 if index == len(lines) - 1 and not complete:
                     return
                 raise ValueError(f"corrupt JSONL record {index + 1} in {self.path}")
+
+    def append_many(
+        self, events: Sequence[dict[str, Any]], *, idempotency_key: str = "event_id"
+    ) -> list[bool]:
+        """Append a validated batch under one lock and durability barrier.
+
+        Returns one insertion flag per supplied event, including duplicates.
+        Existing records are never rewritten, and a repeated batch is a no-op.
+        """
+
+        prepared = []
+        for event in events:
+            event_id = str(event.get(idempotency_key, ""))
+            if not event_id:
+                raise ValueError(f"event requires {idempotency_key}")
+            prepared.append((event_id, (
+                json.dumps(event, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+                + "\n"
+            ).encode("utf-8")))
+        if not prepared:
+            return []
+        with self.lock_path.open("a+b") as lock:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+            seen = {str(item.get(idempotency_key, "")) for item in self.iter_valid()}
+            inserted, pending = [], []
+            for event_id, encoded in prepared:
+                inserted.append(event_id not in seen)
+                if event_id not in seen:
+                    pending.append(encoded)
+                    seen.add(event_id)
+            if pending:
+                with self.path.open("ab") as stream:
+                    stream.write(b"".join(pending))
+                    stream.flush()
+                    os.fsync(stream.fileno())
+                _fsync_directory(self.path.parent)
+            return inserted
 
     def read_all(self) -> list[dict[str, Any]]:
         return list(self.iter_valid())

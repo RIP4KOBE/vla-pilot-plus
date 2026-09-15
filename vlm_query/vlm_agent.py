@@ -17,6 +17,108 @@ from datetime import datetime
 from utils.logging_utils import SteerLogger
 log = SteerLogger("VLMAgent")
 
+
+_RETRYABLE_OPENAI_ERROR_NAMES = frozenset({
+    "apiconnectionerror",
+    "apitimeouterror",
+    "connecterror",
+    "connectionerror",
+    "connecttimeout",
+    "internalservererror",
+    "pooltimeout",
+    "proxyerror",
+    "ratelimiterror",
+    "readerror",
+    "readtimeout",
+    "remoteprotocolerror",
+    "sslerror",
+    "timeouterror",
+    "writeerror",
+    "writetimeout",
+})
+
+_RETRYABLE_OPENAI_ERROR_MARKERS = (
+    "429",
+    "connection aborted",
+    "connection closed",
+    "connection error",
+    "connection refused",
+    "connection reset",
+    "eof occurred",
+    "gateway timeout",
+    "rate limit",
+    "remote protocol error",
+    "server disconnected",
+    "service unavailable",
+    "ssl",
+    "temporarily unavailable",
+    "timed out",
+    "timeout",
+    "tls handshake",
+    "unexpected eof",
+)
+
+
+def _openai_exception_chain(error):
+    """Yield an exception and its explicit/implicit causes without looping."""
+    seen = set()
+    current = error
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        yield current
+        current = current.__cause__ or current.__context__
+
+
+def is_retryable_openai_network_error(error):
+    """Return whether an OpenAI failure is transient and safe to replay verbatim."""
+    chain = tuple(_openai_exception_chain(error))
+    for item in chain:
+        status_code = getattr(item, "status_code", None)
+        if status_code is None:
+            response = getattr(item, "response", None)
+            status_code = getattr(response, "status_code", None)
+        if status_code == 429 or (isinstance(status_code, int) and status_code >= 500):
+            return True
+
+        class_name = item.__class__.__name__.lower()
+        if class_name in _RETRYABLE_OPENAI_ERROR_NAMES:
+            return True
+
+    description = " | ".join(
+        f"{item.__class__.__name__}: {item}" for item in chain
+    ).lower()
+    return any(marker in description for marker in _RETRYABLE_OPENAI_ERROR_MARKERS)
+
+
+def call_openai_with_network_recovery(
+    request_fn,
+    *,
+    recovery_label,
+    sleep_fn=None,
+):
+    """Retry a complete OpenAI operation while preserving the warm local runtime.
+
+    ``request_fn`` must include consumption of a streamed response so a stream that
+    fails midway is replayed from the beginning rather than returning partial text.
+    Schema, authentication, and other non-network failures remain fail-closed.
+    """
+    sleep_fn = sleep_fn or time.sleep
+    failure_count = 0
+    while True:
+        try:
+            return request_fn()
+        except Exception as error:
+            if not is_retryable_openai_network_error(error):
+                raise
+            delay_seconds = min(60, 10 * (2 ** failure_count))
+            failure_count += 1
+            log.warning(
+                f"Transient OpenAI failure during {recovery_label}; keeping the "
+                f"runtime warm and retrying the same request in {delay_seconds}s "
+                f"(network failure {failure_count}): {error}"
+            )
+            sleep_fn(delay_seconds)
+
 # Function to encode the image
 def encode_image(image_path):
     with open(image_path, "rb") as image_file:
@@ -232,20 +334,31 @@ class VLMAgent:
         cv2.imwrite(image_path, img[..., ::-1])
         # build prompt
         messages = self._build_prompt(image_path, instruction, save_dir=self.task_dir, **metadata)
-        # stream back the response
-        stream = self.client.chat.completions.create(model=self.config['model'],
-                                                        messages=messages,
-                                                        temperature=self.config['temperature'],
-                                                        max_completion_tokens=self.config['max_completion_tokens'],
-                                                        stream=True)
-        output = ""
-        start = time.time()
-        for chunk in stream:
-            print(f'[{time.time()-start:.2f}s] Querying OpenAI API...', end='\r')
-            if chunk.choices and len(chunk.choices) > 0:
-                if chunk.choices[0].delta.content is not None:
-                    output += chunk.choices[0].delta.content
-        print(f'[{time.time()-start:.2f}s] Querying OpenAI API...Done')
+        # Stream back the response. The complete stream is the retry unit so a
+        # tunnel reset midway cannot leak a partial guidance program downstream.
+        def request_guidance_once():
+            stream = self.client.chat.completions.create(
+                model=self.config['model'],
+                messages=messages,
+                temperature=self.config['temperature'],
+                max_completion_tokens=self.config['max_completion_tokens'],
+                stream=True,
+            )
+            output_parts = []
+            start = time.time()
+            for chunk in stream:
+                print(f'[{time.time()-start:.2f}s] Querying OpenAI API...', end='\r')
+                if chunk.choices and len(chunk.choices) > 0:
+                    content = chunk.choices[0].delta.content
+                    if content is not None:
+                        output_parts.append(content)
+            print(f'[{time.time()-start:.2f}s] Querying OpenAI API...Done')
+            return "".join(output_parts)
+
+        output = call_openai_with_network_recovery(
+            request_guidance_once,
+            recovery_label="guidance generation",
+        )
         # save raw output
         with open(os.path.join(self.task_dir, 'output_raw.txt'), 'w') as f:
             f.write(output)
@@ -361,11 +474,14 @@ class VLMAgent:
         ]
 
         try:
-            response = self.client.chat.completions.create(
-                model=self.config['model'],
-                messages=messages,
-                temperature=0.3,  # Lower temperature for consistent outputs
-                max_completion_tokens=200
+            response = call_openai_with_network_recovery(
+                lambda: self.client.chat.completions.create(
+                    model=self.config['model'],
+                    messages=messages,
+                    temperature=0.3,  # Lower temperature for consistent outputs
+                    max_completion_tokens=200,
+                ),
+                recovery_label="segmentation planning",
             )
             output = response.choices[0].message.content.strip()
             log.info(f"[Segmentation Planning] VLM output: {output}")

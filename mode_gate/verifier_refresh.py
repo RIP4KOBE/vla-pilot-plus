@@ -1,255 +1,73 @@
-"""Policy-stable verifier refresh after 200 new labels or calibration drift."""
-
-from __future__ import annotations
-
-from dataclasses import asdict, dataclass
-import hashlib
+"""Policy-stable refresh whose data selection, timing and acceptance belong to Planner."""
+from dataclasses import asdict
 import json
 from pathlib import Path
-from typing import Any, Mapping, Sequence
-
-import numpy as np
-
-from .incidents import IncidentMemory
+from .experience_planner import ExperiencePlanner
 from .io_utils import atomic_write_json
-from .registry import ActiveDeployment, PolicyRegistry
-from .verifier import DeployedVerifierPredictor, load_verifier_input
-from .verifier_training import (
-    VerifierExample,
-    VerifierTrainingConfig,
-    build_verifier_examples,
-    train_verifier_ablations,
-)
-
-
-@dataclass(frozen=True)
-class VerifierRefreshStatus:
-    due: bool
-    reasons: tuple[str, ...]
-    current_strong_contexts: int
-    last_attempted_contexts: int
-    brier_drift: float | None
-
-
-def verifier_refresh_status(
-    *,
-    current_strong_contexts: int,
-    last_attempted_contexts: int,
-    has_active_verifier: bool,
-    brier_drift: float | None,
-    minimum_cold_start_contexts: int = 1700,
-    increment: int = 200,
-    brier_drift_threshold: float = 0.02,
-) -> VerifierRefreshStatus:
-    if min(current_strong_contexts, last_attempted_contexts) < 0:
-        raise ValueError("verifier context counts must be non-negative")
-    if increment <= 0 or minimum_cold_start_contexts <= 0:
-        raise ValueError("verifier refresh thresholds must be positive")
-    reasons = []
-    if not has_active_verifier:
-        if (
-            current_strong_contexts >= minimum_cold_start_contexts
-            and current_strong_contexts - last_attempted_contexts >= increment
-        ):
-            reasons.append("cold_start_evidence_ready")
-    elif current_strong_contexts - last_attempted_contexts >= increment:
-        reasons.append("at_least_200_new_labeled_contexts")
-    if brier_drift is not None and brier_drift > brier_drift_threshold:
-        reasons.append("brier_drift_exceeded_threshold")
-    return VerifierRefreshStatus(
-        due=bool(reasons),
-        reasons=tuple(reasons),
-        current_strong_contexts=int(current_strong_contexts),
-        last_attempted_contexts=int(last_attempted_contexts),
-        brier_drift=None if brier_drift is None else float(brier_drift),
-    )
-
+from .verifier_training import (VerifierTrainingConfig, continue_from_active_verifier,
+                               build_verifier_examples, train_verifier, record_verifier_training_usage,
+                               selected_feedback_usage)
 
 class VerifierRefreshCoordinator:
-    """Retrain a verifier without rerunning the already-passed policy gate."""
+    def __init__(self, *, registry, incidents, output_root, config=VerifierTrainingConfig(), planner=None,
+                 allowed_task_keys=()):
+        self.registry, self.incidents = registry, incidents
+        self.output_root, self.config = Path(output_root), config
+        self.planner = planner or ExperiencePlanner(incidents)
+        self.allowed_task_keys = tuple(allowed_task_keys)
 
-    def __init__(
-        self,
-        *,
-        registry: PolicyRegistry,
-        incidents: IncidentMemory,
-        output_root: Path,
-        config: VerifierTrainingConfig = VerifierTrainingConfig(device="cpu"),
-        brier_drift_threshold: float = 0.02,
-    ) -> None:
-        self.registry = registry
-        self.incidents = incidents
-        self.output_root = Path(output_root)
+    def train_for_policy(self, policy_id, *, current=None, selection=None):
+        from .verifier_feedback import publish_verifier_feedback
+        feedback = publish_verifier_feedback(self.incidents)
         self.output_root.mkdir(parents=True, exist_ok=True)
-        self.config = config
-        self.brier_drift_threshold = float(brier_drift_threshold)
-
-    @property
-    def state_path(self) -> Path:
-        return self.output_root / "refresh_state.json"
-
-    def run(self) -> dict[str, Any]:
-        active = self.registry.active()
-        if active is None:
-            raise RuntimeError("cannot refresh verifier before a policy is active")
-        try:
-            examples = tuple(
-                build_verifier_examples(
-                    self.incidents,
-                    policy_id=active.policy_id,
-                )
-            )
-        except ValueError as exc:
-            return {
-                "schema_version": "verifier-refresh-result-v1",
-                "policy_id": active.policy_id,
-                "deployment_revision": active.deployment_revision,
-                "refreshed": False,
-                "status": {
-                    "due": False,
-                    "reasons": [f"no_refreshable_evidence: {exc}"],
-                    "current_strong_contexts": 0,
-                    "last_attempted_contexts": 0,
-                    "brier_drift": None,
-                },
-            }
-        strong_count = len({item.record_id for item in examples if not item.weak})
-        state = self._state(active)
-        drift = self._brier_drift(active, examples)
-        status = verifier_refresh_status(
-            current_strong_contexts=strong_count,
-            last_attempted_contexts=int(state.get("last_attempted_contexts", 0)),
-            has_active_verifier=active.verifier_id is not None,
-            brier_drift=drift,
-            brier_drift_threshold=self.brier_drift_threshold,
-        )
-        if not status.due:
-            return {
-                "schema_version": "verifier-refresh-result-v1",
-                "policy_id": active.policy_id,
-                "deployment_revision": active.deployment_revision,
-                "refreshed": False,
-                "status": asdict(status),
-            }
-
-        ablation = train_verifier_ablations(
-            examples,
-            policy_id=active.policy_id,
-            output_root=self.output_root / "ablations",
-            config=self.config,
-            metadata={
-                "experiment_role": "policy_stable_verifier_refresh",
-                "source_deployment_revision": active.deployment_revision,
-                "refresh_reasons": list(status.reasons),
-            },
-        )
-        selected_name = ablation.selected_channel_set
-        next_deployment = active
-        if selected_name is not None:
-            selected = ablation.results[selected_name]
-            self.registry.install_artifact(
-                "verifier", selected.verifier_id, Path(selected.artifact_root)
-            )
-            next_deployment = self.registry.promote(
-                policy_id=active.policy_id,
-                verifier_id=selected.verifier_id,
-                controller_mode="learned_verifier",
-                manifest_hash=active.manifest_hash,
-                expected_revision=active.deployment_revision,
-                reason="verifier_refresh_without_policy_regression_rerun",
-            )
-        next_state = {
-            "schema_version": "verifier-refresh-state-v1",
-            "policy_id": active.policy_id,
-            "last_attempted_contexts": strong_count,
-            "last_dataset_hash": ablation.dataset_hash,
-            "last_ablation_report_path": ablation.report_path,
-            "selected_channel_set": selected_name,
-            "deployment_revision": next_deployment.deployment_revision,
-        }
-        atomic_write_json(self.state_path, next_state)
-        result = {
-            "schema_version": "verifier-refresh-result-v1",
-            "policy_id": active.policy_id,
-            "source_deployment_revision": active.deployment_revision,
-            "deployment_revision": next_deployment.deployment_revision,
-            "refreshed": selected_name is not None,
-            "status": asdict(status),
-            "selected_channel_set": selected_name,
-            "controller_mode": next_deployment.controller_mode,
-            "verifier_id": next_deployment.verifier_id,
-            "ablation_report_path": ablation.report_path,
-        }
-        report_id = hashlib.sha256(
-            json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
-        ).hexdigest()[:16]
-        atomic_write_json(self.output_root / f"refresh_{report_id}.json", result)
+        selection_path = self.output_root / "planner_selection.json"
+        if selection is None and selection_path.is_file():
+            selection = json.loads(selection_path.read_text())
+        if selection is None:
+            selection = self.planner.run(purpose="verifier_training", current={
+                **(current or {"policy_id":policy_id}),
+                "observed_verifier_feedback": {k:feedback[k] for k in ("schema_version", "ledger_path", "counts")}})
+        atomic_write_json(selection_path, selection)
+        request = selection.get("training_request")
+        if request is None:
+            return None
+        config_values = asdict(continue_from_active_verifier(self.config, self.registry))
+        allowed = {"learning_rate", "weight_decay", "batch_size", "max_epochs", "patience", "seed"}
+        if config_values["channel_set"] != "full":
+            raise ValueError("online verifier must keep scene, all candidates and history inputs")
+        if set(request.get("config", {})) - allowed:
+            raise ValueError("Planner may configure small-head training, not change input/budget/backbone contracts")
+        config_values.update(request.get("config", {}))
+        examples = build_verifier_examples(self.incidents, policy_id=policy_id, request=request,
+                                          allowed_task_keys=self.allowed_task_keys)
+        result = train_verifier(examples, policy_id=policy_id, output_root=self.output_root,
+                                config=VerifierTrainingConfig(**config_values), reviewer=self.planner.review_head,
+                                metadata={"planner_retrain_request":request,
+                                          "observed_feedback":selected_feedback_usage(self.incidents, examples),
+                                          "allowed_task_keys":list(self.allowed_task_keys)})
+        record_verifier_training_usage(self.incidents, result, examples, request_id=request["event_id"])
         return result
 
-    def _state(self, active: ActiveDeployment) -> Mapping[str, Any]:
-        if not self.state_path.is_file():
-            trained_count = self._active_trained_count(active)
-            return {
-                "policy_id": active.policy_id,
-                "last_attempted_contexts": trained_count,
-            }
-        value = json.loads(self.state_path.read_text(encoding="utf-8"))
-        if value.get("policy_id") != active.policy_id:
-            return {"policy_id": active.policy_id, "last_attempted_contexts": 0}
-        return value
-
-    def _active_trained_count(self, active: ActiveDeployment) -> int:
-        if active.verifier_id is None:
-            return 0
-        manifest = self._active_verifier_manifest(active)
-        counts = manifest.get("metadata", {}).get("metrics", {}).get(
-            "split_counts", {}
-        )
-        return int(
-            sum(
-                int(counts.get(split, {}).get("strong_contexts", 0))
-                for split in ("train", "calibration", "test")
-            )
-        )
-
-    def _active_verifier_manifest(self, active: ActiveDeployment) -> Mapping[str, Any]:
-        if active.verifier_id is None:
-            raise ValueError("active deployment has no verifier")
-        path = self.registry.root / "verifiers" / active.verifier_id / "manifest.json"
-        return json.loads(path.read_text(encoding="utf-8"))
-
-    def _brier_drift(
-        self,
-        active: ActiveDeployment,
-        examples: Sequence[VerifierExample],
-    ) -> float | None:
-        if active.verifier_id is None:
-            return None
-        test = tuple(item for item in examples if item.split == "test" and not item.weak)
-        if not test:
-            return None
-        artifact = self.registry.root / "verifiers" / active.verifier_id
-        predictor = DeployedVerifierPredictor(artifact)
-        probabilities = predictor.predict_probabilities(
-            [load_verifier_input(Path(item.feature_path)) for item in test]
-        )
-        squared_error = 0.0
-        outcomes = 0
-        for item, probability in zip(test, probabilities):
-            squared_error += item.failures * (1.0 - float(probability)) ** 2
-            squared_error += item.successes * float(probability) ** 2
-            outcomes += item.trials
-        current_brier = squared_error / outcomes
-        reference = self._active_verifier_manifest(active).get("metadata", {}).get(
-            "metrics", {}
-        )
-        if "brier" not in reference:
-            return None
-        return float(current_brier) - float(reference["brier"])
-
-
-__all__ = [
-    "VerifierRefreshCoordinator",
-    "VerifierRefreshStatus",
-    "verifier_refresh_status",
-]
+    def run(self, *, current=None):
+        completed = self.output_root / "refresh_result.json"
+        if completed.is_file():
+            return json.loads(completed.read_text())
+        active = self.registry.active()
+        if active is None:
+            raise RuntimeError("no active policy for verifier refresh")
+        result = self.train_for_policy(active.policy_id, current={"active_policy":asdict(active), **(current or {}),
+            "allowed_task_keys":list(self.allowed_task_keys)})
+        refreshed = bool(result and result.gate.passed)
+        revision = active.deployment_revision
+        if refreshed:
+            self.registry.install_artifact("verifier", result.verifier_id, Path(result.artifact_root))
+            deployment = self.registry.promote(policy_id=active.policy_id, verifier_id=result.verifier_id,
+                controller_mode="learned_verifier", manifest_hash=active.manifest_hash,
+                expected_revision=revision, reason="Planner independent-experience verifier review")
+            revision = deployment.deployment_revision
+        report = {"schema_version":"verifier-refresh-result-v3", "policy_id":active.policy_id,
+                  "source_deployment_revision":active.deployment_revision, "deployment_revision":revision,
+                  "refreshed":refreshed, "result":asdict(result) if result else None,
+                  "reason":"Planner-selected retrain" if result else "Planner chose not to retrain yet"}
+        atomic_write_json(self.output_root / "refresh_result.json", report)
+        return report

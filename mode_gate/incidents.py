@@ -7,8 +7,12 @@ from datetime import datetime, timezone
 import hashlib
 import math
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
+from .experiment_contract import (
+    FIXED_BUDGET_50_LABEL_VERSION,
+    require_fixed_budget_50_contract,
+)
 from .io_utils import AtomicJsonl
 
 
@@ -32,9 +36,12 @@ class VerifierDecisionRecord:
     controller_mode: str
     failure_count: int
     remaining_budget: int
+    retry_budget: int = 50
+    retry_index: int = 0
+    label_version: str = FIXED_BUDGET_50_LABEL_VERSION
     behavior_propensity: float = 1.0
     verifier_feature_path: str = ""
-    feature_schema: str = "grounded-verifier-input-v1"
+    feature_schema: str = "candidate-verifier-input-v3"
     provenance: Mapping[str, Any] = field(default_factory=dict)
     recorded_at: str = field(default_factory=_now)
 
@@ -65,6 +72,12 @@ class VerifierDecisionRecord:
                 raise ValueError("verifier_decision does not match head argmax")
         if not 0.0 < self.behavior_propensity <= 1.0:
             raise ValueError("behavior_propensity must be in (0, 1]")
+        if self.retry_budget <= 0 or not 0 <= self.retry_index <= self.retry_budget:
+            raise ValueError("invalid retry budget/index")
+        if self.remaining_budget != self.retry_budget - self.retry_index:
+            raise ValueError("remaining_budget must equal retry_budget - retry_index")
+        if not self.label_version.strip():
+            raise ValueError("decision label_version must be non-empty")
 
 
 @dataclass(frozen=True)
@@ -85,6 +98,7 @@ class VerifierLabelRecord:
     weak: bool = False
     weight: float = 1.0
     behavior_propensity: float | None = None
+    label_config: Mapping[str, Any] = field(default_factory=dict)
     labeled_at: str = field(default_factory=_now)
 
     def __post_init__(self) -> None:
@@ -93,10 +107,6 @@ class VerifierLabelRecord:
         expected = 1.0 - self.successes / self.branches
         if abs(self.p_expansion - expected) > 1e-9:
             raise ValueError("p_expansion must equal 1 - successes/branches")
-        if self.source == "demo_match" and not self.weak:
-            raise ValueError("demo_match labels must be weak")
-        if self.source == "post_expansion_recheck":
-            raise ValueError("post-expansion recheck is remedy evidence, not a verifier label")
         if self.weight <= 0:
             raise ValueError("label weight must be positive")
         if self.behavior_propensity is not None and not 0 < self.behavior_propensity <= 1:
@@ -107,6 +117,8 @@ class VerifierLabelRecord:
             "test",
         }:
             raise ValueError("data_split must be train, calibration, or test")
+        if self.label_version == FIXED_BUDGET_50_LABEL_VERSION:
+            require_fixed_budget_50_contract(self.label_config)
 
 
 @dataclass(frozen=True)
@@ -126,6 +138,7 @@ class CapabilitySignatureRecord:
     delta_id: str = ""
     ticket_id: str = ""
     recorded_at: str = field(default_factory=_now)
+    metadata: Mapping[str, Any] = field(default_factory=dict)
 
 
 class IncidentMemory:
@@ -135,6 +148,20 @@ class IncidentMemory:
         self.decisions = AtomicJsonl(self.root / "verifier_decisions.jsonl")
         self.labels = AtomicJsonl(self.root / "verifier_labels.jsonl")
         self.signatures = AtomicJsonl(self.root / "capability_signatures.jsonl")
+        from .experiences import ExperienceLibrary
+        self.experiences = ExperienceLibrary(self.root)
+
+    def record_fact(self, **kwargs):
+        return self.experiences.record_fact(**kwargs)
+
+    def record_video_frame(self, *args, **kwargs):
+        return self.experiences.record_video_frame(*args, **kwargs)
+
+    def annotate(self, value):
+        from .verifier_feedback import validate_feedback_annotation
+        validate_feedback_annotation(self, value)
+        return self.experiences.annotate(value, known_decisions={
+            x["record_id"]: x for x in self.decisions.iter_valid()})
 
     def record_decision(self, record: VerifierDecisionRecord) -> bool:
         value = {"event": "DECISION_RECORDED", **asdict(record)}
@@ -148,24 +175,63 @@ class IncidentMemory:
         ):
             raise KeyError(f"unknown verifier decision {record.record_id}")
         value = {"event": "LABEL_ATTACHED", **asdict(record)}
+        # Preserve observed branch counts, but binary training selection/labels
+        # live only in the independently revisioned Planner interpretation log.
         value["event_id"] = hashlib.sha256(
             f"{record.record_id}\0{record.label_version}\0{record.source}\0"
             f"{record.policy_id}\0{record.snapshot_hash}".encode()
         ).hexdigest()
-        return self.labels.append(value)
+        added = self.labels.append(value)
+        self._label_fact(record, value["event_id"])
+        return added
+
+    def _label_fact(self, record, identity):
+        decision = next(x for x in self.decisions.iter_valid() if x["record_id"] == record.record_id)
+        self.record_fact(episode_id=decision.get("provenance", {}).get("episode_id", record.record_id),
+            context_id=record.record_id, kind="counterfactual_outcomes", payload=asdict(record),
+            event_id="counterfactual:" + identity)
 
     def record_signature(self, record: CapabilitySignatureRecord) -> bool:
-        value = {"event": "REMEDY_VALIDATED", **asdict(record)}
+        value = {"event": ("REMEDY_VALIDATED" if record.validated else
+                           "CAPABILITY_SIGNATURE_RECORDED"), **asdict(record)}
         value["event_id"] = f"signature:{record.signature_id}:{record.policy_id}"
         return self.signatures.append(value)
 
-    def joined_training_rows(self, *, include_weak: bool = True) -> list[dict[str, Any]]:
+    def attach_labels(self, records: Sequence[VerifierLabelRecord]) -> list[bool]:
+        """Validate all decisions once, then durably append idempotent labels."""
+
+        known = {item["record_id"] for item in self.decisions.iter_valid()}
+        events = []
+        for record in records:
+            if record.record_id not in known:
+                raise KeyError(f"unknown verifier decision {record.record_id}")
+            value = {"event": "LABEL_ATTACHED", **asdict(record)}
+            value["event_id"] = hashlib.sha256(
+                f"{record.record_id}\0{record.label_version}\0{record.source}\0"
+                f"{record.policy_id}\0{record.snapshot_hash}".encode()
+            ).hexdigest()
+            events.append(value)
+        added = self.labels.append_many(events)
+        for record, event in zip(records, events):
+            self._label_fact(record, event["event_id"])
+        return added
+
+    def joined_training_rows(
+        self,
+        *,
+        include_weak: bool = True,
+        label_version: str | None = None,
+    ) -> list[dict[str, Any]]:
         decisions = {
             item["record_id"]: item for item in self.decisions.iter_valid()
         }
         rows = []
         seen_versions: set[tuple[str, str, str, str]] = set()
         for label in self.labels.iter_valid():
+            if label_version is not None and str(label.get("label_version")) != str(
+                label_version
+            ):
+                continue
             if label.get("weak", False) and not include_weak:
                 continue
             key = (

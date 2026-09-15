@@ -86,6 +86,11 @@ from core.sam3_segmenter import create_segmenter as create_sam3_segmenter
 from core.gemini_grounder import create_gemini_grounder, create_gemini_stage_recognizer
 from vlm_query.vlm_agent import VLMAgent
 from utils.vis_utils import TrajectoryVideoRecorder, add_text_to_image
+from mode_gate.experiment_contract import label_contract_payload
+from mode_gate.formal_protocol import prepare_requested_coordinators
+
+# Only an explicit PID/hash-checked warm migration can refresh coordinators.
+prepare_requested_coordinators()
 
 from core.policy_observation_sampling import policy_observation_sample_num
 
@@ -111,6 +116,87 @@ def _get_visualization_action_chunk(policy: Any, adapter: Any, action_chunk: tor
     return candidates
 
 
+def _active_deployment_is_loaded_theta0(
+    registry: Any,
+    active: Any,
+    *,
+    base_pretrained_path: str,
+    loaded_checkpoint_digest: str,
+) -> bool:
+    """Prove that the active immutable policy is the theta0 already in memory.
+
+    A rollout starts from ``policy.pretrained_path`` and then checks
+    the active registry at the first episode boundary.  Reloading the same
+    bootstrap artifact there wastes another full checkpoint read and briefly
+    occupies two GPUs.  Skip that reload only when the immutable theta0
+    reference and every committed deployment transaction back to
+    ``bootstrap_theta0`` agree on the same policy.
+    """
+
+    from pathlib import Path
+
+    try:
+        reference_path = Path(registry.root) / "base/theta_0/ref.json"
+        reference = json.loads(reference_path.read_text(encoding="utf-8"))
+        if reference.get("schema_version") != "theta0-reference-v1":
+            return False
+        if (
+            Path(str(reference["checkpoint_path"])).resolve()
+            != Path(base_pretrained_path).resolve()
+            or str(reference["checkpoint_digest"]) != str(loaded_checkpoint_digest)
+        ):
+            return False
+        expected = {
+            "deployment_revision": int(active.deployment_revision),
+            "policy_id": str(active.policy_id),
+            "controller_mode": str(active.controller_mode),
+            "verifier_id": active.verifier_id,
+            "manifest_hash": str(active.manifest_hash),
+            "transaction_id": str(active.transaction_id),
+        }
+        seen: set[str] = set()
+        while expected:
+            transaction_id = str(expected["transaction_id"])
+            if transaction_id in seen:
+                return False
+            seen.add(transaction_id)
+            transaction_path = (
+                Path(registry.root)
+                / "attempts"
+                / f"transaction_{transaction_id}.json"
+            )
+            transaction = json.loads(transaction_path.read_text(encoding="utf-8"))
+            if transaction.get("status") != "COMMITTED":
+                return False
+            next_value = dict(transaction.get("next") or {})
+            if any(next_value.get(key) != value for key, value in expected.items()):
+                return False
+            # Installing/retraining a verifier does not change immutable
+            # policy weights. The verifier has already been loaded above.
+            if str(next_value.get("policy_id")) != str(active.policy_id):
+                return False
+            previous = transaction.get("previous")
+            if transaction.get("reason") == "bootstrap_theta0":
+                return previous is None and int(next_value["deployment_revision"]) == 1
+            if not isinstance(previous, dict):
+                return False
+            expected = {
+                key: previous.get(key)
+                for key in (
+                    "deployment_revision",
+                    "policy_id",
+                    "controller_mode",
+                    "verifier_id",
+                    "manifest_hash",
+                    "transaction_id",
+                )
+            }
+        return False
+    except (KeyError, OSError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        log.warning(f"Cannot prove active policy is loaded theta0: {exc}")
+        return False
+
+
 class Main:
     def __init__(self, cfg: DictConfig):
         """
@@ -127,6 +213,15 @@ class Main:
             cfg.get("mode_gate", {}), resolve=True
         )
         self.mode_gate_config = ModeGateConfig.from_mapping(raw_mode_gate_config)
+
+        # Some policy implementations construct tensors on bare ``cuda``
+        # inside ``from_pretrained``.  Select the requested ordinal before any
+        # adapter or model construction so ``device=cuda:6`` never stages a
+        # multi-GB checkpoint on GPU0 first.  This is not process-level GPU
+        # binding; all devices remain visible.
+        self.device = str(cfg.get('device', 'cuda'))
+        if torch.cuda.is_available() and self.device.startswith("cuda"):
+            torch.cuda.set_device(torch.device(self.device))
 
         # Log the resolved configuration
         log.info(f"Configuration:\n{OmegaConf.to_yaml(cfg, resolve=True)[:500]}...")
@@ -214,8 +309,12 @@ class Main:
         else:
             raise ValueError(f"Unknown policy type: {policy_type}")
 
-        self.device = cfg.get('device', 'cuda')
         self.policy.to(self.device)
+        # ``nn.Module.to`` moves parameters but does not update the LeRobot
+        # policy config. PI05 and its observation processor consult this field
+        # later, so keep it aligned when using a non-default GPU.
+        if hasattr(self.policy, "config") and hasattr(self.policy.config, "device"):
+            self.policy.config.device = str(self.device)
 
         if policy_type == 'rdt':
             # RDTSteer handles all obs/action processing internally.
@@ -301,21 +400,16 @@ class Main:
         else:
             self.sam3_segmenter = None
 
-        # Initialize Gemini grounder if enabled
+        # Keep the legacy configuration key, but use account planning without API credentials.
         gemini_config = perception_cfg.get('gemini_grounding', {})
-        self.use_gemini = gemini_config.get('enabled', False) if gemini_config else False
+        self.use_gemini = (bool(gemini_config.get('enabled', False))
+                          and self.config.get('planner_steering_enabled', True)) if gemini_config else False
         if self.use_gemini:
-            api_key = gemini_config.get('api_key') or os.environ.get('GOOGLE_API_KEY')
-            if api_key:
-                gemini_dict = OmegaConf.to_container(gemini_config, resolve=True)
-                gemini_dict['api_key'] = api_key
-                log.info("Initializing Gemini grounder for visual grounding")
-                self.gemini_grounder = create_gemini_grounder(gemini_dict)
-                self.gemini_default_objects = list(gemini_config.get('default_objects', []))
-            else:
-                log.warning("Gemini API key not found - disabling Gemini grounding")
-                self.use_gemini = False
-                self.gemini_grounder = None
+            gemini_dict = OmegaConf.to_container(gemini_config, resolve=True)
+            gemini_dict.pop('api_key', None)
+            log.info("Initializing Codex account planner for visual grounding")
+            self.gemini_grounder = create_gemini_grounder(gemini_dict)
+            self.gemini_default_objects = list(gemini_config.get('default_objects', []))
         else:
             self.gemini_grounder = None
 
@@ -333,14 +427,15 @@ class Main:
             env_type=self.backend,
         )
 
-        # Initialize Gemini stage recognizer (for real-time stage recognition)
+        # Initialize account-based real-time stage recognition.
         gemini_config = OmegaConf.to_container(perception_cfg.get('gemini', {}), resolve=True)
-        if self.config.get("use_vlm_stage_recognition", True):
+        if (self.config.get("use_vlm_stage_recognition", True)
+                and self.config.get('planner_steering_enabled', True)):
             try:
                 self.gemini_stage_recognizer = create_gemini_stage_recognizer(gemini_config)
-                log.info("Gemini stage recognizer initialized")
+                log.info("Codex account stage recognizer initialized")
             except Exception as e:
-                log.warning(f"Failed to initialize Gemini stage recognizer: {e}")
+                log.warning(f"Failed to initialize Codex account stage recognizer: {e}")
                 self.gemini_stage_recognizer = None
         else:
             self.gemini_stage_recognizer = None
@@ -361,12 +456,11 @@ class Main:
         from pathlib import Path
 
         from mode_gate.cards import (
-            CombinedModeCardRenderer,
-            ModeCardRenderer,
+            CandidateCardRenderer,
             adapter_camera_projector,
         )
         from mode_gate.checkpoint_math import checkpoint_digest
-        from mode_gate.gate import TrajectoryModeGate
+        from mode_gate.gate import TrajectoryCandidateGate
         from mode_gate.geometry import adapter_geometry_scorer
         from mode_gate.incidents import IncidentMemory
         from mode_gate.projectors import (
@@ -375,11 +469,15 @@ class Main:
         )
         from mode_gate.preflight import source_revision
         from mode_gate.registry import PolicyRegistry
-        from mode_gate.runtime import ModeAwareRuntime
-        from mode_gate.semantic_planner import GeminiSemanticPlanner
+        from mode_gate.runtime import CandidateRuntime
+        from mode_gate.semantic_planner import (
+            SemanticPlanner,
+            preflight_with_network_recovery,
+        )
         from mode_gate.slow_loop import SlowLoopStore
         from mode_gate.snapshots import DecisionSnapshotStore
         from mode_gate.verifier import DeployedVerifierPredictor
+        from mode_gate.experiment_contract import fixed_budget_controller_mode
 
         if self.backend == "calvin":
             projector = CalvinTrajectoryProjector(self.adapter)
@@ -391,7 +489,6 @@ class Main:
             )
 
         camera_projector = adapter_camera_projector(self.adapter)
-        renderer = ModeCardRenderer(camera_projector)
         registry = PolicyRegistry(Path(self.mode_gate_config.registry_root))
         self.mode_gate_source_revision = source_revision(Path(PROJECT_ROOT))
         self.active_policy_checkpoint_digest = checkpoint_digest(
@@ -403,52 +500,105 @@ class Main:
             self._initialize_theta0_scene_encoder(registry)
         active = registry.active()
         verifier = None
-        effective_mode = "fixed_budget_4"
-        if active is not None and active.controller_mode == "learned_verifier":
+        effective_mode = fixed_budget_controller_mode(
+            self.mode_gate_config.retry_budget
+        )
+        if (active is not None and active.controller_mode == "learned_verifier"
+                and not self.config.get('initialization_posthoc_only', False)):
             verifier_path = Path(self.mode_gate_config.registry_root) / "verifiers" / str(active.verifier_id)
-            verifier = DeployedVerifierPredictor(verifier_path, device=str(self.device))
+            try:
+                verifier = DeployedVerifierPredictor(
+                    verifier_path, device=str(self.device)
+                )
+            except ValueError as exc:
+                if self.mode_gate_config.require_learned_verifier:
+                    raise RuntimeError(
+                        "Formal verifier could not load; fixed-budget fallback is disabled"
+                    ) from exc
+                log.warning(
+                    "Legacy verifier is incompatible with the candidate architecture; "
+                    f"fixed-budget bootstrap (50) remains active until the new head is trained: {exc}"
+                )
+                verifier = None
             # The theta0 scene encoder is attached by the deployment loader.
-            # Without it, fail back to the frozen N=4 controller rather than
+            # Without it, use the configured fixed-budget controller rather than
             # running a verifier on active-policy features.
-            if getattr(self, "theta0_scene_encoder", None) is not None:
+            if (
+                verifier is not None
+                and getattr(self, "theta0_scene_encoder", None) is not None
+            ):
                 effective_mode = "learned_verifier"
+        if self.mode_gate_config.require_learned_verifier and effective_mode != "learned_verifier":
+            raise RuntimeError("Formal execution needs its initialized verifier and frozen v44 encoder")
         self.mode_gate_config = replace(
             self.mode_gate_config,
             controller_mode=effective_mode,
         )
-        gate = TrajectoryModeGate(self.mode_gate_config, projector, renderer)
-        planner = GeminiSemanticPlanner(
+        gate = TrajectoryCandidateGate(self.mode_gate_config, projector)
+        planner = SemanticPlanner(
             model=self.mode_gate_config.planner_model,
             prompt_version=self.mode_gate_config.planner_prompt_version,
             timeout_seconds=self.mode_gate_config.planner_timeout_seconds,
             max_retries=self.mode_gate_config.planner_max_retries,
-            cache_dir=Path(self.mode_gate_config.incident_root) / "gemini_cache",
+            thinking_level=self.mode_gate_config.planner_reasoning_effort,
+            cache_dir=Path(self.mode_gate_config.incident_root) / "planner_cache",
+            max_provider_calls=self.mode_gate_config.planner_max_provider_calls,
+            call_ledger_path=(
+                Path(self.mode_gate_config.planner_call_ledger)
+                if self.mode_gate_config.planner_call_ledger
+                else (
+                    Path(self.mode_gate_config.incident_root)
+                    / "gemini_provider_calls.jsonl"
+                    if self.mode_gate_config.planner_max_provider_calls > 0
+                    else None
+                )
+            ),
         )
-        planner.preflight()
+        if (not self.config.get('initialization_posthoc_only', False)
+                and self.config.get('planner_steering_enabled', True)):
+            preflight_with_network_recovery(
+                planner,
+                recovery_label="online mode-aware runtime startup",
+            )
         self.mode_gate_registry = registry
         self.mode_gate_incidents = IncidentMemory(Path(self.mode_gate_config.incident_root))
         self.mode_gate_snapshot_store = DecisionSnapshotStore(
             Path(self.mode_gate_config.snapshot_root)
         )
         self.mode_gate_slow_loop = SlowLoopStore(Path(self.mode_gate_config.slow_loop_root))
-        self.mode_aware_runtime = ModeAwareRuntime(
+        self.mode_aware_runtime = CandidateRuntime(
             config=self.mode_gate_config,
             gate=gate,
             planner=planner,
-            combined_renderer=CombinedModeCardRenderer(camera_projector),
+            combined_renderer=CandidateCardRenderer(camera_projector),
             geometry_factory=lambda context: adapter_geometry_scorer(
                 self.adapter, context.metadata
             ),
             incidents=self.mode_gate_incidents,
             verifier=verifier,
+            backbone_id=(self.theta0_scene_encoder.theta0_checksum
+                         if getattr(self, "theta0_scene_encoder", None) is not None else ""),
         )
         from mode_gate.deployment import EpisodeBoundaryDeploymentManager
 
+        initial_deployment_revision = 0
+        if active is not None and _active_deployment_is_loaded_theta0(
+            registry,
+            active,
+            base_pretrained_path=str(self.base_pretrained_path),
+            loaded_checkpoint_digest=str(self.active_policy_checkpoint_digest),
+        ):
+            initial_deployment_revision = int(active.deployment_revision)
+            log.info(
+                "Active registry policy is the already-loaded theta0; "
+                f"starting at deployment revision {initial_deployment_revision}"
+            )
         self.mode_gate_deployment_manager = EpisodeBoundaryDeploymentManager(
             registry=registry,
             policy_loader=self._fresh_load_registry_policy,
             verifier_loader=self._fresh_load_registry_verifier,
             canary=self._deployment_canary,
+            initial_revision=initial_deployment_revision,
         )
         # Compatibility sentinel used by the existing rollout condition.
         self.mode_gate_controller = self.mode_aware_runtime
@@ -456,6 +606,61 @@ class Main:
             f"Mode-aware v2 runtime initialized: controller_mode={effective_mode}, "
             f"baseline={self.mode_gate_config.baseline_kind or 'none'}"
         )
+
+    def _launch_expansion_automation(self, slow_job) -> dict[str, Any]:
+        """Detach the slow worker that will issue and serve the demo ticket."""
+
+        from pathlib import Path
+
+        from mode_gate.expansion_automation import launch_expansion_worker
+        from mode_gate.io_utils import atomic_write_json
+
+        if not bool(self.mode_gate_config.auto_start_expansion_worker):
+            return {"launch_status": "disabled_by_config"}
+        if self.mode_gate_config.baseline_kind:
+            # Formal audit and baselines may emit EXPANSION outcomes for
+            # measurement, but must never solicit human data.
+            return {"launch_status": "disabled_for_baseline"}
+        persistent_root = Path(self.mode_gate_config.slow_loop_root).resolve().parent
+        try:
+            launch = launch_expansion_worker(
+                job_id=slow_job.job_id,
+                repo_root=Path(PROJECT_ROOT),
+                persistent_root=persistent_root,
+                slow_loop_root=Path(self.mode_gate_config.slow_loop_root),
+                registry_root=Path(self.mode_gate_config.registry_root),
+                incident_root=Path(self.mode_gate_config.incident_root),
+                snapshot_root=Path(self.mode_gate_config.snapshot_root),
+                operator=self.mode_gate_config.teleop_operator,
+                teleop_port=int(self.mode_gate_config.teleop_port),
+                teleop_max_steps=int(self.mode_gate_config.teleop_max_steps),
+                full_cycle=bool(getattr(self, "expansion_full_cycle", False)),
+                gpu_index=int(str(self.device).split(":")[-1]),
+            )
+            log.warning(
+                "Automatic expansion worker launched: "
+                f"job={slow_job.job_id}, teleop={launch['teleop_url']}"
+            )
+            return launch
+        except Exception as exc:
+            failure = {
+                "schema_version": "vls-expansion-worker-launch-failure-v1",
+                "launch_status": "failed",
+                "job_id": slow_job.job_id,
+                "error_type": type(exc).__name__,
+                "error": str(exc),
+            }
+            atomic_write_json(
+                persistent_root
+                / "slow_worker_launches"
+                / f"{slow_job.job_id}.failure.json",
+                failure,
+            )
+            log.error(
+                "Automatic expansion worker failed to launch; the persistent "
+                f"job remains resumable: {failure}"
+            )
+            return failure
 
     def _initialize_theta0_scene_encoder(self, registry) -> None:
         """Bind a permanently frozen feature source to theta0 and its processor."""
@@ -475,6 +680,11 @@ class Main:
             theta0_checksum = json.loads(reference.read_text(encoding="utf-8"))[
                 "checkpoint_digest"
             ]
+        elif theta0_root.resolve() == Path(self.base_pretrained_path).resolve():
+            # _init_mode_gate computed this exact digest immediately before
+            # constructing the scene encoder.  Reuse it instead of rereading
+            # a multi-GB checkpoint from shared storage during cold startup.
+            theta0_checksum = self.active_policy_checkpoint_digest
         else:
             theta0_checksum = checkpoint_digest(theta0_root)
         tokenizer_path = self.policy_type_config.get("tokenizer_path", None)
@@ -482,7 +692,15 @@ class Main:
             theta0_root,
             tokenizer_root=Path(tokenizer_path) if tokenizer_path else None,
         )
+        existing_encoder = getattr(self, 'theta0_scene_encoder', None)
+        if (existing_encoder is not None
+                and existing_encoder.theta0_checksum == theta0_checksum
+                and existing_encoder.processor_hash == processor_digest
+                and existing_encoder.cache_dir == Path(self.mode_gate_config.incident_root) / 'scene_features'):
+            return  # Controller/phase changes never need to reload the frozen VLM.
         theta0_preprocessor = self.policy_preprocessor
+        if self.active_policy_checkpoint_digest != theta0_checksum:
+            raise ValueError("scene encoder must be initialized from v44, not the current merged policy")
 
         def batch_factory(kind: str, _image: Any, instruction: str) -> dict[str, Any]:
             raw = self.adapter.get_policy_observation(sample_num=1)
@@ -520,6 +738,7 @@ class Main:
         checkpoint = Path(self.mode_gate_config.registry_root) / "policies" / deployment.policy_id
         candidate = PI05PolicySteer.from_pretrained(str(checkpoint))
         candidate.to(self.device)
+        candidate.config.device = str(self.device)
         overrides = {"device_processor": {"device": str(candidate.config.device)}}
         tokenizer_path = self.policy_type_config.get("tokenizer_path", None)
         if tokenizer_path:
@@ -545,7 +764,9 @@ class Main:
         }
 
     def _fresh_load_registry_verifier(self, deployment):
-        if deployment.controller_mode == "fixed_budget_4":
+        if deployment.controller_mode.startswith("fixed_budget_"):
+            if self.mode_gate_config.require_learned_verifier:
+                raise RuntimeError("Formal execution cannot load a fixed-budget deployment")
             return None
         if getattr(self, "theta0_scene_encoder", None) is None:
             raise RuntimeError("learned verifier deployment requires the immutable theta0 encoder")
@@ -570,7 +791,7 @@ class Main:
                 finite
                 and policy._action_chunk_horizon == self.mode_gate_config.chunk_horizon
                 and (
-                    deployment.controller_mode == "fixed_budget_4"
+                    deployment.controller_mode.startswith("fixed_budget_")
                     or verifier is not None
                 )
             ),
@@ -582,6 +803,15 @@ class Main:
     def _reload_active_deployment(self) -> None:
         if self.mode_aware_runtime is None:
             return
+        from pathlib import Path
+        from mode_gate.runtime_settings import apply_runtime_steering_settings
+
+        apply_runtime_steering_settings(
+            self,
+            request_path=Path(self.mode_gate_config.slow_loop_root).parent
+            / "formal_experiment/runtime_steering_settings.json",
+            at_episode_boundary=True,
+        )
         bundle = self.mode_gate_deployment_manager.reload_if_changed(
             at_episode_boundary=True
         )
@@ -599,9 +829,16 @@ class Main:
         self.active_policy_checkpoint_digest = checkpoint_digest(
             Path(bundle.policy["checkpoint"])
         )
+        deployment_mode = bundle.deployment.controller_mode
+        if deployment_mode.startswith("fixed_budget_"):
+            from mode_gate.experiment_contract import fixed_budget_controller_mode
+
+            deployment_mode = fixed_budget_controller_mode(
+                self.mode_gate_config.retry_budget
+            )
         self.mode_gate_config = replace(
             self.mode_gate_config,
-            controller_mode=bundle.deployment.controller_mode,
+            controller_mode=deployment_mode,
         )
         self.mode_aware_runtime.config = self.mode_gate_config
         self.mode_aware_runtime.controller = EpisodeChunkController(
@@ -714,7 +951,7 @@ class Main:
         current_stage: int,
         use_guidance: bool,
     ) -> Any | None:
-        """Sample/score modes and return only the selected real medoid chunk."""
+        """Sample/score modes and return only the selected real candidate chunk."""
         import hashlib
         from pathlib import Path
 
@@ -726,6 +963,14 @@ class Main:
             signature_hash,
         )
         from mode_gate.types import ActionChunkBatch, GateContext
+
+        # A checked, method-only warm update preserves this object's fields.
+        # Refresh source provenance once before recording the first new decision.
+        method_revision = getattr(type(self), '_planner_role_methods_sha256', None)
+        if method_revision and getattr(self, '_planner_role_recorded_revision', None) != method_revision:
+            from mode_gate.preflight import source_revision
+            self.mode_gate_source_revision = source_revision(Path(PROJECT_ROOT))
+            self._planner_role_recorded_revision = method_revision
 
         observation_image = np.asarray(self.adapter.get_vlm_image())
         instruction = self.adapter.get_task_description()
@@ -756,6 +1001,13 @@ class Main:
                 "backend": self.backend,
                 "episode": episode + 1,
                 "global_step": global_step,
+                "execution_horizon": int(self.policy._action_chunk_horizon),
+                "initialization_posthoc_only": bool(self.config.get('initialization_posthoc_only', False)),
+                "planner_steering_enabled": bool(self.config.get('planner_steering_enabled', True)),
+                "online_stage_guidance_judgment": bool(
+                    self.config.get('planner_steering_enabled', True)
+                    and self.config.get('use_vlm_stage_recognition', True)
+                    and not self.config.get('initialization_posthoc_only', False)),
                 "code_revision": self.mode_gate_source_revision,
                 **context_provenance,
                 **self._build_mode_context_metadata(instruction),
@@ -780,7 +1032,8 @@ class Main:
                     adapter=self.adapter,
                     policy=self.policy,
                     policy_id=policy_id,
-                    controller_state=self.mode_aware_runtime.controller.state.as_dict(),
+                    controller_state={**self.mode_aware_runtime.controller.state.as_dict(),
+                                      "executed_history": self.mode_aware_runtime.executed_history},
                     provenance={
                         "backend": self.backend,
                         "episode": episode + 1,
@@ -788,12 +1041,23 @@ class Main:
                         "task": instruction,
                         "task_stage": stage_label,
                         "context_id": context_id,
+                        **context_provenance,
                         "progress_history": list(
                             self.mode_aware_runtime.progress_history[-8:]
                         ),
                         "planner_model": self.mode_gate_config.planner_model,
                         "planner_prompt_version": self.mode_gate_config.planner_prompt_version,
+                        "gemini_thinking_level": self.mode_gate_config.verifier_thinking_level,
+                        "label_version": self.mode_gate_config.label_version,
+                        "label_config": label_contract_payload(
+                            self.mode_gate_config.experiment_contract()
+                        ),
                         "chunk_horizon": self.mode_gate_config.chunk_horizon,
+                        "retry_budget": self.mode_gate_config.retry_budget,
+                        "retry_schedule": [
+                            list(level)
+                            for level in self.mode_gate_config.retry_schedule
+                        ],
                         "sample_count": self.mode_gate_config.sample_count,
                         "policy_checkpoint_digest": self.active_policy_checkpoint_digest,
                         "code_revision": self.mode_gate_source_revision,
@@ -828,7 +1092,6 @@ class Main:
                                 else None
                             ),
                         },
-                        **context_provenance,
                     },
                     observation_image=observation_image,
                     stateful_components={"keypoint_tracker": self.keypoint_tracker},
@@ -888,6 +1151,7 @@ class Main:
                 scene_signature = encoded
                 scene_features = encoded.joint_feature
                 scene_path = encoded.cache_path
+            from mode_gate.ticket_visuals import policy_camera_images
             result = self.mode_aware_runtime.process_batch(
                 context=context,
                 batch=batch,
@@ -895,6 +1159,7 @@ class Main:
                 scene_feature=scene_features,
                 scene_feature_path=scene_path,
                 snapshot=snapshot,
+                camera_images=policy_camera_images(self.adapter),
             )
             if result.status is RuntimeStatus.INTERNAL_RESAMPLE:
                 continue
@@ -902,7 +1167,7 @@ class Main:
                 selected_index = result.selected.sample_index
                 if int(execution_action_chunk.shape[0]) <= selected_index:
                     raise RuntimeError(
-                        "selected medoid index is not present in executable policy batch"
+                        "selected candidate index is not present in executable policy batch"
                     )
                 return execution_action_chunk[selected_index : selected_index + 1]
             if result.status is RuntimeStatus.EXPAND:
@@ -938,7 +1203,7 @@ class Main:
                 merge_method = (
                     "retain_uniform"
                     if baseline_kind == "always_expand_retain"
-                    else "v2_language_only"
+                    else "planner_uniform"
                 )
                 slow_job = self.mode_gate_slow_loop.create(
                     active_policy_id=policy_id,
@@ -960,6 +1225,7 @@ class Main:
                         "semantic_failure_types": list(result.semantic_failure_types),
                         "required_trajectory_pattern": result.required_trajectory_pattern,
                         "round_analysis_path": result.analysis_path,
+                        "multimodal_evidence_path": result.evidence_path,
                         "round_analysis_sha256": sha256_file(
                             Path(result.analysis_path)
                         ),
@@ -981,8 +1247,10 @@ class Main:
                         "candidate_merge_method": merge_method,
                         "code_revision": self.mode_gate_source_revision,
                         **context_provenance,
+                        "episode_id": self.mode_aware_runtime.episode_id,
                     },
                 )
+                expansion_automation = self._launch_expansion_automation(slow_job)
                 atomic_write_json(
                     request_path,
                     {
@@ -996,6 +1264,7 @@ class Main:
                         "failure_mode": failure_mode.value,
                         "code_revision": self.mode_gate_source_revision,
                         "round_analysis_path": result.analysis_path,
+                        "multimodal_evidence_path": result.evidence_path,
                         "round_analysis_sha256": sha256_file(
                             Path(result.analysis_path)
                         ),
@@ -1010,12 +1279,41 @@ class Main:
                             result.route.label_eligible if result.route else False
                         ),
                         "slow_loop_job_id": slow_job.job_id,
+                        "automation": expansion_automation,
                     },
                 )
                 log.warning(f"Mode-aware runtime requested expansion: {request_path}")
+                self._wait_for_expansion_demonstrations(slow_job, episode_dir)
                 return None
             raise RuntimeError(f"mode-aware runtime aborted: {result.error}")
         raise RuntimeError("mode-aware runtime exceeded the one permitted internal fresh resample")
+
+    def _wait_for_expansion_demonstrations(self, slow_job, episode_dir):
+        """Keep the resident fast loop idle until this ticket has usable demos."""
+        if (
+            not self.mode_gate_config.auto_start_expansion_worker
+            or self.mode_gate_config.baseline_kind
+        ):
+            return
+        from pathlib import Path
+        from mode_gate.expansion_automation import wait_for_expansion_demonstrations
+        from mode_gate.io_utils import atomic_write_json
+
+        def update(progress):
+            atomic_write_json(
+                Path(episode_dir) / "mode_gate_demonstration_wait.json", progress
+            )
+            callback = getattr(self, "expansion_wait_callback", None)
+            if callback is not None:
+                callback(progress)
+
+        wait_for_expansion_demonstrations(
+            store=self.mode_gate_slow_loop,
+            job_id=slow_job.job_id,
+            on_update=update,
+            stop_requested=getattr(self, "expansion_stop_requested", None),
+            wait_for_completion=bool(getattr(self, "expansion_full_cycle", False)),
+        )
 
     def _guidance_snapshot_provenance(
         self, *, current_stage: int, use_guidance: bool
@@ -1053,7 +1351,6 @@ class Main:
 
     def perform_task_for_episode(self, episode_dir: str):
         """Prepare for each episode (keypoint detection, guidance generation, etc.)"""
-        from utils.guidance_utils import load_functions_from_txt
 
         # Get keypoint detection inputs from adapter (includes segmentation if available)
         rgb, depth, points, segmentation, segment_id_to_name = self.adapter.get_keypoint_detection_inputs()
@@ -1082,7 +1379,8 @@ class Main:
             log.info(f"Interactable objects from adapter: {object_names}")
 
             # Use Gemini grounding for segmentation (preferred)
-            if self.use_gemini and self.gemini_grounder is not None and len(object_names) > 0:
+            if (self.use_gemini and self.gemini_grounder is not None and len(object_names) > 0
+                    and self.config.get('planner_steering_enabled', True)):
                 log.info("Using Gemini for visual grounding")
                 log.info(f"Gemini detecting: {object_names}")
                 segmentation, segment_id_to_name = self.gemini_grounder.detect_to_segmentation(
@@ -1133,34 +1431,16 @@ class Main:
         self.vlm_agent.task_dir = os.path.join(episode_dir, 'vlm_agent')
         os.makedirs(self.vlm_agent.task_dir, exist_ok=True)
 
-        # Load or generate guidance functions
-        if self.cached_functions_dir is not None:
-            guidance_functions_dir = self.cached_functions_dir
-            if not os.path.exists(guidance_functions_dir):
-                raise ValueError(f"cached_functions_dir does not exist: {guidance_functions_dir}")
-            log.info(f"Using cached guidance functions from: {guidance_functions_dir}")
-        else:
-            # Use instruction from adapter (already retrieved above)
-            metadata = {
-                'init_keypoint_positions': key_points,
-                'num_keypoints': len(key_points),
-                'key_points_objects_map': key_points_objects_map
-            }
-            guidance_functions_dir = self.vlm_agent.generate_guidance(
-                projected_img, instruction, metadata
-            )
-
+        metadata = {
+            'init_keypoint_positions': key_points,
+            'num_keypoints': len(key_points),
+            'key_points_objects_map': key_points_objects_map,
+        }
+        guidance_functions_dir, program_info, guidance_fns = self._prepare_guidance_program(
+            projected_img, instruction, metadata
+        )
         self.guidance_functions_dir = os.path.abspath(guidance_functions_dir)
-
-        # Load guidance functions
-        with open(os.path.join(guidance_functions_dir, 'metadata.json'), 'r') as f:
-            self.program_info = json.load(f)
-
-        self.guidance_fns = dict()
-        for stage in range(1, self.program_info['num_stages'] + 1):
-            load_path = os.path.join(guidance_functions_dir, f'stage{stage}_guidance.txt')
-            self.guidance_fns[stage] = load_functions_from_txt(load_path) if os.path.exists(load_path) else []
-
+        self.program_info, self.guidance_fns = program_info, guidance_fns
         output_raw_path = os.path.join(guidance_functions_dir, 'output_raw.txt')
         self.stage_descriptions = self.vlm_agent._extract_stage_descriptions_from_output(output_raw_path)
 
@@ -1168,6 +1448,110 @@ class Main:
             log.info(f"Stage {stage}: {len(fns)} guidance functions loaded")
         log.info(f"Loaded {len(self.guidance_fns)} stages total")
         log.debug(f"Stage descriptions:\n{self.stage_descriptions}")
+
+    def _prepare_guidance_program(self, image, instruction, metadata):
+        """Validate generated rewards and request bounded syntax repairs before motion.
+
+        The same reward-code provider sees the same scene/instruction. Rejected
+        programs stay in separate attempt directories; the AST sandbox is never
+        weakened and cached programs are read-only, not silently rewritten.
+        """
+        from copy import deepcopy
+        from pathlib import Path
+        from mode_gate.io_utils import atomic_write_json
+        from utils.guidance_utils import (
+            _SAFE_BUILTINS, _SAFE_TENSOR_MEMBERS, _SAFE_TORCH_MEMBERS,
+            load_functions_from_txt,
+        )
+
+        def load_program(directory):
+            directory = Path(directory)
+            try:
+                info = json.loads((directory / 'metadata.json').read_text())
+                count = int(info['num_stages'])
+            except (OSError, KeyError, TypeError, ValueError) as error:
+                raise ValueError(f'invalid guidance metadata: {error}') from error
+            if count < 1:
+                raise ValueError('guidance must describe at least one stage')
+            functions = {}
+            for stage in range(1, count + 1):
+                path = directory / f'stage{stage}_guidance.txt'
+                if not path.is_file():
+                    raise ValueError(f'missing generated stage {stage} guidance file')
+                functions[stage] = load_functions_from_txt(str(path))
+                if not functions[stage]:
+                    raise ValueError(f'empty generated stage {stage} guidance')
+            return str(directory), info, functions
+
+        if self.cached_functions_dir is not None:
+            log.info(f"Using cached guidance functions from: {self.cached_functions_dir}")
+            return load_program(self.cached_functions_dir)
+
+        attempts = int(self.config.get('guidance_code_generation_attempts', 3))
+        if not 1 <= attempts <= 5:
+            raise ValueError('guidance code generation attempts must be between 1 and 5')
+        original_template = self.vlm_agent.prompt_template
+        base_dir = Path(self.vlm_agent.task_dir)
+        constraints = (
+            '\n\nRUNTIME EXECUTION CONTRACT (overrides any earlier suggestion to use arbitrary Python/PyTorch):\n'
+            'Rewards must be side-effect-free tensor expressions. Assign only local variable names. '
+            'Never assign or augment tensor elements/slices/attributes, including on a copy; '
+            'do not call clone, detach, numpy, item, or in-place methods. '
+            'Instead of copying and changing an element, form a new target by adding a '
+            'torch.tensor offset with the source tensor device/dtype. '
+            'Do not import modules, define helpers, use loops, branches, comprehensions, '
+            'filesystem/network calls, or private attributes. '
+            'Each stage file must stay within 500 AST nodes and 32 KiB. '
+            'Provide a self-contained stageN_guidance(keypoints, action_sequence) for every declared stage.\n'
+            f'Allowed builtins: {", ".join(sorted(_SAFE_BUILTINS))}.\n'
+            f'Allowed torch members: {", ".join(sorted(_SAFE_TORCH_MEMBERS))}.\n'
+            f'Allowed tensor members: {", ".join(sorted(_SAFE_TENSOR_MEMBERS))}.\n'
+        )
+        feedback = ''
+        try:
+            for attempt in range(1, attempts + 1):
+                directory = base_dir if attempt == 1 else base_dir / f'generation_{attempt:03d}'
+                directory.mkdir(parents=True, exist_ok=True)
+                self.vlm_agent.task_dir = str(directory)
+                self.vlm_agent.prompt_template = original_template + constraints + feedback
+                try:
+                    generated = self.vlm_agent.generate_guidance(image, instruction, deepcopy(metadata))
+                    result = load_program(generated)
+                except ValueError as error:
+                    atomic_write_json(directory / 'validation_error.json', {
+                        'generation_attempt': attempt, 'error': f'{type(error).__name__}: {error}',
+                        'executed_steps': 0, 'native_failure_label_allowed': False,
+                    })
+                    if attempt == attempts:
+                        raise
+                    log.warning(f'Generated reward validation failed; repairing code in the same warm '
+                                f'attempt ({attempt}/{attempts}), no robot motion: {error}')
+                    raw = directory / 'output_raw.txt'
+                    previous = raw.read_text()[:16000] if raw.is_file() else ''
+                    feedback = ('\nPrevious output failed runtime validation. Keep the same scene, '
+                                'task and intended reward; repair its unsupported syntax/operations.\n'
+                                f'Validation error: {error}\nPrevious output:\n{previous}\n')
+                    continue
+                atomic_write_json(directory / 'validation_result.json', {
+                    'accepted': True, 'generation_attempt': attempt,
+                    'validator': 'unchanged_guidance_ast_and_dummy_inputs',
+                })
+                return result
+        finally:
+            self.vlm_agent.prompt_template = original_template
+
+    def _record_preparation_failure(self, episode_dir, error):
+        """A no-motion preparation failure is not the previous completed episode."""
+        if self.mode_aware_runtime is not None:
+            import hashlib
+            identity = 'preparation-' + hashlib.sha256(os.path.abspath(episode_dir).encode()).hexdigest()
+            self.mode_aware_runtime.episode_id = identity
+            self.mode_gate_incidents.record_fact(
+                episode_id=identity, context_id='', kind='episode_preparation_failure',
+                payload={'output_dir':os.path.abspath(episode_dir),
+                         'error':f'{type(error).__name__}: {error}',
+                         'executed_steps':0, 'native_failure_label_allowed':False},
+            )
 
     def _get_gripper_value(self, action_chunk, action_idx: int) -> Optional[float]:
         """Extract gripper value from action chunk."""
@@ -1214,7 +1598,11 @@ class Main:
         vlm_query_limit = self.config.get("vlm_query_limit", 10)
         vlm_query_count = state.get('vlm_query_count', 0)
 
-        if trigger_reason and self.gemini_stage_recognizer is not None and vlm_query_count < vlm_query_limit:
+        if (trigger_reason and self.gemini_stage_recognizer is not None
+                and self.config.get('use_vlm_stage_recognition', True)
+                and self.config.get('planner_steering_enabled', True)
+                and not self.config.get('initialization_posthoc_only', False)
+                and vlm_query_count < vlm_query_limit):
             log.info(f"[Trigger] {trigger_reason} (query {vlm_query_count + 1}/{vlm_query_limit})")
 
             new_stage, need_guidance = self.gemini_stage_recognizer.identify_stage_and_guidance(
@@ -1249,6 +1637,11 @@ class Main:
 
     def run(self):
         """Main running loop."""
+        from mode_gate.formal_protocol import apply_requested_warm_update
+        apply_requested_warm_update(self)
+        if getattr(getattr(self, 'mode_gate_config', None), 'enabled', False):
+            from scripts.initialize_candidate_verifier import continue_driver_if_requested
+            continue_driver_if_requested(self)
         self.success_count = 0
         base_output_dir = self.output_dir
         episode_num = self.config.get('episode_num', 10)
@@ -1295,6 +1688,7 @@ class Main:
                     self.perform_task_for_episode(episode_dir)
                 except Exception as e:
                     log.error(f"Episode {episode+1} preparation failed: {e}")
+                    self._record_preparation_failure(episode_dir, e)
                     episode_error = True
                     # Save error info
                     error_file = os.path.join(episode_dir, 'error.txt')
@@ -1335,6 +1729,9 @@ class Main:
                     ) from e
                 log.warning(f"Skipping episode {episode+1} due to execution error")
                 continue
+            finally:
+                if self.mode_aware_runtime is not None:
+                    self.mode_gate_incidents.experiences.finish_video(self.mode_aware_runtime.episode_id, finalize=True)
 
         # Final statistics
         success_rate = self.success_count / episode_num * 100
@@ -1395,8 +1792,14 @@ class Main:
         last_step_info = {}
         if self.mode_aware_runtime is not None:
             self.mode_aware_runtime.start_episode(stage_id=str(current_stage))
+            from mode_gate.ticket_visuals import policy_camera_images
+            self.mode_gate_incidents.record_video_frame(
+                self.mode_aware_runtime.episode_id, policy_camera_images(self.adapter),
+                context_id="initial", step=0)
 
         while not done:
+            if getattr(self, "expansion_stop_requested", lambda: False)():
+                raise InterruptedError("experiment park/stop requested at policy step boundary")
             generate_new_chunk = (action_executed == 0)
 
             if generate_new_chunk and self.config.get("use_guidance", True) and hasattr(self, 'guidance_fns'):
@@ -1549,8 +1952,11 @@ class Main:
                         behavior_name="mode_gate_expansion",
                     )
                     return
-            else:
+            elif self.mode_gate_controller is None:
                 action_chunk = sample_policy(None)
+            # With the candidate controller, keep the selected executable
+            # chunk between boundaries. The policy cache still contains all
+            # candidates; rereading it would switch back to particle zero.
 
             # Get image and add status overlay
             if self.config.get("debug_draw_trajectory", False):
@@ -1615,6 +2021,20 @@ class Main:
             self.video_recorder.add_frame(self.adapter.vlm_camera, image_with_status)
             obs, reward, terminated, truncated, info = self.adapter.step(action_chunk[0][action_executed])
             last_step_info = info
+            if self.mode_aware_runtime is not None:
+                from mode_gate.ticket_visuals import policy_camera_images
+                recorded_action = action_chunk[0][action_executed]
+                if hasattr(recorded_action, "detach"):
+                    recorded_action = recorded_action.detach().cpu().numpy()
+                self.mode_aware_runtime.record_execution_step(
+                    recorded_action, self.adapter.get_ee_pose_world(),
+                    native_success=bool(info.get("success", False)),
+                    images=policy_camera_images(self.adapter))
+                if terminated or truncated or info.get("success", False):
+                    self.mode_aware_runtime._close_factual_labels(
+                        success=bool(info.get("success", False)),
+                        censored=not bool(info.get("success", False)), reason="native_terminal")
+                    self.mode_gate_incidents.experiences.finish_video(self.mode_aware_runtime.episode_id)
 
             action_executed += 1
             if action_executed == action_horizon:
@@ -1623,11 +2043,19 @@ class Main:
             observation = self._get_policy_observation()
             global_steps += 1
 
-            if terminated or truncated:
+            if terminated or truncated or info.get('success', False):
                 is_success = info.get('success', False)
+                if self.mode_aware_runtime is not None:
+                    self.mode_gate_incidents.record_fact(
+                        episode_id=self.mode_aware_runtime.episode_id, context_id='',
+                        kind='rollout_completed', payload={
+                            'native_success': bool(is_success), 'steps': global_steps,
+                            'terminated': bool(terminated), 'truncated': bool(truncated),
+                            'success_authority': 'LIBERO-PRO native success only',
+                            'complete_task_rollout': True,
+                        })
                 if (
-                    truncated
-                    and not is_success
+                    not is_success
                     and self.mode_aware_runtime is not None
                 ):
                     import hashlib
@@ -1671,7 +2099,8 @@ class Main:
                         adapter=self.adapter,
                         policy=self.policy,
                         policy_id=policy_id,
-                        controller_state=self.mode_aware_runtime.controller.state.as_dict(),
+                        controller_state={**self.mode_aware_runtime.controller.state.as_dict(),
+                                      "executed_history": self.mode_aware_runtime.executed_history},
                         provenance={
                             "backend": self.backend,
                             "episode": episode + 1,
@@ -1680,6 +2109,10 @@ class Main:
                             "context_id": timeout_context_id,
                             "terminal_timeout": True,
                             **provenance,
+                            "label_version": self.mode_gate_config.label_version,
+                            "label_config": label_contract_payload(
+                                self.mode_gate_config.experiment_contract()
+                            ),
                         },
                         observation_image=image,
                         stateful_components={"keypoint_tracker": self.keypoint_tracker},
@@ -1698,6 +2131,18 @@ class Main:
                         e_goal=signature.e_goal,
                         e_obs=signature.e_obs,
                     )
+                    from mode_gate.ticket_visuals import build_decision_evidence, policy_camera_images
+                    from mode_gate.types import GateContext
+                    timeout_evidence = build_decision_evidence(
+                        directory=Path(episode_dir) / "timeout_evidence",
+                        context=GateContext(timeout_context_id, image, instruction, str(current_stage),
+                                            self._build_mode_context_metadata(instruction)),
+                        analysis_path=self.mode_aware_runtime.last_analysis_path,
+                        executed_history=self.mode_aware_runtime.executed_history,
+                        images=policy_camera_images(self.adapter),
+                        project_points=self.mode_aware_runtime.combined_renderer._project_points,
+                        library=self.mode_gate_incidents.experiences,
+                        episode_id=self.mode_aware_runtime.episode_id)
                     timeout_job = self.mode_gate_slow_loop.create(
                         active_policy_id=policy_id,
                         input_hash=hashlib.sha256(
@@ -1705,12 +2150,13 @@ class Main:
                                 f"{timeout_snapshot.snapshot_hash}\0"
                                 f"{timeout_signature_id}\0"
                                 f"{self.mode_gate_config.baseline_kind}\0"
-                                f"{'retain_uniform' if self.mode_gate_config.baseline_kind == 'always_expand_retain' else 'v2_language_only'}"
+                                f"{'retain_uniform' if self.mode_gate_config.baseline_kind == 'always_expand_retain' else 'planner_uniform'}"
                             ).encode("utf-8")
                         ).hexdigest(),
                         metadata={
                             "context_id": timeout_context_id,
                             "record_id": None,
+                            "multimodal_evidence_path": str(timeout_evidence),
                             "snapshot_id": timeout_snapshot.snapshot_id,
                             "snapshot_hash": timeout_snapshot.snapshot_hash,
                             "signature_id": timeout_signature_id,
@@ -1729,10 +2175,17 @@ class Main:
                                 "retain_uniform"
                                 if self.mode_gate_config.baseline_kind
                                 == "always_expand_retain"
-                                else "v2_language_only"
+                                else "planner_uniform"
                             ),
                             **provenance,
+                            "episode_id": self.mode_aware_runtime.episode_id,
+                            "complete_task_rollout": True,
+                            "executed_steps": global_steps,
+                            "native_terminal_reason": "truncated" if truncated else "terminated",
                         },
+                    )
+                    timeout_automation = self._launch_expansion_automation(
+                        timeout_job
                     )
                     atomic_write_json(
                         Path(episode_dir) / "mode_gate_timeout_expansion.json",
@@ -1744,8 +2197,10 @@ class Main:
                             "signature_id": timeout_signature_id,
                             "failure_mode": FailureMode.UNKNOWN.value,
                             "slow_loop_job_id": timeout_job.job_id,
+                            "automation": timeout_automation,
                         },
                     )
+                    self._wait_for_expansion_demonstrations(timeout_job, episode_dir)
                 if is_success:
                     done = True
                     self.success_count += 1

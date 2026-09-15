@@ -15,17 +15,6 @@ from typing import Any, Mapping, Sequence
 import numpy as np
 
 
-class PlannerAction(str, Enum):
-    CONTINUE_STEERING = "CONTINUE_STEERING"
-    REQUEST_EXPANSION = "REQUEST_EXPANSION"
-
-
-class ControllerStatus(str, Enum):
-    STEERING_COMPLETE = "STEERING_COMPLETE"
-    REQUEST_EXPANSION = "REQUEST_EXPANSION"
-    ABORTED = "ABORTED"
-
-
 class ControllerRoute(str, Enum):
     """Externally visible route selected by the v2 controller."""
 
@@ -38,7 +27,7 @@ class ControllerRoute(str, Enum):
 class FailureTrigger(str, Enum):
     STAGNATION = "STAGNATION"
     CONTACT = "CONTACT"
-    NO_SAFE_MODE = "NO_SAFE_MODE"
+    NO_SAFE_CANDIDATE = "NO_SAFE_CANDIDATE"
     TIMEOUT = "TIMEOUT"
 
 
@@ -94,6 +83,7 @@ class SamplingDiagnostics:
     ess_ratio: float
     unique_ratio: float
     resample_indices: Sequence[Sequence[int]] = field(default_factory=tuple)
+    resample_timesteps: Sequence[int] = field(default_factory=tuple)
 
     def __post_init__(self) -> None:
         ancestors = tuple(int(value) for value in self.ancestor_ids)
@@ -106,22 +96,26 @@ class SamplingDiagnostics:
         if any(not np.isfinite(float(value)) for value in self.ess_history):
             raise ValueError("ess_history contains non-finite values")
         object.__setattr__(self, "ancestor_ids", ancestors)
+        timesteps = tuple(int(value) for value in self.resample_timesteps)
+        if any(value < 0 for value in timesteps):
+            raise ValueError("resample timesteps must be nonnegative")
+        object.__setattr__(self, "resample_timesteps", timesteps)
 
 
 @dataclass(frozen=True)
 class SelectedExecution:
-    mode_id: str
+    candidate_id: str
     sample_index: int
     sample_id: str
 
     def __post_init__(self) -> None:
-        if not self.mode_id or not self.sample_id or self.sample_index < 0:
+        if not self.candidate_id or not self.sample_id or self.sample_index < 0:
             raise ValueError("invalid selected execution")
 
 
 @dataclass(frozen=True)
 class GeometryEvidence:
-    mode_id: str
+    candidate_id: str
     collision_risk: float
     reachability: float
     grasp_plausibility: float
@@ -139,8 +133,8 @@ class GeometryEvidence:
 
 
 @dataclass(frozen=True)
-class SemanticModeScore:
-    mode_id: str
+class SemanticCandidateScore:
+    candidate_id: str
     semantic_score: float
     reason: str
     predicted_failure_types: Sequence[str] = field(default_factory=tuple)
@@ -152,18 +146,22 @@ class SemanticModeScore:
 
 @dataclass(frozen=True)
 class SemanticPlan:
-    mode_scores: Sequence[SemanticModeScore]
+    candidate_scores: Sequence[SemanticCandidateScore]
     required_trajectory_pattern: str
     observed_stage_id: str
     stage_confidence: float
     model: str
     prompt_version: str
     raw_response: Mapping[str, Any] = field(default_factory=dict, repr=False)
+    selected_candidate_id: str | None = None
+    selection_reason: str = ""
 
     def __post_init__(self) -> None:
-        ids = [item.mode_id for item in self.mode_scores]
+        ids = [item.candidate_id for item in self.candidate_scores]
         if not ids or len(ids) != len(set(ids)):
-            raise ValueError("semantic plan must contain unique mode IDs")
+            raise ValueError("semantic plan must contain unique candidate IDs")
+        if self.selected_candidate_id is not None and self.selected_candidate_id not in ids:
+            raise ValueError("Planner selected an unknown candidate")
         if not 0.0 <= float(self.stage_confidence) <= 1.0:
             raise ValueError("stage_confidence must be in [0, 1]")
 
@@ -312,16 +310,14 @@ class TaskSpaceTrajectoryBatch:
 
 
 @dataclass(frozen=True)
-class ModeEvidence:
-    mode_id: str
-    component_index: int
-    weight: float
-    member_indices: np.ndarray
-    representative_indices: Mapping[str, int]
-    representative_sample_ids: Mapping[str, str]
-    card_path: Path
-    projection_unavailable: bool
-    statistics: Mapping[str, Any] = field(default_factory=dict)
+class CandidateEvidence:
+    candidate_id: str
+    sample_index: int
+    sample_id: str
+
+    def __post_init__(self) -> None:
+        if not self.candidate_id or not self.sample_id or self.sample_index < 0:
+            raise ValueError("invalid candidate identity")
 
 
 @dataclass(frozen=True)
@@ -331,67 +327,27 @@ class RoundEvidence:
     checkpoint_id: str
     action_batch: ActionChunkBatch
     trajectories: TaskSpaceTrajectoryBatch
-    normalized_positions: np.ndarray
-    normalized_rotvecs: np.ndarray
-    normalized_grippers: np.ndarray
-    descriptors: np.ndarray
-    reduced_descriptors: np.ndarray
-    labels: np.ndarray
-    responsibilities: np.ndarray
-    modes: Sequence[ModeEvidence]
-    fit_degraded: bool
-    fit_metadata: Mapping[str, Any]
+    candidates: Sequence[CandidateEvidence]
     sampling_diagnostics: SamplingDiagnostics | None = None
 
+    def __post_init__(self) -> None:
+        count = self.action_batch.sample_count
+        if len(self.candidates) != count or len(self.trajectories.positions) != count:
+            raise ValueError("every sampled candidate must be retained")
+        if [c.sample_index for c in self.candidates] != list(range(count)):
+            raise ValueError("candidate ordering must preserve the original batch")
+        if tuple(c.sample_id for c in self.candidates) != self.action_batch.sample_ids:
+            raise ValueError("candidate sample IDs must match the full original batch")
+        if tuple(self.trajectories.sample_ids) != self.action_batch.sample_ids:
+            raise ValueError("predicted trajectories must map to original action samples")
 
-@dataclass(frozen=True)
-class PlannerModeAssessment:
-    mode_id: str
-    behavior_interpretation: str
-    task_compatibility: str
-    difficulty: str
-    evidence: Sequence[str]
-
-
-@dataclass(frozen=True)
-class PlannerDecision:
-    decision: PlannerAction
-    required_trajectory_pattern: str
-    mode_assessments: Sequence[PlannerModeAssessment]
-    supporting_mode_ids: Sequence[str]
-    verifier_candidate_mode_ids: Sequence[str]
-    rationale: str
-    raw_response: Mapping[str, Any] = field(default_factory=dict, repr=False)
-
-
-@dataclass(frozen=True)
-class VerifierEvidence:
-    mode_id: str
-    task_match: str
-    missing_subpatterns: Sequence[str]
-    predicted_failure_types: Sequence[str]
-    candidate_reward_signals: Sequence[str]
-    uncertainty: float
-    evidence: Sequence[str]
-    raw_response: Mapping[str, Any] = field(default_factory=dict, repr=False)
-
-
-@dataclass(frozen=True)
-class ExpansionRequest:
-    context_id: str
-    trigger_reason: str
-    missing_or_hard_pattern: str
-    steering_checkpoint_id: str
-    planner_decision: PlannerDecision
-    verifier_evidence: Sequence[VerifierEvidence]
-    artifact_manifest: Path
-
-
-@dataclass(frozen=True)
-class ControllerResult:
-    status: ControllerStatus
-    snapshot: SteeringSnapshot | None = None
-    execution_action_chunk: Any = field(default=None, repr=False, compare=False)
-    expansion_request: ExpansionRequest | None = None
-    rounds: int = 0
-    error: str | None = None
+    def planner_candidates(self) -> list[dict[str, Any]]:
+        """Full unpooled predictions, never verifier embeddings or representatives."""
+        return [{"candidate_id": c.candidate_id, "sample_id": c.sample_id,
+                 "sample_index": c.sample_index, "kind": "predicted_candidate",
+                 "actions": self.action_batch.actions[c.sample_index].tolist(),
+                 "positions": self.trajectories.positions[c.sample_index].tolist(),
+                 "orientations_xyzw": self.trajectories.orientations[c.sample_index].tolist(),
+                 "grippers": self.trajectories.grippers[c.sample_index].tolist(),
+                 "coordinate_frame": self.trajectories.frame}
+                for c in self.candidates]

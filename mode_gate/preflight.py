@@ -47,8 +47,11 @@ TRAINING_SMOKE_SOURCE_PATHS = (
 )
 
 GEMINI_CANARY_SOURCE_PATHS = (
+    "configs/planner_account.json",
     "configs/perception.yaml",
     "core/gemini_grounder.py",
+    "mode_gate/planner_account.py",
+    "mode_gate/codex_account.py",
     "mode_gate/semantic_planner.py",
     "mode_gate/tickets.py",
     "scripts/gemini_canary.py",
@@ -57,9 +60,13 @@ GEMINI_CANARY_SOURCE_PATHS = (
 TELEOP_CANARY_SOURCE_PATHS = (
     "core/env_adapters/libero_adapter.py",
     "mode_gate/data_pipeline.py",
+    "mode_gate/expansion_automation.py",
     "mode_gate/teleop.py",
+    "mode_gate/teleop_guidance.py",
+    "mode_gate/teleop_supervisor.py",
     "mode_gate/eval_manifest.py",
     "patches/robosuite_egl.py",
+    "scripts/auto_teleop_supervisor_canary.py",
     "scripts/teleop_canary.py",
     "scripts/teleop_server.py",
 )
@@ -233,12 +240,22 @@ def _python_dependencies() -> dict:
 def _mode_gate_config() -> dict:
     config = ModeGateConfig()
     config.validate()
-    if config.chunk_horizon != 10 or config.retry_budget != 4:
+    if config.chunk_horizon != 10 or config.retry_budget != 50:
         raise RuntimeError("controller horizon/budget contract changed")
     return {
         "sample_count": config.sample_count,
         "chunk_horizon": config.chunk_horizon,
         "retry_budget": config.retry_budget,
+        "max_policy_steps_per_branch": (
+            config.chunk_horizon * config.retry_budget
+        ),
+        "label_version": config.label_version,
+        "gemini_thinking_level": config.verifier_thinking_level,
+        "provider_call_limits": {
+            "factual": config.factual_provider_call_limit,
+            "counterfactual": config.counterfactual_provider_call_limit,
+            "total": config.total_provider_call_limit,
+        },
         "verifier_decision_rule": "head_argmax",
     }
 
@@ -627,21 +644,26 @@ def _training_smoke(path: Path, repo_root: Path) -> dict:
 
 
 def _gemini_canary(path: Path, repo_root: Path) -> dict:
+    # Legacy option/function name: old Gemini evidence cannot validate the new task.
+    from .planner_account import load_planner_account_config
+    profile = load_planner_account_config(repo_root / "configs/planner_account.json")
     value = json.loads(path.read_text(encoding="utf-8"))
     if value.get("source_fingerprint") != gemini_canary_source_fingerprint(repo_root):
-        raise RuntimeError("Gemini canary is stale for the current provider source")
+        raise RuntimeError("Account planner canary is stale for the current provider source")
     if (
-        value.get("schema_version") != "hgpu1-gemini-canary-v3"
+        value.get("schema_version") != "hgpu1-account-planner-canary-v1"
         or value.get("visual_input_kind") != "synthetic"
         or not value.get("passed")
-        or value.get("model") != "gemini-robotics-er-2-preview"
-        or value.get("ticket_model") != "gemini-robotics-er-2-preview"
+        or any(value.get(key) != profile[key] for key in
+               ("model", "reasoning_effort", "auth_mode", "planner_thread_id"))
+        or value.get("gemini_api_enabled") is not False
+        or value.get("ticket_model") != profile["model"]
         or value.get("interaction_exercised") is not True
         or value.get("grounding_exercised") is not True
         or value.get("stage_exercised") is not True
         or value.get("ticket_exercised") is not True
     ):
-        raise RuntimeError(f"Gemini provider canary has not passed: {value.get('error')}")
+        raise RuntimeError(f"Account planner canary has not passed: {value.get('error')}")
     return value
 
 
@@ -682,7 +704,7 @@ def _teleop_canary(
 def _baseline_manifest(path: Path, protocol_path: Path) -> dict:
     value = json.loads(path.read_text(encoding="utf-8"))
     protocol = json.loads(protocol_path.read_text(encoding="utf-8"))
-    if value.get("schema_version") != "baseline-suite-v1":
+    if value.get("schema_version") != "baseline-suite-v2":
         raise ValueError("unsupported baseline manifest schema")
     if value.get("protocol_manifest_hash") != protocol.get("manifest_sha256"):
         raise ValueError("baseline manifest is not bound to the joint protocol")
@@ -697,12 +719,7 @@ def _baseline_manifest(path: Path, protocol_path: Path) -> dict:
         raise ValueError("baseline manifest checksum is invalid")
     ids = {str(item["id"]) for item in value.get("baselines", ())}
     required = {
-        "fixed_budget_1",
-        "fixed_budget_2",
-        "fixed_budget_4",
-        "fixed_budget_8",
-        "fixed_budget_16",
-        "fixed_budget_32",
+        "fixed_budget_50",
         "always_expansion_retain",
         "oracle_verifier",
         "clare_minimal_faithful",
@@ -762,9 +779,25 @@ def _snapshot_canary(
 
 
 def _git_revision(repo_root: Path) -> str:
-    head = subprocess.check_output(
-        ["git", "rev-parse", "HEAD"], cwd=repo_root, text=True
-    ).strip()
+    repo_root = Path(repo_root).resolve()
+    try:
+        # The hgpu runtime checkout is intentionally writable by multiple
+        # container users.  Treat ownership as provenance metadata, not a
+        # reason to mutate global git config or block an experiment.
+        head = subprocess.check_output(
+            [
+                "git",
+                "-c",
+                f"safe.directory={repo_root}",
+                "rev-parse",
+                "HEAD",
+            ],
+            cwd=repo_root,
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        head = "git-unavailable"
     import hashlib
 
     digest = hashlib.sha256()

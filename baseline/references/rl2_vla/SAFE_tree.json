@@ -1,0 +1,1158 @@
+{
+  "sha": "de285232f1d4e45ba435732d21952a1dd5f42821",
+  "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/de285232f1d4e45ba435732d21952a1dd5f42821",
+  "tree": [
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "229f145c0d18622131ce9fe9cbd88626e08de81d",
+      "size": 2152,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/229f145c0d18622131ce9fe9cbd88626e08de81d"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "20658af3365dd51ce4887d9101c66103c31fd774",
+      "size": 8123,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/20658af3365dd51ce4887d9101c66103c31fd774"
+    },
+    {
+      "path": "assets",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "cf087984a455e2c8d97a523cf803eea849f8141c",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/cf087984a455e2c8d97a523cf803eea849f8141c"
+    },
+    {
+      "path": "assets/safe-teaser-static.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ce261dd712796b7bf701213dcd1211b146884243",
+      "size": 428075,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/ce261dd712796b7bf701213dcd1211b146884243"
+    },
+    {
+      "path": "failure_prob",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "657f2adb71bf0b02132e17d0257f36aa2e94e325",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/657f2adb71bf0b02132e17d0257f36aa2e94e325"
+    },
+    {
+      "path": "failure_prob/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "failure_prob/conf",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3b9bd94d60a088728b6f7d77ce0529634d975a2f",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/3b9bd94d60a088728b6f7d77ce0529634d975a2f"
+    },
+    {
+      "path": "failure_prob/conf/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f18104b47749e7709cb7896bd86732669e64281a",
+      "size": 10866,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/f18104b47749e7709cb7896bd86732669e64281a"
+    },
+    {
+      "path": "failure_prob/conf/collect_videos.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7a29eda3ee6a7f30f1158cc65d9228ae806cfc22",
+      "size": 213,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/7a29eda3ee6a7f30f1158cc65d9228ae806cfc22"
+    },
+    {
+      "path": "failure_prob/conf/config.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dbc342579dc03b0a645efe9b4f28263e6f09b6dd",
+      "size": 290,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/dbc342579dc03b0a645efe9b4f28263e6f09b6dd"
+    },
+    {
+      "path": "failure_prob/conf/dataset",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "257e7cbf8f445961c6bda56567a4a0b22ef900ce",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/257e7cbf8f445961c6bda56567a4a0b22ef900ce"
+    },
+    {
+      "path": "failure_prob/conf/dataset/open_pizero_simpler_bridge.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "70767bbf8b51f3fa317094483287294ab1f66478",
+      "size": 214,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/70767bbf8b51f3fa317094483287294ab1f66478"
+    },
+    {
+      "path": "failure_prob/conf/dataset/open_pizero_simpler_fractal.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f473c87b06f920d55797de1ea0a5ac4f5645a41e",
+      "size": 176,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/f473c87b06f920d55797de1ea0a5ac4f5645a41e"
+    },
+    {
+      "path": "failure_prob/conf/dataset/openvla.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3e2c5a1fd0b84d19cb162dab67a7bd8138771327",
+      "size": 26,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/3e2c5a1fd0b84d19cb162dab67a7bd8138771327"
+    },
+    {
+      "path": "failure_prob/conf/dataset/openvla_libero_10.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "90de9bc1406a22110dc661987d2b36fb031a1194",
+      "size": 104,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/90de9bc1406a22110dc661987d2b36fb031a1194"
+    },
+    {
+      "path": "failure_prob/conf/dataset/openvla_libero_10_multi.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e1fdcad93d8e516f718416a91961e2bc9daa4102",
+      "size": 107,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/e1fdcad93d8e516f718416a91961e2bc9daa4102"
+    },
+    {
+      "path": "failure_prob/conf/dataset/pizero.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0dddb75901d1cf86303b963161c6f21ded91cecf",
+      "size": 74,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/0dddb75901d1cf86303b963161c6f21ded91cecf"
+    },
+    {
+      "path": "failure_prob/conf/dataset/pizero_fast.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aee3a739aa6d9c47e969e5fba2c7081acd60abec",
+      "size": 83,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/aee3a739aa6d9c47e969e5fba2c7081acd60abec"
+    },
+    {
+      "path": "failure_prob/conf/dataset/pizero_fast_libero_sample10.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0bf1458db30d118304bb5ba20b046fd702709697",
+      "size": 101,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/0bf1458db30d118304bb5ba20b046fd702709697"
+    },
+    {
+      "path": "failure_prob/conf/dataset/pizero_libero_sample10.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1e46b69502a11dbca51f18e18f26c848f204f54a",
+      "size": 92,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/1e46b69502a11dbca51f18e18f26c848f204f54a"
+    },
+    {
+      "path": "failure_prob/conf/feat_vis.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7ef6b2adf14427abf030d9a948d13847e05a249d",
+      "size": 287,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/7ef6b2adf14427abf030d9a948d13847e05a249d"
+    },
+    {
+      "path": "failure_prob/conf/model",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7f28d330aaf38cac66fa19ce0da7c68b2dfc8f1e",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/7f28d330aaf38cac66fa19ce0da7c68b2dfc8f1e"
+    },
+    {
+      "path": "failure_prob/conf/model/embed.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e9d5f798173addbc35ec44d33ab3dafbff6ef95a",
+      "size": 24,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/e9d5f798173addbc35ec44d33ab3dafbff6ef95a"
+    },
+    {
+      "path": "failure_prob/conf/model/indep.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5d23c446660d7d8c77d889003d543fa9e2ab352c",
+      "size": 24,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/5d23c446660d7d8c77d889003d543fa9e2ab352c"
+    },
+    {
+      "path": "failure_prob/conf/model/logpzo.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f96079348679f3a13a1e102cb8793a4ad5bcdc58",
+      "size": 26,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/f96079348679f3a13a1e102cb8793a4ad5bcdc58"
+    },
+    {
+      "path": "failure_prob/conf/model/lstm.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0f90586e27bfcaa721706f935d8c26c9f28aff55",
+      "size": 24,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/0f90586e27bfcaa721706f935d8c26c9f28aff55"
+    },
+    {
+      "path": "failure_prob/conf/model/rnd.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6503abbca697b19ff1d5c514ac1b72ad3d685e9c",
+      "size": 23,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/6503abbca697b19ff1d5c514ac1b72ad3d685e9c"
+    },
+    {
+      "path": "failure_prob/data",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "140beae37c86dee95b0dcec80586af686ea3f3e6",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/140beae37c86dee95b0dcec80586af686ea3f3e6"
+    },
+    {
+      "path": "failure_prob/data/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "56739887b5683fc4b74c4cb677dfed2d5ebd753c",
+      "size": 992,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/56739887b5683fc4b74c4cb677dfed2d5ebd753c"
+    },
+    {
+      "path": "failure_prob/data/open_pizero.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dc113b4e42982a007da570f651f106031ba52a21",
+      "size": 7158,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/dc113b4e42982a007da570f651f106031ba52a21"
+    },
+    {
+      "path": "failure_prob/data/openvla.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1e8ffb0ddecf6a35694b508757f8ebeb43d4ae71",
+      "size": 6516,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/1e8ffb0ddecf6a35694b508757f8ebeb43d4ae71"
+    },
+    {
+      "path": "failure_prob/data/pizero.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "79c682d0b783f2b2c63728cff544bb959f971bd1",
+      "size": 6913,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/79c682d0b783f2b2c63728cff544bb959f971bd1"
+    },
+    {
+      "path": "failure_prob/data/pizero_fast.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "893cdd755ce552181a564df7df70980c7f94657b",
+      "size": 10137,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/893cdd755ce552181a564df7df70980c7f94657b"
+    },
+    {
+      "path": "failure_prob/data/pizero_fast_droid.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ae6d380fdad1200319e874aac5bbe03f44728190",
+      "size": 20522,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/ae6d380fdad1200319e874aac5bbe03f44728190"
+    },
+    {
+      "path": "failure_prob/data/utils.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "408738a30d6765e9a5135e5f2aaa7803d45ca2ed",
+      "size": 15768,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/408738a30d6765e9a5135e5f2aaa7803d45ca2ed"
+    },
+    {
+      "path": "failure_prob/model",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "47d3018d55f67be082ea64c93984707e1af38d34",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/47d3018d55f67be082ea64c93984707e1af38d34"
+    },
+    {
+      "path": "failure_prob/model/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "42fe90db496757944b59969c0db85371ca57c6b2",
+      "size": 975,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/42fe90db496757944b59969c0db85371ca57c6b2"
+    },
+    {
+      "path": "failure_prob/model/base.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1c55863b36e28d911042bbe2183d4d83c94ab8ca",
+      "size": 6887,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/1c55863b36e28d911042bbe2183d4d83c94ab8ca"
+    },
+    {
+      "path": "failure_prob/model/diffusion",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "378ef79fcff4613f016d61cd1734fcac6ea00b76",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/378ef79fcff4613f016d61cd1734fcac6ea00b76"
+    },
+    {
+      "path": "failure_prob/model/diffusion/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "failure_prob/model/diffusion/conditional_unet1d.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "51d8ffe6f87a0ee6d3ef3d4a737c70ec872dacf0",
+      "size": 8888,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/51d8ffe6f87a0ee6d3ef3d4a737c70ec872dacf0"
+    },
+    {
+      "path": "failure_prob/model/diffusion/conv1d_components.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1c4cfc92550a753ab6bb0e9de958ba31f08f5146",
+      "size": 1223,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/1c4cfc92550a753ab6bb0e9de958ba31f08f5146"
+    },
+    {
+      "path": "failure_prob/model/diffusion/positional_embedding.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fe7fdcd3f7962e9e81fba23d117f21e18298b46e",
+      "size": 480,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/fe7fdcd3f7962e9e81fba23d117f21e18298b46e"
+    },
+    {
+      "path": "failure_prob/model/embed.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5da17a3fcd0737632817ae71281e1a7dbb085b95",
+      "size": 12582,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/5da17a3fcd0737632817ae71281e1a7dbb085b95"
+    },
+    {
+      "path": "failure_prob/model/indep.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4fa0d7e5b438e97b82e1f8c10a7504daaae54893",
+      "size": 4157,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/4fa0d7e5b438e97b82e1f8c10a7504daaae54893"
+    },
+    {
+      "path": "failure_prob/model/logpZO.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "13856fa963d2c57366461573a91f87bf8fafffdf",
+      "size": 6808,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/13856fa963d2c57366461573a91f87bf8fafffdf"
+    },
+    {
+      "path": "failure_prob/model/lstm.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c8c4602d3bcee01a4733ff394342813db27256d7",
+      "size": 5201,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/c8c4602d3bcee01a4733ff394342813db27256d7"
+    },
+    {
+      "path": "failure_prob/model/rnd.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cc94637be08277378b862b8460116bc051c754a3",
+      "size": 4949,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/cc94637be08277378b862b8460116bc051c754a3"
+    },
+    {
+      "path": "failure_prob/model/utils.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a0a4aff34f47ad2f94237f2a13e5ae06bf562494",
+      "size": 5603,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/a0a4aff34f47ad2f94237f2a13e5ae06bf562494"
+    },
+    {
+      "path": "failure_prob/train.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dcc4859fd807fd6fa72e86e0961a428bdd40954f",
+      "size": 26300,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/dcc4859fd807fd6fa72e86e0961a428bdd40954f"
+    },
+    {
+      "path": "failure_prob/utils",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "2b4b39ca5f9f5672ccb7ba4a5ddb5ea03a29838a",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/2b4b39ca5f9f5672ccb7ba4a5ddb5ea03a29838a"
+    },
+    {
+      "path": "failure_prob/utils/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "failure_prob/utils/conformal.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "65db42752e15659cfdcd1075b0de7e05766e7806",
+      "size": 4620,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/65db42752e15659cfdcd1075b0de7e05766e7806"
+    },
+    {
+      "path": "failure_prob/utils/conformal",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "17bbcf4335e279548c6a61c0fc1121ec957e1382",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/17bbcf4335e279548c6a61c0fc1121ec957e1382"
+    },
+    {
+      "path": "failure_prob/utils/conformal/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "failure_prob/utils/conformal/abstract_predictor.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "277e04ac84ca7a094a8350dc10f9037eae59e678",
+      "size": 1794,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/277e04ac84ca7a094a8350dc10f9037eae59e678"
+    },
+    {
+      "path": "failure_prob/utils/conformal/functional_predictor.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b69b558dd63568b9b65379dd02c3be6b5c14cfbc",
+      "size": 8236,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/b69b558dd63568b9b65379dd02c3be6b5c14cfbc"
+    },
+    {
+      "path": "failure_prob/utils/conformal/split_cp.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e1008af48f0103b3938623e2a0fb23e062ae7f99",
+      "size": 4693,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/e1008af48f0103b3938623e2a0fb23e062ae7f99"
+    },
+    {
+      "path": "failure_prob/utils/constants.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "84bcdf8e816205dd77f5aad7f5ab56fbafc23433",
+      "size": 3105,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/84bcdf8e816205dd77f5aad7f5ab56fbafc23433"
+    },
+    {
+      "path": "failure_prob/utils/failure_metrics.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ff6f3e926cfbfd6467a99d18151661e615eee05a",
+      "size": 7721,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/ff6f3e926cfbfd6467a99d18151661e615eee05a"
+    },
+    {
+      "path": "failure_prob/utils/figure.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "32aea9638f1e8f09b28d867037a2eed11f91312b",
+      "size": 1485,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/32aea9638f1e8f09b28d867037a2eed11f91312b"
+    },
+    {
+      "path": "failure_prob/utils/metrics.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "267e42d21f96420aaa5299d3261959cdcce65e89",
+      "size": 32757,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/267e42d21f96420aaa5299d3261959cdcce65e89"
+    },
+    {
+      "path": "failure_prob/utils/random.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f6614847f293f9713c4aee388d25634f190661b7",
+      "size": 311,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/f6614847f293f9713c4aee388d25634f190661b7"
+    },
+    {
+      "path": "failure_prob/utils/routines.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "69d9219441c0f02d95e54891f5879afddae80b11",
+      "size": 14888,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/69d9219441c0f02d95e54891f5879afddae80b11"
+    },
+    {
+      "path": "failure_prob/utils/timer.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "27ed995b243afed0894e4d5ef18aab3e2ca2c54b",
+      "size": 453,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/27ed995b243afed0894e4d5ef18aab3e2ca2c54b"
+    },
+    {
+      "path": "failure_prob/utils/torch.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "219fbae6089a6445f40e31a8481dd3a7bf376abb",
+      "size": 946,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/219fbae6089a6445f40e31a8481dd3a7bf376abb"
+    },
+    {
+      "path": "failure_prob/utils/video.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "84665cc84cece9796bb193158a2c108f92ae953d",
+      "size": 17396,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/84665cc84cece9796bb193158a2c108f92ae953d"
+    },
+    {
+      "path": "failure_prob/utils/vis.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1852e3a645133730538528769acf9309dc183adf",
+      "size": 3531,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/1852e3a645133730538528769acf9309dc183adf"
+    },
+    {
+      "path": "failure_prob/utils/wandb.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e348ecc7481677178e69cc660bc37fb411faa895",
+      "size": 15138,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/e348ecc7481677178e69cc660bc37fb411faa895"
+    },
+    {
+      "path": "notebooks",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "71270f57a32e9af55a360a066b171c1d9116f2aa",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/71270f57a32e9af55a360a066b171c1d9116f2aa"
+    },
+    {
+      "path": "notebooks/figures",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "afc3a79116a5af005d3be1cf5270fbbf289deb2c",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/afc3a79116a5af005d3be1cf5270fbbf289deb2c"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1bd52e469793f7b83560612e32e0424ed21ac16a",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/1bd52e469793f7b83560612e32e0424ed21ac16a"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_combined_task_per_seed_safe_s0",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "85c8a8de53848e76a4c5c2f21595c249b3df8e25",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/85c8a8de53848e76a4c5c2f21595c249b3df8e25"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_combined_task_per_seed_safe_s0/opi0_simpler_v1-per_task-bal_acc_seed0.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7ecae027ec103527accb81140e41a672488c5d67",
+      "size": 16538,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/7ecae027ec103527accb81140e41a672488c5d67"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_combined_task_per_seed_safe_s0/opi0_simpler_v1-per_task-bal_acc_seed42.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "df4034820463425d0941aba33c1fe5883b08d514",
+      "size": 16488,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/df4034820463425d0941aba33c1fe5883b08d514"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_combined_task_per_seed_safe_s0/opi0_simpler_v1-per_task-bal_acc_seed7.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "940879a1f0c239733a018dce18bf8b0183e6f1f4",
+      "size": 16273,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/940879a1f0c239733a018dce18bf8b0183e6f1f4"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_combined_task_per_seed_safe_s0/opi0_simpler_v1-per_task-balacc_tdet_seed0.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6fed96bbf1b7bc9ecafe7cd47283ac5cea38b468",
+      "size": 15459,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/6fed96bbf1b7bc9ecafe7cd47283ac5cea38b468"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_combined_task_per_seed_safe_s0/opi0_simpler_v1-per_task-balacc_tdet_seed42.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b7a4339574fe7885df05fdaab57caa524b76ae04",
+      "size": 15590,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/b7a4339574fe7885df05fdaab57caa524b76ae04"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_combined_task_per_seed_safe_s0/opi0_simpler_v1-per_task-balacc_tdet_seed7.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "24ae79f46ea61c47ce3cba34e60305345203440c",
+      "size": 15125,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/24ae79f46ea61c47ce3cba34e60305345203440c"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_combined_task_per_seed_safe_s0/opi0_simpler_v1-per_task-fnr_seed0.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e3f54117ad1e2137ef3f91b18179884bab56006e",
+      "size": 14713,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/e3f54117ad1e2137ef3f91b18179884bab56006e"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_combined_task_per_seed_safe_s0/opi0_simpler_v1-per_task-fnr_seed42.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ed1d1986e5e85c6fba77b13d2edc5543a534fe8e",
+      "size": 14703,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/ed1d1986e5e85c6fba77b13d2edc5543a534fe8e"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_combined_task_per_seed_safe_s0/opi0_simpler_v1-per_task-fnr_seed7.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7b30f8697efaba486386f96d3b1e4df5cfbd38ae",
+      "size": 14882,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/7b30f8697efaba486386f96d3b1e4df5cfbd38ae"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_combined_task_per_seed_safe_s0/opi0_simpler_v1-per_task-fpr_seed0.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "44e5c6e26cf9dcf7bd703459612f24243cf1deb2",
+      "size": 15208,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/44e5c6e26cf9dcf7bd703459612f24243cf1deb2"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_combined_task_per_seed_safe_s0/opi0_simpler_v1-per_task-fpr_seed42.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "88a6cd331c1ca9fe9925deddc4dab2a6e1ca2fb2",
+      "size": 15188,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/88a6cd331c1ca9fe9925deddc4dab2a6e1ca2fb2"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_combined_task_per_seed_safe_s0/opi0_simpler_v1-per_task-fpr_seed7.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "798d6ee871d0c7a62d11a1e797e42c9b92b372ac",
+      "size": 15361,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/798d6ee871d0c7a62d11a1e797e42c9b92b372ac"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_combined_task_per_seed_safe_s0/opi0_simpler_v1-per_task-tnr_seed0.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7088327542a0bc5e5cde4ffbe6330314a179c809",
+      "size": 15302,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/7088327542a0bc5e5cde4ffbe6330314a179c809"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_combined_task_per_seed_safe_s0/opi0_simpler_v1-per_task-tnr_seed42.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87de33fc346f8ea21e9a2e8d9d75e72ca1dff3db",
+      "size": 15288,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/87de33fc346f8ea21e9a2e8d9d75e72ca1dff3db"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_combined_task_per_seed_safe_s0/opi0_simpler_v1-per_task-tnr_seed7.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1b1d9480006e9d68f4d16d04514443d4da55af86",
+      "size": 15459,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/1b1d9480006e9d68f4d16d04514443d4da55af86"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_combined_task_per_seed_safe_s0/opi0_simpler_v1-per_task-tpr_seed0.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "05625fb7c5744c7205c75c6794623314ad7e7933",
+      "size": 15673,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/05625fb7c5744c7205c75c6794623314ad7e7933"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_combined_task_per_seed_safe_s0/opi0_simpler_v1-per_task-tpr_seed42.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5c3ed349a6337bfd77536c46a3d999b7d0f990ab",
+      "size": 15659,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/5c3ed349a6337bfd77536c46a3d999b7d0f990ab"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_combined_task_per_seed_safe_s0/opi0_simpler_v1-per_task-tpr_seed7.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6cefb1a9ef0805bf0c3eb269f5a8f19d3b17c5dc",
+      "size": 15836,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/6cefb1a9ef0805bf0c3eb269f5a8f19d3b17c5dc"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_combined_task_per_seed_safe_s0/rl2_cp_alphas_combined.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e808fd1dcc6206a9a1dc891d567597f538a5fe9a",
+      "size": 334,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/e808fd1dcc6206a9a1dc891d567597f538a5fe9a"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_per_task_per_seed_safe_s0",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e789a6f09d3cef349717cbbdcab99eef9ec5c3ec",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/e789a6f09d3cef349717cbbdcab99eef9ec5c3ec"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_per_task_per_seed_safe_s0/opi0_simpler_v1-per_task-bal_acc_seed0.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7c4461ffa3c550f20911fbbd5d81220a58319d72",
+      "size": 22551,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/7c4461ffa3c550f20911fbbd5d81220a58319d72"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_per_task_per_seed_safe_s0/opi0_simpler_v1-per_task-bal_acc_seed42.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ed9f9451fd98e9b0f2491b3a8946dd0f9f0f118b",
+      "size": 23068,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/ed9f9451fd98e9b0f2491b3a8946dd0f9f0f118b"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_per_task_per_seed_safe_s0/opi0_simpler_v1-per_task-bal_acc_seed7.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1b7c03c2df4d883794cf0627f5273961df85e228",
+      "size": 22137,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/1b7c03c2df4d883794cf0627f5273961df85e228"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_per_task_per_seed_safe_s0/opi0_simpler_v1-per_task-balacc_tdet_seed0.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "528bbde022c181a8e9d920d72d5b137691646a86",
+      "size": 21453,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/528bbde022c181a8e9d920d72d5b137691646a86"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_per_task_per_seed_safe_s0/opi0_simpler_v1-per_task-balacc_tdet_seed42.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7d0bf68243ca73a27eef4b54baac20009edb0b7e",
+      "size": 21761,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/7d0bf68243ca73a27eef4b54baac20009edb0b7e"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_per_task_per_seed_safe_s0/opi0_simpler_v1-per_task-balacc_tdet_seed7.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "79661b0a6ce0045c0da2bb77ffdcaf593a52b282",
+      "size": 21526,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/79661b0a6ce0045c0da2bb77ffdcaf593a52b282"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_per_task_per_seed_safe_s0/opi0_simpler_v1-per_task-fnr_seed0.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ae73e4bbda7b984ad8c7f2cea7460c221bcbd862",
+      "size": 19093,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/ae73e4bbda7b984ad8c7f2cea7460c221bcbd862"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_per_task_per_seed_safe_s0/opi0_simpler_v1-per_task-fnr_seed42.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c2eb8bdb46bdf53387ae431e5d35e3acf4d99715",
+      "size": 19051,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/c2eb8bdb46bdf53387ae431e5d35e3acf4d99715"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_per_task_per_seed_safe_s0/opi0_simpler_v1-per_task-fnr_seed7.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cbf7ffea8ac559d160aca3ffb7fcf9e1f4eef554",
+      "size": 19226,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/cbf7ffea8ac559d160aca3ffb7fcf9e1f4eef554"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_per_task_per_seed_safe_s0/opi0_simpler_v1-per_task-fpr_seed0.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "84c6640c96be113619d2a9945edeb3c325ab2e5c",
+      "size": 19244,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/84c6640c96be113619d2a9945edeb3c325ab2e5c"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_per_task_per_seed_safe_s0/opi0_simpler_v1-per_task-fpr_seed42.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "95d7c7ebb4ba41cd75afdd5c8ed3a6946c4c6923",
+      "size": 19301,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/95d7c7ebb4ba41cd75afdd5c8ed3a6946c4c6923"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_per_task_per_seed_safe_s0/opi0_simpler_v1-per_task-fpr_seed7.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "977f294a6790b1af4672c5a11ac2430d38a46859",
+      "size": 19435,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/977f294a6790b1af4672c5a11ac2430d38a46859"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_per_task_per_seed_safe_s0/opi0_simpler_v1-per_task-tnr_seed0.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7236ae4c7550c54034b2d676b5f8789635d62fde",
+      "size": 19133,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/7236ae4c7550c54034b2d676b5f8789635d62fde"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_per_task_per_seed_safe_s0/opi0_simpler_v1-per_task-tnr_seed42.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b29081bf5a454ca9f821a76e0fec6c9a9309015",
+      "size": 19197,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/5b29081bf5a454ca9f821a76e0fec6c9a9309015"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_per_task_per_seed_safe_s0/opi0_simpler_v1-per_task-tnr_seed7.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "152233669f8e054375cefd5af4bf22cb26e4be6e",
+      "size": 19318,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/152233669f8e054375cefd5af4bf22cb26e4be6e"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_per_task_per_seed_safe_s0/opi0_simpler_v1-per_task-tpr_seed0.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bfb33e4eb22a6c720d52ab7aded3b7b145a32bcb",
+      "size": 19176,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/bfb33e4eb22a6c720d52ab7aded3b7b145a32bcb"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_per_task_per_seed_safe_s0/opi0_simpler_v1-per_task-tpr_seed42.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "274629af961ed3b58cd315579afeb440be6340b4",
+      "size": 19143,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/274629af961ed3b58cd315579afeb440be6340b4"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_per_task_per_seed_safe_s0/opi0_simpler_v1-per_task-tpr_seed7.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f01af0b9254fff0c6c6ae131ad883a0723c94884",
+      "size": 19315,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/f01af0b9254fff0c6c6ae131ad883a0723c94884"
+    },
+    {
+      "path": "notebooks/figures/example_plots_opi0_simpler/opi0_cp_plots_per_task_per_seed_safe_s0/rl2_cp_alphas_per_task.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "53e066fa6c529744b556c53fcff10a7b8f6ae2a7",
+      "size": 1368,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/53e066fa6c529744b556c53fcff10a7b8f6ae2a7"
+    },
+    {
+      "path": "scripts",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "773b5432f06f22a33ac60cd145573df089ff415f",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/773b5432f06f22a33ac60cd145573df089ff415f"
+    },
+    {
+      "path": "scripts/batch_training",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0f5da77dd8e1db6c61489559d10faed852c35e03",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/0f5da77dd8e1db6c61489559d10faed852c35e03"
+    },
+    {
+      "path": "scripts/batch_training/alpha_heuristic_opi0_simpler.bash",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f0a2692048865ce497f146e2a22229207242d4c4",
+      "size": 2092,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/f0a2692048865ce497f146e2a22229207242d4c4"
+    },
+    {
+      "path": "scripts/batch_training/logs",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "21fbb3d1d06408f58e2a2ff0e2c44cde5e1b5bcb",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/21fbb3d1d06408f58e2a2ff0e2c44cde5e1b5bcb"
+    },
+    {
+      "path": "scripts/batch_training/logs/SAVED",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "31405c91526c104c631798f68befbe7ea4874302",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/31405c91526c104c631798f68befbe7ea4874302"
+    },
+    {
+      "path": "scripts/batch_training/logs/SAVED/rl2_pi0_bridge_safe_ckpt_combined_cp",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ff63fe2887bd012afc2d7cf09ce2844beeda1caf",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/ff63fe2887bd012afc2d7cf09ce2844beeda1caf"
+    },
+    {
+      "path": "scripts/batch_training/logs/SAVED/rl2_pi0_bridge_safe_ckpt_combined_cp/config.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "19cb987466f8ed63d384ef0bed3f6a46eba1efa5",
+      "size": 1698,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/19cb987466f8ed63d384ef0bed3f6a46eba1efa5"
+    },
+    {
+      "path": "scripts/batch_training/logs/SAVED/rl2_pi0_bridge_safe_ckpt_combined_cp/cp_band_by_alpha.npy",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "08543c85ebb563466e1d3879cd01a476f0cb0ea5",
+      "size": 4945,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/08543c85ebb563466e1d3879cd01a476f0cb0ea5"
+    },
+    {
+      "path": "scripts/batch_training/logs/SAVED/rl2_pi0_bridge_safe_ckpt_combined_cp/model_final.ckpt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "67e7adc0d4f860c7c3e192a164af972a604aac1a",
+      "size": 5254661,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/67e7adc0d4f860c7c3e192a164af972a604aac1a"
+    },
+    {
+      "path": "scripts/batch_training/logs/SAVED/rl2_pi0_bridge_safe_ckpt_per_task_cp",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8d10572a46203d93922da8f01f926ca30afb5853",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/8d10572a46203d93922da8f01f926ca30afb5853"
+    },
+    {
+      "path": "scripts/batch_training/logs/SAVED/rl2_pi0_bridge_safe_ckpt_per_task_cp/config.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "95df5e819de329a69fdf1e24d11a39483fe776da",
+      "size": 1699,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/95df5e819de329a69fdf1e24d11a39483fe776da"
+    },
+    {
+      "path": "scripts/batch_training/logs/SAVED/rl2_pi0_bridge_safe_ckpt_per_task_cp/cp_bands_by_task.npy",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8634789f28e7c454ccd42e64ad671a6f326e5e51",
+      "size": 18958,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/8634789f28e7c454ccd42e64ad671a6f326e5e51"
+    },
+    {
+      "path": "scripts/batch_training/logs/SAVED/rl2_pi0_bridge_safe_ckpt_per_task_cp/model_final.ckpt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "67e7adc0d4f860c7c3e192a164af972a604aac1a",
+      "size": 5254661,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/67e7adc0d4f860c7c3e192a164af972a604aac1a"
+    },
+    {
+      "path": "scripts/batch_training/opi0_simpler_parallel_runs",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "cd052d9a7b13c86e3d372da5ece34b4688ada748",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/cd052d9a7b13c86e3d372da5ece34b4688ada748"
+    },
+    {
+      "path": "scripts/batch_training/opi0_simpler_parallel_runs/submit_opi0_simpler_0.bash",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5e41adecde7befc07ed368c36f4dfe8c50d9fabb",
+      "size": 6045,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/5e41adecde7befc07ed368c36f4dfe8c50d9fabb"
+    },
+    {
+      "path": "scripts/batch_training/opi0_simpler_parallel_runs/submit_opi0_simpler_1.bash",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c04ca2f672a3a7e7c38792c9cc40ca34eae8b0c5",
+      "size": 6045,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/c04ca2f672a3a7e7c38792c9cc40ca34eae8b0c5"
+    },
+    {
+      "path": "scripts/batch_training/opi0_simpler_parallel_runs/submit_opi0_simpler_2.bash",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bd57a89c90348c2565592a13222187b18ab3e2f0",
+      "size": 6046,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/bd57a89c90348c2565592a13222187b18ab3e2f0"
+    },
+    {
+      "path": "scripts/batch_training/opi0_simpler_parallel_runs/submit_opi0_simpler_3.bash",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "30649b6760566788545d4b9b040be34e2e5f0c39",
+      "size": 6050,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/30649b6760566788545d4b9b040be34e2e5f0c39"
+    },
+    {
+      "path": "scripts/batch_training/submit_openvla_libero.bash",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d0a7d872e9893f05ae37271376a888451ff0873e",
+      "size": 4646,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/d0a7d872e9893f05ae37271376a888451ff0873e"
+    },
+    {
+      "path": "scripts/batch_training/submit_opi0_simpler.bash",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d3a9af8878a880dfd365ec2c7e7434d7c88a0e6e",
+      "size": 6064,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/d3a9af8878a880dfd365ec2c7e7434d7c88a0e6e"
+    },
+    {
+      "path": "scripts/batch_training/submit_pi0diff_libero.bash",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7b4a4843cd50feb04ef093023e3a22f079438430",
+      "size": 4503,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/7b4a4843cd50feb04ef093023e3a22f079438430"
+    },
+    {
+      "path": "scripts/batch_training/submit_pi0fast_libero.bash",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e123b35805eacc48804d01cccde606c5238b429c",
+      "size": 3546,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/e123b35805eacc48804d01cccde606c5238b429c"
+    },
+    {
+      "path": "scripts/batch_training/train_optimal_opi0_simpler.bash",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "af209c0b843d22c51cafac700b14f15947454dda",
+      "size": 1995,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/af209c0b843d22c51cafac700b14f15947454dda"
+    },
+    {
+      "path": "scripts/batch_training/visualize_cp_band.py",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "de835223cdd3d49de00bb83df2cf9e61a096a1e0",
+      "size": 9166,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/de835223cdd3d49de00bb83df2cf9e61a096a1e0"
+    },
+    {
+      "path": "scripts/eval_conformal_figure.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3edbb21caae8961dbd9c5345f2e50abad754cb46",
+      "size": 31651,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/3edbb21caae8961dbd9c5345f2e50abad754cb46"
+    },
+    {
+      "path": "scripts/get_wandb_metrics.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ba0915742bdb2cf8980b431c7cea4e87126cc29a",
+      "size": 15358,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/ba0915742bdb2cf8980b431c7cea4e87126cc29a"
+    },
+    {
+      "path": "scripts/restructure_dataset.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dd57c627a47ef2cfd574520305e0d7ec78e97d5c",
+      "size": 1946,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/dd57c627a47ef2cfd574520305e0d7ec78e97d5c"
+    },
+    {
+      "path": "scripts/visualize_features.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "328504d38a5a792381be15ca2631bdf21e228a72",
+      "size": 9616,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/328504d38a5a792381be15ca2631bdf21e228a72"
+    },
+    {
+      "path": "scripts/wandb_metrics_batch_v2",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "50fc976492ce1299218a47501cf2d183080dce18",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/50fc976492ce1299218a47501cf2d183080dce18"
+    },
+    {
+      "path": "scripts/wandb_metrics_batch_v2/SAVED",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "618474576795aad84039cba61364f101ba135f98",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/618474576795aad84039cba61364f101ba135f98"
+    },
+    {
+      "path": "scripts/wandb_metrics_batch_v2/SAVED/example_opi0_simpler",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "179f2f4f179575d47baaafea28d3c96ad0638345",
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/trees/179f2f4f179575d47baaafea28d3c96ad0638345"
+    },
+    {
+      "path": "scripts/wandb_metrics_batch_v2/SAVED/example_opi0_simpler/opi0_simpler_v1-lstm.csv",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "92f8ba843e1b87d500ed550e869899889d1d533b",
+      "size": 3629088,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/92f8ba843e1b87d500ed550e869899889d1d533b"
+    },
+    {
+      "path": "scripts/wandb_metrics_batch_v2/SAVED/example_opi0_simpler/opi0_simpler_v1.csv",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ae2588561ad366342ca501770604cc8d390f9246",
+      "size": 443077,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/ae2588561ad366342ca501770604cc8d390f9246"
+    },
+    {
+      "path": "setup.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "07f9239cc2e8f99f518cbfa455d221669e0e1fd1",
+      "size": 269,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/07f9239cc2e8f99f518cbfa455d221669e0e1fd1"
+    },
+    {
+      "path": "setup_envs.bash.template",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "329079ca633bb07560c7a3668868bc3524fa76d0",
+      "size": 243,
+      "url": "https://api.github.com/repos/rl2-vla/SAFE/git/blobs/329079ca633bb07560c7a3668868bc3524fa76d0"
+    }
+  ],
+  "truncated": false
+}

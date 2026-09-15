@@ -1118,6 +1118,14 @@ class LiberoEnv(gym.Env):
         return image
 
     def _make_envs_task(self, task_suite: Any, task_id: int = 0):
+        from patches.libero_pro import (
+            configure_libero_process_resources,
+            libero_initialization_deadline,
+            patch_control_env_reset,
+        )
+
+        configure_libero_process_resources()
+        patch_control_env_reset()
         task = task_suite.get_task(task_id)
         self.task = task.name
         task_bddl_file = str(_resolve_libero_resource("bddl_files", task.problem_folder, task.bddl_file))
@@ -1149,8 +1157,16 @@ class LiberoEnv(gym.Env):
             "horizon": self._max_episode_steps,
             "ignore_done": False,
         }
-        env = OffScreenRenderEnv(**env_args)
-        env.reset()
+        with libero_initialization_deadline():
+            env = OffScreenRenderEnv(**env_args)
+            try:
+                env.reset()
+            except BaseException:
+                try:
+                    env.close()
+                except Exception:
+                    logging.getLogger(__name__).exception("Failed to close LIBERO after reset failure")
+                raise
         return env
 
     def _extract_language_from_bddl(self, bddl_file: str) -> str | None:
@@ -1237,10 +1253,28 @@ class LiberoEnv(gym.Env):
         # Increasing this value can improve determinism and reproducibility across resets.
         for _ in range(self.num_steps_wait):
             raw_obs, _, _, _ = self._env.step(get_libero_dummy_action())
+            if self._simulator_done():
+                raise RuntimeError(
+                    "LIBERO reset settling exhausted the simulator horizon; "
+                    "num_steps_wait must leave room for policy actions"
+                )
         self._last_raw_obs = raw_obs
         observation = self._format_raw_obs(raw_obs)
         info = {"is_success": False}
         return observation, info
+
+    def _simulator_done(self) -> bool:
+        # BDDLBaseDomain.step replaces robosuite's returned done with predicate
+        # success, but robosuite still refuses actions after its own horizon.
+        # Read that flag; never clear it or extend the configured horizon.
+        simulator = getattr(self._env, "env", self._env)
+        return bool(getattr(simulator, "done", False))
+
+    def _episode_end_flags(self, done: bool) -> tuple[bool, bool, bool]:
+        success = bool(self._env.check_success())
+        terminated = bool(done or success)
+        truncated = self._simulator_done() and not terminated
+        return success, terminated, truncated
 
     def step(self, action: np.ndarray) -> tuple[dict[str, Any], float, bool, bool, dict[str, Any]]:
         if action.ndim != 1:
@@ -1251,27 +1285,27 @@ class LiberoEnv(gym.Env):
         raw_obs, reward, done, info = self._env.step(action)
         self._last_raw_obs = raw_obs
 
-        is_success = self._env.check_success()
-        terminated = done or is_success
+        is_success, terminated, truncated = self._episode_end_flags(done)
         info.update(
             {
                 "task": self.task,
                 "task_id": self.task_id,
                 "done": done,
                 "success": is_success,
+                "TimeLimit.truncated": truncated,
             }
         )
         observation = self._format_raw_obs(raw_obs)
-        if terminated:
+        if terminated or truncated:
             info["final_info"] = {
                 "task": self.task,
                 "task_id": self.task_id,
                 "done": bool(done),
                 "success": bool(is_success),
+                "TimeLimit.truncated": truncated,
             }
             if self.auto_reset:
                 self.reset()
-        truncated = False
         return observation, reward, terminated, truncated, info
 
     def close(self):
@@ -1419,6 +1453,23 @@ class LiberoAdapter(BaseEnvAdapter):
         self.env_preprocessor = PolicyProcessorPipeline(steps=env_preprocessor_steps)
         self.env_postprocessor = PolicyProcessorPipeline(steps=env_postprocessor_steps)
 
+    def close(self):
+        """Release each task's simulator instead of inheriting Gym's no-op close."""
+        environments, self._env = getattr(self, "_env", []), []
+        first_error = None
+        try:
+            for environment in environments:
+                try:
+                    environment.close()
+                except Exception as exc:
+                    if first_error is None:
+                        first_error = exc
+                    logging.getLogger(__name__).exception("Failed to close a LIBERO environment")
+        finally:
+            self._last_obs = None
+            self._robot_state = None
+        if first_error is not None:
+            raise first_error
 
     def get_vlm_image(self) -> np.ndarray:
         """
@@ -1455,6 +1506,34 @@ class LiberoAdapter(BaseEnvAdapter):
         # Flip for correct human-viewable orientation
         rgb = np.flipud(rgb).copy()
         return rgb
+
+    def refresh_offscreen_render_context(self) -> None:
+        """Rebuild MuJoCo's GPU-side render resources without changing state.
+
+        The pinned robosuite renderer caches an ``MjrContext`` across many
+        exact simulator restores.  With EGL that cache can eventually render a
+        stable but stale scene even though qpos, qvel, and every captured model
+        field have been restored exactly.  Rebuilding only the GPU-side
+        context is observational and leaves the simulator and RNG untouched.
+        """
+
+        robosuite_env = self._get_current_robosuite_env()
+        if robosuite_env is None:
+            raise RuntimeError("cannot refresh renderer without an active environment")
+        sim = robosuite_env.sim
+        context = getattr(sim, "_render_context_offscreen", None)
+        if context is None:
+            raise RuntimeError("MuJoCo offscreen render context is unavailable")
+        make_current = getattr(getattr(context, "gl_ctx", None), "make_current", None)
+        rebuild = getattr(context, "_set_mujoco_context_and_buffers", None)
+        render_context = getattr(context, "con", None)
+        free = getattr(render_context, "free", None)
+        if not callable(make_current) or not callable(rebuild) or not callable(free):
+            raise RuntimeError("pinned MuJoCo renderer does not support safe refresh")
+        make_current()
+        free()
+        rebuild()
+        sim.forward()
 
     def get_vlm_image_raw(self) -> np.ndarray:
         """
@@ -2401,7 +2480,7 @@ class LiberoAdapter(BaseEnvAdapter):
         self._last_obs = observation
 
         # Check for truncation based on max steps
-        truncated = self.episode_step >= current_env._max_episode_steps
+        truncated = bool(truncated or self.episode_step >= current_env._max_episode_steps)
 
         # Add task info to info dict
         info['task_idx'] = self.current_task_idx
@@ -2427,10 +2506,9 @@ class LiberoAdapter(BaseEnvAdapter):
         current_env = self._env[self.current_task_idx]
         raw_obs, reward, done, info = current_env._env.step(action_numpy)
         current_env._last_raw_obs = raw_obs
-        success = bool(current_env._env.check_success())
-        terminated = bool(done or success)
+        success, terminated, truncated = current_env._episode_end_flags(done)
         self.episode_step += 1
-        truncated = self.episode_step >= current_env._max_episode_steps
+        truncated = bool(truncated or self.episode_step >= current_env._max_episode_steps)
         info = dict(info or {})
         info.update(
             {
@@ -2438,16 +2516,18 @@ class LiberoAdapter(BaseEnvAdapter):
                 "task_id": current_env.task_id,
                 "done": bool(done),
                 "success": success,
+                "TimeLimit.truncated": truncated,
                 "task_idx": self.current_task_idx,
                 "task_description": getattr(current_env, "task_description", ""),
             }
         )
-        if terminated:
+        if terminated or truncated:
             info["final_info"] = {
                 "task": current_env.task,
                 "task_id": current_env.task_id,
                 "done": bool(done),
                 "success": success,
+                "TimeLimit.truncated": truncated,
             }
         return {}, float(reward), terminated, bool(truncated), info
 

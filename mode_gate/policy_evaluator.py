@@ -3,16 +3,20 @@
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from contextlib import contextmanager, redirect_stdout, redirect_stderr
 from dataclasses import asdict, dataclass
 import hashlib
 import json
+import logging
 import os
 from pathlib import Path
 import re
 import subprocess
+import sys
 from typing import Any, Callable, Mapping, Sequence
 
 from .evaluation import EpisodeLedger, PolicyScore, assert_raw_profile, wilson_interval
+from .io_utils import atomic_write_json
 
 
 @dataclass(frozen=True)
@@ -173,13 +177,28 @@ class RawPolicyEvaluator:
         ledger_path: Path,
         manifest_hash: str,
         max_workers: int = 1,
+        reuse_raw_results: bool = False,
     ) -> None:
         self.executor = executor
         self.ledger = EpisodeLedger(Path(ledger_path))
         self.manifest_hash = str(manifest_hash)
         self.max_workers = int(max_workers)
+        self.reuse_raw_results = bool(reuse_raw_results)
         if self.max_workers <= 0:
             raise ValueError("max_workers must be positive")
+
+    def _active_rows(self) -> dict[str, dict[str, Any]]:
+        rows = {}
+        for item in self.ledger.events.iter_valid():
+            key = item["episode_key"]
+            event_type = item.get("event_type", "EPISODE_COMPLETED")
+            if event_type == "EPISODE_INVALIDATED":
+                rows.pop(key, None)
+            elif event_type == "EPISODE_COMPLETED":
+                rows[key] = item
+            else:
+                raise ValueError(f"unknown episode ledger event type: {event_type}")
+        return rows
 
     def evaluate(
         self,
@@ -211,14 +230,27 @@ class RawPolicyEvaluator:
         profile_hash = hashlib.sha256(
             json.dumps(profile_value, sort_keys=True, separators=(",", ":")).encode()
         ).hexdigest()
+        active_rows = self._active_rows()
         existing = {
             item["episode_key"]: item
-            for item in self.ledger.events.iter_valid()
+            for item in active_rows.values()
             if item.get("policy_id") == policy_id
             and item.get("metric_role") == metric_role
             and item.get("manifest_hash") == self.manifest_hash
             and item.get("evaluation_profile_hash") == profile_hash
         }
+        if any(row.get("checkpoint_digest") != checkpoint_digest for row in existing.values()):
+            raise ValueError("policy ID reused with a different checkpoint digest")
+        reusable = {}
+        if self.reuse_raw_results and require_raw_profile and metric_role.startswith("promotion_raw:"):
+            for row in active_rows.values():
+                if (row.get("policy_id") == policy_id
+                        and row.get("checkpoint_digest") == checkpoint_digest
+                        and row.get("manifest_hash") == self.manifest_hash
+                        and row.get("evaluation_profile_hash") == profile_hash
+                        and str(row.get("metric_role", "")).startswith("promotion_raw:")):
+                    key = json.dumps(row.get("context"), sort_keys=True)
+                    reusable[key] = row
         pending = [
             context
             for context in contexts
@@ -226,20 +258,21 @@ class RawPolicyEvaluator:
         ]
 
         def run(context: EvaluationContext) -> tuple[EvaluationContext, RawEpisodeResult]:
+            cached = reusable.get(json.dumps(asdict(context), sort_keys=True))
+            if cached is not None:
+                return context, RawEpisodeResult(
+                    success=bool(cached["success"]), steps=cached.get("steps"),
+                    output_dir=str(cached.get("output_dir", "")),
+                    metadata={**dict(cached.get("metadata") or {}),
+                              "reused_raw_episode_key": cached["episode_key"],
+                              "reused_raw_metric_role": cached["metric_role"]},
+                )
             value = self.executor(policy_id, Path(checkpoint_path), context)
             if isinstance(value, bool):
                 value = RawEpisodeResult(value)
             return context, value
 
-        if self.max_workers == 1:
-            completed = [run(context) for context in pending]
-        else:
-            completed = []
-            with ThreadPoolExecutor(max_workers=self.max_workers) as pool:
-                futures = {pool.submit(run, context): context for context in pending}
-                for future in as_completed(futures):
-                    completed.append(future.result())
-        for context, result in completed:
+        def commit(context: EvaluationContext, result: RawEpisodeResult) -> None:
             key = _ledger_key(metric_role, policy_id, context, profile_hash)
             self.ledger.append(
                 key,
@@ -257,9 +290,27 @@ class RawPolicyEvaluator:
                     "metadata": dict(result.metadata),
                 },
             )
+        if self.max_workers == 1:
+            for context in pending:
+                commit(*run(context))
+        else:
+            # Save each completed episode even if another worker fails. Failed
+            # episodes are not binary failures and remain pending on resume.
+            errors = []
+            with ThreadPoolExecutor(max_workers=self.max_workers) as pool:
+                futures = {pool.submit(run, context): context for context in pending}
+                for future in as_completed(futures):
+                    try:
+                        completed = future.result()
+                    except Exception as exc:
+                        errors.append(exc)
+                    else:
+                        commit(*completed)
+            if errors:
+                raise errors[0]
         rows_by_key = {
             item["episode_key"]: item
-            for item in self.ledger.events.iter_valid()
+            for item in self._active_rows().values()
             if item.get("policy_id") == policy_id
             and item.get("metric_role") == metric_role
             and item.get("manifest_hash") == self.manifest_hash
@@ -311,16 +362,22 @@ class HydraRawEpisodeExecutor:
         output_root: Path,
         timeout_seconds: float = 1800.0,
         extra_overrides: Sequence[str] = (),
+        keep_warm: bool = False,
     ) -> None:
         self.repo_root = Path(repo_root)
         self.python_executable = Path(python_executable)
         self.output_root = Path(output_root)
         self.timeout_seconds = float(timeout_seconds)
         self.extra_overrides = tuple(extra_overrides)
+        self.keep_warm = bool(keep_warm)
+        self._runner = None
+        self._checkpoint = None
 
     def __call__(
         self, policy_id: str, checkpoint_path: Path, context: EvaluationContext
     ) -> RawEpisodeResult:
+        if self.keep_warm:
+            return self._call_warm(policy_id, checkpoint_path, context)
         runtime_suite = runtime_suite_name(context.suite, context.perturbation_variant)
         run_dir = self.output_root / policy_id / context.episode_key
         run_dir.mkdir(parents=True, exist_ok=True)
@@ -372,6 +429,94 @@ class HydraRawEpisodeExecutor:
             output_dir=str(run_dir),
             metadata={"runtime_suite": runtime_suite, "returncode": process.returncode},
         )
+
+    def _call_warm(self, policy_id: str, checkpoint_path: Path,
+                   context: EvaluationContext) -> RawEpisodeResult:
+        """One resident model per candidate; no cold start between contexts."""
+        import gc
+        from hydra import compose, initialize_config_dir
+        from omegaconf import OmegaConf
+        import torch
+        from main import Main
+        runtime_suite = runtime_suite_name(context.suite, context.perturbation_variant)
+        run_dir = self.output_root / policy_id / context.episode_key
+        run_dir.mkdir(parents=True, exist_ok=True)
+        with initialize_config_dir(version_base=None, config_dir=str(self.repo_root / "configs")):
+            cfg = compose(config_name="config", overrides=[
+                "backend=libero", f"backend.libero.suite_name={runtime_suite}",
+                f"backend.libero.task_ids_filter=[{context.task_index}]",
+                "main.episode_num=1", f"main.init_state_id={context.init_state_id}",
+                f"main.env_seed={context.env_seed}", f"main.policy_seed={context.policy_seed}",
+                "main.use_guidance=false", "main.use_vlm_stage_recognition=false",
+                "main.fail_on_episode_error=true", "mode_gate.enabled=false",
+                "perception.gemini_grounding.enabled=false", "policy.type=pi05",
+                f"policy.pi05.pretrained_path={checkpoint_path}",
+                f"main.output_dir={run_dir}", *self.extra_overrides,
+            ])
+        atomic_write_json(run_dir / "evaluation_context.json", {
+            "schema_version": "raw-evaluation-context-v1",
+            "policy_id": policy_id,
+            "checkpoint_path": str(checkpoint_path),
+            "context": asdict(context),
+            "config": OmegaConf.to_container(cfg, resolve=True),
+        })
+        checkpoint = str(checkpoint_path.resolve())
+        if self._runner is not None and self._checkpoint != checkpoint:
+            self._runner.adapter.close()
+            self._runner = None
+            gc.collect()
+            torch.cuda.empty_cache()
+        with _warm_episode_log(run_dir / "executor.log"):
+            if self._runner is None:
+                self._runner = Main(cfg)
+                self._checkpoint = checkpoint
+            else:
+                runner = self._runner
+                env_config = OmegaConf.to_container(cfg.backend.libero, resolve=True)
+                env_config["episode_num"] = 1
+                runner.adapter.close()
+                runner.adapter.__init__(None, env_config, device=runner.device)
+                runner.cfg, runner.config = cfg, cfg.main
+                runner.output_dir = str(run_dir) + "/"
+            self._runner.run()
+        provenance = self._runner.adapter.get_context_provenance()
+        for key, expected in (("runtime_suite", runtime_suite), ("task_id", context.task_id),
+                              ("init_state_id", context.init_state_id)):
+            if str(provenance[key]) != str(expected):
+                raise RuntimeError(f"raw evaluation context mismatch: {key}")
+        current_env = self._runner.adapter._env[self._runner.adapter.current_task_idx]
+        simulator = current_env._env.env
+        return RawEpisodeResult(
+            success=bool(self._runner.success_count),
+            steps=int(self._runner.adapter.episode_step),
+            output_dir=str(run_dir),
+            metadata={"runtime_suite": runtime_suite, "keep_warm": True,
+                      "simulator_done": bool(simulator.done),
+                      "simulator_timestep": int(simulator.timestep),
+                      "simulator_horizon": int(simulator.horizon),
+                      "reset_settling_steps": int(current_env.num_steps_wait)},
+        )
+
+
+@contextmanager
+def _warm_episode_log(path: Path):
+    """Do not leave resident loggers attached to a closed episode stream."""
+    console = sys.stdout
+    with path.open("a", encoding="utf-8") as stream:
+        with redirect_stdout(stream), redirect_stderr(stream):
+            try:
+                yield
+            finally:
+                loggers = [logging.getLogger(), *logging.Logger.manager.loggerDict.values()]
+                for logger in loggers:
+                    if not isinstance(logger, logging.Logger):
+                        continue
+                    for handler in logger.handlers:
+                        # Dynamic stderr handlers already follow redirection
+                        # and have a read-only stream property. Only rebind
+                        # handlers that actually captured this file object.
+                        if vars(handler).get("stream") is stream:
+                            handler.setStream(console)
 
 
 def _ledger_key(

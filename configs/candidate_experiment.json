@@ -1,0 +1,39 @@
+{
+  "schema_version": "candidate-env-position20-v1",
+  "root": "/shared/hengyil6/vls/self_improve/fixed_budget_50/env_position20_20260914",
+  "variants": ["use_environment", "use_swap"],
+  "task_count": 20,
+  "formal_execution": {
+    "planner_steering_enabled": false,
+    "candidate_selection": "first_safe_vls_particle",
+    "online_stage_guidance_judgment": false,
+    "planner_remaining_roles": ["posthoc_labels", "training_data", "verifier_retrain", "slow_loop"],
+    "controller_mode": "learned_verifier",
+    "decision_rule": "head_argmax",
+    "fixed_budget_execution": false,
+    "fixed_budget_fallback": false,
+    "minimum_resteer_chunks": 0,
+    "maximum_resteer_chunks": 50,
+    "policy_steps_per_chunk": 10,
+    "mandatory_counterfactual_replay": false,
+    "expansion_prerequisite": "one_complete_native_task_rollout",
+    "early_expansion": "record_proposal_and_continue_original_rollout",
+    "success_authority": "LIBERO-PRO native success only"
+  },
+  "initialization": {
+    "task_keys": [
+      "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment",
+      "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap"
+    ],
+    "planner_role": "posthoc_labels_data_training_only",
+    "auto_start_formal": true,
+    "formal_passes": 1
+  },
+  "demo_completion": "/shared/hengyil6/vls/self_improve/demo_precollection/environment_swap_20/completion.json",
+  "baseline_config": "/shared/hengyil6/vls/baseline_runs/env_position20_20260910/v44_vls_official_dev_20260911/config.json",
+  "baseline_runtime": "/root/vla-pilot-plus/baseline/experiments/env_position20_20260910/vls_runtime_template.json",
+  "demonstration_policy": "planner_selects_precollected_current_task_no_recollection",
+  "merge_method": "planner_uniform",
+  "merge_coefficients": {"mode": "fixed_uniform", "alpha": 0.8},
+  "label_version": "fixed_budget_50-v2"
+}

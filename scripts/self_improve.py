@@ -34,7 +34,7 @@ from mode_gate.candidates import (  # noqa: E402
     DeltaLineageEntry,
     compose_expansion_candidates,
     compose_retain_expansion_candidates,
-    compose_reuse_candidates,
+    compose_selected_remedy,
 )
 from mode_gate.curriculum import (  # noqa: E402
     BALANCED_PRO_VARIANT,
@@ -49,6 +49,9 @@ from mode_gate.eval_manifest import (  # noqa: E402
     FinalSealGuard,
     validate_libero_pro_manifest,
 )
+from mode_gate.factual_reconstruction import (  # noqa: E402
+    reconstruct_factual_labels,
+)
 from mode_gate.final_evaluation import (  # noqa: E402
     FinalEvaluationSubject,
     FinalSealedEvaluationCoordinator,
@@ -59,16 +62,19 @@ from mode_gate.io_utils import sha256_file  # noqa: E402
 from mode_gate.job_runner import execute_job_spec  # noqa: E402
 from mode_gate.offline_replay import execute_replay_plan  # noqa: E402
 from mode_gate.preflight import run_preflight  # noqa: E402
+from mode_gate.replay_budget import prepare_cost_capped_replay_plan  # noqa: E402
 from mode_gate.policy_evaluator import (  # noqa: E402
     HydraRawEpisodeExecutor,
     RawPolicyEvaluator,
     contexts_from_manifest,
 )
 from mode_gate.promotion import (  # noqa: E402
+    PromotionConfig,
     PolicyCandidate,
     PolicyPromotionCoordinator,
     TriggerTaskEvaluator,
     deploy_policy_gate,
+    load_retention_history,
 )
 from mode_gate.registry import PolicyRegistry  # noqa: E402
 from mode_gate.slow_loop import SlowLoopState, SlowLoopStore  # noqa: E402
@@ -78,6 +84,7 @@ from mode_gate.throughput import (  # noqa: E402
     RolloutThroughputBenchmark,
     throughput_contexts_from_manifest,
 )
+from mode_gate.teleop_supervisor import TeleopSupervisor  # noqa: E402
 from mode_gate.training import (  # noqa: E402
     build_lerobot_coft_command,
     prepare_source_catalog,
@@ -85,14 +92,16 @@ from mode_gate.training import (  # noqa: E402
 from mode_gate.verifier_training import (  # noqa: E402
     VerifierTrainingConfig,
     build_verifier_examples,
+    record_verifier_training_usage,
     train_verifier,
     train_verifier_ablations,
     train_verifier_holdout,
 )
 from mode_gate.verifier_refresh import VerifierRefreshCoordinator  # noqa: E402
+from mode_gate.experience_planner import ExperiencePlanner  # noqa: E402
 
 
-DEFAULT_ROOT = Path("/shared/hengyil6/vls/self_improve")
+DEFAULT_ROOT = Path("/shared/hengyil6/vls/self_improve/fixed_budget_50/env_position20_20260914")
 DEFAULT_PYTHON = Path("/shared/hengyil6/vls/envs/vla-pilot/bin/python")
 
 
@@ -214,7 +223,7 @@ def parser() -> argparse.ArgumentParser:
     promote.add_argument("--verifier-id")
     promote.add_argument(
         "--controller-mode",
-        choices=("learned_verifier", "fixed_budget_4"),
+        choices=("learned_verifier", "fixed_budget_50"),
         required=True,
     )
     promote.add_argument("--manifest-hash", required=True)
@@ -275,7 +284,9 @@ def parser() -> argparse.ArgumentParser:
     )
     verifier.add_argument("--policy-id", required=True)
     verifier.add_argument(
-        "--output", type=Path, default=DEFAULT_ROOT / "verifier_attempts"
+        "--output",
+        type=Path,
+        default=DEFAULT_ROOT / "fixed_budget_50/verifier_attempts",
     )
     verifier.add_argument("--config-json", type=Path)
     verifier.add_argument("--registry", type=Path, default=DEFAULT_ROOT / "registry")
@@ -288,7 +299,9 @@ def parser() -> argparse.ArgumentParser:
     )
     verifier_ablations.add_argument("--policy-id", required=True)
     verifier_ablations.add_argument(
-        "--output", type=Path, default=DEFAULT_ROOT / "verifier_ablations"
+        "--output",
+        type=Path,
+        default=DEFAULT_ROOT / "fixed_budget_50/verifier_ablations",
     )
     verifier_ablations.add_argument("--config-json", type=Path)
     verifier_ablations.add_argument(
@@ -306,9 +319,35 @@ def parser() -> argparse.ArgumentParser:
     )
     verifier_holdout.add_argument("--value", required=True)
     verifier_holdout.add_argument(
-        "--output", type=Path, default=DEFAULT_ROOT / "verifier_holdouts"
+        "--output",
+        type=Path,
+        default=DEFAULT_ROOT / "fixed_budget_50/verifier_holdouts",
     )
     verifier_holdout.add_argument("--config-json", type=Path)
+
+    factual = commands.add_parser("reconstruct-factual-labels")
+    factual.add_argument(
+        "--incidents", type=Path, default=DEFAULT_ROOT / "audit/incidents"
+    )
+    factual.add_argument(
+        "--episodes", type=Path, default=DEFAULT_ROOT / "audit/episodes.jsonl"
+    )
+    factual.add_argument(
+        "--plan", type=Path, default=DEFAULT_ROOT / "audit/replay_plan.json"
+    )
+    factual.add_argument(
+        "--output",
+        type=Path,
+        default=DEFAULT_ROOT / "audit/factual_reconstruction.json",
+    )
+    factual.add_argument(
+        "--label-version", default="fixed_budget_50-v2"
+    )
+    factual.add_argument(
+        "--apply",
+        action="store_true",
+        help="append reconstructed labels after the complete dry-run validation",
+    )
 
     verifier_refresh = commands.add_parser("refresh-verifier")
     verifier_refresh.add_argument(
@@ -320,7 +359,10 @@ def parser() -> argparse.ArgumentParser:
     verifier_refresh.add_argument(
         "--output", type=Path, default=DEFAULT_ROOT / "verifier_refresh"
     )
-    verifier_refresh.add_argument("--config-json", type=Path)
+    verifier_refresh.add_argument(
+        "--config-json", type=Path,
+        default=Path(__file__).resolve().parents[1] / "configs/verifier_online.json",
+    )
     verifier_refresh.add_argument("--brier-drift-threshold", type=float, default=0.02)
 
     run_job = commands.add_parser("run-job")
@@ -337,6 +379,34 @@ def parser() -> argparse.ArgumentParser:
     run_job.add_argument("--tickets", type=Path, default=DEFAULT_ROOT / "tickets")
     run_job.add_argument("--work", type=Path, default=DEFAULT_ROOT / "slow_work")
     run_job.add_argument("--once", action="store_true")
+    run_job.add_argument("--full-cycle", action="store_true",
+                         help="execute collection, co-FT, merge, policy gates and verifier refresh")
+    run_job.add_argument("--gpu-index", type=int, default=6)
+    run_job.add_argument("--coft-source-spec", type=Path)
+    run_job.add_argument(
+        "--auto-teleop",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="start automatic collection; expose a human page only when fallback is needed",
+    )
+    run_job.add_argument(
+        "--watch-collection",
+        action="store_true",
+        help="stay alive through human collection and resume curation automatically",
+    )
+    run_job.add_argument(
+        "--teleop-runtime",
+        type=Path,
+        default=DEFAULT_ROOT / "teleop_runtime",
+    )
+    run_job.add_argument("--teleop-operator", default="human")
+    run_job.add_argument("--collection-mode", choices=("human", "auto_skill"), default="auto_skill")
+    run_job.add_argument("--skill-config", type=Path, default=REPO_ROOT / "configs/skill_collection.json")
+    run_job.add_argument("--teleop-port", type=int, default=8765)
+    run_job.add_argument("--teleop-backend-port", type=int)
+    run_job.add_argument("--teleop-max-steps", type=int, default=3000)
+    run_job.add_argument("--teleop-startup-timeout", type=float, default=600.0)
+    run_job.add_argument("--collection-poll-seconds", type=float, default=2.0)
 
     execute_job = commands.add_parser("execute-job-spec")
     execute_job.add_argument("--spec", type=Path, required=True)
@@ -374,8 +444,13 @@ def parser() -> argparse.ArgumentParser:
     policy_gate.add_argument("--rollout-output", type=Path, required=True)
     policy_gate.add_argument("--python", type=Path, default=DEFAULT_PYTHON)
     policy_gate.add_argument("--workers", type=int, default=1)
+    policy_gate.add_argument("--device", default="cuda:6")
     policy_gate.add_argument("--bootstrap-draws", type=int, default=10_000)
     policy_gate.add_argument("--reuse", action="store_true")
+    policy_gate.add_argument("--promotion-config", type=Path,
+                             default=REPO_ROOT / "configs/policy_promotion.json")
+    policy_gate.add_argument("--experiment-output", type=Path,
+                             default=DEFAULT_ROOT / "fixed_budget_50/formal_experiment")
 
     deploy_gate = commands.add_parser("deploy-gate")
     deploy_gate.add_argument("--report", type=Path, required=True)
@@ -415,8 +490,17 @@ def parser() -> argparse.ArgumentParser:
     replay = commands.add_parser("replay-new-policy")
     replay.add_argument("--plan", type=Path, required=True)
     replay.add_argument("--repo-root", type=Path, default=REPO_ROOT)
-    replay.add_argument("--device", default="cuda:0")
+    replay.add_argument("--device", default="cuda:6")
     replay.add_argument("--ledger", type=Path)
+
+    capped_replay = commands.add_parser("prepare-cost-capped-replay")
+    capped_replay.add_argument("--source-plan", type=Path, required=True)
+    capped_replay.add_argument("--output-dir", type=Path, required=True)
+    capped_replay.add_argument(
+        "--record-id", action="append", required=True, dest="record_ids"
+    )
+    capped_replay.add_argument("--max-provider-calls", type=int, default=5000)
+    capped_replay.add_argument("--branch-ledger", type=Path)
 
     audit = commands.add_parser("collect-verifier-audit")
     audit.add_argument(
@@ -453,7 +537,7 @@ def parser() -> argparse.ArgumentParser:
     )
     audit.add_argument("--python", type=Path, default=DEFAULT_PYTHON)
     audit.add_argument("--workers", type=int, default=1)
-    audit.add_argument("--gpu-index", type=int, default=0)
+    audit.add_argument("--gpu-index", type=int, default=6)
     audit.add_argument("--limit", type=int)
     audit.add_argument(
         "--use-guidance",
@@ -461,6 +545,15 @@ def parser() -> argparse.ArgumentParser:
         default=True,
     )
     audit.add_argument("--episode-timeout", type=float, default=3600.0)
+    audit.add_argument(
+        "--keep-going-on-retryable-error",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help=(
+            "defer failed contexts, continue breadth-first collection, and retry "
+            "without terminating the coordinator"
+        ),
+    )
 
     final_eval = commands.add_parser("final-evaluate")
     final_eval.add_argument(
@@ -632,10 +725,10 @@ def main(argv: list[str] | None = None) -> int:
         if len(args.delta) != len(args.alpha_l):
             raise ValueError("--delta and --alpha-l counts must match")
         deltas = [
-            (path, {"vision": 1.0, "language": alpha, "action": 1.0})
+            (path, {"vision": alpha, "language": alpha, "action": alpha})
             for path, alpha in zip(args.delta, args.alpha_l)
         ]
-        _print(compose_policy(args.theta0, deltas, args.output))
+        _print(compose_policy(args.theta0, deltas, args.output, allow_uniform_alpha=True))
     elif args.command == "compose-candidates":
         spec = json.loads(args.spec_json.read_text(encoding="utf-8"))
         lineage = tuple(
@@ -652,6 +745,7 @@ def main(argv: list[str] | None = None) -> int:
                 **common,
                 new_delta_id=str(spec["new_delta_id"]),
                 new_delta_path=Path(spec["new_delta_path"]),
+                alpha_l_values=spec['alpha_values'],
             )
         elif spec.get("mode") == "RETAIN_EXPANSION":
             result = compose_retain_expansion_candidates(
@@ -660,9 +754,11 @@ def main(argv: list[str] | None = None) -> int:
                 new_delta_path=Path(spec["new_delta_path"]),
             )
         elif spec.get("mode") == "REUSE":
-            result = compose_reuse_candidates(
+            result = compose_selected_remedy(
                 **common,
                 target_delta_id=str(spec["target_delta_id"]),
+                target_delta_path=Path(spec["target_delta_path"]),
+                alpha_l_values=spec["alpha_l_values"],
             )
         else:
             raise ValueError(
@@ -775,6 +871,16 @@ def main(argv: list[str] | None = None) -> int:
         _print(result)
         if result["needs_more_demos"]:
             return 3
+    elif args.command == "reconstruct-factual-labels":
+        result = reconstruct_factual_labels(
+            incidents=args.incidents,
+            episodes=args.episodes,
+            replay_plan=args.plan,
+            output=args.output,
+            label_version=args.label_version,
+            apply=args.apply,
+        )
+        _print(result)
     elif args.command == "train-verifier":
         overrides = {}
         if args.config_json:
@@ -789,7 +895,9 @@ def main(argv: list[str] | None = None) -> int:
             output_root=args.output,
             config=config,
             metadata={"working_revision": _working_revision()},
+            reviewer=ExperiencePlanner(IncidentMemory(args.incidents)).review_head,
         )
+        record_verifier_training_usage(IncidentMemory(args.incidents), result, examples)
         installed = None
         if args.install:
             if not result.gate.passed:
@@ -824,13 +932,16 @@ def main(argv: list[str] | None = None) -> int:
             policy_id=args.policy_id,
             output_root=args.output,
             config=config,
+            reviewer=ExperiencePlanner(IncidentMemory(args.incidents)).review_head,
             metadata={"working_revision": _working_revision()},
         )
+        for trained in result.results.values():
+            record_verifier_training_usage(IncidentMemory(args.incidents), trained, examples)
         installed = None
         if args.install_selected:
             if result.selected_channel_set is None:
                 raise RuntimeError(
-                    "no ablation passed the deployment gate; keep fixed-budget-4"
+                    "no ablation passed the deployment gate; keep the active candidate verifier"
                 )
             selected = result.results[result.selected_channel_set]
             installed = PolicyRegistry(args.registry).install_artifact(
@@ -877,18 +988,38 @@ def main(argv: list[str] | None = None) -> int:
             incidents=IncidentMemory(args.incidents),
             output_root=args.output,
             config=VerifierTrainingConfig(**overrides),
-            brier_drift_threshold=args.brier_drift_threshold,
         ).run()
         _print(result)
         if not result["refreshed"] and result.get("status", {}).get("due"):
             return 2
     elif args.command == "run-job":
+        if args.once and args.watch_collection:
+            raise ValueError("--once and --watch-collection are mutually exclusive")
         _load_formal_manifest(args.protocol_manifest)
         load_dotenv(REPO_ROOT / ".env", override=False)
-        planner = None
-        if os.environ.get("GOOGLE_API_KEY"):
-            planner = TicketCollectionPlanner()
+        planner = TicketCollectionPlanner(
+            max_provider_calls=10000,
+            call_ledger_path=DEFAULT_ROOT / "audit/incidents/fixed_budget_50/factual_gemini_provider_calls.jsonl",
+            thinking_level="ultra",
+        )
         store = SlowLoopStore(args.root)
+        teleop_supervisor = None
+        if args.auto_teleop:
+            teleop_supervisor = TeleopSupervisor(
+                repo_root=REPO_ROOT,
+                python_executable=DEFAULT_PYTHON,
+                protocol_manifest=args.protocol_manifest,
+                snapshot_root=args.snapshots,
+                runtime_root=args.teleop_runtime,
+                operator=args.teleop_operator,
+                port=args.teleop_backend_port or TeleopSupervisor.recorded_backend_port(
+                    args.teleop_runtime, default=args.teleop_port + 1),
+                public_port=args.teleop_port,
+                max_steps=args.teleop_max_steps,
+                startup_timeout_seconds=args.teleop_startup_timeout,
+                collection_mode=args.collection_mode,
+                skill_config=args.skill_config,
+            )
         worker = SlowLoopWorker(
             store=store,
             registry=PolicyRegistry(args.registry),
@@ -898,8 +1029,31 @@ def main(argv: list[str] | None = None) -> int:
             work_root=args.work,
             snapshot_root=args.snapshots,
             ticket_planner=planner,
+            teleop_supervisor=teleop_supervisor,
         )
-        job = worker.step(args.job_id) if args.once else worker.run_until_blocked(args.job_id)
+        if args.full_cycle:
+            if args.once or args.coft_source_spec is None:
+                raise ValueError("full-cycle requires coft-source-spec and cannot use --once")
+            job = store.current(args.job_id)
+            store.annotate(job.job_id, expected_state=job.state, metadata={
+                "coft_source_spec_path": str(args.coft_source_spec.resolve()),
+                "training_gpu_index": args.gpu_index,
+                "evaluation_gpu_index": args.gpu_index,
+                "replay_gpu_index": args.gpu_index,
+                "counterfactual_call_ledger": str(DEFAULT_ROOT /
+                    "audit/incidents/fixed_budget_50/counterfactual_gemini_provider_calls.jsonl"),
+                "full_cycle_auto_execute": True,
+            })
+            job = worker.run_full_cycle(args.job_id, poll_seconds=args.collection_poll_seconds)
+        elif args.once:
+            job = worker.step(args.job_id)
+        elif args.watch_collection:
+            job = worker.run_through_collection(
+                args.job_id,
+                poll_seconds=args.collection_poll_seconds,
+            )
+        else:
+            job = worker.run_until_blocked(args.job_id)
         _print(job.__dict__ | {"state": job.state.value})
         if job.state.value == "RETRYABLE_ERROR":
             return 2
@@ -932,7 +1086,13 @@ def main(argv: list[str] | None = None) -> int:
         )
         _print(summary.__dict__)
     elif args.command == "policy-gate":
+        if args.workers != 1:
+            raise ValueError("resident GPU6 policy gate requires --workers 1")
+        promotion_config = PromotionConfig.load(args.promotion_config)
         manifest = _load_formal_manifest(args.manifest)
+        retention_history = load_retention_history(
+            experiment_output=args.experiment_output, manifest=manifest,
+        )
         ticket = json.loads(args.ticket.read_text(encoding="utf-8"))
         parent = _policy_candidate(
             json.loads(args.parent_json.read_text(encoding="utf-8"))
@@ -948,21 +1108,27 @@ def main(argv: list[str] | None = None) -> int:
                 repo_root=REPO_ROOT,
                 python_executable=args.python,
                 output_root=args.rollout_output,
+                extra_overrides=(f"device={args.device}",),
+                keep_warm=True,
             ),
             ledger_path=args.ledger,
             manifest_hash=manifest["manifest_sha256"],
             max_workers=args.workers,
+            reuse_raw_results=True,
         )
         coordinator = PolicyPromotionCoordinator(
             evaluator=evaluator,
             manifest=manifest,
             output_root=args.output,
             bootstrap_draws=args.bootstrap_draws,
+            config=promotion_config,
+            retention_history=retention_history,
         )
         trigger = TriggerTaskEvaluator(
             evaluator=evaluator,
             manifest=manifest,
             ticket=ticket,
+            config=promotion_config,
         )
         gate_fn = coordinator.run_reuse if args.reuse else coordinator.run
         report = gate_fn(
@@ -1024,6 +1190,15 @@ def main(argv: list[str] | None = None) -> int:
             ledger_path=args.ledger,
         )
         _print(result)
+    elif args.command == "prepare-cost-capped-replay":
+        result = prepare_cost_capped_replay_plan(
+            source_plan=args.source_plan,
+            output_dir=args.output_dir,
+            record_ids=args.record_ids,
+            max_provider_calls=args.max_provider_calls,
+            branch_ledger_path=args.branch_ledger,
+        )
+        _print(result)
     elif args.command == "collect-verifier-audit":
         manifest = _load_formal_manifest(args.manifest)
         incidents = IncidentMemory(args.incident_root)
@@ -1051,6 +1226,7 @@ def main(argv: list[str] | None = None) -> int:
             preflight_path=args.preflight,
             max_workers=args.workers,
             replay_gpu_index=args.gpu_index,
+            continue_on_retryable_error=args.keep_going_on_retryable_error,
         ).run(limit=args.limit)
         _print(result)
     elif args.command == "final-evaluate":

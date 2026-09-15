@@ -1,439 +1,175 @@
-"""Frozen-backbone Deep Sets verifier and calibration utilities."""
-
+"""Decision-time-only candidate verifier. No trainable policy/backbone is owned here."""
 from __future__ import annotations
-
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import json
-import math
 import os
 from pathlib import Path
-from typing import Iterable, Sequence
-
+from typing import Sequence
 import numpy as np
 import torch
 from torch import Tensor, nn
 from torch.nn import functional as F
-
-from .features import ModeFeatureEncoderV1
-from .types import ControllerRoute, GeometryEvidence, RoundEvidence, SemanticModeScore
-
+from .types import ControllerRoute, RoundEvidence
+from .experiment_contract import FIXED_BUDGET_50_LABEL_VERSION, require_fixed_budget_50_contract
+from .io_utils import atomic_write_json, sha256_file
 
 SCENE_DIMS = 2048
-MODE_EE_DIMS = 20
-MODE_EMBED_DIMS = 37
-POOLED_MODE_DIMS = 74
-GLOBAL_DIMS = 7
-VERIFIER_INPUT_DIMS = SCENE_DIMS + POOLED_MODE_DIMS + GLOBAL_DIMS
+TRAJECTORY_DIMS = 15  # recorded action(7), predicted/observed xyz(3), xyzw(4), gripper(1)
+HISTORY_DIMS = 15
+VERIFIER_INPUT_DIMS = 128 + 128 + 64 + 2
 VERIFIER_CLASSES = (ControllerRoute.RESTEER, ControllerRoute.EXPAND)
-
+VERIFIER_HEAD_ARCHITECTURE = "all-candidate-gru-deepset-history-two-logits-v3"
+VERIFIER_FEATURE_SCHEMA = "candidate-verifier-input-v3"
 
 @dataclass(frozen=True)
-class ModeVerifierInput:
+class CandidateVerifierInput:
     scene_feature: np.ndarray
-    mode_ee_features: np.ndarray
-    geometry_features: np.ndarray
-    semantic_features: np.ndarray
-    mode_weights: np.ndarray
-    global_features: np.ndarray
-    scene_missing: bool = False
-    # Columns: EE, geometry, semantic, weight.
-    mode_missing: np.ndarray | None = None
-    global_missing: np.ndarray | None = None
-    mode_weight_features: np.ndarray | None = None
+    candidate_trajectories: np.ndarray
+    executed_history: np.ndarray
+    remaining_budget: int
+    retry_budget: int = 50
+    candidate_ids: tuple[str, ...] = ()
+    context_id: str = ""
+    backbone_id: str = ""
+    decision_step: int = 0
 
     def __post_init__(self) -> None:
         scene = np.asarray(self.scene_feature, dtype=np.float32)
-        ee = np.asarray(self.mode_ee_features, dtype=np.float32)
-        geometry = np.asarray(self.geometry_features, dtype=np.float32)
-        semantic = np.asarray(self.semantic_features, dtype=np.float32)
-        weights = np.asarray(self.mode_weights, dtype=np.float32)
-        global_features = np.asarray(self.global_features, dtype=np.float32)
+        paths = np.asarray(self.candidate_trajectories, dtype=np.float32)
+        history = np.asarray(self.executed_history, dtype=np.float32)
         if scene.shape != (SCENE_DIMS,):
-            raise ValueError(f"scene_feature must have shape ({SCENE_DIMS},)")
-        if ee.ndim != 2 or ee.shape[1] != MODE_EE_DIMS or not 1 <= len(ee) <= 4:
-            raise ValueError("mode_ee_features must have shape (K, 20), K in [1, 4]")
-        count = len(ee)
-        if geometry.shape != (count, 3) or semantic.shape != (count, 1):
-            raise ValueError("geometry/semantic feature shapes do not match K")
-        if weights.shape != (count,) or np.any(weights < 0) or float(weights.sum()) <= 0:
-            raise ValueError("mode_weights must be a positive simplex vector")
-        weights = weights / weights.sum()
-        if global_features.shape != (GLOBAL_DIMS,):
-            raise ValueError("global_features must have shape (7,)")
-        mode_missing = (
-            np.zeros((count, 4), dtype=bool)
-            if self.mode_missing is None
-            else np.asarray(self.mode_missing, dtype=bool)
-        )
-        global_missing = (
-            np.zeros(GLOBAL_DIMS, dtype=bool)
-            if self.global_missing is None
-            else np.asarray(self.global_missing, dtype=bool)
-        )
-        weight_features = (
-            weights[:, None]
-            if self.mode_weight_features is None
-            else np.asarray(self.mode_weight_features, dtype=np.float32)
-        )
-        if mode_missing.shape != (count, 4):
-            raise ValueError("mode_missing must have shape (K, 4)")
-        if global_missing.shape != (GLOBAL_DIMS,):
-            raise ValueError("global_missing must have shape (7,)")
-        if weight_features.shape != (count, 1):
-            raise ValueError("mode_weight_features must have shape (K, 1)")
-        for value in (scene, ee, geometry, semantic, weights, global_features, weight_features):
-            if not np.isfinite(value).all():
-                raise ValueError("verifier input contains non-finite values")
+            raise ValueError("scene feature must be the frozen v44 2048-D joint image/instruction feature")
+        if paths.ndim != 3 or min(paths.shape[:2]) < 1 or paths.shape[-1] != TRAJECTORY_DIMS:
+            raise ValueError("all candidate sequences must have shape (N,T,15), with no truncation of N or T")
+        if history.ndim != 2 or history.shape[-1] != HISTORY_DIMS:
+            raise ValueError("executed history must have shape (steps,15)")
+        if not all(np.isfinite(x).all() for x in (scene, paths, history)):
+            raise ValueError("non-finite verifier input")
+        if self.retry_budget <= 0 or not 0 <= self.remaining_budget <= self.retry_budget:
+            raise ValueError("invalid remaining budget")
+        if self.decision_step < len(history):
+            raise ValueError("history cannot contain steps later than the decision")
+        ids = self.candidate_ids or tuple(f"candidate-{i}" for i in range(len(paths)))
+        if len(ids) != len(paths) or len(set(ids)) != len(ids):
+            raise ValueError("candidate IDs must preserve all samples exactly once")
         object.__setattr__(self, "scene_feature", scene)
-        object.__setattr__(self, "mode_ee_features", ee)
-        object.__setattr__(self, "geometry_features", geometry)
-        object.__setattr__(self, "semantic_features", semantic)
-        object.__setattr__(self, "mode_weights", weights)
-        object.__setattr__(self, "global_features", global_features)
-        object.__setattr__(self, "mode_missing", mode_missing)
-        object.__setattr__(self, "global_missing", global_missing)
-        object.__setattr__(self, "mode_weight_features", weight_features)
-
-
-def ablate_verifier_input(
-    item: ModeVerifierInput, channel_set: str
-) -> ModeVerifierInput:
-    """Apply the exact channel contract used by an ablation artifact.
-
-    Missing channels are represented through the model's learned missing-value
-    embeddings.  The same transformation is used during fitting and deployed
-    inference so an ablation can never silently consume channels it did not
-    train on.
-    """
-
-    if channel_set == "full":
-        return item
-    if channel_set == "modes_only":
-        return ModeVerifierInput(**{**item.__dict__, "scene_missing": True})
-    if channel_set == "scene_only":
-        return ModeVerifierInput(
-            **{
-                **item.__dict__,
-                "mode_missing": np.ones_like(item.mode_missing, dtype=bool),
-                "global_missing": np.ones_like(item.global_missing, dtype=bool),
-            }
-        )
-    raise ValueError(f"unknown verifier channel set: {channel_set!r}")
-
+        object.__setattr__(self, "candidate_trajectories", paths)
+        object.__setattr__(self, "executed_history", history)
+        object.__setattr__(self, "candidate_ids", tuple(ids))
 
 class GroundedCapabilityVerifier(nn.Module):
-    """2129-D two-class head; scene extraction is external and permanently frozen."""
-
+    """Train the small trajectory/history encoders and head; never the v44 VLM."""
     def __init__(self) -> None:
         super().__init__()
-        self.ee_mlp = nn.Sequential(
-            nn.Linear(MODE_EE_DIMS, 32),
-            nn.ReLU(),
-        )
-        self.ee_missing = nn.Parameter(torch.zeros(32))
-        self.geometry_missing = nn.Parameter(torch.zeros(3))
-        self.semantic_missing = nn.Parameter(torch.zeros(1))
-        self.weight_missing = nn.Parameter(torch.zeros(1))
-        self.scene_missing = nn.Parameter(torch.zeros(SCENE_DIMS))
-        self.global_missing = nn.Parameter(torch.zeros(GLOBAL_DIMS))
-        self.head = nn.Sequential(
-            nn.Linear(VERIFIER_INPUT_DIMS, 256),
-            nn.ReLU(),
-            nn.Dropout(0.1),
-            nn.Linear(256, 64),
-            nn.ReLU(),
-            nn.Linear(64, len(VERIFIER_CLASSES)),
-        )
+        self.scene_projection = nn.Sequential(nn.LayerNorm(SCENE_DIMS), nn.Linear(SCENE_DIMS, 128), nn.GELU())
+        self.trajectory_encoder = nn.GRU(TRAJECTORY_DIMS, 64, batch_first=True)
+        self.history_encoder = nn.GRU(HISTORY_DIMS, 64, batch_first=True)
+        self.empty_history = nn.Parameter(torch.zeros(64))
+        self.head = nn.Sequential(nn.LayerNorm(VERIFIER_INPUT_DIMS),
+                                  nn.Linear(VERIFIER_INPUT_DIMS, 128), nn.GELU(),
+                                  nn.Linear(128, 2))
 
-    def encode_one(self, item: ModeVerifierInput, *, device: torch.device | None = None) -> Tensor:
-        if device is None:
-            device = next(self.parameters()).device
-        scene = torch.as_tensor(item.scene_feature, device=device)
-        if item.scene_missing:
-            scene = self.scene_missing
-        ee = torch.as_tensor(item.mode_ee_features, device=device)
-        geometry = torch.as_tensor(item.geometry_features, device=device)
-        semantic = torch.as_tensor(item.semantic_features, device=device)
-        weight_feature = torch.as_tensor(item.mode_weight_features, device=device)
-        missing = torch.as_tensor(item.mode_missing, device=device)
-        ee_embedded = self.ee_mlp(ee)
-        ee_embedded = torch.where(missing[:, 0:1], self.ee_missing[None, :], ee_embedded)
-        geometry = torch.where(
-            missing[:, 1:2], self.geometry_missing[None, :], geometry
-        )
-        semantic = torch.where(
-            missing[:, 2:3], self.semantic_missing[None, :], semantic
-        )
-        weight_feature = torch.where(
-            missing[:, 3:4], self.weight_missing[None, :], weight_feature
-        )
-        per_mode = torch.cat([ee_embedded, geometry, semantic, weight_feature], dim=1)
-        if per_mode.shape[1] != MODE_EMBED_DIMS:
-            raise RuntimeError("per-mode verifier embedding must be 37-D")
-        pool_weights = torch.as_tensor(item.mode_weights, device=device)
-        weighted_mean = (pool_weights[:, None] * per_mode).sum(dim=0)
-        elementwise_max = per_mode.max(dim=0).values
-        pooled = torch.cat([weighted_mean, elementwise_max], dim=0)
-        global_features = torch.as_tensor(item.global_features, device=device)
-        global_missing = torch.as_tensor(item.global_missing, device=device)
-        global_features = torch.where(
-            global_missing, self.global_missing, global_features
-        )
-        encoded = torch.cat([scene, pooled, global_features], dim=0)
-        if encoded.shape != (VERIFIER_INPUT_DIMS,):
-            raise RuntimeError(
-                f"verifier input must be {VERIFIER_INPUT_DIMS}-D, got {tuple(encoded.shape)}"
-            )
-        return encoded
+    def encode_one(self, item: CandidateVerifierInput, *, device=None) -> Tensor:
+        device = device or next(self.parameters()).device
+        # Every sequence and every time point participates in this shared trainable encoder.
+        paths = torch.as_tensor(item.candidate_trajectories, device=device)
+        _, states = self.trajectory_encoder(paths)
+        all_candidates = states[-1]
+        pooled = torch.cat((all_candidates.mean(0), all_candidates.amax(0)))
+        scene = self.scene_projection(torch.as_tensor(item.scene_feature, device=device).detach())
+        if len(item.executed_history):
+            _, history_state = self.history_encoder(torch.as_tensor(item.executed_history, device=device)[None])
+            history = history_state[-1, 0]
+        else:
+            history = self.empty_history
+        budget = torch.tensor([item.remaining_budget / item.retry_budget, item.retry_budget / 50.0],
+                              dtype=torch.float32, device=device)
+        return torch.cat((scene, pooled, history, budget))
 
-    def forward(self, items: ModeVerifierInput | Sequence[ModeVerifierInput]) -> Tensor:
-        if isinstance(items, ModeVerifierInput):
+    def forward(self, items: CandidateVerifierInput | Sequence[CandidateVerifierInput]) -> Tensor:
+        if isinstance(items, CandidateVerifierInput):
             items = (items,)
-        encoded = torch.stack([self.encode_one(item) for item in items], dim=0)
-        return self.head(encoded)
+        return self.head(torch.stack([self.encode_one(item) for item in items]))
 
+def build_verifier_input(*, scene_feature: np.ndarray, evidence: RoundEvidence,
+                         remaining_budget: int, retry_budget: int,
+                         executed_history: np.ndarray | None = None,
+                         backbone_id: str = "", decision_step: int | None = None,
+                         **diagnostics) -> CandidateVerifierInput:
+    # Geometry/Planner scores and post-decision outcomes are deliberately NOT feature channels.
+    actions = evidence.action_batch.actions
+    aligned_actions = np.concatenate((np.zeros_like(actions[:, :1, :7]), actions[:, :, :7]), axis=1)
+    sequences = np.concatenate((aligned_actions, evidence.trajectories.positions,
+                                evidence.trajectories.orientations,
+                                evidence.trajectories.grippers[..., None]), axis=-1)
+    history = np.empty((0, HISTORY_DIMS), dtype=np.float32) if executed_history is None else executed_history
+    return CandidateVerifierInput(scene_feature, sequences, history, remaining_budget, retry_budget,
+                                  tuple(c.candidate_id for c in evidence.candidates),
+                                  evidence.context_id, backbone_id,
+                                  len(history) if decision_step is None else decision_step)
 
-def build_verifier_input(
-    *,
-    scene_feature: np.ndarray,
-    evidence: RoundEvidence,
-    geometry: Sequence[GeometryEvidence],
-    semantics: Sequence[SemanticModeScore],
-    failure_count: int,
-    remaining_budget: int,
-    ess_ratio: float,
-    unique_ratio: float,
-) -> ModeVerifierInput:
-    mode_ids = [mode.mode_id for mode in evidence.modes]
-    geometry_by_id = {item.mode_id: item for item in geometry}
-    semantic_by_id = {item.mode_id: item for item in semantics}
-    if set(geometry_by_id) != set(mode_ids) or set(semantic_by_id) != set(mode_ids):
-        raise ValueError("verifier channels must cover every mode")
-    all_features = ModeFeatureEncoderV1().encode(evidence.trajectories)
-    medoid_features = np.stack(
-        [
-            all_features[int(mode.representative_indices["medoid"])]
-            for mode in evidence.modes
-        ]
-    )
-    geometry_features = np.asarray(
-        [
-            [
-                geometry_by_id[mode_id].collision_risk,
-                geometry_by_id[mode_id].reachability,
-                geometry_by_id[mode_id].grasp_plausibility,
-            ]
-            for mode_id in mode_ids
-        ],
-        dtype=np.float32,
-    )
-    semantic_features = np.asarray(
-        [[semantic_by_id[mode_id].semantic_score] for mode_id in mode_ids],
-        dtype=np.float32,
-    )
-    weights = np.asarray([mode.weight for mode in evidence.modes], dtype=np.float32)
-    weights /= weights.sum()
-    entropy = float(-(weights * np.log(np.clip(weights, 1e-12, 1.0))).sum())
-    globals_ = np.asarray(
-        [
-            min(4, max(0, failure_count)) / 4.0,
-            min(4, max(0, remaining_budget)) / 4.0,
-            len(mode_ids) / 4.0,
-            float(weights.max()),
-            entropy / math.log(4.0),
-            float(np.clip(ess_ratio, 0.0, 1.0)),
-            float(np.clip(unique_ratio, 0.0, 1.0)),
-        ],
-        dtype=np.float32,
-    )
-    return ModeVerifierInput(
-        scene_feature=scene_feature,
-        mode_ee_features=medoid_features,
-        geometry_features=geometry_features,
-        semantic_features=semantic_features,
-        mode_weights=weights,
-        global_features=globals_,
-    )
-
+def ablate_verifier_input(item: CandidateVerifierInput, channel_set: str) -> CandidateVerifierInput:
+    if channel_set == "full":
+        return item
+    if channel_set == "candidates_only":
+        return replace(item, scene_feature=np.zeros_like(item.scene_feature))
+    if channel_set == "scene_only":
+        return replace(item, candidate_trajectories=np.zeros_like(item.candidate_trajectories),
+                       executed_history=np.zeros_like(item.executed_history))
+    raise ValueError(f"unsupported candidate verifier ablation: {channel_set}")
 
 class FeatureStandardizer:
-    """Train-split-only channel normalizer with a serializable contract."""
-
-    _channels = (
-        "scene_feature",
-        "mode_ee_features",
-        "geometry_features",
-        "semantic_features",
-        "mode_weight_features",
-        "global_features",
-    )
-
-    def __init__(self, statistics: dict[str, tuple[np.ndarray, np.ndarray]]) -> None:
-        self.statistics = statistics
-
+    """Normalization is learned LayerNorm inside the small head, not an old fixed feature vector."""
+    def __init__(self, statistics=None):
+        self.statistics = {}
     @classmethod
-    def fit(cls, items: Sequence[ModeVerifierInput]) -> "FeatureStandardizer":
+    def fit(cls, items):
         if not items:
-            raise ValueError("cannot fit standardizer on an empty train split")
-        values_and_missing = {
-            "scene_feature": (
-                np.stack([item.scene_feature for item in items]),
-                np.stack(
-                    [
-                        np.full(SCENE_DIMS, item.scene_missing, dtype=bool)
-                        for item in items
-                    ]
-                ),
-            ),
-            "mode_ee_features": (
-                np.concatenate([item.mode_ee_features for item in items]),
-                np.concatenate(
-                    [
-                        np.broadcast_to(
-                            item.mode_missing[:, 0:1], item.mode_ee_features.shape
-                        )
-                        for item in items
-                    ]
-                ),
-            ),
-            "geometry_features": (
-                np.concatenate([item.geometry_features for item in items]),
-                np.concatenate(
-                    [
-                        np.broadcast_to(
-                            item.mode_missing[:, 1:2], item.geometry_features.shape
-                        )
-                        for item in items
-                    ]
-                ),
-            ),
-            "semantic_features": (
-                np.concatenate([item.semantic_features for item in items]),
-                np.concatenate(
-                    [
-                        np.broadcast_to(
-                            item.mode_missing[:, 2:3], item.semantic_features.shape
-                        )
-                        for item in items
-                    ]
-                ),
-            ),
-            "mode_weight_features": (
-                np.concatenate([item.mode_weights[:, None] for item in items]),
-                np.concatenate([item.mode_missing[:, 3:4] for item in items]),
-            ),
-            "global_features": (
-                np.stack([item.global_features for item in items]),
-                np.stack([item.global_missing for item in items]),
-            ),
-        }
-        stats = {}
-        for name, (array, missing) in values_and_missing.items():
-            valid = ~missing
-            count = valid.sum(axis=0)
-            safe_count = np.maximum(count, 1)
-            mean = ((array * valid).sum(axis=0) / safe_count).astype(np.float32)
-            centered = np.where(valid, array - mean, 0.0)
-            scale = np.sqrt((centered * centered).sum(axis=0) / safe_count).astype(
-                np.float32
-            )
-            mean[count == 0] = 0.0
-            scale[scale < 1e-6] = 1.0
-            stats[name] = (mean, scale)
-        return cls(stats)
-
-    def transform(self, item: ModeVerifierInput) -> ModeVerifierInput:
-        def norm(name: str, value: np.ndarray) -> np.ndarray:
-            mean, scale = self.statistics[name]
-            return (value - mean) / scale
-
-        return ModeVerifierInput(
-            scene_feature=norm("scene_feature", item.scene_feature),
-            mode_ee_features=norm("mode_ee_features", item.mode_ee_features),
-            geometry_features=norm("geometry_features", item.geometry_features),
-            semantic_features=norm("semantic_features", item.semantic_features),
-            mode_weights=item.mode_weights,
-            mode_weight_features=norm(
-                "mode_weight_features", item.mode_weights[:, None]
-            ),
-            global_features=norm("global_features", item.global_features),
-            scene_missing=item.scene_missing,
-            mode_missing=item.mode_missing,
-            global_missing=item.global_missing,
-        )
-
-    def to_json(self) -> dict[str, dict[str, list[float]]]:
-        return {
-            name: {"mean": mean.tolist(), "scale": scale.tolist()}
-            for name, (mean, scale) in self.statistics.items()
-        }
-
+            raise ValueError("training inputs are empty")
+        return cls()
+    def transform(self, item):
+        return item
+    def to_json(self):
+        return {"kind": "head_layer_norm_v3"}
     @classmethod
-    def from_json(cls, value: dict[str, dict[str, list[float]]]) -> "FeatureStandardizer":
-        return cls(
-            {
-                name: (
-                    np.asarray(item["mean"], dtype=np.float32),
-                    np.asarray(item["scale"], dtype=np.float32),
-                )
-                for name, item in value.items()
-            }
-        )
+    def from_json(cls, value):
+        if value != {"kind": "head_layer_norm_v3"}:
+            raise ValueError("legacy feature normalizer is incompatible; regenerate inputs")
+        return cls()
 
-
-def save_verifier_input(
-    path: Path,
-    item: ModeVerifierInput,
-    *,
-    metadata: dict | None = None,
-) -> Path:
-    """Atomically persist all pre-decision channels before logging a route."""
-
+def save_verifier_input(path: Path, item: CandidateVerifierInput, *, metadata: dict | None = None) -> Path:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.parent / f".{path.name}.{os.getpid()}.tmp"
     with temporary.open("wb") as stream:
-        np.savez_compressed(
-            stream,
-            scene_feature=item.scene_feature.astype(np.float16),
-            mode_ee_features=item.mode_ee_features.astype(np.float16),
-            geometry_features=item.geometry_features.astype(np.float16),
-            semantic_features=item.semantic_features.astype(np.float16),
-            mode_weights=item.mode_weights.astype(np.float32),
-            mode_weight_features=item.mode_weight_features.astype(np.float16),
-            global_features=item.global_features.astype(np.float32),
-            scene_missing=np.asarray([item.scene_missing], dtype=bool),
-            mode_missing=item.mode_missing.astype(bool),
-            global_missing=item.global_missing.astype(bool),
-        )
+        np.savez_compressed(stream, scene_feature=item.scene_feature,
+                            candidate_trajectories=item.candidate_trajectories,
+                            executed_history=item.executed_history,
+                            remaining_budget=item.remaining_budget, retry_budget=item.retry_budget,
+                            candidate_ids=np.asarray(item.candidate_ids), context_id=item.context_id,
+                            backbone_id=item.backbone_id, decision_step=item.decision_step,
+                            feature_schema=VERIFIER_FEATURE_SCHEMA)
         stream.flush()
         os.fsync(stream.fileno())
     os.replace(temporary, path)
-    metadata_path = path.with_suffix(".json")
-    metadata_tmp = metadata_path.parent / f".{metadata_path.name}.{os.getpid()}.tmp"
-    metadata_tmp.write_text(
-        json.dumps(metadata or {}, ensure_ascii=False, sort_keys=True),
-        encoding="utf-8",
-    )
-    os.replace(metadata_tmp, metadata_path)
+    value = dict(metadata or {})
+    value.update(schema_version=VERIFIER_FEATURE_SCHEMA, retry_budget=item.retry_budget,
+                 remaining_budget=item.remaining_budget, candidate_count=len(item.candidate_ids),
+                 candidate_ids=list(item.candidate_ids), backbone_id=item.backbone_id,
+                 context_id=item.context_id, decision_step=item.decision_step,
+                 feature_sha256=sha256_file(path), input_time_scope="at_decision")
+    atomic_write_json(path.with_suffix(".json"), value)
     return path
 
-
-def load_verifier_input(path: Path) -> ModeVerifierInput:
+def load_verifier_input(path: Path) -> CandidateVerifierInput:
     with np.load(Path(path), allow_pickle=False) as data:
-        return ModeVerifierInput(
-            scene_feature=data["scene_feature"].astype(np.float32),
-            mode_ee_features=data["mode_ee_features"].astype(np.float32),
-            geometry_features=data["geometry_features"].astype(np.float32),
-            semantic_features=data["semantic_features"].astype(np.float32),
-            mode_weights=data["mode_weights"].astype(np.float32),
-            mode_weight_features=data["mode_weight_features"].astype(np.float32),
-            global_features=data["global_features"].astype(np.float32),
-            scene_missing=bool(data["scene_missing"][0]),
-            mode_missing=data["mode_missing"].astype(bool),
-            global_missing=data["global_missing"].astype(bool),
-        )
-
+        if str(data.get("feature_schema", "")) != VERIFIER_FEATURE_SCHEMA:
+            raise ValueError("legacy verifier features are incompatible; regenerate full decision-time candidates")
+        return CandidateVerifierInput(
+            data["scene_feature"], data["candidate_trajectories"], data["executed_history"],
+            int(data["remaining_budget"]), int(data["retry_budget"]),
+            tuple(data["candidate_ids"].tolist()), str(data["context_id"]),
+            str(data["backbone_id"]), int(data["decision_step"]))
 
 def binomial_cross_entropy(
     logits: Tensor,
@@ -555,38 +291,27 @@ def expected_calibration_error(
     )
 
 
-def save_verifier_artifact(
-    root: Path,
-    *,
-    model: GroundedCapabilityVerifier,
-    standardizer: FeatureStandardizer,
-    calibrator: PlattCalibrator,
-    metadata: dict,
-) -> None:
+
+def save_verifier_artifact(root: Path, *, model: GroundedCapabilityVerifier,
+                          standardizer: FeatureStandardizer, calibrator: PlattCalibrator,
+                          metadata: dict) -> None:
     root = Path(root)
     root.mkdir(parents=True, exist_ok=True)
+    require_fixed_budget_50_contract(metadata["label_config"])
+    if not metadata.get("backbone_id"):
+        raise ValueError("artifact must identify the frozen v44 backbone")
     temporary = root / f".head.{os.getpid()}.tmp"
     torch.save(model.state_dict(), temporary)
     os.replace(temporary, root / "head.pt")
-    manifest = {
-        "schema_version": "grounded-capability-verifier-v2",
-        "input_dims": VERIFIER_INPUT_DIMS,
+    atomic_write_json(root / "manifest.json", {
+        "schema_version": "candidate-capability-verifier-v3",
+        "input_schema": VERIFIER_FEATURE_SCHEMA, "head_architecture": VERIFIER_HEAD_ARCHITECTURE,
         "output_classes": [route.value for route in VERIFIER_CLASSES],
-        "decision_rule": "head_argmax",
+        "decision_rule": "head_argmax", "backbone_frozen": True,
+        "trainable_components": ["trajectory_encoder", "history_encoder", "scene_projection", "head", "empty_history"],
         "normalizer": standardizer.to_json(),
-        "calibrator": {
-            "slope": calibrator.slope,
-            "intercept": calibrator.intercept,
-        },
-        "metadata": metadata,
-    }
-    temporary_json = root / f".manifest.{os.getpid()}.tmp"
-    temporary_json.write_text(
-        json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2),
-        encoding="utf-8",
-    )
-    os.replace(temporary_json, root / "manifest.json")
-
+        "calibrator": {"slope": calibrator.slope, "intercept": calibrator.intercept},
+        "head_sha256": sha256_file(root / "head.pt"), "metadata": metadata})
 
 @dataclass(frozen=True)
 class VerifierPrediction:
@@ -594,92 +319,43 @@ class VerifierPrediction:
     logits: tuple[float, float]
     p_expansion: float
 
-
 class DeployedVerifierPredictor:
     def __init__(self, artifact_root: Path, *, device: str = "cpu") -> None:
         self.artifact_root = Path(artifact_root)
-        manifest = json.loads(
-            (self.artifact_root / "manifest.json").read_text(encoding="utf-8")
-        )
-        if manifest.get("schema_version") != "grounded-capability-verifier-v2":
-            raise ValueError("unsupported verifier artifact schema")
-        if int(manifest.get("input_dims", -1)) != VERIFIER_INPUT_DIMS:
-            raise ValueError("verifier artifact input dimension mismatch")
-        if tuple(manifest.get("output_classes", ())) != tuple(
-            route.value for route in VERIFIER_CLASSES
-        ):
-            raise ValueError("verifier artifact class order mismatch")
-        if manifest.get("decision_rule") != "head_argmax":
-            raise ValueError("verifier artifact must use direct head argmax")
+        manifest = json.loads((self.artifact_root / "manifest.json").read_text())
+        if (manifest.get("schema_version") != "candidate-capability-verifier-v3"
+                or manifest.get("head_architecture") != VERIFIER_HEAD_ARCHITECTURE
+                or manifest.get("decision_rule") != "head_argmax"
+                or manifest.get("output_classes") != [x.value for x in VERIFIER_CLASSES]
+                or manifest.get("backbone_frozen") is not True):
+            raise ValueError("incompatible verifier: train the new candidate encoder/head, do not load legacy weights")
+        if sha256_file(self.artifact_root / "head.pt") != manifest["head_sha256"]:
+            raise ValueError("verifier checkpoint integrity mismatch")
+        self.metadata = manifest["metadata"]
+        require_fixed_budget_50_contract(self.metadata["label_config"])
         self.model = GroundedCapabilityVerifier().to(device)
-        state = torch.load(
-            self.artifact_root / "head.pt", map_location=device, weights_only=True
-        )
-        self.model.load_state_dict(state, strict=True)
+        self.model.load_state_dict(torch.load(self.artifact_root / "head.pt", map_location=device, weights_only=True))
         self.model.eval()
         self.standardizer = FeatureStandardizer.from_json(manifest["normalizer"])
-        self.calibrator = PlattCalibrator(
-            float(manifest["calibrator"]["slope"]),
-            float(manifest["calibrator"]["intercept"]),
-        )
-        self.metadata = manifest.get("metadata", {})
-
-        training_config = self.metadata.get("training_config", {})
-        self.channel_set = str(training_config.get("channel_set", "full"))
-        if self.channel_set not in {"full", "scene_only", "modes_only"}:
-            raise ValueError(
-                f"unsupported verifier artifact channel set {self.channel_set!r}"
-            )
-
-    def predict_logits(self, item: ModeVerifierInput) -> np.ndarray:
-        item = ablate_verifier_input(item, self.channel_set)
-        normalized = self.standardizer.transform(item)
+        self.calibrator = PlattCalibrator(**manifest["calibrator"])
+        self.channel_set = self.metadata.get("training_config", {}).get("channel_set", "full")
+    def predict_logits(self, item: CandidateVerifierInput) -> np.ndarray:
+        if item.retry_budget != 50 or item.backbone_id != self.metadata["backbone_id"]:
+            raise ValueError("decision-time input budget/backbone differs from trained artifact")
         with torch.inference_mode():
-            logits = self.model(normalized)[0].detach().cpu().numpy()
-        return np.asarray(logits, dtype=np.float64)
-
-    def predict_logit_margin(self, item: ModeVerifierInput) -> float:
+            logits = self.model(ablate_verifier_input(item, self.channel_set))[0].cpu().numpy()
+        return np.asarray(logits, dtype=float)
+    def predict(self, item: CandidateVerifierInput) -> VerifierPrediction:
+        logits = self.predict_logits(item)
+        return VerifierPrediction(VERIFIER_CLASSES[int(np.argmax(logits))],
+                                  tuple(map(float, logits)),
+                                  float(self.calibrator.predict(logits[1] - logits[0])))
+    def predict_logit_margin(self, item):
         logits = self.predict_logits(item)
         return float(logits[1] - logits[0])
-
-    def predict_probability(self, item: ModeVerifierInput) -> float:
-        """Diagnostic calibrated probability; never used to choose the route."""
-
-        return float(self.calibrator.predict(self.predict_logit_margin(item)))
-
-    def predict(self, item: ModeVerifierInput) -> VerifierPrediction:
-        logits = self.predict_logits(item)
-        route = VERIFIER_CLASSES[int(np.argmax(logits))]
-        margin = float(logits[1] - logits[0])
-        return VerifierPrediction(
-            route=route,
-            logits=(float(logits[0]), float(logits[1])),
-            p_expansion=float(self.calibrator.predict(margin)),
-        )
-
-    def predict_probabilities(self, items: Sequence[ModeVerifierInput]) -> np.ndarray:
-        return np.asarray(
-            [self.predict_probability(item) for item in items], dtype=np.float64
-        )
-
-    def predict_routes(self, items: Sequence[ModeVerifierInput]) -> tuple[ControllerRoute, ...]:
-        return tuple(self.predict(item).route for item in items)
-
-
-__all__ = [
-    "FeatureStandardizer",
-    "DeployedVerifierPredictor",
-    "GroundedCapabilityVerifier",
-    "ModeVerifierInput",
-    "PlattCalibrator",
-    "VerifierPrediction",
-    "VERIFIER_CLASSES",
-    "VERIFIER_INPUT_DIMS",
-    "ablate_verifier_input",
-    "binomial_cross_entropy",
-    "build_verifier_input",
-    "expected_calibration_error",
-    "load_verifier_input",
-    "save_verifier_input",
-    "save_verifier_artifact",
-]
+    def predict_probability(self, item):
+        return self.predict(item).p_expansion
+    def predict_probabilities(self, items):
+        return np.asarray([self.predict_probability(x) for x in items])
+    def predict_routes(self, items):
+        return tuple(self.predict(x).route for x in items)

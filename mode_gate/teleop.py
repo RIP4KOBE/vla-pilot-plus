@@ -80,6 +80,9 @@ class TeleopSession:
         self.writer.start(frame, ee_position=ee)
 
     def handle(self, key: str) -> dict[str, Any]:
+        driver = getattr(self, "collection_driver", None)
+        if driver is not None and not driver.needs_human:
+            return self.status("automatic_control_active")
         key = key.lower()
         if key == "hq":
             return self.status("high_quality_preview", high_quality=True)
@@ -112,10 +115,14 @@ class TeleopSession:
             self._refresh_observation_cache()
             return self.status("undone")
         if key == "r":
+            if driver is not None:
+                driver.before_human_reset()
             if self.reset_current is not None:
                 self.writer = self.reset_current()
                 self.gripper = -1.0
                 self.initialize()
+                if driver is not None:
+                    driver.after_human_reset()
                 return self.status("reset")
             if self.initial_state is None:
                 raise RuntimeError("teleop session is not initialized")
@@ -159,10 +166,14 @@ class TeleopSession:
                 self.writer = next_writer
                 self.gripper = -1.0
                 self.initialize()
+                if driver is not None:
+                    driver.human_demo_saved()
                 return self.status("saved_next")
             self.saved = True
             self.pending_saved_path = None
             self.last_error = None
+            if driver is not None:
+                driver.human_demo_saved()
             return self.status("saved_queue_complete")
         if self.terminal_state == "invalid":
             return self.status("invalid_episode_reset_required")
@@ -187,6 +198,22 @@ class TeleopSession:
             return self.status("ignored")
         action[6] = self.gripper
         self.last_action_scale = action_scale
+        message = self.execute_action(action)
+        return self.status(message if message != "stepped" or action_scale == 1.0
+                           else f"stepped_scale_{int(action_scale)}")
+
+    def execute_action(self, action: np.ndarray) -> str:
+        """Record a real continuous-controller action without a browser key/JPEG.
+
+        Caller must run on the simulator's owning thread. The same T+1/T
+        recorder is shared by automatic collection and manual fallback.
+        """
+        if self.saved or self.terminal_state is not None:
+            raise ValueError("cannot move a completed or terminated episode")
+        action = np.asarray(action, dtype=np.float32)
+        if action.shape != (7,) or not np.isfinite(action).all() or np.max(np.abs(action)) > 1.0:
+            raise ValueError("controller action must be finite normalized [7]")
+        self.gripper = float(action[6])
         try:
             step = getattr(self.adapter, "step_teleop", None)
             if not callable(step):
@@ -199,9 +226,9 @@ class TeleopSession:
                 raise
             if self._task_success():
                 self.terminal_state = "success"
-                return self.status("task_success_stop_and_mark")
+                return "task_success_stop_and_mark"
             self.terminal_state = "invalid"
-            return self.status("episode_timeout_reset_required")
+            return "episode_timeout_reset_required"
         state = self.adapter.capture_simulator_state()
         self.state_history.append({key: np.asarray(value).copy() for key, value in state.items()})
         frame, ee = self._frame(state)
@@ -217,12 +244,10 @@ class TeleopSession:
         if terminated or truncated:
             if simulator_success:
                 self.terminal_state = "success"
-                return self.status("task_success_stop_and_mark")
+                return "task_success_stop_and_mark"
             self.terminal_state = "invalid"
-            return self.status("episode_timeout_reset_required")
-        return self.status(
-            "stepped" if action_scale == 1.0 else f"stepped_scale_{int(action_scale)}"
-        )
+            return "episode_timeout_reset_required"
+        return "stepped"
 
     def _task_success(self) -> bool:
         if self.task_success_provider is not None:
@@ -248,6 +273,17 @@ class TeleopSession:
         if self.guidance_provider is not None:
             try:
                 guidance = dict(self.guidance_provider(self))
+                previous = (self._last_guidance or {}).get("checklist_complete", [])
+                current = guidance.get("checklist_complete", [])
+                if len(previous) == len(current):
+                    added = [str(i + 1) for i, value in enumerate(current)
+                             if value is True and previous[i] is not True]
+                    lost = [str(i + 1) for i, value in enumerate(current)
+                            if value is False and previous[i] is True]
+                    if lost:
+                        guidance["transition_message"] = f"第 {'、'.join(lost)} 步条件已失效，请重新检查。"
+                    elif added:
+                        guidance["transition_message"] = f"第 {'、'.join(added)} 步已完成。"
                 self._last_guidance = dict(guidance)
             except Exception as exc:
                 if self._last_guidance is not None:
@@ -256,24 +292,20 @@ class TeleopSession:
                         "阶段信号短暂异常，继续显示上一次可靠提示"
                     )
                     guidance["stale"] = True
+                    guidance["checklist_complete"] = [None] * len(guidance.get("checklist", []))
+                    guidance.pop("transition_message", None)
                 else:
                     guidance = {
                         "stage_index": 0,
-                        "stage_title": "第 1/4 阶段：打开最上层抽屉",
-                        "next_action": (
-                            "先将张开的夹爪移动到最上层银色把手两侧，"
-                            "闭合夹爪后沿滑轨向外直拉。"
-                        ),
-                        "checklist": [
-                            "打开木柜最上层抽屉。",
-                            "按本条方向要求抓取黑色碗。",
-                            "稳定抬起黑色碗并移到抽屉上方。",
-                            "把碗放入抽屉并抬离机械臂。",
-                        ],
-                        "checklist_complete": [False] * 4,
+                        "stage_title": "当前任务状态暂不可读",
+                        "next_action": "请暂缓操作，刷新页面重试；不会把未知状态标记为完成。",
+                        "checklist": list(self.ui_context.get("must_demonstrate_zh", [])),
+                        "checklist_complete": [None] * len(self.ui_context.get("must_demonstrate_zh", [])),
                         "stale": True,
                     }
                 guidance["diagnostic"] = f"{type(exc).__name__}: {exc}"
+                guidance["task_success"] = None
+                self._last_guidance = dict(guidance)
         coverage_cell = str(self.writer.metadata["coverage_cell"])
         return {
             "message": message,
@@ -283,7 +315,8 @@ class TeleopSession:
             "gripper_toggle_limit": 4,
             "init_state_id": self.writer.metadata["init_state_id"],
             "coverage_cell": coverage_cell,
-            "coverage_hint": coverage_hint_zh(coverage_cell),
+            "coverage_hint": self.ui_context.get("coverage_hints_zh", {}).get(coverage_cell)
+                             or coverage_hint_zh(coverage_cell),
             "queue_index": int(queue_index),
             "queue_total": int(queue_total),
             "max_steps": self.max_steps,
@@ -309,6 +342,31 @@ class TeleopSession:
             "image2": _jpeg_data_url(
                 self._last_image2, quality=94 if high_quality else 80
             ),
+        }
+
+    def service_status(self) -> dict[str, Any]:
+        """Return a cheap health payload without rendering either camera.
+
+        The slow-loop supervisor polls this endpoint while the operator is not
+        interacting with the page.  Keeping it independent from ``status``
+        avoids extra MuJoCo renders and prevents health checks from adding
+        latency to step-per-key teleoperation.
+        """
+
+        queue_index, queue_total = (1, 1)
+        if self.queue_position_provider is not None:
+            queue_index, queue_total = self.queue_position_provider()
+        return {
+            "schema_version": "vls-teleop-session-health-v1",
+            "ticket_id": str(self.writer.metadata.get("ticket_id", "")),
+            "queue_index": min(int(queue_index), int(queue_total)),
+            "queue_total": int(queue_total),
+            "queue_complete": bool(self.saved),
+            "steps": len(self.writer.actions),
+            "terminal_state": self.terminal_state,
+            "last_error": self.last_error,
+            "guidance": self._last_guidance,
+            "operator_language": "zh-CN" if self.ui_context.get("must_avoid_zh") else None,
         }
 
     def _refresh_observation_cache(
@@ -356,186 +414,22 @@ class TeleopSession:
 def coverage_hint_zh(coverage_cell: str) -> str:
     """Turn the code-owned ticket cell into an operator-facing instruction."""
 
-    value = str(coverage_cell).split("=", 1)[-1].strip().lower()
+    value = str(coverage_cell).split("=", 1)[-1].strip().lower().replace("_", " ")
     translations = {
-        "from the top-left": "本条从黑色碗的左上方接近碗并完成抓取。",
-        "from the top-right": "本条从黑色碗的右上方接近碗并完成抓取。",
-        "from the front": "本条从黑色碗的正前方接近碗并完成抓取。",
-        "from the back": "本条从黑色碗的后方接近碗并完成抓取。",
-        "from directly above": "本条从黑色碗的正上方垂直接近并完成抓取。",
+        "from the top-left": "本条从目标物体的左上方接近并完成抓取。",
+        "from the top-right": "本条从目标物体的右上方接近并完成抓取。",
+        "from the front": "本条从目标物体的正前方接近并完成抓取。",
+        "from the back": "本条从目标物体的后方接近并完成抓取。",
+        "from directly above": "本条从目标物体的正上方垂直接近并完成抓取。",
     }
-    return translations.get(value, f"本条覆盖要求：{coverage_cell}")
+    return translations.get(value, "请遵循下方本条示范要求。")
 
 
-def libero_drawer_bowl_metrics(
-    adapter: Any,
+def create_teleop_app(
+    session: TeleopSession,
     *,
-    initial_bowl_z: float | None,
-) -> dict[str, Any]:
-    """Read lightweight, deterministic stage signals from the live simulator."""
-
-    wrapper = adapter._get_current_robosuite_env()
-    sim = wrapper.sim
-    model = sim.model
-
-    joint_names = [model.joint_id2name(index) for index in range(int(model.njnt))]
-    top_joint = next(
-        (
-            (index, name)
-            for index, name in enumerate(joint_names)
-            if name and str(name).lower().endswith("top_level")
-        ),
-        None,
-    )
-    drawer_fraction = None
-    top_joint_name = None
-    if top_joint is not None:
-        joint_index, top_joint_name = top_joint
-        qpos_address = int(model.jnt_qposadr[joint_index])
-        qpos = float(sim.data.qpos[qpos_address])
-        low, high = np.asarray(model.jnt_range[joint_index], dtype=np.float64)
-        span = float(high - low)
-        drawer_fraction = (
-            float(np.clip((high - qpos) / span, 0.0, 1.0)) if span > 0 else None
-        )
-
-    body_candidates = []
-    for body_index in range(int(model.nbody)):
-        name = model.body_id2name(body_index)
-        if name and "akita_black_bowl" in str(name).lower():
-            body_candidates.append((body_index, str(name)))
-    bowl_body = min(body_candidates, key=lambda item: (len(item[1]), item[1])) if body_candidates else None
-    bowl_position = (
-        np.asarray(sim.data.body_xpos[bowl_body[0]], dtype=np.float64).copy()
-        if bowl_body is not None
-        else None
-    )
-
-    site_candidates = []
-    for site_index in range(int(model.nsite)):
-        name = model.site_id2name(site_index)
-        lowered = str(name or "").lower()
-        if lowered.endswith("top_region") and "cabinet" in lowered:
-            site_candidates.append((site_index, str(name)))
-    drawer_site = min(site_candidates, key=lambda item: (len(item[1]), item[1])) if site_candidates else None
-    drawer_position = (
-        np.asarray(sim.data.site_xpos[drawer_site[0]], dtype=np.float64).copy()
-        if drawer_site is not None
-        else None
-    )
-
-    ee_position = np.asarray(adapter.get_ee_pose_world().position, dtype=np.float64)
-    task_success = bool(wrapper.check_success())
-    bowl_z = float(bowl_position[2]) if bowl_position is not None else None
-    return {
-        "task_success": task_success,
-        "drawer_open_fraction": drawer_fraction,
-        "top_drawer_joint": top_joint_name,
-        "bowl_body": bowl_body[1] if bowl_body is not None else None,
-        "drawer_site": drawer_site[1] if drawer_site is not None else None,
-        "bowl_z": bowl_z,
-        "bowl_lift_m": (
-            max(0.0, bowl_z - float(initial_bowl_z))
-            if bowl_z is not None and initial_bowl_z is not None
-            else 0.0
-        ),
-        "ee_to_bowl_m": (
-            float(np.linalg.norm(ee_position - bowl_position))
-            if bowl_position is not None
-            else None
-        ),
-        "bowl_to_drawer_m": (
-            float(np.linalg.norm(bowl_position - drawer_position))
-            if bowl_position is not None and drawer_position is not None
-            else None
-        ),
-        "gripper_width_m": float(adapter.get_gripper_state()),
-    }
-
-
-def drawer_bowl_operator_guidance(
-    metrics: Mapping[str, Any],
-    *,
-    gripper_command: float,
-    coverage_hint: str,
-) -> dict[str, Any]:
-    """Select the next concrete operator action from simulator-grounded signals."""
-
-    drawer = metrics.get("drawer_open_fraction")
-    ee_to_bowl = metrics.get("ee_to_bowl_m")
-    bowl_lift = float(metrics.get("bowl_lift_m") or 0.0)
-    bowl_to_drawer = metrics.get("bowl_to_drawer_m")
-    success = bool(metrics.get("task_success", False))
-    closed = float(gripper_command) > 0.0
-
-    checklist = [
-        "抓住最上层银色把手，沿滑轨向外直拉，把上层抽屉充分打开。",
-        f"只抓桌面上的黑色碗；{coverage_hint}",
-        "闭合夹爪并把碗稳定抬离桌面，搬到打开的上层抽屉正上方。",
-        "把碗缓慢降入上层抽屉，张开夹爪释放，再把机械臂抬离。",
-    ]
-    stage_index = 0
-    title = "第 1/4 阶段：打开最上层抽屉"
-    next_action = (
-        "目标是柜子最上层抽屉的银色横把手。夹爪保持张开，移动到把手两侧，"
-        "按空格闭合，再沿抽屉滑轨向外直拉；不要抓中层或下层把手。"
-    )
-    if success:
-        stage_index = 4
-        title = "任务已由 LIBERO-PRO 判定成功"
-        next_action = "停止移动，点击“标记成功”，然后点击“保存 / 下一条”。"
-    elif drawer is not None and float(drawer) >= 0.65:
-        if bowl_lift < 0.025:
-            stage_index = 1
-            if ee_to_bowl is not None and float(ee_to_bowl) <= 0.09:
-                title = "第 2/4 阶段：对准并抓住黑色碗"
-                next_action = (
-                    "你已靠近黑色碗。让两指位于碗沿两侧，缓慢下降；"
-                    + ("夹爪已经闭合，现在用 Q 抬起碗。" if closed else "对准后按空格闭合夹爪，再用 Q 抬起。")
-                )
-            else:
-                title = "第 2/4 阶段：按本条要求接近黑色碗"
-                next_action = (
-                    f"{coverage_hint}目标是黑色碗，不是白盘、酒瓶或蓝色盒子。"
-                    "先移动到碗上方约 5 厘米，再缓慢下降。"
-                )
-        elif bowl_to_drawer is None or float(bowl_to_drawer) > 0.16:
-            stage_index = 2
-            title = "第 3/4 阶段：把黑色碗搬到上层抽屉上方"
-            next_action = (
-                "保持夹爪闭合并让碗离开桌面；移动到已经打开的最上层抽屉正上方。"
-                "绕开炉子、盘子和其他物体，不要松开夹爪。"
-            )
-        else:
-            stage_index = 3
-            title = "第 4/4 阶段：把碗放进上层抽屉"
-            next_action = (
-                "碗已接近抽屉内部。缓慢下降，确认碗完全位于抽屉内后按空格张开；"
-                "再用 Q 抬起机械臂，等待页面显示任务成功。"
-            )
-
-    completion = [index < stage_index for index in range(4)]
-    progress_parts = []
-    if drawer is not None:
-        progress_parts.append(f"抽屉开度 {100.0 * float(drawer):.0f}%")
-    progress_parts.append(f"碗抬升 {100.0 * bowl_lift:.1f} cm")
-    if ee_to_bowl is not None:
-        progress_parts.append(f"夹爪距碗 {100.0 * float(ee_to_bowl):.1f} cm")
-    if bowl_to_drawer is not None:
-        progress_parts.append(f"碗距抽屉中心 {100.0 * float(bowl_to_drawer):.1f} cm")
-    return {
-        "stage_index": stage_index,
-        "stage_title": title,
-        "next_action": next_action,
-        "checklist": checklist,
-        "checklist_complete": completion,
-        "progress": " · ".join(progress_parts),
-        "task_success": success,
-        "metrics": dict(metrics),
-    }
-
-
-def create_teleop_app(session: TeleopSession):
+    service_metadata: Mapping[str, Any] | None = None,
+):
     try:
         from fastapi import FastAPI, WebSocket, WebSocketDisconnect
         from fastapi.responses import HTMLResponse
@@ -543,13 +437,85 @@ def create_teleop_app(session: TeleopSession):
         raise RuntimeError("install fastapi and uvicorn from requirements.txt") from exc
 
     app = FastAPI(title="VLS T2 Teleoperation")
+    driver = getattr(session, "collection_driver", None)
+    if driver is not None:
+        import asyncio
+
+        @app.on_event("startup")
+        async def start_collection():
+            app.state.collection_task = asyncio.create_task(driver.run())
+
+        @app.on_event("shutdown")
+        async def stop_collection():
+            app.state.collection_task.cancel()
+            try:
+                await app.state.collection_task
+            except asyncio.CancelledError:
+                pass
 
     @app.get("/")
     async def index():
+        if driver is not None and not driver.needs_human:
+            return HTMLResponse("<html lang='zh'><p>自动采集中；只有连续失败后才开放人工操作。</p></html>", status_code=409)
         return HTMLResponse(_HTML)
+
+    @app.get("/healthz")
+    async def healthz():
+        if hasattr(session, "service_status"):
+            payload = dict(session.service_status())
+        else:
+            payload = {
+                "schema_version": "vls-teleop-session-health-v1",
+                "queue_complete": False,
+            }
+        return {
+            **payload,
+            **(driver.status() if driver is not None else {}),
+            **dict(service_metadata or {}),
+            "service": "vls-teleop",
+            "ready": True,
+        }
+
+    def ticket_media():
+        refs = {}
+        def visit(value):
+            if isinstance(value, Mapping):
+                if value.get("path") and value.get("sha256"):
+                    refs[str(value["sha256"])] = value
+                for child in value.values():
+                    visit(child)
+            elif isinstance(value, (list, tuple)):
+                for child in value:
+                    visit(child)
+        ui = getattr(session, "ui_context", {})
+        visit(ui.get("multimodal_evidence", {}))
+        visit(ui.get("suggested_path"))
+        return refs
+
+    @app.get("/ticket/evidence")
+    async def ticket_evidence():
+        ui = getattr(session, "ui_context", {})
+        return {"guidance": ui.get("visual_guidance", {}),
+                "media": [{"url": f"/ticket/media/{digest}", "kind": ref.get("kind"),
+                           "name": Path(ref["path"]).name}
+                          for digest, ref in ticket_media().items()],
+                "legend_zh": ui.get("multimodal_evidence", {}).get("legend_zh", "")}
+
+    @app.get("/ticket/media/{digest}")
+    async def ticket_media_file(digest: str):
+        from fastapi import HTTPException
+        from fastapi.responses import FileResponse
+        from .io_utils import sha256_file
+        ref = ticket_media().get(digest)
+        if ref is None or not Path(ref["path"]).is_file() or sha256_file(Path(ref["path"])) != digest:
+            raise HTTPException(status_code=404, detail="ticket evidence unavailable")
+        return FileResponse(ref["path"])
 
     @app.websocket("/ws")
     async def websocket(websocket: WebSocket):
+        if driver is not None and not driver.needs_human:
+            await websocket.close(code=1008, reason="automatic collector owns the simulator")
+            return
         await websocket.accept()
         if isinstance(session, TeleopSession):
             connected = session.status("connected", high_quality=True)
@@ -598,33 +564,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .mission,.control-panel{background:#20242a;border:1px solid #56606c;border-radius:10px;padding:14px 18px;margin:0 auto 14px;max-width:1160px}
 .mission h2{margin:0 0 8px}.queue{color:#9ee;font-weight:700}.target{font-size:20px;margin:7px 0}.coverage{color:#ffd479;font-size:18px}
 .stage{margin-top:10px;color:#7ee787;font-size:21px;font-weight:700}.next{background:#12251a;border-left:5px solid #3fb950;padding:10px 12px;margin:8px 0;font-size:18px;line-height:1.5}.progress{color:#b7c7d6}
-.lists{display:grid;grid-template-columns:1fr 1fr;gap:20px}.lists li{margin:4px 0}.done{text-decoration:line-through;color:#8b949e}
+.lists{display:grid;grid-template-columns:1fr 1fr;gap:20px}.lists li{margin:7px 0;line-height:1.5}.done{color:#7ee787}.current{color:#ffd479;font-weight:700}.unknown{color:#ffab70}.notice{color:#7ee787;font-size:19px;min-height:26px}.note{color:#b7c7d6;font-size:14px;margin:8px 0}
 .frames{display:flex;gap:18px;justify-content:center;max-width:1160px;margin:auto}.camera{flex:1;max-width:560px;text-align:center}.camera img{width:100%;border:1px solid #555;transform:rotate(180deg)}
 button{font-size:16px;margin:4px;padding:9px 12px;border-radius:7px;border:1px solid #77818d;cursor:pointer}.speed button.active{background:#238636;color:white;border-color:#3fb950}
 .drive{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:10px}.pad{display:grid;grid-template-columns:repeat(3,minmax(95px,1fr));gap:5px}.pad button{min-height:48px;touch-action:none}.pad-title{grid-column:1/-1;color:#9ee;font-weight:700}
 .actions{margin-top:10px}.status,.help,.warning{max-width:1160px;margin-left:auto;margin-right:auto}.status{padding:10px 4px;font-size:17px;color:#9ee}.status.invalid{color:#ff7b72;font-weight:800;background:#341a1a;border:1px solid #ff7b72;border-radius:8px}.status.success{color:#7ee787;font-weight:800}.help{line-height:1.6}.warning{color:#ffd479}
 @media(max-width:900px){.frames{display:block}.camera{margin:auto}.lists,.drive{grid-template-columns:1fr}}
 </style></head><body>
-<div class="mission"><h2>LIBERO-PRO 人工示范</h2><div class="queue" id="queue">正在连接…</div><div class="target" id="task"></div><div class="coverage" id="coverage"></div><div class="stage" id="stage"></div><div class="next" id="next"></div><div class="progress" id="progress"></div><div class="lists"><div><b>完整任务步骤</b><ol id="checklist"></ol></div><div><b>必须避免</b><ul id="avoid"></ul></div></div></div>
+<div class="mission"><h2>LIBERO-PRO 人工示范</h2><div class="queue" id="queue">正在连接…</div><div class="target" id="task"></div><div class="coverage" id="coverage"></div><div class="stage" id="stage"></div><div class="notice" id="notice" role="status" aria-live="polite"></div><div class="next" id="next"></div><div class="progress" id="progress"></div><div class="note" id="guidance-note"></div><div class="lists"><div><b>完整任务步骤（自动更新）</b><ol id="checklist"></ol><b>本条示范要求（操作时遵守）</b><ul id="demo-requirements"></ul></div><div><b>必须避免</b><ul id="avoid"></ul></div></div></div>
 <div class="frames"><div class="camera"><div>外部相机（看全局）</div><img id="cam1"></div><div class="camera"><div>腕部相机（对准抓取）</div><img id="cam2"><small>画面边缘的灰/黑块通常是夹爪或机械臂自遮挡，不是缺帧。</small></div></div>
-<div class="status" id="status"></div>
+<div class="mission"><h2>扩张依据与建议</h2><div id="ticket-evidence"></div></div>\n<div class="status" id="status"></div>
 <div class="control-panel"><div class="speed"><b>移动速度：</b><button data-speed="1">精细 1×</button><button data-speed="2" class="active">标准 2×</button><button data-speed="4">快速 4×</button><span>　可按住键盘连续移动，松手即停；Shift 临时使用快速 4×。</span></div>
 <div class="drive"><div class="pad"><div class="pad-title">平移（按住按钮或键盘）</div><span></span><button data-hold="w">W　向前</button><button data-hold="q">Q　上升</button><button data-hold="a">A　向左</button><button data-hold="s">S　向后</button><button data-hold="d">D　向右</button><span></span><button data-hold="e">E　下降</button><span></span></div>
 <div class="pad"><div class="pad-title">旋转（接近目标后使用精细档）</div><span></span><button data-hold="arrowup">↑　前倾</button><button data-hold="z">Z　左旋</button><button data-hold="arrowleft">←　左倾</button><button data-hold="arrowdown">↓　后倾</button><button data-hold="arrowright">→　右倾</button><span></span><button data-hold="x">X　右旋</button><span></span></div></div>
 <div class="actions"><button data-k=" ">切换夹爪（空格）</button><button data-k="u">撤销一步 U</button><button data-k="r">本条重置 R</button><button data-k="success">标记成功</button><button data-k="n">保存 / 下一条 N</button><button data-k="hq">刷新高清画面</button><button id="rotate">切换画面方向</button></div></div>
-<div class="help"><b>推荐操作：</b>远距离移动用“快速 4×”，靠近把手、碗或抽屉边缘后切换“精细 1×”。按住方向键会在收到上一帧后继续走，不会积压失控；松开立即停止后续动作。<br><b>坐标：</b>W/S 前后，A/D 左右，Q/E 上下；方向键与 Z/X 控制姿态。grip=-1 为张开，grip=1 为闭合。</div>
+<div class="help"><b>推荐操作：</b>远距离移动用“快速 4×”，靠近目标物体、把手或容器边缘后切换“精细 1×”。按住方向键会在收到上一帧后继续走，不会积压失控；松开立即停止后续动作。<br><b>坐标：</b>W/S 前后，A/D 左右，Q/E 上下；方向键与 Z/X 控制姿态。grip=-1 为张开，grip=1 为闭合。</div>
 <p class="warning">只有页面显示“LIBERO-PRO 已判定成功”后才能标记并保存。每条至少 50 步，夹爪切换最多 4 次；第 5 次会被页面直接阻止，请重置本条后重做。画面旋转只影响浏览器显示，保存数据仍保持冻结的 LIBERO-PRO / LeRobot 图像语义。</p>
 <script>
 const byId=id=>document.getElementById(id),status=byId('status'),cam1=byId('cam1'),cam2=byId('cam2'),rotate=byId('rotate');
 const ws=new WebSocket(`ws://${location.host}/ws`),moveKeys=new Set(['w','s','a','d','q','e','arrowup','arrowdown','arrowleft','arrowright','z','x']);
 let busy=false,sentAt=0,heldKey=null,heldScale=2,selectedScale=2,pendingHq=false;
-const renderList=(id,items,completed=[])=>{const root=byId(id);root.replaceChildren();(items||[]).forEach((value,index)=>{const li=document.createElement('li');li.textContent=value;if(completed[index])li.className='done';root.appendChild(li)})};
+const renderList=(id,items,completed=[],active=-1)=>{const root=byId(id);root.replaceChildren();(items||[]).forEach((value,index)=>{const li=document.createElement('li'),tracked=id==='checklist';li.textContent=(tracked?(completed[index]===true?'✓ 已完成 · ':completed[index]==null?'？状态未知 · ':index===active?'▶ 当前步骤 · ':'○ 待完成 · '):'')+value;li.className=tracked?(completed[index]===true?'done':completed[index]==null?'unknown':index===active?'current':''):'';root.appendChild(li)})};
 const sendRaw=key=>{if(ws.readyState!==WebSocket.OPEN||busy)return false;busy=true;sentAt=performance.now();status.textContent=key==='n'?'正在原子保存…通常只需数秒；耗时的物理回放将在采集后批量进行。':'正在执行并刷新画面…（松开按键即可停止连续移动）';ws.send(JSON.stringify({key}));return true};
 const sendMove=()=>{if(heldKey)sendRaw(`scale:${heldScale}:${heldKey}`)};
 const startHold=(key,scale)=>{heldKey=key;heldScale=scale;sendMove()};
 const stopHold=key=>{if(!key||heldKey===key){if(heldKey)pendingHq=true;heldKey=null;if(pendingHq&&!busy){pendingHq=false;setTimeout(()=>sendRaw('hq'),0)}}};
 const terminalMessages=new Set(['episode_timeout_reset_required','invalid_episode_reset_required','task_success_stop_and_mark','success_marked','saved_next','saved_queue_complete']);
-ws.onmessage=e=>{const latency=sentAt?` · ${Math.round(performance.now()-sentAt)} ms`:'';busy=false;sentAt=0;const x=JSON.parse(e.data),ui=x.ui||{},g=x.guidance||{},left=x.remaining_steps==null?'':` · 剩余 ${x.remaining_steps}/${x.max_steps} 步`;cam1.src=x.image;cam2.src=x.image2;byId('queue').textContent=`第 ${x.queue_index}/${x.queue_total} 条示范 · init=${x.init_state_id} · ${x.steps} 步${left}`;byId('task').textContent=`总目标：${ui.task_instruction_zh||ui.task_instruction||x.ui?.task_id||''}`;byId('coverage').textContent=`本条变化要求：${x.coverage_hint}`;byId('stage').textContent=g.stage_title||'读取当前阶段…';byId('next').textContent=g.next_action||'请按完整任务步骤操作。';byId('progress').textContent=`${g.progress||''} · 夹爪切换 ${x.gripper_toggles||0}/${x.gripper_toggle_limit||4}`;renderList('checklist',g.checklist||ui.must_demonstrate,g.checklist_complete);renderList('avoid',ui.must_avoid_zh||ui.must_avoid);const messages={episode_timeout_reset_required:'本条已超时作废，不能保存。请点击“本条重置”。',invalid_episode_reset_required:'本条已作废，不能继续或保存。请点击“本条重置”。',terminal_episode_reset_required:'episode 已结束；如需重做，请点击“本条重置”。',simulator_has_not_confirmed_success:'LIBERO-PRO 尚未判定任务成功，当前不能标记或保存。',gripper_toggle_limit_reached:'夹爪已切换 4 次，第 5 次未执行；本条无法再满足整理规则，请重置后重做。',too_many_gripper_toggles_reset_required:'夹爪切换超过 4 次，本条不能保存，请重置后重做。',task_success_stop_and_mark:'LIBERO-PRO 已判定成功，请停止移动，点击“标记成功”，再保存。',success_marked:'成功已确认，现在可以保存 / 下一条。',save_validation_failed:'文件已经保留，但自动回放校验失败；不需要重做，请暂停操作并查看下方原因。',saved_next:'保存完成，已进入下一条；物理回放将在采集后批量校验。',saved_queue_complete:'全部示范已保存；物理回放将在采集后批量校验。',high_quality_preview:'高清静止画面已刷新。',reset:'本条已完整重置，可以重新采集。',stepped_scale_2:'标准 2× 移动完成。',stepped_scale_4:'快速 4× 移动完成；接近目标后请切换精细档。'};const detail=x.error_detail?` · 原因：${x.error_detail}`:'';status.textContent=`${messages[x.message]||`状态=${x.message}`}${detail} · 速度=${x.action_scale||selectedScale}× · grip=${x.gripper===-1?'张开 (-1)':'闭合 (1)'} · 夹爪切换=${x.gripper_toggles||0}/${x.gripper_toggle_limit||4}${latency}`;status.className=`status ${x.terminal_state==='invalid'||x.message==='save_validation_failed'||x.message==='gripper_toggle_limit_reached'?'invalid':x.terminal_state==='success'?'success':''}`;if(terminalMessages.has(x.message)||x.terminal_state)stopHold();if(heldKey&&!x.terminal_state)setTimeout(sendMove,25);else if(pendingHq&&!x.terminal_state&&x.message!=='high_quality_preview'){pendingHq=false;setTimeout(()=>sendRaw('hq'),0)}};
+ws.onmessage=e=>{const latency=sentAt?` · ${Math.round(performance.now()-sentAt)} ms`:'';busy=false;sentAt=0;const x=JSON.parse(e.data),ui=x.ui||{},g=x.guidance||{},left=x.remaining_steps==null?'':` · 剩余 ${x.remaining_steps}/${x.max_steps} 步`;cam1.src=x.image;cam2.src=x.image2;byId('queue').textContent=`第 ${x.queue_index}/${x.queue_total} 条示范 · init=${x.init_state_id} · ${x.steps} 步${left}`;byId('task').textContent=`总目标：${ui.task_instruction_zh||ui.task_instruction||x.ui?.task_id||''}`;byId('coverage').textContent=`本条变化要求：${x.coverage_hint}`;byId('stage').textContent=g.stage_title||'读取当前阶段…';byId('next').textContent=g.next_action||'请按完整任务步骤操作。';byId('progress').textContent=`${g.progress||''} · 夹爪切换 ${x.gripper_toggles||0}/${x.gripper_toggle_limit||4}`;renderList('checklist',g.checklist||ui.must_demonstrate_zh,g.checklist_complete,g.stage_index);renderList('avoid',ui.must_avoid_zh);renderList('demo-requirements',ui.must_demonstrate_zh);byId('guidance-note').textContent=ui.guidance_note_zh||'';if(['reset','saved_next','connected'].includes(x.message))byId('notice').textContent='';if(g.transition_message)byId('notice').textContent=g.transition_message;if(g.stale)byId('notice').textContent='状态暂不可读，完成标记已置为未知。';const messages={episode_timeout_reset_required:'本条已超时作废，不能保存。请点击“本条重置”。',invalid_episode_reset_required:'本条已作废，不能继续或保存。请点击“本条重置”。',terminal_episode_reset_required:'episode 已结束；如需重做，请点击“本条重置”。',simulator_has_not_confirmed_success:'LIBERO-PRO 尚未判定任务成功，当前不能标记或保存。',gripper_toggle_limit_reached:'夹爪已切换 4 次，第 5 次未执行；本条无法再满足整理规则，请重置后重做。',too_many_gripper_toggles_reset_required:'夹爪切换超过 4 次，本条不能保存，请重置后重做。',task_success_stop_and_mark:'LIBERO-PRO 已判定成功，请停止移动，点击“标记成功”，再保存。',success_marked:'成功已确认，现在可以保存 / 下一条。',save_validation_failed:'文件已经保留，但自动回放校验失败；不需要重做，请暂停操作并查看下方原因。',saved_next:'保存完成，已进入下一条；物理回放将在采集后批量校验。',saved_queue_complete:'全部示范已保存；物理回放将在采集后批量校验。',high_quality_preview:'高清静止画面已刷新。',reset:'本条已完整重置，可以重新采集。',stepped_scale_2:'标准 2× 移动完成。',stepped_scale_4:'快速 4× 移动完成；接近目标后请切换精细档。'};const detail=x.error_detail?` · 原因：${x.error_detail}`:'';status.textContent=`${messages[x.message]||`状态=${x.message}`}${detail} · 速度=${x.action_scale||selectedScale}× · grip=${x.gripper===-1?'张开 (-1)':'闭合 (1)'} · 夹爪切换=${x.gripper_toggles||0}/${x.gripper_toggle_limit||4}${latency}`;status.className=`status ${x.terminal_state==='invalid'||x.message==='save_validation_failed'||x.message==='gripper_toggle_limit_reached'?'invalid':x.terminal_state==='success'?'success':''}`;if(terminalMessages.has(x.message)||x.terminal_state)stopHold();if(heldKey&&!x.terminal_state)setTimeout(sendMove,25);else if(pendingHq&&!x.terminal_state&&x.message!=='high_quality_preview'){pendingHq=false;setTimeout(()=>sendRaw('hq'),0)}};
+fetch('/ticket/evidence').then(r=>r.json()).then(data=>{const root=byId('ticket-evidence');const p=document.createElement('p');p.textContent=[data.guidance.failure_description_zh,data.guidance.desired_capability_zh,data.legend_zh].filter(Boolean).join('；');root.appendChild(p);for(const m of data.media||[]){let el;if(['real_observation','observed_overlay','suggested_path_overlay'].includes(m.kind)){el=document.createElement('img');el.src=m.url;el.style.maxWidth='360px';el.alt=m.kind==='suggested_path_overlay'?'Planner 建议路径（未执行）':'真实观测／实测轨迹';}else if(m.kind==='executed_video'){el=document.createElement('video');el.src=m.url;el.controls=true;el.preload='metadata';el.style.maxWidth='480px';}else if(m.kind==='complete_episode_video'){el=document.createElement('a');el.href=m.url;el.textContent='完整原视频索引';el.target='_blank';}if(el)root.appendChild(el);}}).catch(()=>{byId('ticket-evidence').textContent='当前 ticket 暂无历史图像证据。'});
 ws.onerror=()=>{busy=false;stopHold();status.textContent='WebSocket 连接失败，请刷新'};ws.onclose=e=>{busy=false;stopHold();if(e.code!==1000)status.textContent=`WebSocket 已断开 (${e.code})，请刷新重连`};
 document.querySelectorAll('[data-speed]').forEach(button=>button.onclick=()=>{selectedScale=Number(button.dataset.speed);document.querySelectorAll('[data-speed]').forEach(item=>item.classList.toggle('active',item===button))});
 document.querySelectorAll('[data-hold]').forEach(button=>{button.onpointerdown=e=>{e.preventDefault();button.setPointerCapture(e.pointerId);startHold(button.dataset.hold,selectedScale)};button.onpointerup=button.onpointercancel=()=>stopHold(button.dataset.hold)});
@@ -639,6 +606,4 @@ __all__ = [
     "TeleopSession",
     "coverage_hint_zh",
     "create_teleop_app",
-    "drawer_bowl_operator_guidance",
-    "libero_drawer_bowl_metrics",
 ]

@@ -1,18 +1,16 @@
 #!/usr/bin/env python
-"""Validate hgpu1 Gemini credentials/model access without exposing secrets."""
+"""Validate native Codex account planning (legacy command filename retained)."""
 
 from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
 import json
-import os
 from pathlib import Path
 import socket
 import sys
 import time
 
-from dotenv import load_dotenv
 import numpy as np
 
 
@@ -22,7 +20,8 @@ if str(REPO_ROOT) not in sys.path:
 
 from mode_gate.io_utils import atomic_write_json  # noqa: E402
 from mode_gate.preflight import gemini_canary_source_fingerprint  # noqa: E402
-from mode_gate.semantic_planner import GeminiSemanticPlanner  # noqa: E402
+from mode_gate.semantic_planner import SemanticPlanner  # noqa: E402
+from mode_gate.planner_account import load_planner_account_config  # noqa: E402
 from mode_gate.tickets import (  # noqa: E402
     TICKET_PLANNER_MODEL,
     TicketCollectionPlanner,
@@ -38,15 +37,11 @@ DEFAULT_OUTPUT = Path(
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
-    # Four sequential requests, each independently capped at 60 seconds.
-    parser.add_argument("--max-latency-seconds", type=float, default=240.0)
+    # Four sequential native-task requests, each independently capped at 1200 s.
+    parser.add_argument("--max-latency-seconds", type=float, default=4800.0)
     args = parser.parse_args()
 
-    load_dotenv(REPO_ROOT / ".env", override=False)
-    credential_present = bool(
-        os.environ.get("MODE_GATE_GEMINI_API_KEY")
-        or os.environ.get("GOOGLE_API_KEY")
-    )
+    profile = load_planner_account_config()
     started = time.monotonic()
     error = None
     interaction_exercised = False
@@ -57,7 +52,7 @@ def main() -> int:
     stage_result = None
     ticket_result = None
     try:
-        planner = GeminiSemanticPlanner(cache_dir=args.output.parent / "cache")
+        planner = SemanticPlanner(cache_dir=args.output.parent / "account_cache")
         planner.preflight(exercise_interactions=True)
         interaction_exercised = True
 
@@ -65,7 +60,7 @@ def main() -> int:
         # verifies request/schema compatibility without exporting a simulator frame.
         image = np.full((128, 128, 3), 245, dtype=np.uint8)
         image[30:98, 34:94] = np.array([210, 25, 25], dtype=np.uint8)
-        visual_config = {"model": "gemini-robotics-er-2-preview"}
+        visual_config = {"model": profile["model"], "thinking_level": profile["reasoning_effort"]}
         detections = GeminiGrounder(visual_config).detect_objects(
             image, ["large red rectangle"]
         )
@@ -112,14 +107,17 @@ def main() -> int:
         and elapsed <= args.max_latency_seconds
     )
     value = {
-        "schema_version": "hgpu1-gemini-canary-v3",
+        "schema_version": "hgpu1-account-planner-canary-v1",
         "source_fingerprint": gemini_canary_source_fingerprint(REPO_ROOT),
         "recorded_at": datetime.now(timezone.utc).isoformat(),
         "host": socket.gethostname(),
-        "model": "gemini-robotics-er-2-preview",
+        "model": profile["model"],
+        "reasoning_effort": profile["reasoning_effort"],
+        "auth_mode": profile["auth_mode"],
+        "planner_thread_id": profile["planner_thread_id"],
+        "gemini_api_enabled": False,
         "latency_seconds": elapsed,
         "max_latency_seconds": args.max_latency_seconds,
-        "credential_present": credential_present,
         "interaction_exercised": interaction_exercised,
         "grounding_exercised": grounding_exercised,
         "grounding_detection_count": grounding_detection_count,
@@ -135,7 +133,7 @@ def main() -> int:
     atomic_write_json(args.output, value)
     print(json.dumps(value, indent=2, sort_keys=True))
     if not passed:
-        raise RuntimeError(f"Gemini canary failed: {error or 'latency threshold'}")
+        raise RuntimeError(f"Account planner canary failed: {error or 'latency threshold'}")
     return 0
 
 

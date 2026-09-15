@@ -7,11 +7,13 @@ policy object that is serving a live episode.
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 import hashlib
 import json
 import os
 from pathlib import Path
+import subprocess
+import time
 from typing import Any, Callable, Mapping
 
 import numpy as np
@@ -20,7 +22,6 @@ from .candidates import (
     DeltaLineageEntry,
     compose_expansion_candidates,
     compose_retain_expansion_candidates,
-    compose_reuse_candidates,
 )
 from .checkpoint_math import (
     checkpoint_digest,
@@ -29,20 +30,29 @@ from .checkpoint_math import (
     partition_counts,
     verify_full_delta_reconstruction,
 )
+from .counterfactual import REPLAY_PROGRESS_CONTRACT
+from .experiment_contract import (
+    FIXED_BUDGET_50_CONTRACT,
+    label_contract_payload,
+    regenerate_budget_state,
+)
 from .data_pipeline import curate_and_export_ticket
-from .incidents import CapabilitySignatureRecord, IncidentMemory
+from .incidents import IncidentMemory
 from .io_utils import atomic_write_json, sha256_file
-from .job_runner import SERVER_PYTHON
+from .job_runner import SERVER_PYTHON, execute_job_spec
 from .registry import PolicyRegistry
 from .promotion import deploy_policy_gate
-from .signatures import FailureMode, lookup_validated_remedies
-from .slow_loop import ALLOWED, SlowLoopJob, SlowLoopState, SlowLoopStore
+from .expansion_automation import expansion_demonstrations_ready
+from .slow_loop import ALLOWED, MANDATORY_DEMOS_PROTOCOL, SlowLoopJob, SlowLoopState, SlowLoopStore
 from .tickets import TicketCollectionPlanner, issue_ticket
+from .teleop_supervisor import TeleopSupervisor
 from .training import CoFTConfig, build_lerobot_coft_command, prepare_source_catalog
 from .verifier_training import (
     VerifierTrainingConfig,
     build_verifier_examples,
+    continue_from_active_verifier,
     train_verifier_ablations,
+    verifier_deployment_allowed,
 )
 
 
@@ -85,6 +95,7 @@ class SlowLoopWorker:
         work_root: Path,
         snapshot_root: Path | None = None,
         ticket_planner: TicketCollectionPlanner | None = None,
+        teleop_supervisor: TeleopSupervisor | None = None,
         handlers: Mapping[SlowLoopState, SlowHandler] | None = None,
     ) -> None:
         self.store = store
@@ -106,19 +117,66 @@ class SlowLoopWorker:
         self.ticket_root.mkdir(parents=True, exist_ok=True)
         self.work_root.mkdir(parents=True, exist_ok=True)
         self.ticket_planner = ticket_planner
+        self.teleop_supervisor = teleop_supervisor
         self.handlers = dict(handlers or {})
 
     def run_until_blocked(self, job_id: str, *, max_steps: int = 100) -> SlowLoopJob:
         for _ in range(max_steps):
             before = self.store.current(job_id)
             after = self.step(job_id)
+            # A production worker owns the human-collection service, so do not
+            # return in the small gap between issuing a ticket and launching
+            # its localhost frontend/backend.
+            if (
+                after.state is SlowLoopState.AWAITING_DEMOS
+                and self.teleop_supervisor is not None
+                and after != before
+            ):
+                continue
             if after.state in BLOCKED_STATES or after == before:
                 return after
         raise RuntimeError(f"slow-loop job {job_id} exceeded {max_steps} transitions")
 
+    def run_through_collection(
+        self,
+        job_id: str,
+        *,
+        poll_seconds: float = 2.0,
+        max_polls: int | None = None,
+    ) -> SlowLoopJob:
+        """Keep supervising human collection, then resume through curation.
+
+        This method is intended for the detached worker launched by the
+        rollout process.  It blocks only while a human queue is genuinely
+        active; all other slow-loop wait points retain their existing
+        resumable behavior.
+        """
+
+        if self.teleop_supervisor is None:
+            raise RuntimeError("automatic collection requires a teleop supervisor")
+        if poll_seconds <= 0:
+            raise ValueError("collection poll_seconds must be positive")
+        polls = 0
+        while True:
+            job = self.run_until_blocked(job_id)
+            if job.state not in {
+                SlowLoopState.AWAITING_DEMOS,
+                SlowLoopState.COLLECTING,
+            }:
+                return job
+            if max_polls is not None and polls >= int(max_polls):
+                return job
+            polls += 1
+            time.sleep(float(poll_seconds))
+
     def step(self, job_id: str) -> SlowLoopJob:
         job = self.store.current(job_id)
-        if job.state in BLOCKED_STATES:
+        managed_collection_state = (
+            self.teleop_supervisor is not None
+            and job.state
+            in {SlowLoopState.AWAITING_DEMOS, SlowLoopState.COLLECTING}
+        )
+        if job.state in BLOCKED_STATES and not managed_collection_state:
             return job
         try:
             return self._step(job)
@@ -144,6 +202,73 @@ class SlowLoopWorker:
                 },
             )
 
+    def run_full_cycle(self, job_id: str, *, poll_seconds: float = 2.0) -> SlowLoopJob:
+        """Resident orchestration, including execution of generated GPU jobs.
+
+        Failed jobs wait for a recovery token from the finite experiment
+        supervisor (or an explicit repair). They are never treated as completed.
+        Collection and GPU-memory waits are normal live states, not permission
+        prompts or scheduled jobs.
+        """
+        if self.teleop_supervisor is None or poll_seconds <= 0:
+            raise ValueError("full-cycle requires managed teleoperation and a positive poll interval")
+        executable = {
+            SlowLoopState.TRAINING: "training_job_path",
+            SlowLoopState.RAW_REGRESSION: "policy_gate_job_path",
+            SlowLoopState.NEW_POLICY_COUNTERFACTUAL: "new_policy_counterfactual_job_spec_path",
+        }
+        root = self._job_dir(self.store.current(job_id))
+        status_path = root / "automation_status.json"
+        while True:
+            before = self.store.current(job_id)
+            # Publish the resumed state before potentially long export/training
+            # preparation; do not display an old collection error throughout it.
+            atomic_write_json(status_path, {
+                "job_id": job_id, "state": before.state.value, "pid": os.getpid(),
+                "error": before.metadata.get("last_error") if before.state is SlowLoopState.RETRYABLE_ERROR else None,
+                "waiting_for": None, "updated_at_unix": time.time(),
+            })
+            if before.state is SlowLoopState.RETRYABLE_ERROR:
+                retry = root / "retry.request"
+                if not retry.exists():
+                    time.sleep(poll_seconds)
+                    continue
+                retry.unlink()
+            after = self.step(job_id)
+            waiting_for = None
+            if after.state is SlowLoopState.DATASET_READY:
+                source = after.metadata.get("coft_source_spec_path")
+                if source and not Path(str(source)).is_file():
+                    waiting_for = {"kind": "coft_replay_source", "path": str(source)}
+            atomic_write_json(status_path, {
+                "job_id": job_id, "state": after.state.value, "pid": os.getpid(),
+                "error": after.metadata.get("last_error") if after.state is SlowLoopState.RETRYABLE_ERROR else None,
+                "waiting_for": waiting_for,
+                "updated_at_unix": time.time(),
+            })
+            if after.state in {SlowLoopState.DEPLOYED, SlowLoopState.POLICY_REJECTED, SlowLoopState.CANCELLED}:
+                return after
+            if after == before and after.state in executable:
+                spec_path = after.metadata.get(executable[after.state])
+                if spec_path:
+                    result = execute_job_spec(Path(str(spec_path)))
+                    atomic_write_json(status_path, {
+                        "job_id": job_id, "state": after.state.value, "pid": os.getpid(),
+                        "execution": result, "updated_at_unix": time.time(),
+                    })
+                    if result.get("launched") and not result.get("completed"):
+                        retry = root / "retry.request"
+                        while not retry.exists():
+                            time.sleep(poll_seconds)
+                        retry.unlink()
+                    elif not result.get("completed"):
+                        time.sleep(30)
+                    continue
+            if after.state is SlowLoopState.RETRYABLE_ERROR:
+                time.sleep(30)
+            elif after == before or after.state in BLOCKED_STATES:
+                time.sleep(poll_seconds)
+
     def _step(self, job: SlowLoopJob) -> SlowLoopJob:
         if job.state is SlowLoopState.RETRYABLE_ERROR:
             resume = SlowLoopState(str(job.metadata["resume_state"]))
@@ -155,7 +280,8 @@ class SlowLoopWorker:
                 next_state=resume,
                 input_hash=job.input_hash,
                 output_hash=job.output_hash,
-                metadata={"retrying_state": resume.value},
+                metadata={"retrying_state": resume.value,
+                          "last_error": None, "last_error_type": None},
             )
         if job.state is SlowLoopState.STALE_BASE:
             active = self.registry.active()
@@ -184,7 +310,13 @@ class SlowLoopWorker:
                 next_state=SlowLoopState.AWAITING_DEMOS,
                 input_hash=job.input_hash,
                 output_hash=job.output_hash,
-                metadata={"demo_collection_append_only": True},
+                metadata={
+                    "demo_collection_append_only": True,
+                    "collection_round": int(
+                        job.metadata.get("collection_round", 1)
+                    )
+                    + 1,
+                },
             )
 
         stale = self._stale_active(job)
@@ -206,12 +338,44 @@ class SlowLoopWorker:
                 input_hash=job.input_hash,
                 output_hash=None,
             )
-        if job.state is SlowLoopState.LOOKUP_PENDING:
+        if job.state is SlowLoopState.AWAITING_DEMOS:
+            if self.teleop_supervisor is None:
+                return job
+            service = self.teleop_supervisor.ensure_running(job)
+            if service.state == "busy":
+                return job
+            if not service.ready:
+                raise RuntimeError(
+                    f"automatic teleoperation is not ready: {service.state}"
+                )
+            transition = WorkerTransition(
+                next_state=SlowLoopState.COLLECTING,
+                artifacts=(Path(str(service.service_record_path)),),
+                metadata={
+                    **service.as_metadata(),
+                    "teleop_auto_started": True,
+                },
+            )
+        elif job.state is SlowLoopState.COLLECTING:
+            if self.teleop_supervisor is None:
+                return job
+            service = self.teleop_supervisor.poll(job)
+            if not service.complete:
+                return job
+            transition = WorkerTransition(
+                next_state=SlowLoopState.CURATING,
+                artifacts=(Path(str(service.completion_path)),),
+                metadata={
+                    **service.as_metadata(),
+                    "teleop_collection_complete": True,
+                },
+            )
+        elif job.state is SlowLoopState.LOOKUP_PENDING:
             transition = self._lookup(job)
-        elif job.state is SlowLoopState.TICKET_READY:
-            transition = self._issue_ticket(job)
         elif job.state is SlowLoopState.REUSE_EVALUATING:
             transition = self._prepare_reuse(job)
+        elif job.state is SlowLoopState.TICKET_READY:
+            transition = self._issue_ticket(job)
         elif job.state is SlowLoopState.CURATING:
             transition = self._curate(job)
         elif job.state is SlowLoopState.DATASET_READY:
@@ -235,7 +399,13 @@ class SlowLoopWorker:
             if transition is None:
                 return job
         elif job.state is SlowLoopState.POLICY_STAGED:
-            transition = self._prepare_new_policy_counterfactual(job)
+            report = Path(str(job.metadata["policy_gate_report_path"]))
+            self.incidents.record_fact(
+                episode_id=str(job.metadata.get("episode_id", job.job_id)), context_id=str(job.metadata.get("record_id", "")),
+                kind="expansion_comparison", payload={"policy_id": job.active_policy_id,
+                    "new_policy_id": job.metadata["staged_policy_id"], "report": json.loads(report.read_text())})
+            transition = WorkerTransition(next_state=SlowLoopState.VERIFIER_TRAINING,
+                artifacts=(report,), metadata={"verifier_training_timing": "planner_decides"})
         elif job.state is SlowLoopState.NEW_POLICY_COUNTERFACTUAL:
             path = job.metadata.get("new_policy_counterfactual_manifest_path")
             if not path:
@@ -246,12 +416,7 @@ class SlowLoopWorker:
                     return job
                 path = str(default_result)
             result_value = json.loads(Path(str(path)).read_text(encoding="utf-8"))
-            if result_value.get("schema_version") not in {
-                "new-policy-counterfactual-result-v1",
-                # Backward-compatible externally produced result used before
-                # the explicit job contract was introduced.
-                None,
-            }:
+            if result_value.get("schema_version") != "new-policy-counterfactual-result-v2":
                 raise ValueError("unsupported new-policy counterfactual result")
             if result_value.get("complete") is not True:
                 raise ValueError("new-policy counterfactual result is incomplete")
@@ -260,7 +425,7 @@ class SlowLoopWorker:
                 job.metadata["staged_policy_id"],
             }:
                 raise ValueError("counterfactual result targets a different policy")
-            if result_value.get("schema_version") == "new-policy-counterfactual-result-v1":
+            if result_value.get("schema_version") == "new-policy-counterfactual-result-v2":
                 plan_path = Path(
                     str(job.metadata["new_policy_counterfactual_plan_path"])
                 )
@@ -274,14 +439,26 @@ class SlowLoopWorker:
                     raise ValueError("counterfactual result planned-context count changed")
                 if int(result_value.get("contexts_completed", -1)) != len(planned_ids):
                     raise ValueError("counterfactual result did not complete every context")
+                if (
+                    result_value.get("label_version")
+                    != FIXED_BUDGET_50_CONTRACT.label_version
+                ):
+                    raise ValueError("counterfactual result has a stale label version")
+                required_labeled_ids = {
+                    str(item["record_id"])
+                    for item in result_value.get("results", ())
+                    if item.get("label_status") == "LABELED"
+                }
                 labeled_ids = {
                     str(item["record_id"])
                     for item in self.incidents.labels.iter_valid()
                     if str(item.get("policy_id"))
                     == str(job.metadata["staged_policy_id"])
+                    and str(item.get("label_version"))
+                    == FIXED_BUDGET_50_CONTRACT.label_version
                     and not bool(item.get("weak", False))
                 }
-                missing_labels = sorted(planned_ids - labeled_ids)
+                missing_labels = sorted(required_labeled_ids - labeled_ids)
                 if missing_labels:
                     raise ValueError(
                         "counterfactual result is missing attached labels: "
@@ -303,17 +480,19 @@ class SlowLoopWorker:
             transition = WorkerTransition(
                 next_state=(
                     SlowLoopState.READY_PAIR
-                    if verifier_result.get("gate", {}).get("passed")
+                    if verifier_deployment_allowed(verifier_result)
                     else SlowLoopState.READY_FIXED_BUDGET
                 ),
                 artifacts=(Path(str(path)),),
                 metadata={
+                    "verifier_result_path": str(path),
                     "verifier_gate_passed": bool(
                         verifier_result.get("gate", {}).get("passed")
                     ),
                     "verifier_gate_reasons": list(
                         verifier_result.get("gate", {}).get("reasons", ())
                     ),
+                    "verifier_deployment_authorization": verifier_result.get("deployment_authorization"),
                 },
             )
         elif job.state in {
@@ -347,6 +526,8 @@ class SlowLoopWorker:
 
     def _curate(self, job: SlowLoopJob) -> WorkerTransition:
         ticket_path = Path(str(job.metadata["ticket_path"]))
+        # Native success during collection is sufficient. Action replay is
+        # optional diagnostics and must not block curation or request refills.
         repo_id = str(
             job.metadata.get("lerobot_repo_id")
             or f"vls/ticket_{job.ticket_id or job.job_id}"
@@ -367,6 +548,28 @@ class SlowLoopWorker:
                 },
             )
         dataset_info = Path(str(result["export_root"])) / "meta/info.json"
+        from .experiences import artifact_ref
+        accepted = json.loads(curation_path.read_text()).get("accepted", {})
+        demos = [Path(path) for path in accepted]
+        for path in demos:
+            if sha256_file(path) != accepted[str(path)]["sha256"]:
+                raise ValueError("curated demonstration changed after acceptance")
+        record_id = job.metadata.get("record_id")
+        decision = next((row for row in self.incidents.decisions.iter_valid()
+                         if row["record_id"] == record_id), None)
+        if decision and decision.get("provenance", {}).get("round_analysis_path"):
+            from .demo_matching import compare_demo_candidates
+            for demo_path in demos:
+                compare_demo_candidates(self.incidents, record_id=record_id, demo_path=demo_path)
+        self.incidents.record_fact(
+            episode_id=job.job_id, context_id=str(job.metadata.get("record_id", "")),
+            kind="curated_demonstrations", payload={"task_id":job.metadata.get("task_id"),
+                "ticket_id":job.ticket_id, "policy_id":job.active_policy_id,
+                "curation":artifact_ref(curation_path, kind="curation_result"),
+                "demonstrations":[artifact_ref(path, kind="demonstration")
+                                  for path in demos],
+                "viewing_videos":[artifact_ref(path, kind="executed_video")
+                                  for path in sorted(ticket_path.parent.rglob("*.mp4"))]})
         return WorkerTransition(
             next_state=SlowLoopState.DATASET_READY,
             artifacts=(curation_path, dataset_info),
@@ -384,6 +587,11 @@ class SlowLoopWorker:
             # experiment.  Waiting here is intentional and hash-visible.
             return None
         source_spec_path = Path(str(source_spec_value))
+        # The verified transfer publishes this file atomically only when the
+        # original replay dataset is complete. Remain ready for that handoff;
+        # do not churn error events or restart collection while it is pending.
+        if not source_spec_path.is_file():
+            return None
         source_spec = json.loads(source_spec_path.read_text(encoding="utf-8"))
         replay = {
             str(key): Path(str(value))
@@ -393,6 +601,16 @@ class SlowLoopWorker:
             str(key): Path(str(value))
             for key, value in dict(source_spec.get("old", {})).items()
         }
+        # Only previously deployed tickets enter the old-demonstration pool;
+        # failed/unfinished expansions and canary data are never promoted here.
+        for event in self.store.events.iter_valid():
+            if event.get("state") != SlowLoopState.DEPLOYED.value:
+                continue
+            metadata = event.get("metadata", {})
+            dataset = metadata.get("current_ticket_dataset_path")
+            repo_id = metadata.get("current_ticket_repo_id")
+            if dataset and repo_id and event.get("ticket_id") != job.ticket_id:
+                old[str(repo_id)] = Path(str(dataset))
         current_repo_id = str(job.metadata["current_ticket_repo_id"])
         current_dataset = Path(str(job.metadata["current_ticket_dataset_path"]))
         root = self._job_dir(job) / "coft"
@@ -438,7 +656,8 @@ class SlowLoopWorker:
             "schema_version": "coft-job-v1",
             "job_id": job.job_id,
             "gpu_count": training_config.gpus,
-            "preferred_gpu_indices": [4, 5, 6, 7, 0, 1, 2, 3],
+            "preferred_gpu_indices": [int(job.metadata.get("training_gpu_index", 6))],
+            "physical_device": f"cuda:{int(job.metadata.get('training_gpu_index', 6))}",
             "minimum_free_gib_per_gpu": 45.0,
             "command": command,
             "cwd": str(Path(__file__).resolve().parents[1]),
@@ -446,6 +665,9 @@ class SlowLoopWorker:
             "parent_policy_id": job.active_policy_id,
             "parent_checkpoint_digest": checkpoint_digest(parent),
             "expected_checkpoint": str(expected_checkpoint),
+            "resumable_checkpoints": True,
+            "checkpoint_interval": training_config.checkpoint_interval,
+            "checkpoint_commit_required": True,
         }
         job_spec_path = root / "training_job.json"
         atomic_write_json(job_spec_path, job_spec)
@@ -464,12 +686,23 @@ class SlowLoopWorker:
         checkpoint = Path(str(job.metadata["theta_ft_checkpoint_path"]))
         if not checkpoint.is_dir():
             return None
+        spec_path = job.metadata.get("training_job_path")
+        spec = json.loads(Path(str(spec_path)).read_text()) if spec_path else {}
+        if spec.get("checkpoint_commit_required"):
+            from .coft_recovery import checkpoint_complete
+            if not checkpoint_complete(checkpoint.parent, expected_step=1000,
+                                       source_manifest=Path(str(job.metadata["coft_source_manifest_path"]))):
+                return None
         counts = partition_counts(checkpoint)
         if sum(counts.values()) != 812:
             raise ValueError(f"trained checkpoint is incomplete: {counts}")
         manifest = {
             "schema_version": "coft-result-v1",
             "job_id": job.job_id,
+            "ticket_id": job.ticket_id,
+            "parent_policy_id": job.active_policy_id,
+            "current_ticket_dataset_path": job.metadata["current_ticket_dataset_path"],
+            "slow_loop_protocol": MANDATORY_DEMOS_PROTOCOL,
             "theta_ft_checkpoint_path": str(checkpoint.resolve()),
             "theta_ft_checkpoint_digest": checkpoint_digest(checkpoint),
             "partition_counts": counts,
@@ -569,8 +802,24 @@ class SlowLoopWorker:
             grid = compose_retain_expansion_candidates(**candidate_kwargs)
             candidate_merge_method = "retain_uniform"
         else:
-            grid = compose_expansion_candidates(**candidate_kwargs)
-            candidate_merge_method = "v2_language_only"
+            from .experience_planner import ExperiencePlanner
+            from .campaign import configured_merge_selection
+            selection_path = self._job_dir(job) / 'merge_selection.json'
+            selection = configured_merge_selection()
+            if selection is not None:
+                # The user's current fixed alpha supersedes an unconsumed
+                # cached Planner grid. No additional candidates are composed.
+                atomic_write_json(selection_path, selection)
+            elif selection_path.is_file():
+                selection = json.loads(selection_path.read_text())
+            else:
+                selection = ExperiencePlanner(self.incidents).choose_merge_coefficients({
+                    'parent_policy_id': job.active_policy_id, 'task': self._manifest_task(job.metadata),
+                    'delta_id': delta_id, 'training': json.loads(Path(job.metadata['training_result_path']).read_text()),
+                    'accepted_lineage': [asdict(x) for x in accepted_lineage]})
+                atomic_write_json(selection_path, selection)
+            grid = compose_expansion_candidates(**candidate_kwargs, alpha_l_values=selection['alpha_values'])
+            candidate_merge_method = "planner_uniform"
         grid_path = (
             self._job_dir(job)
             / "candidates"
@@ -598,6 +847,8 @@ class SlowLoopWorker:
         ]
         if cleanup is not None:
             artifacts.append(delta_work / "theta_ft_cleanup.json")
+        if job.metadata.get("baseline_kind") != "always_expand_retain":
+            artifacts.append(selection_path)
         return WorkerTransition(
             next_state=SlowLoopState.ALPHA_SELECTING,
             artifacts=tuple(artifacts),
@@ -610,12 +861,17 @@ class SlowLoopWorker:
                 "parent_candidate_path": str(parent_path),
                 "candidates_json_path": str(candidates_path),
                 "candidate_merge_method": candidate_merge_method,
+                **({"merge_coefficient_selection": selection,
+                    "merge_selection_path": str(selection_path)}
+                   if job.metadata.get("baseline_kind") != "always_expand_retain" else {}),
             },
         )
 
     def _prepare_policy_gate(self, job: SlowLoopJob) -> WorkerTransition:
-        root = self._job_dir(job) / "policy_gate"
+        evidence = self._require_current_task_training(job)
+        root = self._job_dir(job) / "policy_gate" / _digest_json(evidence)[:16]
         report_root = root / "reports"
+        ticket_path = Path(str(job.metadata["ticket_path"]))
         command = [
             "/shared/hengyil6/vls/envs/vla-pilot/bin/python",
             str(Path(__file__).resolve().parents[1] / "scripts/self_improve.py"),
@@ -623,7 +879,7 @@ class SlowLoopWorker:
             "--manifest",
             str(self.protocol_manifest_path),
             "--ticket",
-            str(job.metadata["ticket_path"]),
+            str(ticket_path),
             "--parent-json",
             str(job.metadata["parent_candidate_path"]),
             "--candidates-json",
@@ -636,14 +892,21 @@ class SlowLoopWorker:
             str(root / "rollouts"),
             "--workers",
             str(int(job.metadata.get("evaluation_workers", 1))),
+            "--device",
+            f"cuda:{int(job.metadata.get('evaluation_gpu_index', 6))}",
         ]
+        if job.metadata.get("gate_kind") == "REUSE":
+            command.append("--reuse")
         spec = {
             "schema_version": "policy-gate-job-v1",
+            "slow_loop_protocol": MANDATORY_DEMOS_PROTOCOL,
+            "current_task_training_evidence": evidence,
+            "merge_coefficient_selection": job.metadata.get("merge_coefficient_selection"),
             "job_id": job.job_id,
             "command": command,
             "cwd": str(Path(__file__).resolve().parents[1]),
             "manifest_sha256": self.protocol_manifest["manifest_sha256"],
-            "preferred_gpu_index": int(job.metadata.get("evaluation_gpu_index", 4)),
+            "preferred_gpu_index": int(job.metadata.get("evaluation_gpu_index", 6)),
             "minimum_free_gib": 20.0,
             "report_root": str(report_root),
         }
@@ -651,10 +914,17 @@ class SlowLoopWorker:
         atomic_write_json(spec_path, spec)
         return WorkerTransition(
             next_state=SlowLoopState.RAW_REGRESSION,
-            artifacts=(spec_path,),
+            artifacts=(spec_path, ticket_path, *(
+                (Path(job.metadata["merge_selection_path"]),) if job.metadata.get("merge_selection_path") else ())),
             metadata={
+                **{k: job.metadata[k] for k in ("delta_id", "registered_delta_path", "parent_candidate_path",
+                    "candidates_json_path", "remedy_delta_digest", "merge_coefficient_selection", "merge_selection_path")
+                   if k in job.metadata},
                 "policy_gate_job_path": str(spec_path),
+                "policy_gate_report_path": None,
                 "policy_gate_output_root": str(report_root),
+                "policy_gate_trigger_context_path": str(ticket_path),
+                "current_task_training_evidence": evidence,
             },
         )
 
@@ -678,194 +948,172 @@ class SlowLoopWorker:
         return tuple(result)
 
     def _lookup(self, job: SlowLoopJob) -> WorkerTransition:
-        metadata = job.metadata
-        if metadata.get("baseline_kind") == "always_expand_retain":
-            payload = {
-                "schema_version": "signature-lookup-result-v1",
-                "job_id": job.job_id,
-                "signature_id": metadata["signature_id"],
-                "failure_mode": metadata["failure_mode"],
-                "active_policy_id": job.active_policy_id,
-                "matches": [],
-                "lookup_disabled": True,
-                "reason": "always-expansion-retain-control",
-            }
+        if job.metadata.get("baseline_kind") == "always_expand_retain" or job.metadata.get("lookup_enabled") is False:
             path = self._job_dir(job) / "lookup.json"
-            atomic_write_json(path, payload)
-            return WorkerTransition(
-                next_state=SlowLoopState.TICKET_READY,
-                artifacts=(path,),
-                metadata={
-                    "lookup_result_path": str(path),
-                    "lookup_match_count": 0,
-                    "reuse_candidates": [],
-                    "lookup_disabled": True,
-                },
-            )
-        feature_path = Path(str(metadata["signature_feature_path"]))
-        if feature_path.stem != str(metadata["signature_feature_id"]):
-            raise ValueError("signature feature ID/path mismatch")
-        with np.load(feature_path, allow_pickle=False) as values:
-            e_goal = values["goal"].astype(np.float32)
-            e_obs = values["observation"].astype(np.float32)
-        failure_mode = FailureMode(str(metadata["failure_mode"]))
-        records = []
-        for value in self.incidents.signatures.iter_valid():
-            fields = CapabilitySignatureRecord.__dataclass_fields__
-            records.append(
-                CapabilitySignatureRecord(
-                    **{
-                        name: (
-                            value[name]
-                            if name in value
-                            else fields[name].default
-                        )
-                        for name in fields
-                        if name != "recorded_at" or name in value
-                    }
-                )
-            )
-        matches = lookup_validated_remedies(
-            query_failure_mode=failure_mode,
-            query_e_goal=e_goal,
-            query_e_obs=e_obs,
-            records=records,
-        )
-        payload = {
-            "schema_version": "signature-lookup-result-v1",
-            "job_id": job.job_id,
-            "signature_id": metadata["signature_id"],
-            "failure_mode": failure_mode.value,
-            "active_policy_id": job.active_policy_id,
-            "matches": [
-                {
-                    "signature_id": item.signature.signature_id,
-                    "source_policy_id": item.signature.policy_id,
-                    "delta_id": item.signature.delta_id,
-                    "ticket_id": item.signature.ticket_id,
-                    "similarity": item.similarity,
-                    "alpha_candidates": list(item.alpha_candidates),
-                }
-                for item in matches
-            ],
-        }
+            atomic_write_json(path, {"remedy":None, "matches":[], "reason":"lookup disabled by explicit baseline"})
+            return WorkerTransition(next_state=SlowLoopState.TICKET_READY, artifacts=(path,),
+                metadata={"lookup_result_path":str(path), "lookup_disabled":True,
+                          "lookup_match_count":0, "gate_kind":"EXPANSION",
+                          "current_task_demonstrations_required":True,
+                          "slow_loop_protocol":MANDATORY_DEMOS_PROTOCOL})
+        from .signatures import retrieve_experiences
+        from .incidents import CapabilitySignatureRecord
+        from .experience_planner import ExperiencePlanner
+        fields = CapabilitySignatureRecord.__dataclass_fields__
+        records = [CapabilitySignatureRecord(**{k:v for k,v in row.items() if k in fields})
+                   for row in self.incidents.signatures.iter_valid()]
+        with np.load(Path(job.metadata["signature_feature_path"]), allow_pickle=False) as data:
+            catalog = retrieve_experiences(query_e_goal=data["goal"], query_e_obs=data["observation"], records=records)
+        current = dict(job.metadata)
+        evidence_path = current.get("multimodal_evidence_path")
+        if evidence_path and Path(evidence_path).is_file():
+            current["visual_evidence"] = json.loads(Path(evidence_path).read_text())
+        selection = ExperiencePlanner(self.incidents).run(
+            purpose="remedy_lookup", current=current, remedies=catalog)
+        selection["active_policy_id"] = job.active_policy_id
         path = self._job_dir(job) / "lookup.json"
-        atomic_write_json(path, payload)
-        return WorkerTransition(
-            next_state=(
-                SlowLoopState.REUSE_EVALUATING
-                if matches
-                else SlowLoopState.TICKET_READY
-            ),
-            artifacts=(path,),
-            metadata={
-                "lookup_result_path": str(path),
-                "lookup_match_count": len(matches),
-                "reuse_candidates": payload["matches"],
-            },
-        )
+        atomic_write_json(path, selection)
+        if selection.get("training_request"):
+            from .verifier_refresh import VerifierRefreshCoordinator
+            # Fulfil the Planner request at this safe slow-loop boundary. The
+            # staged-policy step remains responsible for head adoption.
+            VerifierRefreshCoordinator(registry=self.registry, incidents=self.incidents,
+                output_root=self._job_dir(job) / "lookup_verifier_training").train_for_policy(
+                    job.active_policy_id, current=current, selection=selection)
+        return WorkerTransition(next_state=SlowLoopState.TICKET_READY, artifacts=(path,),
+            metadata={"lookup_result_path": str(path), "lookup_result_sha256": sha256_file(path),
+                      "lookup_match_count": len(catalog), "lookup_disabled": False,
+                      "gate_kind": "REUSE" if selection.get("remedy") else "EXPANSION",
+                      "slow_loop_protocol": MANDATORY_DEMOS_PROTOCOL,
+                      "current_task_demonstrations_required": not bool(selection.get("remedy"))})
 
     def _prepare_reuse(self, job: SlowLoopJob) -> WorkerTransition:
-        lookup_path = Path(str(job.metadata["lookup_result_path"]))
-        lookup = json.loads(lookup_path.read_text(encoding="utf-8"))
-        usable = [
-            item
-            for item in lookup.get("matches", ())
-            if item.get("delta_id") and item.get("ticket_id")
-        ]
-        if not usable:
-            return WorkerTransition(
-                next_state=SlowLoopState.TICKET_READY,
-                artifacts=(lookup_path,),
-                metadata={"reuse_fallback_reason": "match_missing_delta_or_ticket_lineage"},
-            )
-        match = usable[0]
-        active_root = self.registry.root / "policies" / job.active_policy_id
-        candidate_metadata_path = active_root / "candidate.json"
-        if not candidate_metadata_path.is_file():
-            return WorkerTransition(
-                next_state=SlowLoopState.TICKET_READY,
-                artifacts=(lookup_path,),
-                metadata={"reuse_fallback_reason": "active_policy_has_no_delta_lineage"},
-            )
-        candidate_metadata = json.loads(
-            candidate_metadata_path.read_text(encoding="utf-8")
-        )
-        lineage = []
-        for value in candidate_metadata.get("lineage", ()):
-            payload = dict(value)
-            registered = self.registry.root / "deltas" / str(payload["delta_id"])
-            if registered.exists():
-                payload["path"] = str(registered)
-            lineage.append(DeltaLineageEntry(**payload))
-        if not lineage:
-            return WorkerTransition(
-                next_state=SlowLoopState.TICKET_READY,
-                artifacts=(lookup_path, candidate_metadata_path),
-                metadata={"reuse_fallback_reason": "active_policy_lineage_is_empty"},
-            )
-        theta0_ref = json.loads(
-            (self.registry.root / "base/theta_0/ref.json").read_text(encoding="utf-8")
-        )
-        source_ticket = self.ticket_root / str(match["ticket_id"]) / "ticket.json"
-        if not source_ticket.is_file():
-            return WorkerTransition(
-                next_state=SlowLoopState.TICKET_READY,
-                artifacts=(lookup_path, candidate_metadata_path),
-                metadata={"reuse_fallback_reason": "validated_source_ticket_missing"},
-            )
-        grid = compose_reuse_candidates(
-            theta0_checkpoint=Path(theta0_ref["checkpoint_path"]),
-            parent_policy_id=job.active_policy_id,
-            accepted_lineage=lineage,
-            target_delta_id=str(match["delta_id"]),
-            output_root=self._job_dir(job) / "reuse_candidates",
-        )
-        grid_path = (
-            self._job_dir(job)
-            / "reuse_candidates"
-            / f"candidate_grid_{grid['attempt_hash'][:16]}.json"
-        )
-        target_lineage = [
-            item for item in lineage if item.delta_id == str(match["delta_id"])
-        ]
-        if len(target_lineage) != 1:
-            raise ValueError("validated REUSE delta is absent from active policy lineage")
-        parent_spec = {
-            "policy_id": job.active_policy_id,
-            "checkpoint_path": str(active_root.resolve()),
-            "checkpoint_digest": checkpoint_digest(active_root),
-            "alpha_l": target_lineage[0].alpha_l,
-        }
-        parent_path = self._job_dir(job) / "reuse_parent.json"
-        candidates_path = self._job_dir(job) / "reuse_candidates.json"
-        atomic_write_json(parent_path, parent_spec)
+        from .candidates import compose_selected_remedy
+        from .campaign import configured_merge_selection
+        path = Path(job.metadata["lookup_result_path"])
+        if sha256_file(path) != job.metadata["lookup_result_sha256"]:
+            raise ValueError("Planner remedy decision changed")
+        selection = json.loads(path.read_text())
+        if selection["active_policy_id"] != job.active_policy_id:
+            raise ValueError("Planner remedy was chosen against a stale parent")
+        remedy = selection["remedy"]
+        delta_id = str(remedy["delta_id"])
+        delta_path = self.registry.root / "deltas" / delta_id
+        if not delta_path.is_dir():
+            raise FileNotFoundError(delta_path)
+        if checkpoint_digest(delta_path) != remedy["metadata"].get("delta_digest"):
+            raise ValueError("remedy delta differs from its historical validation identity")
+        historical_report = Path(remedy["metadata"]["policy_gate_report_path"])
+        if sha256_file(historical_report) != remedy["metadata"]["policy_gate_report_sha256"]:
+            raise ValueError("historical remedy evaluation evidence changed")
+        theta0 = json.loads((self.registry.root / "base/theta_0/ref.json").read_text())
+        merge_selection = configured_merge_selection() or {
+            "alpha_values": selection["alpha_l_values"], "selection_owner": "planner"}
+        merge_selection_path = self._job_dir(job) / "reuse_merge_selection.json"
+        atomic_write_json(merge_selection_path, merge_selection)
+        grid = compose_selected_remedy(theta0_checkpoint=theta0["checkpoint_path"],
+            parent_policy_id=job.active_policy_id, accepted_lineage=self._active_delta_lineage(job.active_policy_id),
+            target_delta_id=delta_id, target_delta_path=delta_path,
+            alpha_l_values=merge_selection["alpha_values"], output_root=self._job_dir(job) / "reuse_candidates")
+        parent = self.registry.root / "policies" / job.active_policy_id
+        parent_path, candidates_path = self._job_dir(job) / "parent_candidate.json", self._job_dir(job) / "candidates.json"
+        atomic_write_json(parent_path, {"policy_id":job.active_policy_id, "checkpoint_path":str(parent),
+                                       "checkpoint_digest":checkpoint_digest(parent), "alpha_l":0.0})
         atomic_write_json(candidates_path, grid["candidates"])
-        return WorkerTransition(
-            next_state=SlowLoopState.RAW_REGRESSION,
-            artifacts=(
-                lookup_path,
-                candidate_metadata_path,
-                grid_path,
-                parent_path,
-                candidates_path,
-                source_ticket,
-            ),
-            metadata={
-                "gate_kind": "REUSE",
-                "reuse_source_signature_id": match["signature_id"],
-                "reuse_source_delta_id": match["delta_id"],
-                "reuse_source_ticket_id": match["ticket_id"],
-                "reuse_source_ticket_path": str(source_ticket),
-                "parent_candidate_path": str(parent_path),
-                "candidate_grid_path": str(grid_path),
-                "candidates_json_path": str(candidates_path),
-            },
-        )
+        metadata = {**job.metadata, "delta_id":delta_id, "registered_delta_path":str(delta_path),
+                    "parent_candidate_path":str(parent_path), "candidates_json_path":str(candidates_path),
+                    "merge_coefficient_selection":merge_selection,
+                    "merge_selection_path":str(merge_selection_path),
+                    "remedy_delta_digest":checkpoint_digest(delta_path)}
+        # This prepares the same real current-task and old-task evaluation used for a new delta.
+        return self._prepare_policy_gate(replace(job, metadata=metadata))
+
+    def _require_current_task_training(self, job: SlowLoopJob) -> dict[str, Any]:
+        """Candidate selection cannot stand in for collecting and learning."""
+        if job.metadata.get("gate_kind") == "REUSE":
+            required = {"lookup_result_path", "lookup_result_sha256", "registered_delta_path",
+                        "candidates_json_path", "remedy_delta_digest"}
+            if not required <= set(job.metadata):
+                raise ValueError("REUSE requires Planner evidence and measured current-policy reconstruction")
+            selection_path = Path(job.metadata["lookup_result_path"])
+            delta_path = Path(job.metadata["registered_delta_path"])
+            candidates_path = Path(job.metadata["candidates_json_path"])
+            if sha256_file(selection_path) != job.metadata["lookup_result_sha256"]:
+                raise ValueError("remedy selection changed")
+            if checkpoint_digest(delta_path) != job.metadata["remedy_delta_digest"]:
+                raise ValueError("remedy delta changed")
+            selection = json.loads(selection_path.read_text())
+            if selection["active_policy_id"] != job.active_policy_id:
+                raise ValueError("remedy parent changed")
+            candidates = json.loads(candidates_path.read_text())
+            if not candidates or any(x.get("candidate_kind") != "REUSE" or x.get("target_delta_id") != job.metadata["delta_id"] for x in candidates):
+                raise ValueError("reconstructed candidates do not match the chosen remedy")
+            return {"protocol":MANDATORY_DEMOS_PROTOCOL, "parent_policy_id":job.active_policy_id,
+                    "lookup_sha256":sha256_file(selection_path), "delta_digest":checkpoint_digest(delta_path),
+                    "candidates_sha256":sha256_file(candidates_path), "gate_kind":"REUSE"}
+        if not job.ticket_id or not job.metadata.get("ticket_path"):
+            raise ValueError("current-task demonstration ticket is required")
+        ticket_path = Path(str(job.metadata["ticket_path"]))
+        ticket = json.loads(ticket_path.read_text())
+        task = self._manifest_task(job.metadata)
+        if (ticket.get("ticket_id") != job.ticket_id
+                or ticket.get("parent_policy_id") != job.active_policy_id
+                or any(str(ticket.get(k)) != str(task[k])
+                       for k in ("suite", "task_id", "perturbation_variant"))):
+            raise ValueError("demonstration ticket does not match the current task and parent")
+        if not expansion_demonstrations_ready(job):
+            raise ValueError("current-task curated nonempty demonstrations are required")
+        dataset = Path(str(job.metadata["current_ticket_dataset_path"])).resolve()
+        source_ticket_path = Path(job.metadata.get('demonstration_source_ticket_path', str(ticket_path)))
+        source_ticket = json.loads(source_ticket_path.read_text())
+        if any(str(source_ticket[k]) != str(task[k]) for k in ('suite', 'task_id', 'perturbation_variant')):
+            raise ValueError('precollected demonstration source is from another task/variant')
+        if not dataset.is_relative_to(source_ticket_path.parent.resolve()):
+            raise ValueError("current-task dataset must belong to the selected source ticket")
+        curation_path = source_ticket_path.parent / "curation.json"
+        curation = json.loads(curation_path.read_text())
+        if (curation.get("ticket_id") != source_ticket['ticket_id']
+                or curation.get("needs_more_demos") is not False
+                or Path(str(curation.get("export_root", ""))).resolve() != dataset):
+            raise ValueError("current-ticket demonstration curation is incomplete or mismatched")
+        result_path = job.metadata.get("training_result_path")
+        if not result_path:
+            raise ValueError("current-task policy training result is required")
+        result_path = Path(str(result_path))
+        result = json.loads(result_path.read_text())
+        if (result.get("job_id") != job.job_id
+                or result.get("ticket_id") != job.ticket_id
+                or result.get("parent_policy_id") != job.active_policy_id
+                or Path(str(result.get("current_ticket_dataset_path", ""))).resolve() != dataset):
+            raise ValueError("training result does not belong to this task, ticket, and parent")
+        if not job.metadata.get("delta_id"):
+            raise ValueError("a newly trained current-task delta is required")
+        candidates_path = Path(str(job.metadata["candidates_json_path"]))
+        candidates = json.loads(candidates_path.read_text())
+        if not candidates or any(
+            c.get("candidate_kind") != "EXPANSION"
+            or c.get("target_delta_id") != job.metadata["delta_id"]
+            for c in candidates
+        ):
+            raise ValueError("candidates must merge the newly trained current-task delta")
+        return {
+            "protocol": MANDATORY_DEMOS_PROTOCOL, "job_id": job.job_id,
+            "ticket_id": job.ticket_id, "parent_policy_id": job.active_policy_id,
+            "task_id": task["task_id"], "perturbation_variant": task["perturbation_variant"],
+            "ticket_sha256": sha256_file(ticket_path),
+            "curation_sha256": sha256_file(curation_path),
+            "dataset_info_sha256": sha256_file(dataset / "meta/info.json"),
+            "training_result_sha256": sha256_file(result_path),
+            "candidates_sha256": sha256_file(candidates_path),
+            "new_delta_id": job.metadata["delta_id"],
+        }
 
     def _consume_policy_gate(
         self, job: SlowLoopJob, *, trigger_phase: bool
     ) -> WorkerTransition | None:
+        evidence = self._require_current_task_training(job)
+        if job.metadata.get("current_task_training_evidence") != evidence:
+            raise ValueError("current-task training evidence changed after candidate preparation")
         path_value = job.metadata.get("policy_gate_report_path")
         if not path_value:
             output_root = job.metadata.get("policy_gate_output_root")
@@ -889,20 +1137,28 @@ class SlowLoopWorker:
             raise ValueError("policy gate report uses a different frozen manifest")
         if report.get("parent", {}).get("policy_id") != job.active_policy_id:
             raise ValueError("policy gate parent is stale")
+        if report.get("gate_kind", "EXPANSION") != job.metadata.get("gate_kind", "EXPANSION"):
+            raise ValueError("policy gate kind differs from the requested measured validation")
         decision = report.get("decision", {})
         if decision.get("status") != "POLICY_STAGED":
+            if job.metadata.get("gate_kind") == "REUSE":
+                next_state = SlowLoopState.TICKET_READY
+            elif job.metadata.get("precollected_demonstrations"):
+                # A rejected merge is measured feedback, not permission to
+                # recollect the already-complete twenty-task demonstration bank.
+                next_state = SlowLoopState.POLICY_REJECTED
+            else:
+                next_state = SlowLoopState.NEEDS_MORE_DEMOS
             return WorkerTransition(
-                next_state=(
-                    SlowLoopState.TICKET_READY
-                    if report.get("gate_kind") == "REUSE"
-                    else SlowLoopState.NEEDS_MORE_DEMOS
-                ),
+                next_state=next_state,
                 artifacts=(path,),
                 metadata={
+                    "reuse_rejected": job.metadata.get("gate_kind") == "REUSE",
+                    "gate_kind": "EXPANSION",
                     "policy_gate_report_path": str(path),
                     "policy_gate_status": decision.get("status"),
                     "policy_gate_reason": decision.get("reason"),
-                    "reuse_fallback_to_ticket": report.get("gate_kind") == "REUSE",
+                    "new_collection_required": False if job.metadata.get("precollected_demonstrations") else None,
                 },
             )
         if not trigger_phase:
@@ -934,7 +1190,7 @@ class SlowLoopWorker:
     def _prepare_new_policy_counterfactual(
         self, job: SlowLoopJob
     ) -> WorkerTransition:
-        """Freeze the exact historical snapshot bank for the staged policy.
+        """Build an actionable historical snapshot bank for the staged policy.
 
         The simulator replay runs in the code-owned hgpu1 GPU worker.  This
         step freezes its immutable input and expected output locations so a
@@ -950,6 +1206,7 @@ class SlowLoopWorker:
         feature_root = root / "features"
         feature_root.mkdir(parents=True, exist_ok=True)
         contexts = []
+        excluded_contexts = []
         for decision in self.incidents.decisions.iter_valid():
             split = self._decision_verifier_split(decision)
             if split is None:
@@ -958,6 +1215,27 @@ class SlowLoopWorker:
             snapshot_manifest = self.snapshot_root / snapshot_id / "manifest.json"
             if not snapshot_manifest.is_file():
                 continue
+            snapshot_value = json.loads(
+                snapshot_manifest.read_text(encoding="utf-8")
+            )
+            budget_state = regenerate_budget_state(
+                dict(snapshot_value.get("controller_state") or {}),
+                contract=FIXED_BUDGET_50_CONTRACT,
+            )
+            if int(budget_state["remaining_budget"]) <= 0:
+                # Forced expansion after the tenth RE-STEER is a legitimate
+                # decision snapshot, but has no continuation to replay. Filter
+                # before sparse selection so it cannot consume a task's slot.
+                # Do not reset its budget, relabel it, or alter source evidence.
+                excluded_contexts.append({
+                    "record_id": str(decision["record_id"]),
+                    "snapshot_id": snapshot_id,
+                    "reason": "fixed10_retry_budget_exhausted",
+                    "retry_index": int(budget_state["retry_index"]),
+                    "remaining_budget": int(budget_state["remaining_budget"]),
+                })
+                continue
+            group = decision.get("provenance", {}).get("group", {})
             contexts.append(
                 {
                     "record_id": str(decision["record_id"]),
@@ -966,31 +1244,48 @@ class SlowLoopWorker:
                     "snapshot_id": snapshot_id,
                     "snapshot_hash": str(decision["snapshot_hash"]),
                     "snapshot_manifest_path": str(snapshot_manifest.resolve()),
-                    "remaining_budget": int(decision["remaining_budget"]),
+                    "label_version": FIXED_BUDGET_50_CONTRACT.label_version,
+                    "budget_state": budget_state,
                     "data_split": split,
+                    "task_key": "::".join(
+                        str(group.get(name) or "")
+                        for name in ("suite", "task_id", "perturbation_variant")
+                    ),
+                    "selection_score": decision.get("p_expansion"),
                     "fresh_feature_output_path": str(
                         (feature_root / f"{decision['record_id']}.npz").resolve()
                     ),
                 }
             )
-        contexts.sort(key=lambda value: value["record_id"])
+        contexts = _select_sparse_replay_contexts(
+            contexts,
+            limit=FIXED_BUDGET_50_CONTRACT.counterfactual_context_limit,
+        )
         result_path = root / "result.json"
         plan = {
-            "schema_version": "new-policy-counterfactual-plan-v2",
+            "schema_version": "new-policy-counterfactual-plan-v3",
             "job_id": job.job_id,
             "policy_id": policy_id,
             "checkpoint_path": str(checkpoint.resolve()),
             "checkpoint_digest": checkpoint_digest_value,
             "snapshot_root": str(self.snapshot_root.resolve()),
             "incident_root": str(self.incidents.root.resolve()),
+            "label_version": FIXED_BUDGET_50_CONTRACT.label_version,
+            "label_config": label_contract_payload(FIXED_BUDGET_50_CONTRACT),
             "retry_estimand": (
-                "P(fail to advance/succeed under remaining fixed four-level "
+                "P(fail to advance/succeed under remaining fixed_budget_50 "
                 "RE-STEER schedule)"
             ),
-            "adaptive_branches": [16, 32, 64],
+            "adaptive_branches": [16, 32],
             "decision_rule": "head_argmax",
-            "max_posterior_width": 0.20,
+            "progress_contract": REPLAY_PROGRESS_CONTRACT,
+            "gemini_max_provider_calls": 5000,
+            "gemini_call_ledger_path": str(Path(str(job.metadata.get(
+                "counterfactual_call_ledger", self.incidents.root /
+                "fixed_budget_50/counterfactual_gemini_provider_calls.jsonl"))).resolve()),
+            "branch_ledger_path": str((root / "branches.jsonl").resolve()),
             "contexts": contexts,
+            "excluded_contexts": excluded_contexts,
             "result_path": str(result_path.resolve()),
         }
         canonical = json.dumps(plan, sort_keys=True, separators=(",", ":")).encode()
@@ -998,14 +1293,14 @@ class SlowLoopWorker:
         plan_path = root / "plan.json"
         atomic_write_json(plan_path, plan)
         repo_root = Path(__file__).resolve().parents[1]
-        replay_gpu_index = int(job.metadata.get("replay_gpu_index", 0))
+        replay_gpu_index = int(job.metadata.get("replay_gpu_index", 6))
         if not 0 <= replay_gpu_index <= 7:
             raise ValueError("replay_gpu_index must be in [0, 7]")
         job_spec_path = root / "replay_job.json"
         atomic_write_json(
             job_spec_path,
             {
-                "schema_version": "counterfactual-replay-job-v1",
+                "schema_version": "counterfactual-replay-job-v2",
                 "job_id": job.job_id,
                 "plan_sha256": plan["plan_sha256"],
                 "preferred_gpu_index": replay_gpu_index,
@@ -1029,13 +1324,21 @@ class SlowLoopWorker:
             atomic_write_json(
                 result_path,
                 {
-                    "schema_version": "new-policy-counterfactual-result-v1",
+                    "schema_version": "new-policy-counterfactual-result-v2",
                     "plan_sha256": plan["plan_sha256"],
                     "policy_id": policy_id,
+                    "label_version": FIXED_BUDGET_50_CONTRACT.label_version,
+                    "label_config": label_contract_payload(
+                        FIXED_BUDGET_50_CONTRACT
+                    ),
                     "complete": True,
                     "contexts_planned": 0,
                     "contexts_completed": 0,
-                    "reason": "no_frozen_verifier_decision_snapshots_available",
+                    "contexts_labeled": 0,
+                    "contexts_censored": 0,
+                    "results": [],
+                    "reason": "no_actionable_verifier_decision_snapshots_available",
+                    "excluded_contexts": excluded_contexts,
                 },
             )
             artifacts.append(result_path)
@@ -1075,6 +1378,7 @@ class SlowLoopWorker:
         if len(matching) != 1:
             return None
         split_map = {
+            "demo_online_pool": "train",
             "verifier_audit_train": "train",
             "verifier_calibration": "calibration",
             "verifier_test": "test",
@@ -1090,80 +1394,44 @@ class SlowLoopWorker:
         return memberships[0] if memberships else None
 
     def _train_verifier_for_staged_policy(self, job: SlowLoopJob) -> Path:
-        """Retrain all verifier ablations in the external slow worker process."""
-
+        from .verifier_refresh import VerifierRefreshCoordinator
         root = self._job_dir(job) / "verifier"
         result_path = root / "verifier_result.json"
         if result_path.is_file():
             return result_path
         policy_id = str(job.metadata["staged_policy_id"])
-        try:
-            examples = build_verifier_examples(
-                self.incidents,
-                policy_id=policy_id,
-            )
-            ablation = train_verifier_ablations(
-                examples,
-                policy_id=policy_id,
-                output_root=root / "ablations",
-                config=VerifierTrainingConfig(device="cpu"),
-                metadata={
-                    "slow_loop_job_id": job.job_id,
-                    "protocol_manifest_hash": self.protocol_manifest[
-                        "manifest_sha256"
-                    ],
-                },
-            )
-            selected_name = ablation.selected_channel_set
-            if selected_name is None:
-                full = ablation.results["full"]
-                value = {
-                    "schema_version": "verifier-training-result-v1",
-                    "policy_id": policy_id,
-                    "verifier_id": full.verifier_id,
-                    "artifact_root": full.artifact_root,
-                    "gate": {
-                        "passed": False,
-                        "reasons": list(full.gate.reasons),
-                    },
-                    "selected_channel_set": None,
-                    "controller_mode": "fixed_budget_4",
-                    "ablation_report_path": ablation.report_path,
-                }
+        coordinator = VerifierRefreshCoordinator(
+            registry=self.registry, incidents=self.incidents, output_root=root,
+            config=VerifierTrainingConfig(device=f"cuda:{int(job.metadata.get('evaluation_gpu_index',6))}"))
+        result = coordinator.train_for_policy(policy_id, current=dict(job.metadata))
+        if result is not None and result.gate.passed:
+            value = {**asdict(result), "policy_id":policy_id, "controller_mode":"learned_verifier"}
+        else:
+            active = self.registry.active()
+            existing = self.registry.root / "verifiers" / str(active.verifier_id) if active and active.verifier_id else None
+            previous = json.loads((existing / "training_result.json").read_text()) if existing and (existing / "training_result.json").is_file() else None
+            if previous:
+                previous["artifact_root"] = str(existing)
+            if previous and verifier_deployment_allowed(previous):
+                value = {**previous, "policy_id":policy_id, "retained_existing_verifier":True,
+                         "controller_mode":"learned_verifier"}
             else:
-                selected = ablation.results[selected_name]
-                value = {
-                    "schema_version": "verifier-training-result-v1",
-                    "policy_id": policy_id,
-                    "verifier_id": selected.verifier_id,
-                    "artifact_root": selected.artifact_root,
-                    "gate": {
-                        "passed": selected.gate.passed,
-                        "reasons": list(selected.gate.reasons),
-                    },
-                    "selected_channel_set": selected_name,
-                    "controller_mode": "learned_verifier",
-                    "ablation_report_path": ablation.report_path,
-                }
-        except (FileNotFoundError, ValueError) as exc:
-            value = {
-                "schema_version": "verifier-training-result-v1",
-                "policy_id": policy_id,
-                "verifier_id": None,
-                "artifact_root": None,
-                "gate": {
-                    "passed": False,
-                    "reasons": [
-                        f"insufficient_or_invalid_verifier_evidence: {type(exc).__name__}: {exc}"
-                    ],
-                },
-                "selected_channel_set": None,
-                "controller_mode": "fixed_budget_4",
-            }
+                if active is not None and active.controller_mode == "learned_verifier":
+                    raise RuntimeError(
+                        "Initialized verifier is unavailable; do not replace it with fixed-budget execution"
+                    )
+                value = {"policy_id":policy_id, "verifier_id":None, "artifact_root":None,
+                         "gate":{"passed":False,"reasons":["Planner has not approved a new candidate verifier"]},
+                         "controller_mode":"fixed_budget_50"}
+        value.update(label_version=FIXED_BUDGET_50_CONTRACT.label_version,
+                     label_config=label_contract_payload())
         atomic_write_json(result_path, value)
         return result_path
 
     def _deploy(self, job: SlowLoopJob) -> WorkerTransition:
+        evidence = self._require_current_task_training(job)
+        if job.metadata.get("current_task_training_evidence") != evidence:
+            raise ValueError("current-task training evidence changed before deployment")
         report_path = Path(str(job.metadata["policy_gate_report_path"]))
         report = json.loads(report_path.read_text(encoding="utf-8"))
         verifier_result = None
@@ -1171,14 +1439,15 @@ class SlowLoopWorker:
         if job.state is SlowLoopState.READY_PAIR:
             verifier_path = Path(str(job.metadata["verifier_result_path"]))
             verifier_result = json.loads(verifier_path.read_text(encoding="utf-8"))
-            if not verifier_result.get("gate", {}).get("passed"):
-                raise ValueError("READY_PAIR requires a passing verifier result")
+            if not verifier_deployment_allowed(verifier_result):
+                raise ValueError("READY_PAIR requires a validated or explicitly provisional verifier")
             artifacts.append(verifier_path)
         active = self.registry.active()
         expected_revision = 0 if active is None else active.deployment_revision
-        if active is not None and active.policy_id != job.active_policy_id:
+        winner_id = report.get("decision", {}).get("winner", {}).get("policy_id")
+        if active is not None and active.policy_id not in {job.active_policy_id, winner_id}:
             raise RuntimeError("active policy changed before deployment")
-        signature, signature_artifacts = self._materialize_validated_signature(job)
+        signature, signature_artifacts = self._materialize_signature_record(job)
         artifacts.extend(signature_artifacts)
         deployment = deploy_policy_gate(
             report=report,
@@ -1204,49 +1473,63 @@ class SlowLoopWorker:
                 "deployed_policy_id": deployment.policy_id,
                 "deployed_verifier_id": deployment.verifier_id,
                 "deployed_controller_mode": deployment.controller_mode,
+                "capability_label_use_status": "record_only",
+                "signature_reuse_enabled": True,
             },
         )
 
-    def _materialize_validated_signature(
+    def _materialize_signature_record(
         self, job: SlowLoopJob
     ) -> tuple[dict[str, Any], tuple[Path, ...]]:
+        """Persist labels/features for later analysis, never retrieve a remedy."""
         task = self._manifest_task(job.metadata)
-        if (
-            str(task.get("benchmark")) != "LIBERO-PRO"
-            or str(task.get("runtime_suite")) == str(task.get("suite"))
-        ):
-            raise ValueError("validated remedies may only originate from LIBERO-PRO")
+        if (str(task.get("benchmark")) != "LIBERO-PRO"
+                or str(task.get("runtime_suite")) == str(task.get("suite"))):
+            raise ValueError("experimental capability labels must originate from LIBERO-PRO")
         source = Path(str(job.metadata["signature_feature_path"]))
         with np.load(source, allow_pickle=False) as values:
             goal = np.asarray(values["goal"], dtype=np.float16)
             observation = np.asarray(values["observation"], dtype=np.float16)
-        root = self._job_dir(job) / "validated_signature"
+        root = self._job_dir(job) / "capability_signature"
         root.mkdir(parents=True, exist_ok=True)
-        goal_path = root / "e_goal.npy"
-        observation_path = root / "e_obs.npy"
+        goal_path, observation_path = root / "e_goal.npy", root / "e_obs.npy"
         _atomic_save_array(goal_path, goal)
         _atomic_save_array(observation_path, observation)
-        return (
-            {
-                "signature_id": job.metadata["signature_id"],
-                "suite": str(task["suite"]),
-                "task_id": str(task["task_id"]),
-                "perturbation_variant": str(task["perturbation_variant"]),
-                "failure_mode": job.metadata["failure_mode"],
-                "e_goal_path": str(goal_path),
-                "e_obs_path": str(observation_path),
-                "delta_id": job.metadata.get("reuse_source_delta_id", ""),
-                "ticket_id": job.ticket_id
-                or job.metadata.get("reuse_source_ticket_id", ""),
+        report_path = Path(str(job.metadata["policy_gate_report_path"]))
+        return ({
+            "signature_id": job.metadata["signature_id"],
+            "suite": str(task["suite"]), "task_id": str(task["task_id"]),
+            "perturbation_variant": str(task["perturbation_variant"]),
+            "failure_mode": job.metadata["failure_mode"],
+            "e_goal_path": str(goal_path), "e_obs_path": str(observation_path),
+            "delta_id": job.metadata.get("delta_id", ""),
+            "ticket_id": job.ticket_id or "",
+            "metadata": {
+                "slow_loop_job_id": job.job_id, "parent_policy_id": job.active_policy_id,
+                "slow_loop_protocol": MANDATORY_DEMOS_PROTOCOL,
+                "label_config": label_contract_payload(FIXED_BUDGET_50_CONTRACT),
+                "policy_gate_report_path": str(report_path),
+                "policy_gate_report_sha256": sha256_file(report_path),
+                "multimodal_evidence_path": job.metadata.get("multimodal_evidence_path"),
+                "candidate_manifest_path": job.metadata.get("candidates_json_path"),
+                "validated_on_parent_policy_id": job.active_policy_id,
+                "delta_digest": checkpoint_digest(Path(job.metadata["registered_delta_path"])),
+                "current_task_training_evidence": job.metadata.get("current_task_training_evidence"),
             },
-            (goal_path, observation_path),
-        )
+        }, (goal_path, observation_path))
 
     def _issue_ticket(self, job: SlowLoopJob) -> WorkerTransition:
+        from .campaign import configured_merge_selection
         if self.ticket_planner is None:
             raise RuntimeError("TicketCollectionPlanner is not configured")
         metadata = job.metadata
+        if metadata.get("reuse_rejected") and metadata.get("ticket_path"):
+            return WorkerTransition(next_state=SlowLoopState.AWAITING_DEMOS,
+                artifacts=(Path(metadata["ticket_path"]),),
+                metadata={"current_task_demonstrations_required":True, "gate_kind":"EXPANSION"})
         task = self._manifest_task(metadata)
+        evidence_path = metadata.get("multimodal_evidence_path")
+        evidence = json.loads(Path(evidence_path).read_text()) if evidence_path and Path(evidence_path).is_file() else {}
         collection, planner_metadata = self.ticket_planner.plan(
             task_instruction=str(metadata["task_instruction"]),
             failure_mode=str(metadata["failure_mode"]),
@@ -1256,6 +1539,7 @@ class SlowLoopWorker:
             semantic_failure_types=tuple(
                 metadata.get("semantic_failure_types", ())
             ),
+            multimodal_evidence=evidence,
         )
         active = self.registry.active()
         registry_summary = {
@@ -1276,6 +1560,7 @@ class SlowLoopWorker:
             collection=collection,
             parent_policy_id=job.active_policy_id,
             registry_summary=registry_summary,
+            multimodal_evidence=evidence,
             acceptance_criteria={
                 "eval_split": "regression",
                 "raw_profile": {
@@ -1283,8 +1568,12 @@ class SlowLoopWorker:
                     "mode_gate.enabled": False,
                     "use_vlm_stage_recognition": False,
                 },
-                "alpha_l": [0.2, 0.4, 0.6, 0.8],
-                "trigger_recheck_required": True,
+                "merge_coefficients": (configured_merge_selection()
+                    or "Planner-selected uniform language/vision/action alpha"),
+                "current_task_demonstrations_required": True,
+                "current_task_training_required": True,
+                "signature_reuse_allowed": True,
+                "selection_criterion": "current_task_gain_minus_old_task_forgetting",
             },
             target_object_id=(
                 str(metadata["target_object_id"])
@@ -1293,15 +1582,66 @@ class SlowLoopWorker:
             ),
         )
         ticket_path = self.ticket_root / ticket.ticket_id / "ticket.json"
+        from .ticket_visuals import render_suggested_path
+        suggested = render_suggested_path(evidence, collection.visual_guidance, output_dir=ticket_path.parent)
+        if suggested:
+            atomic_write_json(ticket_path.parent / "suggested_path_evidence.json", suggested)
+        dataset_metadata, dataset_artifacts = {}, ()
+        next_state = SlowLoopState.REUSE_EVALUATING
+        if metadata.get('gate_kind') != 'REUSE':
+            dataset_metadata, dataset_artifacts = self._select_precollected_demonstrations(job, task, ticket_path)
+            next_state = SlowLoopState.DATASET_READY
         return WorkerTransition(
-            next_state=SlowLoopState.AWAITING_DEMOS,
-            artifacts=(ticket_path,),
+            next_state=next_state,
+            artifacts=(ticket_path, *dataset_artifacts),
             ticket_id=ticket.ticket_id,
             metadata={
                 "ticket_path": str(ticket_path),
                 "ticket_planner": planner_metadata,
+                "slow_loop_protocol": MANDATORY_DEMOS_PROTOCOL,
+                "current_task_demonstrations_required": metadata.get("gate_kind") != "REUSE",
+                "gate_kind": metadata.get("gate_kind", "EXPANSION"),
+                "collection_round": int(metadata.get("collection_round", 1)),
+                **dataset_metadata,
             },
         )
+
+    def _select_precollected_demonstrations(self, job, task, ticket_path):
+        from .campaign import demonstration_bank
+        from .experiences import artifact_ref
+        from .experience_planner import ExperiencePlanner
+        candidates = [x for x in demonstration_bank(self.protocol_manifest) if x['task_key'] == task['task_key']]
+        if not candidates:
+            raise ValueError('current-task precollected demonstrations missing; do not start automatic recollection')
+        selection_path = ticket_path.parent / 'precollected_selection.json'
+        if selection_path.is_file():
+            selection = json.loads(selection_path.read_text())
+        else:
+            selection = ExperiencePlanner(self.incidents).select_demonstrations(
+                {'task': task, 'parent_policy_id': job.active_policy_id,
+                 'expansion_ticket': json.loads(ticket_path.read_text())}, candidates)
+            atomic_write_json(selection_path, selection)
+        selected = next(x for x in candidates if x['ticket_id'] == selection['ticket_id'])
+        for path, identity in selected['accepted'].items():
+            if sha256_file(Path(path)) != identity['sha256']:
+                raise ValueError('selected native-success demonstration changed')
+        record_id = job.metadata.get('record_id')
+        if record_id:
+            from .demo_matching import compare_demo_candidates
+            for demo_path in selected['accepted']:
+                compare_demo_candidates(self.incidents, record_id=record_id, demo_path=Path(demo_path))
+        self.incidents.record_fact(episode_id=job.job_id, context_id=str(record_id or ''),
+            kind='precollected_demonstrations_selected', payload={**selected, 'selection': selection,
+                'demonstrations':[{'path':path, **identity, 'kind':'demonstration'}
+                                  for path,identity in selected['accepted'].items()],
+                'viewing_videos':[artifact_ref(path, kind='executed_video')
+                                  for path in selected.get('video_paths', ())],
+                'current_parent_policy_id': job.active_policy_id, 'new_collection_required': False})
+        return ({'demonstration_source_ticket_path': selected['ticket_path'],
+                 'precollected_selection_path': str(selection_path), 'precollected_demonstrations': True,
+                 'current_ticket_dataset_path': selected['dataset_root'], 'current_ticket_repo_id': selected['repo_id'],
+                 'curation_needs_more_demos': False, 'teleop_auto_started': False},
+                (selection_path, Path(selected['dataset_root']) / 'meta/info.json'))
 
     def _manifest_task(self, metadata: Mapping[str, Any]) -> Mapping[str, Any]:
         expected = (
@@ -1354,6 +1694,42 @@ def _artifact_output_hash(*, job: SlowLoopJob, transition: WorkerTransition) -> 
             "metadata": dict(transition.metadata),
         }
     )
+
+
+def _select_sparse_replay_contexts(
+    contexts: list[dict[str, Any]], *, limit: int
+) -> list[dict[str, Any]]:
+    """Take one near-boundary context per task before adding task depth."""
+
+    def distance(value: Mapping[str, Any]) -> float:
+        score = value.get("selection_score")
+        try:
+            return abs(float(score) - 0.5) if score is not None else float("inf")
+        except (TypeError, ValueError):
+            return float("inf")
+
+    grouped: dict[str, list[dict[str, Any]]] = {}
+    for value in contexts:
+        grouped.setdefault(str(value.get("task_key") or "UNKNOWN"), []).append(value)
+    for values in grouped.values():
+        values.sort(key=lambda value: (distance(value), value["record_id"]))
+    tasks = sorted(
+        grouped,
+        key=lambda task: (distance(grouped[task][0]), task),
+    )
+    selected: list[dict[str, Any]] = []
+    depth = 0
+    while len(selected) < min(int(limit), len(contexts)):
+        before = len(selected)
+        for task in tasks:
+            if depth < len(grouped[task]):
+                selected.append(grouped[task][depth])
+                if len(selected) == int(limit):
+                    break
+        if len(selected) == before:
+            break
+        depth += 1
+    return selected
 
 
 def _digest_json(value: Mapping[str, Any]) -> str:

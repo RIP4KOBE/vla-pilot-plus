@@ -35,7 +35,8 @@ class CoFTConfig:
     grad_clip: float = 1.0
     gradient_checkpointing: bool = True
     auto_scale_schedule: bool = False
-    save_final_params_only: bool = True
+    save_final_params_only: bool = False
+    checkpoint_interval: int = 250
 
     def validate(self) -> None:
         if not 1 <= self.gpus <= 2:
@@ -86,9 +87,13 @@ class SourceAwareSampler(Sampler[int]):
         replay_indices: Sequence[int],
         num_samples: int,
         seed: int,
+        start_index: int = 0,
     ) -> None:
         self.num_samples = int(num_samples)
         self.seed = int(seed)
+        self.start_index = int(start_index)
+        if not 0 <= self.start_index <= self.num_samples:
+            raise ValueError("sampler resume offset is outside the planned draws")
         if not new_indices or not replay_indices:
             raise ValueError("new demos and replay transitions are both required")
         all_indices: list[int] = []
@@ -176,10 +181,10 @@ class SourceAwareSampler(Sampler[int]):
         )
         sampled = torch.cat(draws)
         sampled = sampled[torch.randperm(len(sampled), generator=generator)]
-        return iter(sampled.tolist())
+        return iter(sampled[self.start_index:].tolist())
 
     def __len__(self) -> int:
-        return self.num_samples
+        return self.num_samples - self.start_index
 
 
 def write_training_manifest(
@@ -320,7 +325,6 @@ def prepare_source_catalog(
     catalog_root.mkdir(parents=True, exist_ok=True)
     records: dict[str, dict[str, object]] = {}
     feature_contract = None
-    fps = None
     offset = 0
     new_indices: list[int] = []
     old_indices: dict[str, list[int]] = {}
@@ -334,14 +338,21 @@ def prepare_source_catalog(
             frames = int(info.get("total_frames", 0))
             if frames <= 0:
                 raise ValueError(f"dataset {repo_id} has no transitions")
-            current_features = json.dumps(
-                info.get("features", {}), sort_keys=True, separators=(",", ":")
-            )
-            current_fps = int(info.get("fps", 0))
+            # Names ("action"/"actions", "channel"/"channels") and stored
+            # FPS are metadata, not tensor compatibility. The pinned LeRobot
+            # factory resolves action delta indices separately at each
+            # dataset's native FPS. Never relabel or resample the source data.
+            current_features = json.dumps({
+                key: {"dtype": value.get("dtype"), "shape": value.get("shape")}
+                for key, value in info.get("features", {}).items()
+            }, sort_keys=True, separators=(",", ":"))
+            current_fps = float(info.get("fps", 0))
+            if current_fps <= 0:
+                raise ValueError(f"dataset {repo_id} has invalid native fps")
             if feature_contract is None:
-                feature_contract, fps = current_features, current_fps
-            if current_features != feature_contract or current_fps != fps:
-                raise ValueError("co-FT source datasets have incompatible features/fps")
+                feature_contract = current_features
+            if current_features != feature_contract:
+                raise ValueError("co-FT source datasets have incompatible tensor features")
             target = catalog_root / repo_id
             target.parent.mkdir(parents=True, exist_ok=True)
             if target.is_symlink():
@@ -363,6 +374,8 @@ def prepare_source_catalog(
                 "role": role,
                 "source": str(source),
                 "info_sha256": sha256_file(info_path),
+                "native_fps": current_fps,
+                "temporal_alignment": "native_policy_step_indices_no_resampling",
                 "frames": frames,
                 "global_from_index": offset,
                 "global_to_index": offset + frames,
@@ -385,7 +398,7 @@ def prepare_source_catalog(
             "feature_contract_sha256": hashlib.sha256(
                 str(feature_contract).encode()
             ).hexdigest(),
-            "fps": fps,
+            "fps_by_repo": {key: item["native_fps"] for key, item in records.items()},
         }
     )
     canonical = json.dumps(
@@ -441,7 +454,7 @@ def build_lerobot_coft_command(
         "--num_workers=4",
         "--eval_freq=0",
         "--log_freq=20",
-        f"--save_freq={config.optimizer_steps}",
+        f"--save_freq={min(config.checkpoint_interval, config.optimizer_steps)}",
         "--save_checkpoint=true",
         f"--save_final_params_only={str(config.save_final_params_only).lower()}",
         "--wandb.enable=false",

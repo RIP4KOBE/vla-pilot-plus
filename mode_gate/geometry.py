@@ -1,4 +1,4 @@
-"""Deterministic geometry scoring and safe semantic medoid selection."""
+"""Deterministic geometry scoring and safe semantic candidate selection."""
 
 from __future__ import annotations
 
@@ -9,10 +9,10 @@ import numpy as np
 
 from .types import (
     GeometryEvidence,
-    ModeEvidence,
+    CandidateEvidence,
     RoundEvidence,
     SelectedExecution,
-    SemanticModeScore,
+    SemanticCandidateScore,
 )
 
 
@@ -46,7 +46,7 @@ class GeometryContext:
 
 
 class GeometryScorer:
-    """Score mode medoids using clone-sim when available, else ee_proxy_v1."""
+    """Score mode candidates using clone-sim when available, else ee_proxy_v1."""
 
     def __init__(
         self,
@@ -59,20 +59,20 @@ class GeometryScorer:
         self.clone_sim_evaluator = clone_sim_evaluator
 
     def score_round(self, evidence: RoundEvidence) -> tuple[GeometryEvidence, ...]:
-        return tuple(self.score_mode(evidence, mode) for mode in evidence.modes)
+        return tuple(self.score_candidate(evidence, candidate) for candidate in evidence.candidates)
 
-    def score_mode(
+    def score_candidate(
         self,
         evidence: RoundEvidence,
-        mode: ModeEvidence,
+        candidate: CandidateEvidence,
     ) -> GeometryEvidence:
-        index = int(mode.representative_indices["medoid"])
+        index = candidate.sample_index
         positions = np.asarray(evidence.trajectories.positions[index], dtype=np.float64)
         gripper = np.asarray(evidence.trajectories.grippers[index], dtype=np.float64)
         if self.clone_sim_evaluator is not None:
             result = dict(self.clone_sim_evaluator(positions, gripper))
             return GeometryEvidence(
-                mode_id=mode.mode_id,
+                candidate_id=candidate.candidate_id,
                 collision_risk=float(result["collision_risk"]),
                 reachability=float(result["reachability"]),
                 grasp_plausibility=float(result["grasp_plausibility"]),
@@ -84,11 +84,11 @@ class GeometryScorer:
                 ),
                 method="clone_sim_v1",
             )
-        return self._score_proxy(mode.mode_id, positions, gripper)
+        return self._score_proxy(candidate.candidate_id, positions, gripper)
 
     def _score_proxy(
         self,
-        mode_id: str,
+        candidate_id: str,
         positions: np.ndarray,
         gripper: np.ndarray,
     ) -> GeometryEvidence:
@@ -99,7 +99,7 @@ class GeometryScorer:
         max_violation = float(np.linalg.norm(violation, axis=1).max())
         if max_violation > 1e-9:
             return GeometryEvidence(
-                mode_id=mode_id,
+                candidate_id=candidate_id,
                 collision_risk=1.0,
                 reachability=0.0,
                 grasp_plausibility=0.0,
@@ -119,7 +119,7 @@ class GeometryScorer:
                 exact_penetration = exact_penetration or obstacle.exact
         if exact_penetration:
             return GeometryEvidence(
-                mode_id=mode_id,
+                candidate_id=candidate_id,
                 collision_risk=1.0,
                 reachability=0.0,
                 grasp_plausibility=0.0,
@@ -160,7 +160,7 @@ class GeometryScorer:
             )
             grasp = proximity if closes else 0.5 * proximity
         return GeometryEvidence(
-            mode_id=mode_id,
+            candidate_id=candidate_id,
             collision_risk=collision_risk,
             reachability=reachability,
             grasp_plausibility=grasp,
@@ -169,38 +169,31 @@ class GeometryScorer:
         )
 
 
-def select_execution_medoid(
-    modes: Sequence[ModeEvidence],
+def select_execution_candidate(
+    candidates: Sequence[CandidateEvidence],
     geometry: Sequence[GeometryEvidence],
-    semantics: Sequence[SemanticModeScore],
+    semantics: Sequence[SemanticCandidateScore],
+    selected_candidate_id: str | None = None,
 ) -> SelectedExecution | None:
-    """Apply the frozen lexicographic ranking from the v2 contract."""
+    """Execute the Planner's candidate choice, subject only to hard safety vetoes."""
 
-    mode_by_id = {mode.mode_id: mode for mode in modes}
-    geometry_by_id = {item.mode_id: item for item in geometry}
-    semantic_by_id = {item.mode_id: item for item in semantics}
-    expected = set(mode_by_id)
+    candidate_by_id = {item.candidate_id: item for item in candidates}
+    geometry_by_id = {item.candidate_id: item for item in geometry}
+    semantic_by_id = {item.candidate_id: item for item in semantics}
+    expected = set(candidate_by_id)
     if set(geometry_by_id) != expected or set(semantic_by_id) != expected:
-        raise ValueError("geometry and semantic scores must cover every mode exactly once")
-    safe = [mode for mode in modes if not geometry_by_id[mode.mode_id].hard_safety_veto]
-    if not safe:
+        raise ValueError("geometry and semantics must cover all candidates exactly once")
+    if not any(not item.hard_safety_veto for item in geometry):
         return None
-    winner = min(
-        safe,
-        key=lambda mode: (
-            -semantic_by_id[mode.mode_id].semantic_score,
-            geometry_by_id[mode.mode_id].collision_risk,
-            -geometry_by_id[mode.mode_id].reachability,
-            -geometry_by_id[mode.mode_id].grasp_plausibility,
-            -mode.weight,
-            mode.mode_id,
-        ),
-    )
-    sample_index = int(winner.representative_indices["medoid"])
+    if selected_candidate_id not in expected:
+        raise ValueError("Planner must select an existing candidate when safe candidates exist")
+    winner = candidate_by_id[selected_candidate_id]
+    if geometry_by_id[winner.candidate_id].hard_safety_veto:
+        raise ValueError("Planner selected a hard-vetoed candidate; replan, do not relabel as incapability")
     return SelectedExecution(
-        mode_id=winner.mode_id,
-        sample_index=sample_index,
-        sample_id=winner.representative_sample_ids["medoid"],
+        candidate_id=winner.candidate_id,
+        sample_index=winner.sample_index,
+        sample_id=winner.sample_id,
     )
 
 
@@ -256,5 +249,5 @@ __all__ = [
     "GeometryContext",
     "GeometryScorer",
     "adapter_geometry_scorer",
-    "select_execution_medoid",
+    "select_execution_candidate",
 ]

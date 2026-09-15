@@ -22,7 +22,6 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 from typing import Optional, Dict, Tuple, List
 from torch.nn.functional import interpolate
-from kmeans_pytorch import kmeans
 from sklearn.cluster import MeanShift
 
 from utils.keypoint_utils import (
@@ -35,6 +34,105 @@ from utils.keypoint_utils import (
 from utils.logging_utils import SteerLogger
 
 logger = SteerLogger("KeypointDetector")
+
+_KMEANS_MAX_ITERATIONS = 100
+
+
+def _bounded_kmeans(
+    X: torch.Tensor,
+    num_clusters: int,
+    *,
+    device: torch.device,
+    tol: float = 1e-4,
+    max_iterations: int = _KMEANS_MAX_ITERATIONS,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Run bounded Euclidean k-means and repair empty clusters.
+
+    ``kmeans_pytorch`` computes the mean of an empty selection as NaN and has
+    no iteration cap. Once that happens its convergence predicate can never be
+    true, so a single sparse/duplicate object mask spins forever. This local
+    implementation preserves the existing initialization and output contract,
+    but moves a farthest donor point into every empty cluster and always exits.
+    """
+
+    if X.ndim != 2 or X.shape[0] == 0:
+        raise ValueError("k-means input must be a non-empty 2D tensor")
+    num_clusters = int(num_clusters)
+    max_iterations = int(max_iterations)
+    if num_clusters <= 0 or num_clusters > X.shape[0]:
+        raise ValueError("num_clusters must be in [1, number of samples]")
+    if max_iterations <= 0:
+        raise ValueError("max_iterations must be positive")
+
+    values = X.detach().to(device=device, dtype=torch.float32).contiguous()
+    if not torch.isfinite(values).all():
+        raise ValueError("k-means input contains non-finite values")
+
+    # Match kmeans_pytorch's NumPy-based, without-replacement initialization so
+    # existing seeded runs retain the same source of randomness.
+    initial_indices = np.random.choice(
+        values.shape[0], num_clusters, replace=False
+    )
+    centers = values[
+        torch.as_tensor(initial_indices, dtype=torch.long, device=values.device)
+    ].clone()
+    repaired_empty_clusters = 0
+
+    for iteration in range(1, max_iterations + 1):
+        distances = torch.sum(
+            (values[:, None, :] - centers[None, :, :]) ** 2,
+            dim=-1,
+        )
+        assignments = torch.argmin(distances, dim=1)
+        counts = torch.bincount(assignments, minlength=num_clusters)
+
+        empty_clusters = torch.nonzero(counts == 0, as_tuple=False).flatten()
+        if empty_clusters.numel():
+            assigned_distances = distances.gather(
+                1, assignments[:, None]
+            ).squeeze(1)
+            for empty_cluster_tensor in empty_clusters:
+                empty_cluster = int(empty_cluster_tensor.item())
+                # A donor cluster with >1 members always exists because N >= K.
+                donor_eligible = counts[assignments] > 1
+                donor_scores = assigned_distances.masked_fill(
+                    ~donor_eligible, float("-inf")
+                )
+                donor_point = int(torch.argmax(donor_scores).item())
+                donor_cluster = int(assignments[donor_point].item())
+                assignments[donor_point] = empty_cluster
+                counts[donor_cluster] -= 1
+                counts[empty_cluster] += 1
+                repaired_empty_clusters += 1
+
+        updated_centers = torch.stack(
+            [
+                values[assignments == cluster_id].mean(dim=0)
+                for cluster_id in range(num_clusters)
+            ],
+            dim=0,
+        )
+        if not torch.isfinite(updated_centers).all():
+            raise RuntimeError("bounded k-means produced a non-finite center")
+
+        center_shift = torch.linalg.vector_norm(
+            updated_centers - centers, dim=1
+        ).sum()
+        centers = updated_centers
+        if center_shift.square().item() < float(tol):
+            break
+    else:
+        logger.warning(
+            f"K-means reached the {max_iterations}-iteration safety cap; "
+            "using the last finite clustering"
+        )
+
+    if repaired_empty_clusters:
+        logger.warning(
+            f"K-means repaired {repaired_empty_clusters} empty-cluster "
+            f"assignments in {iteration} iteration(s)"
+        )
+    return assignments.cpu(), centers.cpu()
 
 # DINOv3 model variants (HuggingFace)
 DINOV3_MODELS = {
@@ -440,6 +538,11 @@ class KeypointDetector:
 
             # reduce dimensionality to be less sensitive to noise and texture
             obj_features_flat = obj_features_flat.double()
+            if not torch.isfinite(obj_features_flat).all():
+                logger.warning(
+                    f"Mask {idx}: non-finite DINO features detected, skipping"
+                )
+                continue
             
             # Skip if too few points for clustering
             num_points = obj_features_flat.shape[0]
@@ -470,17 +573,19 @@ class KeypointDetector:
             
             X = torch.cat([X, feature_points_torch], dim=-1)
             
-            # Check for NaN values
-            if torch.isnan(X).any():
-                logger.warning(f"Warning: NaN detected in features for mask {idx}, skipping")
+            # Check all non-finite values before clustering. Infinities can make
+            # PCA/k-means fail just as surely as NaNs.
+            if not torch.isfinite(X).all():
+                logger.warning(
+                    f"Warning: non-finite values detected in features for mask {idx}, skipping"
+                )
                 continue
             
             # the feature dimension contains both feature and pixel coordinates
             # cluster features to get meaningful regions
-            cluster_ids_x, cluster_centers = kmeans(
+            cluster_ids_x, cluster_centers = _bounded_kmeans(
                 X=X,
                 num_clusters=self.config['num_candidates_per_mask'],
-                distance='euclidean',
                 device=self.device,
             )
             cluster_centers = cluster_centers.to(self.device)
@@ -673,4 +778,3 @@ class KeypointDetector:
         )
         
         return keypoints, projected, mask_ids, dino_vis
-

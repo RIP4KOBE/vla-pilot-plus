@@ -81,64 +81,28 @@ def signature_hash(
     return digest.hexdigest()
 
 
-@dataclass(frozen=True)
-class LookupMatch:
-    signature: CapabilitySignatureRecord
-    similarity: float
-    alpha_candidates: tuple[float, ...]
 
-
-def lookup_validated_remedies(
-    *,
-    query_failure_mode: FailureMode,
-    query_e_goal: np.ndarray,
-    query_e_obs: np.ndarray,
-    records: Iterable[CapabilitySignatureRecord],
-    similarity_threshold: float = 0.85,
-    minimum_headroom: float = 0.15,
-) -> tuple[LookupMatch, ...]:
-    matches = []
+def retrieve_experiences(*, query_e_goal, query_e_obs, records):
+    """Return evidence channels, never fixed-formula acceptance or task/failure gating."""
+    from dataclasses import asdict
+    from .experiences import artifact_ref
+    result = []
     for record in records:
-        if record.failure_mode != query_failure_mode.value:
-            continue
-        if not (
-            record.validated
-            and record.regression_passed
-            and record.trigger_recheck_passed
-        ):
-            continue
-        if 1.0 - record.alpha_l < minimum_headroom - 1e-12:
-            continue
-        goal = np.load(Path(record.e_goal_path), allow_pickle=False).astype(np.float32)
-        observation = np.load(Path(record.e_obs_path), allow_pickle=False).astype(np.float32)
-        similarity = 0.5 * cosine_similarity(query_e_goal, goal) + 0.5 * cosine_similarity(
-            query_e_obs, observation
-        )
-        if similarity < similarity_threshold:
-            continue
-        alphas = tuple(
-            sorted(
-                {
-                    round(min(1.0, record.alpha_l + increment), 8)
-                    for increment in (0.15, 0.30, 0.50)
-                    if min(1.0, record.alpha_l + increment) > record.alpha_l
-                }
-            )
-        )
-        if alphas:
-            matches.append(LookupMatch(record, similarity, alphas))
-    matches.sort(
-        key=lambda item: (-item.similarity, item.signature.signature_id)
-    )
-    return tuple(matches)
-
-
-__all__ = [
-    "FailureMode",
-    "KEYWORD_MAP_VERSION",
-    "LookupMatch",
-    "cosine_similarity",
-    "lookup_validated_remedies",
-    "map_failure_text",
-    "signature_hash",
-]
+        value = asdict(record)
+        scores = {}
+        for name, query, path in (("goal_similarity", query_e_goal, record.e_goal_path),
+                                  ("scene_similarity", query_e_obs, record.e_obs_path)):
+            if Path(path).is_file():
+                scores[name] = cosine_similarity(query, np.load(path, allow_pickle=False).astype(np.float32))
+        value["retrieval_diagnostics"] = scores
+        value["retrieval_is_validation"] = False
+        refs = []
+        for key in ("policy_gate_report_path", "multimodal_evidence_path", "candidate_manifest_path"):
+            path = record.metadata.get(key)
+            if path and Path(path).is_file():
+                refs.append(artifact_ref(path, kind="historical_evidence"))
+        value["evidence_refs"] = refs
+        result.append(value)
+    # Stable catalog allows pagination and independent language/vision inspection;
+    # no weighted similarity formula or semantic threshold decides reuse.
+    return tuple(sorted(result, key=lambda x: x["signature_id"]))

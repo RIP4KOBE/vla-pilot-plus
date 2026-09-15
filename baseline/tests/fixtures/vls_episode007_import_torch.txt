@@ -1,0 +1,117 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the white mug (porcelain_mug_1_main, keypoints 0,1,2). Use a top grasp near its rim (keypoint 1).
+# Stage 2: Move gripper with the white mug to place it on the plate (plate_1_main, keypoints 6,7). Target the plate center (mean of 6 and 7).
+# Stage 3: Move gripper to grasp the chocolate pudding (chocolate_pudding_1_main, keypoint 8).
+# Stage 4: Move gripper with the chocolate pudding to a point to the right of the plate (positive Y direction from plate center).
+
+num_stages = 4
+
+### stage 1 guidance: grasp white mug
+def stage1_guidance(keypoints, action_sequence):
+    # Move toward the white mug; use keypoint 1 (near mug rim) for a good top grasp.
+    import torch
+
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device),
+    )
+    weights = weights / weights.sum()
+
+    mug_idx = torch.tensor([1], dtype=torch.long, device=keypoints.device)
+    mug_pos = keypoints[mug_idx][0]
+
+    xy_dist = torch.norm(action_sequence[..., :2] - mug_pos[:2], dim=-1)
+    z_dist = torch.abs(action_sequence[..., 2] - mug_pos[2])
+
+    d = xy_dist * 2.0 + z_dist  # emphasize XY for top-down grasp
+    reward = -((d ** 2) * weights).sum(dim=1)
+    return reward.mean()
+
+### stage 2 guidance: place white mug on plate
+def stage2_guidance(keypoints, action_sequence):
+    # Move mug to the center of the plate (average of keypoints 6 and 7), slightly above surface.
+    import torch
+
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device),
+    )
+    weights = weights / weights.sum()
+
+    plate_indices = torch.tensor([6, 7], dtype=torch.long, device=keypoints.device)
+    plate_center = keypoints[plate_indices].mean(dim=0)
+
+    # offset slightly above plate in Z for safe placement
+    offset = torch.tensor([0.0, 0.0, 0.05], device=keypoints.device)
+    target_pos = plate_center + offset
+
+    xy_dist = torch.norm(action_sequence[..., :2] - target_pos[:2], dim=-1)
+    z_dist = torch.abs(action_sequence[..., 2] - target_pos[2])
+
+    d = xy_dist * 2.0 + z_dist
+    reward = -((d ** 2) * weights).sum(dim=1)
+    return reward.mean()
+
+### stage 3 guidance: grasp chocolate pudding
+def stage3_guidance(keypoints, action_sequence):
+    # Move toward the chocolate pudding container (keypoint 8).
+    import torch
+
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device),
+    )
+    weights = weights / weights.sum()
+
+    pudding_idx = torch.tensor([8], dtype=torch.long, device=keypoints.device)
+    pudding_pos = keypoints[pudding_idx][0]
+
+    xy_dist = torch.norm(action_sequence[..., :2] - pudding_pos[:2], dim=-1)
+    z_dist = torch.abs(action_sequence[..., 2] - pudding_pos[2])
+
+    d = xy_dist * 2.0 + z_dist  # emphasize XY
+    reward = -((d ** 2) * weights).sum(dim=1)
+    return reward.mean()
+
+### stage 4 guidance: place chocolate pudding to the right of the plate
+def stage4_guidance(keypoints, action_sequence):
+    # Move pudding to a point to the right (+Y) of the plate center.
+    import torch
+
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device),
+    )
+    weights = weights / weights.sum()
+
+    plate_indices = torch.tensor([6, 7], dtype=torch.long, device=keypoints.device)
+    plate_center = keypoints[plate_indices].mean(dim=0)
+
+    # Define a target 8cm to the right (+Y) of the plate center, slightly above surface.
+    offset = torch.tensor([0.0, 0.08, 0.05], device=keypoints.device)
+    target_pos = plate_center + offset
+
+    xy_dist = torch.norm(action_sequence[..., :2] - target_pos[:2], dim=-1)
+    z_dist = torch.abs(action_sequence[..., 2] - target_pos[2])
+
+    d = xy_dist * 2.0 + z_dist
+    reward = -((d ** 2) * weights).sum(dim=1)
+    return reward.mean()
+```

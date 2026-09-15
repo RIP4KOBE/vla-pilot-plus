@@ -9,6 +9,7 @@ import os
 from pathlib import Path
 import re
 import sys
+import time
 
 import h5py
 
@@ -20,7 +21,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from mode_gate.data_pipeline import validate_demo_replay  # noqa: E402
+from mode_gate.data_pipeline import NATIVE_REPLAY_ACCEPTANCE, validate_demo_replay  # noqa: E402
+from mode_gate.io_utils import atomic_write_json  # noqa: E402
 from mode_gate.policy_evaluator import runtime_suite_name  # noqa: E402
 from mode_gate.tickets import ExpansionTicket  # noqa: E402
 from scripts.teleop_server import _manifest_task  # noqa: E402
@@ -36,7 +38,11 @@ def main() -> int:
     parser.add_argument("--raw-dir", type=Path)
     parser.add_argument("--max-steps", type=int, default=3000)
     parser.add_argument("--force", action="store_true")
+    parser.add_argument("--progress-path", type=Path)
+    parser.add_argument("--observation-size", type=int, default=32)
     args = parser.parse_args()
+    if not 16 <= args.observation_size <= 512:
+        parser.error("observation-size must be between 16 and 512")
     ticket = ExpansionTicket.model_validate_json(
         args.ticket.read_text(encoding="utf-8")
     )
@@ -63,17 +69,33 @@ def main() -> int:
             ),
             "task_ids_filter": [int(task["task_index"])],
             "episode_num": 1,
-            "observation_width": 256,
-            "observation_height": 256,
+            # RGB is not compared or rewritten by action/state validation.
+            "observation_width": args.observation_size,
+            "observation_height": args.observation_size,
             "camera_depths": False,
             "auto_reset": False,
             "max_episode_steps": int(args.max_steps),
         }
     )
-    adapter = create_adapter("libero", config)
+    adapter = create_adapter("libero", config, device="cpu")
     failed = []
+    errors = []
+    completed = []
+    progress_path = args.progress_path or args.ticket.parent / "action_replay_progress.json"
+    def progress(state, current=None):
+        atomic_write_json(progress_path, {"schema_version": "demo-action-replay-progress-v1",
+            "state": state, "pid": os.getpid(), "total": len(paths), "completed": completed,
+            "completed_count": len(completed), "current_demo": str(current) if current else None,
+            "failed": failed, "errors": errors, "updated_at_unix": time.time(),
+            "diagnostic_tolerances": {"state": 5e-3, "qpos": 1e-4, "qvel": 5e-3},
+            "acceptance_version": NATIVE_REPLAY_ACCEPTANCE,
+            "state_error_role": "diagnostic_only", "success_authority": "LIBERO-PRO native predicate",
+            "validation_mode": "initial_restore_once_then_actions_only", "physics_device": "cpu",
+            "observation_size": args.observation_size})
+    progress("VALIDATING")
     try:
         for path in paths:
+            progress("VALIDATING", path)
             match = _DEMO.match(path.name)
             assert match is not None
             with h5py.File(path, "r") as handle:
@@ -82,10 +104,12 @@ def main() -> int:
                 init_state_id = int(handle.attrs["init_state_id"])
                 env_seed = int(handle.attrs.get("env_seed", int(match.group(1))))
             if not committed and not already_valid:
-                failed.append({"demo": str(path), "error": "not collection_committed"})
+                errors.append({"demo": str(path), "error": "not collection_committed"})
                 continue
             if already_valid and not args.force:
-                print(json.dumps({"demo": str(path), "status": "already_valid"}))
+                result = {"demo": str(path), "status": "already_valid"}
+                completed.append(result)
+                print(json.dumps(result), flush=True)
                 continue
             try:
                 error = validate_demo_replay(
@@ -100,36 +124,43 @@ def main() -> int:
                 )
                 with h5py.File(path, "r+") as handle:
                     valid = bool(handle.attrs["replay_validated"])
+                    native_success = bool(handle.attrs["replay_task_success"])
                     handle.attrs["replay_status"] = "validated" if valid else "rejected"
                     handle.flush()
                 result = {
                     "demo": str(path),
                     "status": "validated" if valid else "rejected",
                     "max_state_error": error,
+                    "native_success": native_success,
+                    "acceptance_version": NATIVE_REPLAY_ACCEPTANCE,
                 }
-                print(json.dumps(result))
+                completed.append(result)
+                print(json.dumps(result), flush=True)
                 if not valid:
                     failed.append(result)
             except Exception as exc:
                 with h5py.File(path, "r+") as handle:
                     handle.attrs["replay_status"] = "error"
                     handle.flush()
-                failed.append(
+                errors.append(
                     {"demo": str(path), "error": f"{type(exc).__name__}: {exc}"}
                 )
+            progress("VALIDATING")
     finally:
         adapter.close()
+    progress("ERROR" if errors else "COMPLETE")
     print(
         json.dumps(
             {
                 "total": len(paths),
                 "failed": failed,
-                "all_valid": not failed,
+                "errors": errors,
+                "all_valid": not failed and not errors,
             },
             indent=2,
         )
     )
-    return 0 if not failed else 2
+    return 1 if errors else (2 if failed else 0)
 
 
 if __name__ == "__main__":

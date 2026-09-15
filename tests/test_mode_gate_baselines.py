@@ -19,7 +19,7 @@ from mode_gate.baselines import (
     FixedBudgetRouter,
     GeometryGateRouter,
     MatchedRandomRouter,
-    ModeCountGateRouter,
+    CandidateCountGateRouter,
     OracleRouter,
     ResteerOnlyRouter,
     SemanticGateRouter,
@@ -60,7 +60,7 @@ def _opportunity(**overrides):
     values = {
         "opportunity_id": "op-1",
         "retry_index": 0,
-        "active_mode_count": 3,
+        "active_candidate_count": 3,
         "max_semantic_score": 0.8,
         "min_collision_risk": 0.1,
     }
@@ -77,8 +77,8 @@ def test_baseline_routes_have_frozen_and_unambiguous_semantics():
     assert always.merge_method == "retain_uniform"
     assert always.metadata["equation"] == "parent + alpha * (theta_ft - parent)"
     assert ResteerOnlyRouter().decide(_opportunity()).route is ControllerRoute.RESTEER
-    assert ModeCountGateRouter(2).decide(
-        _opportunity(active_mode_count=1)
+    assert CandidateCountGateRouter(2).decide(
+        _opportunity(active_candidate_count=1)
     ).route is ControllerRoute.EXPAND
     assert SemanticGateRouter(0.5).decide(
         _opportunity(max_semantic_score=0.49)
@@ -287,22 +287,22 @@ def test_random_control_matches_expansion_count_exactly_and_is_order_invariant()
     assert expanded_first == expanded_second
 
 
-def test_experimental_fixed_budget_can_drive_the_real_chunk_controller_past_four():
+def test_fixed_budget_10_can_drive_the_real_chunk_controller_past_four():
     config = ModeGateConfig(
         enabled=True,
         baseline_kind="fixed_budget",
-        baseline_budget=8,
+        baseline_budget=50,
     )
     router = build_baseline_router(
         kind=config.baseline_kind,
         budget=config.baseline_budget,
     )
-    controller = EpisodeChunkController(config, retry_budget_override=8)
+    controller = EpisodeChunkController(config, retry_budget_override=50)
     controller.start_episode()
     controller.state.verification_due = True
     controller.begin_sampling()
     controller.mark_abstracted()
-    controller.mark_scored(has_safe_mode=True)
+    controller.mark_scored(has_safe_candidate=True)
     controller.state.retry_index = 4
     baseline = router.decide(_opportunity(retry_index=4))
     decision = controller.route_scored_batch(
@@ -310,9 +310,9 @@ def test_experimental_fixed_budget_can_drive_the_real_chunk_controller_past_four
         override_reason=baseline.reason,
     )
     assert decision.route is ControllerRoute.RESTEER
-    assert controller.state.retry_budget == 8
+    assert controller.state.retry_budget == 50
     assert controller.state.retry_index == 5
-    assert decision.remaining_budget == 3
+    assert decision.remaining_budget == 45
     assert decision.verifier_called is False
 
 
@@ -324,17 +324,12 @@ def test_baseline_manifest_is_immutable_and_protocol_bound(tmp_path):
     assert first["manifest_sha256"]
     ids = {value["id"] for value in first["baselines"]}
     assert {
-        "fixed_budget_1",
-        "fixed_budget_2",
-        "fixed_budget_4",
-        "fixed_budget_8",
-        "fixed_budget_16",
-        "fixed_budget_32",
+        "fixed_budget_10",
         "always_expansion_retain",
         "oracle_verifier",
         "resteer_only",
         "verifier_no_lookup",
-        "mode_count_gate",
+        "candidate_count_gate",
         "semantic_gate",
         "geometry_gate",
         "random_matched",

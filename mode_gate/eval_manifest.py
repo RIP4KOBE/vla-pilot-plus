@@ -31,6 +31,23 @@ def generate_joint_manifest(
     alpha_bonus = set(bonus_order[:20])
     regression_bonus = set(bonus_order[:10])
     final_bonus = set(bonus_order[20:40])
+    bonus_load = {
+        key: int(key in alpha_bonus)
+        + int(key in regression_bonus)
+        + int(key in final_bonus)
+        for key in keys
+    }
+    train_bonus = set(
+        sorted(keys, key=lambda key: (bonus_load[key], _hash(f"train\0{key}")))[:20]
+    )
+    for key in train_bonus:
+        bonus_load[key] += 1
+    calibration_bonus = set(
+        sorted(
+            keys,
+            key=lambda key: (bonus_load[key], _hash(f"calibration\0{key}")),
+        )[:20]
+    )
 
     entries = []
     for task, key in sorted(zip(tasks, keys), key=lambda item: item[1]):
@@ -42,9 +59,12 @@ def generate_joint_manifest(
             "policy_alpha_selection": 2 + int(key in alpha_bonus),
             "policy_regression": 6 + int(key in regression_bonus),
             "policy_final_sealed": 12 + int(key in final_bonus),
-            "verifier_audit_train": 12,
-            "verifier_calibration": 4,
-            "verifier_test": 4,
+            # These sum to the suggested 500/100/200 bank. Collection may
+            # stop before exhausting it once independent held-out evidence is
+            # sufficient; the counts are not deployment gates.
+            "verifier_audit_train": 12 + int(key in train_bonus),
+            "verifier_calibration": 2 + int(key in calibration_bonus),
+            "verifier_test": 5,
             "fixed_development_probe": 2,
         }
         splits: dict[str, list[str]] = {}
@@ -82,6 +102,12 @@ def generate_joint_manifest(
     manifest = {
         "schema_version": "joint-eval-manifest-v1",
         "split_seed": SPLIT_SEED,
+        "verifier_suggested_targets": {
+            "train": 500,
+            "calibration": 100,
+            "test": 200,
+            "hard_gate": False,
+        },
         "dataset_hash": dataset_hash,
         "bddl_hash": bddl_hash,
         "init_state_manifest_hash": init_state_manifest_hash,
@@ -101,6 +127,9 @@ def validate_joint_manifest(manifest: Mapping[str, Any]) -> None:
         "policy_alpha_selection": 0,
         "policy_regression": 0,
         "policy_final_sealed": 0,
+        "verifier_audit_train": 0,
+        "verifier_calibration": 0,
+        "verifier_test": 0,
     }
     for task in tasks:
         task_index = int(task.get("task_index", -1))
@@ -122,12 +151,29 @@ def validate_joint_manifest(manifest: Mapping[str, Any]) -> None:
             raise ValueError(f"manifest does not account for 50 states: {task['task_key']}")
         if len(task["splits"]["demo_online_pool"]) < 5:
             raise ValueError("demo/online pool too small")
-    if totals != {
+    policy_totals = {
+        name: totals[name]
+        for name in (
+            "policy_alpha_selection",
+            "policy_regression",
+            "policy_final_sealed",
+        )
+    }
+    if policy_totals != {
         "policy_alpha_selection": 100,
         "policy_regression": 250,
         "policy_final_sealed": 500,
     }:
-        raise ValueError(f"formal policy split totals are wrong: {totals}")
+        raise ValueError(f"formal policy split totals are wrong: {policy_totals}")
+    if any(
+        totals[name] <= 0
+        for name in (
+            "verifier_audit_train",
+            "verifier_calibration",
+            "verifier_test",
+        )
+    ):
+        raise ValueError("verifier splits must be non-empty independent banks")
     if any(indices != set(range(10)) for indices in indices_by_suite.values()):
         raise ValueError("each formal suite must contain task_index 0..9 exactly once")
 

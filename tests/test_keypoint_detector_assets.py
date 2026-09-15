@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 import torch
 
-from core.keypoint_detector import KeypointDetector
+from core.keypoint_detector import KeypointDetector, _bounded_kmeans
 from mode_gate.preflight import _directory_fingerprint
 
 
@@ -108,3 +108,33 @@ def test_frozen_source_fingerprint_ignores_runtime_bytecode(tmp_path):
 
     source.write_text("revision = 2\n", encoding="utf-8")
     assert _directory_fingerprint(repo) != first
+
+
+def test_bounded_kmeans_repairs_duplicate_point_empty_clusters():
+    # Five requested clusters over only two unique points deterministically
+    # creates empty clusters in the previous unbounded implementation.
+    values = torch.tensor(
+        [[0.0, 0.0]] * 8 + [[1.0, 1.0]] * 2,
+        dtype=torch.float32,
+    )
+
+    assignments, centers = _bounded_kmeans(
+        values,
+        5,
+        device=torch.device("cpu"),
+        max_iterations=10,
+    )
+
+    assert assignments.shape == (10,)
+    assert centers.shape == (5, 2)
+    assert torch.isfinite(centers).all()
+    assert torch.all(torch.bincount(assignments, minlength=5) > 0)
+
+
+def test_bounded_kmeans_rejects_nonfinite_input():
+    with pytest.raises(ValueError, match="non-finite"):
+        _bounded_kmeans(
+            torch.tensor([[0.0, 1.0], [float("nan"), 2.0]]),
+            2,
+            device=torch.device("cpu"),
+        )

@@ -1,0 +1,79 @@
+{
+  "schema_version": "baseline-real-v44-smoke-v1",
+  "synthetic_training_targets": true,
+  "base": {
+    "checkpoint": "/shared/hengyil6/vls/models/pi05_libero_finetuned_v044",
+    "files": {
+      "config.json": "2f6d4b96b032593e1de65b391ee7252a70227bff398ef1b94658fea17818142f",
+      "policy_postprocessor.json": "37d719a6584600988e6c343306d2eaee0575109f235ad500313577f73e47e8a1",
+      "policy_postprocessor_step_0_unnormalizer_processor.safetensors": "a002c0df7f79c5b169c5a899ad151d4ea1bed246c7d82bd93ed1556558d517a9",
+      "policy_preprocessor.json": "3d669ffc18d0364536735d8203076dcc69d3a6523aa5956ccaada3f9e1e6b748",
+      "policy_preprocessor_step_2_normalizer_processor.safetensors": "a002c0df7f79c5b169c5a899ad151d4ea1bed246c7d82bd93ed1556558d517a9",
+      "model.safetensors": "877b3ec1130548b69af7f8aeef3ec9d3fc7738040f0b9beb490857ec970997ae"
+    },
+    "pretraining": "LIBERO-40 (user-provided provenance)",
+    "chunk_size": 50,
+    "physical_action_dim": 7,
+    "normalization": "unchanged checkpoint processors",
+    "tokenizer_files": {
+      "added_tokens.json": "7d0bad90030d638a4bf89a82e91206e25f1fbe0012f14bca21666a64b643bc49",
+      "special_tokens_map.json": "5ef37093ae4236587b6e8266acb815b46e2db8ce656c66552bfa574d32880405",
+      "tokenizer.json": "ef6773c135b77b834de1d13c75a4c98ab7a3684ffd602d1831e1f1bf5467c563",
+      "tokenizer.model": "8986bb4f423f07f8c7f70d0dbe3526fb2316056c17bae71b1ea975e77a168fc6",
+      "tokenizer_config.json": "3259402b1d1802e02417d7bff75a889ec61d359d15be6050a957b307c48edbbe"
+    },
+    "sha256": "c718e6ca3a9225e3c6f79a667d0ec33fdbf9581390fc32d7ae3f73e3338436ec"
+  },
+  "started_unix": 1788753394.23585,
+  "checks": {
+    "base_sampling": {
+      "shape": [
+        1,
+        50,
+        7
+      ],
+      "max_error_vs_native": 0.0
+    },
+    "latent_roundtrip": {
+      "passed": true
+    },
+    "clare": {
+      "trained_layers": 18,
+      "checkpoint_roundtrip": true
+    },
+    "mlr_ifa": {
+      "grad_norm": 1.3988947868347168,
+      "checkpoint_roundtrip": true,
+      "changed_query_weights": 2097128,
+      "flow_loss": 0.03331989794969559,
+      "ifa_loss": 2.260394811630249,
+      "selected_pairs": 1
+    },
+    "continual_vla_rl": {
+      "grad_norm": 3.3213701248168945,
+      "transitions": 10,
+      "checkpoint_roundtrip": true
+    },
+    "rl2_vla": {
+      "qam_grad_norm": 19.655574798583984,
+      "checkpoint_roundtrip": true,
+      "steering": true,
+      "failure_probability": 0.42568597197532654,
+      "candidate_count": 2,
+      "best_score": 0.07291901111602783,
+      "critic_loss": 1.3878414630889893,
+      "flow_loss": 1.7603001594543457,
+      "adjoint_loss": 0.0037726471200585365
+    },
+    "libero_pro": {
+      "executed_steps": 10,
+      "runtime_suite": "libero_spatial_object",
+      "context_verified": true,
+      "success_is_not_a_benchmark_result": false
+    }
+  },
+  "gpu": "_CudaDeviceProperties(name='NVIDIA RTX 6000D', major=12, minor=0, total_memory=85042MB, multi_processor_count=156, uuid=e6f54bec-13b1-3c6a-a1d7-9d3cbf4c6661, L2_cache_size=112MB)",
+  "passed": true,
+  "finished_unix": 1788753425.15401,
+  "peak_allocated_mib": 14891.2451171875
+}

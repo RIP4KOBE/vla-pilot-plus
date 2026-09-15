@@ -37,7 +37,7 @@ class BaselineKind(str, Enum):
     ALWAYS_EXPAND_RETAIN = "always_expand_retain"
     RESTEER_ONLY = "resteer_only"
     VERIFIER_NO_LOOKUP = "verifier_no_lookup"
-    MODE_COUNT_GATE = "mode_count_gate"
+    CANDIDATE_COUNT_GATE = "candidate_count_gate"
     SEMANTIC_GATE = "semantic_gate"
     GEOMETRY_GATE = "geometry_gate"
     ORACLE = "oracle"
@@ -51,7 +51,7 @@ class BaselineOpportunity:
 
     opportunity_id: str
     retry_index: int
-    active_mode_count: int
+    active_candidate_count: int
     max_semantic_score: float
     min_collision_risk: float
     learned_p_expansion: float | None = None
@@ -61,7 +61,7 @@ class BaselineOpportunity:
     def __post_init__(self) -> None:
         if not self.opportunity_id:
             raise ValueError("opportunity_id is required")
-        if self.retry_index < 0 or not 0 <= self.active_mode_count <= 4:
+        if self.retry_index < 0 or not self.active_candidate_count >= 0:
             raise ValueError("invalid retry index or active mode count")
         for name in ("max_semantic_score", "min_collision_risk"):
             value = float(getattr(self, name))
@@ -112,8 +112,8 @@ class FixedBudgetRouter(BaselineRouter):
     kind: BaselineKind = BaselineKind.FIXED_BUDGET
 
     def __post_init__(self) -> None:
-        if self.budget not in {1, 2, 4, 8, 16, 32}:
-            raise ValueError("fixed budget must be one of 1,2,4,8,16,32")
+        if self.budget <= 0:
+            raise ValueError("fixed budget must be positive")
 
     def decide(self, opportunity: BaselineOpportunity) -> BaselineDecision:
         if opportunity.retry_index >= self.budget:
@@ -180,25 +180,25 @@ class VerifierNoLookupRouter(BaselineRouter):
 
 
 @dataclass(frozen=True)
-class ModeCountGateRouter(BaselineRouter):
-    """Expand when fewer than ``minimum_modes`` viable modes remain."""
+class CandidateCountGateRouter(BaselineRouter):
+    """Expand when fewer than ``minimum_candidates`` viable modes remain."""
 
-    minimum_modes: int = 2
-    kind: BaselineKind = BaselineKind.MODE_COUNT_GATE
+    minimum_candidates: int = 2
+    kind: BaselineKind = BaselineKind.CANDIDATE_COUNT_GATE
 
     def __post_init__(self) -> None:
-        if not 1 <= self.minimum_modes <= 4:
-            raise ValueError("minimum_modes must be in [1, 4]")
+        if self.minimum_candidates < 1:
+            raise ValueError("minimum_candidates must be in [1, 4]")
 
     def decide(self, opportunity: BaselineOpportunity) -> BaselineDecision:
-        expand = opportunity.active_mode_count < self.minimum_modes
+        expand = opportunity.active_candidate_count < self.minimum_candidates
         return BaselineDecision(
             ControllerRoute.EXPAND if expand else ControllerRoute.RESTEER,
             "mode_count_threshold",
             lookup_enabled=False,
             metadata={
-                "active_mode_count": opportunity.active_mode_count,
-                "minimum_modes": self.minimum_modes,
+                "active_candidate_count": opportunity.active_candidate_count,
+                "minimum_candidates": self.minimum_candidates,
             },
         )
 
@@ -240,7 +240,7 @@ class GeometryGateRouter(BaselineRouter):
 
     def decide(self, opportunity: BaselineOpportunity) -> BaselineDecision:
         expand = (
-            opportunity.active_mode_count == 0
+            opportunity.active_candidate_count == 0
             or opportunity.min_collision_risk > self.maximum_collision_risk
         )
         return BaselineDecision(
@@ -315,7 +315,7 @@ def build_baseline_router(
     *,
     kind: str,
     budget: int = 4,
-    minimum_modes: int = 2,
+    minimum_candidates: int = 2,
     threshold: float = 0.5,
     expansion_rate: float = 0.0,
     seed: int = 20260825,
@@ -334,8 +334,8 @@ def build_baseline_router(
         return ResteerOnlyRouter()
     if baseline is BaselineKind.VERIFIER_NO_LOOKUP:
         return VerifierNoLookupRouter()
-    if baseline is BaselineKind.MODE_COUNT_GATE:
-        return ModeCountGateRouter(int(minimum_modes))
+    if baseline is BaselineKind.CANDIDATE_COUNT_GATE:
+        return CandidateCountGateRouter(int(minimum_candidates))
     if baseline is BaselineKind.SEMANTIC_GATE:
         return SemanticGateRouter(float(threshold))
     if baseline is BaselineKind.GEOMETRY_GATE:
@@ -371,7 +371,7 @@ def baseline_suite_spec(
     if len(seeds) != 3 or len(set(seeds)) != 3:
         raise ValueError("headline baselines require exactly three random seeds")
     value: dict[str, Any] = {
-        "schema_version": "baseline-suite-v1",
+        "schema_version": "baseline-suite-v2",
         "protocol_manifest_hash": protocol_manifest_hash,
         "headline_order_seeds": list(seeds),
         "adversarial_hard_to_easy_seed": int(adversarial_order_seed),
@@ -380,9 +380,9 @@ def baseline_suite_spec(
                 "id": f"fixed_budget_{budget}",
                 "kind": BaselineKind.FIXED_BUDGET.value,
                 "budget": budget,
-                "priority": 1 if budget == 4 else 2,
+                "priority": 1,
             }
-            for budget in (1, 2, 4, 8, 16, 32)
+            for budget in (10,)
         ]
         + [
             {
@@ -409,9 +409,9 @@ def baseline_suite_spec(
                 "priority": 2,
             },
             {
-                "id": "mode_count_gate",
-                "kind": BaselineKind.MODE_COUNT_GATE.value,
-                "minimum_modes": 2,
+                "id": "candidate_count_gate",
+                "kind": BaselineKind.CANDIDATE_COUNT_GATE.value,
+                "minimum_candidates": 2,
                 "priority": 2,
             },
             {
@@ -972,7 +972,7 @@ __all__ = [
     "FixedBudgetRouter",
     "GeometryGateRouter",
     "MatchedRandomRouter",
-    "ModeCountGateRouter",
+    "CandidateCountGateRouter",
     "OracleRouter",
     "ResteerOnlyRouter",
     "SemanticGateRouter",

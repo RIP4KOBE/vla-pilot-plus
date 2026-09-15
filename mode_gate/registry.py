@@ -15,6 +15,11 @@ from uuid import uuid4
 import fcntl
 
 from .io_utils import AtomicJsonl, atomic_write_json, sha256_file
+from .experiment_contract import (
+    FIXED_BUDGET_50_LABEL_VERSION,
+    fixed_budget_from_controller_mode,
+    require_fixed_budget_50_contract,
+)
 
 
 def _now() -> str:
@@ -146,14 +151,14 @@ class PolicyRegistry:
             return self.promote(
                 policy_id=str(policy_id),
                 verifier_id=None,
-                controller_mode="fixed_budget_4",
+                controller_mode="fixed_budget_50",
                 manifest_hash=str(manifest_hash),
                 expected_revision=0,
                 reason="bootstrap_theta0",
             )
         expected = (
             str(policy_id),
-            "fixed_budget_4",
+            "fixed_budget_50",
             None,
             str(manifest_hash),
         )
@@ -163,6 +168,20 @@ class PolicyRegistry:
             current.verifier_id,
             current.manifest_hash,
         )
+        if (
+            current.policy_id == str(policy_id)
+            and current.controller_mode == "fixed_budget_4"
+            and current.verifier_id is None
+            and current.manifest_hash == str(manifest_hash)
+        ):
+            return self.promote(
+                policy_id=str(policy_id),
+                verifier_id=None,
+                controller_mode="fixed_budget_50",
+                manifest_hash=str(manifest_hash),
+                expected_revision=current.deployment_revision,
+                reason="migrate_fixed_budget_4_to_fixed_budget_50",
+            )
         if actual != expected:
             raise RuntimeError("registry is already active with a different deployment")
         return current
@@ -183,12 +202,13 @@ class PolicyRegistry:
         expected_revision: int,
         reason: str = "promotion",
     ) -> ActiveDeployment:
-        if controller_mode not in {"learned_verifier", "fixed_budget_4"}:
+        fixed_budget = fixed_budget_from_controller_mode(controller_mode)
+        if controller_mode != "learned_verifier" and fixed_budget is None:
             raise ValueError("invalid controller mode")
         if controller_mode == "learned_verifier" and verifier_id is None:
             raise ValueError("learned_verifier deployment requires verifier_id")
-        if controller_mode == "fixed_budget_4" and verifier_id is not None:
-            raise ValueError("fixed_budget_4 deployment must not name a verifier")
+        if fixed_budget is not None and verifier_id is not None:
+            raise ValueError("fixed-budget deployment must not name a verifier")
         if not (self.root / "policies" / policy_id).exists():
             raise FileNotFoundError(f"policy is not installed: {policy_id}")
         if verifier_id is not None and not (self.root / "verifiers" / verifier_id).exists():
@@ -202,8 +222,14 @@ class PolicyRegistry:
             verifier_manifest = json.loads(
                 verifier_manifest_path.read_text(encoding="utf-8")
             )
-            if verifier_manifest.get("metadata", {}).get("policy_id") != policy_id:
+            verifier_metadata = verifier_manifest.get("metadata", {})
+            if verifier_metadata.get("policy_id") != policy_id:
                 raise ValueError("verifier artifact policy_id does not match deployment policy")
+            if verifier_metadata.get("label_version") != FIXED_BUDGET_50_LABEL_VERSION:
+                raise ValueError("verifier artifact is not fixed_budget_50")
+            require_fixed_budget_50_contract(
+                dict(verifier_metadata.get("label_config") or {})
+            )
         with self.lock_path.open("a+b") as lock:
             fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
             current = self.active()

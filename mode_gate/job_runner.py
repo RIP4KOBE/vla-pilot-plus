@@ -19,6 +19,59 @@ from .io_utils import atomic_write_json
 SERVER_PYTHON = Path("/shared/hengyil6/vls/envs/vla-pilot/bin/python")
 
 
+def adopt_existing_execution(spec_path: Path, *, coordinator_pid=None) -> dict | None:
+    """Find an exact in-flight job, including an orphan of a dead coordinator.
+
+    Attaching records identity only: it never signals, restarts, or waits on the
+    child. A replacement coordinator must consume its artifacts before retrying.
+    """
+    from .experiment_supervisor import process_identity, read_json, same_process
+    spec_path = Path(spec_path).resolve()
+    spec = read_json(spec_path)
+    command = list(map(str, spec["command"]))
+    digest = hashlib.sha256(spec_path.read_bytes()).hexdigest()
+    running_path = spec_path.with_name(spec_path.stem + ".running.json")
+    record = read_json(running_path)
+    if record and record.get("spec_sha256") != digest:
+        raise ValueError("job spec changed after a running execution was recorded")
+    if record and same_process(record):
+        return record
+    candidates = [command]
+    if record.get("actual_command"):
+        candidates.append(record["actual_command"])
+    matches = []
+    for proc in Path("/proc").glob("[0-9]*"):
+        observed = process_identity(int(proc.name))
+        if not observed:
+            continue
+        actual = observed["command"]
+        # Python symlinks are equivalent; every job argument must still match.
+        matched = any(actual[1:] == expected[1:] and actual and
+                      Path(actual[0]).resolve() == Path(expected[0]).resolve()
+                      for expected in candidates)
+        # Accelerate's Python trainer may outlive its launcher. Match its full
+        # module argument tail, not a generic Python/GPU process name.
+        module = "lerobot.scripts.lerobot_train"
+        if spec["schema_version"] == "coft-job-v1" and module in actual:
+            matched |= any(module in expected and
+                           actual[actual.index(module):] == expected[expected.index(module):]
+                           for expected in candidates)
+        if matched:
+            try:
+                if (proc / "cwd").resolve() == Path(spec["cwd"]).resolve():
+                    matches.append(observed)
+            except OSError:
+                continue
+    if not matches:
+        return None
+    observed = matches[0]
+    record = {**observed, "spec_sha256": digest, "actual_command": observed["command"],
+              "coordinator_pid": coordinator_pid, "adopted_at": time.time(),
+              "related_pids": [item["pid"] for item in matches]}
+    atomic_write_json(running_path, record)
+    return record
+
+
 def execute_job_spec(
     spec_path: Path,
     *,
@@ -30,7 +83,7 @@ def execute_job_spec(
     if schema not in {
         "coft-job-v1",
         "policy-gate-job-v1",
-        "counterfactual-replay-job-v1",
+        "counterfactual-replay-job-v2",
     }:
         raise ValueError(f"unsupported executable job schema: {schema}")
     command = tuple(map(str, spec.get("command", ())))
@@ -47,7 +100,40 @@ def execute_job_spec(
 
     lock_path = spec_path.with_suffix(spec_path.suffix + ".execution.lock")
     with lock_path.open("a+b") as lock:
-        fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        try:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return {"launched": False, "completed": False, "blocked_reason": "job_already_owned"}
+        running = adopt_existing_execution(spec_path, coordinator_pid=os.getpid())
+        if running:
+            # An adopted orphan no longer has its original parent enforcing
+            # process.wait(timeout). Preserve that bound after handoff too.
+            from .experiment_supervisor import same_process
+            began = float(running.get("started_at", running.get("adopted_at", time.time())))
+            if time.time() - began >= timeout_seconds and same_process(running):
+                pid = int(running["pid"])
+                if os.getpgid(pid) == pid:
+                    os.killpg(pid, signal.SIGTERM)
+                else:
+                    os.kill(pid, signal.SIGTERM)
+                deadline = time.monotonic() + 30
+                while time.monotonic() < deadline and same_process(running):
+                    time.sleep(.2)
+                if same_process(running):
+                    # Only this verified process group belongs to the job.
+                    if os.getpgid(pid) == pid:
+                        os.killpg(pid, signal.SIGKILL)
+                    else:
+                        os.kill(pid, signal.SIGKILL)
+                result = {"schema_version": "slow-job-result-v1", "spec_sha256": spec_hash,
+                          "job_schema": schema, "launched": True, "completed": False,
+                          "returncode": 124, "timed_out": True, "adopted_execution": True,
+                          "log_path": str(spec_path.with_name(spec_path.stem + ".log")),
+                          "recorded_at": datetime.now(timezone.utc).isoformat()}
+                atomic_write_json(result_path, result)
+                return result
+            return {"launched": False, "completed": False,
+                    "blocked_reason": "existing_execution_still_running", "pid": running["pid"]}
         selected_gpu_indices: list[int] | None = None
         if schema == "coft-job-v1":
             memory = _gpu_memory_snapshot()
@@ -61,8 +147,10 @@ def execute_job_spec(
                     spec.get("preferred_gpu_indices", [4, 5, 6, 7, 0, 1, 2, 3]),
                 )
             )
-            if len(preference) != 8 or set(preference) != set(range(8)):
-                raise ValueError("preferred_gpu_indices must be a permutation of 0..7")
+            if not preference or len(set(preference)) != len(preference) or any(
+                index < 0 or index >= len(memory) for index in preference
+            ):
+                raise ValueError("preferred_gpu_indices must be unique valid physical GPUs")
             eligible = [
                 index
                 for index in preference
@@ -84,7 +172,7 @@ def execute_job_spec(
                 }
                 atomic_write_json(result_path, result)
                 return result
-        elif schema == "counterfactual-replay-job-v1":
+        elif schema == "counterfactual-replay-job-v2":
             memory = _gpu_memory_snapshot()
             index = int(spec.get("preferred_gpu_index", -1))
             if not 0 <= index < len(memory):
@@ -142,12 +230,28 @@ def execute_job_spec(
             }
         )
         if selected_gpu_indices is not None:
-            environment["CUDA_VISIBLE_DEVICES"] = ",".join(
-                map(str, selected_gpu_indices)
-            )
+            if len(selected_gpu_indices) != 1:
+                raise ValueError("this experiment supports one physical GPU without remapping")
+            physical_device = f"cuda:{selected_gpu_indices[0]}"
+            if schema == "coft-job-v1":
+                if spec.get("physical_device", physical_device) != physical_device:
+                    raise ValueError("co-FT physical device differs from selected GPU")
+                environment["ACCELERATE_TORCH_DEVICE"] = physical_device
+            elif schema == "policy-gate-job-v1":
+                if "--device" not in command or command[command.index("--device") + 1] != physical_device:
+                    raise ValueError("policy gate must use its explicit physical CUDA device")
+        if environment.get("CUDA_VISIBLE_DEVICES"):
+            raise ValueError("remove CUDA_VISIBLE_DEVICES: physical GPU numbering must stay unchanged")
+        resume = None
+        if schema == "coft-job-v1" and spec.get("resumable_checkpoints"):
+            from .coft_recovery import prepare_coft_execution
+            command, resume = prepare_coft_execution(command, spec)
         started = time.monotonic()
         timed_out = False
-        with log_path.open("w", encoding="utf-8") as log:
+        with log_path.open("a", encoding="utf-8") as log:
+            log_start_offset = log.tell()
+            log.write(f"\n=== execution attempt {datetime.now(timezone.utc).isoformat()} ===\n")
+            log.flush()
             process = subprocess.Popen(
                 command,
                 cwd=cwd,
@@ -157,6 +261,14 @@ def execute_job_spec(
                 text=True,
                 start_new_session=True,
             )
+            from .experiment_supervisor import process_identity
+            identity = process_identity(process.pid)
+            if identity:
+                atomic_write_json(spec_path.with_name(spec_path.stem + ".running.json"), {
+                    **identity, "actual_command": list(command), "spec_sha256": spec_hash,
+                    "coordinator_pid": os.getpid(), "started_at": time.time(),
+                    "log_start_offset": log_start_offset, "resume": resume,
+                })
             try:
                 returncode = process.wait(timeout=float(timeout_seconds))
             except subprocess.TimeoutExpired:
@@ -181,11 +293,17 @@ def execute_job_spec(
             "timed_out": timed_out,
             "elapsed_seconds": time.monotonic() - started,
             "log_path": str(log_path),
+            "log_start_offset": log_start_offset,
+            "resume": resume,
             "gpu_memory_before": memory,
             "selected_gpu_indices": selected_gpu_indices,
             "recorded_at": datetime.now(timezone.utc).isoformat(),
         }
         atomic_write_json(result_path, result)
+        from .io_utils import AtomicJsonl
+        AtomicJsonl(spec_path.with_name(spec_path.stem + ".attempts.jsonl")).append({
+            **result, "event_id": hashlib.sha256(json.dumps(result, sort_keys=True).encode()).hexdigest(),
+        })
         return result
 
 

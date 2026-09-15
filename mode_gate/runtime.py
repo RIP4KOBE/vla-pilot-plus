@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from enum import Enum
 import hashlib
 from pathlib import Path
@@ -16,10 +16,11 @@ from .baselines import (
     BaselineOpportunity,
     build_baseline_router,
 )
-from .cards import CombinedModeCardRenderer
+from .cards import CandidateCardRenderer
 from .config import ModeGateConfig
-from .gate import TrajectoryModeGate
-from .geometry import GeometryScorer, select_execution_medoid
+from .experiment_contract import label_contract_payload
+from .gate import TrajectoryCandidateGate
+from .geometry import GeometryScorer, select_execution_candidate
 from .incidents import (
     IncidentMemory,
     VerifierDecisionRecord,
@@ -27,7 +28,10 @@ from .incidents import (
 )
 from .io_utils import atomic_write_json, sha256_file
 from .progress import ProgressMonitor
-from .semantic_planner import GeminiSemanticPlanner
+from .semantic_planner import (
+    GeminiSemanticPlanner,
+    score_semantics_with_network_recovery,
+)
 from .state_machine import EpisodeChunkController, RouteDecision
 from .types import (
     ActionChunkBatch,
@@ -36,6 +40,8 @@ from .types import (
     GateContext,
     ProgressEvidence,
     SelectedExecution,
+    SemanticPlan,
+    SemanticCandidateScore,
 )
 from .verifier import (
     DeployedVerifierPredictor,
@@ -66,25 +72,27 @@ class RuntimeDecision:
     semantic_failure_types: tuple[str, ...] = ()
     required_trajectory_pattern: str = ""
     analysis_path: str = ""
+    evidence_path: str = ""
 
 
-class ModeAwareRuntime:
+class CandidateRuntime:
     def __init__(
         self,
         *,
         config: ModeGateConfig,
-        gate: TrajectoryModeGate,
+        gate: TrajectoryCandidateGate,
         planner: GeminiSemanticPlanner,
-        combined_renderer: CombinedModeCardRenderer,
+        combined_renderer: CandidateCardRenderer,
         geometry_factory: Callable[[GateContext], GeometryScorer],
         incidents: IncidentMemory,
         verifier: DeployedVerifierPredictor | None = None,
+        backbone_id: str = "",
     ) -> None:
         self.config = config
         self.baseline_router = build_baseline_router(
             kind=config.baseline_kind,
             budget=config.baseline_budget,
-            minimum_modes=config.baseline_minimum_modes,
+            minimum_candidates=config.baseline_minimum_candidates,
             threshold=config.baseline_threshold,
             expansion_rate=config.baseline_expansion_rate,
             seed=config.baseline_seed,
@@ -108,12 +116,18 @@ class ModeAwareRuntime:
         self.geometry_factory = geometry_factory
         self.incidents = incidents
         self.verifier = verifier
+        self.backbone_id = backbone_id
         self.progress_monitor = ProgressMonitor()
         self.progress_history: list[dict[str, Any]] = []
         self._last_semantic_stage_id: str | None = None
         self._last_semantic_confidence = 0.0
         self._round_id = 0
         self._pending_factual: list[dict[str, Any]] = []
+        self.executed_history: list[list[float]] = []
+        self.episode_id = uuid4().hex
+        self._execution_context = None
+        self.last_analysis_path = None
+        self.last_evidence_path = None
 
     def start_episode(self, *, stage_id: str = "UNKNOWN") -> None:
         self.controller.start_episode(stage_id=stage_id)
@@ -125,6 +139,11 @@ class ModeAwareRuntime:
         # Any opportunity left open by a provider/runtime crash is censored,
         # never converted into a capability failure label.
         self._pending_factual = []
+        self.executed_history = []
+        self.episode_id = uuid4().hex
+        self._execution_context = None
+        self.last_analysis_path = None
+        self.last_evidence_path = None
 
     @property
     def verification_due(self) -> bool:
@@ -141,10 +160,10 @@ class ModeAwareRuntime:
     ) -> RouteDecision:
         terminal_timeout = bool(kwargs.get("terminal_timeout", False))
         decision = self.controller.observe_chunk(progress, **kwargs)
-        if terminal_timeout:
-            self._pending_factual = []
-        elif progress.task_success or progress.advanced:
-            self._close_factual_labels(success=True)
+        if progress.task_success:
+            self._close_factual_labels(success=True, reason="native_success")
+        elif terminal_timeout:
+            self._close_factual_labels(success=False, censored=True, reason="terminal")
         self.progress_history.append(
             {
                 "stage_id": progress.stage_id,
@@ -196,6 +215,7 @@ class ModeAwareRuntime:
         scene_feature: np.ndarray | None = None,
         scene_feature_path: Path | None = None,
         snapshot: DecisionSnapshot | None = None,
+        camera_images: dict | None = None,
     ) -> RuntimeDecision:
         self._round_id += 1
         was_fresh = self.controller.state.verification_due
@@ -204,50 +224,95 @@ class ModeAwareRuntime:
             round_dir = Path(artifact_root) / context.context_id / f"round_{self._round_id:03d}"
             evidence = self.gate.analyze(context, batch, round_dir)
             analysis_path = _save_round_evidence(round_dir, evidence)
+            self.last_analysis_path = analysis_path
+            from .ticket_visuals import build_decision_evidence
+            evidence_path = build_decision_evidence(
+                directory=round_dir / "visuals", context=context, analysis_path=analysis_path,
+                executed_history=self.executed_history, images=camera_images or {},
+                project_points=self.combined_renderer._project_points,
+                library=self.incidents.experiences, episode_id=self.episode_id)
+            self.last_evidence_path = evidence_path
             self.controller.mark_abstracted()
             geometry = self.geometry_factory(context).score_round(evidence)
-            mode_paths = {
-                mode.mode_id: evidence.trajectories.positions[
-                    int(mode.representative_indices["medoid"])
+            candidate_paths = {
+                mode.candidate_id: evidence.trajectories.positions[
+                    mode.sample_index
                 ]
-                for mode in evidence.modes
+                for mode in evidence.candidates
             }
             overlay = self.combined_renderer.render(
                 observation_image=context.observation_image,
-                mode_paths=mode_paths,
-                output_path=round_dir / "combined_modes.png",
+                candidate_paths=candidate_paths,
+                output_path=round_dir / "all_candidates.png",
             )
-            semantic = self.planner.score(
-                context,
-                evidence,
-                geometry,
-                overlay.path,
-                object_distances=_endpoint_object_distances(
+            posthoc_only = bool(context.metadata.get('initialization_posthoc_only', False))
+            planner_enabled = bool(context.metadata.get('planner_steering_enabled', True)) and not posthoc_only
+            if not planner_enabled:
+                # VLS/FK already produced these particles. Preserve its order
+                # and take the first non-vetoed particle; no semantic ranking,
+                # stage judgment or online Planner request. This does NOT
+                # change the learned verifier or the formal retry protocol.
+                safe = {item.candidate_id for item in geometry if not item.hard_safety_veto}
+                selected_id = next((item.candidate_id for item in evidence.candidates
+                                    if item.candidate_id in safe), None)
+                phase = 'initialization' if posthoc_only else 'formal_online_planner_disabled'
+                reason = f'{phase}: original VLS particle order, hard safety veto only; not an LLM judgment'
+                semantic = SemanticPlan(
+                    tuple(SemanticCandidateScore(item.candidate_id,0.,reason) for item in evidence.candidates),
+                    '', 'UNKNOWN', 0., 'local_vls_particle_order', 'local-vls-selection-v1',
+                    raw_response={'metadata':{'provider':'local_policy','planner_called':False,
+                                             'planner_steering_enabled':False, 'phase':phase,
+                                             'semantic_scores_are_placeholders':True}},
+                    selected_candidate_id=selected_id, selection_reason=reason)
+            else:
+                semantic = score_semantics_with_network_recovery(
+                    self.planner,
+                    context,
                     evidence,
-                    context.metadata.get("object_positions", {}),
-                ),
-                progress_history=context.metadata.get("progress_history", ()),
-            )
-            self._last_semantic_stage_id = semantic.observed_stage_id
+                    geometry,
+                    overlay.path,
+                    recovery_label="online mode-aware runtime",
+                    object_distances=_endpoint_object_distances(
+                        evidence,
+                        context.metadata.get("object_positions", {}),
+                    ),
+                    progress_history=context.metadata.get("progress_history", ()),
+                )
+            self._last_semantic_stage_id = (
+                None if not planner_enabled
+                else semantic.observed_stage_id)
             self._last_semantic_confidence = semantic.stage_confidence
             semantic_failure_types = tuple(
                 sorted(
                     {
                         str(value)
-                        for score in semantic.mode_scores
+                        for score in semantic.candidate_scores
                         for value in score.predicted_failure_types
                         if str(value).strip()
                     }
                 )
             )
-            selected = select_execution_medoid(
-                evidence.modes, geometry, semantic.mode_scores
+            selected = select_execution_candidate(
+                evidence.candidates, geometry, semantic.candidate_scores, semantic.selected_candidate_id
             )
-            internal = self.controller.mark_scored(has_safe_mode=selected is not None)
+            internal = self.controller.mark_scored(has_safe_candidate=selected is not None)
             if selected is None:
+                self.incidents.record_fact(episode_id=self.episode_id,
+                    context_id=f"{context.context_id}:round:{self._round_id}", kind="safety_veto",
+                    payload={"task":context.task_instruction, "policy_id":batch.checkpoint_id,
+                             "candidate_count":len(evidence.candidates), "geometry":[asdict(x) for x in geometry],
+                             "multimodal_evidence":{"path":str(evidence_path),"sha256":sha256_file(evidence_path),"kind":"historical_evidence"},
+                             "remaining_budget":self.controller.state.remaining_budget,
+                             "label_status":"CENSORED_NOT_A_CAPABILITY_LABEL"})
                 if was_fresh:
                     route = self.controller.force_expand("no_safe_mode_after_fresh_sampling")
-                    self._close_factual_labels(success=False)
+                    if route.route is ControllerRoute.ABORT:
+                        self._close_factual_labels(success=False, censored=True, reason="safety_abort")
+                        decision = RuntimeDecision(RuntimeStatus.ABORT, None, route, self._round_id,
+                                                   error=route.reason)
+                        self._save_summary(round_dir, decision, geometry, semantic)
+                        return decision
+                    self._close_factual_labels(success=False, censored=self.controller.state.remaining_budget > 0, reason="expansion")
                     decision = RuntimeDecision(
                         RuntimeStatus.EXPAND,
                         None,
@@ -256,6 +321,7 @@ class ModeAwareRuntime:
                         semantic_failure_types=semantic_failure_types,
                         required_trajectory_pattern=semantic.required_trajectory_pattern,
                         analysis_path=str(analysis_path),
+                        evidence_path=str(evidence_path),
                     )
                 else:
                     decision = RuntimeDecision(
@@ -266,6 +332,7 @@ class ModeAwareRuntime:
                         semantic_failure_types=semantic_failure_types,
                         required_trajectory_pattern=semantic.required_trajectory_pattern,
                         analysis_path=str(analysis_path),
+                        evidence_path=str(evidence_path),
                     )
                 self._save_summary(round_dir, decision, geometry, semantic)
                 return decision
@@ -291,11 +358,15 @@ class ModeAwareRuntime:
                     scene_feature=scene_feature,
                     evidence=evidence,
                     geometry=geometry,
-                    semantics=semantic.mode_scores,
+                    semantics=semantic.candidate_scores,
                     failure_count=self.controller.state.failure_count,
                     remaining_budget=int(opportunity_remaining_budget),
+                    retry_budget=int(self.controller.retry_budget),
                     ess_ratio=diagnostics.ess_ratio if diagnostics else 1.0,
                     unique_ratio=diagnostics.unique_ratio if diagnostics else 1.0,
+                    executed_history=np.asarray(self.executed_history, dtype=np.float32).reshape(-1, 15),
+                    backbone_id=self.backbone_id,
+                    decision_step=len(self.executed_history),
                 )
             baseline_needs_verifier = (
                 self.config.baseline_kind
@@ -329,10 +400,10 @@ class ModeAwareRuntime:
                     BaselineOpportunity(
                         opportunity_id=opportunity_id,
                         retry_index=int(opportunity_retry_index),
-                        active_mode_count=len(safe_geometry),
+                        active_candidate_count=len(safe_geometry),
                         max_semantic_score=max(
                             float(item.semantic_score)
-                            for item in semantic.mode_scores
+                            for item in semantic.candidate_scores
                         ),
                         min_collision_risk=(
                             min(float(item.collision_risk) for item in safe_geometry)
@@ -351,26 +422,6 @@ class ModeAwareRuntime:
             )
             exploration_applied = False
             exploration_override = None
-            if (
-                was_fresh
-                and baseline_decision is None
-                and production_needs_verifier
-                and verifier_decision is ControllerRoute.EXPAND
-                and int(opportunity_remaining_budget) > 0
-                and self.config.exploration_epsilon > 0.0
-            ):
-                material = (
-                    f"verifier-exploration-v1\0{context.context_id}\0"
-                    f"{snapshot.snapshot_id if snapshot is not None else ''}\0"
-                    f"{opportunity_retry_index}\0{self.config.seed}"
-                )
-                draw = int.from_bytes(
-                    hashlib.sha256(material.encode("utf-8")).digest()[:8], "big"
-                ) / float(2**64)
-                if draw < self.config.exploration_epsilon:
-                    exploration_applied = True
-                    exploration_override = ControllerRoute.RESTEER
-                    behavior_propensity = self.config.exploration_epsilon
             route = self.controller.route_scored_batch(
                 verifier_decision=verifier_decision,
                 route_override=(
@@ -391,6 +442,9 @@ class ModeAwareRuntime:
                     baseline_needs_verifier or exploration_applied
                 ),
             )
+            if not planner_enabled and route.reason == 'planner_selected_safe_candidate':
+                route = replace(route,reason=('initialization_vls_policy_particle' if posthoc_only
+                                              else 'local_vls_policy_particle'))
             status = {
                 ControllerRoute.EXECUTE: RuntimeStatus.EXECUTE,
                 ControllerRoute.RESTEER: RuntimeStatus.RESTEER,
@@ -398,7 +452,7 @@ class ModeAwareRuntime:
                 ControllerRoute.ABORT: RuntimeStatus.ABORT,
             }[route.route]
             if status is RuntimeStatus.EXPAND:
-                self._close_factual_labels(success=False)
+                self._close_factual_labels(success=False, censored=self.controller.state.remaining_budget > 0, reason="expansion")
             record_id = uuid4().hex if was_fresh else None
             decision = RuntimeDecision(
                 status=status,
@@ -412,6 +466,7 @@ class ModeAwareRuntime:
                 semantic_failure_types=semantic_failure_types,
                 required_trajectory_pattern=semantic.required_trajectory_pattern,
                 analysis_path=str(analysis_path),
+                        evidence_path=str(evidence_path),
             )
             if was_fresh:
                 if snapshot is None:
@@ -422,14 +477,36 @@ class ModeAwareRuntime:
                     self.incidents.root / "sidecars" / f"{record_id}.npz",
                     verifier_input,
                     metadata={
-                        "schema_version": "grounded-verifier-input-v1",
+                        "schema_version": "candidate-verifier-input-v3",
                         "context_id": context.context_id,
                         "policy_id": snapshot.policy_id,
                         "snapshot_id": snapshot.snapshot_id,
                         "round_id": self._round_id,
-                        "mode_ids": [mode.mode_id for mode in evidence.modes],
+                        "candidate_ids": [mode.candidate_id for mode in evidence.candidates],
                         "retry_index": opportunity_retry_index,
+                        "retry_budget": self.controller.retry_budget,
                         "remaining_budget": opportunity_remaining_budget,
+                        "failure_count": self.controller.state.failure_count,
+                        "retry_schedule": [
+                            list(level) for level in self.config.retry_schedule
+                        ],
+                        "chunk_horizon": self.config.chunk_horizon,
+                        "max_policy_steps": (
+                            int(opportunity_remaining_budget)
+                            * self.config.chunk_horizon
+                        ),
+                        "label_version": self.config.label_version,
+                        "label_contract_hash": (
+                            self.config.experiment_contract().contract_hash
+                        ),
+                        "gemini_thinking_level": (
+                            self.config.verifier_thinking_level
+                        ),
+                        "semantic_model": semantic.model,
+                        "planner_provenance": semantic.raw_response.get("metadata", {}),
+                        "label_config": label_contract_payload(
+                            self.config.experiment_contract()
+                        ),
                     },
                 )
                 self.incidents.record_decision(
@@ -465,19 +542,34 @@ class ModeAwareRuntime:
                         ),
                         failure_count=self.controller.state.failure_count,
                         remaining_budget=int(opportunity_remaining_budget),
+                        retry_budget=int(self.controller.retry_budget),
+                        retry_index=int(opportunity_retry_index),
+                        label_version=self.config.label_version,
                         behavior_propensity=float(
                             behavior_propensity
                         ),
                         provenance={
                             "round_id": self._round_id,
                             "retry_index": opportunity_retry_index,
+                            "retry_budget": self.controller.retry_budget,
                             "remaining_budget": opportunity_remaining_budget,
+                            "label_version": self.config.label_version,
+                            "label_config": label_contract_payload(
+                                self.config.experiment_contract()
+                            ),
                             "semantic_model": semantic.model,
                             "semantic_prompt_version": semantic.prompt_version,
+                            "planner_provenance": semantic.raw_response.get("metadata", {}),
                             "code_revision": context.metadata.get("code_revision"),
-                            "fit_metadata": evidence.fit_metadata,
+                            "candidate_count": len(evidence.candidates),
                             "semantic_failure_types": list(semantic_failure_types),
                             "required_trajectory_pattern": semantic.required_trajectory_pattern,
+                            "episode_id": self.episode_id,
+                            "route_reason": route.reason,
+                            "label_eligible": route.label_eligible,
+                            "rollout_complete": self.controller.state.rollout_complete,
+                            "require_complete_rollout_before_expansion": self.config.require_complete_rollout_before_expansion,
+                            "multimodal_evidence_path": str(evidence_path),
                             "round_analysis_path": str(analysis_path),
                             "round_analysis_sha256": sha256_file(analysis_path),
                             "round_metadata_path": str(analysis_path.with_suffix(".json")),
@@ -525,9 +617,36 @@ class ModeAwareRuntime:
                             "snapshot_hash": snapshot.snapshot_hash,
                             "behavior_propensity": behavior_propensity,
                             "data_split": data_split,
+                            "label_config": label_contract_payload(
+                                self.config.experiment_contract()
+                            ),
                         }
                     )
+            self._execution_context = record_id or f"{context.context_id}:round:{self._round_id}"
+            self._execution_policy = batch.checkpoint_id
+            self._selected_candidate_id = selected.candidate_id
+            self.incidents.record_fact(
+                episode_id=self.episode_id, context_id=self._execution_context, kind="decision_context",
+                payload={"task": context.task_instruction, "analysis_path": str(analysis_path),
+                         "multimodal_evidence": {"path": str(evidence_path), "sha256": sha256_file(evidence_path), "kind": "historical_evidence"},
+                         "candidate_count": batch.sample_count, "selected_candidate_id": selected.candidate_id,
+                         "route": route.route.value, "policy_id": batch.checkpoint_id,
+                         "verifier_proposal": verifier_decision.value if verifier_decision else None,
+                         "route_reason": route.reason, "label_eligible": route.label_eligible,
+                         "rollout_complete": self.controller.state.rollout_complete,
+                         "verifier_id": self.verifier.artifact_root.name if self.verifier else None,
+                         "step": len(self.executed_history), "retry_index": opportunity_retry_index,
+                         "remaining_budget": opportunity_remaining_budget,
+                         "image_path": str(overlay.path), "image_kind": "real_observation_with_predicted_overlay",
+                         "semantic": semantic.raw_response})
             self._save_summary(round_dir, decision, geometry, semantic)
+            if status is RuntimeStatus.EXPAND:
+                self.incidents.record_fact(episode_id=self.episode_id, context_id=self._execution_context,
+                    kind="retry_outcome", payload={"native_success":False,
+                        "censored":self.controller.state.remaining_budget > 0,
+                        "stop_reason":"expansion", "retry_chunks_executed":self.controller.state.retry_index,
+                        "remaining_budget":self.controller.state.remaining_budget,
+                        "policy_id":batch.checkpoint_id, "retry_budget":self.controller.retry_budget})
             return decision
         except Exception as exc:
             self._pending_factual = []
@@ -540,25 +659,38 @@ class ModeAwareRuntime:
                 error=route.reason,
             )
 
-    def _close_factual_labels(self, *, success: bool) -> None:
+    def _close_factual_labels(self, *, success: bool, censored: bool = False, reason: str = "") -> None:
         pending, self._pending_factual = self._pending_factual, []
         for item in pending:
-            self.incidents.attach_label(
-                VerifierLabelRecord(
-                    record_id=str(item["record_id"]),
-                    label_version="factual-online-retry-v1",
-                    source="factual_online_retry",
-                    branches=1,
-                    successes=1 if success else 0,
-                    p_expansion=0.0 if success else 1.0,
-                    policy_id=str(item["policy_id"]),
-                    snapshot_hash=str(item["snapshot_hash"]),
-                    data_split=str(item["data_split"]),
-                    weak=False,
-                    weight=1.0,
-                    behavior_propensity=float(item["behavior_propensity"]),
-                )
-            )
+            self.incidents.record_fact(
+                episode_id=self.episode_id, context_id=str(item["record_id"]),
+                kind="retry_outcome", payload={
+                    **item, "native_success": bool(success), "censored": bool(censored),
+                    "stop_reason": reason, "retry_chunks_executed": self.controller.state.retry_index,
+                    "remaining_budget": self.controller.state.remaining_budget,
+                    "retry_budget": self.controller.retry_budget,
+                    "interpretation": "observation_only_not_a_training_label",
+                })
+
+    def record_execution_step(self, action, pose, *, native_success: bool, images=None):
+        action = np.asarray(action, dtype=np.float32).reshape(-1)[:7]
+        position = np.asarray(pose.position, dtype=np.float32)
+        orientation = np.asarray(pose.quaternion, dtype=np.float32)[[1, 2, 3, 0]]
+        row = np.concatenate((action, position, orientation, [action[-1]]))
+        if row.shape != (15,) or not np.isfinite(row).all():
+            raise ValueError("history must contain physical OSC actions and observed poses")
+        self.executed_history.append(row.tolist())
+        self.incidents.record_fact(
+            episode_id=self.episode_id, context_id=str(self._execution_context or ""),
+            kind="executed_step", payload={"step": len(self.executed_history),
+                "action_osc": action.tolist(), "observed_pose": row[7:14].tolist(),
+                "native_success": bool(native_success), "policy_id": getattr(self, "_execution_policy", ""),
+                "candidate_id": getattr(self, "_selected_candidate_id", None),
+                "retry_index": self.controller.state.retry_index})
+        if images:
+            self.incidents.record_video_frame(self.episode_id, images,
+                                             context_id=str(self._execution_context or ""),
+                                             step=len(self.executed_history))
 
     @staticmethod
     def _save_summary(round_dir: Path, decision: RuntimeDecision, geometry: Any, semantic: Any) -> None:
@@ -591,6 +723,7 @@ class ModeAwareRuntime:
                 "semantic_failure_types": list(decision.semantic_failure_types),
                 "required_trajectory_pattern": decision.required_trajectory_pattern,
                 "analysis_path": decision.analysis_path,
+                "evidence_path": decision.evidence_path,
                 "analysis_sha256": (
                     sha256_file(Path(decision.analysis_path))
                     if decision.analysis_path
@@ -608,7 +741,7 @@ class ModeAwareRuntime:
                 ),
                 "geometry": [asdict(item) for item in geometry],
                 "semantic": {
-                    "mode_scores": [asdict(item) for item in semantic.mode_scores],
+                    "candidate_scores": [asdict(item) for item in semantic.candidate_scores],
                     "required_trajectory_pattern": semantic.required_trajectory_pattern,
                     "observed_stage_id": semantic.observed_stage_id,
                     "stage_confidence": semantic.stage_confidence,
@@ -631,12 +764,12 @@ def _endpoint_object_distances(
         if value.shape == (3,) and np.isfinite(value).all():
             positions[str(name)] = value
     result: dict[str, dict[str, float]] = {}
-    for mode in evidence.modes:
-        sample_index = int(mode.representative_indices["medoid"])
+    for mode in evidence.candidates:
+        sample_index = mode.sample_index
         endpoint = np.asarray(
             evidence.trajectories.positions[sample_index, -1], dtype=np.float64
         )
-        result[mode.mode_id] = {
+        result[mode.candidate_id] = {
             name: float(np.linalg.norm(endpoint - object_position))
             for name, object_position in positions.items()
         }
@@ -658,23 +791,7 @@ def _save_round_evidence(round_dir: Path, evidence: Any) -> Path:
             positions=evidence.trajectories.positions,
             orientations=evidence.trajectories.orientations,
             grippers=evidence.trajectories.grippers,
-            normalized_positions=evidence.normalized_positions,
-            normalized_rotvecs=evidence.normalized_rotvecs,
-            normalized_grippers=evidence.normalized_grippers,
-            descriptors=evidence.descriptors,
-            reduced_descriptors=evidence.reduced_descriptors,
-            labels=evidence.labels,
-            responsibilities=evidence.responsibilities,
-            medoid_indices=np.asarray(
-                [
-                    int(mode.representative_indices["medoid"])
-                    for mode in evidence.modes
-                ],
-                dtype=np.int64,
-            ),
-            mode_weights=np.asarray(
-                [float(mode.weight) for mode in evidence.modes], dtype=np.float64
-            ),
+            candidate_ids=np.asarray([c.candidate_id for c in evidence.candidates]),
         )
         stream.flush()
         os.fsync(stream.fileno())
@@ -689,7 +806,7 @@ def _save_round_evidence(round_dir: Path, evidence: Any) -> Path:
         path.with_suffix(".json"),
         _round_metadata_jsonable(
             {
-                "schema_version": "mode-round-evidence-v2",
+                "schema_version": "candidate-round-evidence-v3",
                 "context_id": evidence.context_id,
                 "round_id": int(evidence.round_id),
                 "checkpoint_id": evidence.checkpoint_id,
@@ -700,22 +817,9 @@ def _save_round_evidence(round_dir: Path, evidence: Any) -> Path:
                 "action_dtype": str(actions.dtype),
                 "action_sha256": hashlib.sha256(actions.tobytes()).hexdigest(),
                 "analysis_sha256": sha256_file(path),
-                "fit_degraded": bool(evidence.fit_degraded),
-                "fit_metadata": evidence.fit_metadata,
                 "sampling_diagnostics": diagnostics,
-                "modes": [
-                    {
-                        "mode_id": mode.mode_id,
-                        "component_index": int(mode.component_index),
-                        "weight": float(mode.weight),
-                        "member_indices": mode.member_indices,
-                        "representative_indices": mode.representative_indices,
-                        "representative_sample_ids": mode.representative_sample_ids,
-                        "projection_unavailable": bool(mode.projection_unavailable),
-                        "statistics": mode.statistics,
-                    }
-                    for mode in evidence.modes
-                ],
+                "candidates": [asdict(candidate) for candidate in evidence.candidates],
+                "evidence_kind": "predicted_candidates_not_executed_actions",
             }
         ),
     )
@@ -741,4 +845,4 @@ def _round_metadata_jsonable(value: Any) -> Any:
     return value
 
 
-__all__ = ["ModeAwareRuntime", "RuntimeDecision", "RuntimeStatus"]
+__all__ = ["CandidateRuntime", "RuntimeDecision", "RuntimeStatus"]

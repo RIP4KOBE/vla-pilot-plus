@@ -1,0 +1,8 @@
+{
+  "schema_version": "current-task-retention-tradeoff-v2",
+  "current_task_splits": ["policy_alpha_selection", "policy_regression"],
+  "current_policy_seed_repeats": 2,
+  "retention_split": "policy_alpha_selection",
+  "retention_scope": "completed_formal_tasks",
+  "forgetting_penalty": 1.0
+}

@@ -16,6 +16,68 @@ from .io_utils import atomic_write_json, sha256_file
 from .types import DecisionSnapshot
 
 
+_RGB_VALIDATION_RENDER_ATTEMPTS = 3
+
+
+def _validate_restored_rgb(
+    *,
+    adapter: Any,
+    expected_image: np.ndarray,
+    rgb_atol: float,
+) -> float:
+    """Validate a restored frame while tolerating stale EGL front buffers.
+
+    MuJoCo/EGL can occasionally return the previous scene on the first render
+    after an exact state restore.  Rendering is observational, so retry a
+    bounded number of times while keeping the original tolerance fail-closed.
+    """
+
+    errors: list[float] = []
+    observed_shapes: list[tuple[int, ...]] = []
+    expected_shape = tuple(expected_image.shape)
+    expected_float = expected_image.astype(np.float32)
+    renderer_refreshed = False
+    while True:
+        for _ in range(_RGB_VALIDATION_RENDER_ATTEMPTS):
+            actual_image = np.asarray(adapter.get_vlm_image())
+            actual_shape = tuple(actual_image.shape)
+            observed_shapes.append(actual_shape)
+            if actual_shape != expected_shape:
+                errors.append(float("inf"))
+                continue
+            rgb_error = float(
+                np.abs(expected_float - actual_image.astype(np.float32)).mean()
+            )
+            errors.append(rgb_error)
+            if rgb_error <= rgb_atol:
+                return rgb_error
+
+        refresh = getattr(adapter, "refresh_offscreen_render_context", None)
+        if renderer_refreshed or not callable(refresh):
+            break
+        try:
+            refresh()
+        except Exception as exc:
+            raise RuntimeError(
+                "restored RGB mismatch and offscreen renderer refresh failed"
+            ) from exc
+        renderer_refreshed = True
+
+    if any(shape != expected_shape for shape in observed_shapes):
+        raise ValueError(
+            "restored RGB validation failed after "
+            f"{len(errors)} renders; renderer_refreshed={renderer_refreshed}; "
+            f"expected shape {expected_shape}, observed shapes {observed_shapes}, "
+            f"mean absolute errors {errors}"
+        )
+    raise ValueError(
+        "restored RGB mean absolute error "
+        f"{errors[-1]:.4f} exceeds {rgb_atol} after "
+        f"{len(errors)} renders; renderer_refreshed={renderer_refreshed}; "
+        f"errors={errors}"
+    )
+
+
 class DecisionSnapshotStore:
     def __init__(self, root: Path) -> None:
         self.root = Path(root)
@@ -179,16 +241,11 @@ class DecisionSnapshotStore:
             component_restore(saved_components[name])
 
         expected_image = np.load(directory / "observation.npy", allow_pickle=False)
-        actual_image = np.asarray(adapter.get_vlm_image())
-        if expected_image.shape != actual_image.shape:
-            raise ValueError("restored RGB shape mismatch")
-        rgb_error = float(
-            np.abs(expected_image.astype(np.float32) - actual_image.astype(np.float32)).mean()
+        rgb_error = _validate_restored_rgb(
+            adapter=adapter,
+            expected_image=expected_image,
+            rgb_atol=rgb_atol,
         )
-        if rgb_error > rgb_atol:
-            raise ValueError(
-                f"restored RGB mean absolute error {rgb_error:.4f} exceeds {rgb_atol}"
-            )
         return {"manifest": manifest, "rgb_mean_absolute_error": rgb_error}
 
     def restore_simulator_only(
@@ -211,16 +268,11 @@ class DecisionSnapshotStore:
             simulator_state = {key: data[key] for key in data.files}
         adapter.restore_simulator_state(simulator_state)
         expected_image = np.load(directory / "observation.npy", allow_pickle=False)
-        actual_image = np.asarray(adapter.get_vlm_image())
-        if expected_image.shape != actual_image.shape:
-            raise ValueError("restored RGB shape mismatch")
-        rgb_error = float(
-            np.abs(expected_image.astype(np.float32) - actual_image.astype(np.float32)).mean()
+        rgb_error = _validate_restored_rgb(
+            adapter=adapter,
+            expected_image=expected_image,
+            rgb_atol=rgb_atol,
         )
-        if rgb_error > rgb_atol:
-            raise ValueError(
-                f"restored RGB mean absolute error {rgb_error:.4f} exceeds {rgb_atol}"
-            )
         return {"manifest": manifest, "rgb_mean_absolute_error": rgb_error}
 
 

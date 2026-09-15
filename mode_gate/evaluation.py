@@ -48,58 +48,97 @@ class PromotionDecision:
     eligible_ids: tuple[str, ...]
 
 
-def select_alpha_top2(scores: Sequence[PolicyScore]) -> tuple[PolicyScore, ...]:
-    if len(scores) != 4 or {round(item.alpha_l, 8) for item in scores} != {
-        0.2,
-        0.4,
-        0.6,
-        0.8,
-    }:
-        raise ValueError("alpha selection requires the frozen four candidates")
+def rank_current_task_candidates(scores: Sequence[PolicyScore]) -> tuple[PolicyScore, ...]:
+    """Rank all candidates by held-out current-task SR, never old-task SR."""
+    if not scores or len({item.candidate_id for item in scores}) != len(scores):
+        raise ValueError("current-task ranking requires unique, non-empty candidates")
     return tuple(
-        sorted(scores, key=lambda item: (-item.macro_sr, item.alpha_l, item.candidate_id))[:2]
+        sorted(scores, key=lambda item: (-item.macro_sr, item.alpha_l, item.candidate_id))
     )
+
+
+def gain_retention_tradeoffs(
+    *, parent_current_sr: float, current_task_scores: Sequence[PolicyScore],
+    forgetting: Mapping[str, float], forgetting_penalty: float = 1.0,
+) -> dict[str, dict[str, object]]:
+    """Two objectives: increase the current task and limit old-task losses."""
+    ranked = rank_current_task_candidates(current_task_scores)
+    if (not math.isfinite(forgetting_penalty) or forgetting_penalty < 0
+            or not math.isfinite(parent_current_sr) or not 0 <= parent_current_sr <= 1):
+        raise ValueError("invalid tradeoff weight or parent success rate")
+    if set(forgetting) != {item.candidate_id for item in ranked}:
+        raise ValueError("every candidate requires paired old-task forgetting evidence")
+    values = {}
+    for item in ranked:
+        loss = float(forgetting[item.candidate_id])
+        if (not math.isfinite(loss) or not 0 <= loss <= 1
+                or not math.isfinite(item.macro_sr) or not 0 <= item.macro_sr <= 1):
+            raise ValueError("success rates and forgetting must be finite probabilities")
+        gain = item.macro_sr - parent_current_sr
+        values[item.candidate_id] = {
+            "current_task_gain": gain, "old_task_forgetting": loss,
+            "score": gain - forgetting_penalty * loss,
+            "current_task_improved": gain > 0,
+        }
+    for key, value in values.items():
+        value["pareto_dominated"] = any(
+            other["current_task_gain"] >= value["current_task_gain"] - 1e-12
+            and other["old_task_forgetting"] <= value["old_task_forgetting"] + 1e-12
+            and (other["current_task_gain"] > value["current_task_gain"] + 1e-12
+                 or other["old_task_forgetting"] < value["old_task_forgetting"] - 1e-12)
+            for other_key, other in values.items() if other_key != key
+        )
+    return values
 
 
 def raw_promotion_decision(
-    *,
-    parent_macro_sr: float,
-    regression_scores: Sequence[PolicyScore],
-    trigger_recheck_pass: Mapping[str, bool],
+    *, parent_current_sr: float, current_task_scores: Sequence[PolicyScore],
+    forgetting: Mapping[str, float], forgetting_penalty: float = 1.0,
 ) -> PromotionDecision:
-    raw_improved = [
-        item for item in regression_scores if item.macro_sr > parent_macro_sr
-    ]
-    eligible = [
-        item for item in raw_improved if trigger_recheck_pass.get(item.candidate_id, False)
-    ]
-    if not eligible:
-        return PromotionDecision(
-            status="NEEDS_MORE_DEMOS",
-            winner=None,
-            reason=(
-                "no_candidate_strictly_improved_raw_macro"
-                if not raw_improved
-                else "all_raw_improved_candidates_failed_trigger_recheck"
-            ),
-            eligible_ids=(),
-        )
-    winner = min(
-        eligible,
-        key=lambda item: (-item.macro_sr, item.alpha_l, item.candidate_id),
+    values = gain_retention_tradeoffs(
+        parent_current_sr=parent_current_sr, current_task_scores=current_task_scores,
+        forgetting=forgetting, forgetting_penalty=forgetting_penalty,
     )
+    # Compare ALL merged candidates by the same difference score. Current-task
+    # ties, declines and negative combined scores are not separate rejection
+    # gates. In particular, a 100% parent must not make promotion impossible.
+    winner = min(current_task_scores, key=lambda item: (
+        -round(values[item.candidate_id]["score"], 12),
+        values[item.candidate_id]["old_task_forgetting"],
+        -values[item.candidate_id]["current_task_gain"],
+        item.alpha_l, item.candidate_id,
+    ))
     return PromotionDecision(
-        status="POLICY_STAGED",
-        winner=winner,
-        reason="highest_raw_macro_among_trigger_recheck_passes",
-        eligible_ids=tuple(sorted(item.candidate_id for item in eligible)),
+        status="POLICY_STAGED", winner=winner,
+        reason="best_current_task_gain_minus_old_task_forgetting",
+        eligible_ids=tuple(sorted(item.candidate_id for item in current_task_scores)),
     )
 
 
-def trigger_score(seen_successes: int, seen_total: int, unseen_successes: int, unseen_total: int) -> float:
-    if min(seen_total, unseen_total) <= 0:
-        raise ValueError("seen and unseen trigger recheck both require episodes")
-    return 0.5 * seen_successes / seen_total + 0.5 * unseen_successes / unseen_total
+def retention_metrics(*, parent: PolicyScore, candidate: PolicyScore) -> dict[str, object]:
+    """Measure paired old-task losses without a zero-drop acceptance gate.
+
+    Clip each task's loss BEFORE averaging so gains on unrelated old tasks
+    cannot cancel forgetting elsewhere. Report net SR change separately.
+    Finite-sample diagnostics are not proof of zero forgetting.
+    """
+    if not parent.per_task_sr or set(parent.per_task_sr) != set(candidate.per_task_sr):
+        raise ValueError("retention task banks must be non-empty and paired")
+    if any(not math.isfinite(value) or not 0 <= value <= 1
+           for scores in (parent.per_task_sr, candidate.per_task_sr) for value in scores.values()):
+        raise ValueError("old-task success rates must be finite probabilities")
+    deltas = {task: candidate.per_task_sr[task] - parent.per_task_sr[task]
+              for task in sorted(parent.per_task_sr)}
+    losses = {task: max(0.0, -delta) for task, delta in deltas.items()}
+    return {
+        "macro_delta": candidate.macro_sr - parent.macro_sr,
+        "per_task_delta": deltas, "per_task_forgetting": losses,
+        "macro_forgetting": sum(losses.values()) / len(losses),
+        "max_task_forgetting": max(losses.values()),
+        "regressed_tasks": [task for task, loss in losses.items() if loss > 1e-12],
+        "criterion": "mean_positive_per_task_success_rate_drop",
+        "zero_drop_required": False, "statistical_zero_forgetting_proven": False,
+    }
 
 
 def wilson_interval(successes: int, total: int, z: float = 1.959963984540054) -> tuple[float, float]:
@@ -160,22 +199,73 @@ def adaptive_counterfactual_target(
     *,
     successes: int,
     trials: int,
-    max_width: float = 0.20,
+    max_width: float | None = None,
+    posterior_confidence: float = 0.95,
+    decision_boundary: float = 0.5,
+    initial_branches: int = 16,
+    max_branches: int = 32,
 ) -> tuple[int, tuple[float, float]]:
-    if trials not in {16, 32, 64} or not 0 <= successes <= trials:
-        raise ValueError("adaptive audit trials must be 16, 32, or 64")
+    """Return 16 or 32 branches under the fixed-budget-10 label rule.
+
+    ``max_width`` is accepted only so old callers fail by semantics rather than
+    by signature; interval width no longer controls collection.  At 16 trials
+    we stop when at least ``posterior_confidence`` of the Beta posterior lies
+    on one side of 0.5.  Otherwise we request 32.  Thirty-two is final even if
+    still uncertain; the caller must censor that context instead of attaching
+    a binary label.
+    """
+
+    del max_width
+    if trials not in {int(initial_branches), int(max_branches)} or not 0 <= successes <= trials:
+        raise ValueError("adaptive audit trials must be the configured 16 or 32")
+    if not 0.5 < float(posterior_confidence) < 1.0:
+        raise ValueError("posterior_confidence must be in (0.5, 1)")
+    if not 0.0 < float(decision_boundary) < 1.0:
+        raise ValueError("decision_boundary must be in (0, 1)")
     failures = trials - successes
+    alpha = (1.0 - float(posterior_confidence)) / 2.0
     interval = (
-        float(beta.ppf(0.025, failures + 1, successes + 1)),
-        float(beta.ppf(0.975, failures + 1, successes + 1)),
+        float(beta.ppf(alpha, failures + 1, successes + 1)),
+        float(beta.ppf(1.0 - alpha, failures + 1, successes + 1)),
     )
-    # The verifier is a direct symmetric two-class head.  More branches are
-    # requested only when the posterior cannot distinguish which outcome is
-    # the majority; there is no configurable cost-derived routing threshold.
-    uncertain = interval[0] <= 0.5 <= interval[1] or interval[1] - interval[0] > max_width
-    if trials < 64 and uncertain:
-        return trials * 2, interval
+    below = float(beta.cdf(decision_boundary, failures + 1, successes + 1))
+    above = 1.0 - below
+    decisive = max(below, above) >= float(posterior_confidence)
+    if trials == int(initial_branches) and not decisive:
+        return int(max_branches), interval
     return trials, interval
+
+
+def counterfactual_posterior_status(
+    *,
+    successes: int,
+    trials: int,
+    posterior_confidence: float = 0.95,
+    decision_boundary: float = 0.5,
+) -> dict[str, object]:
+    """Describe whether a replay label is decisive or must be censored."""
+
+    if trials <= 0 or not 0 <= successes <= trials:
+        raise ValueError("invalid counterfactual counts")
+    failures = trials - successes
+    below = float(beta.cdf(decision_boundary, failures + 1, successes + 1))
+    above = 1.0 - below
+    side_probability = max(below, above)
+    if side_probability >= float(posterior_confidence):
+        label_status = "LABELED"
+        posterior_side = "EXPANSION" if above >= below else "RE-STEER"
+    else:
+        label_status = "AMBIGUOUS/CENSORED"
+        posterior_side = "AMBIGUOUS"
+    return {
+        "label_status": label_status,
+        "posterior_side": posterior_side,
+        "posterior_side_probability": side_probability,
+        "posterior_probability_below_boundary": below,
+        "posterior_probability_above_boundary": above,
+        "decision_boundary": float(decision_boundary),
+        "posterior_confidence_required": float(posterior_confidence),
+    }
 
 
 class EpisodeLedger:
@@ -268,10 +358,12 @@ __all__ = [
     "PolicyScore",
     "PromotionDecision",
     "adaptive_counterfactual_target",
+    "counterfactual_posterior_status",
     "assert_raw_profile",
     "paired_hierarchical_bootstrap",
     "raw_promotion_decision",
-    "select_alpha_top2",
-    "trigger_score",
+    "rank_current_task_candidates",
+    "retention_metrics",
+    "gain_retention_tradeoffs",
     "wilson_interval",
 ]

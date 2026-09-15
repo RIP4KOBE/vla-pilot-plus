@@ -12,8 +12,10 @@ from typing import Any, Callable, Mapping, Sequence
 import h5py
 import numpy as np
 
-from .mixture import TrajectoryModeFitter
 from .io_utils import atomic_write_json, sha256_file
+
+
+NATIVE_DEMO_ACCEPTANCE = "libero-collection-native-success-v1"
 
 
 @dataclass(frozen=True)
@@ -25,7 +27,7 @@ class DemoFrame:
 
 
 class DemoWriter:
-    """In-memory step-per-key episode buffer with atomic HDF5 commit."""
+    """Shared continuous-action / teleoperation buffer with atomic HDF5 commit."""
 
     def __init__(
         self,
@@ -125,6 +127,10 @@ class DemoWriter:
         self.start(frame, ee_position=ee_position)
 
     def save(self) -> Path:
+        if self.metadata.get("demonstration_source") == "codex_skill_controller" and not (
+            self.explicit_success and self.successes and self.successes[-1]
+        ):
+            raise ValueError("automatic failures must remain diagnostic NPZ, not training HDF5")
         if len(self.frames) != len(self.actions) + 1:
             raise RuntimeError("HDF5 contract requires T+1 states and T actions")
         if not self.actions:
@@ -187,6 +193,20 @@ class CurationResult:
     coverage: dict[str, dict[str, float | int]]
 
 
+def pending_demo_replays(paths: Sequence[Path]) -> tuple[Path, ...]:
+    """List optional replay diagnostics; this is not a training/curation gate."""
+    pending = []
+    for path in map(Path, paths):
+        with h5py.File(path, "r") as handle:
+            committed_success = (bool(handle.attrs.get("collection_committed", False))
+                and bool(handle.attrs.get("explicit_success", False))
+                and bool(handle.attrs.get("simulator_success", False)))
+            if (committed_success and not bool(handle.attrs.get("replay_validated", False))
+                    and handle.attrs.get("replay_status") != "rejected"):
+                pending.append(path)
+    return tuple(pending)
+
+
 def curate_ticket_demos(
     paths: Sequence[Path],
     *,
@@ -204,26 +224,34 @@ def curate_ticket_demos(
                 np.isfinite(handle[name][...]).all()
                 for name in ("observation/state", "action", "simulator_state")
             )
-            success = bool(handle.attrs.get("explicit_success", False))
+            # The original LIBERO-PRO predicate is the success authority.
+            # A second simulation (or an infrastructure error running it)
+            # cannot invalidate an already successful collection episode.
+            success = bool(handle.attrs.get("simulator_success", False))
+            if "success" in handle:
+                success = success and length > 0 and len(handle["success"]) == length and bool(handle["success"][-1])
+            automatic = handle.attrs.get("demonstration_source") == "codex_skill_controller"
             toggles = int(
                 np.sum(
                     np.signbit(handle["action"][:-1, 6])
                     != np.signbit(handle["action"][1:, 6])
                 )
             )
-            replay_validated = bool(handle.attrs.get("replay_validated", False))
-            if not finite or not success or length < 50 or toggles > 4 or not replay_validated:
+            if not finite or not success or length < (1 if automatic else 50) or (not automatic and toggles > 4):
                 hard_rejected.append(path)
                 continue
             cell = str(handle.attrs["coverage_cell"])
             ee = np.asarray(handle["ee_position"], dtype=np.float64)
-            records.append((path, cell, ee, length))
+            records.append((path, cell, ee, length, automatic))
             lengths.append(length)
     if lengths:
-        median = float(np.median(lengths))
+        median = float(np.median([record[3] for record in records if not record[4]] or lengths))
         filtered = []
         for record in records:
-            if 0.5 * median <= record[3] <= 2.0 * median:
+            # Continuous controllers are faster than key-driven humans. Do not
+            # discard native successful trajectories for being faster than
+            # the mixed-source duration median.
+            if record[4] or 0.5 * median <= record[3] <= 2.0 * median:
                 filtered.append(record)
             else:
                 hard_rejected.append(record[0])
@@ -234,21 +262,11 @@ def curate_ticket_demos(
     for cell, quota in required_quotas.items():
         cell_records = [record for record in records if record[1] == cell]
         if not cell_records:
-            coverage[cell] = {"accepted": 0, "quota": int(quota), "main_mode_fraction": 0.0}
+            coverage[cell] = {"accepted": 0, "quota": int(quota), "diversity_preserved": True}
             continue
-        descriptors = np.stack([_demo_descriptor(record[2]) for record in cell_records])
-        if len(descriptors) >= 3:
-            fit = TrajectoryModeFitter(
-                max_components=min(4, len(descriptors)),
-                pca_dims=min(8, descriptors.shape[1]),
-                min_unique_ancestors=2,
-            ).fit(descriptors)
-            main = max(fit.modes, key=lambda mode: mode.weight)
-            keep_indices = set(int(value) for value in main.member_indices)
-            main_fraction = len(keep_indices) / len(cell_records)
-        else:
-            keep_indices = set(range(len(cell_records)))
-            main_fraction = 1.0
+        # Native-success trajectories are not discarded for differing motion strategies.
+        keep_indices = set(range(len(cell_records)))
+        preserve_diversity = True
         kept = [record[0] for index, record in enumerate(cell_records) if index in keep_indices]
         accepted.extend(kept)
         hard_rejected.extend(
@@ -257,7 +275,7 @@ def curate_ticket_demos(
         coverage[cell] = {
             "accepted": len(kept),
             "quota": int(quota),
-            "main_mode_fraction": main_fraction,
+            "diversity_preserved": preserve_diversity,
         }
 
     rejected_dir = Path(rejected_dir)
@@ -270,7 +288,7 @@ def curate_ticket_demos(
         moved.append(destination)
     needs_more = any(
         int(item["accepted"]) < int(item["quota"])
-        or float(item["main_mode_fraction"]) < 0.6
+        or (not item.get("diversity_preserved", False) and float(item["main_mode_fraction"]) < 0.6)
         for item in coverage.values()
     )
     return CurationResult(tuple(accepted), tuple(moved), needs_more, coverage)
@@ -301,9 +319,13 @@ def export_lerobot_v3(
     )
     for path in map(Path, hdf5_paths):
         with h5py.File(path, "r") as handle:
+            if handle.attrs.get("demonstration_source") == "codex_skill_controller" and not (
+                bool(handle.attrs.get("simulator_success", False)) and bool(handle.attrs.get("explicit_success", False))
+            ):
+                raise ValueError("refusing to export a failed automatic demonstration")
             actions = handle["action"]
             frames = actions.shape[0]
-            task = str(handle.attrs["task"])
+            task = str(handle.attrs.get("task_instruction") or handle.attrs["task"])
             if handle["observation/state"].shape[0] != frames + 1:
                 raise ValueError("HDF5 state/action alignment is invalid")
             for index in range(frames):
@@ -397,6 +419,10 @@ def curate_and_export_ticket(
             )
     artifact = {
         "schema_version": "ticket-curation-v1",
+        "demo_acceptance_version": NATIVE_DEMO_ACCEPTANCE,
+        "demo_success_authority": "LIBERO-PRO native predicate during collection",
+        "replay_role": "diagnostic_only",
+        "replay_state_error_role": "diagnostic_only",
         "ticket_id": ticket["ticket_id"],
         "ticket_sha256": sha256_file(ticket_path),
         "required_quotas": required_quotas,
@@ -433,6 +459,9 @@ def curate_and_export_ticket(
     return artifact
 
 
+NATIVE_REPLAY_ACCEPTANCE = "libero-native-success-v1"
+
+
 def validate_demo_replay(
     path: Path,
     *,
@@ -442,7 +471,13 @@ def validate_demo_replay(
     velocity_tolerance: float | None = None,
     prepare_replay: Callable[[], None] | None = None,
 ) -> float:
-    """Replay every action and persist exact state-alignment diagnostics.
+    """Replay recorded actions for optional reproducibility diagnostics.
+
+    State/component tolerances only annotate diagnostics. Contact trajectories
+    need not reproduce every floating-point simulator state to succeed. Stop
+    at LIBERO-PRO success or terminal failure; never restore intermediate states.
+    Neither this replay's success nor its numerical errors decide whether the
+    original collection episode is accepted by curation.
 
     ``prepare_replay`` must reset any controller / environment runtime state
     that is not represented by MuJoCo's flattened data state.  In particular,
@@ -471,6 +506,7 @@ def validate_demo_replay(
     maximum_qpos_error = 0.0
     maximum_qvel_error = 0.0
     replay_success: bool | None = None
+    steps_executed = 0
     try:
         if prepare_replay is not None:
             prepare_replay()
@@ -478,10 +514,12 @@ def validate_demo_replay(
         step = getattr(adapter, "step_teleop", adapter.step)
         for index, action in enumerate(actions):
             transition = step(torch.from_numpy(action).to(adapter.device))
-            if isinstance(transition, tuple) and len(transition) >= 5:
-                info = transition[4]
-                if isinstance(info, Mapping) and "success" in info:
-                    replay_success = bool(info["success"])
+            if (not isinstance(transition, tuple) or len(transition) < 5
+                    or not isinstance(transition[4], Mapping)
+                    or "success" not in transition[4]):
+                raise RuntimeError("LIBERO-PRO native success signal missing during action replay")
+            replay_success = bool(transition[4]["success"])
+            steps_executed = index + 1
             current = capture()
             flattened = np.asarray(current["flattened_sim_state"], dtype=np.float64)
             if flattened.shape != simulator_states[index + 1].shape:
@@ -518,6 +556,10 @@ def validate_demo_replay(
                             )
                         ),
                     )
+            if replay_success or bool(transition[2]) or bool(transition[3]):
+                break
+        if replay_success is None:
+            raise RuntimeError("action replay produced no LIBERO-PRO success observation")
     except Exception as exc:
         with h5py.File(path, "r+") as handle:
             handle.attrs["replay_validated"] = False
@@ -534,26 +576,23 @@ def validate_demo_replay(
         handle.attrs["replay_max_qvel_error"] = maximum_qvel_error
         handle.attrs["replay_tolerance"] = float(tolerance)
         handle.attrs["replay_validation_version"] = "controller-reset-v1"
-        success_matches = replay_success is None or replay_success == recorded_success
+        success_matches = replay_success == recorded_success
         position_limit = float(
             tolerance if position_tolerance is None else position_tolerance
         )
         velocity_limit = float(
             tolerance if velocity_tolerance is None else velocity_tolerance
         )
-        component_valid = (
-            maximum_qpos_error <= position_limit
-            and maximum_qvel_error <= velocity_limit
-        )
         handle.attrs["replay_success_matches"] = bool(success_matches)
-        if replay_success is not None:
-            handle.attrs["replay_task_success"] = bool(replay_success)
+        handle.attrs["replay_task_success"] = bool(replay_success)
+        handle.attrs["replay_steps_executed"] = steps_executed
+        handle.attrs["replay_recorded_action_count"] = len(actions)
         handle.attrs["replay_position_tolerance"] = position_limit
         handle.attrs["replay_velocity_tolerance"] = velocity_limit
-        handle.attrs["replay_acceptance_version"] = "physical-state-v1"
-        handle.attrs["replay_validated"] = bool(
-            maximum <= tolerance and component_valid and success_matches
-        )
+        handle.attrs["replay_acceptance_version"] = NATIVE_REPLAY_ACCEPTANCE
+        handle.attrs["replay_state_error_role"] = "diagnostic_only"
+        handle.attrs["replay_success_authority"] = "LIBERO-PRO native predicate"
+        handle.attrs["replay_validated"] = bool(recorded_success and replay_success)
         if "replay_error" in handle.attrs:
             del handle.attrs["replay_error"]
         handle.flush()
@@ -563,18 +602,22 @@ def validate_demo_replay(
 def reassess_demo_replay(
     path: Path,
     *,
-    tolerance: float,
-    position_tolerance: float,
-    velocity_tolerance: float,
+    tolerance: float | None = None,
+    position_tolerance: float | None = None,
+    velocity_tolerance: float | None = None,
 ) -> bool:
-    """Apply versioned physical tolerances to persisted full-replay metrics."""
+    """Apply native-success acceptance to completed replay evidence, not labels.
+
+    Keep the old numerical diagnostics and previous acceptance evidence. The
+    optional legacy tolerance arguments cannot alter the new success decision.
+    A missing/error replay cannot be promoted by this metadata-only operation.
+    """
 
     path = Path(path)
     required = {
         "replay_max_state_error",
-        "replay_max_qpos_error",
-        "replay_max_qvel_error",
-        "replay_success_matches",
+        "simulator_success",
+        "replay_task_success",
         "replay_validation_version",
     }
     with h5py.File(path, "r+") as handle:
@@ -583,21 +626,18 @@ def reassess_demo_replay(
             raise ValueError(
                 f"demo has no complete replay diagnostics: missing={missing}"
             )
-        maximum = float(handle.attrs["replay_max_state_error"])
-        qpos = float(handle.attrs["replay_max_qpos_error"])
-        qvel = float(handle.attrs["replay_max_qvel_error"])
-        success_matches = bool(handle.attrs["replay_success_matches"])
-        valid = bool(
-            maximum <= float(tolerance)
-            and qpos <= float(position_tolerance)
-            and qvel <= float(velocity_tolerance)
-            and success_matches
-        )
-        handle.attrs["replay_tolerance"] = float(tolerance)
-        handle.attrs["replay_position_tolerance"] = float(position_tolerance)
-        handle.attrs["replay_velocity_tolerance"] = float(velocity_tolerance)
-        handle.attrs["replay_acceptance_version"] = "physical-state-v1"
+        if handle.attrs.get("replay_error") or handle.attrs.get("replay_status") == "error":
+            raise RuntimeError("cannot reassess an errored/incomplete action replay")
+        if handle.attrs.get("replay_acceptance_version") != NATIVE_REPLAY_ACCEPTANCE:
+            previous = {key: value.item() if hasattr(value, "item") else value
+                        for key, value in handle.attrs.items() if key.startswith("replay_")}
+            handle.attrs["replay_prior_acceptance_json"] = json.dumps(previous, sort_keys=True)
+        valid = bool(handle.attrs["simulator_success"] and handle.attrs["replay_task_success"])
+        handle.attrs["replay_acceptance_version"] = NATIVE_REPLAY_ACCEPTANCE
+        handle.attrs["replay_state_error_role"] = "diagnostic_only"
+        handle.attrs["replay_success_authority"] = "LIBERO-PRO native predicate"
         handle.attrs["replay_validated"] = valid
+        handle.attrs["replay_status"] = "validated" if valid else "rejected"
         handle.flush()
     return valid
 

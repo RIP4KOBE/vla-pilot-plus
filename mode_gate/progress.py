@@ -31,6 +31,28 @@ def canonicalize_stage_id(value: str | int | None) -> str:
     return text
 
 
+def is_forward_stage_transition(
+    before: str | int | None,
+    after: str | int | None,
+) -> bool:
+    """Return true only for a monotonic Gemini stage transition.
+
+    The strict planner schema emits ``stage_N``. Treating any identity change
+    as progress would turn a noisy stage regression (for example 2→1) into a
+    successful RE-STEER label.
+    """
+
+    previous = canonicalize_stage_id(before)
+    current = canonicalize_stage_id(after)
+    if previous in {"", "UNKNOWN"} or current in {"", "UNKNOWN"}:
+        return False
+    previous_match = re.fullmatch(r"stage_([1-9][0-9]*)", previous)
+    current_match = re.fullmatch(r"stage_([1-9][0-9]*)", current)
+    if previous_match and current_match:
+        return int(current_match.group(1)) > int(previous_match.group(1))
+    return current != previous
+
+
 @dataclass
 class ProgressMonitor:
     confidence_threshold: float = 0.8
@@ -92,13 +114,24 @@ class ProgressMonitor:
             qualified = confidence >= self.confidence_threshold or supported
             gemini_advanced = (
                 self._last_gemini_stage_id is not None
-                and stage_id not in {"", "UNKNOWN", self._last_gemini_stage_id}
+                and is_forward_stage_transition(
+                    self._last_gemini_stage_id,
+                    stage_id,
+                )
             )
             advanced = gemini_advanced and qualified
             # Do not let an uncorroborated low-confidence guess become the
             # baseline. A qualified first observation establishes the
             # baseline but is not itself evidence of a transition.
-            if stage_id not in {"", "UNKNOWN"} and qualified:
+            if (
+                stage_id not in {"", "UNKNOWN"}
+                and qualified
+                and (
+                    self._last_gemini_stage_id is None
+                    or gemini_advanced
+                    or stage_id == self._last_gemini_stage_id
+                )
+            ):
                 self._last_gemini_stage_id = stage_id
             source = "gemini_planner"
         else:
@@ -125,4 +158,8 @@ class ProgressMonitor:
         )
 
 
-__all__ = ["ProgressMonitor", "canonicalize_stage_id"]
+__all__ = [
+    "ProgressMonitor",
+    "canonicalize_stage_id",
+    "is_forward_stage_transition",
+]

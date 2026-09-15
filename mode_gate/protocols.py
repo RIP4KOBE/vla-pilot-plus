@@ -7,12 +7,9 @@ from typing import Protocol, Sequence, runtime_checkable
 from .types import (
     ActionChunkBatch,
     GateContext,
-    ModeEvidence,
-    PlannerDecision,
     RoundEvidence,
     SteeringSnapshot,
     TaskSpaceTrajectoryBatch,
-    VerifierEvidence,
 )
 
 
@@ -38,25 +35,3 @@ class TrajectoryProjector(Protocol):
         context: GateContext,
     ) -> TaskSpaceTrajectoryBatch:
         """Project environment actions without stepping an environment."""
-
-
-@runtime_checkable
-class Planner(Protocol):
-    def decide(
-        self,
-        context: GateContext,
-        history: Sequence[RoundEvidence],
-    ) -> PlannerDecision:
-        """Interpret every mode card and return a binary decision."""
-
-
-@runtime_checkable
-class Verifier(Protocol):
-    def verify(
-        self,
-        context: GateContext,
-        round_evidence: RoundEvidence,
-        mode: ModeEvidence,
-    ) -> VerifierEvidence:
-        """Verify one mode using offline multimodal evidence only."""
-

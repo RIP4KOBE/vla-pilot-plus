@@ -1,9 +1,10 @@
-"""Exact snapshot counterfactual replay with adaptive 16→32→64 branches."""
+"""Exact snapshot counterfactual replay with adaptive 16→32 branches."""
 
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 import hashlib
+import inspect
 from pathlib import Path
 import random
 from typing import Any, Callable, Mapping, Protocol
@@ -11,11 +12,23 @@ from typing import Any, Callable, Mapping, Protocol
 import numpy as np
 import torch
 
-from .evaluation import adaptive_counterfactual_target
+from .evaluation import (
+    adaptive_counterfactual_target,
+    counterfactual_posterior_status,
+)
+from .experiment_contract import (
+    DEFAULT_RETRY_SCHEDULE_50,
+    FIXED_BUDGET_50_CONTRACT,
+    label_contract_payload,
+    require_fixed_budget_50_contract,
+)
 from .incidents import IncidentMemory, VerifierLabelRecord
 from .io_utils import AtomicJsonl, atomic_write_json
 from .snapshots import DecisionSnapshotStore
 from .types import ProgressEvidence, SamplingCondition
+
+
+REPLAY_PROGRESS_CONTRACT = "libero-native-success-terminal-fixed50-v3"
 
 
 @dataclass(frozen=True)
@@ -36,6 +49,9 @@ class CounterfactualResult:
     successes: int
     p_expansion: float
     posterior_interval: tuple[float, float]
+    posterior_side_probability: float
+    label_status: str
+    censored: bool
     label_attached: bool
 
 
@@ -62,11 +78,11 @@ class NewPolicyFeatureBuilder(Protocol):
 
 
 @dataclass(frozen=True)
-class FreshMedoidSelection:
-    """One already-scored, safe medoid in executable environment action space."""
+class FreshCandidateSelection:
+    """One already-scored, safe candidate in executable environment action space."""
 
     actions: np.ndarray
-    mode_id: str
+    candidate_id: str
     sample_index: int
     metadata: Mapping[str, Any] = field(default_factory=dict)
 
@@ -74,33 +90,33 @@ class FreshMedoidSelection:
         value = np.asarray(self.actions, dtype=np.float32)
         if value.ndim == 3:
             if value.shape[0] != 1:
-                raise ValueError("fresh medoid selection must contain exactly one chunk")
+                raise ValueError("fresh candidate selection must contain exactly one chunk")
             value = value[0]
         if value.ndim != 2 or value.shape[1] < 7 or len(value) < 1:
-            raise ValueError("fresh medoid actions must have shape (H, 7+)")
+            raise ValueError("fresh candidate actions must have shape (H, 7+)")
         if not np.isfinite(value).all():
-            raise ValueError("fresh medoid actions contain non-finite values")
-        if not self.mode_id or self.sample_index < 0:
-            raise ValueError("fresh medoid selection requires a valid mode/sample")
+            raise ValueError("fresh candidate actions contain non-finite values")
+        if not self.candidate_id or self.sample_index < 0:
+            raise ValueError("fresh candidate selection requires a valid mode/sample")
         object.__setattr__(self, "actions", value)
         object.__setattr__(self, "metadata", dict(self.metadata))
 
 
-class FreshMedoidSampler(Protocol):
+class FreshCandidateSampler(Protocol):
     def __call__(
         self,
         *,
         adapter: Any,
         policy: Any,
         condition: SamplingCondition,
-    ) -> FreshMedoidSelection | None: ...
+    ) -> FreshCandidateSelection | None: ...
 
 
 class FixedBudgetResteerExecutor:
-    """Execute the factual four-level RE-STEER schedule from an exact snapshot.
+    """Execute the configured RE-STEER schedule from an exact snapshot.
 
-    ``fresh_sampler`` owns policy sampling, mode abstraction, geometry safety,
-    and semantic medoid selection.  This executor owns the estimand-defining
+    ``fresh_sampler`` owns policy sampling, full candidate projection, geometry safety,
+    and semantic candidate selection.  This executor owns the estimand-defining
     behavior policy: every failed opportunity gets a new sample, executes at
     most one 10-step chunk, and never consults the learned verifier.
     """
@@ -108,20 +124,15 @@ class FixedBudgetResteerExecutor:
     def __init__(
         self,
         *,
-        fresh_sampler: FreshMedoidSampler,
-        retry_schedule: tuple[tuple[float, float], ...] = (
-            (1.00, 1.00),
-            (1.15, 1.10),
-            (1.30, 1.25),
-            (1.50, 1.40),
-        ),
+        fresh_sampler: FreshCandidateSampler,
+        retry_schedule: tuple[tuple[float, float], ...] = DEFAULT_RETRY_SCHEDULE_50,
         chunk_horizon: int = 10,
         progress_observer: Callable[..., ProgressEvidence] | None = None,
     ) -> None:
-        if len(retry_schedule) != 4:
-            raise ValueError("counterfactual retry schedule must contain four levels")
-        if int(chunk_horizon) != 10:
-            raise ValueError("counterfactual chunk horizon is frozen at 10")
+        if not retry_schedule:
+            raise ValueError("counterfactual retry schedule must be non-empty")
+        if int(chunk_horizon) <= 0:
+            raise ValueError("counterfactual chunk horizon must be positive")
         self.fresh_sampler = fresh_sampler
         self.retry_schedule = tuple(
             (float(guide), float(diversity))
@@ -139,28 +150,40 @@ class FixedBudgetResteerExecutor:
         remaining_budget: int,
         controller_state: Mapping[str, Any],
     ) -> BranchOutcome:
-        if not 0 <= int(remaining_budget) <= 4:
-            raise ValueError("remaining counterfactual retry budget must be in [0, 4]")
-        retry_index = int(controller_state.get("retry_index", 4 - remaining_budget))
-        if retry_index < 0 or retry_index + remaining_budget > 4:
+        retry_budget = int(controller_state.get("retry_budget", len(self.retry_schedule)))
+        if retry_budget != len(self.retry_schedule):
+            raise ValueError("controller retry budget and schedule length disagree")
+        if not 1 <= int(remaining_budget) <= retry_budget:
+            raise ValueError(
+                "counterfactual replay requires an actionable remaining budget"
+            )
+        retry_index = int(
+            controller_state.get("retry_index", retry_budget - remaining_budget)
+        )
+        if retry_index < 0 or retry_index + remaining_budget > retry_budget:
             raise ValueError("snapshot retry index and remaining budget are inconsistent")
         attempts: list[dict[str, Any]] = []
         chunks_executed = 0
-        for offset in range(int(remaining_budget)):
+        def condition_for(offset: int) -> SamplingCondition:
             schedule_index = retry_index + offset
             guide, diversity = self.retry_schedule[schedule_index]
-            seed = _attempt_seed(branch_seed, offset)
+            return SamplingCondition(
+                seed=_attempt_seed(branch_seed, offset),
+                retry_index=schedule_index,
+                guide_mult=guide,
+                diversity_mult=diversity,
+            )
+
+        for offset in range(int(remaining_budget)):
+            condition = condition_for(offset)
+            schedule_index = condition.retry_index
+            guide, diversity = condition.guide_mult, condition.diversity_mult
+            seed = condition.seed
             random.seed(seed)
             np.random.seed(seed % (2**32))
             torch.manual_seed(seed)
             if torch.cuda.is_available():
                 torch.cuda.manual_seed_all(seed)
-            condition = SamplingCondition(
-                seed=seed,
-                retry_index=schedule_index,
-                guide_mult=guide,
-                diversity_mult=diversity,
-            )
             selection = self.fresh_sampler(
                 adapter=adapter,
                 policy=policy,
@@ -178,7 +201,7 @@ class FixedBudgetResteerExecutor:
                 continue
             attempt.update(
                 {
-                    "mode_id": selection.mode_id,
+                    "candidate_id": selection.candidate_id,
                     "sample_index": selection.sample_index,
                     "selection_metadata": dict(selection.metadata),
                 }
@@ -188,7 +211,7 @@ class FixedBudgetResteerExecutor:
             task_success = False
             executed_steps = 0
             for action in selection.actions[: self.chunk_horizon]:
-                # FreshMedoidSelection is deliberately serialized in NumPy
+                # FreshCandidateSelection is deliberately serialized in NumPy
                 # environment-action space.  LeRobot adapters, however,
                 # require a torch PolicyAction at their processor boundary.
                 # Normalize that contract here so offline replay cannot feed
@@ -207,12 +230,65 @@ class FixedBudgetResteerExecutor:
                 if task_success or terminal:
                     break
             chunks_executed += 1
+            if task_success:
+                attempt.update(
+                    {
+                        "executed_steps": executed_steps,
+                        "stage_advanced": False,
+                        "task_success": True,
+                        "terminal": terminal,
+                        "progress_stage_id": "TASK_SUCCESS",
+                        "progress_confidence": 1.0,
+                        "progress_source": "libero_success",
+                    }
+                )
+                attempts.append(attempt)
+                return BranchOutcome(
+                    success=True,
+                    chunks_executed=chunks_executed,
+                    task_success=True,
+                    metadata={"attempts": attempts},
+                )
+            if terminal:
+                attempt.update(
+                    {
+                        "executed_steps": executed_steps,
+                        "stage_advanced": False,
+                        "task_success": False,
+                        "terminal": True,
+                        "progress_stage_id": "TERMINAL",
+                        "progress_confidence": 1.0,
+                        "progress_source": "libero_terminal",
+                    }
+                )
+                attempts.append(attempt)
+                return BranchOutcome(
+                    success=False,
+                    chunks_executed=chunks_executed,
+                    terminal_timeout=True,
+                    metadata={"attempts": attempts},
+                )
             after = _progress_snapshot(adapter)
+            has_next_attempt = offset + 1 < int(remaining_budget)
+            next_condition = (
+                condition_for(offset + 1)
+                if has_next_attempt
+                else SamplingCondition(
+                    seed=_progress_probe_seed(branch_seed, offset),
+                    retry_index=schedule_index,
+                    guide_mult=guide,
+                    diversity_mult=diversity,
+                )
+            )
             progress = self._observe_progress(
                 adapter=adapter,
                 before=before,
                 after=after,
                 task_success=task_success,
+                selection=selection,
+                next_condition=next_condition,
+                cache_next_selection=has_next_attempt,
+                terminal=terminal,
             )
             attempt.update(
                 {
@@ -220,22 +296,18 @@ class FixedBudgetResteerExecutor:
                     "stage_advanced": progress.advanced,
                     "task_success": progress.task_success,
                     "terminal": terminal,
+                    "progress_stage_id": progress.stage_id,
+                    "progress_confidence": progress.confidence,
+                    "progress_source": progress.source,
                 }
             )
             attempts.append(attempt)
-            if progress.advanced or progress.task_success:
+            if progress.task_success:
                 return BranchOutcome(
                     success=True,
                     chunks_executed=chunks_executed,
                     stage_advanced=progress.advanced,
                     task_success=progress.task_success,
-                    metadata={"attempts": attempts},
-                )
-            if terminal:
-                return BranchOutcome(
-                    success=False,
-                    chunks_executed=chunks_executed,
-                    terminal_timeout=True,
                     metadata={"attempts": attempts},
                 )
         return BranchOutcome(
@@ -251,13 +323,37 @@ class FixedBudgetResteerExecutor:
         before: Mapping[str, Any],
         after: Mapping[str, Any],
         task_success: bool,
+        selection: FreshCandidateSelection,
+        next_condition: SamplingCondition,
+        cache_next_selection: bool,
+        terminal: bool,
     ) -> ProgressEvidence:
         if self.progress_observer is not None:
+            kwargs = {
+                "adapter": adapter,
+                "before": before,
+                "after": after,
+                "task_success": task_success,
+            }
+            optional = {
+                "selection": selection,
+                "next_condition": next_condition,
+                "cache_next_selection": cache_next_selection,
+                "terminal": terminal,
+            }
+            parameters = inspect.signature(self.progress_observer).parameters
+            accepts_kwargs = any(
+                item.kind is inspect.Parameter.VAR_KEYWORD
+                for item in parameters.values()
+            )
+            if accepts_kwargs:
+                kwargs.update(optional)
+            else:
+                kwargs.update(
+                    {key: value for key, value in optional.items() if key in parameters}
+                )
             value = self.progress_observer(
-                adapter=adapter,
-                before=before,
-                after=after,
-                task_success=task_success,
+                **kwargs,
             )
             if not isinstance(value, ProgressEvidence):
                 raise TypeError("progress_observer must return ProgressEvidence")
@@ -309,11 +405,40 @@ class CounterfactualReplayWorker:
         policy_id: str,
         label_version: str,
         source: str = "counterfactual_replay",
-        max_width: float = 0.20,
         verifier_feature_path: Path | None = None,
         data_split: str | None = None,
+        label_config: Mapping[str, Any] | None = None,
+        budget_state: Mapping[str, Any] | None = None,
     ) -> CounterfactualResult:
+        contract_payload = dict(
+            label_config or label_contract_payload(FIXED_BUDGET_50_CONTRACT)
+        )
+        contract = require_fixed_budget_50_contract(contract_payload)
+        if label_version != contract.label_version:
+            raise ValueError("counterfactual label version/config mismatch")
         decision = self._decision(record_id)
+        budget_state = dict(budget_state or {})
+        retry_budget = int(budget_state.get("retry_budget", contract.retry_budget))
+        retry_index = int(budget_state.get("retry_index", 0))
+        remaining_budget = int(
+            budget_state.get("remaining_budget", retry_budget - retry_index)
+        )
+        if (
+            retry_budget != contract.retry_budget
+            or retry_index < 0
+            or remaining_budget != retry_budget - retry_index
+            or remaining_budget <= 0
+        ):
+            raise ValueError(
+                "counterfactual budget state is not fixed_budget_50 actionable"
+            )
+        budget_state.update(
+            {
+                "retry_budget": retry_budget,
+                "retry_index": retry_index,
+                "remaining_budget": remaining_budget,
+            }
+        )
         if verifier_feature_path is None:
             if policy_id != str(decision["policy_id"]):
                 raise ValueError(
@@ -326,8 +451,13 @@ class CounterfactualReplayWorker:
         policy = self.policy_loader(policy_id)
         if isinstance(policy, Mapping) and "policy" in policy:
             policy = policy["policy"]
-        completed = self._completed(record_id, policy_id)
-        target = 16
+        completed = self._completed(
+            record_id,
+            policy_id,
+            label_version=label_version,
+            contract_hash=contract.contract_hash,
+        )
+        target = contract.counterfactual_initial_branches
         interval = (0.0, 1.0)
         while True:
             for branch_index in range(target):
@@ -338,14 +468,32 @@ class CounterfactualReplayWorker:
                     policy=policy,
                     policy_id=policy_id,
                     branch_index=branch_index,
+                    budget_state=budget_state,
+                    label_version=label_version,
+                    contract_hash=contract.contract_hash,
                 )
                 event = {
-                    "event_id": _branch_id(record_id, policy_id, branch_index),
+                    "event_id": _branch_id(
+                        record_id,
+                        policy_id,
+                        branch_index,
+                        label_version=label_version,
+                        contract_hash=contract.contract_hash,
+                    ),
                     "event": "COUNTERFACTUAL_BRANCH_COMPLETED",
                     "record_id": record_id,
                     "policy_id": policy_id,
                     "branch_index": branch_index,
-                    "branch_seed": _branch_seed(record_id, policy_id, branch_index),
+                    "branch_seed": _branch_seed(
+                        record_id,
+                        policy_id,
+                        branch_index,
+                        label_version=label_version,
+                        contract_hash=contract.contract_hash,
+                    ),
+                    "label_version": label_version,
+                    "label_contract_hash": contract.contract_hash,
+                    "budget_state": dict(budget_state),
                     **asdict(outcome),
                 }
                 self.ledger.append(event)
@@ -356,34 +504,52 @@ class CounterfactualReplayWorker:
             next_target, interval = adaptive_counterfactual_target(
                 successes=successes,
                 trials=target,
-                max_width=max_width,
+                posterior_confidence=contract.posterior_confidence,
+                decision_boundary=contract.decision_boundary,
+                initial_branches=contract.counterfactual_initial_branches,
+                max_branches=contract.counterfactual_max_branches,
             )
             if next_target == target:
                 break
             target = next_target
 
-        label = VerifierLabelRecord(
-            record_id=record_id,
-            label_version=label_version,
-            source=source,
-            branches=target,
+        posterior = counterfactual_posterior_status(
             successes=successes,
-            p_expansion=1.0 - successes / target,
-            policy_id=policy_id,
-            snapshot_hash=str(decision["snapshot_hash"]),
-            verifier_feature_path=str(verifier_feature_path.resolve()),
-            data_split=data_split,
-            weak=False,
-            weight=1.0,
+            trials=target,
+            posterior_confidence=contract.posterior_confidence,
+            decision_boundary=contract.decision_boundary,
         )
-        attached = self.incidents.attach_label(label)
+        p_expansion = 1.0 - successes / target
+        attached = False
+        if posterior["label_status"] == "LABELED":
+            label = VerifierLabelRecord(
+                record_id=record_id,
+                label_version=label_version,
+                source=source,
+                branches=target,
+                successes=successes,
+                p_expansion=p_expansion,
+                policy_id=policy_id,
+                snapshot_hash=str(decision["snapshot_hash"]),
+                verifier_feature_path=str(verifier_feature_path.resolve()),
+                data_split=data_split,
+                weak=False,
+                weight=1.0,
+                label_config=contract_payload,
+            )
+            attached = self.incidents.attach_label(label)
         return CounterfactualResult(
             record_id=record_id,
             policy_id=policy_id,
             branches=target,
             successes=successes,
-            p_expansion=label.p_expansion,
+            p_expansion=p_expansion,
             posterior_interval=interval,
+            posterior_side_probability=float(
+                posterior["posterior_side_probability"]
+            ),
+            label_status=str(posterior["label_status"]),
+            censored=posterior["label_status"] != "LABELED",
             label_attached=attached,
         )
 
@@ -394,6 +560,9 @@ class CounterfactualReplayWorker:
         policy: Any,
         policy_id: str,
         branch_index: int,
+        budget_state: Mapping[str, Any],
+        label_version: str,
+        contract_hash: str,
     ) -> BranchOutcome:
         restored = self.snapshots.restore(
             str(decision["snapshot_id"]),
@@ -405,7 +574,13 @@ class CounterfactualReplayWorker:
         manifest = restored["manifest"]
         if manifest["snapshot_hash"] != decision["snapshot_hash"]:
             raise RuntimeError("decision/snapshot hash mismatch during replay")
-        seed = _branch_seed(str(decision["record_id"]), policy_id, branch_index)
+        seed = _branch_seed(
+            str(decision["record_id"]),
+            policy_id,
+            branch_index,
+            label_version=label_version,
+            contract_hash=contract_hash,
+        )
         random.seed(seed)
         np.random.seed(seed % (2**32))
         torch.manual_seed(seed)
@@ -415,21 +590,21 @@ class CounterfactualReplayWorker:
             adapter=self.adapter,
             policy=policy,
             branch_seed=seed,
-            remaining_budget=int(decision["remaining_budget"]),
-            controller_state=manifest["controller_state"],
+            remaining_budget=int(budget_state["remaining_budget"]),
+            controller_state=budget_state,
         )
         if isinstance(value, bool):
             return BranchOutcome(
                 success=value,
-                chunks_executed=int(decision["remaining_budget"]),
-                stage_advanced=value,
+                chunks_executed=int(budget_state["remaining_budget"]),
+                task_success=value,
             )
         if value.chunks_executed < 0 or value.chunks_executed > int(
-            decision["remaining_budget"]
+            budget_state["remaining_budget"]
         ):
-            raise ValueError("branch executor exceeded the frozen retry budget")
-        if value.success != (value.stage_advanced or value.task_success):
-            raise ValueError("branch success must mean stage advance or task success")
+            raise ValueError("branch executor exceeded the configured retry budget")
+        if value.success != value.task_success:
+            raise ValueError("branch success must be LIBERO-PRO native task success")
         return value
 
     def _decision(self, record_id: str) -> dict[str, Any]:
@@ -442,10 +617,22 @@ class CounterfactualReplayWorker:
             raise KeyError(f"expected one verifier decision {record_id!r}, got {len(matches)}")
         return matches[0]
 
-    def _completed(self, record_id: str, policy_id: str) -> dict[int, dict[str, Any]]:
+    def _completed(
+        self,
+        record_id: str,
+        policy_id: str,
+        *,
+        label_version: str,
+        contract_hash: str,
+    ) -> dict[int, dict[str, Any]]:
         result = {}
         for item in self.ledger.iter_valid():
             if item.get("record_id") != record_id or item.get("policy_id") != policy_id:
+                continue
+            if (
+                str(item.get("label_version")) != label_version
+                or str(item.get("label_contract_hash")) != contract_hash
+            ):
                 continue
             index = int(item["branch_index"])
             if index in result and result[index] != item:
@@ -461,7 +648,7 @@ class NewPolicyReplayCoordinator:
     the listed post-failure snapshot, fresh-sample the staged policy, recompute
     modes/geometry/Gemini channels, and persist the resulting verifier input at
     the exact requested path. ``CounterfactualReplayWorker`` then independently
-    restores that snapshot for each adaptive 16→32→64 retry branch.
+    restores that snapshot for each adaptive 16→32 retry branch.
     """
 
     def __init__(
@@ -476,10 +663,14 @@ class NewPolicyReplayCoordinator:
     def run_plan(self, plan_path: Path) -> dict[str, Any]:
         plan_path = Path(plan_path)
         plan = json_load(plan_path)
-        if plan.get("schema_version") != "new-policy-counterfactual-plan-v2":
+        if plan.get("schema_version") != "new-policy-counterfactual-plan-v3":
             raise ValueError("unsupported new-policy replay plan")
         if plan.get("decision_rule") != "head_argmax":
             raise ValueError("new-policy replay plan must use direct head argmax")
+        if plan.get("progress_contract") != REPLAY_PROGRESS_CONTRACT:
+            raise ValueError(
+                "new-policy replay plan uses a stale progress contract"
+            )
         expected_hash = str(plan.get("plan_sha256") or "")
         unsigned = {key: value for key, value in plan.items() if key != "plan_sha256"}
         actual_hash = hashlib.sha256(
@@ -487,14 +678,35 @@ class NewPolicyReplayCoordinator:
         ).hexdigest()
         if expected_hash != actual_hash:
             raise ValueError("new-policy replay plan checksum mismatch")
+        contract_payload = dict(plan.get("label_config") or {})
+        contract = require_fixed_budget_50_contract(contract_payload)
+        if str(plan.get("label_version")) != contract.label_version:
+            raise ValueError("new-policy replay plan label/config mismatch")
+        if tuple(map(int, plan.get("adaptive_branches", ()))) != (
+            contract.counterfactual_initial_branches,
+            contract.counterfactual_max_branches,
+        ):
+            raise ValueError("new-policy replay plan branch schedule is not fixed10")
         policy_id = str(plan["policy_id"])
         contexts = tuple(plan.get("contexts", ()))
         record_ids = [str(item["record_id"]) for item in contexts]
         if len(record_ids) != len(set(record_ids)):
             raise ValueError("new-policy replay plan contains duplicate records")
         results = []
-        label_version = f"new-policy-{policy_id}-{expected_hash[:12]}"
+        label_version = contract.label_version
         for context in contexts:
+            budget_state = dict(context.get("budget_state") or {})
+            if (
+                int(budget_state.get("retry_budget", -1)) != contract.retry_budget
+                or int(budget_state.get("remaining_budget", -1))
+                != contract.retry_budget - int(budget_state.get("retry_index", -1))
+                or not 1
+                <= int(budget_state.get("remaining_budget", -1))
+                <= contract.retry_budget
+            ):
+                raise ValueError(
+                    "new-policy replay context has no actionable fixed10 budget"
+                )
             output_path = Path(str(context["fresh_feature_output_path"]))
             built = Path(
                 self.feature_builder(
@@ -512,15 +724,18 @@ class NewPolicyReplayCoordinator:
                 policy_id=policy_id,
                 label_version=label_version,
                 source="counterfactual_replay",
-                max_width=float(plan["max_posterior_width"]),
                 verifier_feature_path=built,
                 data_split=str(context["data_split"]),
+                label_config=contract_payload,
+                budget_state=budget_state,
             )
             results.append(asdict(result))
         value = {
-            "schema_version": "new-policy-counterfactual-result-v1",
+            "schema_version": "new-policy-counterfactual-result-v2",
             "plan_sha256": expected_hash,
             "policy_id": policy_id,
+            "label_version": label_version,
+            "label_config": contract_payload,
             "complete": True,
             "contexts_planned": len(contexts),
             "contexts_completed": len(results),
@@ -531,22 +746,49 @@ class NewPolicyReplayCoordinator:
         return value
 
 
-def _branch_seed(record_id: str, policy_id: str, branch_index: int) -> int:
+def _branch_seed(
+    record_id: str,
+    policy_id: str,
+    branch_index: int,
+    *,
+    label_version: str = FIXED_BUDGET_50_CONTRACT.label_version,
+    contract_hash: str = FIXED_BUDGET_50_CONTRACT.contract_hash,
+) -> int:
     digest = hashlib.sha256(
-        f"counterfactual-v1\0{record_id}\0{policy_id}\0{branch_index}".encode()
+        (
+            f"counterfactual-v2\0{label_version}\0{contract_hash}\0"
+            f"{record_id}\0{policy_id}\0{branch_index}"
+        ).encode()
     ).digest()
     return int.from_bytes(digest[:8], "big") % (2**63 - 1)
 
 
-def _branch_id(record_id: str, policy_id: str, branch_index: int) -> str:
+def _branch_id(
+    record_id: str,
+    policy_id: str,
+    branch_index: int,
+    *,
+    label_version: str = FIXED_BUDGET_50_CONTRACT.label_version,
+    contract_hash: str = FIXED_BUDGET_50_CONTRACT.contract_hash,
+) -> str:
     return hashlib.sha256(
-        f"branch\0{record_id}\0{policy_id}\0{branch_index}".encode()
+        (
+            f"branch-v2\0{label_version}\0{contract_hash}\0"
+            f"{record_id}\0{policy_id}\0{branch_index}"
+        ).encode()
     ).hexdigest()
 
 
 def _attempt_seed(branch_seed: int, offset: int) -> int:
     digest = hashlib.sha256(
         f"resteer-attempt-v1\0{int(branch_seed)}\0{int(offset)}".encode()
+    ).digest()
+    return int.from_bytes(digest[:8], "big") % (2**63 - 1)
+
+
+def _progress_probe_seed(branch_seed: int, offset: int) -> int:
+    digest = hashlib.sha256(
+        f"resteer-progress-probe-v1\0{int(branch_seed)}\0{int(offset)}".encode()
     ).digest()
     return int.from_bytes(digest[:8], "big") % (2**63 - 1)
 
@@ -603,7 +845,7 @@ __all__ = [
     "CounterfactualReplayWorker",
     "CounterfactualResult",
     "FixedBudgetResteerExecutor",
-    "FreshMedoidSelection",
+    "FreshCandidateSelection",
     "NewPolicyFeatureBuilder",
     "NewPolicyReplayCoordinator",
 ]

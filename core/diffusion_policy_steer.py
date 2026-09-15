@@ -46,6 +46,7 @@ class DiffusionPolicySteer(DiffusionPolicy):
     """
 
     name = "diffusion_steer"
+    _steering_limits_native = True
 
     def __init__(self, config: DiffusionConfig):
         super().__init__(config)
@@ -136,7 +137,8 @@ class DiffusionPolicySteer(DiffusionPolicy):
         global_step: int = 0,
         current_stage: int = 1,
     ) -> Tensor:
-
+        from core.steering_limits import bounded_steering_scales
+        guide_scale, diversity_scale = bounded_steering_scales(self, guide_scale, diversity_scale)
         if batch is None:
             raise ValueError("batch cannot be None")
             

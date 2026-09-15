@@ -36,7 +36,8 @@ class EpisodeControllerState:
     last_stage_id: str = "UNKNOWN"
     chunks_executed: int = 0
     terminal: bool = False
-    retry_budget: int = 4
+    rollout_complete: bool = False
+    retry_budget: int = 50
     trace: list[str] = field(default_factory=list)
 
     @property
@@ -64,6 +65,13 @@ class EpisodeChunkController:
         )
         if self.retry_budget <= 0:
             raise ValueError("controller retry budget must be positive")
+        if (
+            retry_budget_override is not None
+            and self.retry_budget != int(config.retry_budget)
+        ):
+            raise ValueError(
+                "controller retry budget override must match the experiment contract"
+            )
         self.state = EpisodeControllerState(retry_budget=self.retry_budget)
 
     def start_episode(self, *, stage_id: str = "UNKNOWN") -> None:
@@ -90,18 +98,20 @@ class EpisodeChunkController:
             raise RuntimeError(f"cannot abstract from {self.state.phase.value}")
         self._transition(ControllerPhase.ABSTRACT)
 
-    def mark_scored(self, *, has_safe_mode: bool) -> RouteDecision | None:
+    def mark_scored(self, *, has_safe_candidate: bool) -> RouteDecision | None:
         if self.state.phase is not ControllerPhase.ABSTRACT:
             raise RuntimeError(f"cannot score from {self.state.phase.value}")
         self._transition(ControllerPhase.SCORE)
-        if has_safe_mode:
+        if has_safe_candidate:
             return None
         self.state.verification_due = True
-        self.state.failure_count = min(4, self.state.failure_count + 1)
+        self.state.failure_count = min(
+            self.retry_budget, self.state.failure_count + 1
+        )
         self._transition(ControllerPhase.VERIFICATION_DUE)
         return RouteDecision(
             route=ControllerRoute.EXECUTE,
-            reason=FailureTrigger.NO_SAFE_MODE.value,
+            reason=FailureTrigger.NO_SAFE_CANDIDATE.value,
             phase=self.state.phase,
             remaining_budget=self.state.remaining_budget,
             verifier_called=False,
@@ -128,15 +138,21 @@ class EpisodeChunkController:
             self._transition(ControllerPhase.EXECUTE)
             return RouteDecision(
                 route=ControllerRoute.EXECUTE,
-                reason="safe_semantic_medoid",
+                reason="planner_selected_safe_candidate",
                 phase=self.state.phase,
                 remaining_budget=self.state.remaining_budget,
                 verifier_called=False,
             )
 
         self._transition(ControllerPhase.VERIFY)
+        if self.state.remaining_budget == 0:
+            if self._needs_complete_rollout():
+                return self._continue_original_rollout("retry_cap_reached_waiting_for_complete_rollout", False)
+            return self._expand("retry_budget_exhausted", verifier_called=False)
         if route_override is not None:
             if route_override is ControllerRoute.EXPAND:
+                if self._needs_complete_rollout():
+                    return self._continue_original_rollout("expansion_deferred_until_complete_rollout", override_verifier_called)
                 return self._expand(
                     override_reason or "experimental_baseline_expand",
                     verifier_called=override_verifier_called,
@@ -157,9 +173,6 @@ class EpisodeChunkController:
                 remaining_budget=self.state.remaining_budget,
                 verifier_called=override_verifier_called,
             )
-        if self.state.remaining_budget == 0:
-            return self._expand("retry_budget_exhausted", verifier_called=False)
-
         if self.config.controller_mode == "learned_verifier":
             if verifier_decision not in {
                 ControllerRoute.RESTEER,
@@ -169,6 +182,8 @@ class EpisodeChunkController:
                     "learned verifier must directly decide RE-STEER or EXPANSION"
                 )
             if verifier_decision is ControllerRoute.EXPAND:
+                if self._needs_complete_rollout():
+                    return self._continue_original_rollout("expansion_deferred_until_complete_rollout", True)
                 return self._expand(
                     "verifier_head_argmax:EXPANSION",
                     verifier_called=True,
@@ -207,9 +222,11 @@ class EpisodeChunkController:
         self.state.chunks_executed += 1
 
         if progress.task_success or progress.advanced:
+            if progress.task_success:
+                self.state.rollout_complete = True
             self.state.stagnant_chunks = 0
             self.state.failure_count = 0
-            self.state.retry_index = 0
+            # Stage progress cannot replenish the episode's 50-chunk budget.
             self.state.verification_due = False
             self.state.retry_active = False
             self.state.last_stage_id = progress.stage_id
@@ -223,6 +240,7 @@ class EpisodeChunkController:
             )
 
         if terminal_timeout or failure_trigger is FailureTrigger.TIMEOUT:
+            self.state.rollout_complete = True
             # No executable horizon remains, so this is a ticket-only event and
             # must not become a verifier training label.
             return self._expand(
@@ -233,7 +251,7 @@ class EpisodeChunkController:
 
         immediate = failure_trigger in {
             FailureTrigger.CONTACT,
-            FailureTrigger.NO_SAFE_MODE,
+            FailureTrigger.NO_SAFE_CANDIDATE,
         }
         if self.state.retry_active or immediate:
             self.state.stagnant_chunks = self.config.stagnation_window
@@ -250,7 +268,9 @@ class EpisodeChunkController:
             # Count observed failed execution opportunities, not routing
             # decisions.  This value is consumed by the verifier before it
             # decides whether the next fresh batch should be executed.
-            self.state.failure_count = min(4, self.state.failure_count + 1)
+            self.state.failure_count = min(
+                self.retry_budget, self.state.failure_count + 1
+            )
             self.state.verification_due = True
             self.state.retry_active = False
             self._transition(ControllerPhase.VERIFICATION_DUE)
@@ -301,6 +321,8 @@ class EpisodeChunkController:
         label_eligible: bool = True,
     ) -> RouteDecision:
         self._require_live()
+        if self._needs_complete_rollout():
+            return self.abort(f"incomplete_rollout_safety_abort:{reason}")
         return self._expand(
             reason,
             verifier_called=False,
@@ -314,6 +336,8 @@ class EpisodeChunkController:
         verifier_called: bool,
         label_eligible: bool = True,
     ) -> RouteDecision:
+        if self._needs_complete_rollout():
+            raise RuntimeError("cannot enter EXPANSION before a complete native task rollout")
         self.state.terminal = True
         self._transition(ControllerPhase.EXPAND)
         return RouteDecision(
@@ -324,6 +348,18 @@ class EpisodeChunkController:
             verifier_called=verifier_called,
             label_eligible=label_eligible,
         )
+
+    def _needs_complete_rollout(self) -> bool:
+        return self.config.require_complete_rollout_before_expansion and not self.state.rollout_complete
+
+    def _continue_original_rollout(self, reason: str, verifier_called: bool) -> RouteDecision:
+        # This is a prerequisite continuation, not a verifier RE-STEER choice.
+        # Do not consume/refill retries, manufacture a label, or change steering.
+        self.state.verification_due = False
+        self.state.retry_active = False
+        self._transition(ControllerPhase.EXECUTE)
+        return RouteDecision(ControllerRoute.EXECUTE, reason, self.state.phase,
+                             self.state.remaining_budget, verifier_called, label_eligible=False)
 
     def _transition(self, phase: ControllerPhase) -> None:
         self.state.phase = phase

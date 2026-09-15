@@ -29,7 +29,7 @@ from mode_gate.audit import (
 from mode_gate.candidates import (
     DeltaLineageEntry,
     compose_expansion_candidates,
-    compose_reuse_candidates,
+    compose_selected_remedy,
 )
 from mode_gate.config import ModeGateConfig
 from mode_gate.counterfactual import (
@@ -37,8 +37,9 @@ from mode_gate.counterfactual import (
     CounterfactualResult,
     CounterfactualReplayWorker,
     FixedBudgetResteerExecutor,
-    FreshMedoidSelection,
+    FreshCandidateSelection,
     NewPolicyReplayCoordinator,
+    REPLAY_PROGRESS_CONTRACT,
 )
 from mode_gate.curriculum import (
     LIBERO_PRO_VARIANTS,
@@ -55,7 +56,6 @@ from mode_gate.data_pipeline import (
     reassess_demo_replay,
     validate_demo_replay,
 )
-from mode_gate.demo_matching import attach_demo_match_label
 from mode_gate.deployed_evaluation import (
     DeployedDevelopmentCoordinator,
     checkpoint_identity_canary,
@@ -70,19 +70,22 @@ from mode_gate.evaluation import (
     PolicyScore,
     adaptive_counterfactual_target,
     raw_promotion_decision,
-    select_alpha_top2,
+    rank_current_task_candidates,
     wilson_interval,
 )
-from mode_gate.features import (
-    ModeFeatureEncoderV1,
-    TrajectoryDescriptorEncoder,
-    select_task_keypoints,
+from mode_gate.experiment_contract import (
+    FIXED_BUDGET_50_CONTRACT,
+    FIXED_BUDGET_50_LABEL_VERSION,
+    label_contract_payload,
+    regenerate_budget_state,
 )
+from mode_gate.features import select_task_keypoints
+from mode_gate.factual_reconstruction import reconstruct_factual_labels
 from mode_gate.geometry import (
     AxisAlignedBox,
     GeometryContext,
     GeometryScorer,
-    select_execution_medoid,
+    select_execution_candidate,
 )
 from mode_gate.incidents import (
     CapabilitySignatureRecord,
@@ -90,8 +93,13 @@ from mode_gate.incidents import (
     VerifierDecisionRecord,
     VerifierLabelRecord,
 )
-from mode_gate.io_utils import sha256_file
-from mode_gate.offline_replay import HgpuReplayApplication, validate_replay_plan
+from mode_gate.io_utils import AtomicJsonl, atomic_write_json, sha256_file
+from mode_gate.offline_replay import (
+    HgpuReplayApplication,
+    _completed_replay_result,
+    _score_semantics_with_network_recovery,
+    validate_replay_plan,
+)
 from mode_gate.progress import ProgressMonitor, canonicalize_stage_id
 from mode_gate.policy_evaluator import (
     EvaluationContext,
@@ -107,16 +115,22 @@ from mode_gate.promotion import (
     deploy_policy_gate,
 )
 from mode_gate.registry import PolicyRegistry
-from mode_gate.runtime import ModeAwareRuntime, _save_round_evidence
-from mode_gate.semantic_planner import GeminiSemanticPlanner
+from mode_gate.runtime import CandidateRuntime, _save_round_evidence
+from mode_gate.semantic_planner import (
+    GeminiCallBudgetExceeded,
+    GeminiSemanticPlanner,
+    preflight_with_network_recovery,
+    score_semantics_with_network_recovery,
+)
 from mode_gate.scene_encoder import (
     MaskedHiddenStates,
     Theta0SceneEncoder,
     processor_artifact_digest,
 )
-from mode_gate.signatures import FailureMode, lookup_validated_remedies
+from mode_gate.signatures import FailureMode
 from mode_gate.slow_loop import SlowLoopState, SlowLoopStore
 from mode_gate.slow_worker import SlowLoopWorker
+from mode_gate.teleop_supervisor import TeleopServiceResult
 from mode_gate.snapshots import DecisionSnapshotStore
 from mode_gate.state_machine import EpisodeChunkController
 from mode_gate.training import (
@@ -140,11 +154,12 @@ from mode_gate.types import (
     FailureTrigger,
     GateContext,
     GeometryEvidence,
-    ModeEvidence,
+    CandidateEvidence,
     ProgressEvidence,
     RoundEvidence,
+    SamplingCondition,
     SamplingDiagnostics,
-    SemanticModeScore,
+    SemanticCandidateScore,
     SemanticPlan,
     TaskSpaceTrajectoryBatch,
 )
@@ -152,24 +167,16 @@ from mode_gate.verifier import (
     DeployedVerifierPredictor,
     FeatureStandardizer,
     GroundedCapabilityVerifier,
-    ModeVerifierInput,
+    CandidateVerifierInput,
     PlattCalibrator,
+    VERIFIER_HEAD_ARCHITECTURE,
     VERIFIER_INPUT_DIMS,
     ablate_verifier_input,
     binomial_cross_entropy,
     load_verifier_input,
     save_verifier_input,
 )
-from mode_gate.verifier_training import (
-    VerifierExample,
-    VerifierTrainingConfig,
-    assert_group_isolation,
-    build_verifier_holdout,
-    train_verifier,
-    verifier_channel_correlation,
-    verifier_training_weights,
-)
-from mode_gate.verifier_refresh import verifier_refresh_status
+from mode_gate.verifier_training import VerifierExample, VerifierTrainingConfig, train_verifier
 from core.pi05_steer import PI05PolicySteer
 from core.fkd_class import FKD
 from core.diffusion_policy_steer import DiffusionPolicySteer
@@ -188,11 +195,11 @@ def _progress(advanced=False, success=False):
 def _score_and_route(controller, verifier_decision=None):
     controller.begin_sampling()
     controller.mark_abstracted()
-    assert controller.mark_scored(has_safe_mode=True) is None
+    assert controller.mark_scored(has_safe_candidate=True) is None
     return controller.route_scored_batch(verifier_decision=verifier_decision)
 
 
-def test_v2_controller_uses_fresh_post_failure_batches_and_four_retries():
+def test_v2_controller_uses_fresh_post_failure_batches_and_ten_retries():
     controller = EpisodeChunkController(ModeGateConfig(controller_mode="learned_verifier"))
     controller.start_episode(stage_id="1")
     for _ in range(3):
@@ -202,13 +209,13 @@ def test_v2_controller_uses_fresh_post_failure_batches_and_four_retries():
     assert controller.state.phase is ControllerPhase.VERIFICATION_DUE
     assert controller.state.failure_count == 1
 
-    for retry in range(4):
+    for retry in range(50):
         route = _score_and_route(controller, ControllerRoute.RESTEER)
         assert route.route is ControllerRoute.RESTEER
         assert route.reason == "verifier_head_argmax:RE-STEER"
         controller.observe_chunk(_progress())
         assert controller.state.verification_due
-        assert controller.state.failure_count == min(4, retry + 2)
+        assert controller.state.failure_count == min(50, retry + 2)
     route = _score_and_route(controller, ControllerRoute.RESTEER)
     assert route.route is ControllerRoute.EXPAND
     assert route.reason == "retry_budget_exhausted"
@@ -228,13 +235,13 @@ def test_learned_verifier_routes_directly_from_head_class_without_threshold():
 
 
 def test_v2_controller_resets_counters_on_stage_advance_and_timeout_is_not_label():
-    controller = EpisodeChunkController(ModeGateConfig(controller_mode="fixed_budget_4"))
+    controller = EpisodeChunkController(ModeGateConfig(controller_mode="fixed_budget_50"))
     controller.start_episode(stage_id="1")
     _score_and_route(controller)
     controller.state.retry_index = 2
     decision = controller.observe_chunk(_progress(advanced=True))
     assert decision.route is ControllerRoute.EXECUTE
-    assert controller.state.retry_index == 0
+    assert controller.state.retry_index == 2
     _score_and_route(controller)
     timeout = controller.observe_chunk(_progress(), terminal_timeout=True)
     assert timeout.route is ControllerRoute.EXPAND
@@ -265,6 +272,13 @@ def test_progress_monitor_predicate_precedence_and_gemini_confidence_gate():
         normalized_reward=0.03,
     )
     assert supported.advanced and supported.source == "gemini_planner"
+    regressed = monitor.observe(
+        task_success=False,
+        gemini_stage_id="stage_1",
+        gemini_confidence=0.95,
+        normalized_reward=0.03,
+    )
+    assert not regressed.advanced
     predicate = monitor.observe(
         task_success=False,
         predicate_stage_id="3",
@@ -304,7 +318,7 @@ def test_progress_monitor_explicit_predicate_false_and_w3_boundary():
     monitor = ProgressMonitor()
     monitor.reset(stage_id="1", reward=0.0)
     controller = EpisodeChunkController(
-        ModeGateConfig(controller_mode="fixed_budget_4")
+        ModeGateConfig(controller_mode="fixed_budget_50")
     )
     controller.start_episode(stage_id="1")
     for index in range(3):
@@ -477,7 +491,8 @@ def test_coft_source_manifest_and_command_freeze_training_contract(tmp_path):
     assert "--steps=1000" in joined
     assert "--freeze_pretrained_processor_stats=true" in joined
     assert "--tokenizer_path=/shared/hengyil6/vls/models/paligemma-tokenizer" in joined
-    assert "--save_final_params_only=true" in joined
+    assert "--save_final_params_only=false" in joined
+    assert "--save_freq=250" in joined
     assert "--policy.scheduler_auto_scale=false" in joined
     assert "--policy.optimizer_weight_decay=1e-10" in joined
     assert "--policy.optimizer_betas=[0.9,0.95]" in joined
@@ -597,15 +612,6 @@ def _trajectory_batch(count=4, points=11):
     )
 
 
-def test_frozen_trajectory_descriptors_are_79d_and_verifier_modes_are_20d():
-    trajectories = _trajectory_batch()
-    keypoints = np.arange(24, dtype=np.float64).reshape(8, 3) / 100
-    descriptor = TrajectoryDescriptorEncoder().encode(trajectories, keypoints)
-    assert descriptor.descriptors.shape == (4, 79)
-    assert descriptor.keypoint_validity.shape == (4, 8)
-    mode_features = ModeFeatureEncoderV1().encode(trajectories)
-    assert mode_features.shape == (4, 20)
-    np.testing.assert_allclose(mode_features[:, :3], 0.0)
 
 
 def test_task_keypoints_prioritize_instruction_object_then_stable_ids():
@@ -627,164 +633,27 @@ def test_task_keypoints_prioritize_instruction_object_then_stable_ids():
 def _round_evidence(tmp_path):
     trajectories = _trajectory_batch()
     actions = ActionChunkBatch(
-        actions=np.zeros((4, 10, 7), dtype=np.float32),
-        sample_ids=trajectories.sample_ids,
-        context_id="ctx",
-        round_id=1,
-        checkpoint_id="policy-0",
-        action_space="delta_ee_pose",
-        coordinate_frame="world",
-    )
-    modes = []
-    for index in range(2):
-        modes.append(
-            ModeEvidence(
-                mode_id=f"m{index}",
-                component_index=index,
-                weight=0.6 if index == 0 else 0.4,
-                member_indices=np.array([index, index + 2]),
-                representative_indices={"medoid": index, "diverse": index + 2, "boundary": (index + 1) % 4},
-                representative_sample_ids={"medoid": f"s{index}", "diverse": f"s{index+2}", "boundary": f"s{(index+1)%4}"},
-                card_path=tmp_path / f"m{index}.png",
-                projection_unavailable=False,
-            )
-        )
-    return RoundEvidence(
-        context_id="ctx",
-        round_id=1,
-        checkpoint_id="policy-0",
-        action_batch=actions,
-        trajectories=trajectories,
-        normalized_positions=np.zeros((4, 8, 3)),
-        normalized_rotvecs=np.zeros((4, 8, 3)),
-        normalized_grippers=np.zeros((4, 8)),
-        descriptors=np.zeros((4, 79)),
-        reduced_descriptors=np.zeros((4, 2)),
-        labels=np.array([0, 1, 0, 1]),
-        responsibilities=np.full((4, 2), 0.5),
-        modes=tuple(modes),
-        fit_degraded=False,
-        fit_metadata={"multiplicities": {"0": 3, "1": 1}},
-        sampling_diagnostics=SamplingDiagnostics(
-            ess_history=(4.0, 2.0),
-            ancestor_ids=(0, 0, 0, 1),
-            ess_ratio=0.5,
-            unique_ratio=0.5,
-            resample_indices=((0, 0, 1, 0),),
-        ),
-    )
+        actions=np.zeros((4, trajectories.positions.shape[1]-1, 7), dtype=np.float32),
+        sample_ids=trajectories.sample_ids, context_id="ctx", round_id=1,
+        checkpoint_id="policy-0", action_space="delta_ee_pose", coordinate_frame="world")
+    return RoundEvidence("ctx",1,"policy-0",actions,trajectories,
+        tuple(CandidateEvidence(f"m{i}",i,f"s{i}") for i in range(4)),
+        SamplingDiagnostics((4.0,2.0),(0,0,0,1),.5,.5,((0,0,1,0),)))
 
 
 def test_round_evidence_persists_sampling_diagnostics_and_hashes(tmp_path):
     evidence = _round_evidence(tmp_path)
     path = _save_round_evidence(tmp_path / "round_001", evidence)
     metadata = json.loads(path.with_suffix(".json").read_text(encoding="utf-8"))
-    assert metadata["schema_version"] == "mode-round-evidence-v2"
+    assert metadata["schema_version"] == "candidate-round-evidence-v3"
     assert metadata["sample_ids"] == ["s0", "s1", "s2", "s3"]
     assert metadata["sampling_diagnostics"]["ancestor_ids"] == [0, 0, 0, 1]
     assert metadata["sampling_diagnostics"]["ess_history"] == [4.0, 2.0]
-    assert metadata["fit_metadata"]["multiplicities"] == {"0": 3, "1": 1}
+    assert "fit_metadata" not in metadata and len(metadata["candidates"]) == 4
     assert metadata["analysis_sha256"] == sha256_file(path)
     assert len(metadata["action_sha256"]) == 64
 
 
-def test_verifier_decision_records_pre_route_remaining_budget(tmp_path):
-    evidence = _round_evidence(tmp_path)
-
-    class Gate:
-        def analyze(self, context, batch, round_dir):
-            assert context.context_id == batch.context_id == evidence.context_id
-            return evidence
-
-    class Renderer:
-        def render(self, *, output_path, **kwargs):
-            del kwargs
-            output_path = Path(output_path)
-            output_path.parent.mkdir(parents=True, exist_ok=True)
-            output_path.write_bytes(b"overlay")
-            return SimpleNamespace(path=output_path)
-
-    class Planner:
-        def score(self, context, round_evidence, geometry, overlay_path, **kwargs):
-            del context, geometry, overlay_path, kwargs
-            return SemanticPlan(
-                mode_scores=tuple(
-                    SemanticModeScore(mode.mode_id, 0.9 - 0.1 * index, "ok")
-                    for index, mode in enumerate(round_evidence.modes)
-                ),
-                required_trajectory_pattern="reach then grasp",
-                observed_stage_id="reach_object",
-                stage_confidence=0.95,
-                model="gemini-robotics-er-2-preview",
-                prompt_version="mode-scorer-v3",
-            )
-
-    memory = IncidentMemory(tmp_path / "incidents")
-    runtime = ModeAwareRuntime(
-        config=ModeGateConfig(
-            sample_count=4,
-            controller_mode="fixed_budget_4",
-            baseline_kind="fixed_budget",
-            baseline_budget=4,
-            exploration_epsilon=0.0,
-        ),
-        gate=Gate(),
-        planner=Planner(),
-        combined_renderer=Renderer(),
-        geometry_factory=lambda context: SimpleNamespace(
-            score_round=lambda value: tuple(
-                GeometryEvidence(
-                    mode_id=mode.mode_id,
-                    collision_risk=0.0,
-                    reachability=1.0,
-                    grasp_plausibility=0.8,
-                    hard_safety_veto=False,
-                )
-                for mode in value.modes
-            )
-        ),
-        incidents=memory,
-    )
-    runtime.start_episode(stage_id="1")
-    runtime.controller.state.verification_due = True
-    runtime.controller.state.failure_count = 1
-    snapshot = DecisionSnapshot(
-        snapshot_id="snapshot-1",
-        policy_id="policy_000",
-        simulator_state_path=tmp_path / "simulator.npz",
-        controller_state=runtime.controller.state.as_dict(),
-        rng_state_path=tmp_path / "runtime.pt",
-        provenance={},
-        snapshot_hash="a" * 64,
-        observation_hash="b" * 64,
-    )
-    result = runtime.process_batch(
-        context=GateContext(
-            context_id="ctx",
-            observation_image=np.zeros((16, 16, 3), dtype=np.uint8),
-            task_instruction="open drawer",
-            task_stage="1",
-            metadata={"code_revision": "test-source"},
-        ),
-        batch=evidence.action_batch,
-        artifact_root=tmp_path / "artifacts",
-        scene_feature=np.zeros(2048, dtype=np.float32),
-        scene_feature_path=tmp_path / "scene.npz",
-        snapshot=snapshot,
-    )
-    assert result.status.value == "RE-STEER"
-    assert result.route.remaining_budget == 3
-    decision = list(memory.decisions.iter_valid())[0]
-    assert decision["remaining_budget"] == 4
-    assert decision["provenance"]["retry_index"] == 0
-    assert decision["provenance"]["remaining_budget"] == 4
-    feature_metadata = json.loads(
-        Path(decision["verifier_feature_path"])
-        .with_suffix(".json")
-        .read_text(encoding="utf-8")
-    )
-    assert feature_metadata["remaining_budget"] == 4
-    assert feature_metadata["retry_index"] == 0
 
 
 def test_geometry_hard_veto_and_lexicographic_medoid_selection(tmp_path):
@@ -796,29 +665,22 @@ def test_geometry_hard_veto_and_lexicographic_medoid_selection(tmp_path):
     geometry = GeometryScorer(context).score_round(evidence)
     assert geometry[1].hard_safety_veto is False
     semantics = (
-        SemanticModeScore("m0", 0.7, "ok"),
-        SemanticModeScore("m1", 0.9, "better"),
+        SemanticCandidateScore("m0", 0.7, "ok"),
+        SemanticCandidateScore("m1", 0.9, "better"),
+        SemanticCandidateScore("m2", 0.7, "ok"),
+        SemanticCandidateScore("m3", 0.7, "ok"),
     )
-    selected = select_execution_medoid(evidence.modes, geometry, semantics)
-    assert selected.mode_id == "m1"
+    selected = select_execution_candidate(evidence.candidates, geometry, semantics, "m1")
+    assert selected.candidate_id == "m1"
     assert selected.sample_index == 1
 
 
 def _verifier_input(order=(0, 1, 2)):
     rng = np.random.default_rng(8)
-    ee = rng.normal(size=(3, 20)).astype(np.float32)
-    geometry = rng.normal(size=(3, 3)).astype(np.float32)
-    semantic = rng.normal(size=(3, 1)).astype(np.float32)
-    weights = np.array([0.2, 0.3, 0.5], dtype=np.float32)
-    order = np.asarray(order)
-    return ModeVerifierInput(
-        scene_feature=np.ones(2048, dtype=np.float32),
-        mode_ee_features=ee[order],
-        geometry_features=geometry[order],
-        semantic_features=semantic[order],
-        mode_weights=weights[order],
-        global_features=np.zeros(7, dtype=np.float32),
-    )
+    candidates = rng.normal(size=(3,11,15)).astype(np.float32)
+    return CandidateVerifierInput(scene_feature=np.ones(2048,dtype=np.float32),
+        candidate_trajectories=candidates[np.asarray(order)],executed_history=np.zeros((0,15),dtype=np.float32),
+        remaining_budget=50,retry_budget=50,candidate_ids=tuple(f"m{i}" for i in order),backbone_id="v44-sha",context_id="ctx")
 
 
 def test_deep_sets_is_permutation_invariant_and_binomial_target_is_soft():
@@ -830,6 +692,7 @@ def test_deep_sets_is_permutation_invariant_and_binomial_target_is_soft():
     encoded = model.encode_one(_verifier_input())
     assert encoded.shape == (VERIFIER_INPUT_DIMS,)
     assert first.shape == (1, 2)
+    assert isinstance(model.head[-1], torch.nn.Linear)
     loss = binomial_cross_entropy(
         torch.tensor([[0.0, 0.0]]),
         successes=torch.tensor([4]),
@@ -848,30 +711,12 @@ def test_verifier_predecision_sidecar_roundtrip(tmp_path):
     restored = load_verifier_input(path)
     np.testing.assert_allclose(restored.scene_feature, item.scene_feature, atol=1e-3)
     np.testing.assert_allclose(
-        restored.mode_ee_features, item.mode_ee_features, atol=1e-3
+        restored.candidate_trajectories, item.candidate_trajectories, atol=1e-3
     )
-    np.testing.assert_allclose(restored.mode_weights, item.mode_weights)
+    assert restored.candidate_ids == item.candidate_ids
     assert json.loads(path.with_suffix(".json").read_text())["context_id"] == "ctx"
 
 
-def test_verifier_standardizer_excludes_explicitly_missing_channels():
-    first = _verifier_input()
-    second = ModeVerifierInput(
-        **{
-            **first.__dict__,
-            "scene_feature": np.full(2048, 1e6, dtype=np.float32),
-            "scene_missing": True,
-            "geometry_features": np.full((3, 3), 1e6, dtype=np.float32),
-            "mode_missing": np.asarray(
-                [[False, True, False, False]] * 3, dtype=bool
-            ),
-        }
-    )
-    standardizer = FeatureStandardizer.fit([first, second])
-    scene_mean, _ = standardizer.statistics["scene_feature"]
-    geometry_mean, _ = standardizer.statistics["geometry_features"]
-    np.testing.assert_allclose(scene_mean, first.scene_feature)
-    np.testing.assert_allclose(geometry_mean, first.geometry_features.mean(axis=0))
 
 
 def test_binomial_platt_uses_rates_not_any_success_labels():
@@ -893,137 +738,38 @@ def test_binomial_platt_uses_rates_not_any_success_labels():
     )
 
 
-def test_verifier_training_pipeline_is_grouped_calibrated_and_fail_closed(tmp_path):
-    examples = []
-    for index in range(8):
-        item = _verifier_input()
-        item = ModeVerifierInput(
-            **{
-                **item.__dict__,
-                "scene_feature": np.full(
-                    2048, float(index % 2), dtype=np.float32
-                ),
-            }
-        )
-        path = tmp_path / f"feature-{index}.npz"
-        save_verifier_input(path, item, metadata={"policy_id": "policy-v1"})
-        split = "train" if index < 4 else "calibration" if index < 6 else "test"
-        success = 16 if index % 2 == 0 else 0
-        examples.append(
-            VerifierExample(
-                record_id=f"r{index}",
-                policy_id="policy-v1",
-                group_id=f"g{index}",
-                split=split,
-                feature_path=str(path),
-                source="counterfactual_replay",
-                successes=success,
-                trials=16,
-                weight=1.0,
-                weak=False,
-                behavior_propensity=1.0,
-            )
-        )
-    config = VerifierTrainingConfig(
-        max_epochs=3,
-        patience=2,
-        batch_size=2,
-        bootstrap_samples=20,
-        min_train_contexts=100,
-        min_train_each_side=10,
-        min_calibration_contexts=10,
-        min_calibration_each_side=5,
-        min_test_contexts=10,
-        min_test_expansion_contexts=5,
-        max_ece=1.0,
-        channel_set="scene_only",
-    )
-    result = train_verifier(
-        examples,
-        policy_id="policy-v1",
-        output_root=tmp_path / "artifacts",
-        config=config,
-    )
-    assert not result.gate.passed
-    assert any("train strong contexts" in reason for reason in result.gate.reasons)
-    assert "classwise_ece" in result.metrics
-    assert result.metrics["decision_rule"] == "head_argmax"
-    predictor = DeployedVerifierPredictor(Path(result.artifact_root))
-    assert predictor.channel_set == "scene_only"
-    prediction = predictor.predict(_verifier_input())
-    assert prediction.route in {ControllerRoute.RESTEER, ControllerRoute.EXPAND}
-    assert len(prediction.logits) == 2
-    assert 0.0 <= prediction.p_expansion <= 1.0
-    manifest = json.loads(
-        (Path(result.artifact_root) / "manifest.json").read_text(encoding="utf-8")
-    )
-    assert manifest["decision_rule"] == "head_argmax"
-    assert "threshold" not in manifest
-    changed_modes = _verifier_input()
-    changed_modes = ModeVerifierInput(
-        **{
-            **changed_modes.__dict__,
-            "geometry_features": np.ones_like(changed_modes.geometry_features),
-            "semantic_features": np.zeros_like(changed_modes.semantic_features),
-        }
-    )
-    assert predictor.predict_probability(changed_modes) == pytest.approx(
-        predictor.predict_probability(_verifier_input()), abs=1e-8
-    )
-
-    leaked = [
-        examples[0],
-        VerifierExample(
-            **{**examples[1].__dict__, "group_id": "g0", "split": "test"}
-        ),
-    ]
-    with pytest.raises(ValueError, match="group leakage"):
-        assert_group_isolation(leaked)
 
 
-def test_verifier_channel_ablation_and_true_holdout_contract(tmp_path):
-    item = _verifier_input()
-    scene_only = ablate_verifier_input(item, "scene_only")
-    modes_only = ablate_verifier_input(item, "modes_only")
-    assert scene_only.mode_missing.all()
-    assert scene_only.global_missing.all()
-    assert not scene_only.scene_missing
-    assert modes_only.scene_missing
-    assert not modes_only.mode_missing.all()
 
-    examples = []
-    for split in ("train", "calibration", "test"):
-        for task_id in ("held", "fit"):
-            path = tmp_path / f"{split}-{task_id}.npz"
-            save_verifier_input(path, item, metadata={"policy_id": "policy-v1"})
-            examples.append(
-                VerifierExample(
-                    record_id=f"{split}-{task_id}",
-                    policy_id="policy-v1",
-                    group_id=f"{split}-{task_id}",
-                    split=split,
-                    feature_path=str(path),
-                    source="audit",
-                    successes=8 if task_id == "fit" else 0,
-                    trials=16,
-                    weight=1.0,
-                    weak=False,
-                    behavior_propensity=1.0,
-                    suite="libero",
-                    task_id=task_id,
-                    perturbation_variant="base",
-                    origin_policy_id="origin-1",
-                    recorded_at="2026-08-25T00:00:00+00:00",
-                )
-            )
-    held_out = build_verifier_holdout(examples, kind="task", value="held")
-    assert {row.task_id for row in held_out if row.split != "test"} == {"fit"}
-    assert {row.task_id for row in held_out if row.split == "test"} == {"held"}
-    correlation = verifier_channel_correlation(
-        [row for row in examples if row.split == "test"], [item, item]
-    )
-    assert correlation["contexts"] == 2
-    assert correlation["columns"][-1] == "p_expansion"
+
+
+
+def test_reuse_gate_handoff_refuses_to_skip_current_task_demonstrations(tmp_path):
+    store = SlowLoopStore(tmp_path / "slow")
+    job = store.create(active_policy_id="round-one-merged", input_hash="input", metadata={
+        "gate_kind": "REUSE", "suite": "libero_10", "task_id": "black-bowl",
+        "perturbation_variant": "env", "reuse_source_ticket_id": "stove-source",
+        "parent_candidate_path": str(tmp_path / "parent.json"),
+        "candidates_json_path": str(tmp_path / "candidates.json"),
+    })
+    for state in (SlowLoopState.LOOKUP_PENDING, SlowLoopState.REUSE_EVALUATING,
+                  SlowLoopState.RAW_REGRESSION):
+        job = store.advance(job.job_id, expected_state=job.state, next_state=state,
+                            input_hash=job.input_hash, output_hash=None)
+    worker = SlowLoopWorker.__new__(SlowLoopWorker)
+    worker.store, worker.work_root = store, tmp_path / "work"
+    worker.registry = SimpleNamespace(active=lambda: None)
+    worker.protocol_manifest_path = tmp_path / "manifest.json"
+    worker.protocol_manifest = {"manifest_sha256": "hash", "tasks": [{
+        "suite": "libero_10", "task_id": "black-bowl", "perturbation_variant": "env",
+        "splits": {"demo_online_pool": [37], "policy_regression": [1, 2]},
+    }]}
+    with pytest.raises(ValueError, match="Planner evidence"):
+        worker._step(job)
+
+
+
+
 
 
 class _PrefixSource:
@@ -1099,12 +845,18 @@ def test_processor_digest_binds_external_tokenizer(tmp_path):
 
 class _PlannerModels:
     def get(self, *, model):
-        assert model == "gemini-robotics-er-2-preview"
+        assert model == "gpt-6-astra"
 
 
 class _PlannerInteractions:
     def __init__(self, payload):
-        self.payload = payload
+        self.payload = json.loads(json.dumps(payload))
+        candidates = self.payload.get("candidates", [])
+        if [x["candidate_id"] for x in candidates] == ["m0", "m1"]:
+            candidates.extend([{**candidates[0], "candidate_id": f"m{i}"} for i in (2, 3)])
+        if candidates:
+            self.payload.setdefault("selected_candidate_id", candidates[0]["candidate_id"])
+            self.payload.setdefault("selection_reason", "explicit test candidate selection")
         self.calls = 0
         self.kwargs = None
 
@@ -1122,9 +874,9 @@ def test_gemini_planner_scores_every_mode_once_and_caches(tmp_path):
     card = tmp_path / "combined.png"
     card.write_bytes(b"png")
     payload = {
-        "modes": [
-            {"mode_id": "m0", "semantic_score": 0.2, "reason": "a", "predicted_failure_types": []},
-            {"mode_id": "m1", "semantic_score": 0.8, "reason": "b", "predicted_failure_types": ["offset"]},
+        "candidates": [
+            {"candidate_id": "m0", "semantic_score": 0.2, "reason": "a", "predicted_failure_types": []},
+            {"candidate_id": "m1", "semantic_score": 0.8, "reason": "b", "predicted_failure_types": ["offset"]},
         ],
         "required_trajectory_pattern": "approach then grasp",
         "observed_stage_id": "stage_1",
@@ -1138,18 +890,124 @@ def test_gemini_planner_scores_every_mode_once_and_caches(tmp_path):
     )
     context = GateContext("ctx", np.zeros((8, 8, 3), np.uint8), "pick", "1")
     geometry = tuple(
-        GeometryEvidence(mode.mode_id, 0.1, 0.9, 0.8, False)
-        for mode in evidence.modes
+        GeometryEvidence(mode.candidate_id, 0.1, 0.9, 0.8, False)
+        for mode in evidence.candidates
     )
     first = planner.score(context, evidence, geometry, card)
     second = planner.score(context, evidence, geometry, card)
-    assert [item.mode_id for item in first.mode_scores] == ["m0", "m1"]
+    assert [item.candidate_id for item in first.candidate_scores] == ["m0", "m1", "m2", "m3"]
     assert second.raw_response["metadata"]["cache_hit"] is True
     assert interactions.calls == 1
-    assert interactions.kwargs["model"] == "gemini-robotics-er-2-preview"
-    assert interactions.kwargs["generation_config"] == {"thinking_level": "high"}
+    assert interactions.kwargs["model"] == "gpt-6-astra"
+    assert interactions.kwargs["generation_config"] == {"thinking_level": "ultra"}
     assert interactions.kwargs["response_format"]["mime_type"] == "application/json"
     assert [item["type"] for item in interactions.kwargs["input"]] == ["text", "image"]
+
+
+def test_gemini_provider_call_budget_is_persistent_and_cache_hits_are_free(tmp_path):
+    evidence = _round_evidence(tmp_path)
+    card = tmp_path / "combined.png"
+    card.write_bytes(b"png")
+    payload = {
+        "candidates": [
+            {
+                "candidate_id": mode.candidate_id,
+                "semantic_score": 0.5,
+                "reason": "ok",
+                "predicted_failure_types": [],
+            }
+            for mode in evidence.candidates
+        ],
+        "required_trajectory_pattern": "approach",
+        "observed_stage_id": "stage_1",
+        "stage_confidence": 0.9,
+    }
+    ledger = tmp_path / "provider_calls.jsonl"
+    cache = tmp_path / "cache"
+    first_interactions = _PlannerInteractions(payload)
+    first = GeminiSemanticPlanner(
+        client=SimpleNamespace(
+            models=_PlannerModels(), interactions=first_interactions
+        ),
+        cache_dir=cache,
+        max_provider_calls=1,
+        call_ledger_path=ledger,
+    )
+    geometry = tuple(
+        GeometryEvidence(mode.candidate_id, 0.1, 0.9, 0.8, False)
+        for mode in evidence.candidates
+    )
+    context = GateContext("ctx-a", np.zeros((8, 8, 3), np.uint8), "pick", "1")
+    first.score(context, evidence, geometry, card)
+    cached = first.score(context, evidence, geometry, card)
+    assert cached.raw_response["metadata"]["cache_hit"] is True
+    assert first_interactions.calls == 1
+    assert len(ledger.read_text(encoding="utf-8").splitlines()) == 1
+
+    second_interactions = _PlannerInteractions(payload)
+    restarted = GeminiSemanticPlanner(
+        client=SimpleNamespace(
+            models=_PlannerModels(), interactions=second_interactions
+        ),
+        cache_dir=cache,
+        max_provider_calls=1,
+        call_ledger_path=ledger,
+    )
+    new_context = GateContext(
+        "ctx-b", np.zeros((8, 8, 3), np.uint8), "pick", "1"
+    )
+    with pytest.raises(GeminiCallBudgetExceeded, match="budget exhausted"):
+        restarted.score(new_context, evidence, geometry, card)
+    assert second_interactions.calls == 0
+    assert len(ledger.read_text(encoding="utf-8").splitlines()) == 1
+
+
+def test_gemini_provider_retries_each_consume_one_reserved_call(tmp_path):
+    evidence = _round_evidence(tmp_path)
+    card = tmp_path / "combined.png"
+    card.write_bytes(b"png")
+    payload = {
+        "candidates": [
+            {
+                "candidate_id": mode.candidate_id,
+                "semantic_score": 0.5,
+                "reason": "ok",
+                "predicted_failure_types": [],
+            }
+            for mode in evidence.candidates
+        ],
+        "required_trajectory_pattern": "approach",
+        "observed_stage_id": "stage_1",
+        "stage_confidence": 0.9,
+    }
+
+    class FlakyInteractions(_PlannerInteractions):
+        def create(self, **kwargs):
+            self.calls += 1
+            if self.calls == 1:
+                raise RuntimeError("transient")
+            self.kwargs = kwargs
+            return SimpleNamespace(output_text=json.dumps(self.payload))
+
+    interactions = FlakyInteractions(payload)
+    ledger = tmp_path / "provider_calls.jsonl"
+    planner = GeminiSemanticPlanner(
+        client=SimpleNamespace(models=_PlannerModels(), interactions=interactions),
+        max_retries=1,
+        max_provider_calls=2,
+        call_ledger_path=ledger,
+    )
+    geometry = tuple(
+        GeometryEvidence(mode.candidate_id, 0.1, 0.9, 0.8, False)
+        for mode in evidence.candidates
+    )
+    context = GateContext("ctx", np.zeros((8, 8, 3), np.uint8), "pick", "1")
+    result = planner.score(context, evidence, geometry, card)
+    assert result.observed_stage_id == "stage_1"
+    assert interactions.calls == 2
+    events = [json.loads(line) for line in ledger.read_text().splitlines()]
+    assert [item["sequence"] for item in events] == [1, 2]
+    assert [item["attempt"] for item in events] == [1, 2]
 
 
 def test_gemini_planner_rejects_descriptive_stage_identity(tmp_path):
@@ -1158,14 +1016,14 @@ def test_gemini_planner_rejects_descriptive_stage_identity(tmp_path):
     card.write_bytes(b"png")
     interactions = _PlannerInteractions(
         {
-            "modes": [
+            "candidates": [
                 {
-                    "mode_id": mode.mode_id,
+                    "candidate_id": mode.candidate_id,
                     "semantic_score": 0.5,
                     "reason": "ok",
                     "predicted_failure_types": [],
                 }
-                for mode in evidence.modes
+                for mode in evidence.candidates
             ],
             "required_trajectory_pattern": "approach",
             "observed_stage_id": "Stage 1: approach object (keypoint 11)",
@@ -1178,8 +1036,8 @@ def test_gemini_planner_rejects_descriptive_stage_identity(tmp_path):
     )
     context = GateContext("ctx", np.zeros((8, 8, 3), np.uint8), "pick", "stage_1")
     geometry = tuple(
-        GeometryEvidence(mode.mode_id, 0.1, 0.9, 0.8, False)
-        for mode in evidence.modes
+        GeometryEvidence(mode.candidate_id, 0.1, 0.9, 0.8, False)
+        for mode in evidence.candidates
     )
     with pytest.raises(Exception, match="semantic scoring failed"):
         planner.score(context, evidence, geometry, card)
@@ -1203,9 +1061,9 @@ def test_gemini_planner_preflight_timeout_is_bounded():
 
 def test_gemini_planner_canary_exercises_interactions_api():
     payload = {
-        "modes": [
+        "candidates": [
             {
-                "mode_id": "canary-m0",
+                "candidate_id": "canary-m0",
                 "semantic_score": 1.0,
                 "reason": "provider canary",
                 "predicted_failure_types": [],
@@ -1235,187 +1093,40 @@ def test_incident_memory_is_append_only_idempotent_and_joins_late_labels(tmp_pat
         verifier_decision="RE-STEER", verifier_logits=(1.0, 0.0),
         p_expansion=0.2, decision_rule="head_argmax",
         controller_mode="learned_verifier",
-        failure_count=1, remaining_budget=3,
+        failure_count=1, remaining_budget=3, retry_index=47,
     )
     assert memory.record_decision(decision)
     assert not memory.record_decision(decision)
     label = VerifierLabelRecord(
-        record_id="r1", label_version="v1", source="counterfactual_replay",
+        record_id="r1", label_version=FIXED_BUDGET_50_LABEL_VERSION,
+        source="counterfactual_replay",
         branches=16, successes=4, p_expansion=0.75, policy_id="p",
         snapshot_hash="a" * 64,
+        label_config=label_contract_payload(),
     )
     assert memory.attach_label(label)
     assert len(memory.joined_training_rows()) == 1
-    with pytest.raises(ValueError):
-        VerifierLabelRecord(
-            record_id="r1", label_version="v2", source="demo_match",
-            branches=16, successes=1, p_expansion=15 / 16, policy_id="p",
-            snapshot_hash="a" * 64, weak=False,
-        )
-    with pytest.raises(ValueError, match="remedy evidence"):
-        VerifierLabelRecord(
-            record_id="r1",
-            label_version="v3",
-            source="post_expansion_recheck",
-            branches=1,
-            successes=1,
-            p_expansion=0.0,
-            policy_id="p",
-            snapshot_hash="a" * 64,
-        )
+    assert len(list(memory.experiences.facts.iter_valid())) == 1
+    assert not list(memory.experiences.interpretations.iter_valid())
 
 
-def test_factual_retry_outcomes_close_pending_decisions_with_propensity(tmp_path):
-    memory = IncidentMemory(tmp_path / "incidents")
-    for index in range(2):
-        memory.record_decision(
-            VerifierDecisionRecord(
-                record_id=f"factual-{index}",
-                context_id="episode-context",
-                policy_id="policy-1",
-                snapshot_id=f"snapshot-{index}",
-                snapshot_hash=str(index + 1) * 64,
-                scene_feature_path="",
-                route="RE-STEER",
-                verifier_decision="EXPANSION",
-                verifier_logits=(0.0, 1.0),
-                p_expansion=0.95,
-                decision_rule="head_argmax",
-                controller_mode="learned_verifier",
-                failure_count=index + 1,
-                remaining_budget=3 - index,
-                behavior_propensity=0.1,
-            )
-        )
-    runtime = ModeAwareRuntime.__new__(ModeAwareRuntime)
-    runtime.incidents = memory
-    runtime._pending_factual = [
-        {
-            "record_id": f"factual-{index}",
-            "policy_id": "policy-1",
-            "snapshot_hash": str(index + 1) * 64,
-            "behavior_propensity": 0.1,
-            "data_split": "train",
-        }
-        for index in range(2)
-    ]
-    runtime._close_factual_labels(success=True)
-    labels = list(memory.labels.iter_valid())
-    assert len(labels) == 2
-    assert all(item["source"] == "factual_online_retry" for item in labels)
-    assert all(item["branches"] == item["successes"] == 1 for item in labels)
-    assert all(item["behavior_propensity"] == 0.1 for item in labels)
-    assert runtime._pending_factual == []
-    weights = verifier_training_weights(
-        [
-            VerifierExample(
-                record_id="explore",
-                policy_id="policy-1",
-                group_id="episode-context",
-                split="train",
-                feature_path="unused",
-                source="factual_online_retry",
-                successes=1,
-                trials=1,
-                weight=1.0,
-                weak=False,
-                behavior_propensity=0.1,
-            ),
-            VerifierExample(
-                record_id="ordinary",
-                policy_id="policy-1",
-                group_id="episode-context",
-                split="train",
-                feature_path="unused",
-                source="factual_online_retry",
-                successes=1,
-                trials=1,
-                weight=1.0,
-                weak=False,
-                behavior_propensity=1.0,
-            ),
-        ],
-        ipw_clip=10.0,
-    )
-    assert weights == {"explore": 5.0, "ordinary": 0.5}
 
 
-def test_demo_match_is_weak_same_snapshot_same_target_only(tmp_path):
-    analysis = tmp_path / "analysis.npz"
-    positions = np.asarray(
-        [[[0.0, 0.0, 0.0], [0.01, 0.0, 0.0], [0.02, 0.0, 0.0]]]
-    )
-    np.savez(
-        analysis,
-        positions=positions,
-        grippers=np.asarray([[1.0, 1.0, -1.0]]),
-        medoid_indices=np.asarray([0]),
-    )
-    feature = tmp_path / "feature.npz"
-    feature.write_bytes(b"feature")
-    memory = IncidentMemory(tmp_path / "incidents")
-    memory.record_decision(
-        VerifierDecisionRecord(
-            record_id="r-demo",
-            context_id="c",
-            policy_id="p",
-            snapshot_id="snapshot",
-            snapshot_hash="b" * 64,
-            scene_feature_path="",
-            verifier_feature_path=str(feature),
-            route="RE-STEER",
-            verifier_decision="RE-STEER",
-            verifier_logits=(1.0, 0.0),
-            p_expansion=0.2,
-            decision_rule="head_argmax",
-            controller_mode="learned_verifier",
-            failure_count=1,
-            remaining_budget=4,
-            provenance={
-                "round_analysis_path": str(analysis),
-                "round_analysis_sha256": sha256_file(analysis),
-            },
-        )
-    )
-    image = np.zeros((256, 256, 3), dtype=np.uint8)
-    writer = DemoWriter(
-        tmp_path / "demo.h5",
-        task="task",
-        ticket_id="ticket",
-        operator="operator",
-        init_state_id="failure",
-        snapshot_id="snapshot",
-        hashes={"snapshot": "b" * 64},
-        coverage_cell="failure",
-    )
-    writer.start(
-        DemoFrame(image, image, np.zeros(8), np.zeros(1)),
-        ee_position=positions[0, 0],
-    )
-    for index, gripper in enumerate((1.0, -1.0), start=1):
-        action = np.zeros(7)
-        action[6] = gripper
-        writer.append(
-            action,
-            DemoFrame(image, image, np.zeros(8), np.asarray([index])),
-            reward=0.0,
-            done=False,
-            success=False,
-            ee_position=positions[0, index],
-        )
-    demo = writer.save()
-    result = attach_demo_match_label(
-        memory,
-        record_id="r-demo",
-        demo_path=demo,
-        label_version="demo-v1",
-        candidate_target_object_id="bowl",
-        demo_target_object_id="bowl",
-    )
-    assert result.matched and result.label_attached
-    label = next(memory.labels.iter_valid())
-    assert label["weak"] and label["weight"] == 0.25
-    assert label["data_split"] == "train"
+def test_atomic_label_batch_is_idempotent_and_validates_before_writing(tmp_path):
+    ledger = AtomicJsonl(tmp_path / "labels.jsonl")
+    events = [{"event_id": "a", "value": 1}, {"event_id": "b", "value": 2}]
+    assert ledger.append_many(events + events[:1]) == [True, True, False]
+    original = ledger.path.read_bytes()
+    assert ledger.append_many(events) == [False, False]
+    assert ledger.path.read_bytes() == original
+    with pytest.raises(ValueError, match="event requires"):
+        ledger.append_many([{"event_id": "c"}, {}])
+    assert ledger.path.read_bytes() == original
+    assert ledger.read_all() == events
+
+
+
+
 
 
 def test_counterfactual_worker_restores_each_branch_and_resumes_idempotently(tmp_path):
@@ -1434,7 +1145,7 @@ def test_counterfactual_worker_restores_each_branch_and_resumes_idempotently(tmp
         decision_rule="head_argmax",
         controller_mode="learned_verifier",
         failure_count=1,
-        remaining_budget=4,
+        remaining_budget=50,
     )
     memory.record_decision(decision)
 
@@ -1458,6 +1169,7 @@ def test_counterfactual_worker_restores_each_branch_and_resumes_idempotently(tmp
         executor_calls.append(kwargs["branch_seed"])
         return BranchOutcome(
             success=True,
+            task_success=True,
             chunks_executed=1,
             stage_advanced=True,
         )
@@ -1475,13 +1187,13 @@ def test_counterfactual_worker_restores_each_branch_and_resumes_idempotently(tmp
     first = worker.run(
         record_id="decision-1",
         policy_id="policy-new",
-        label_version="labels-v1",
+        label_version=FIXED_BUDGET_50_LABEL_VERSION,
         verifier_feature_path=new_policy_feature,
     )
     second = worker.run(
         record_id="decision-1",
         policy_id="policy-new",
-        label_version="labels-v1",
+        label_version=FIXED_BUDGET_50_LABEL_VERSION,
         verifier_feature_path=new_policy_feature,
     )
 
@@ -1492,11 +1204,11 @@ def test_counterfactual_worker_restores_each_branch_and_resumes_idempotently(tmp
     assert snapshots.calls == [("snapshot-1", False)] * 16
 
 
-def test_new_policy_replay_coordinator_uses_frozen_plan_and_exact_feature_path(tmp_path):
+def test_new_policy_replay_coordinator_uses_versioned_plan_and_exact_feature_path(tmp_path):
     result_path = tmp_path / "result.json"
     feature_path = tmp_path / "features" / "r1.npz"
     unsigned = {
-        "schema_version": "new-policy-counterfactual-plan-v2",
+        "schema_version": "new-policy-counterfactual-plan-v3",
         "job_id": "job-1",
         "policy_id": "policy-new",
         "checkpoint_path": "/checkpoint",
@@ -1504,9 +1216,11 @@ def test_new_policy_replay_coordinator_uses_frozen_plan_and_exact_feature_path(t
         "snapshot_root": "/snapshots",
         "incident_root": "/incidents",
         "retry_estimand": "retry failure",
-        "adaptive_branches": [16, 32, 64],
+        "adaptive_branches": [16, 32],
         "decision_rule": "head_argmax",
-        "max_posterior_width": 0.20,
+        "progress_contract": REPLAY_PROGRESS_CONTRACT,
+        "label_version": FIXED_BUDGET_50_LABEL_VERSION,
+        "label_config": label_contract_payload(),
         "contexts": [
             {
                 "record_id": "r1",
@@ -1515,7 +1229,7 @@ def test_new_policy_replay_coordinator_uses_frozen_plan_and_exact_feature_path(t
                 "snapshot_id": "s1",
                 "snapshot_hash": "b" * 64,
                 "snapshot_manifest_path": "/snapshots/s1/manifest.json",
-                "remaining_budget": 4,
+                "budget_state": regenerate_budget_state({"retry_index": 0}),
                 "data_split": "test",
                 "fresh_feature_output_path": str(feature_path),
             }
@@ -1543,6 +1257,9 @@ def test_new_policy_replay_coordinator_uses_frozen_plan_and_exact_feature_path(t
                 successes=4,
                 p_expansion=0.75,
                 posterior_interval=(0.5, 0.9),
+                posterior_side_probability=0.99,
+                label_status="LABELED",
+                censored=False,
                 label_attached=True,
             )
 
@@ -1592,9 +1309,9 @@ def test_fixed_budget_counterfactual_executes_fresh_schedule_until_progress():
         conditions.append(condition)
         actions = np.zeros((10, 7), dtype=np.float32)
         actions[:, 0] = condition.retry_index + 1
-        return FreshMedoidSelection(
+        return FreshCandidateSelection(
             actions=actions,
-            mode_id=f"mode-{condition.retry_index}",
+            candidate_id=f"mode-{condition.retry_index}",
             sample_index=condition.retry_index,
         )
 
@@ -1603,13 +1320,13 @@ def test_fixed_budget_counterfactual_executes_fresh_schedule_until_progress():
         adapter=adapter,
         policy=object(),
         branch_seed=123,
-        remaining_budget=4,
+        remaining_budget=10,
         controller_state={"retry_index": 0},
     )
-    assert outcome.success and outcome.stage_advanced
-    assert outcome.chunks_executed == 2 and adapter.steps == 20
-    assert [item.retry_index for item in conditions] == [0, 1]
-    assert [item.guide_mult for item in conditions] == [1.0, 1.15]
+    assert not outcome.success and not outcome.task_success
+    assert outcome.chunks_executed == 10 and adapter.steps == 100
+    assert [item.retry_index for item in conditions] == list(range(10))
+    assert [item.guide_mult for item in conditions] == [1.0] * 10
 
 
 def test_offline_replay_loads_guidance_as_list(tmp_path, monkeypatch):
@@ -1642,6 +1359,257 @@ def test_offline_replay_loads_guidance_as_list(tmp_path, monkeypatch):
     assert functions == [reward]
 
 
+def test_offline_replay_aligns_policy_config_and_processor_device(
+    tmp_path, monkeypatch
+):
+    import core.pi05_steer as pi05_steer
+    import lerobot.policies.factory as policy_factory
+
+    calls = {}
+
+    class FakeTarget:
+        def __init__(self):
+            self.config = SimpleNamespace(device="cuda:0")
+
+        @classmethod
+        def from_pretrained(cls, path):
+            calls["checkpoint"] = path
+            return cls()
+
+        def to(self, device):
+            calls["module_device"] = device
+            return self
+
+        def post_init(self, **kwargs):
+            calls["post_init"] = kwargs
+
+        def eval(self):
+            calls["eval"] = True
+
+    def fake_processors(*, policy_cfg, pretrained_path, preprocessor_overrides):
+        calls["config_device"] = policy_cfg.device
+        calls["processor_device"] = preprocessor_overrides["device_processor"][
+            "device"
+        ]
+        return object(), object()
+
+    monkeypatch.setattr(pi05_steer, "PI05PolicySteer", FakeTarget)
+    monkeypatch.setattr(
+        policy_factory, "make_pre_post_processors", fake_processors
+    )
+    application = HgpuReplayApplication.__new__(HgpuReplayApplication)
+    application.device = "cuda:4"
+    application.adapter = object()
+    application.main = SimpleNamespace(
+        mode_gate_config=SimpleNamespace(
+            theta0_checkpoint=tmp_path / "theta0", sample_count=40
+        ),
+        policy_type_config={},
+    )
+
+    target, _ = application._load_target_policy(tmp_path / "policy")
+
+    assert calls["module_device"] == "cuda:4"
+    assert calls["config_device"] == "cuda:4"
+    assert calls["processor_device"] == "cuda:4"
+    assert target.config.device == "cuda:4"
+    assert calls["eval"] is True
+
+
+def test_offline_replay_keeps_warm_process_during_gemini_network_outage(
+    monkeypatch,
+):
+    from mode_gate.agents import AgentCallError
+
+    calls = []
+    sleeps = []
+
+    class Planner:
+        def score(self, *args, **kwargs):
+            calls.append((args, kwargs))
+            if len(calls) < 3:
+                raise AgentCallError(
+                    "Gemini semantic scoring failed: "
+                    "SSL UNEXPECTED_EOF_WHILE_READING"
+                )
+            return "semantic-plan"
+
+    monkeypatch.setattr("mode_gate.offline_replay.time.sleep", sleeps.append)
+
+    result = _score_semantics_with_network_recovery(
+        Planner(), "context", frozen_prompt="same"
+    )
+
+    assert result == "semantic-plan"
+    assert len(calls) == 3
+    assert all(call == (("context",), {"frozen_prompt": "same"}) for call in calls)
+    assert sleeps == [10.0, 20.0]
+
+
+def test_offline_replay_does_not_retry_gemini_schema_failure(monkeypatch):
+    from mode_gate.agents import AgentCallError
+
+    class Planner:
+        def score(self):
+            raise AgentCallError("duplicate or missing mode ID")
+
+    monkeypatch.setattr(
+        "mode_gate.offline_replay.time.sleep",
+        lambda delay: pytest.fail(f"unexpected retry sleep: {delay}"),
+    )
+
+    with pytest.raises(AgentCallError, match="duplicate or missing"):
+        _score_semantics_with_network_recovery(Planner())
+
+
+def test_online_semantic_scoring_keeps_warm_runtime_during_tunnel_reconnect():
+    from mode_gate.agents import AgentCallError
+
+    calls = []
+    sleeps = []
+
+    class Planner:
+        def score(self, *args, **kwargs):
+            calls.append((args, kwargs))
+            if len(calls) == 1:
+                raise AgentCallError(
+                    "Gemini semantic scoring failed after 3 attempts: "
+                    "[Errno 111] Connection refused"
+                )
+            if len(calls) == 2:
+                raise AgentCallError(
+                    "Gemini semantic scoring failed after 3 attempts: "
+                    "SSL UNEXPECTED_EOF_WHILE_READING"
+                )
+            return "semantic-plan"
+
+    result = score_semantics_with_network_recovery(
+        Planner(),
+        "same-evidence",
+        recovery_label="online mode-aware runtime",
+        sleep_fn=sleeps.append,
+        frozen_prompt="same",
+    )
+
+    assert result == "semantic-plan"
+    assert len(calls) == 3
+    assert all(
+        call == (("same-evidence",), {"frozen_prompt": "same"})
+        for call in calls
+    )
+    assert sleeps == [10.0, 20.0]
+
+
+def test_planner_preflight_keeps_warm_runtime_during_tunnel_reconnect():
+    from mode_gate.agents import AgentCallError
+
+    calls = []
+    sleeps = []
+
+    class Planner:
+        def preflight(self, *, exercise_interactions=False):
+            calls.append(exercise_interactions)
+            if len(calls) == 1:
+                raise AgentCallError(
+                    "Gemini planner preflight failed: "
+                    "Gemini planner preflight exceeded 60.0s"
+                )
+
+    preflight_with_network_recovery(
+        Planner(),
+        exercise_interactions=True,
+        recovery_label="test startup",
+        sleep_fn=sleeps.append,
+    )
+
+    assert calls == [True, True]
+    assert sleeps == [10.0]
+
+
+def test_offline_replay_reconstructs_and_skips_completed_context(tmp_path):
+    feature = tmp_path / "feature.npz"
+    save_verifier_input(feature, _verifier_input(), metadata={
+                "schema_version": "candidate-verifier-input-v3",
+                "record_id": "record-1",
+                "snapshot_id": "snapshot-1",
+                "target_policy_id": "policy-1",
+                "label_version": FIXED_BUDGET_50_LABEL_VERSION,
+                "label_contract_hash": FIXED_BUDGET_50_CONTRACT.contract_hash,
+            })
+    context = {
+        "record_id": "record-1",
+        "snapshot_id": "snapshot-1",
+        "snapshot_hash": "snapshot-hash",
+        "data_split": "train",
+        "fresh_feature_output_path": str(feature),
+    }
+    label = {
+        "record_id": "record-1",
+        "policy_id": "policy-1",
+        "label_version": FIXED_BUDGET_50_LABEL_VERSION,
+        "source": "counterfactual_replay",
+        "snapshot_hash": "snapshot-hash",
+        "data_split": "train",
+        "verifier_feature_path": str(feature),
+        "branches": 16,
+        "successes": 0,
+        "p_expansion": 1.0,
+        "weak": False,
+        "weight": 1.0,
+        "label_config": label_contract_payload(),
+    }
+    branches = [
+        {
+            "event": "COUNTERFACTUAL_BRANCH_COMPLETED",
+            "record_id": "record-1",
+            "policy_id": "policy-1",
+            "branch_index": index,
+            "success": False,
+            "label_version": FIXED_BUDGET_50_LABEL_VERSION,
+            "label_contract_hash": FIXED_BUDGET_50_CONTRACT.contract_hash,
+        }
+        for index in range(16)
+    ]
+
+    result = _completed_replay_result(
+        context,
+        policy_id="policy-1",
+        label_version=FIXED_BUDGET_50_LABEL_VERSION,
+        source="counterfactual_replay",
+        contract=FIXED_BUDGET_50_CONTRACT,
+        labels=[label],
+        branch_events=branches,
+    )
+
+    assert result is not None
+    assert result.branches == 16
+    assert result.successes == 0
+    assert result.p_expansion == 1.0
+    assert result.label_attached is False
+    assert (
+        _completed_replay_result(
+            context,
+            policy_id="policy-1",
+            label_version=FIXED_BUDGET_50_LABEL_VERSION,
+            source="counterfactual_replay",
+            contract=FIXED_BUDGET_50_CONTRACT,
+            labels=[],
+            branch_events=branches,
+        )
+        is None
+    )
+    with pytest.raises(ValueError, match="branches are incomplete"):
+        _completed_replay_result(
+            context,
+            policy_id="policy-1",
+            label_version=FIXED_BUDGET_50_LABEL_VERSION,
+            source="counterfactual_replay",
+            contract=FIXED_BUDGET_50_CONTRACT,
+            labels=[label],
+            branch_events=branches[:-1],
+        )
+
+
 def test_fixed_budget_counterfactual_consumes_no_safe_opportunities_without_actions():
     calls = []
 
@@ -1661,23 +1629,6 @@ def test_fixed_budget_counterfactual_consumes_no_safe_opportunities_without_acti
     assert all(item["no_safe_mode"] for item in outcome.metadata["attempts"])
 
 
-def test_signature_lookup_requires_validated_remedy_and_headroom(tmp_path):
-    goal = np.ones(4, dtype=np.float32)
-    obs = np.array([1, 2, 3, 4], dtype=np.float32)
-    goal_path, obs_path = tmp_path / "goal.npy", tmp_path / "obs.npy"
-    np.save(goal_path, goal)
-    np.save(obs_path, obs)
-    record = CapabilitySignatureRecord(
-        signature_id="sig", suite="libero", task_id="1", perturbation_variant="base",
-        failure_mode=FailureMode.APPROACH_BLOCKED.value, e_goal_path=str(goal_path),
-        e_obs_path=str(obs_path), policy_id="p1", alpha_l=0.6, validated=True,
-        trigger_recheck_passed=True, regression_passed=True,
-    )
-    matches = lookup_validated_remedies(
-        query_failure_mode=FailureMode.APPROACH_BLOCKED,
-        query_e_goal=goal, query_e_obs=obs, records=[record],
-    )
-    assert matches[0].alpha_candidates == (0.75, 0.9, 1.0)
 
 
 def test_slow_loop_rejects_invalid_transitions_and_resumes(tmp_path):
@@ -1774,7 +1725,7 @@ def test_slow_worker_consumes_gate_and_atomically_deploys_fixed_budget(tmp_path)
     registry.promote(
         policy_id="p0",
         verifier_id=None,
-        controller_mode="fixed_budget_4",
+        controller_mode="fixed_budget_50",
         manifest_hash="manifest",
         expected_revision=0,
     )
@@ -1825,14 +1776,13 @@ def test_slow_worker_consumes_gate_and_atomically_deploys_fixed_budget(tmp_path)
         ticket_root=tmp_path / "tickets",
         work_root=tmp_path / "work",
     )
+    # This test isolates atomic deployment; prerequisite integrity is exercised
+    # by test_mandatory_demos against real ticket/training artifacts.
+    worker._require_current_task_training = lambda current: {}
+    store.annotate(job.job_id, expected_state=SlowLoopState.RAW_REGRESSION,
+                   metadata={"current_task_training_evidence": {}, "registered_delta_path":str(winner_checkpoint)})
     assert worker.step(job.job_id).state is SlowLoopState.TRIGGER_RECHECK
     assert worker.step(job.job_id).state is SlowLoopState.POLICY_STAGED
-    assert worker.step(job.job_id).state is SlowLoopState.NEW_POLICY_COUNTERFACTUAL
-    store.annotate(
-        job.job_id,
-        expected_state=SlowLoopState.NEW_POLICY_COUNTERFACTUAL,
-        metadata={"new_policy_counterfactual_manifest_path": str(counterfactual_path)},
-    )
     assert worker.step(job.job_id).state is SlowLoopState.VERIFIER_TRAINING
     store.annotate(
         job.job_id,
@@ -1843,9 +1793,23 @@ def test_slow_worker_consumes_gate_and_atomically_deploys_fixed_budget(tmp_path)
     deployed = worker.step(job.job_id)
     assert deployed.state is SlowLoopState.DEPLOYED
     assert registry.active().policy_id == "p1"
-    assert registry.active().controller_mode == "fixed_budget_4"
-    signature = next(IncidentMemory(tmp_path / "incidents").signatures.iter_valid())
-    assert signature["policy_id"] == "p1" and signature["validated"]
+    assert registry.active().controller_mode == "fixed_budget_50"
+    signatures = list(IncidentMemory(tmp_path / "incidents").signatures.iter_valid())
+    assert len(signatures) == 1
+    signature = signatures[0]
+    assert signature["event"] == "CAPABILITY_SIGNATURE_RECORDED"
+    assert signature["policy_id"] == "p1"
+    assert not signature["validated"]
+    assert not signature["trigger_recheck_passed"]
+    assert signature["metadata"]["current_task_evaluation"]["passed"]
+    assert signature["metadata"]["use_status"] == "evidence_only_requires_current_policy_validation"
+    assert signature["metadata"]["signature_reuse_enabled"]
+    assert np.load(signature["e_goal_path"], allow_pickle=False).shape == (2048,)
+    # Retrying a committed deployment finishes the label append without a new
+    # registry revision or duplicate label.
+    worker._deploy(store.current(job.job_id))
+    assert registry.active().deployment_revision == 2
+    assert len(list(IncidentMemory(tmp_path / "incidents").signatures.iter_valid())) == 1
 
 
 def test_ticket_planner_uses_current_frozen_text_model_and_strict_payload():
@@ -1863,10 +1827,11 @@ def test_ticket_planner_uses_current_frozen_text_model_and_strict_payload():
                                 "axis": "handle_approach_side",
                                 "value": "centered",
                                 "quota": 15,
+                                "operator_instruction_zh": "从把手正中央接近并抓取。",
                             }
                         ],
-                        "must_demonstrate": ["grasp then pull the top drawer"],
-                        "must_avoid": ["contacting the drawer face"],
+                        "must_demonstrate": ["抓住把手后拉开上层抽屉。"],
+                        "must_avoid": ["不要碰撞抽屉面板。"],
                     }
                 ),
                 usage_metadata=None,
@@ -1886,14 +1851,14 @@ def test_ticket_planner_uses_current_frozen_text_model_and_strict_payload():
     assert (
         provenance["model"]
         == TICKET_PLANNER_MODEL
-        == "gemini-robotics-er-2-preview"
+        == "gpt-6-astra"
     )
     assert calls[0]["model"] == TICKET_PLANNER_MODEL
     assert collection.coverage_axes[0].axis == "handle_approach_side"
 
 
-def test_ticket_planner_rejects_unfrozen_model():
-    with pytest.raises(ValueError, match="frozen to gemini-robotics-er-2-preview"):
+def test_ticket_planner_rejects_noncontract_model():
+    with pytest.raises(ValueError, match="requires gpt-6-astra"):
         TicketCollectionPlanner(model="gemini-2.5-flash", client=object())
 
 
@@ -1906,8 +1871,8 @@ def test_ticket_planner_rejects_coverage_that_cannot_fill_demo_queue():
                     {
                         "capability_gap": "drawer pull is unreliable",
                         "coverage_axes": [
-                            {"axis": "handle_type", "value": "bar", "quota": 5},
-                            {"axis": "handle_type", "value": "knob", "quota": 5},
+                            {"axis": "handle_type", "value": "bar", "quota": 5, "operator_instruction_zh": "横向把手"},
+                            {"axis": "handle_type", "value": "knob", "quota": 5, "operator_instruction_zh": "旋钮把手"},
                         ],
                         "must_demonstrate": ["grasp and pull"],
                         "must_avoid": ["collision"],
@@ -1987,7 +1952,11 @@ def test_slow_loop_ticket_reissue_is_append_only_and_requires_zero_demos(tmp_pat
     assert reissued.metadata["ticket_reissued_from"] == "ticket-old"
 
 
-def test_slow_worker_closes_lookup_and_code_owned_ticket_path(tmp_path):
+def test_slow_worker_closes_lookup_and_code_owned_ticket_path(tmp_path, monkeypatch):
+    monkeypatch.setattr(SlowLoopWorker, '_select_precollected_demonstrations',
+        lambda *args: ({'precollected_demonstrations':True}, ()))
+    monkeypatch.setattr("mode_gate.experience_planner.ExperiencePlanner.run",
+        lambda *args, **kwargs: {"remedy":None,"reason":"没有合适的历史 remedy"})
     manifest = {
         "schema_version": "joint-eval-manifest-v1",
         "manifest_sha256": "manifest",
@@ -2055,7 +2024,7 @@ def test_slow_worker_closes_lookup_and_code_owned_ticket_path(tmp_path):
         ticket_planner=TicketPlanner(),
     )
     result = worker.run_until_blocked(job.job_id)
-    assert result.state is SlowLoopState.AWAITING_DEMOS
+    assert result.state is SlowLoopState.DATASET_READY
     assert result.ticket_id
     ticket = json.loads(Path(result.metadata["ticket_path"]).read_text())
     assert ticket["eval_split"] == "regression"
@@ -2063,128 +2032,423 @@ def test_slow_worker_closes_lookup_and_code_owned_ticket_path(tmp_path):
     assert result.metadata["lookup_match_count"] == 0
 
 
-def test_slow_worker_lookup_composes_reuse_grid_from_validated_delta(tmp_path):
-    theta0 = tmp_path / "theta0"
-    theta_ft = tmp_path / "theta_ft"
-    theta0.mkdir()
-    theta_ft.mkdir()
-    values = {
-        "model.paligemma_with_expert.paligemma.model.vision_tower.x": torch.ones(2),
-        "model.paligemma_with_expert.paligemma.model.language_model.x": torch.ones(2),
-        "model.action_in_proj.weight": torch.ones(2),
-    }
-    save_file(values, str(theta0 / "model.safetensors"))
-    save_file({key: value + 0.5 for key, value in values.items()}, str(theta_ft / "model.safetensors"))
-    delta = tmp_path / "delta"
-    extract_full_delta(theta0, theta_ft, delta, parent_policy_id="p0")
-    initial_grid = compose_expansion_candidates(
-        theta0_checkpoint=theta0,
-        parent_policy_id="p0",
-        accepted_lineage=(),
-        new_delta_id="delta-1",
-        new_delta_path=delta,
-        output_root=tmp_path / "initial-grid",
-    )
-    active_checkpoint = Path(initial_grid["candidates"][1]["checkpoint_path"])
-    registry = PolicyRegistry(tmp_path / "registry")
-    registry.initialize_base(
-        checkpoint_path=str(theta0),
-        digest=checkpoint_digest(theta0),
-        metadata={},
-    )
-    registry.install_artifact("delta", "delta-1", delta)
-    registry.install_artifact("policy", "active", active_checkpoint)
-    registry.promote(
-        policy_id="active",
-        verifier_id=None,
-        controller_mode="fixed_budget_4",
-        manifest_hash="manifest",
-        expected_revision=0,
-    )
-    tickets = tmp_path / "tickets"
-    (tickets / "source-ticket").mkdir(parents=True)
-    (tickets / "source-ticket" / "ticket.json").write_text("{}", encoding="utf-8")
-    goal = np.ones(2048, dtype=np.float32)
-    observation = np.ones(2048, dtype=np.float32)
-    goal_path, obs_path = tmp_path / "goal.npy", tmp_path / "obs.npy"
-    np.save(goal_path, goal)
-    np.save(obs_path, observation)
-    incidents = IncidentMemory(tmp_path / "incidents")
-    incidents.record_signature(
-        CapabilitySignatureRecord(
-            signature_id="source-signature",
-            suite="libero_spatial",
-            task_id="task",
-            perturbation_variant="base",
-            failure_mode=FailureMode.APPROACH_BLOCKED.value,
-            e_goal_path=str(goal_path),
-            e_obs_path=str(obs_path),
-            policy_id="active",
-            alpha_l=0.4,
-            validated=True,
-            trigger_recheck_passed=True,
-            regression_passed=True,
-            delta_id="delta-1",
-            ticket_id="source-ticket",
-        )
-    )
-    feature_id = "f" * 64
-    feature_path = tmp_path / f"{feature_id}.npz"
-    np.savez(feature_path, goal=goal.astype(np.float16), observation=observation.astype(np.float16))
-    manifest = {
-        "schema_version": "joint-eval-manifest-v1",
-        "manifest_sha256": "manifest",
-        "tasks": [],
-    }
+def test_slow_worker_automatically_starts_and_completes_teleop(tmp_path):
     manifest_path = tmp_path / "manifest.json"
-    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
-    store = SlowLoopStore(tmp_path / "slow")
-    job = store.create(
-        active_policy_id="active",
-        input_hash="input",
-        metadata={
-            "signature_id": "query-signature",
-            "signature_feature_id": feature_id,
-            "signature_feature_path": str(feature_path),
-            "failure_mode": FailureMode.APPROACH_BLOCKED.value,
-        },
-    )
-    worker = SlowLoopWorker(
-        store=store,
-        registry=registry,
-        incidents=incidents,
-        protocol_manifest=manifest_path,
-        ticket_root=tickets,
-        work_root=tmp_path / "work",
-    )
-    assert worker.step(job.job_id).state is SlowLoopState.LOOKUP_PENDING
-    assert worker.step(job.job_id).state is SlowLoopState.REUSE_EVALUATING
-    result = worker.step(job.job_id)
-    assert result.state is SlowLoopState.RAW_REGRESSION
-    candidates = json.loads(Path(result.metadata["candidates_json_path"]).read_text())
-    assert [item["alpha_l"] for item in candidates] == [0.55, 0.7, 0.9]
-    assert result.metadata["reuse_source_delta_id"] == "delta-1"
-    failed_gate = tmp_path / "failed-reuse-gate.json"
-    failed_gate.write_text(
+    manifest_path.write_text(
         json.dumps(
             {
-                "schema_version": "raw-policy-gate-report-v1",
-                "gate_kind": "REUSE",
-                "manifest_hash": "manifest",
-                "parent": {"policy_id": "active"},
-                "decision": {"status": "NEEDS_MORE_DEMOS", "reason": "no improvement"},
+                "schema_version": "joint-eval-manifest-v1",
+                "manifest_sha256": "manifest",
+                "tasks": [],
             }
         ),
         encoding="utf-8",
     )
-    store.annotate(
-        job.job_id,
-        expected_state=SlowLoopState.RAW_REGRESSION,
-        metadata={"policy_gate_report_path": str(failed_gate)},
+    ticket_path = tmp_path / "tickets/ticket-1/ticket.json"
+    ticket_path.parent.mkdir(parents=True)
+    ticket_path.write_text(json.dumps({"ticket_id": "ticket-1"}), encoding="utf-8")
+    service_record = tmp_path / "service.json"
+    service_record.write_text("{}", encoding="utf-8")
+    completion = tmp_path / "completion.json"
+    completion.write_text("{}", encoding="utf-8")
+
+    class Supervisor:
+        def ensure_running(self, job):
+            assert job.state is SlowLoopState.AWAITING_DEMOS
+            return TeleopServiceResult(
+                state="ready",
+                url="http://127.0.0.1:8765/",
+                job_id=job.job_id,
+                ticket_id="ticket-1",
+                collection_round=1,
+                pid=123,
+                service_record_path=str(service_record),
+                completion_path=str(completion),
+            )
+
+        def poll(self, job):
+            assert job.state is SlowLoopState.COLLECTING
+            return TeleopServiceResult(
+                state="complete",
+                url="http://127.0.0.1:8765/",
+                job_id=job.job_id,
+                ticket_id="ticket-1",
+                collection_round=1,
+                service_record_path=str(service_record),
+                completion_path=str(completion),
+            )
+
+    store = SlowLoopStore(tmp_path / "slow")
+    job = store.create(
+        active_policy_id="p0",
+        input_hash="input",
+        metadata={"ticket_path": str(ticket_path), "collection_round": 1},
     )
-    fallback = worker.step(job.job_id)
-    assert fallback.state is SlowLoopState.TICKET_READY
-    assert fallback.metadata["reuse_fallback_to_ticket"]
+    for state in (
+        SlowLoopState.LOOKUP_PENDING,
+        SlowLoopState.TICKET_READY,
+        SlowLoopState.AWAITING_DEMOS,
+    ):
+        current = store.current(job.job_id)
+        job = store.advance(
+            job.job_id,
+            expected_state=current.state,
+            next_state=state,
+            input_hash=current.input_hash,
+            output_hash=state.value,
+            ticket_id="ticket-1" if state is SlowLoopState.AWAITING_DEMOS else None,
+        )
+    worker = SlowLoopWorker(
+        store=store,
+        registry=PolicyRegistry(tmp_path / "registry"),
+        incidents=IncidentMemory(tmp_path / "incidents"),
+        protocol_manifest=manifest_path,
+        ticket_root=tmp_path / "tickets",
+        work_root=tmp_path / "work",
+        teleop_supervisor=Supervisor(),
+    )
+    collecting = worker.step(job.job_id)
+    assert collecting.state is SlowLoopState.COLLECTING
+    assert collecting.metadata["teleop_auto_started"] is True
+    assert collecting.metadata["teleop_url"] == "http://127.0.0.1:8765/"
+    curating = worker.step(job.job_id)
+    assert curating.state is SlowLoopState.CURATING
+    assert curating.metadata["teleop_collection_complete"] is True
+
+
+def test_teleop_health_bypasses_provider_proxy(monkeypatch):
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+    import threading
+    from mode_gate.teleop_supervisor import TeleopSupervisor
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            assert self.path == "/healthz"
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b'{"service":"vls-teleop","ready":true}')
+
+        def log_message(self, *args):
+            pass
+
+    for key in ("HTTP_PROXY", "HTTPS_PROXY", "http_proxy", "https_proxy"):
+        monkeypatch.setenv(key, "http://127.0.0.1:1")
+    for key in ("NO_PROXY", "no_proxy"):
+        monkeypatch.delenv(key, raising=False)
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        supervisor = TeleopSupervisor.__new__(TeleopSupervisor)
+        supervisor.port = server.server_address[1]
+        assert supervisor._health() == {"service": "vls-teleop", "ready": True}
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+
+@pytest.mark.parametrize("state", [
+    SlowLoopState.EXPANSION_TRIGGERED, SlowLoopState.AWAITING_DEMOS,
+    SlowLoopState.COLLECTING, SlowLoopState.CURATING,
+    SlowLoopState.NEEDS_MORE_DEMOS, SlowLoopState.RETRYABLE_ERROR,
+])
+def test_expansion_demo_barrier_rejects_incomplete_collection(tmp_path, state):
+    from mode_gate.expansion_automation import expansion_demonstrations_ready
+
+    info = tmp_path / "dataset/meta/info.json"
+    info.parent.mkdir(parents=True)
+    info.write_text('{"total_episodes":15}')
+    job = SimpleNamespace(state=state, metadata={
+        "teleop_auto_started": True, "teleop_collection_complete": True,
+        "curation_needs_more_demos": False,
+        "current_ticket_dataset_path": str(info.parent.parent),
+    })
+    assert not expansion_demonstrations_ready(job)
+
+
+def test_expansion_demo_barrier_waits_before_fast_loop_continues(tmp_path, monkeypatch):
+    from mode_gate import expansion_automation
+
+    info = tmp_path / "dataset/meta/info.json"
+    info.parent.mkdir(parents=True)
+    info.write_text('{"total_episodes":1}')
+    job = SimpleNamespace(
+        state=SlowLoopState.AWAITING_DEMOS, sequence=0, ticket_id="ticket-current",
+        metadata={"task_id": "current-task", "collection_round": 1},
+    )
+    events = []
+
+    class Store:
+        def current(self, job_id):
+            assert job_id == "job-current"
+            return job
+
+    def collect(_):
+        assert events[-1]["state"] == "WAITING_FOR_DEMONSTRATIONS"
+        job.sequence += 1
+        if job.sequence == 1:
+            job.state = SlowLoopState.CURATING
+            job.metadata["teleop_collection_complete"] = True
+        else:
+            job.state = SlowLoopState.DATASET_READY
+            job.metadata.update(
+                curation_needs_more_demos=False,
+                current_ticket_dataset_path=str(info.parent.parent),
+            )
+
+    monkeypatch.setattr(expansion_automation.time, "sleep", collect)
+    expansion_automation.wait_for_expansion_demonstrations(
+        store=Store(), job_id="job-current", on_update=events.append,
+    )
+    assert [x["state"] for x in events] == [
+        "WAITING_FOR_DEMONSTRATIONS", "WAITING_FOR_DEMONSTRATIONS",
+        "DEMONSTRATIONS_READY",
+    ]
+    assert job.state is SlowLoopState.DATASET_READY
+
+
+def test_expansion_demo_barrier_does_not_accept_empty_or_missing_dataset(tmp_path):
+    from mode_gate.expansion_automation import expansion_demonstrations_ready
+
+    job = SimpleNamespace(state=SlowLoopState.DATASET_READY, metadata={
+        "curation_needs_more_demos": False,
+        "current_ticket_dataset_path": str(tmp_path / "dataset"),
+    })
+    assert not expansion_demonstrations_ready(job)
+    info = tmp_path / "dataset/meta/info.json"
+    info.parent.mkdir(parents=True)
+    info.write_text('{"total_episodes":0}')
+    assert not expansion_demonstrations_ready(job)
+    info.write_text('{"total_episodes":1}')
+    assert expansion_demonstrations_ready(job)
+
+
+def test_expansion_worker_launcher_detaches_managed_collection(tmp_path, monkeypatch):
+    from mode_gate import expansion_automation
+
+    python = tmp_path / "python"
+    python.touch()
+    calls = []
+
+    class Process:
+        pid = 424242
+
+        def wait(self):
+            return 0
+
+    def popen(command, **kwargs):
+        calls.append((command, kwargs))
+        return Process()
+
+    monkeypatch.setattr(expansion_automation.subprocess, "Popen", popen)
+    repo_root = Path(__file__).resolve().parents[1]
+    record = expansion_automation.launch_expansion_worker(
+        job_id="job-1",
+        repo_root=repo_root,
+        persistent_root=tmp_path / "persistent",
+        slow_loop_root=tmp_path / "persistent/slow_loop",
+        registry_root=tmp_path / "persistent/registry",
+        incident_root=tmp_path / "persistent/incidents",
+        snapshot_root=tmp_path / "persistent/snapshots",
+        python_executable=python,
+        operator="operator",
+    )
+    command, kwargs = calls[0]
+    assert record["launch_status"] == "launched"
+    assert record["teleop_url"] == "http://127.0.0.1:8765/"
+    assert "--auto-teleop" in command
+    assert "--watch-collection" in command
+    assert command[command.index("--job-id") + 1] == "job-1"
+    assert kwargs["start_new_session"] is True
+
+
+def test_expansion_full_cycle_barrier_waits_through_training(tmp_path, monkeypatch):
+    from mode_gate import expansion_automation
+    info = tmp_path / "dataset/meta/info.json"
+    info.parent.mkdir(parents=True)
+    info.write_text('{"total_episodes":1}')
+    job = SimpleNamespace(state=SlowLoopState.TRAINING, sequence=0, ticket_id="t",
+                          metadata={"curation_needs_more_demos": False,
+                                    "current_ticket_dataset_path": str(info.parent.parent)})
+    seen = []
+
+    def complete(_):
+        assert seen[-1]["state"] == "WAITING_FOR_SLOW_LOOP"
+        job.state = SlowLoopState.DEPLOYED
+        job.sequence += 1
+
+    monkeypatch.setattr(expansion_automation.time, "sleep", complete)
+    expansion_automation.wait_for_expansion_demonstrations(
+        store=SimpleNamespace(current=lambda _: job), job_id="job",
+        wait_for_completion=True, on_update=seen.append)
+    assert seen[-1]["state"] == "SLOW_LOOP_COMPLETE"
+
+
+def test_teleop_portal_survives_queue_backend_and_proxies_websocket(monkeypatch):
+    import socket
+    import threading
+    import uvicorn
+    from fastapi import FastAPI, WebSocket
+    from fastapi.responses import HTMLResponse
+    from fastapi.testclient import TestClient
+    from mode_gate.teleop_supervisor import create_teleop_portal_app
+
+    backend = FastAPI()
+    queue = {"active": False}
+
+    @backend.get("/healthz")
+    def health():
+        return {"service": "vls-teleop", "ready": True,
+                "queue_complete": not queue["active"]}
+
+    @backend.get("/", response_class=HTMLResponse)
+    def index():
+        return "<h1>Current task</h1>"
+
+    @backend.websocket("/ws")
+    async def echo(websocket: WebSocket):
+        await websocket.accept()
+        await websocket.send_text("initial-frame")
+        await websocket.send_text(await websocket.receive_text())
+        await websocket.close()
+
+    sock = socket.socket()
+    sock.bind(("127.0.0.1", 0))
+    port = sock.getsockname()[1]
+    server = uvicorn.Server(uvicorn.Config(backend, log_level="error"))
+    thread = threading.Thread(target=lambda: server.run(sockets=[sock]), daemon=True)
+    thread.start()
+    deadline = time.monotonic() + 5
+    while not server.started and time.monotonic() < deadline:
+        time.sleep(0.01)
+    assert server.started
+    monkeypatch.setenv("HTTP_PROXY", "http://127.0.0.1:1")
+    monkeypatch.setenv("HTTPS_PROXY", "http://127.0.0.1:1")
+    monkeypatch.setenv("ALL_PROXY", "http://127.0.0.1:1")
+    monkeypatch.delenv("NO_PROXY", raising=False)
+    try:
+        app = create_teleop_portal_app(backend_port=port, service_token="test")
+        with TestClient(app) as client:
+            assert "入口在线" in client.get("/").text
+            queue["active"] = True
+            assert "Current task" in client.get("/").text
+            with client.websocket_connect("/ws") as websocket:
+                assert websocket.receive_text() == "initial-frame"
+                websocket.send_text("test-only-no-simulator")
+                assert websocket.receive_text() == "test-only-no-simulator"
+            queue["active"] = False
+            assert "入口在线" in client.get("/").text
+            server.should_exit = True
+            thread.join(timeout=5)
+            assert client.get("/healthz").json()["ready"] is True
+            assert "入口在线" in client.get("/").text
+    finally:
+        server.should_exit = True
+        thread.join(timeout=5)
+        sock.close()
+
+
+def test_full_cycle_executes_generated_jobs_in_order(tmp_path, monkeypatch):
+    from dataclasses import replace
+    from mode_gate import slow_worker as module
+
+    store = SlowLoopStore(tmp_path / "slow")
+    job = store.create(active_policy_id="p", input_hash="input")
+    current = [replace(job, state=SlowLoopState.TRAINING, metadata={
+        "training_job_path": "training.json", "policy_gate_job_path": "gate.json",
+        "new_policy_counterfactual_job_spec_path": "replay.json"})]
+    monkeypatch.setattr(store, "current", lambda _: current[0])
+    completed = []
+    states = {SlowLoopState.TRAINING: ("training.json", SlowLoopState.RAW_REGRESSION),
+              SlowLoopState.RAW_REGRESSION: ("gate.json", SlowLoopState.NEW_POLICY_COUNTERFACTUAL),
+              SlowLoopState.NEW_POLICY_COUNTERFACTUAL: ("replay.json", SlowLoopState.DEPLOYED)}
+
+    def step(_):
+        name, next_state = states[current[0].state]
+        if name in completed:
+            current[0] = replace(current[0], state=next_state, sequence=current[0].sequence + 1)
+        return current[0]
+
+    def execute(path):
+        completed.append(str(path))
+        return {"launched": True, "completed": True}
+
+    worker = module.SlowLoopWorker.__new__(module.SlowLoopWorker)
+    worker.store = store
+    worker.work_root = tmp_path / "work"
+    worker.teleop_supervisor = object()
+    monkeypatch.setattr(worker, "step", step)
+    monkeypatch.setattr(module, "execute_job_spec", execute)
+    result = worker.run_full_cycle(job.job_id)
+    assert result.state is SlowLoopState.DEPLOYED
+    assert completed == ["training.json", "gate.json", "replay.json"]
+
+
+def test_coft_preserves_native_fps_and_ignores_display_names(tmp_path):
+    sources = []
+    for name, fps in (("new", 20), ("replay", 10)):
+        root = tmp_path / name
+        (root / "meta").mkdir(parents=True)
+        (root / "meta/info.json").write_text(json.dumps({
+            "fps": fps, "total_frames": 5, "total_episodes": 1,
+            "features": {"action": {"dtype": "float32", "shape": [7],
+                                       "names": [name], "fps": fps}},
+        }))
+        sources.append(root)
+    hashes = [sha256_file(root / "meta/info.json") for root in sources]
+    value = prepare_source_catalog(
+        catalog_root=tmp_path / "catalog", manifest_path=tmp_path / "sources.json",
+        new_datasets={"vls/new": sources[0]}, old_ticket_datasets={},
+        replay_datasets={"libero/replay": sources[1]}, seed=17)
+    assert value["fps_by_repo"] == {"vls/new": 20, "libero/replay": 10}
+    assert hashes == [sha256_file(root / "meta/info.json") for root in sources]
+    assert value["datasets"]["libero/replay"]["temporal_alignment"] == "native_policy_step_indices_no_resampling"
+
+
+def test_raw_gate_reuses_warm_model_across_contexts(tmp_path, monkeypatch):
+    import sys
+    from mode_gate.policy_evaluator import HydraRawEpisodeExecutor, EvaluationContext
+
+    constructed = []
+    runs = []
+
+    class Adapter:
+        def __init__(self, env=None, config=None, device=None):
+            self.current_task_idx = 0
+            self.episode_step = 7
+            self._env = [SimpleNamespace(num_steps_wait=5, _env=SimpleNamespace(
+                env=SimpleNamespace(done=False, timestep=12, horizon=720)))]
+
+        def close(self):
+            pass
+
+        def get_context_provenance(self):
+            return {"runtime_suite": "libero_10_lan", "task_id": "task",
+                    "init_state_id": str(runs[-1])}
+
+    class Runner:
+        def __init__(self, cfg):
+            constructed.append(True)
+            self.cfg, self.config = cfg, cfg.main
+            self.adapter, self.device = Adapter(), "cuda:6"
+
+        def run(self):
+            runs.append(self.config.init_state_id)
+            self.success_count = 1
+
+    monkeypatch.setitem(sys.modules, "main", SimpleNamespace(Main=Runner))
+    executor = HydraRawEpisodeExecutor(
+        repo_root=Path(__file__).resolve().parents[1], python_executable=Path(sys.executable),
+        output_root=tmp_path, extra_overrides=("device=cuda:6",), keep_warm=True)
+    for state in (21, 22):
+        context = EvaluationContext(suite="libero_10", task_id="task", task_index=2,
+            perturbation_variant="use_language", init_state_id=str(state), env_seed=1, policy_seed=1)
+        assert executor("policy", tmp_path / "checkpoint", context).success
+    assert len(constructed) == 1
+    assert list(map(str, runs)) == ["21", "22"]
+
+
 
 
 def test_joint_manifest_is_byte_stable_and_has_exact_formal_counts():
@@ -2279,11 +2543,11 @@ def test_raw_gate_and_adaptive_counterfactual_rules():
         PolicyScore(f"p{index}", alpha, sr, {"t": sr})
         for index, (alpha, sr) in enumerate(zip((0.2, 0.4, 0.6, 0.8), (0.4, 0.6, 0.6, 0.5)))
     )
-    assert [item.alpha_l for item in select_alpha_top2(scores)] == [0.4, 0.6]
+    assert [item.alpha_l for item in rank_current_task_candidates(scores)] == [0.4, 0.6, 0.8, 0.2]
     decision = raw_promotion_decision(
-        parent_macro_sr=0.55,
-        regression_scores=select_alpha_top2(scores),
-        trigger_recheck_pass={"p1": False, "p2": True},
+        parent_current_sr=0.55,
+        current_task_scores=scores,
+        forgetting={"p0": 0.0, "p1": 0.04, "p2": 0.01, "p3": 0.0},
     )
     assert decision.winner.candidate_id == "p2"
     next_trials, interval = adaptive_counterfactual_target(successes=1, trials=16)
@@ -2322,13 +2586,13 @@ def test_full_delta_compose_and_registry_cas(tmp_path):
     registry.initialize_base(checkpoint_path=str(base), digest="a" * 64, metadata={})
     registry.install_artifact("policy", "p1", merged)
     active = registry.promote(
-        policy_id="p1", verifier_id=None, controller_mode="fixed_budget_4",
+        policy_id="p1", verifier_id=None, controller_mode="fixed_budget_50",
         manifest_hash="m", expected_revision=0,
     )
     assert active.deployment_revision == 1
     with pytest.raises(RuntimeError):
         registry.promote(
-            policy_id="p1", verifier_id=None, controller_mode="fixed_budget_4",
+            policy_id="p1", verifier_id=None, controller_mode="fixed_budget_50",
             manifest_hash="m", expected_revision=0,
         )
 
@@ -2389,7 +2653,7 @@ def test_expansion_and_reuse_candidate_composition_preserves_full_lineage(tmp_pa
     delta1, delta2 = tmp_path / "delta1", tmp_path / "delta2"
     extract_full_delta(theta0, ft1, delta1, parent_policy_id="p0")
     extract_full_delta(theta0, ft2, delta2, parent_policy_id="p0")
-    lineage = [DeltaLineageEntry("d1", str(delta1), alpha_l=0.4)]
+    lineage = [DeltaLineageEntry("d1", str(delta1), alpha_v=0.4, alpha_l=0.4, alpha_a=0.4)]
     expansion = compose_expansion_candidates(
         theta0_checkpoint=theta0,
         parent_policy_id="p1",
@@ -2397,6 +2661,7 @@ def test_expansion_and_reuse_candidate_composition_preserves_full_lineage(tmp_pa
         new_delta_id="d2",
         new_delta_path=delta2,
         output_root=tmp_path / "expansion",
+        alpha_l_values=[0.2, 0.4, 0.6, 0.8],
     )
     assert [item["alpha_l"] for item in expansion["candidates"]] == [0.2, 0.4, 0.6, 0.8]
     candidate = Path(expansion["candidates"][0]["checkpoint_path"])
@@ -2405,22 +2670,31 @@ def test_expansion_and_reuse_candidate_composition_preserves_full_lineage(tmp_pa
     with safe_open(candidate / index["weight_map"][language_key], framework="pt", device="cpu") as handle:
         torch.testing.assert_close(handle.get_tensor(language_key), values[language_key] + 0.4)
 
-    reuse = compose_reuse_candidates(
+    reuse = compose_selected_remedy(
         theta0_checkpoint=theta0,
         parent_policy_id="p1",
         accepted_lineage=lineage,
         target_delta_id="d1",
+        target_delta_path=delta1, alpha_l_values=[0.1, 0.6, 0.95],
         output_root=tmp_path / "reuse",
     )
-    resumed = compose_reuse_candidates(
+    resumed = compose_selected_remedy(
         theta0_checkpoint=theta0,
         parent_policy_id="p1",
         accepted_lineage=lineage,
         target_delta_id="d1",
+        target_delta_path=delta1, alpha_l_values=[0.1, 0.6, 0.95],
         output_root=tmp_path / "reuse",
     )
     assert reuse == resumed
-    assert [item["alpha_l"] for item in reuse["candidates"]] == [0.55, 0.7, 0.9]
+    assert [item["alpha_l"] for item in reuse["candidates"]] == [0.1, 0.6, 0.95]
+    external = compose_selected_remedy(theta0_checkpoint=theta0,parent_policy_id="p1",
+        accepted_lineage=lineage,target_delta_id="d2",target_delta_path=delta2,
+        alpha_l_values=[0.3],output_root=tmp_path/"external_remedy")
+    restored = Path(external["candidates"][0]["checkpoint_path"])
+    merge_index = json.loads((restored/"model.safetensors.index.json").read_text())
+    with safe_open(restored/merge_index["weight_map"][language_key],framework="pt",device="cpu") as handle:
+        torch.testing.assert_close(handle.get_tensor(language_key),values[language_key]+0.5)
 
 
 def test_checkpoint_math_ignores_and_preserves_processor_safetensors(tmp_path):
@@ -2550,6 +2824,126 @@ def test_snapshot_roundtrip_restores_simulator_policy_and_rgb(tmp_path):
     assert policy.value.item() == 3
     assert component.value.item() == 3
     assert result["rgb_mean_absolute_error"] == 0
+
+
+def test_snapshot_restore_discards_a_bounded_stale_egl_frame(tmp_path):
+    class StaleFirstFrameAdapter(_SnapshotAdapter):
+        def __init__(self):
+            super().__init__()
+            self.rendered_frames = 0
+
+        def get_vlm_image(self):
+            self.rendered_frames += 1
+            if self.rendered_frames == 1:
+                return np.full_like(self.image, 255)
+            return self.image
+
+    adapter, policy = StaleFirstFrameAdapter(), _SnapshotPolicy()
+    store = DecisionSnapshotStore(tmp_path)
+    snapshot = store.capture(
+        adapter=adapter,
+        policy=policy,
+        policy_id="p0",
+        controller_state={},
+        provenance={},
+        observation_image=adapter.image,
+    )
+
+    result = store.restore(snapshot.snapshot_id, adapter=adapter, policy=policy)
+
+    assert result["rgb_mean_absolute_error"] == 0
+    assert adapter.rendered_frames == 2
+
+
+def test_snapshot_restore_still_fails_closed_after_stale_frame_retries(tmp_path):
+    class AlwaysWrongFrameAdapter(_SnapshotAdapter):
+        def __init__(self):
+            super().__init__()
+            self.rendered_frames = 0
+
+        def get_vlm_image(self):
+            self.rendered_frames += 1
+            return np.full_like(self.image, 255)
+
+    adapter, policy = AlwaysWrongFrameAdapter(), _SnapshotPolicy()
+    store = DecisionSnapshotStore(tmp_path)
+    snapshot = store.capture(
+        adapter=adapter,
+        policy=policy,
+        policy_id="p0",
+        controller_state={},
+        provenance={},
+        observation_image=adapter.image,
+    )
+
+    with pytest.raises(ValueError, match="after 3 renders"):
+        store.restore(snapshot.snapshot_id, adapter=adapter, policy=policy)
+    assert adapter.rendered_frames == 3
+
+
+def test_snapshot_restore_refreshes_stale_offscreen_context_once(tmp_path):
+    class StaleRendererAdapter(_SnapshotAdapter):
+        def __init__(self):
+            super().__init__()
+            self.rendered_frames = 0
+            self.refreshes = 0
+            self.stale = True
+
+        def get_vlm_image(self):
+            self.rendered_frames += 1
+            return np.full_like(self.image, 255) if self.stale else self.image
+
+        def refresh_offscreen_render_context(self):
+            self.refreshes += 1
+            self.stale = False
+
+    adapter, policy = StaleRendererAdapter(), _SnapshotPolicy()
+    store = DecisionSnapshotStore(tmp_path)
+    snapshot = store.capture(
+        adapter=adapter,
+        policy=policy,
+        policy_id="p0",
+        controller_state={},
+        provenance={},
+        observation_image=adapter.image,
+    )
+
+    result = store.restore(snapshot.snapshot_id, adapter=adapter, policy=policy)
+
+    assert result["rgb_mean_absolute_error"] == 0
+    assert adapter.refreshes == 1
+    assert adapter.rendered_frames == 4
+
+
+def test_libero_renderer_refresh_rebuilds_only_gpu_context():
+    from core.env_adapters.libero_adapter import LiberoAdapter
+
+    class Call:
+        def __init__(self):
+            self.count = 0
+
+        def __call__(self):
+            self.count += 1
+
+    make_current = Call()
+    free = Call()
+    rebuild = Call()
+    forward = Call()
+    context = SimpleNamespace(
+        gl_ctx=SimpleNamespace(make_current=make_current),
+        con=SimpleNamespace(free=free),
+        _set_mujoco_context_and_buffers=rebuild,
+    )
+    sim = SimpleNamespace(_render_context_offscreen=context, forward=forward)
+    adapter = LiberoAdapter.__new__(LiberoAdapter)
+    adapter._get_current_robosuite_env = lambda: SimpleNamespace(sim=sim)
+
+    adapter.refresh_offscreen_render_context()
+
+    assert make_current.count == 1
+    assert free.count == 1
+    assert rebuild.count == 1
+    assert forward.count == 1
 
 
 def test_demo_writer_keeps_t_plus_one_states_and_undo(tmp_path):
@@ -2928,66 +3322,8 @@ def test_teleop_server_guidance_provider_returns_operator_guidance() -> None:
     body = source.split("    def guidance_provider", 1)[1].split(
         "    def reset_current", 1
     )[0]
-    assert "return drawer_bowl_operator_guidance(" in body
-
-
-def test_teleop_guidance_tracks_drawer_bowl_stages() -> None:
-    from mode_gate.teleop import drawer_bowl_operator_guidance
-
-    base = {
-        "task_success": False,
-        "drawer_open_fraction": 0.1,
-        "ee_to_bowl_m": 0.3,
-        "bowl_lift_m": 0.0,
-        "bowl_to_drawer_m": 0.4,
-    }
-    stage_1 = drawer_bowl_operator_guidance(
-        base,
-        gripper_command=-1.0,
-        coverage_hint="从左上方接近。",
-    )
-    assert stage_1["stage_index"] == 0
-    assert "最上层" in stage_1["next_action"]
-
-    stage_2 = drawer_bowl_operator_guidance(
-        base | {"drawer_open_fraction": 0.8},
-        gripper_command=-1.0,
-        coverage_hint="从左上方接近。",
-    )
-    assert stage_2["stage_index"] == 1
-    assert "黑色碗" in stage_2["next_action"]
-
-    stage_3 = drawer_bowl_operator_guidance(
-        base
-        | {
-            "drawer_open_fraction": 0.8,
-            "bowl_lift_m": 0.04,
-            "bowl_to_drawer_m": 0.3,
-        },
-        gripper_command=1.0,
-        coverage_hint="从左上方接近。",
-    )
-    assert stage_3["stage_index"] == 2
-
-    stage_4 = drawer_bowl_operator_guidance(
-        base
-        | {
-            "drawer_open_fraction": 0.8,
-            "bowl_lift_m": 0.04,
-            "bowl_to_drawer_m": 0.1,
-        },
-        gripper_command=1.0,
-        coverage_hint="从左上方接近。",
-    )
-    assert stage_4["stage_index"] == 3
-
-    complete = drawer_bowl_operator_guidance(
-        base | {"task_success": True},
-        gripper_command=-1.0,
-        coverage_hint="从左上方接近。",
-    )
-    assert complete["stage_index"] == 4
-    assert complete["task_success"]
+    assert "return task_guidance.status(" in body
+    assert "drawer_bowl_task" not in source
 
 
 def test_teleop_status_reuses_last_camera_frame() -> None:
@@ -3084,6 +3420,42 @@ def test_teleop_step_and_render_stay_on_websocket_thread() -> None:
     assert session.handle_thread == session.status_thread
 
 
+def test_teleop_health_endpoint_is_render_free_and_identified() -> None:
+    pytest.importorskip("fastapi")
+    from fastapi.testclient import TestClient
+
+    from mode_gate.teleop import create_teleop_app
+
+    class Session:
+        def service_status(self):
+            return {
+                "schema_version": "vls-teleop-session-health-v1",
+                "ticket_id": "ticket-1",
+                "queue_complete": False,
+            }
+
+        def status(self, _message):
+            raise AssertionError("health checks must not render a camera frame")
+
+    app = create_teleop_app(
+        Session(),
+        service_metadata={
+            "schema_version": "vls-managed-teleop-health-v1",
+            "job_id": "job-1",
+            "service_token": "token",
+            "collection_round": 1,
+            "ticket_id": "ticket-1",
+            "ticket_sha256": "a" * 64,
+        },
+    )
+    with TestClient(app) as client:
+        payload = client.get("/healthz").json()
+    assert payload["ready"] is True
+    assert payload["service"] == "vls-teleop"
+    assert payload["job_id"] == "job-1"
+    assert payload["queue_complete"] is False
+
+
 def test_demo_replay_validator_persists_exact_state_error(tmp_path):
     output = tmp_path / "demo.hdf5"
     writer = DemoWriter(
@@ -3136,7 +3508,7 @@ def test_demo_replay_validator_persists_exact_state_error(tmp_path):
 
         def step(self, action):
             self.value += float(action[0])
-            return None, 0.0, False, False, {}
+            return None, 0.0, False, False, {"success": self.value >= 3.0}
 
         def capture_simulator_state(self):
             return {"flattened_sim_state": np.asarray([self.value])}
@@ -3188,7 +3560,7 @@ def test_demo_replay_prepare_resets_controller_runtime(tmp_path):
 
         def step(self, action):
             self.value += float(action[0]) + self.controller_offset
-            return None, 0.0, False, False, {}
+            return None, 0.0, False, False, {"success": self.value == 1.0}
 
         def capture_simulator_state(self):
             return {"flattened_sim_state": np.asarray([self.value])}
@@ -3204,7 +3576,7 @@ def test_demo_replay_prepare_resets_controller_runtime(tmp_path):
         assert int(handle.attrs["replay_max_state_error_index"]) == -1
 
 
-def test_demo_replay_reassessment_uses_physical_component_tolerances(tmp_path):
+def test_demo_replay_reassessment_uses_native_success_not_state_tolerances(tmp_path):
     output = tmp_path / "demo.hdf5"
     with h5py.File(output, "w") as handle:
         handle.attrs["replay_validation_version"] = "controller-reset-v1"
@@ -3213,15 +3585,21 @@ def test_demo_replay_reassessment_uses_physical_component_tolerances(tmp_path):
         handle.attrs["replay_max_qvel_error"] = 2.9e-3
         handle.attrs["replay_success_matches"] = True
         handle.attrs["replay_validated"] = False
+        handle.attrs["simulator_success"] = True
+        handle.attrs["replay_task_success"] = True
+        handle.attrs["replay_acceptance_version"] = "physical-state-v1"
     assert reassess_demo_replay(
         output,
-        tolerance=5e-3,
-        position_tolerance=1e-4,
-        velocity_tolerance=5e-3,
+        tolerance=1e-15,
+        position_tolerance=1e-15,
+        velocity_tolerance=1e-15,
     )
     with h5py.File(output, "r") as handle:
         assert bool(handle.attrs["replay_validated"])
-        assert handle.attrs["replay_acceptance_version"] == "physical-state-v1"
+        assert handle.attrs["replay_acceptance_version"] == "libero-native-success-v1"
+        assert handle.attrs["replay_state_error_role"] == "diagnostic_only"
+        assert json.loads(handle.attrs["replay_prior_acceptance_json"])["replay_validated"] is False
+        assert handle.attrs["replay_max_state_error"] == 2.9e-3
 
 
 def test_teleop_queue_resumes_only_contiguous_committed_demos(tmp_path):
@@ -3326,6 +3704,7 @@ def test_ticket_curation_is_coverage_aware_exported_and_resumable(tmp_path, monk
             handle.attrs["ticket_id"] = "ticket-1"
             handle.attrs["coverage_cell"] = "approach_side=left"
             handle.attrs["explicit_success"] = True
+            handle.attrs["simulator_success"] = True
             handle.attrs["replay_max_state_error"] = 0.0
             handle.attrs["replay_validated"] = True
 
@@ -3351,7 +3730,7 @@ def test_ticket_curation_is_coverage_aware_exported_and_resumable(tmp_path, monk
     assert (ticket_root / "exports" / "lerobot_v3" / "meta" / "info.json").is_file()
 
 
-def test_policy_promotion_runs_frozen_100_250_and_trigger_gate_idempotently(tmp_path):
+def test_policy_promotion_current_task_tradeoff_is_idempotent(tmp_path):
     tasks = [
         {
             "suite": f"libero_{index // 10}",
@@ -3434,26 +3813,32 @@ def test_policy_promotion_runs_frozen_100_250_and_trigger_gate_idempotently(tmp_
         manifest=manifest,
         output_root=tmp_path / "reports",
         bootstrap_draws=50,
+        retention_history={"schema_version": "policy-retention-history-v1",
+                           "manifest_hash": manifest["manifest_sha256"],
+                           "task_keys": [t["task_key"] for t in manifest["tasks"]]},
     )
     first = coordinator.run(
         parent=parent,
         candidates=candidates,
         trigger_evaluator=trigger,
-        trigger_identity={"ticket_id": "ticket"},
+        trigger_identity={"ticket_id": "ticket", "task_key": manifest["tasks"][0]["task_key"]},
     )
     calls = list(evaluator.calls)
     second = coordinator.run(
         parent=parent,
         candidates=candidates,
         trigger_evaluator=trigger,
-        trigger_identity={"ticket_id": "ticket"},
+        trigger_identity={"ticket_id": "ticket", "task_key": manifest["tasks"][0]["task_key"]},
     )
 
     assert first == second
     assert evaluator.calls == calls
-    assert first["alpha_selection"]["episodes"] == 100
-    assert first["regression"]["episodes"] == 250
-    assert first["alpha_selection"]["top2"] == ["candidate-06", "candidate-04"]
+    assert first["alpha_selection"]["episodes"] == 12
+    assert first["alpha_selection"]["global_alpha_selection_skipped"]
+    assert first["regression"]["episodes"] == 100 - len(manifest["tasks"][0]["splits"]["policy_alpha_selection"])
+    assert len(first["regression"]["candidates"]) == 4
+    assert first["alpha_selection"]["ranking"][0] == "candidate-06"
+    assert not first["tradeoff"]["zero_drop_required"]
     assert first["decision"]["status"] == "POLICY_STAGED"
     assert first["decision"]["winner"]["policy_id"] == "candidate-06"
 
@@ -3507,7 +3892,7 @@ def test_deployed_dev_uses_installed_policy_fresh_seeds_and_separate_metric(tmp_
     active = registry.promote(
         policy_id="policy-1",
         verifier_id=None,
-        controller_mode="fixed_budget_4",
+        controller_mode="fixed_budget_50",
         manifest_hash=manifest["manifest_sha256"],
         expected_revision=0,
     )
@@ -3561,6 +3946,7 @@ def test_offline_replay_plan_is_immutable_and_progress_is_monotonic(tmp_path):
     manifest = {
         "snapshot_id": "snapshot-1",
         "snapshot_hash": "a" * 64,
+        "controller_state": {"retry_index": 0, "failure_count": 1},
         "provenance": {
             "suite": "libero_object",
             "runtime_suite": "libero_object",
@@ -3573,15 +3959,20 @@ def test_offline_replay_plan_is_immutable_and_progress_is_monotonic(tmp_path):
     incidents.mkdir()
     result_path = tmp_path / "result.json"
     plan = {
-        "schema_version": "new-policy-counterfactual-plan-v2",
+        "schema_version": "new-policy-counterfactual-plan-v3",
         "policy_id": "policy-2",
         "checkpoint_path": str(checkpoint),
         "checkpoint_digest": checkpoint_digest(checkpoint),
         "snapshot_root": str(snapshots),
         "incident_root": str(incidents),
-        "adaptive_branches": [16, 32, 64],
+        "adaptive_branches": [16, 32],
         "decision_rule": "head_argmax",
-        "max_posterior_width": 0.20,
+        "progress_contract": REPLAY_PROGRESS_CONTRACT,
+        "label_version": FIXED_BUDGET_50_LABEL_VERSION,
+        "label_config": label_contract_payload(),
+        "gemini_max_provider_calls": 5000,
+        "gemini_call_ledger_path": str((tmp_path / "gemini.jsonl").resolve()),
+        "branch_ledger_path": str((tmp_path / "branches.jsonl").resolve()),
         "contexts": [
             {
                 "record_id": "record-1",
@@ -3590,7 +3981,10 @@ def test_offline_replay_plan_is_immutable_and_progress_is_monotonic(tmp_path):
                 "snapshot_hash": "a" * 64,
                 "snapshot_manifest_path": str(manifest_path.resolve()),
                 "data_split": "train",
-                "remaining_budget": 4,
+                "label_version": FIXED_BUDGET_50_LABEL_VERSION,
+                "budget_state": regenerate_budget_state(
+                    {"retry_index": 0, "failure_count": 1}
+                ),
                 "fresh_feature_output_path": str(tmp_path / "feature.npz"),
             }
         ],
@@ -3607,7 +4001,8 @@ def test_offline_replay_plan_is_immutable_and_progress_is_monotonic(tmp_path):
     with pytest.raises(ValueError, match="checksum"):
         validate_replay_plan(plan_path)
 
-    progress = HgpuReplayApplication.progress_observer(
+    application = HgpuReplayApplication.__new__(HgpuReplayApplication)
+    progress = application.progress_observer(
         adapter=None,
         before={"completed_count": 1},
         after={"completed_count": 2, "goal_count": 3},
@@ -3615,7 +4010,7 @@ def test_offline_replay_plan_is_immutable_and_progress_is_monotonic(tmp_path):
     )
     assert progress.advanced
     assert progress.stage_id == "bddl-goals:2/3"
-    regressed = HgpuReplayApplication.progress_observer(
+    regressed = application.progress_observer(
         adapter=None,
         before={"completed_count": 2},
         after={"completed_count": 1, "goal_count": 3},
@@ -3624,7 +4019,99 @@ def test_offline_replay_plan_is_immutable_and_progress_is_monotonic(tmp_path):
     assert not regressed.advanced
 
 
-def test_verifier_audit_uses_only_frozen_shards_and_writes_replay_job(tmp_path):
+def test_offline_progress_uses_post_action_gemini_stage_and_prefetches_next_mode():
+    application = HgpuReplayApplication.__new__(HgpuReplayApplication)
+    application._prefetched_selections = {}
+    post_semantic = SimpleNamespace(
+        observed_stage_id="stage_2",
+        stage_confidence=0.95,
+        model="gemini-robotics-er-2-preview",
+        prompt_version="mode-scorer-v3",
+    )
+    post_selected = SimpleNamespace(
+        sample_index=0,
+        candidate_id="mode-post",
+        sample_id="sample-post",
+    )
+    post_analysis = SimpleNamespace(
+        selected=post_selected,
+        execution_actions=np.zeros((1, 10, 7), dtype=np.float32),
+        semantic=post_semantic,
+    )
+    application._sample_and_analyze = lambda condition, purpose: post_analysis
+    current = FreshCandidateSelection(
+        actions=np.zeros((10, 7), dtype=np.float32),
+        candidate_id="mode-pre",
+        sample_index=0,
+        metadata={
+            "semantic_observed_stage_id": "stage_1",
+            "semantic_stage_confidence": 0.98,
+        },
+    )
+    next_condition = SamplingCondition(seed=11, retry_index=1)
+    progress = application.progress_observer(
+        adapter=None,
+        before={"completed_count": 0},
+        after={"completed_count": 0, "goal_count": 1},
+        task_success=False,
+        selection=current,
+        next_condition=next_condition,
+        cache_next_selection=True,
+    )
+    assert progress.advanced
+    assert progress.stage_id == "stage_2"
+    assert progress.source == "gemini_planner"
+    assert next_condition not in application._prefetched_selections
+
+    post_semantic.observed_stage_id = "stage_1"
+    no_progress = application.progress_observer(
+        adapter=None,
+        before={"completed_count": 0},
+        after={"completed_count": 0, "goal_count": 1},
+        task_success=False,
+        selection=current,
+        next_condition=next_condition,
+        cache_next_selection=True,
+    )
+    assert not no_progress.advanced
+    assert application._prefetched_selections[next_condition].candidate_id == "mode-post"
+
+    application._prefetched_selections.clear()
+    current = FreshCandidateSelection(
+        actions=np.zeros((10, 7), dtype=np.float32),
+        candidate_id="mode-pre",
+        sample_index=0,
+        metadata={
+            "semantic_observed_stage_id": "stage_2",
+            "semantic_stage_confidence": 0.98,
+        },
+    )
+    regressed = application.progress_observer(
+        adapter=None,
+        before={"completed_count": 0},
+        after={"completed_count": 0, "goal_count": 1},
+        task_success=False,
+        selection=current,
+        next_condition=next_condition,
+        cache_next_selection=True,
+    )
+    assert not regressed.advanced
+
+
+def test_counterfactual_replay_rejects_forced_expansion_without_retry_budget():
+    with pytest.raises(ValueError, match="actionable remaining budget"):
+        FixedBudgetResteerExecutor(
+            fresh_sampler=lambda **kwargs: None,
+        )(
+            adapter=object(),
+            policy=object(),
+            branch_seed=1,
+            remaining_budget=0,
+            controller_state={"retry_index": 4},
+        )
+
+
+def test_verifier_audit_uses_only_versioned_shards_and_writes_replay_job(tmp_path):
     manifest = generate_joint_manifest(
         [
             {
@@ -3672,7 +4159,7 @@ def test_verifier_audit_uses_only_frozen_shards_and_writes_replay_job(tmp_path):
     registry.promote(
         policy_id="policy-a",
         verifier_id=None,
-        controller_mode="fixed_budget_4",
+        controller_mode="fixed_budget_50",
         manifest_hash=manifest["manifest_sha256"],
         expected_revision=0,
     )
@@ -3701,14 +4188,260 @@ def test_verifier_audit_uses_only_frozen_shards_and_writes_replay_job(tmp_path):
         replay_plan_path=tmp_path / "replay" / "plan.json",
         max_workers=2,
     ).run(limit=8)
-    assert report["pilot"]
+    assert report["experimental_increment"]
     assert report["scheduled_context_count"] == 8
     assert report["verifier_opportunities"] == 0
     assert Path(report["replay_job_path"]).is_file()
     assert validate_replay_plan(report["replay_plan_path"])["contexts"] == []
     replay_job = json.loads(Path(report["replay_job_path"]).read_text())
-    assert replay_job["preferred_gpu_index"] == 0
-    assert replay_job["command"][-1] == "cuda:0"
+    assert replay_job["preferred_gpu_index"] == 6
+    assert replay_job["command"][-1] == "cuda:6"
+
+
+def test_verifier_audit_excludes_forced_expansion_without_retry_choice(tmp_path):
+    manifest = generate_joint_manifest(
+        [
+            {
+                "suite": f"libero_{index // 10}",
+                "task_id": str(index),
+                "task_index": index % 10,
+                "perturbation_variant": "base",
+                "init_state_ids": [str(state) for state in range(50)],
+            }
+            for index in range(40)
+        ],
+        dataset_hash="d",
+        bddl_hash="b",
+        init_state_manifest_hash="i",
+        generator_git_sha="g",
+    )
+    source = tmp_path / "source"
+    source.mkdir()
+    save_file({"weight": torch.ones(1)}, str(source / "model.safetensors"))
+    registry = PolicyRegistry(tmp_path / "registry")
+    registry.install_artifact("policy", "policy-a", source)
+    registry.promote(
+        policy_id="policy-a",
+        verifier_id=None,
+        controller_mode="fixed_budget_50",
+        manifest_hash=manifest["manifest_sha256"],
+        expected_revision=0,
+    )
+
+    context = audit_contexts_from_manifest(manifest, limit=1)[0]
+    group = {
+        "suite": context.evaluation.suite,
+        "task_id": context.evaluation.task_id,
+        "perturbation_variant": context.evaluation.perturbation_variant,
+        "init_state_id": context.evaluation.init_state_id,
+    }
+    incidents = IncidentMemory(tmp_path / "incidents")
+    snapshot_root = tmp_path / "snapshots"
+    snapshot_root.mkdir()
+    for record_id, snapshot_id, budget, route in (
+        ("actionable", "snapshot-actionable", 10, "RE-STEER"),
+        ("forced", "snapshot-forced", 0, "EXPANSION"),
+    ):
+        directory = snapshot_root / snapshot_id
+        directory.mkdir()
+        (directory / "manifest.json").write_text(
+            json.dumps(
+                {
+                    "snapshot_id": snapshot_id,
+                    "snapshot_hash": "a" * 64,
+                    "controller_state": {
+                        "retry_index": 50 - budget,
+                        "failure_count": 1,
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+        incidents.record_decision(
+            VerifierDecisionRecord(
+                record_id=record_id,
+                context_id=record_id,
+                policy_id="policy-a",
+                snapshot_id=snapshot_id,
+                snapshot_hash="a" * 64,
+                scene_feature_path="",
+                route=route,
+                verifier_decision=None,
+                verifier_logits=None,
+                p_expansion=None,
+                decision_rule="fixed_budget_50",
+                controller_mode="fixed_budget_50",
+                failure_count=1,
+                remaining_budget=budget,
+                retry_index=50 - budget,
+                provenance={"group": group, "code_revision": "audit-filter-v1"},
+            )
+        )
+
+    class Executor:
+        repo_root = Path(__file__).resolve().parents[1]
+        python_executable = Path("/shared/hengyil6/vls/envs/vla-pilot/bin/python")
+        code_revision = "audit-filter-v1"
+
+        def __call__(self, policy_id, audit_context):
+            return RawEpisodeResult(success=False, output_dir=str(tmp_path / "episode"))
+
+    report = AuditCollectionCoordinator(
+        manifest=manifest,
+        registry=registry,
+        incidents=incidents,
+        snapshot_root=snapshot_root,
+        executor=Executor(),
+        ledger_path=tmp_path / "audit.jsonl",
+        output_path=tmp_path / "collection.json",
+        replay_plan_path=tmp_path / "replay" / "plan.json",
+    ).run(limit=1)
+    plan = validate_replay_plan(Path(report["replay_plan_path"]))
+    assert [item["record_id"] for item in plan["contexts"]] == ["actionable"]
+    assert report["excluded_forced_expansion"] == 1
+    assert plan["progress_contract"] == REPLAY_PROGRESS_CONTRACT
+
+
+def test_verifier_audit_commits_each_episode_before_later_failure(tmp_path):
+    manifest = generate_joint_manifest(
+        [
+            {
+                "suite": f"libero_{index // 10}",
+                "task_id": str(index),
+                "task_index": index % 10,
+                "perturbation_variant": "base",
+                "init_state_ids": [str(state) for state in range(50)],
+            }
+            for index in range(40)
+        ],
+        dataset_hash="d",
+        bddl_hash="b",
+        init_state_manifest_hash="i",
+        generator_git_sha="g",
+    )
+    source = tmp_path / "source"
+    source.mkdir()
+    save_file({"weight": torch.ones(1)}, str(source / "model.safetensors"))
+    registry = PolicyRegistry(tmp_path / "registry")
+    registry.install_artifact("policy", "policy-a", source)
+    registry.promote(
+        policy_id="policy-a",
+        verifier_id=None,
+        controller_mode="fixed_budget_50",
+        manifest_hash=manifest["manifest_sha256"],
+        expected_revision=0,
+    )
+
+    class Executor:
+        repo_root = Path(__file__).resolve().parents[1]
+        python_executable = Path("/shared/hengyil6/vls/envs/vla-pilot/bin/python")
+        code_revision = "audit-streaming-test"
+
+        def __init__(self):
+            self.calls = 0
+
+        def __call__(self, policy_id, context):
+            self.calls += 1
+            if self.calls == 2:
+                raise RuntimeError("injected interruption")
+            return RawEpisodeResult(
+                success=False,
+                output_dir=str(tmp_path / context.episode_key),
+            )
+
+    executor = Executor()
+    ledger_path = tmp_path / "audit.jsonl"
+    coordinator = AuditCollectionCoordinator(
+        manifest=manifest,
+        registry=registry,
+        incidents=IncidentMemory(tmp_path / "incidents"),
+        snapshot_root=tmp_path / "snapshots",
+        executor=executor,
+        ledger_path=ledger_path,
+        output_path=tmp_path / "collection.json",
+        replay_plan_path=tmp_path / "replay" / "plan.json",
+        max_workers=1,
+    )
+    with pytest.raises(RuntimeError, match="injected interruption"):
+        coordinator.run(limit=2)
+
+    completed = EpisodeLedger(ledger_path).completed_for(
+        policy_id="policy-a",
+        manifest_hash=manifest["manifest_sha256"],
+        code_revision=executor.code_revision,
+    )
+    assert len(completed) == 1
+
+
+def test_verifier_audit_defers_retryable_context_and_keeps_collecting(tmp_path):
+    manifest = generate_joint_manifest(
+        [
+            {
+                "suite": f"libero_{index // 10}",
+                "task_id": str(index),
+                "task_index": index % 10,
+                "perturbation_variant": "base",
+                "init_state_ids": [str(state) for state in range(50)],
+            }
+            for index in range(40)
+        ],
+        dataset_hash="d",
+        bddl_hash="b",
+        init_state_manifest_hash="i",
+        generator_git_sha="g",
+    )
+    source = tmp_path / "source"
+    source.mkdir()
+    save_file({"weight": torch.ones(1)}, str(source / "model.safetensors"))
+    registry = PolicyRegistry(tmp_path / "registry")
+    registry.install_artifact("policy", "policy-a", source)
+    registry.promote(
+        policy_id="policy-a",
+        verifier_id=None,
+        controller_mode="fixed_budget_50",
+        manifest_hash=manifest["manifest_sha256"],
+        expected_revision=0,
+    )
+
+    expected = audit_contexts_from_manifest(manifest, limit=2)
+
+    class Executor:
+        repo_root = Path(__file__).resolve().parents[1]
+        python_executable = Path("/shared/hengyil6/vls/envs/vla-pilot/bin/python")
+        code_revision = "audit-keep-going-test"
+
+        def __init__(self):
+            self.calls = []
+
+        def __call__(self, policy_id, context):
+            self.calls.append(context.episode_key)
+            if context == expected[0] and self.calls.count(context.episode_key) == 1:
+                raise RuntimeError("transient provider timeout")
+            return RawEpisodeResult(
+                success=False,
+                output_dir=str(tmp_path / context.episode_key),
+            )
+
+    executor = Executor()
+    AuditCollectionCoordinator(
+        manifest=manifest,
+        registry=registry,
+        incidents=IncidentMemory(tmp_path / "incidents"),
+        snapshot_root=tmp_path / "snapshots",
+        executor=executor,
+        ledger_path=tmp_path / "audit.jsonl",
+        output_path=tmp_path / "collection.json",
+        replay_plan_path=tmp_path / "replay" / "plan.json",
+        max_workers=1,
+        continue_on_retryable_error=True,
+    ).run(limit=2)
+
+    assert executor.calls == [
+        expected[0].episode_key,
+        expected[1].episode_key,
+        expected[0].episode_key,
+    ]
+    assert len(EpisodeLedger(tmp_path / "audit.jsonl").completed()) == 2
 
 
 def test_formal_audit_uses_single_robotics_stage_signal_and_sim_segmentation(
@@ -3893,7 +4626,7 @@ def test_registry_bootstrap_base_policy_is_idempotent(tmp_path):
 
     assert first == second
     assert first.deployment_revision == 1
-    assert first.controller_mode == "fixed_budget_4"
+    assert first.controller_mode == "fixed_budget_50"
     assert checkpoint_digest(registry.root / "policies" / "policy_000") == digest
     with pytest.raises(RuntimeError, match="different deployment"):
         registry.bootstrap_base_policy(
@@ -4023,7 +4756,7 @@ def test_libero_pro_environment_seed_patch_repairs_upstream_int_sentinel():
     assert observed == [DEFAULT_LIBERO_PRO_SEED]
 
 
-def test_reuse_policy_gate_runs_every_candidate_on_regression250(tmp_path):
+def test_reuse_policy_gate_scores_current_task_and_forgetting_for_every_candidate(tmp_path):
     manifest = generate_joint_manifest(
         [
             {
@@ -4070,6 +4803,9 @@ def test_reuse_policy_gate_runs_every_candidate_on_regression250(tmp_path):
         manifest=manifest,
         output_root=tmp_path / "reports",
         bootstrap_draws=10,
+        retention_history={"schema_version": "policy-retention-history-v1",
+                           "manifest_hash": manifest["manifest_sha256"],
+                           "task_keys": [t["task_key"] for t in manifest["tasks"]]},
     )
     parent = PolicyCandidate("parent", "/parent", "p" * 64, 0.4)
     candidates = [
@@ -4092,20 +4828,9 @@ def test_reuse_policy_gate_runs_every_candidate_on_regression250(tmp_path):
         )
 
     report = coordinator.run_reuse(
-        parent=parent,
-        candidates=candidates,
-        trigger_evaluator=trigger,
-        trigger_identity={"ticket_id": "reuse-ticket"},
-    )
-    assert report["alpha_selection"]["skipped"]
-    assert report["regression"]["episodes"] == 250
-    assert {call[0] for call in evaluator.calls} == {
-        "parent",
-        "reuse-55",
-        "reuse-70",
-        "reuse-90",
-    }
-    assert report["decision"]["winner"]["policy_id"] == "reuse-70"
+        parent=parent, candidates=candidates, trigger_evaluator=trigger,
+        trigger_identity={"ticket_id":"reuse-ticket","task_key":manifest["tasks"][0]["task_key"]})
+    assert report["gate_kind"] == "REUSE" and len(report["trigger_recheck"]) == len(candidates)
 
 
 def test_policy_deploy_falls_back_then_switches_only_verifier(tmp_path):
@@ -4134,15 +4859,17 @@ def test_policy_deploy_falls_back_then_switches_only_verifier(tmp_path):
         verifier_result={"gate": {"passed": False}},
     )
     assert first.policy_id == "policy-1"
-    assert first.controller_mode == "fixed_budget_4"
+    assert first.controller_mode == "fixed_budget_50"
     assert first.verifier_id is None
 
     verifier = tmp_path / "verifier"
-    verifier.mkdir()
-    (verifier / "manifest.json").write_text(
-        json.dumps({"metadata": {"policy_id": "policy-1"}}), encoding="utf-8"
-    )
-    (verifier / "head.pt").write_bytes(b"head")
+    from mode_gate.verifier import save_verifier_artifact
+    save_verifier_artifact(verifier, model=GroundedCapabilityVerifier(),standardizer=FeatureStandardizer(),
+        calibrator=PlattCalibrator(1.,0.),metadata={"policy_id":"policy-1",
+            "label_version":FIXED_BUDGET_50_LABEL_VERSION,"label_config":label_contract_payload(),
+            "backbone_id":"v44-test", "metrics":{"independent":{"contexts":1}},
+            "planner_deployment_review":{"accept":True,"planner_provenance":{
+                "planner_thread_id":"01a0893c-15b0-7203-881c-de3c5bcee058"}}})
     second = deploy_policy_gate(
         report=report,
         registry=registry,
@@ -4157,36 +4884,3 @@ def test_policy_deploy_falls_back_then_switches_only_verifier(tmp_path):
     assert second.policy_id == first.policy_id
     assert second.controller_mode == "learned_verifier"
     assert second.verifier_id == "verifier-1"
-
-
-def test_verifier_refresh_requires_cold_start_or_two_hundred_new_contexts():
-    assert not verifier_refresh_status(
-        current_strong_contexts=1699,
-        last_attempted_contexts=0,
-        has_active_verifier=False,
-        brier_drift=None,
-    ).due
-    cold = verifier_refresh_status(
-        current_strong_contexts=1700,
-        last_attempted_contexts=0,
-        has_active_verifier=False,
-        brier_drift=None,
-    )
-    assert cold.due and cold.reasons == ("cold_start_evidence_ready",)
-    assert not verifier_refresh_status(
-        current_strong_contexts=1899,
-        last_attempted_contexts=1700,
-        has_active_verifier=True,
-        brier_drift=0.01,
-    ).due
-    refresh = verifier_refresh_status(
-        current_strong_contexts=1900,
-        last_attempted_contexts=1700,
-        has_active_verifier=True,
-        brier_drift=0.03,
-    )
-    assert refresh.due
-    assert set(refresh.reasons) == {
-        "at_least_200_new_labeled_contexts",
-        "brier_drift_exceeded_threshold",
-    }

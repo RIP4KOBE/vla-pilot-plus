@@ -104,6 +104,8 @@ def main() -> int:
                     "replay_max_qvel_error",
                     "replay_task_success",
                     "replay_success_matches",
+                    "replay_acceptance_version",
+                    "replay_state_error_role",
                 )
                 if key in handle.attrs
             }
@@ -114,9 +116,8 @@ def main() -> int:
         "env_seed": env_seed,
         "init_state_id": init_state_id,
         "max_state_error": error,
-        "tolerance": float(args.tolerance),
-        "position_tolerance": float(args.position_tolerance),
-        "velocity_tolerance": float(args.velocity_tolerance),
+        "diagnostic_tolerances": {"state": float(args.tolerance),
+            "position": float(args.position_tolerance), "velocity": float(args.velocity_tolerance)},
         "valid": replay_validated,
         "diagnostics": diagnostics,
     }

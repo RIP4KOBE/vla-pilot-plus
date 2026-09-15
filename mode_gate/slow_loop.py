@@ -14,6 +14,9 @@ import fcntl
 from .io_utils import AtomicJsonl
 
 
+MANDATORY_DEMOS_PROTOCOL = "planner-evidence-reuse-or-current-task-demonstrations-v3"
+
+
 class SlowLoopState(str, Enum):
     EXPANSION_TRIGGERED = "EXPANSION_TRIGGERED"
     LOOKUP_PENDING = "LOOKUP_PENDING"
@@ -38,12 +41,14 @@ class SlowLoopState(str, Enum):
     RETRYABLE_ERROR = "RETRYABLE_ERROR"
     STALE_BASE = "STALE_BASE"
     POLICY_REJECTED = "POLICY_REJECTED"
+    CANCELLED = "CANCELLED"
     VERIFIER_PENDING = "VERIFIER_PENDING"
     MANUAL_REVIEW = "MANUAL_REVIEW"
 
 
-TERMINAL = {SlowLoopState.DEPLOYED, SlowLoopState.POLICY_REJECTED}
+TERMINAL = {SlowLoopState.DEPLOYED, SlowLoopState.POLICY_REJECTED, SlowLoopState.CANCELLED}
 MUTATING = {
+    SlowLoopState.REUSE_EVALUATING,
     SlowLoopState.TRAINING,
     SlowLoopState.DELTA_READY,
     SlowLoopState.ALPHA_SELECTING,
@@ -63,6 +68,7 @@ ALLOWED: dict[SlowLoopState, set[SlowLoopState]] = {
         SlowLoopState.RETRYABLE_ERROR,
     },
     SlowLoopState.LOOKUP_PENDING: {
+        SlowLoopState.CANCELLED,
         SlowLoopState.REUSE_EVALUATING,
         SlowLoopState.TICKET_READY,
         SlowLoopState.RETRYABLE_ERROR,
@@ -75,12 +81,15 @@ ALLOWED: dict[SlowLoopState, set[SlowLoopState]] = {
         SlowLoopState.RETRYABLE_ERROR,
     },
     SlowLoopState.TICKET_READY: {
+        SlowLoopState.DATASET_READY,
+        SlowLoopState.REUSE_EVALUATING,
         SlowLoopState.AWAITING_DEMOS,
         SlowLoopState.RETRYABLE_ERROR,
         SlowLoopState.STALE_BASE,
     },
     SlowLoopState.AWAITING_DEMOS: {
         SlowLoopState.COLLECTING,
+        SlowLoopState.RETRYABLE_ERROR,
         # Append-only correction path for a ticket that fails an operational
         # integrity check before any demonstration is collected.
         SlowLoopState.TICKET_READY,
@@ -118,12 +127,15 @@ ALLOWED: dict[SlowLoopState, set[SlowLoopState]] = {
         SlowLoopState.STALE_BASE,
     },
     SlowLoopState.TRIGGER_RECHECK: {
+        SlowLoopState.POLICY_REJECTED,
+        SlowLoopState.TICKET_READY,
         SlowLoopState.POLICY_STAGED,
         SlowLoopState.NEEDS_MORE_DEMOS,
         SlowLoopState.RETRYABLE_ERROR,
         SlowLoopState.STALE_BASE,
     },
     SlowLoopState.POLICY_STAGED: {
+        SlowLoopState.VERIFIER_TRAINING,
         SlowLoopState.NEW_POLICY_COUNTERFACTUAL,
         SlowLoopState.RETRYABLE_ERROR,
         SlowLoopState.STALE_BASE,
@@ -155,6 +167,7 @@ ALLOWED: dict[SlowLoopState, set[SlowLoopState]] = {
         SlowLoopState.STALE_BASE,
     },
     SlowLoopState.RETRYABLE_ERROR: {
+        SlowLoopState.CANCELLED,
         SlowLoopState.COLLECTING,
         SlowLoopState.TRAINING,
         SlowLoopState.VERIFIER_TRAINING,
@@ -172,11 +185,13 @@ ALLOWED: dict[SlowLoopState, set[SlowLoopState]] = {
         SlowLoopState.NEW_POLICY_COUNTERFACTUAL,
         SlowLoopState.READY_PAIR,
         SlowLoopState.READY_FIXED_BUDGET,
+        SlowLoopState.AWAITING_DEMOS,
     },
     SlowLoopState.STALE_BASE: {SlowLoopState.LOOKUP_PENDING},
     SlowLoopState.MANUAL_REVIEW: set(),
     SlowLoopState.DEPLOYED: set(),
     SlowLoopState.POLICY_REJECTED: set(),
+    SlowLoopState.CANCELLED: set(),
 }
 
 

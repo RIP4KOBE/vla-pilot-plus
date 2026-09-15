@@ -41,12 +41,15 @@ sam3:
   enabled: false            # SAM3 can't detect small objects well
 
 # ============================================================
-# Gemini Grounding (preferred for visual grounding)
+# Account planner grounding (legacy config section name)
 # ============================================================
 gemini_grounding:
   enabled: true
-  api_key: null             # Reads GOOGLE_API_KEY env var; set in .env
-  model: gemini-robotics-er-2-preview
+  api_key: null             # Unused: native Codex account task, no API credentials
+  model: gpt-6-astra
+  thinking_level: ultra
+  max_provider_calls: ${mode_gate.factual_provider_call_limit}
+  call_ledger_path: ${mode_gate.planner_call_ledger}
   
   # Default objects to detect (overridden per task)
   default_objects:
@@ -59,8 +62,11 @@ gemini_grounding:
     - pink cube
 
 # ============================================================
-# Gemini Stage Recognition (for real-time stage + guidance decisions)
+# Account planner stage recognition (legacy config section name)
 # ============================================================
 gemini:
-  api_key: null             # Reads GOOGLE_API_KEY env var; set in .env
-  model: gemini-robotics-er-2-preview
+  api_key: null             # Unused: native Codex account task, no API credentials
+  model: gpt-6-astra
+  thinking_level: ultra
+  max_provider_calls: ${mode_gate.factual_provider_call_limit}
+  call_ledger_path: ${mode_gate.planner_call_ledger}

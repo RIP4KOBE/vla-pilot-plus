@@ -31,6 +31,7 @@ class PI05PolicySteer(PI05Policy):
     """
     
     name = "pi05_steer"
+    _steering_limits_native = True
     
     def __init__(self, config):
         super().__init__(config)
@@ -125,7 +126,8 @@ class PI05PolicySteer(PI05Policy):
         sigmoid_x0: float = 0.7,
         **kwargs  # Ignore other params for backward compatibility
     ) -> Tensor:
-
+        from core.steering_limits import bounded_steering_scales
+        guide_scale, diversity_scale = bounded_steering_scales(self, guide_scale, diversity_scale)
         self.eval()
 
         if ACTION in batch:
