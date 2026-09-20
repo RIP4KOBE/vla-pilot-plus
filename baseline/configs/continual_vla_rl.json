@@ -1,0 +1,9 @@
+{
+  "method": "continual_vla_rl",
+  "checkpoint": "/shared/hengyil6/vls/models/pi05_libero_finetuned_v044",
+  "tokenizer": "/shared/hengyil6/vls/models/paligemma-tokenizer",
+  "protocol": "/shared/hengyil6/vls/self_improve/protocol/joint_eval_manifest.json",
+  "output_root": "/shared/hengyil6/vls/baseline_runs",
+  "device": "cuda:0",
+  "seed": 20260825
+}

@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "uses_real_simulator": true,
+  "synthetic_noop_policy": true,
+  "cuda_visible_devices": "",
+  "summary": {
+    "context": {
+      "benchmark": "LIBERO-PRO",
+      "context_id": "22f74ab9676da0a49617dbb95e8c56d1dc064cb42f06372f227b84b4da6c2739",
+      "env_seed": 586631865,
+      "init_state_id": "21",
+      "pass_index": 0,
+      "perturbation_variant": "use_language",
+      "policy_seed": 7452789587121265593,
+      "runtime_suite": "libero_10_lan",
+      "source_split": "demo_online_pool",
+      "suite": "libero_10",
+      "task_id": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it",
+      "task_index": 2,
+      "task_key": "libero_10::KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it::use_language",
+      "seed": 586631865,
+      "split": "demo_online_pool"
+    },
+    "success": false,
+    "steps": 715,
+    "chunks": 72,
+    "interventions": 0,
+    "seconds": 146.8497810299741,
+    "environment": {
+      "suite": "libero_10",
+      "runtime_suite": "libero_10_lan",
+      "base_suite": "libero_10",
+      "task_id": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it",
+      "task_index": 2,
+      "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it",
+      "perturbation_variant": "use_language",
+      "init_state_id": "21",
+      "episode_id": "0",
+      "bddl_file": "/shared/hengyil6/vls/repo/third_party/libero_pro/libero/libero/bddl_files/libero_10_lan/KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it.bddl",
+      "bddl_sha256": "75a8a628531e42eb7b9f44324ebdce58a3cff2a76d224c7942f1643f7ef837e3",
+      "init_states_file": "/shared/hengyil6/vls/repo/third_party/libero_pro/libero/libero/init_files/libero_10_lan/KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it.pruned_init",
+      "init_states_sha256": "3f4523b0c0286629a601d22f319bba261185006e16347bc125acf3a699ff9c64",
+      "policy_instruction": "switch stove on and put moka pot on it"
+    },
+    "termination_reason": "simulator_horizon",
+    "simulator_timestep": 720,
+    "simulator_horizon": 720
+  },
+  "final_chunk_steps": 5,
+  "final_chunk_terminal": true,
+  "final_bootstrap_discount": 0.0,
+  "seconds": 155.09261427394813
+}

@@ -1,0 +1,7 @@
+{
+  "batch_size": 32,
+  "bootstrap_samples": 300,
+  "device": "cuda:4",
+  "max_epochs": 100,
+  "patience": 15
+}

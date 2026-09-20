@@ -1,0 +1,33 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the chocolate pudding (keypoint 0), which is the boxed item on the left.
+# Stage 2: Move gripper with chocolate pudding to the basket (no extra decision needed; return 0).
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+
+    high_w = torch.tensor(3.0, device=action_sequence.device)
+    low_w = torch.tensor(1.0, device=action_sequence.device)
+    weights = torch.where(timesteps >= final_start, high_w, low_w)
+    weights = weights / torch.clamp(weights.sum(), min=1e-6)
+
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+
+    xy_dist = torch.norm(action_sequence[..., :2] - target_pos[:2], dim=-1)
+    z_dist = torch.abs(action_sequence[..., 2] - target_pos[2])
+    total_dist = xy_dist * 2.0 + z_dist
+
+    reward = -(total_dist ** 2 * weights).sum(dim=1)
+    return reward.mean()
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    reward = torch.zeros(action_sequence.shape[0], device=action_sequence.device)
+    return reward.mean()
+```

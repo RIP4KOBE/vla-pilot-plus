@@ -1,0 +1,470 @@
+{
+  "sha": "56084df5a17bec4bfd55e8bf881754e551e329c0",
+  "url": "https://api.github.com/repos/rl2-vla/qam/git/trees/56084df5a17bec4bfd55e8bf881754e551e329c0",
+  "tree": [
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e8c422452d589ae76ac84b25a54b60c75cded2d8",
+      "size": 96,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/e8c422452d589ae76ac84b25a54b60c75cded2d8"
+    },
+    {
+      "path": ".gitmodules",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "20162fe7118ac1469fa81202376df76afdb9d77a",
+      "size": 1112,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/20162fe7118ac1469fa81202376df76afdb9d77a"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "26839197383bda29d755186602a2d49f391da255",
+      "size": 3472,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/26839197383bda29d755186602a2d49f391da255"
+    },
+    {
+      "path": "__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "agents",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6b6689355095f302b5f005d522eb47b80a91393c",
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/trees/6b6689355095f302b5f005d522eb47b80a91393c"
+    },
+    {
+      "path": "agents/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e9c4afdcfb914b39e4f6348a6dcc66b9c9c26b5a",
+      "size": 678,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/e9c4afdcfb914b39e4f6348a6dcc66b9c9c26b5a"
+    },
+    {
+      "path": "agents/bam.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a9d04eda1dc53023cd574913c5432dff9d06edb5",
+      "size": 12691,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/a9d04eda1dc53023cd574913c5432dff9d06edb5"
+    },
+    {
+      "path": "agents/cgql.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "41a690c8083a33c3d1be139861fd2b981c571d81",
+      "size": 13998,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/41a690c8083a33c3d1be139861fd2b981c571d81"
+    },
+    {
+      "path": "agents/dcgql.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "da0084e02d32661f656a787d4eb1b62c1a874765",
+      "size": 13552,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/da0084e02d32661f656a787d4eb1b62c1a874765"
+    },
+    {
+      "path": "agents/dsrl.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "de4e90c2557c56f1a802710d9c53854cf79e22b4",
+      "size": 12162,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/de4e90c2557c56f1a802710d9c53854cf79e22b4"
+    },
+    {
+      "path": "agents/fawac.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b40d04ae8a397d18942e58da8b125aadfb15f59",
+      "size": 9468,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/5b40d04ae8a397d18942e58da8b125aadfb15f59"
+    },
+    {
+      "path": "agents/fbrac.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2c3843cd0884231ac6dd20177bf0f4c2a4d775b7",
+      "size": 9850,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/2c3843cd0884231ac6dd20177bf0f4c2a4d775b7"
+    },
+    {
+      "path": "agents/fedit.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8e839971dfde31860c6075d0417145ce30d5496b",
+      "size": 11775,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/8e839971dfde31860c6075d0417145ce30d5496b"
+    },
+    {
+      "path": "agents/fql.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8325dc5c530b68cf4922e747c5e7406c8045621b",
+      "size": 10430,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/8325dc5c530b68cf4922e747c5e7406c8045621b"
+    },
+    {
+      "path": "agents/ifql.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6b60cff35beeb0c550e88aa348f3b0633c5f9386",
+      "size": 9954,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/6b60cff35beeb0c550e88aa348f3b0633c5f9386"
+    },
+    {
+      "path": "agents/model.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a314de41043f3001be13078625f089260f09882b",
+      "size": 11761,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/a314de41043f3001be13078625f089260f09882b"
+    },
+    {
+      "path": "agents/qam.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "08466872f7ef300466c9cc349729ce4698375b44",
+      "size": 20535,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/08466872f7ef300466c9cc349729ce4698375b44"
+    },
+    {
+      "path": "agents/rebrac.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4f8265fabdfb7974b3898711d15331d3396047bd",
+      "size": 10017,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/4f8265fabdfb7974b3898711d15331d3396047bd"
+    },
+    {
+      "path": "agents/rlpd.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ece83376221b0b3750191ea0cf8f3f3256690ac2",
+      "size": 8779,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/ece83376221b0b3750191ea0cf8f3f3256690ac2"
+    },
+    {
+      "path": "assets",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5e1759395f459f5ebfcaea38eda83c4409209138",
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/trees/5e1759395f459f5ebfcaea38eda83c4409209138"
+    },
+    {
+      "path": "assets/bar-dark.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0136ce27ffbe0b3ed6043e4adf35e62c3122260d",
+      "size": 123022,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/0136ce27ffbe0b3ed6043e4adf35e62c3122260d"
+    },
+    {
+      "path": "assets/bar-light.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "abeab4310db5c7d4d9c58efd528cc74ee0e370a6",
+      "size": 133021,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/abeab4310db5c7d4d9c58efd528cc74ee0e370a6"
+    },
+    {
+      "path": "assets/title-dark.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5d3fd133cb3572eaeed765193052c75af2abc18e",
+      "size": 5021814,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/5d3fd133cb3572eaeed765193052c75af2abc18e"
+    },
+    {
+      "path": "assets/title-light.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8ee08443f5d0070c0933fdc795f435508eec4536",
+      "size": 5280387,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/8ee08443f5d0070c0933fdc795f435508eec4536"
+    },
+    {
+      "path": "envs",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f9b320b7523999a8e332a356e8c45429f11f7dab",
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/trees/f9b320b7523999a8e332a356e8c45429f11f7dab"
+    },
+    {
+      "path": "envs/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "envs/bridge_utils.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "37250bf7a198bea449940a3c5fefcd4658ac435c",
+      "size": 9480,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/37250bf7a198bea449940a3c5fefcd4658ac435c"
+    },
+    {
+      "path": "envs/d4rl_utils.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c773cf138d60cf716bb94bdfe4b25f6146f31adc",
+      "size": 1832,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/c773cf138d60cf716bb94bdfe4b25f6146f31adc"
+    },
+    {
+      "path": "envs/env_utils.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1544abbda9eb1463a50c42b55e70466063530f77",
+      "size": 5480,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/1544abbda9eb1463a50c42b55e70466063530f77"
+    },
+    {
+      "path": "envs/ogbench_utils.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e999a2d325b65e5517d7b35183c82e3802930ecd",
+      "size": 9151,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/e999a2d325b65e5517d7b35183c82e3802930ecd"
+    },
+    {
+      "path": "evaluation.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "38d3caa9cd897dbedb1bf7776660101bdca924f8",
+      "size": 5143,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/38d3caa9cd897dbedb1bf7776660101bdca924f8"
+    },
+    {
+      "path": "exp",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8f6bd1582e9a592f184bea3f8068f546c1c170db",
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/trees/8f6bd1582e9a592f184bea3f8068f546c1c170db"
+    },
+    {
+      "path": "exp/SAVED",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "09121b7895e92d8d21aaec885dba43fa801d498b",
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/trees/09121b7895e92d8d21aaec885dba43fa801d498b"
+    },
+    {
+      "path": "exp/SAVED/rl2-vla-qam-bridge",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "77649b461a1798909d77191a45e8eec94b72f721",
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/trees/77649b461a1798909d77191a45e8eec94b72f721"
+    },
+    {
+      "path": "exp/SAVED/rl2-vla-qam-bridge/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1243ca24f0dc559035defb3568289662a2d55e1c",
+      "size": 71,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/1243ca24f0dc559035defb3568289662a2d55e1c"
+    },
+    {
+      "path": "exp_data",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ad4e43cc95be669501d6d6f88e4d6cf796e83db5",
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/trees/ad4e43cc95be669501d6d6f88e4d6cf796e83db5"
+    },
+    {
+      "path": "exp_data/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "72f7a28a05f4b81d7bd2050404bf2422935177a8",
+      "size": 483,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/72f7a28a05f4b81d7bd2050404bf2422935177a8"
+    },
+    {
+      "path": "exp_data/qam-exp-data-quality.pkl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9a60cf4e2c9905d46d0f963a2bb33f58c8d75afb",
+      "size": 738175,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/9a60cf4e2c9905d46d0f963a2bb33f58c8d75afb"
+    },
+    {
+      "path": "exp_data/qam-exp-data-sensitive.pkl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c38c40aa767f2fc65a8d80216b7300226e0e4037",
+      "size": 322015,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/c38c40aa767f2fc65a8d80216b7300226e0e4037"
+    },
+    {
+      "path": "exp_data/qam-exp-data.pkl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "29308189cbd061bb80a6887341cee8d862acc1e6",
+      "size": 2917594,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/29308189cbd061bb80a6887341cee8d862acc1e6"
+    },
+    {
+      "path": "exp_data/sanity-check.ipynb",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "54df12e6fb722b7cfddec474184e67592dbdb718",
+      "size": 1147821,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/54df12e6fb722b7cfddec474184e67592dbdb718"
+    },
+    {
+      "path": "experiments",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "538713f030f743d32d30eabf3b15df471ce4247c",
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/trees/538713f030f743d32d30eabf3b15df471ce4247c"
+    },
+    {
+      "path": "experiments/generate.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "213ed73f0935a94c0e1a347a9554c21a35e5ef58",
+      "size": 1901,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/213ed73f0935a94c0e1a347a9554c21a35e5ef58"
+    },
+    {
+      "path": "experiments/reproduce.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "14ece151ca55bdf796f8cad748dd92bf5a62fac4",
+      "size": 18080,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/14ece151ca55bdf796f8cad748dd92bf5a62fac4"
+    },
+    {
+      "path": "experiments/reproduce_quality.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cc5ad89934489b2261c37f6d856d1f794d97e296",
+      "size": 18205,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/cc5ad89934489b2261c37f6d856d1f794d97e296"
+    },
+    {
+      "path": "experiments/reproduce_rlpd.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aef7d660024accb187801fbbb794f4411d510c21",
+      "size": 4017,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/aef7d660024accb187801fbbb794f4411d510c21"
+    },
+    {
+      "path": "experiments/reproduce_sensitivity.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "29d5eec33c856652bac39adaf7bdef3b60b84bae",
+      "size": 6220,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/29d5eec33c856652bac39adaf7bdef3b60b84bae"
+    },
+    {
+      "path": "log_utils.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9ec1242225b6c1adfffe2a3997859430498199ef",
+      "size": 5806,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/9ec1242225b6c1adfffe2a3997859430498199ef"
+    },
+    {
+      "path": "main.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c5bb0c20c7770d01b7945f93699241157334f055",
+      "size": 22357,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/c5bb0c20c7770d01b7945f93699241157334f055"
+    },
+    {
+      "path": "requirements.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "80be824772b2b56aa33c94261655b9d8bc16b042",
+      "size": 93,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/80be824772b2b56aa33c94261655b9d8bc16b042"
+    },
+    {
+      "path": "train_latents.sh",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1928d0631a58a8a78c86a39804feeb5cfd4e4bb1",
+      "size": 568,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/1928d0631a58a8a78c86a39804feeb5cfd4e4bb1"
+    },
+    {
+      "path": "utils",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d3e4e0d19d3ad360f930237e5b9b0a084f0dc9e2",
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/trees/d3e4e0d19d3ad360f930237e5b9b0a084f0dc9e2"
+    },
+    {
+      "path": "utils/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "utils/datasets.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e2e23ec08a9aa91d40b0645d7b3670a8e64bb311",
+      "size": 5728,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/e2e23ec08a9aa91d40b0645d7b3670a8e64bb311"
+    },
+    {
+      "path": "utils/diffusion.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "706b22e204eb9419356d9ee587658a8957209009",
+      "size": 2013,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/706b22e204eb9419356d9ee587658a8957209009"
+    },
+    {
+      "path": "utils/flax_utils.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bcccbb7ef5a5c70461d187f6ed82ab1ce8970df8",
+      "size": 7129,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/bcccbb7ef5a5c70461d187f6ed82ab1ce8970df8"
+    },
+    {
+      "path": "utils/gym_wrappers.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0b2dd2ff27f390efba7f4e1dbc6c8eba98f50a50",
+      "size": 2481,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/0b2dd2ff27f390efba7f4e1dbc6c8eba98f50a50"
+    },
+    {
+      "path": "utils/networks.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d8759ce69b83ff3be5e545764cf0e4d19654d471",
+      "size": 11296,
+      "url": "https://api.github.com/repos/rl2-vla/qam/git/blobs/d8759ce69b83ff3be5e545764cf0e4d19654d471"
+    }
+  ],
+  "truncated": false
+}

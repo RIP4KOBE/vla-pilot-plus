@@ -210,6 +210,7 @@ dependencies:
       - gitdb==4.0.12
       - gitpython==3.1.45
       - google-crc32c==1.7.1
+      - google-genai==2.17.0
       - grpcio==1.75.1
       - gym==0.26.2
       - gym-notices==0.1.0
@@ -291,8 +292,8 @@ dependencies:
       - pyarrow==21.0.0
       - pybullet==3.2.7
       - pycollada==0.6
-      - pydantic==2.12.2
-      - pydantic-core==2.41.4
+      - pydantic==2.12.5
+      - pydantic-core==2.41.5
       - pyglet==2.1.11
       - pygments==2.19.2
       - pynput==1.8.1

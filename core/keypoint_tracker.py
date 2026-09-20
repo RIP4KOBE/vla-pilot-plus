@@ -203,6 +203,35 @@ class KeypointTracker:
             return np.array([])
         return np.array([info.segment_index for idx, info in self._keypoint_registry.items()])
 
+    def capture_runtime_state(self) -> dict:
+        return {
+            "keypoints": None if self._keypoints is None else self._keypoints.copy(),
+            "registry": {
+                int(index): {
+                    "index": int(info.index),
+                    "initial_world_pos": info.initial_world_pos.copy(),
+                    "local_pos": info.local_pos.copy(),
+                    "segment_index": int(info.segment_index),
+                    "object_name": str(info.object_name),
+                }
+                for index, info in self._keypoint_registry.items()
+            },
+        }
+
+    def restore_runtime_state(self, state: dict) -> None:
+        value = state.get("keypoints")
+        self._keypoints = None if value is None else np.asarray(value).copy()
+        self._keypoint_registry = {
+            int(index): KeypointInfo(
+                index=int(item["index"]),
+                initial_world_pos=np.asarray(item["initial_world_pos"]).copy(),
+                local_pos=np.asarray(item["local_pos"]).copy(),
+                segment_index=int(item["segment_index"]),
+                object_name=str(item["object_name"]),
+            )
+            for index, item in state.get("registry", {}).items()
+        }
+
     def reset(self):
         """Reset the tracker, clearing all registered keypoints."""
         self._keypoints = None

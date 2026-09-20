@@ -1,0 +1,1512 @@
+{
+  "metric_history": {
+    "schema_version": "baseline-continual-matrix-v1",
+    "task_order": [
+      "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment",
+      "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment",
+      "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap",
+      "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap",
+      "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment",
+      "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment",
+      "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap",
+      "libero_goal::put_the_bowl_on_the_plate::use_environment",
+      "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap",
+      "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap",
+      "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment",
+      "libero_object::pick_up_the_cream_cheese_and_place_it_in_the_basket::use_swap",
+      "libero_object::pick_up_the_milk_and_place_it_in_the_basket::use_environment",
+      "libero_object::pick_up_the_orange_juice_and_place_it_in_the_basket::use_environment",
+      "libero_object::pick_up_the_tomato_sauce_and_place_it_in_the_basket::use_swap",
+      "libero_spatial::pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate::use_swap",
+      "libero_spatial::pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate::use_environment",
+      "libero_spatial::pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate::use_swap",
+      "libero_spatial::pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate::use_swap",
+      "libero_spatial::pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate::use_environment"
+    ],
+    "tasks_completed": 20,
+    "matrix": [
+      [
+        0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        0,
+        0.5,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        0,
+        1,
+        0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0.5,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0.5,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0.5,
+        0,
+        1,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0.5,
+        1,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0.5,
+        1,
+        0,
+        0.5,
+        0.5,
+        0,
+        1,
+        0.5,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        0,
+        0.5,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        0,
+        0.5,
+        0,
+        0,
+        1,
+        0.5,
+        0,
+        1,
+        0,
+        0.5,
+        1,
+        0.5,
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        0,
+        0.5,
+        0,
+        0,
+        0.5,
+        0.5,
+        0,
+        1,
+        0,
+        0.5,
+        1,
+        1,
+        1,
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0.5,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0.5,
+        0,
+        0,
+        1,
+        0.5,
+        0.5,
+        1,
+        0.5,
+        1,
+        1,
+        0.5,
+        0,
+        0.5,
+        null,
+        null,
+        null
+      ],
+      [
+        0,
+        0.5,
+        0,
+        0,
+        0.5,
+        0.5,
+        0,
+        0,
+        0.5,
+        0.5,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0.5,
+        1,
+        1,
+        null,
+        null
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0.5,
+        1,
+        0,
+        0.5,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        0.5,
+        0,
+        1,
+        1,
+        0.5,
+        null
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0.5,
+        0.5,
+        0,
+        0.5,
+        0.5,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0
+      ]
+    ],
+    "unseen_cell": null,
+    "stages": [
+      {
+        "tasks_learned": 1,
+        "seen_average_success": 0,
+        "current_task_success": 0,
+        "forgetting": null,
+        "backward_transfer": null,
+        "per_task_forgetting": {},
+        "per_task_backward_transfer": {},
+        "per_variant": {
+          "use_environment": {
+            "successes": 0,
+            "episodes": 2,
+            "success_rate": 0
+          }
+        }
+      },
+      {
+        "tasks_learned": 2,
+        "seen_average_success": 0.25,
+        "current_task_success": 0.5,
+        "forgetting": 0,
+        "backward_transfer": 0,
+        "per_task_forgetting": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0
+        },
+        "per_task_backward_transfer": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0
+        },
+        "per_variant": {
+          "use_environment": {
+            "successes": 1,
+            "episodes": 4,
+            "success_rate": 0.25
+          }
+        }
+      },
+      {
+        "tasks_learned": 3,
+        "seen_average_success": 0.3333333333333333,
+        "current_task_success": 0,
+        "forgetting": 0,
+        "backward_transfer": 0.25,
+        "per_task_forgetting": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 0
+        },
+        "per_task_backward_transfer": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 0.5
+        },
+        "per_variant": {
+          "use_environment": {
+            "successes": 2,
+            "episodes": 4,
+            "success_rate": 0.5
+          },
+          "use_swap": {
+            "successes": 0,
+            "episodes": 2,
+            "success_rate": 0
+          }
+        }
+      },
+      {
+        "tasks_learned": 4,
+        "seen_average_success": 0,
+        "current_task_success": 0,
+        "forgetting": 0.3333333333333333,
+        "backward_transfer": -0.16666666666666666,
+        "per_task_forgetting": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 1,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0
+        },
+        "per_task_backward_transfer": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": -0.5,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0
+        },
+        "per_variant": {
+          "use_environment": {
+            "successes": 0,
+            "episodes": 4,
+            "success_rate": 0
+          },
+          "use_swap": {
+            "successes": 0,
+            "episodes": 4,
+            "success_rate": 0
+          }
+        }
+      },
+      {
+        "tasks_learned": 5,
+        "seen_average_success": 0.1,
+        "current_task_success": 0.5,
+        "forgetting": 0.25,
+        "backward_transfer": -0.125,
+        "per_task_forgetting": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 1,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0
+        },
+        "per_task_backward_transfer": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": -0.5,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0
+        },
+        "per_variant": {
+          "use_environment": {
+            "successes": 1,
+            "episodes": 6,
+            "success_rate": 0.16666666666666666
+          },
+          "use_swap": {
+            "successes": 0,
+            "episodes": 4,
+            "success_rate": 0
+          }
+        }
+      },
+      {
+        "tasks_learned": 6,
+        "seen_average_success": 0.08333333333333333,
+        "current_task_success": 0.5,
+        "forgetting": 0.3,
+        "backward_transfer": -0.2,
+        "per_task_forgetting": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 1,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0.5
+        },
+        "per_task_backward_transfer": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": -0.5,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": -0.5
+        },
+        "per_variant": {
+          "use_environment": {
+            "successes": 1,
+            "episodes": 8,
+            "success_rate": 0.125
+          },
+          "use_swap": {
+            "successes": 0,
+            "episodes": 4,
+            "success_rate": 0
+          }
+        }
+      },
+      {
+        "tasks_learned": 7,
+        "seen_average_success": 0,
+        "current_task_success": 0,
+        "forgetting": 0.3333333333333333,
+        "backward_transfer": -0.25,
+        "per_task_forgetting": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 1,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0.5,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0.5
+        },
+        "per_task_backward_transfer": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": -0.5,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": -0.5,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": -0.5
+        },
+        "per_variant": {
+          "use_environment": {
+            "successes": 0,
+            "episodes": 8,
+            "success_rate": 0
+          },
+          "use_swap": {
+            "successes": 0,
+            "episodes": 6,
+            "success_rate": 0
+          }
+        }
+      },
+      {
+        "tasks_learned": 8,
+        "seen_average_success": 0.1875,
+        "current_task_success": 1,
+        "forgetting": 0.21428571428571427,
+        "backward_transfer": -0.14285714285714285,
+        "per_task_forgetting": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 1,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0.5,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0
+        },
+        "per_task_backward_transfer": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": -0.5,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": -0.5,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0
+        },
+        "per_variant": {
+          "use_environment": {
+            "successes": 3,
+            "episodes": 10,
+            "success_rate": 0.3
+          },
+          "use_swap": {
+            "successes": 0,
+            "episodes": 6,
+            "success_rate": 0
+          }
+        }
+      },
+      {
+        "tasks_learned": 9,
+        "seen_average_success": 0.2222222222222222,
+        "current_task_success": 0,
+        "forgetting": 0.1875,
+        "backward_transfer": -0.0625,
+        "per_task_forgetting": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 1,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0.5,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": 0
+        },
+        "per_task_backward_transfer": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": -0.5,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": -0.5,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0.5,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": 0
+        },
+        "per_variant": {
+          "use_environment": {
+            "successes": 4,
+            "episodes": 10,
+            "success_rate": 0.4
+          },
+          "use_swap": {
+            "successes": 0,
+            "episodes": 8,
+            "success_rate": 0
+          }
+        }
+      },
+      {
+        "tasks_learned": 10,
+        "seen_average_success": 0.1,
+        "current_task_success": 0,
+        "forgetting": 0.2777777777777778,
+        "backward_transfer": -0.16666666666666666,
+        "per_task_forgetting": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 1,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0.5,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 1,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": 0,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0
+        },
+        "per_task_backward_transfer": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": -0.5,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": -0.5,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": -0.5,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": 0,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0
+        },
+        "per_variant": {
+          "use_environment": {
+            "successes": 2,
+            "episodes": 10,
+            "success_rate": 0.2
+          },
+          "use_swap": {
+            "successes": 0,
+            "episodes": 10,
+            "success_rate": 0
+          }
+        }
+      },
+      {
+        "tasks_learned": 11,
+        "seen_average_success": 0.3181818181818182,
+        "current_task_success": 1,
+        "forgetting": 0.15,
+        "backward_transfer": 0,
+        "per_task_forgetting": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 1,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0.5,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": 0,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0,
+          "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0
+        },
+        "per_task_backward_transfer": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": -0.5,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": -0.5,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0.5,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": 0,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0,
+          "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0.5
+        },
+        "per_variant": {
+          "use_environment": {
+            "successes": 6,
+            "episodes": 12,
+            "success_rate": 0.5
+          },
+          "use_swap": {
+            "successes": 1,
+            "episodes": 10,
+            "success_rate": 0.1
+          }
+        }
+      },
+      {
+        "tasks_learned": 12,
+        "seen_average_success": 0.3333333333333333,
+        "current_task_success": 0.5,
+        "forgetting": 0.18181818181818182,
+        "backward_transfer": 0,
+        "per_task_forgetting": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 1,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": 0.5,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0,
+          "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0.5,
+          "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment": 0
+        },
+        "per_task_backward_transfer": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": -0.5,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0.5,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": -0.5,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0.5,
+          "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0,
+          "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment": 0
+        },
+        "per_variant": {
+          "use_environment": {
+            "successes": 6,
+            "episodes": 12,
+            "success_rate": 0.5
+          },
+          "use_swap": {
+            "successes": 2,
+            "episodes": 12,
+            "success_rate": 0.16666666666666666
+          }
+        }
+      },
+      {
+        "tasks_learned": 13,
+        "seen_average_success": 0.4230769230769231,
+        "current_task_success": 1,
+        "forgetting": 0.16666666666666666,
+        "backward_transfer": 0.041666666666666664,
+        "per_task_forgetting": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 0.5,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0.5,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": 0,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0.5,
+          "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0.5,
+          "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_cream_cheese_and_place_it_in_the_basket::use_swap": 0
+        },
+        "per_task_backward_transfer": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 0,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": -0.5,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0.5,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": 0,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0,
+          "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0,
+          "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_cream_cheese_and_place_it_in_the_basket::use_swap": 0.5
+        },
+        "per_variant": {
+          "use_environment": {
+            "successes": 9,
+            "episodes": 14,
+            "success_rate": 0.6428571428571429
+          },
+          "use_swap": {
+            "successes": 2,
+            "episodes": 12,
+            "success_rate": 0.16666666666666666
+          }
+        }
+      },
+      {
+        "tasks_learned": 14,
+        "seen_average_success": 0.5,
+        "current_task_success": 1,
+        "forgetting": 0.15384615384615385,
+        "backward_transfer": 0.07692307692307693,
+        "per_task_forgetting": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 0.5,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0.5,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": 0,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0.5,
+          "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0,
+          "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_cream_cheese_and_place_it_in_the_basket::use_swap": 0.5,
+          "libero_object::pick_up_the_milk_and_place_it_in_the_basket::use_environment": 0
+        },
+        "per_task_backward_transfer": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 0,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0.5,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": 0,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0,
+          "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0.5,
+          "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_cream_cheese_and_place_it_in_the_basket::use_swap": 0,
+          "libero_object::pick_up_the_milk_and_place_it_in_the_basket::use_environment": 0
+        },
+        "per_variant": {
+          "use_environment": {
+            "successes": 12,
+            "episodes": 16,
+            "success_rate": 0.75
+          },
+          "use_swap": {
+            "successes": 2,
+            "episodes": 12,
+            "success_rate": 0.16666666666666666
+          }
+        }
+      },
+      {
+        "tasks_learned": 15,
+        "seen_average_success": 0.5333333333333333,
+        "current_task_success": 1,
+        "forgetting": 0.14285714285714285,
+        "backward_transfer": 0.07142857142857142,
+        "per_task_forgetting": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 0.5,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0.5,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0.5,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": 0,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0.5,
+          "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0,
+          "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_cream_cheese_and_place_it_in_the_basket::use_swap": 0,
+          "libero_object::pick_up_the_milk_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_orange_juice_and_place_it_in_the_basket::use_environment": 0
+        },
+        "per_task_backward_transfer": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 0,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": 0,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0,
+          "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0.5,
+          "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_cream_cheese_and_place_it_in_the_basket::use_swap": 0.5,
+          "libero_object::pick_up_the_milk_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_orange_juice_and_place_it_in_the_basket::use_environment": 0
+        },
+        "per_variant": {
+          "use_environment": {
+            "successes": 11,
+            "episodes": 16,
+            "success_rate": 0.6875
+          },
+          "use_swap": {
+            "successes": 5,
+            "episodes": 14,
+            "success_rate": 0.35714285714285715
+          }
+        }
+      },
+      {
+        "tasks_learned": 16,
+        "seen_average_success": 0.53125,
+        "current_task_success": 0.5,
+        "forgetting": 0.13333333333333333,
+        "backward_transfer": 0.06666666666666667,
+        "per_task_forgetting": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 1,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": 0,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0.5,
+          "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0.5,
+          "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_cream_cheese_and_place_it_in_the_basket::use_swap": 0,
+          "libero_object::pick_up_the_milk_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_orange_juice_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_tomato_sauce_and_place_it_in_the_basket::use_swap": 0
+        },
+        "per_task_backward_transfer": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": -0.5,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0.5,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0.5,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": 0,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0,
+          "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0,
+          "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_cream_cheese_and_place_it_in_the_basket::use_swap": 0.5,
+          "libero_object::pick_up_the_milk_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_orange_juice_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_tomato_sauce_and_place_it_in_the_basket::use_swap": 0
+        },
+        "per_variant": {
+          "use_environment": {
+            "successes": 12,
+            "episodes": 16,
+            "success_rate": 0.75
+          },
+          "use_swap": {
+            "successes": 5,
+            "episodes": 16,
+            "success_rate": 0.3125
+          }
+        }
+      },
+      {
+        "tasks_learned": 17,
+        "seen_average_success": 0.4117647058823529,
+        "current_task_success": 0.5,
+        "forgetting": 0.25,
+        "backward_transfer": -0.0625,
+        "per_task_forgetting": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 1,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0.5,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 1,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": 0,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0,
+          "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0,
+          "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_cream_cheese_and_place_it_in_the_basket::use_swap": 0.5,
+          "libero_object::pick_up_the_milk_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_orange_juice_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_tomato_sauce_and_place_it_in_the_basket::use_swap": 0.5,
+          "libero_spatial::pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate::use_swap": 0.5
+        },
+        "per_task_backward_transfer": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": -0.5,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": -0.5,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": 0,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0.5,
+          "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0.5,
+          "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_cream_cheese_and_place_it_in_the_basket::use_swap": 0,
+          "libero_object::pick_up_the_milk_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_orange_juice_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_tomato_sauce_and_place_it_in_the_basket::use_swap": -0.5,
+          "libero_spatial::pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate::use_swap": -0.5
+        },
+        "per_variant": {
+          "use_environment": {
+            "successes": 10,
+            "episodes": 18,
+            "success_rate": 0.5555555555555556
+          },
+          "use_swap": {
+            "successes": 4,
+            "episodes": 16,
+            "success_rate": 0.25
+          }
+        }
+      },
+      {
+        "tasks_learned": 18,
+        "seen_average_success": 0.5,
+        "current_task_success": 1,
+        "forgetting": 0.20588235294117646,
+        "backward_transfer": 0,
+        "per_task_forgetting": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 0.5,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0.5,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0.5,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": 1,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0,
+          "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0,
+          "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_cream_cheese_and_place_it_in_the_basket::use_swap": 0,
+          "libero_object::pick_up_the_milk_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_orange_juice_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_tomato_sauce_and_place_it_in_the_basket::use_swap": 1,
+          "libero_spatial::pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate::use_swap": 0,
+          "libero_spatial::pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate::use_environment": 0
+        },
+        "per_task_backward_transfer": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 0,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": -1,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0.5,
+          "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0.5,
+          "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_cream_cheese_and_place_it_in_the_basket::use_swap": 0.5,
+          "libero_object::pick_up_the_milk_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_orange_juice_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_tomato_sauce_and_place_it_in_the_basket::use_swap": -1,
+          "libero_spatial::pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate::use_swap": 0,
+          "libero_spatial::pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate::use_environment": 0.5
+        },
+        "per_variant": {
+          "use_environment": {
+            "successes": 11,
+            "episodes": 18,
+            "success_rate": 0.6111111111111112
+          },
+          "use_swap": {
+            "successes": 7,
+            "episodes": 18,
+            "success_rate": 0.3888888888888889
+          }
+        }
+      },
+      {
+        "tasks_learned": 19,
+        "seen_average_success": 0.47368421052631576,
+        "current_task_success": 0.5,
+        "forgetting": 0.2222222222222222,
+        "backward_transfer": -0.027777777777777776,
+        "per_task_forgetting": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 1,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0.5,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": 0.5,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0.5,
+          "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0.5,
+          "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_cream_cheese_and_place_it_in_the_basket::use_swap": 0,
+          "libero_object::pick_up_the_milk_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_orange_juice_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_tomato_sauce_and_place_it_in_the_basket::use_swap": 0.5,
+          "libero_spatial::pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate::use_swap": 0.5,
+          "libero_spatial::pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate::use_environment": 0,
+          "libero_spatial::pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate::use_swap": 0
+        },
+        "per_task_backward_transfer": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": -0.5,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0.5,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": -0.5,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0,
+          "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0,
+          "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_cream_cheese_and_place_it_in_the_basket::use_swap": 0.5,
+          "libero_object::pick_up_the_milk_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_orange_juice_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_tomato_sauce_and_place_it_in_the_basket::use_swap": -0.5,
+          "libero_spatial::pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate::use_swap": -0.5,
+          "libero_spatial::pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate::use_environment": 0.5,
+          "libero_spatial::pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate::use_swap": 0
+        },
+        "per_variant": {
+          "use_environment": {
+            "successes": 12,
+            "episodes": 18,
+            "success_rate": 0.6666666666666666
+          },
+          "use_swap": {
+            "successes": 6,
+            "episodes": 20,
+            "success_rate": 0.3
+          }
+        }
+      },
+      {
+        "tasks_learned": 20,
+        "seen_average_success": 0.45,
+        "current_task_success": 0,
+        "forgetting": 0.21052631578947367,
+        "backward_transfer": -0.02631578947368421,
+        "per_task_forgetting": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 1,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0.5,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0.5,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": 0.5,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0,
+          "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0.5,
+          "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_cream_cheese_and_place_it_in_the_basket::use_swap": 0,
+          "libero_object::pick_up_the_milk_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_orange_juice_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_tomato_sauce_and_place_it_in_the_basket::use_swap": 0,
+          "libero_spatial::pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate::use_swap": 0.5,
+          "libero_spatial::pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate::use_environment": 0,
+          "libero_spatial::pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate::use_swap": 0,
+          "libero_spatial::pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate::use_swap": 0.5
+        },
+        "per_task_backward_transfer": {
+          "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+          "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": -0.5,
+          "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+          "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+          "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0,
+          "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0,
+          "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+          "libero_goal::put_the_bowl_on_the_plate::use_environment": -0.5,
+          "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0.5,
+          "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0,
+          "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_cream_cheese_and_place_it_in_the_basket::use_swap": 0.5,
+          "libero_object::pick_up_the_milk_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_orange_juice_and_place_it_in_the_basket::use_environment": 0,
+          "libero_object::pick_up_the_tomato_sauce_and_place_it_in_the_basket::use_swap": 0,
+          "libero_spatial::pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate::use_swap": -0.5,
+          "libero_spatial::pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate::use_environment": 0.5,
+          "libero_spatial::pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate::use_swap": 0,
+          "libero_spatial::pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate::use_swap": -0.5
+        },
+        "per_variant": {
+          "use_environment": {
+            "successes": 11,
+            "episodes": 20,
+            "success_rate": 0.55
+          },
+          "use_swap": {
+            "successes": 7,
+            "episodes": 20,
+            "success_rate": 0.35
+          }
+        }
+      }
+    ],
+    "metric_role": "development_heldout",
+    "evaluation_controls_training": false,
+    "forgetting_definition": "mean over previous tasks of best observed post-learning success minus current success",
+    "bwt_definition": "mean over previous tasks of current success minus success immediately after learning",
+    "v44_reference": [
+      0,
+      0,
+      0,
+      0,
+      0.5,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0.5,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0.5
+    ],
+    "latest": {
+      "tasks_learned": 20,
+      "seen_average_success": 0.45,
+      "current_task_success": 0,
+      "forgetting": 0.21052631578947367,
+      "backward_transfer": -0.02631578947368421,
+      "per_task_forgetting": {
+        "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+        "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": 1,
+        "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+        "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+        "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0.5,
+        "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0.5,
+        "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+        "libero_goal::put_the_bowl_on_the_plate::use_environment": 0.5,
+        "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0,
+        "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0.5,
+        "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment": 0,
+        "libero_object::pick_up_the_cream_cheese_and_place_it_in_the_basket::use_swap": 0,
+        "libero_object::pick_up_the_milk_and_place_it_in_the_basket::use_environment": 0,
+        "libero_object::pick_up_the_orange_juice_and_place_it_in_the_basket::use_environment": 0,
+        "libero_object::pick_up_the_tomato_sauce_and_place_it_in_the_basket::use_swap": 0,
+        "libero_spatial::pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate::use_swap": 0.5,
+        "libero_spatial::pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate::use_environment": 0,
+        "libero_spatial::pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate::use_swap": 0,
+        "libero_spatial::pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate::use_swap": 0.5
+      },
+      "per_task_backward_transfer": {
+        "libero_10::KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it::use_environment": 0,
+        "libero_10::KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it::use_environment": -0.5,
+        "libero_10::LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket::use_swap": 0,
+        "libero_10::LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate::use_swap": 0,
+        "libero_10::STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy::use_environment": 0,
+        "libero_goal::open_the_middle_drawer_of_the_cabinet::use_environment": 0,
+        "libero_goal::push_the_plate_to_the_front_of_the_stove::use_swap": 0,
+        "libero_goal::put_the_bowl_on_the_plate::use_environment": -0.5,
+        "libero_goal::put_the_cream_cheese_in_the_bowl::use_swap": 0.5,
+        "libero_goal::put_the_wine_bottle_on_top_of_the_cabinet::use_swap": 0,
+        "libero_object::pick_up_the_chocolate_pudding_and_place_it_in_the_basket::use_environment": 0,
+        "libero_object::pick_up_the_cream_cheese_and_place_it_in_the_basket::use_swap": 0.5,
+        "libero_object::pick_up_the_milk_and_place_it_in_the_basket::use_environment": 0,
+        "libero_object::pick_up_the_orange_juice_and_place_it_in_the_basket::use_environment": 0,
+        "libero_object::pick_up_the_tomato_sauce_and_place_it_in_the_basket::use_swap": 0,
+        "libero_spatial::pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate::use_swap": -0.5,
+        "libero_spatial::pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate::use_environment": 0.5,
+        "libero_spatial::pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate::use_swap": 0,
+        "libero_spatial::pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate::use_swap": -0.5
+      },
+      "per_variant": {
+        "use_environment": {
+          "successes": 11,
+          "episodes": 20,
+          "success_rate": 0.55
+        },
+        "use_swap": {
+          "successes": 7,
+          "episodes": 20,
+          "success_rate": 0.35
+        }
+      }
+    }
+  },
+  "stage_evaluations": [
+    {
+      "stage": 1,
+      "episodes": 2,
+      "successes": 0,
+      "completed_at": "2026-09-14T11:30:17.066578+00:00"
+    },
+    {
+      "stage": 2,
+      "episodes": 4,
+      "successes": 1,
+      "completed_at": "2026-09-14T15:44:14.885660+00:00"
+    },
+    {
+      "stage": 3,
+      "episodes": 6,
+      "successes": 2,
+      "completed_at": "2026-09-14T19:46:29.593786+00:00"
+    },
+    {
+      "stage": 4,
+      "episodes": 8,
+      "successes": 0,
+      "completed_at": "2026-09-14T23:55:45.490760+00:00"
+    },
+    {
+      "stage": 5,
+      "episodes": 10,
+      "successes": 1,
+      "completed_at": "2026-09-15T03:44:10.319575+00:00"
+    },
+    {
+      "stage": 6,
+      "episodes": 12,
+      "successes": 1,
+      "completed_at": "2026-09-15T06:56:13.449722+00:00"
+    },
+    {
+      "stage": 7,
+      "episodes": 14,
+      "successes": 0,
+      "completed_at": "2026-09-15T10:19:44.771913+00:00"
+    },
+    {
+      "stage": 8,
+      "episodes": 16,
+      "successes": 3,
+      "completed_at": "2026-09-15T13:37:34.596504+00:00"
+    },
+    {
+      "stage": 9,
+      "episodes": 18,
+      "successes": 4,
+      "completed_at": "2026-09-15T16:48:46.116330+00:00"
+    },
+    {
+      "stage": 10,
+      "episodes": 20,
+      "successes": 2,
+      "completed_at": "2026-09-15T20:11:04.125016+00:00"
+    },
+    {
+      "stage": 11,
+      "episodes": 22,
+      "successes": 7,
+      "completed_at": "2026-09-15T23:39:01.976353+00:00"
+    },
+    {
+      "stage": 12,
+      "episodes": 24,
+      "successes": 8,
+      "completed_at": "2026-09-16T03:21:31.565548+00:00"
+    },
+    {
+      "stage": 13,
+      "episodes": 26,
+      "successes": 11,
+      "completed_at": "2026-09-16T07:10:29.724791+00:00"
+    },
+    {
+      "stage": 14,
+      "episodes": 28,
+      "successes": 14,
+      "completed_at": "2026-09-16T11:16:12.278537+00:00"
+    },
+    {
+      "stage": 15,
+      "episodes": 30,
+      "successes": 16,
+      "completed_at": "2026-09-16T15:15:29.678452+00:00"
+    },
+    {
+      "stage": 16,
+      "episodes": 32,
+      "successes": 17,
+      "completed_at": "2026-09-16T18:40:50.116411+00:00"
+    },
+    {
+      "stage": 17,
+      "episodes": 34,
+      "successes": 14,
+      "completed_at": "2026-09-16T22:12:47.036578+00:00"
+    },
+    {
+      "stage": 18,
+      "episodes": 36,
+      "successes": 18,
+      "completed_at": "2026-09-17T01:43:55.528111+00:00"
+    },
+    {
+      "stage": 19,
+      "episodes": 38,
+      "successes": 18,
+      "completed_at": "2026-09-17T05:26:04.914572+00:00"
+    },
+    {
+      "stage": 20,
+      "episodes": 40,
+      "successes": 18,
+      "completed_at": "2026-09-17T09:40:34.062825+00:00"
+    }
+  ],
+  "total_stage_episodes": 420,
+  "final_episode_file_sha256": "a08e9a694ded62e8080dc126e51bd0a16f512c86279acd828a23fd59154f27e9"
+}

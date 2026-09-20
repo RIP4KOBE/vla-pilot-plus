@@ -46,6 +46,7 @@ class DiffusionPolicySteer(DiffusionPolicy):
     """
 
     name = "diffusion_steer"
+    _steering_limits_native = True
 
     def __init__(self, config: DiffusionConfig):
         super().__init__(config)
@@ -63,7 +64,11 @@ class DiffusionPolicySteer(DiffusionPolicy):
         self._postprocessor = postprocessor
         self._sample_batch_size = sample_batch_size
         if policy_config is not None:
-            action_horizon = policy_config.get('action_horizon', 8)
+            # Hydra's public contract is `action_chunk_horizon`; accepting the
+            # old spelling as a fallback keeps historical configs readable.
+            action_horizon = policy_config.get(
+                'action_chunk_horizon', policy_config.get('action_horizon', 8)
+            )
         else:
             action_horizon = 8
         self.config.n_action_steps = action_horizon
@@ -132,7 +137,8 @@ class DiffusionPolicySteer(DiffusionPolicy):
         global_step: int = 0,
         current_stage: int = 1,
     ) -> Tensor:
-
+        from core.steering_limits import bounded_steering_scales
+        guide_scale, diversity_scale = bounded_steering_scales(self, guide_scale, diversity_scale)
         if batch is None:
             raise ValueError("batch cannot be None")
             

@@ -16,11 +16,15 @@ libero:
   camera_name: agentview_image, robot0_eye_in_hand_image
   obs_type: pixels_agent_pos
   render_mode: rgb_array
+  # hgpu1 has 9 EGL devices; only device index 8 can initialize a headless
+  # display inside the current container.  Override for a different host.
+  render_gpu_device_id: 8
   observation_width: 128  # Resolution for policy observation (low-res for speed)
   observation_height: 128
   visualization_width: 640  # Resolution for VLM/video (high-res for quality)
   visualization_height: 640
   init_states: true
+  auto_reset: false
   num_steps_wait: 5
   max_episode_steps: 720
   vlm_camera: agentview

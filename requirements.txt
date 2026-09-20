@@ -44,6 +44,7 @@ executing==2.2.1
 Farama-Notifications==0.0.4
 fast_kinematics==0.2.2
 fastjsonschema==2.21.2
+fastapi==0.116.1
 filelock==3.20.0
 fonttools==4.60.1
 freetype-py==2.5.1
@@ -56,10 +57,11 @@ glfw==2.10.0
 google-ai-generativelanguage==0.6.15
 google-api-core==2.28.1
 google-api-python-client==2.187.0
-google-auth==2.45.0
+google-auth==2.56.3
 google-auth-httplib2==0.3.0
 google-crc32c==1.7.1
 google-generativeai==0.8.6
+google-genai==2.17.0
 googleapis-common-protos==1.72.0
 grpcio==1.75.1
 grpcio-status==1.71.2
@@ -157,8 +159,8 @@ pyasn1==0.6.1
 pyasn1_modules==0.4.2
 pybullet==3.2.7
 pycollada==0.6
-pydantic==2.12.2
-pydantic_core==2.41.4
+pydantic==2.12.5
+pydantic_core==2.41.5
 pyglet==2.1.11
 Pygments==2.19.2
 pynput==1.8.1
@@ -224,6 +226,7 @@ tzdata==2025.2
 urdfpy==0.0.22
 uritemplate==4.2.0
 urllib3==2.5.0
+uvicorn[standard]==0.35.0
 wandb==0.21.4
 wcwidth==0.2.14
 wheel==0.45.1

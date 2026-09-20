@@ -1,0 +1,44 @@
+{
+  "schema_version": "baseline-main-slow-loop-source-v1",
+  "source_host": "hgpu1",
+  "captured_at": "2026-09-14T08:25:01.851761+00:00",
+  "original_files": {
+    "training.py": "mode_gate/training.py",
+    "candidates.py": "mode_gate/candidates.py",
+    "checkpoint_math.py": "mode_gate/checkpoint_math.py",
+    "io_utils.py": "mode_gate/io_utils.py",
+    "coft_recovery.py": "mode_gate/coft_recovery.py",
+    "native_lerobot_train.py": "third_party/lerobot/src/lerobot/scripts/lerobot_train.py",
+    "candidate_experiment.json": "configs/candidate_experiment.json"
+  },
+  "pinned_files": {
+    "training.py": "c21d47ad6a45b000a8143d848b4ef639578fbe12167b02993efce139698e3740",
+    "candidates.py": "58c9effa99f9f4795e60a2d122e94fe0305e9e2d5866176c3ae5299d4547b372",
+    "checkpoint_math.py": "5a95d64aa94ccdc6ea2d77619ed645267bb9ef0762361b8505a5ed86cebb781c",
+    "io_utils.py": "76e622d645cb9c27467d30d877e021329330009eab7b5d9e6862a802a91bd601",
+    "coft_recovery.py": "2029015b6fb19695cb378577f18da42c3524020c6d29c4dc5bd07d9c7b759250",
+    "native_lerobot_train.py": "5ccbf8e34c3b8ace89ff7a9b47dbb7388b981a175e05b4b387b48c2bbf1b7104",
+    "candidate_experiment.json": "04758e30bba61f95b4376c15221d105a93a507f2fb2b088d25ac93fbd8433537",
+    "__init__.py": "a0d37a7eac76af0dd76bb17500c249330d8cb2d88bb94bfacfa44dcf4c700f58"
+  },
+  "runtime_dependencies": {
+    "third_party/lerobot/src/lerobot/policies/pi05/modeling_pi05.py": "ce291289d534ab97fe7ac530a8d69c52cc3fc1af5ac5a4ad13ac50b99b00892d",
+    "third_party/lerobot/src/lerobot/policies/pi05/configuration_pi05.py": "b733a8c62c2f99319dc41f4ba03840676c6c35cd3878901c65fe7fe071f3a35e",
+    "third_party/lerobot/src/lerobot/policies/pretrained.py": "4d5a42bd475c7beca2ec899b7fcf7a0d890edc4234d143e4397c9999edafc39e",
+    "third_party/lerobot/src/lerobot/policies/factory.py": "cd7ea65567c975488a5860e41357f4fd70f1d02e45f4bacccc5a08759f1c914f",
+    "third_party/lerobot/src/lerobot/datasets/factory.py": "ab3b252e0f777e4d41ea54dfaf7b800fe04ace551b6410f7b979300b660be320",
+    "third_party/lerobot/src/lerobot/datasets/lerobot_dataset.py": "b7d63fe7d37308de876a28f0b8293c4da939aa9b7580c2a0d43b9237163f6be5",
+    "third_party/lerobot/src/lerobot/configs/train.py": "d7e6ad407b3eda60f17eef41f3e3d266ca13dba5e34c0c4abb904427c1ba4232",
+    "third_party/lerobot/src/lerobot/utils/train_utils.py": "02f847746cf83b80f3a2aaa1a443ab0ff206227a95b5dfab21fee6cf2e7bb25f",
+    "third_party/lerobot/src/lerobot/optim/factory.py": "edf8d89ccb778d45588a2b8e23fa85de27a75a8b06332fd23da614860f01f9bb",
+    "third_party/lerobot/src/lerobot/optim/schedulers.py": "c10ecb33db6afd0edf22c220fed3e1a0612bca3c8643a0b0a8108da112e05bb6"
+  },
+  "packages": {
+    "torch": "2.7.1+cu128",
+    "accelerate": "1.12.0",
+    "transformers": "4.53.3",
+    "safetensors": "0.6.2",
+    "datasets": "4.1.1"
+  },
+  "notes": "Pure sampling/checkpoint math/recovery and native trainer copied verbatim; no planner or registry is imported by this baseline."
+}

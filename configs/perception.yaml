@@ -18,6 +18,10 @@ keypoint_detector:
   # Feature extractor: dinov3_vitb16, dinov3_vitl16, dinov2_vits14, dinov2_vitb14, etc.
   # dinov3 models require gated HF access; use dinov2 unless access is granted.
   feature_extractor: dinov2_vitb14
+  # Formal hgpu1 runs are offline and fail closed if either frozen asset is
+  # missing.  Never let torch.hub download mutable code or weights mid-episode.
+  dinov2_repo_path: /shared/hengyil6/vls/cache/torch/hub/facebookresearch_dinov2_main
+  dinov2_weights_path: /shared/hengyil6/vls/cache/torch/hub/checkpoints/dinov2_vitb14_pretrain.pth
 
 # ============================================================
 # VLM Agent (for guidance generation)
@@ -37,12 +41,15 @@ sam3:
   enabled: false            # SAM3 can't detect small objects well
 
 # ============================================================
-# Gemini Grounding (preferred for visual grounding)
+# Account planner grounding (legacy config section name)
 # ============================================================
 gemini_grounding:
   enabled: true
-  api_key: null             # Reads GOOGLE_API_KEY env var; set in .env
-  model: gemini-2.5-flash
+  api_key: null             # Unused: native Codex account task, no API credentials
+  model: gpt-6-astra
+  thinking_level: ultra
+  max_provider_calls: ${mode_gate.factual_provider_call_limit}
+  call_ledger_path: ${mode_gate.planner_call_ledger}
   
   # Default objects to detect (overridden per task)
   default_objects:
@@ -55,9 +62,11 @@ gemini_grounding:
     - pink cube
 
 # ============================================================
-# Gemini Stage Recognition (for real-time stage + guidance decisions)
+# Account planner stage recognition (legacy config section name)
 # ============================================================
 gemini:
-  api_key: null             # Reads GOOGLE_API_KEY env var; set in .env
-  model: gemini-2.5-flash
-
+  api_key: null             # Unused: native Codex account task, no API credentials
+  model: gpt-6-astra
+  thinking_level: ultra
+  max_provider_calls: ${mode_gate.factual_provider_call_limit}
+  call_ledger_path: ${mode_gate.planner_call_ledger}

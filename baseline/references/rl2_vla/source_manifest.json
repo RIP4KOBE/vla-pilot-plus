@@ -1,0 +1,90 @@
+[
+  {
+    "repo": "qam",
+    "commit": "56084df5a17bec4bfd55e8bf881754e551e329c0",
+    "path": "train_latents.sh",
+    "local": "baseline/references/rl2_vla/qam_pinned/train_latents.sh",
+    "url": "https://raw.githubusercontent.com/rl2-vla/qam/56084df5a17bec4bfd55e8bf881754e551e329c0/train_latents.sh",
+    "sha256": "a33568b6156bfc72e72d8b516a001eea14af1ac1b0296220f9f939be751ee1f9"
+  },
+  {
+    "repo": "qam",
+    "commit": "1c681f71d3481164191eb978ecd2c65be9b82e2e",
+    "path": "train_latents.sh",
+    "local": "baseline/references/rl2_vla/qam_train/train_latents.sh",
+    "url": "https://raw.githubusercontent.com/rl2-vla/qam/1c681f71d3481164191eb978ecd2c65be9b82e2e/train_latents.sh",
+    "sha256": "a33568b6156bfc72e72d8b516a001eea14af1ac1b0296220f9f939be751ee1f9"
+  },
+  {
+    "repo": "qam",
+    "commit": "1c681f71d3481164191eb978ecd2c65be9b82e2e",
+    "path": "agents/qam.py",
+    "local": "baseline/references/rl2_vla/qam_train/agents/qam.py",
+    "url": "https://raw.githubusercontent.com/rl2-vla/qam/1c681f71d3481164191eb978ecd2c65be9b82e2e/agents/qam.py",
+    "sha256": "508a77bf1ababd9584b023fa228f0e2dc2749d191d9c34ca4b5ed5d7f1c23cd1"
+  },
+  {
+    "repo": "qam",
+    "commit": "1c681f71d3481164191eb978ecd2c65be9b82e2e",
+    "path": "main.py",
+    "local": "baseline/references/rl2_vla/qam_train/main.py",
+    "url": "https://raw.githubusercontent.com/rl2-vla/qam/1c681f71d3481164191eb978ecd2c65be9b82e2e/main.py",
+    "sha256": "e6fbaf8da9dc928b3b63aef486354458e091b8e48b205b71dcb06571b5b40cfb"
+  },
+  {
+    "repo": "SAFE",
+    "commit": "de285232f1d4e45ba435732d21952a1dd5f42821",
+    "path": "scripts/batch_training/logs/SAVED/rl2_pi0_bridge_safe_ckpt_combined_cp/config.yaml",
+    "local": "baseline/references/rl2_vla/safe/config.yaml",
+    "url": "https://raw.githubusercontent.com/rl2-vla/SAFE/de285232f1d4e45ba435732d21952a1dd5f42821/scripts/batch_training/logs/SAVED/rl2_pi0_bridge_safe_ckpt_combined_cp/config.yaml",
+    "sha256": "7a2527f1f5cfeef98399ead8f89472493a353ba178e87b1b1ec105de706ea270"
+  },
+  {
+    "repo": "SAFE",
+    "commit": "de285232f1d4e45ba435732d21952a1dd5f42821",
+    "path": "failure_prob/train.py",
+    "local": "baseline/references/rl2_vla/safe/train.py",
+    "url": "https://raw.githubusercontent.com/rl2-vla/SAFE/de285232f1d4e45ba435732d21952a1dd5f42821/failure_prob/train.py",
+    "sha256": "113fb5983a88c34daca825905047eb989161d65ad518586faef70a05bf33e2ec"
+  },
+  {
+    "repo": "SAFE",
+    "commit": "de285232f1d4e45ba435732d21952a1dd5f42821",
+    "path": "failure_prob/model/base.py",
+    "local": "baseline/references/rl2_vla/safe/base.py",
+    "url": "https://raw.githubusercontent.com/rl2-vla/SAFE/de285232f1d4e45ba435732d21952a1dd5f42821/failure_prob/model/base.py",
+    "sha256": "8d030dffceca10901aca1debc167324a6678ff52a23619249b45e0f34f97ae6a"
+  },
+  {
+    "repo": "SAFE",
+    "commit": "de285232f1d4e45ba435732d21952a1dd5f42821",
+    "path": "failure_prob/model/lstm.py",
+    "local": "baseline/references/rl2_vla/safe/lstm.py",
+    "url": "https://raw.githubusercontent.com/rl2-vla/SAFE/de285232f1d4e45ba435732d21952a1dd5f42821/failure_prob/model/lstm.py",
+    "sha256": "0d6aa1ca997de252c3cb378bab7359eb7bc4ee31d1a9c8274a9a06a031c83500"
+  },
+  {
+    "repo": "SAFE",
+    "commit": "de285232f1d4e45ba435732d21952a1dd5f42821",
+    "path": "failure_prob/data/utils.py",
+    "local": "baseline/references/rl2_vla/safe/utils.py",
+    "url": "https://raw.githubusercontent.com/rl2-vla/SAFE/de285232f1d4e45ba435732d21952a1dd5f42821/failure_prob/data/utils.py",
+    "sha256": "b25446e5cb50762aba4532bb17511acadb656173335b95620b2c653cd2220c3f"
+  },
+  {
+    "repo": "qam",
+    "commit": "1c681f71d3481164191eb978ecd2c65be9b82e2e",
+    "path": "utils/networks.py",
+    "local": "baseline/references/rl2_vla/qam_train/networks.py",
+    "url": "https://raw.githubusercontent.com/rl2-vla/qam/1c681f71d3481164191eb978ecd2c65be9b82e2e/utils/networks.py",
+    "sha256": "8ee2ddb92a2d0ed115da0fa8d2a419197baea256cdffe8b249b8b29058e1551d"
+  },
+  {
+    "repo": "SAFE",
+    "commit": "de285232f1d4e45ba435732d21952a1dd5f42821",
+    "path": "failure_prob/model/utils.py",
+    "local": "baseline/references/rl2_vla/safe/model_utils.py",
+    "url": "https://raw.githubusercontent.com/rl2-vla/SAFE/de285232f1d4e45ba435732d21952a1dd5f42821/failure_prob/model/utils.py",
+    "sha256": "54358ebde56d4afbe1f134e5c591f0fc10f47747e19bb64a0babc955f1ea177a"
+  }
+]

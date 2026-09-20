@@ -1,6 +1,9 @@
-import torch
-import numpy as np
+import ast
 import numbers
+import re
+
+import numpy as np
+import torch
 
 
 def get_device_from_parameters(model):
@@ -26,23 +29,270 @@ def merge_dicts(dicts):
         for k, v in d.items()
     }
     
+_SAFE_BUILTINS = {
+    "abs": abs,
+    "float": float,
+    "int": int,
+    "len": len,
+    "max": max,
+    "min": min,
+    "range": range,
+}
+
+_SAFE_TORCH_MEMBERS = {
+    "abs",
+    "acos",
+    "arange",
+    "cat",
+    "clamp",
+    "cos",
+    "cross",
+    "dot",
+    "exp",
+    "float16",
+    "float32",
+    "float64",
+    "full",
+    "linspace",
+    "log",
+    "long",
+    "max",
+    "mean",
+    "min",
+    "norm",
+    "ones",
+    "ones_like",
+    "pi",
+    "sigmoid",
+    "sin",
+    "softmax",
+    "sqrt",
+    "stack",
+    "sum",
+    "tanh",
+    "tensor",
+    "where",
+    "zeros",
+    "zeros_like",
+}
+
+_SAFE_TENSOR_MEMBERS = {
+    "abs",
+    "clamp",
+    "device",
+    "dtype",
+    "expand",
+    "float",
+    "long",
+    "max",
+    "mean",
+    "min",
+    "ndim",
+    "norm",
+    "permute",
+    "pow",
+    "repeat",
+    "reshape",
+    "shape",
+    "softmax",
+    "sqrt",
+    "square",
+    "squeeze",
+    "sum",
+    "to",
+    "transpose",
+    "unsqueeze",
+    "view",
+}
+
+
+class UnsafeGuidanceCode(ValueError):
+    """Raised before execution when generated guidance violates the AST policy."""
+
+
+class _GuidanceAstValidator(ast.NodeVisitor):
+    """Small expression language for differentiable, side-effect-free rewards."""
+
+    _FORBIDDEN_NODES = (
+        ast.AsyncFunctionDef,
+        ast.Await,
+        ast.ClassDef,
+        ast.Delete,
+        ast.DictComp,
+        ast.For,
+        ast.GeneratorExp,
+        ast.Global,
+        ast.If,
+        ast.IfExp,
+        ast.Import,
+        ast.ImportFrom,
+        ast.Lambda,
+        ast.ListComp,
+        ast.Nonlocal,
+        ast.Raise,
+        ast.SetComp,
+        ast.Try,
+        ast.While,
+        ast.With,
+        ast.Yield,
+        ast.YieldFrom,
+    )
+
+    def __init__(self) -> None:
+        self.function_names: set[str] = set()
+        self.current_function: str | None = None
+
+    def fail(self, node: ast.AST, message: str) -> None:
+        raise UnsafeGuidanceCode(
+            f"guidance AST rejected at line {getattr(node, 'lineno', '?')}: {message}"
+        )
+
+    def generic_visit(self, node: ast.AST) -> None:
+        if isinstance(node, self._FORBIDDEN_NODES):
+            self.fail(node, f"{type(node).__name__} is not allowed")
+        super().generic_visit(node)
+
+    def visit_Module(self, node: ast.Module) -> None:
+        if len(list(ast.walk(node))) > 500:
+            self.fail(node, "program exceeds the 500-node limit")
+        for statement in node.body:
+            if isinstance(statement, ast.FunctionDef):
+                self.visit(statement)
+            elif isinstance(statement, ast.Assign):
+                # Extraction may retain `num_stages = N`; only literal metadata is safe.
+                if (
+                    len(statement.targets) != 1
+                    or not isinstance(statement.targets[0], ast.Name)
+                    or statement.targets[0].id != "num_stages"
+                    or not isinstance(statement.value, ast.Constant)
+                    or not isinstance(statement.value.value, int)
+                ):
+                    self.fail(statement, "only literal top-level num_stages is allowed")
+            else:
+                self.fail(statement, "only stage guidance functions are allowed at top level")
+
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+        if not re.fullmatch(r"stage[1-9][0-9]*_guidance", node.name):
+            self.fail(node, "function name must match stageN_guidance")
+        if node.decorator_list or node.returns is not None:
+            self.fail(node, "decorators and annotations are not allowed")
+        args = node.args
+        if (
+            len(args.args) != 2
+            or args.posonlyargs
+            or args.kwonlyargs
+            or args.vararg is not None
+            or args.kwarg is not None
+            or args.defaults
+            or args.kw_defaults
+        ):
+            self.fail(node, "guidance functions require exactly two plain arguments")
+        if any(argument.arg.startswith("_") for argument in args.args):
+            self.fail(node, "private argument names are not allowed")
+        previous = self.current_function
+        self.current_function = node.name
+        self.function_names.add(node.name)
+        for statement in node.body:
+            self.visit(statement)
+        self.current_function = previous
+
+    def visit_Attribute(self, node: ast.Attribute) -> None:
+        if node.attr.startswith("_"):
+            self.fail(node, "private/dunder attribute access is not allowed")
+        dotted = self._dotted_name(node)
+        if dotted is not None and dotted.startswith("torch."):
+            parts = dotted.split(".")
+            if len(parts) != 2 or parts[1] not in _SAFE_TORCH_MEMBERS:
+                self.fail(node, f"torch member {dotted!r} is not allowlisted")
+        elif node.attr not in _SAFE_TENSOR_MEMBERS:
+            self.fail(node, f"tensor member {node.attr!r} is not allowlisted")
+        self.visit(node.value)
+
+    def visit_Call(self, node: ast.Call) -> None:
+        if isinstance(node.func, ast.Name):
+            if node.func.id not in _SAFE_BUILTINS:
+                self.fail(node, f"call to {node.func.id!r} is not allowed")
+            if node.func.id == self.current_function:
+                self.fail(node, "recursion is not allowed")
+        elif not isinstance(node.func, ast.Attribute):
+            self.fail(node, "indirect calls are not allowed")
+        self.generic_visit(node)
+
+    def visit_Name(self, node: ast.Name) -> None:
+        if node.id.startswith("_"):
+            self.fail(node, "private/dunder names are not allowed")
+        if isinstance(node.ctx, ast.Load) and node.id in {
+            "breakpoint",
+            "compile",
+            "eval",
+            "exec",
+            "getattr",
+            "globals",
+            "help",
+            "input",
+            "locals",
+            "open",
+            "setattr",
+            "vars",
+        }:
+            self.fail(node, f"name {node.id!r} is forbidden")
+
+    def visit_Assign(self, node: ast.Assign) -> None:
+        if not node.targets or any(not isinstance(target, ast.Name) for target in node.targets):
+            self.fail(node, "assignments may only create local names")
+        self.generic_visit(node)
+
+    def visit_AugAssign(self, node: ast.AugAssign) -> None:
+        if not isinstance(node.target, ast.Name):
+            self.fail(node, "augmented assignments may only update local names")
+        self.generic_visit(node)
+
+    @staticmethod
+    def _dotted_name(node: ast.AST) -> str | None:
+        parts: list[str] = []
+        current = node
+        while isinstance(current, ast.Attribute):
+            parts.append(current.attr)
+            current = current.value
+        if not isinstance(current, ast.Name):
+            return None
+        parts.append(current.id)
+        return ".".join(reversed(parts))
+
+
+def validate_guidance_ast(code_str: str) -> ast.Module:
+    if len(code_str.encode("utf-8")) > 32_768:
+        raise UnsafeGuidanceCode("guidance source exceeds the 32 KiB limit")
+    try:
+        tree = ast.parse(code_str, mode="exec")
+    except SyntaxError as exc:
+        raise UnsafeGuidanceCode(f"invalid guidance syntax: {exc}") from exc
+    validator = _GuidanceAstValidator()
+    validator.visit(tree)
+    if not validator.function_names:
+        raise UnsafeGuidanceCode("no stageN_guidance function found")
+    return tree
+
+
 def exec_safe(code_str, gvars=None, lvars=None):
-    # Allow import statements for VLM-generated guidance functions
-    banned_phrases = ['__']  # Only ban dunder methods for safety
-    for phrase in banned_phrases:
-        assert phrase not in code_str
-  
+    """Execute only the allowlisted tensor-expression subset of Python."""
+    tree = validate_guidance_ast(code_str)
     if gvars is None:
         gvars = {}
     if lvars is None:
         lvars = {}
-    empty_fn = lambda *args, **kwargs: None
-    custom_gvars = merge_dicts([
-        gvars,
-        {'exec': empty_fn, 'eval': empty_fn}
-    ])
+    unexpected_globals = set(gvars) - {"torch"}
+    if unexpected_globals:
+        raise UnsafeGuidanceCode(
+            f"unexpected guidance globals: {sorted(unexpected_globals)}"
+        )
+    custom_gvars = {
+        "__builtins__": _SAFE_BUILTINS,
+        "torch": gvars.get("torch", torch),
+    }
     try:
-        exec(code_str, custom_gvars, lvars)
+        compiled = compile(tree, "<generated-guidance>", "exec")
+        exec(compiled, custom_gvars, lvars)
     except Exception as e:
         print(f'Error executing code:\n{code_str}')
         raise e
