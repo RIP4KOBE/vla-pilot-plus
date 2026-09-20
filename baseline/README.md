@@ -91,7 +91,7 @@ CLARE 先训练新 adapter，再训练该阶段的 AE discriminator，冻结历�
   --run-name clare_seed20260825_continue
 ```
 
-已学习任务会跳过。当前不提供阶段中途 optimizer 状态恢复；阶段中断需从上一个完成的阶段重跑。MLR-IFA 的 resume 还需要保留 artifact 引用的 latent files。
+已学习任务会跳过。CLARE、MLR-IFA 的阶段中断需从上一个完成的阶段重跑；MLR-IFA 还需要保留 artifact 引用的 latent files。两个 RL 方法支持 `--optimizer-resume`，其中 Continual RL 从完整采样组检查点恢复模型、优化器和随机状态。
 
 恢复时检查原始权重、归一化、tokenizer、protocol 和算法设置，并拒绝改变 action horizon 或 denoising 步数。RL² 的 `trigger`、`candidates`、`compose_mean`、`compose_std` 允许作为明确的推理消融配置覆盖，结果中会保存实际配置。
 
@@ -157,6 +157,7 @@ PI0.5 的确定性 flow ODE 没有现成 token log-probability。这里使用显
 ## 验证
 
 2026-09-11 两个 RL baseline 的初始化超时修复、采集前缀复用和优化器恢复说明见 [RECOVERY_20260911.md](RECOVERY_20260911.md)。
+2026-09-20 Continual RL 渲染超时的自动恢复、外部进程检查和单方法续跑见 [RECOVERY_20260920.md](RECOVERY_20260920.md)。
 
 CPU 测试不加载模型或模拟器：
 

@@ -110,36 +110,43 @@ def main(argv=None):
         if cfg["method"] == "rl2_vla" and task_keys:
             raise ValueError("select RL2 tasks during collect; training uses the complete supplied rollout bank")
     from .resources import isolated_device
+    from .simulator_startup import monitor_startup
     with isolated_device(cfg):
         from .io import seed_all
         from .pi05 import Pi05Runtime
         seed_all(cfg["seed"])
         output = safe_output(cfg["output_root"], args.run_name, inputs=(cfg["checkpoint"], cfg["tokenizer"]))
         write_json(output / "config.json", cfg)
-        try:
-            runtime = Pi05Runtime(cfg)
-            write_json(output / "base_identity.json", runtime.identity)
-            if args.command == "train":
-                from .train import train_imitation, train_continual_rl, train_rl2
-                if cfg["method"] in ("clare", "mlr_ifa"):
-                    train_imitation(runtime, cfg, protocol, output, args.task_data, args.resume, args.task_key)
-                elif cfg["method"] == "continual_vla_rl":
-                    train_continual_rl(runtime, cfg, protocol, output, args.task_key, args.resume, args.continue_from,
-                                      args.optimizer_resume)
-                else:
-                    train_rl2(runtime, cfg, protocol, output, args.rollouts, args.resume, args.optimizer_resume)
-            elif args.command == "evaluate":
-                from .evaluation import evaluate
-                evaluate(runtime, cfg, protocol, output, artifact=args.artifact, split=args.split,
-                         limit=args.limit, task_keys=args.task_key)
-            elif args.command == "collect":
-                from .rollout import collect_rollouts
-                collect_rollouts(runtime, cfg, protocol, output, repeats=args.repeats, limit=args.limit, task_keys=args.task_key,
-                                 continue_from=args.continue_from)
-            elif args.command == "smoke":
-                from .smoke import smoke
-                smoke(runtime, cfg, protocol, output, with_environment=args.with_environment)
-            write_json(output / "status.json", {"status": "complete", "command": args.command})
-        except Exception as exc:
-            write_json(output / "status.json", {"status": "failed", "error_type": type(exc).__name__, "error": str(exc)})
-            raise
+        with monitor_startup(output if cfg["method"] == "continual_vla_rl" else None):
+            _run_command(args, cfg, protocol, output, Pi05Runtime)
+
+
+def _run_command(args, cfg, protocol, output, runtime_type):
+    from .simulator_startup import failure_details
+    try:
+        runtime = runtime_type(cfg)
+        write_json(output / "base_identity.json", runtime.identity)
+        if args.command == "train":
+            from .train import train_imitation, train_continual_rl, train_rl2
+            if cfg["method"] in ("clare", "mlr_ifa"):
+                train_imitation(runtime, cfg, protocol, output, args.task_data, args.resume, args.task_key)
+            elif cfg["method"] == "continual_vla_rl":
+                train_continual_rl(runtime, cfg, protocol, output, args.task_key, args.resume, args.continue_from,
+                                   args.optimizer_resume)
+            else:
+                train_rl2(runtime, cfg, protocol, output, args.rollouts, args.resume, args.optimizer_resume)
+        elif args.command == "evaluate":
+            from .evaluation import evaluate
+            evaluate(runtime, cfg, protocol, output, artifact=args.artifact, split=args.split,
+                     limit=args.limit, task_keys=args.task_key)
+        elif args.command == "collect":
+            from .rollout import collect_rollouts
+            collect_rollouts(runtime, cfg, protocol, output, repeats=args.repeats, limit=args.limit, task_keys=args.task_key,
+                             continue_from=args.continue_from)
+        elif args.command == "smoke":
+            from .smoke import smoke
+            smoke(runtime, cfg, protocol, output, with_environment=args.with_environment)
+        write_json(output / "status.json", {"status": "complete", "command": args.command})
+    except Exception as exc:
+        write_json(output / "status.json", {"status": "failed", **failure_details(exc)})
+        raise

@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from .io import load_tensors, save_tensors, to_cpu
+from .io import load_tensors, save_tensors, to_cpu, write_json
 from .scope import check_input_root
 
 
@@ -43,6 +43,13 @@ def save_checkpoint(path, method, optimizer, scheduler, rng, runtime, cfg, proto
         "scheduler": scheduler.state_dict(), "random": random_state(rng),
         "groups_completed": groups_completed, "stage_updates": stage_updates,
         "updates": updates, "environment_steps": environment_steps})
+    # The scheduler need not import torch or load model tensors to distinguish
+    # repeated failures from real progress. Publish only AFTER the atomic save.
+    info = Path(path).stat()
+    write_json(Path(path).with_suffix(".progress.json"), {
+        "task_key": task_key, "groups_completed": groups_completed,
+        "stage_updates": stage_updates, "updates": updates,
+        "checkpoint_size": info.st_size, "checkpoint_mtime_ns": info.st_mtime_ns})
 
 
 def read_checkpoint(path, runtime, cfg, protocol, task_keys=None):

@@ -15,6 +15,8 @@ from .io import read_json, write_json, safe_output
 from .protocol import Protocol
 from .scope import scope_identity
 from .offline_bank import merged_bank
+from .process_watch import verified_worker, ExistingWorker
+from .rl_recovery import prepare_resume, retry_failed_startup, stop_timed_out_worker
 
 
 def now():
@@ -130,7 +132,6 @@ def run(args):
     for job in state["jobs"]:
         if job.get("returncode") is not None:
             continue
-        from .process_watch import verified_worker, ExistingWorker
         identity = verified_worker(job)
         if identity is not None:
             if not getattr(args, "adopt_running", False):
@@ -150,11 +151,7 @@ def run(args):
         else:
             job.update(returncode=-1, interrupted=True)
     if args.resume:
-        for method, item in state["methods"].items():
-            if item["state"] == "COMPLETE" or method in busy_owners:
-                continue
-            item.update(state="QUEUED")
-            item.pop("error", None)
+        prepare_resume(state, busy_owners, getattr(args, "resume_methods", None))
         recover_failed_inputs(state, root, busy_owners)
     state.update(pid=os.getpid(), gpu_indices=args.gpus, max_simultaneous_gpu_workers=len(args.gpus),
                  method_gpu_indices={k: v for k, v in placement.items() if k in methods},
@@ -233,6 +230,8 @@ def run(args):
         for gpu, (child, job, log) in list(running.items()):
             code = child.poll()
             if code is None:
+                if stop_timed_out_worker(job, root / job["name"], configs[job["method"]]["protected_gpu_indices"]):
+                    report("RECOVERING_SIMULATOR")
                 continue
             if log is not None:
                 log.close()
@@ -240,6 +239,7 @@ def run(args):
             del running[gpu]
             if code:
                 state["methods"][job["owner"]].update(state="FAILED", error=f"exit {code}; {job['log']}")
+                retry_failed_startup(state, job, root)
             else:
                 try:
                     finished_job(state, job, root, len(order))
@@ -290,6 +290,9 @@ def run(args):
                     job = {k: v for k, v in spec.items() if k != "extra"}
                     job.update(name=name, pid=child.pid, gpu_index=gpu, gpu_uuid=rows[gpu][0], command=command,
                                log=str(log_path), started_at=now())
+                    identity = verified_worker(job)
+                    if identity is not None:
+                        job["process_start_ticks"] = identity["start_ticks"]
                     state["jobs"].append(job)
                     running[gpu] = (child, job, log)
                     state["methods"][owner].update(state="RUNNING", phase=spec["phase"], current_run=name, gpu_index=gpu)
@@ -310,6 +313,8 @@ def main():
     parser.add_argument("--ticket-root", type=Path, required=True)
     parser.add_argument("--collect-repeats", type=int, default=5)
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--resume-methods", nargs="+", choices=(*METHODS, "v44_reference"),
+                        help="reset only these queue owners when resuming; keep other failures retired")
     parser.add_argument("--adopt-running", action="store_true", help="resume monitoring verified workers during a scheduler handoff")
     parser.add_argument("--method-gpus", type=Path, help="JSON method_gpu_indices mapping inside the allowed GPU pool")
     parser.add_argument("--methods", nargs="+", choices=METHODS, help="run only these methods in a separate queue")
@@ -322,6 +327,8 @@ def main():
         parser.error("collect repeats must be positive")
     if args.adopt_running and not args.resume:
         parser.error("--adopt-running requires --resume")
+    if args.resume_methods and not args.resume:
+        parser.error("--resume-methods requires --resume")
     run(args)
 
 

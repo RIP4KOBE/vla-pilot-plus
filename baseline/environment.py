@@ -75,7 +75,7 @@ def make_environment(cfg, context):
 
 
 def reset_environment(adapter, context):
-    with startup_deadline(getattr(adapter, "_baseline_initialization_seconds", None)):
+    with startup_deadline(getattr(adapter, "_baseline_initialization_seconds", None), operation="reset"):
         adapter.reset(seed=context["seed"], init_state_id=context["init_state_id"])
     actual = adapter.get_context_provenance()
     for key in ("runtime_suite", "task_id", "task_index", "perturbation_variant", "init_state_id"):

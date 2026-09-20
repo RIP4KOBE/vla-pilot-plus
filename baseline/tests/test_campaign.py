@@ -100,6 +100,7 @@ def test_scheduler_fills_two_gpu_slots_without_waiting_for_demonstrations(tmp_pa
         created.append((command, kwargs["env"]["CUDA_VISIBLE_DEVICES"]))
         return child
     monkeypatch.setattr(campaign.subprocess, "Popen", popen)
+    monkeypatch.setattr(campaign, "verified_worker", lambda _: None)
     class EndCheck(Exception):
         pass
     monkeypatch.setattr(campaign.time, "sleep", lambda _: (_ for _ in ()).throw(EndCheck()))
