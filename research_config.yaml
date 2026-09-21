@@ -1,0 +1,13 @@
+task: Execute ARBOR_CONTRACT.md and docs/01_specs/2026-09-21-rdt-qd-ed-autoresearch-execution-prompt.md;
+  GPU7 only.
+coordinator:
+  max_cycles: 32
+  ui:
+    interaction_mode: auto
+budget:
+  max_gpu_hours: 48
+  max_episode_attempts: 240
+  formal_candidates: 1
+gpu_pool:
+- 7
+max_concurrent_gpu_workers: 1

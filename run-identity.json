@@ -1,0 +1,12 @@
+{
+  "run_id": "20260921T093925Z",
+  "run_name": "rdt-qd-ed-final-20260921T093925Z",
+  "branch": "exp/rdt-qd-ed-final-20260921T093925Z",
+  "worktree": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z",
+  "artifacts": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z",
+  "source_commit": "744e08ba4398f2f8e34fb05619c829fc01397f69",
+  "gpu_pool": [
+    7
+  ],
+  "max_concurrent_gpu_workers": 1
+}

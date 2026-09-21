@@ -1,0 +1,19 @@
+# RDT + QD + ED research contract
+
+- Run: `rdt-qd-ed-final-20260921T093925Z`; branch `exp/rdt-qd-ed-final-20260921T093925Z`; source `744e08ba4398f2f8e34fb05619c829fc01397f69`.
+- Target: `/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z`. Artifacts: `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z`.
+- User authorization: execute the 2026-09-21 task prompt autonomously; latest steering restricts **all GPU work to physical GPU7**, one worker, no external process sharing/preemption.
+- Objective: maximize valid task success; reach >=5/10 on historical fixed LIBERO-PRO object-swap acceptance, no worse than contemporaneous P2 and Q0, retain substantive QD and ED.
+- Baseline: historical Q0 sparse 2/10 (tasks 5,8), C0 P2 3/10 (3,8,9); Q1 expand20 tied 2/10 (5,7). New B_dev baseline unknown until measured.
+- Mode: real, effect-oriented with attributable mechanism changes; interaction auto within scope. No repeated routine approval.
+- Frozen: Object EMA checkpoint, observation/action contracts, Stage/cache/perception/prompt/reward provider, strict perturbation, task/success evaluator, 720 steps, 20 Hz, 8 executed actions/chunk.
+- Allowed: QD/EDS mechanism, observation-based ranking, archive/allocation/selection, scoped engineering fixes, CPU tests, authorized GPU7 evals and local commits. No learned-model training or unapproved simulator counterfactual branching.
+- Budget: 48 GPU-hours, 240 dispatched episode attempts including aborted/invalid/recovery; reserve 60 validation + 40 formal/ablation, allocate 20 baseline + 100 development + 20 recovery. No more than 1 final candidate.
+- Compute: 16 population, 10 iterations; full guided chunk 176 candidate evaluations / 11 score batches; record all model/reward/VLM/episode costs.
+- Splits: historical artifacts for diagnosis only; Dev for selection; Validation 20 candidate episodes (10 tasks x2 new seeds) + same-round P2/Q0, frozen before reveal, candidate >=10/20 and >= both controls. Formal 10 historical fixed acceptance tasks, plus P2/Q0 and computation-matched QD removal/replacement ablation. Validation is never used for targeted tuning.
+- Evaluation command: new owned runner to be frozen after infrastructure/profile audit; no inherited runner resume. All commands use {cwd} and {node_id}.
+- Protected: all old worktrees/artifacts/manifests read-only; forbidden old untracked stage-guidance design is not read/copied/modified. No main merge, push, publishing, external resource acquisition, or credential disclosure.
+- Stop: target accepted then finalize; any budget exhausted; one formal failure; or bounded targeted evidence review yields no new falsifiable in-scope hypothesis. Do not conflate study termination with target completion.
+- Current caveats: GPU7 externally occupied; runtime input/cache/profile equality and exposure registry pending audit.
+
+Source specification SHA-256: `3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef`. The user task specification prevails over generic Arbor defaults.
