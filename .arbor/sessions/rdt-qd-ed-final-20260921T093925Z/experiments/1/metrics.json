@@ -1,0 +1,10 @@
+{
+  "node_id": "1",
+  "hypothesis": "Mechanism: Evidence-separated causal diagnosis across proposal, selection, and closed-loop behavior.\nHypothesis: Historical aggregate proxy gains conceal unresolved failure classes; separating observed facts from counterfactual unknowns can identify a testable task-linked mechanism.\nObservable: A source-cited evidence matrix and bounded in-scope mechanism queue, with zero new episodes or invented success scores.\nConflicts: Historical H1/H2/H4/H5 negative outcomes remain valid; no direction is replayed without new evidence and a specific difference.",
+  "score": null,
+  "insight": "20/20 exact Q0 trace replays reproduce archive rewards and selected actions.82 true gripper-discordant eliminations,73/82 separable by fixed duty bins; no true unexecuted outcomes. Preserve historical negatives and distinguish cache repair.",
+  "result": "CPU diagnostic complete; zero online episodes; score unavailable.54 historical task/seed exposure cells registered.",
+  "branch": null,
+  "score_status": "unavailable_no_online_evaluation",
+  "parser_correction": "Generic report parser incorrectly inferred89.0 from a diagnostic percentage; corrected before dispatch, never admissible as task score."
+}

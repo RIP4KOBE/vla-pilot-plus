@@ -1,0 +1,1135 @@
+{
+  "backend_task_order": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "blocks": {
+    "dev": [
+      {
+        "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+        "env_seed": 1969522881,
+        "init_file_sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+        "init_index": 0,
+        "init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
+        "policy_seed": 1969522881,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|dev|task=0|collision=0",
+        "task_id": 0,
+        "task_name": "pick_up_the_alphabet_soup_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+        "env_seed": 1661846292,
+        "init_file_sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+        "init_index": 0,
+        "init_row_sha256": "2c0b399c52b759187483bbc0473bad47b366f3e5a3816f8ce98a5d37640a1725",
+        "policy_seed": 1661846292,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|dev|task=1|collision=0",
+        "task_id": 1,
+        "task_name": "pick_up_the_cream_cheese_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+        "env_seed": 496956836,
+        "init_file_sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+        "init_index": 0,
+        "init_row_sha256": "f77a5f5866952552461f703b40f853add2c13d75cbd54cd8fbbaae641db165c1",
+        "policy_seed": 496956836,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|dev|task=2|collision=0",
+        "task_id": 2,
+        "task_name": "pick_up_the_salad_dressing_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+        "env_seed": 851784825,
+        "init_file_sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+        "init_index": 0,
+        "init_row_sha256": "faa3e635dd29229f763f8748098f92543b7f680fb4212e7036ec49ba55d57c93",
+        "policy_seed": 851784825,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|dev|task=3|collision=0",
+        "task_id": 3,
+        "task_name": "pick_up_the_bbq_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+        "env_seed": 1144935104,
+        "init_file_sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+        "init_index": 0,
+        "init_row_sha256": "e773740b1d2927cb47331e1ff21a056e7118e6aef76681b8001521ff462c10a9",
+        "policy_seed": 1144935104,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|dev|task=4|collision=0",
+        "task_id": 4,
+        "task_name": "pick_up_the_ketchup_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+        "env_seed": 970869399,
+        "init_file_sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+        "init_index": 0,
+        "init_row_sha256": "b9ce167f1250d75a658ff60926d83963155810d20a06d45bdc84a30faf0f47a4",
+        "policy_seed": 970869399,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|dev|task=5|collision=0",
+        "task_id": 5,
+        "task_name": "pick_up_the_tomato_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+        "env_seed": 324717095,
+        "init_file_sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+        "init_index": 0,
+        "init_row_sha256": "aa4fe30bc10b84fcc2ee6b6d38448fbbf6bae9872c2092b0dd19f9b92aa98e11",
+        "policy_seed": 324717095,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|dev|task=6|collision=0",
+        "task_id": 6,
+        "task_name": "pick_up_the_butter_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+        "env_seed": 1541693852,
+        "init_file_sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+        "init_index": 0,
+        "init_row_sha256": "e7dfc87fb7c0a1315e209abb64da13fea1e37ea489253efeedeee7ea14548914",
+        "policy_seed": 1541693852,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|dev|task=7|collision=0",
+        "task_id": 7,
+        "task_name": "pick_up_the_milk_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+        "env_seed": 1709579522,
+        "init_file_sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+        "init_index": 0,
+        "init_row_sha256": "718f2fb31f45c25f9c3f1bcf7637ba8ec113b0773b6ce829c7f4b3d02c154555",
+        "policy_seed": 1709579522,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|dev|task=8|collision=0",
+        "task_id": 8,
+        "task_name": "pick_up_the_chocolate_pudding_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+        "env_seed": 1045350852,
+        "init_file_sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+        "init_index": 0,
+        "init_row_sha256": "d8309b31899377d1051f6d7da47edc747b294842a6fec748aff6c9b822d8797e",
+        "policy_seed": 1045350852,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|dev|task=9|collision=0",
+        "task_id": 9,
+        "task_name": "pick_up_the_orange_juice_and_place_it_in_the_basket"
+      }
+    ],
+    "formal": [
+      {
+        "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+        "env_seed": 44,
+        "init_file_sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+        "init_index": 0,
+        "init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
+        "policy_seed": 44,
+        "task_id": 0,
+        "task_name": "pick_up_the_alphabet_soup_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+        "env_seed": 235,
+        "init_file_sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+        "init_index": 0,
+        "init_row_sha256": "2c0b399c52b759187483bbc0473bad47b366f3e5a3816f8ce98a5d37640a1725",
+        "policy_seed": 235,
+        "task_id": 1,
+        "task_name": "pick_up_the_cream_cheese_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+        "env_seed": 43,
+        "init_file_sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+        "init_index": 0,
+        "init_row_sha256": "f77a5f5866952552461f703b40f853add2c13d75cbd54cd8fbbaae641db165c1",
+        "policy_seed": 43,
+        "task_id": 2,
+        "task_name": "pick_up_the_salad_dressing_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+        "env_seed": 546,
+        "init_file_sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+        "init_index": 0,
+        "init_row_sha256": "faa3e635dd29229f763f8748098f92543b7f680fb4212e7036ec49ba55d57c93",
+        "policy_seed": 546,
+        "task_id": 3,
+        "task_name": "pick_up_the_bbq_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+        "env_seed": 6,
+        "init_file_sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+        "init_index": 0,
+        "init_row_sha256": "e773740b1d2927cb47331e1ff21a056e7118e6aef76681b8001521ff462c10a9",
+        "policy_seed": 6,
+        "task_id": 4,
+        "task_name": "pick_up_the_ketchup_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+        "env_seed": 621,
+        "init_file_sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+        "init_index": 0,
+        "init_row_sha256": "b9ce167f1250d75a658ff60926d83963155810d20a06d45bdc84a30faf0f47a4",
+        "policy_seed": 621,
+        "task_id": 5,
+        "task_name": "pick_up_the_tomato_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+        "env_seed": 197,
+        "init_file_sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+        "init_index": 0,
+        "init_row_sha256": "aa4fe30bc10b84fcc2ee6b6d38448fbbf6bae9872c2092b0dd19f9b92aa98e11",
+        "policy_seed": 197,
+        "task_id": 6,
+        "task_name": "pick_up_the_butter_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+        "env_seed": 87,
+        "init_file_sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+        "init_index": 0,
+        "init_row_sha256": "e7dfc87fb7c0a1315e209abb64da13fea1e37ea489253efeedeee7ea14548914",
+        "policy_seed": 87,
+        "task_id": 7,
+        "task_name": "pick_up_the_milk_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+        "env_seed": 151,
+        "init_file_sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+        "init_index": 0,
+        "init_row_sha256": "718f2fb31f45c25f9c3f1bcf7637ba8ec113b0773b6ce829c7f4b3d02c154555",
+        "policy_seed": 151,
+        "task_id": 8,
+        "task_name": "pick_up_the_chocolate_pudding_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+        "env_seed": 548,
+        "init_file_sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+        "init_index": 0,
+        "init_row_sha256": "d8309b31899377d1051f6d7da47edc747b294842a6fec748aff6c9b822d8797e",
+        "policy_seed": 548,
+        "task_id": 9,
+        "task_name": "pick_up_the_orange_juice_and_place_it_in_the_basket"
+      }
+    ],
+    "validation_c1_b1": [
+      {
+        "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+        "env_seed": 1985224691,
+        "init_file_sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+        "init_index": 0,
+        "init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
+        "policy_seed": 1985224691,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c1_b1|task=0|collision=0",
+        "task_id": 0,
+        "task_name": "pick_up_the_alphabet_soup_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+        "env_seed": 515418294,
+        "init_file_sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+        "init_index": 0,
+        "init_row_sha256": "2c0b399c52b759187483bbc0473bad47b366f3e5a3816f8ce98a5d37640a1725",
+        "policy_seed": 515418294,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c1_b1|task=1|collision=0",
+        "task_id": 1,
+        "task_name": "pick_up_the_cream_cheese_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+        "env_seed": 774999438,
+        "init_file_sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+        "init_index": 0,
+        "init_row_sha256": "f77a5f5866952552461f703b40f853add2c13d75cbd54cd8fbbaae641db165c1",
+        "policy_seed": 774999438,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c1_b1|task=2|collision=0",
+        "task_id": 2,
+        "task_name": "pick_up_the_salad_dressing_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+        "env_seed": 1390688200,
+        "init_file_sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+        "init_index": 0,
+        "init_row_sha256": "faa3e635dd29229f763f8748098f92543b7f680fb4212e7036ec49ba55d57c93",
+        "policy_seed": 1390688200,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c1_b1|task=3|collision=0",
+        "task_id": 3,
+        "task_name": "pick_up_the_bbq_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+        "env_seed": 1375014907,
+        "init_file_sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+        "init_index": 0,
+        "init_row_sha256": "e773740b1d2927cb47331e1ff21a056e7118e6aef76681b8001521ff462c10a9",
+        "policy_seed": 1375014907,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c1_b1|task=4|collision=0",
+        "task_id": 4,
+        "task_name": "pick_up_the_ketchup_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+        "env_seed": 224092818,
+        "init_file_sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+        "init_index": 0,
+        "init_row_sha256": "b9ce167f1250d75a658ff60926d83963155810d20a06d45bdc84a30faf0f47a4",
+        "policy_seed": 224092818,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c1_b1|task=5|collision=0",
+        "task_id": 5,
+        "task_name": "pick_up_the_tomato_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+        "env_seed": 444366020,
+        "init_file_sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+        "init_index": 0,
+        "init_row_sha256": "aa4fe30bc10b84fcc2ee6b6d38448fbbf6bae9872c2092b0dd19f9b92aa98e11",
+        "policy_seed": 444366020,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c1_b1|task=6|collision=0",
+        "task_id": 6,
+        "task_name": "pick_up_the_butter_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+        "env_seed": 370317930,
+        "init_file_sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+        "init_index": 0,
+        "init_row_sha256": "e7dfc87fb7c0a1315e209abb64da13fea1e37ea489253efeedeee7ea14548914",
+        "policy_seed": 370317930,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c1_b1|task=7|collision=0",
+        "task_id": 7,
+        "task_name": "pick_up_the_milk_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+        "env_seed": 1744335475,
+        "init_file_sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+        "init_index": 0,
+        "init_row_sha256": "718f2fb31f45c25f9c3f1bcf7637ba8ec113b0773b6ce829c7f4b3d02c154555",
+        "policy_seed": 1744335475,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c1_b1|task=8|collision=0",
+        "task_id": 8,
+        "task_name": "pick_up_the_chocolate_pudding_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+        "env_seed": 696704775,
+        "init_file_sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+        "init_index": 0,
+        "init_row_sha256": "d8309b31899377d1051f6d7da47edc747b294842a6fec748aff6c9b822d8797e",
+        "policy_seed": 696704775,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c1_b1|task=9|collision=0",
+        "task_id": 9,
+        "task_name": "pick_up_the_orange_juice_and_place_it_in_the_basket"
+      }
+    ],
+    "validation_c1_b2": [
+      {
+        "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+        "env_seed": 563714472,
+        "init_file_sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+        "init_index": 0,
+        "init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
+        "policy_seed": 563714472,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c1_b2|task=0|collision=0",
+        "task_id": 0,
+        "task_name": "pick_up_the_alphabet_soup_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+        "env_seed": 294783783,
+        "init_file_sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+        "init_index": 0,
+        "init_row_sha256": "2c0b399c52b759187483bbc0473bad47b366f3e5a3816f8ce98a5d37640a1725",
+        "policy_seed": 294783783,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c1_b2|task=1|collision=0",
+        "task_id": 1,
+        "task_name": "pick_up_the_cream_cheese_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+        "env_seed": 1664750631,
+        "init_file_sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+        "init_index": 0,
+        "init_row_sha256": "f77a5f5866952552461f703b40f853add2c13d75cbd54cd8fbbaae641db165c1",
+        "policy_seed": 1664750631,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c1_b2|task=2|collision=0",
+        "task_id": 2,
+        "task_name": "pick_up_the_salad_dressing_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+        "env_seed": 1306994509,
+        "init_file_sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+        "init_index": 0,
+        "init_row_sha256": "faa3e635dd29229f763f8748098f92543b7f680fb4212e7036ec49ba55d57c93",
+        "policy_seed": 1306994509,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c1_b2|task=3|collision=0",
+        "task_id": 3,
+        "task_name": "pick_up_the_bbq_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+        "env_seed": 960154554,
+        "init_file_sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+        "init_index": 0,
+        "init_row_sha256": "e773740b1d2927cb47331e1ff21a056e7118e6aef76681b8001521ff462c10a9",
+        "policy_seed": 960154554,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c1_b2|task=4|collision=0",
+        "task_id": 4,
+        "task_name": "pick_up_the_ketchup_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+        "env_seed": 780132427,
+        "init_file_sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+        "init_index": 0,
+        "init_row_sha256": "b9ce167f1250d75a658ff60926d83963155810d20a06d45bdc84a30faf0f47a4",
+        "policy_seed": 780132427,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c1_b2|task=5|collision=0",
+        "task_id": 5,
+        "task_name": "pick_up_the_tomato_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+        "env_seed": 153905269,
+        "init_file_sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+        "init_index": 0,
+        "init_row_sha256": "aa4fe30bc10b84fcc2ee6b6d38448fbbf6bae9872c2092b0dd19f9b92aa98e11",
+        "policy_seed": 153905269,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c1_b2|task=6|collision=0",
+        "task_id": 6,
+        "task_name": "pick_up_the_butter_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+        "env_seed": 1277071924,
+        "init_file_sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+        "init_index": 0,
+        "init_row_sha256": "e7dfc87fb7c0a1315e209abb64da13fea1e37ea489253efeedeee7ea14548914",
+        "policy_seed": 1277071924,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c1_b2|task=7|collision=0",
+        "task_id": 7,
+        "task_name": "pick_up_the_milk_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+        "env_seed": 766178337,
+        "init_file_sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+        "init_index": 0,
+        "init_row_sha256": "718f2fb31f45c25f9c3f1bcf7637ba8ec113b0773b6ce829c7f4b3d02c154555",
+        "policy_seed": 766178337,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c1_b2|task=8|collision=0",
+        "task_id": 8,
+        "task_name": "pick_up_the_chocolate_pudding_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+        "env_seed": 1989704013,
+        "init_file_sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+        "init_index": 0,
+        "init_row_sha256": "d8309b31899377d1051f6d7da47edc747b294842a6fec748aff6c9b822d8797e",
+        "policy_seed": 1989704013,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c1_b2|task=9|collision=0",
+        "task_id": 9,
+        "task_name": "pick_up_the_orange_juice_and_place_it_in_the_basket"
+      }
+    ],
+    "validation_c2_b1": [
+      {
+        "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+        "env_seed": 149173415,
+        "init_file_sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+        "init_index": 0,
+        "init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
+        "policy_seed": 149173415,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c2_b1|task=0|collision=0",
+        "task_id": 0,
+        "task_name": "pick_up_the_alphabet_soup_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+        "env_seed": 1689684047,
+        "init_file_sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+        "init_index": 0,
+        "init_row_sha256": "2c0b399c52b759187483bbc0473bad47b366f3e5a3816f8ce98a5d37640a1725",
+        "policy_seed": 1689684047,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c2_b1|task=1|collision=0",
+        "task_id": 1,
+        "task_name": "pick_up_the_cream_cheese_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+        "env_seed": 700774511,
+        "init_file_sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+        "init_index": 0,
+        "init_row_sha256": "f77a5f5866952552461f703b40f853add2c13d75cbd54cd8fbbaae641db165c1",
+        "policy_seed": 700774511,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c2_b1|task=2|collision=0",
+        "task_id": 2,
+        "task_name": "pick_up_the_salad_dressing_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+        "env_seed": 1638997368,
+        "init_file_sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+        "init_index": 0,
+        "init_row_sha256": "faa3e635dd29229f763f8748098f92543b7f680fb4212e7036ec49ba55d57c93",
+        "policy_seed": 1638997368,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c2_b1|task=3|collision=0",
+        "task_id": 3,
+        "task_name": "pick_up_the_bbq_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+        "env_seed": 1059989897,
+        "init_file_sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+        "init_index": 0,
+        "init_row_sha256": "e773740b1d2927cb47331e1ff21a056e7118e6aef76681b8001521ff462c10a9",
+        "policy_seed": 1059989897,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c2_b1|task=4|collision=0",
+        "task_id": 4,
+        "task_name": "pick_up_the_ketchup_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+        "env_seed": 1960888802,
+        "init_file_sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+        "init_index": 0,
+        "init_row_sha256": "b9ce167f1250d75a658ff60926d83963155810d20a06d45bdc84a30faf0f47a4",
+        "policy_seed": 1960888802,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c2_b1|task=5|collision=0",
+        "task_id": 5,
+        "task_name": "pick_up_the_tomato_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+        "env_seed": 1137297152,
+        "init_file_sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+        "init_index": 0,
+        "init_row_sha256": "aa4fe30bc10b84fcc2ee6b6d38448fbbf6bae9872c2092b0dd19f9b92aa98e11",
+        "policy_seed": 1137297152,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c2_b1|task=6|collision=0",
+        "task_id": 6,
+        "task_name": "pick_up_the_butter_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+        "env_seed": 1740560308,
+        "init_file_sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+        "init_index": 0,
+        "init_row_sha256": "e7dfc87fb7c0a1315e209abb64da13fea1e37ea489253efeedeee7ea14548914",
+        "policy_seed": 1740560308,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c2_b1|task=7|collision=0",
+        "task_id": 7,
+        "task_name": "pick_up_the_milk_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+        "env_seed": 1414251171,
+        "init_file_sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+        "init_index": 0,
+        "init_row_sha256": "718f2fb31f45c25f9c3f1bcf7637ba8ec113b0773b6ce829c7f4b3d02c154555",
+        "policy_seed": 1414251171,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c2_b1|task=8|collision=0",
+        "task_id": 8,
+        "task_name": "pick_up_the_chocolate_pudding_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+        "env_seed": 1001720902,
+        "init_file_sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+        "init_index": 0,
+        "init_row_sha256": "d8309b31899377d1051f6d7da47edc747b294842a6fec748aff6c9b822d8797e",
+        "policy_seed": 1001720902,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c2_b1|task=9|collision=0",
+        "task_id": 9,
+        "task_name": "pick_up_the_orange_juice_and_place_it_in_the_basket"
+      }
+    ],
+    "validation_c2_b2": [
+      {
+        "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+        "env_seed": 1698035434,
+        "init_file_sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+        "init_index": 0,
+        "init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
+        "policy_seed": 1698035434,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c2_b2|task=0|collision=0",
+        "task_id": 0,
+        "task_name": "pick_up_the_alphabet_soup_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+        "env_seed": 1457083363,
+        "init_file_sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+        "init_index": 0,
+        "init_row_sha256": "2c0b399c52b759187483bbc0473bad47b366f3e5a3816f8ce98a5d37640a1725",
+        "policy_seed": 1457083363,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c2_b2|task=1|collision=0",
+        "task_id": 1,
+        "task_name": "pick_up_the_cream_cheese_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+        "env_seed": 22736890,
+        "init_file_sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+        "init_index": 0,
+        "init_row_sha256": "f77a5f5866952552461f703b40f853add2c13d75cbd54cd8fbbaae641db165c1",
+        "policy_seed": 22736890,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c2_b2|task=2|collision=0",
+        "task_id": 2,
+        "task_name": "pick_up_the_salad_dressing_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+        "env_seed": 233463627,
+        "init_file_sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+        "init_index": 0,
+        "init_row_sha256": "faa3e635dd29229f763f8748098f92543b7f680fb4212e7036ec49ba55d57c93",
+        "policy_seed": 233463627,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c2_b2|task=3|collision=0",
+        "task_id": 3,
+        "task_name": "pick_up_the_bbq_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+        "env_seed": 1932958656,
+        "init_file_sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+        "init_index": 0,
+        "init_row_sha256": "e773740b1d2927cb47331e1ff21a056e7118e6aef76681b8001521ff462c10a9",
+        "policy_seed": 1932958656,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c2_b2|task=4|collision=0",
+        "task_id": 4,
+        "task_name": "pick_up_the_ketchup_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+        "env_seed": 645544629,
+        "init_file_sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+        "init_index": 0,
+        "init_row_sha256": "b9ce167f1250d75a658ff60926d83963155810d20a06d45bdc84a30faf0f47a4",
+        "policy_seed": 645544629,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c2_b2|task=5|collision=0",
+        "task_id": 5,
+        "task_name": "pick_up_the_tomato_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+        "env_seed": 267724032,
+        "init_file_sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+        "init_index": 0,
+        "init_row_sha256": "aa4fe30bc10b84fcc2ee6b6d38448fbbf6bae9872c2092b0dd19f9b92aa98e11",
+        "policy_seed": 267724032,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c2_b2|task=6|collision=0",
+        "task_id": 6,
+        "task_name": "pick_up_the_butter_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+        "env_seed": 438699869,
+        "init_file_sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+        "init_index": 0,
+        "init_row_sha256": "e7dfc87fb7c0a1315e209abb64da13fea1e37ea489253efeedeee7ea14548914",
+        "policy_seed": 438699869,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c2_b2|task=7|collision=0",
+        "task_id": 7,
+        "task_name": "pick_up_the_milk_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+        "env_seed": 1929352396,
+        "init_file_sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+        "init_index": 0,
+        "init_row_sha256": "718f2fb31f45c25f9c3f1bcf7637ba8ec113b0773b6ce829c7f4b3d02c154555",
+        "policy_seed": 1929352396,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c2_b2|task=8|collision=0",
+        "task_id": 8,
+        "task_name": "pick_up_the_chocolate_pudding_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+        "env_seed": 2006594832,
+        "init_file_sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+        "init_index": 0,
+        "init_row_sha256": "d8309b31899377d1051f6d7da47edc747b294842a6fec748aff6c9b822d8797e",
+        "policy_seed": 2006594832,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c2_b2|task=9|collision=0",
+        "task_id": 9,
+        "task_name": "pick_up_the_orange_juice_and_place_it_in_the_basket"
+      }
+    ],
+    "validation_c3_b1": [
+      {
+        "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+        "env_seed": 1483767070,
+        "init_file_sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+        "init_index": 0,
+        "init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
+        "policy_seed": 1483767070,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c3_b1|task=0|collision=0",
+        "task_id": 0,
+        "task_name": "pick_up_the_alphabet_soup_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+        "env_seed": 18887513,
+        "init_file_sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+        "init_index": 0,
+        "init_row_sha256": "2c0b399c52b759187483bbc0473bad47b366f3e5a3816f8ce98a5d37640a1725",
+        "policy_seed": 18887513,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c3_b1|task=1|collision=0",
+        "task_id": 1,
+        "task_name": "pick_up_the_cream_cheese_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+        "env_seed": 2109524661,
+        "init_file_sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+        "init_index": 0,
+        "init_row_sha256": "f77a5f5866952552461f703b40f853add2c13d75cbd54cd8fbbaae641db165c1",
+        "policy_seed": 2109524661,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c3_b1|task=2|collision=0",
+        "task_id": 2,
+        "task_name": "pick_up_the_salad_dressing_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+        "env_seed": 239204174,
+        "init_file_sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+        "init_index": 0,
+        "init_row_sha256": "faa3e635dd29229f763f8748098f92543b7f680fb4212e7036ec49ba55d57c93",
+        "policy_seed": 239204174,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c3_b1|task=3|collision=0",
+        "task_id": 3,
+        "task_name": "pick_up_the_bbq_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+        "env_seed": 1023677442,
+        "init_file_sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+        "init_index": 0,
+        "init_row_sha256": "e773740b1d2927cb47331e1ff21a056e7118e6aef76681b8001521ff462c10a9",
+        "policy_seed": 1023677442,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c3_b1|task=4|collision=0",
+        "task_id": 4,
+        "task_name": "pick_up_the_ketchup_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+        "env_seed": 1263109613,
+        "init_file_sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+        "init_index": 0,
+        "init_row_sha256": "b9ce167f1250d75a658ff60926d83963155810d20a06d45bdc84a30faf0f47a4",
+        "policy_seed": 1263109613,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c3_b1|task=5|collision=0",
+        "task_id": 5,
+        "task_name": "pick_up_the_tomato_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+        "env_seed": 188422408,
+        "init_file_sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+        "init_index": 0,
+        "init_row_sha256": "aa4fe30bc10b84fcc2ee6b6d38448fbbf6bae9872c2092b0dd19f9b92aa98e11",
+        "policy_seed": 188422408,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c3_b1|task=6|collision=0",
+        "task_id": 6,
+        "task_name": "pick_up_the_butter_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+        "env_seed": 181826514,
+        "init_file_sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+        "init_index": 0,
+        "init_row_sha256": "e7dfc87fb7c0a1315e209abb64da13fea1e37ea489253efeedeee7ea14548914",
+        "policy_seed": 181826514,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c3_b1|task=7|collision=0",
+        "task_id": 7,
+        "task_name": "pick_up_the_milk_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+        "env_seed": 310077478,
+        "init_file_sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+        "init_index": 0,
+        "init_row_sha256": "718f2fb31f45c25f9c3f1bcf7637ba8ec113b0773b6ce829c7f4b3d02c154555",
+        "policy_seed": 310077478,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c3_b1|task=8|collision=0",
+        "task_id": 8,
+        "task_name": "pick_up_the_chocolate_pudding_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+        "env_seed": 255547017,
+        "init_file_sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+        "init_index": 0,
+        "init_row_sha256": "d8309b31899377d1051f6d7da47edc747b294842a6fec748aff6c9b822d8797e",
+        "policy_seed": 255547017,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c3_b1|task=9|collision=0",
+        "task_id": 9,
+        "task_name": "pick_up_the_orange_juice_and_place_it_in_the_basket"
+      }
+    ],
+    "validation_c3_b2": [
+      {
+        "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+        "env_seed": 1350688622,
+        "init_file_sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+        "init_index": 0,
+        "init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
+        "policy_seed": 1350688622,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c3_b2|task=0|collision=0",
+        "task_id": 0,
+        "task_name": "pick_up_the_alphabet_soup_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+        "env_seed": 308437758,
+        "init_file_sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+        "init_index": 0,
+        "init_row_sha256": "2c0b399c52b759187483bbc0473bad47b366f3e5a3816f8ce98a5d37640a1725",
+        "policy_seed": 308437758,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c3_b2|task=1|collision=0",
+        "task_id": 1,
+        "task_name": "pick_up_the_cream_cheese_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+        "env_seed": 1863352125,
+        "init_file_sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+        "init_index": 0,
+        "init_row_sha256": "f77a5f5866952552461f703b40f853add2c13d75cbd54cd8fbbaae641db165c1",
+        "policy_seed": 1863352125,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c3_b2|task=2|collision=0",
+        "task_id": 2,
+        "task_name": "pick_up_the_salad_dressing_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+        "env_seed": 2065337501,
+        "init_file_sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+        "init_index": 0,
+        "init_row_sha256": "faa3e635dd29229f763f8748098f92543b7f680fb4212e7036ec49ba55d57c93",
+        "policy_seed": 2065337501,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c3_b2|task=3|collision=0",
+        "task_id": 3,
+        "task_name": "pick_up_the_bbq_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+        "env_seed": 1766315897,
+        "init_file_sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+        "init_index": 0,
+        "init_row_sha256": "e773740b1d2927cb47331e1ff21a056e7118e6aef76681b8001521ff462c10a9",
+        "policy_seed": 1766315897,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c3_b2|task=4|collision=0",
+        "task_id": 4,
+        "task_name": "pick_up_the_ketchup_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+        "env_seed": 1150184437,
+        "init_file_sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+        "init_index": 0,
+        "init_row_sha256": "b9ce167f1250d75a658ff60926d83963155810d20a06d45bdc84a30faf0f47a4",
+        "policy_seed": 1150184437,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c3_b2|task=5|collision=0",
+        "task_id": 5,
+        "task_name": "pick_up_the_tomato_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+        "env_seed": 1123764736,
+        "init_file_sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+        "init_index": 0,
+        "init_row_sha256": "aa4fe30bc10b84fcc2ee6b6d38448fbbf6bae9872c2092b0dd19f9b92aa98e11",
+        "policy_seed": 1123764736,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c3_b2|task=6|collision=0",
+        "task_id": 6,
+        "task_name": "pick_up_the_butter_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+        "env_seed": 52479957,
+        "init_file_sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+        "init_index": 0,
+        "init_row_sha256": "e7dfc87fb7c0a1315e209abb64da13fea1e37ea489253efeedeee7ea14548914",
+        "policy_seed": 52479957,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c3_b2|task=7|collision=0",
+        "task_id": 7,
+        "task_name": "pick_up_the_milk_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+        "env_seed": 2076847894,
+        "init_file_sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+        "init_index": 0,
+        "init_row_sha256": "718f2fb31f45c25f9c3f1bcf7637ba8ec113b0773b6ce829c7f4b3d02c154555",
+        "policy_seed": 2076847894,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c3_b2|task=8|collision=0",
+        "task_id": 8,
+        "task_name": "pick_up_the_chocolate_pudding_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+        "env_seed": 611600081,
+        "init_file_sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+        "init_index": 0,
+        "init_row_sha256": "d8309b31899377d1051f6d7da47edc747b294842a6fec748aff6c9b822d8797e",
+        "policy_seed": 611600081,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c3_b2|task=9|collision=0",
+        "task_id": 9,
+        "task_name": "pick_up_the_orange_juice_and_place_it_in_the_basket"
+      }
+    ],
+    "validation_c4_b1": [
+      {
+        "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+        "env_seed": 270958481,
+        "init_file_sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+        "init_index": 0,
+        "init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
+        "policy_seed": 270958481,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c4_b1|task=0|collision=0",
+        "task_id": 0,
+        "task_name": "pick_up_the_alphabet_soup_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+        "env_seed": 858528452,
+        "init_file_sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+        "init_index": 0,
+        "init_row_sha256": "2c0b399c52b759187483bbc0473bad47b366f3e5a3816f8ce98a5d37640a1725",
+        "policy_seed": 858528452,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c4_b1|task=1|collision=0",
+        "task_id": 1,
+        "task_name": "pick_up_the_cream_cheese_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+        "env_seed": 1072612888,
+        "init_file_sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+        "init_index": 0,
+        "init_row_sha256": "f77a5f5866952552461f703b40f853add2c13d75cbd54cd8fbbaae641db165c1",
+        "policy_seed": 1072612888,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c4_b1|task=2|collision=0",
+        "task_id": 2,
+        "task_name": "pick_up_the_salad_dressing_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+        "env_seed": 1463139499,
+        "init_file_sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+        "init_index": 0,
+        "init_row_sha256": "faa3e635dd29229f763f8748098f92543b7f680fb4212e7036ec49ba55d57c93",
+        "policy_seed": 1463139499,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c4_b1|task=3|collision=0",
+        "task_id": 3,
+        "task_name": "pick_up_the_bbq_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+        "env_seed": 412230470,
+        "init_file_sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+        "init_index": 0,
+        "init_row_sha256": "e773740b1d2927cb47331e1ff21a056e7118e6aef76681b8001521ff462c10a9",
+        "policy_seed": 412230470,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c4_b1|task=4|collision=0",
+        "task_id": 4,
+        "task_name": "pick_up_the_ketchup_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+        "env_seed": 322142408,
+        "init_file_sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+        "init_index": 0,
+        "init_row_sha256": "b9ce167f1250d75a658ff60926d83963155810d20a06d45bdc84a30faf0f47a4",
+        "policy_seed": 322142408,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c4_b1|task=5|collision=0",
+        "task_id": 5,
+        "task_name": "pick_up_the_tomato_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+        "env_seed": 136700443,
+        "init_file_sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+        "init_index": 0,
+        "init_row_sha256": "aa4fe30bc10b84fcc2ee6b6d38448fbbf6bae9872c2092b0dd19f9b92aa98e11",
+        "policy_seed": 136700443,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c4_b1|task=6|collision=0",
+        "task_id": 6,
+        "task_name": "pick_up_the_butter_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+        "env_seed": 986082258,
+        "init_file_sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+        "init_index": 0,
+        "init_row_sha256": "e7dfc87fb7c0a1315e209abb64da13fea1e37ea489253efeedeee7ea14548914",
+        "policy_seed": 986082258,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c4_b1|task=7|collision=0",
+        "task_id": 7,
+        "task_name": "pick_up_the_milk_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+        "env_seed": 919906713,
+        "init_file_sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+        "init_index": 0,
+        "init_row_sha256": "718f2fb31f45c25f9c3f1bcf7637ba8ec113b0773b6ce829c7f4b3d02c154555",
+        "policy_seed": 919906713,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c4_b1|task=8|collision=0",
+        "task_id": 8,
+        "task_name": "pick_up_the_chocolate_pudding_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+        "env_seed": 770775633,
+        "init_file_sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+        "init_index": 0,
+        "init_row_sha256": "d8309b31899377d1051f6d7da47edc747b294842a6fec748aff6c9b822d8797e",
+        "policy_seed": 770775633,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c4_b1|task=9|collision=0",
+        "task_id": 9,
+        "task_name": "pick_up_the_orange_juice_and_place_it_in_the_basket"
+      }
+    ],
+    "validation_c4_b2": [
+      {
+        "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+        "env_seed": 244914656,
+        "init_file_sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+        "init_index": 0,
+        "init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
+        "policy_seed": 244914656,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c4_b2|task=0|collision=0",
+        "task_id": 0,
+        "task_name": "pick_up_the_alphabet_soup_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+        "env_seed": 1968499267,
+        "init_file_sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+        "init_index": 0,
+        "init_row_sha256": "2c0b399c52b759187483bbc0473bad47b366f3e5a3816f8ce98a5d37640a1725",
+        "policy_seed": 1968499267,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c4_b2|task=1|collision=0",
+        "task_id": 1,
+        "task_name": "pick_up_the_cream_cheese_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+        "env_seed": 2102161540,
+        "init_file_sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+        "init_index": 0,
+        "init_row_sha256": "f77a5f5866952552461f703b40f853add2c13d75cbd54cd8fbbaae641db165c1",
+        "policy_seed": 2102161540,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c4_b2|task=2|collision=0",
+        "task_id": 2,
+        "task_name": "pick_up_the_salad_dressing_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+        "env_seed": 627678539,
+        "init_file_sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+        "init_index": 0,
+        "init_row_sha256": "faa3e635dd29229f763f8748098f92543b7f680fb4212e7036ec49ba55d57c93",
+        "policy_seed": 627678539,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c4_b2|task=3|collision=0",
+        "task_id": 3,
+        "task_name": "pick_up_the_bbq_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+        "env_seed": 1858913026,
+        "init_file_sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+        "init_index": 0,
+        "init_row_sha256": "e773740b1d2927cb47331e1ff21a056e7118e6aef76681b8001521ff462c10a9",
+        "policy_seed": 1858913026,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c4_b2|task=4|collision=0",
+        "task_id": 4,
+        "task_name": "pick_up_the_ketchup_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+        "env_seed": 595237722,
+        "init_file_sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+        "init_index": 0,
+        "init_row_sha256": "b9ce167f1250d75a658ff60926d83963155810d20a06d45bdc84a30faf0f47a4",
+        "policy_seed": 595237722,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c4_b2|task=5|collision=0",
+        "task_id": 5,
+        "task_name": "pick_up_the_tomato_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+        "env_seed": 847558049,
+        "init_file_sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+        "init_index": 0,
+        "init_row_sha256": "aa4fe30bc10b84fcc2ee6b6d38448fbbf6bae9872c2092b0dd19f9b92aa98e11",
+        "policy_seed": 847558049,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c4_b2|task=6|collision=0",
+        "task_id": 6,
+        "task_name": "pick_up_the_butter_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+        "env_seed": 2031279692,
+        "init_file_sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+        "init_index": 0,
+        "init_row_sha256": "e7dfc87fb7c0a1315e209abb64da13fea1e37ea489253efeedeee7ea14548914",
+        "policy_seed": 2031279692,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c4_b2|task=7|collision=0",
+        "task_id": 7,
+        "task_name": "pick_up_the_milk_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+        "env_seed": 757896818,
+        "init_file_sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+        "init_index": 0,
+        "init_row_sha256": "718f2fb31f45c25f9c3f1bcf7637ba8ec113b0773b6ce829c7f4b3d02c154555",
+        "policy_seed": 757896818,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c4_b2|task=8|collision=0",
+        "task_id": 8,
+        "task_name": "pick_up_the_chocolate_pudding_and_place_it_in_the_basket"
+      },
+      {
+        "bddl_sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+        "env_seed": 384561178,
+        "init_file_sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+        "init_index": 0,
+        "init_row_sha256": "d8309b31899377d1051f6d7da47edc747b294842a6fec748aff6c9b822d8797e",
+        "policy_seed": 384561178,
+        "seed_derivation": "20260921T093925Z|qd-ed-seeds-v1|validation_c4_b2|task=9|collision=0",
+        "task_id": 9,
+        "task_name": "pick_up_the_orange_juice_and_place_it_in_the_basket"
+      }
+    ]
+  },
+  "frozen_at": "2026-09-21T09:55:56.992969+00:00",
+  "history_cells": 54,
+  "history_registry_sha256": "304c99c7f6df75a68c3278df0640c6a5bb744d04b2457d5991881e9ac4b2b573",
+  "layout_claim": "All tasks use existing fixed init row0. New seeds are not new layouts.",
+  "new_outcomes_seen_before_freeze": false,
+  "run_name": "rdt-qd-ed-final-20260921T093925Z",
+  "schema": "qd-ed-frozen-seed-plan-v1",
+  "seed_policy": "Single-task subprocess, explicit policy_seed=env_seed for matched arms; differs from historical sequential global seed0 stream.",
+  "validation_cohort_policy": "Use consecutive cohort numbers only, both seed blocks per task; no result-based choice. Extra preregistered cohorts do not authorize extra budget."
+}

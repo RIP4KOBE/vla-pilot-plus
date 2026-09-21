@@ -21,12 +21,18 @@
 - Current caveats: GPU7 externally occupied; runtime input/cache/profile equality and exposure registry pending audit.
 
 Source specification SHA-256: `3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef`. The user task specification prevails over generic Arbor defaults.
- [DONE]
+ [RUNNING]
+
+**Insight**: New B_dev score remains unknown. CPU diagnosis found82 gripper-discordant archive eliminations,73 duty-bin separations; these are explanatory counts, never task-success scores. Historical no-adoption preserved; engineering input repairs and online prerequisites pending.
 
 ### 1: Mechanism: Evidence-separated causal diagnosis across proposal, selection, and closed-loop behavior.
 Hypothesis: Historical aggregate proxy gains conceal unresolved failure classes; separating observed facts from counterfactual unknowns can identify a testable task-linked mechanism.
 Observable: A source-cited evidence matrix and bounded in-scope mechanism queue, with zero new episodes or invented success scores.
-Conflicts: Historical H1/H2/H4/H5 negative outcomes remain valid; no direction is replayed without new evidence and a specific difference. [RUNNING]
+Conflicts: Historical H1/H2/H4/H5 negative outcomes remain valid; no direction is replayed without new evidence and a specific difference. [DONE]
+
+**Insight**: 20/20 exact Q0 trace replays reproduce archive rewards and selected actions.82 true gripper-discordant eliminations,73/82 separable by fixed duty bins; no true unexecuted outcomes. Preserve historical negatives and distinguish cache repair.
+
+**Result**: CPU diagnostic complete; zero online episodes; score unavailable.54 historical task/seed exposure cells registered.
 
 ### 2: Mechanism: Reproducible runtime and input identity verification before online evaluation.
 Hypothesis: Stale absolute paths and task-ambiguous guidance cache can confound a new control; verifying identities before dispatch isolates infrastructure from QD effects.
@@ -37,3 +43,13 @@ Conflicts: All historical artifacts remain immutable and the protected untracked
 Hypothesis: Starting from latest source while disabling later mechanisms can reproduce Q0/C0 semantics only if code-default and profile differences are audited explicitly.
 Observable: Full Q0/C0 override manifests, source-difference classification and minimal regression plan against 5b0898e; no claim of online parity before measurement.
 Conflicts: Newer HEAD is not presumed best; causal-envelope, anchor, protected lane and degenerate fallback remain disabled. [RUNNING]
+
+### 4: Mechanism: Execution-aware behavioral representation for quality-diversity search.
+Hypothesis: Manipulation modes lost under endpoint-only geometry can survive when archive equivalence includes executed actuator behavior.
+Observable: Preserved action-intent alternatives and task gains at fixed search budget on preregistered Dev.
+Conflicts: Historical H1/H4/H5 proxy gains did not establish task gains; this tests a distinct representation axis without combining those mechanisms. [PENDING]
+
+#### 4.1: Mechanism: Sixteen-cell radial-distance by executed positive-gripper-duty QD archive.
+Hypothesis: Replacing XY-only equivalence separates lower-reward gripper-intent branches during parent search, yielding useful new proposals without extra model evaluations.
+Observable: Correct constant-budget behavior, changed actual parent lineage, N1 Dev>=5/10 and noninferior to same-round P2/Q0 before validation.
+Conflicts: H5 secondary trajectory lanes failed; N1 changes equivalence at capacity16 and leaves quality/allocation/EDS switches unchanged; azimuth/timing information loss is explicitly tested. [RUNNING]
