@@ -33,6 +33,8 @@ from core.eds_mechanism_trace import EDSMechanismTrace, EDSParticleStage
 from core.env_adapters import BaseEnvAdapter
 from core.fkd_class import FKD
 from core.qd_ed import (
+    EXECUTION_INTENT_AXES,
+    EXECUTION_INTENT_DESCRIPTOR,
     QDArchive,
     QDBounds,
     QDParentAllocation,
@@ -42,6 +44,8 @@ from core.qd_ed import (
     fingerprint_action,
     freeze_bounds as qd_freeze_bounds,
     qd_descriptor,
+    execution_intent_descriptor,
+    freeze_execution_intent_bounds,
     within_cell_endpoint_sse as qd_within_cell_endpoint_sse,
 )
 from core.rdt_libero_action_converter import (
@@ -1307,7 +1311,14 @@ class RDTSteer:
         except Exception:
             real = None
         if real is not None and callable(getattr(real, "encode_instruction", None)):
-            embed = real.encode_instruction(task, device=str(self.device))
+            text_model = getattr(real, "text_model", None)
+            handle = (text_model.register_forward_pre_hook(self._encoder_counter_hook("text"), with_kwargs=True)
+                      if isinstance(text_model, nn.Module) else None)
+            try:
+                embed = real.encode_instruction(task, device=str(self.device))
+            finally:
+                if handle is not None:
+                    handle.remove()
             embed = embed.float().to(self.device)
         else:
             embed = torch.zeros(1, 1, 4096, device=self.device)
@@ -1336,6 +1347,7 @@ class RDTSteer:
         return self
 
     def reset(self) -> None:
+        self.reset_episode_compute_counters()
         self.reset_eds_chunk_memory("episode_reset")
         self._cached_action_chunk = None
         self._cached_action_steps_remaining = 0
@@ -1377,6 +1389,65 @@ class RDTSteer:
 
     def get_normalized_reward(self) -> float:
         return self._last_normalized_reward
+
+    def reset_episode_compute_counters(self) -> None:
+        self._episode_compute = {key: 0 for key in (
+            "model_forward_calls", "model_batch_rows", "denoising_invocations",
+            "model_denoising_steps", "denoising_step_batch_rows", "renoise_invocations",
+            "reward_calls", "reward_evaluations", "reward_scoring_batches",
+            "guided_chunks", "unguided_chunks", "rbf_gradient_calls", "rbf_gradient_batch_rows",
+            "vision_encoder_forward_calls", "vision_encoder_batch_rows",
+            "text_encoder_forward_calls", "text_encoder_batch_rows",
+        )}
+        self._episode_compute["model_forward_batch_sizes"] = []
+
+    def _increment_compute(self, name: str, amount: int = 1) -> None:
+        if not hasattr(self, "_episode_compute"):
+            self.reset_episode_compute_counters()
+        self._episode_compute[name] += int(amount)
+
+    def get_episode_compute_counters(self) -> dict:
+        if not hasattr(self, "_episode_compute"):
+            self.reset_episode_compute_counters()
+        return {key: list(value) if isinstance(value, list) else value
+                for key, value in self._episode_compute.items()}
+
+    def _counted_dit(self, samples: Tensor, t: Tensor, cond: dict) -> Tensor:
+        self._increment_compute("model_forward_calls")
+        self._increment_compute("model_batch_rows", samples.shape[0])
+        self._episode_compute["model_forward_batch_sizes"].append(int(samples.shape[0]))
+        return self._dit(samples, t, cond)
+
+    def _counted_scheduler_step(self, scheduler, *args, **kwargs):
+        self._increment_compute("model_denoising_steps")
+        sample = kwargs.get("sample", args[2] if len(args) > 2 else None)
+        if torch.is_tensor(sample):
+            self._increment_compute("denoising_step_batch_rows", sample.shape[0])
+        return scheduler.step(*args, **kwargs)
+
+    def _counted_reward(self, fn, keypoints, trajectories):
+        self._increment_compute("reward_calls")
+        self._increment_compute("reward_evaluations", trajectories.shape[0])
+        return fn(keypoints, trajectories)
+
+    def _encoder_counter_hook(self, kind):
+        def hook(module, args, kwargs):
+            self._increment_compute(f"{kind}_encoder_forward_calls")
+            first = next((v for v in (*args, *kwargs.values()) if torch.is_tensor(v) and v.ndim), None)
+            if first is not None:
+                self._increment_compute(f"{kind}_encoder_batch_rows", first.shape[0])
+        return hook
+
+    def _counted_encode_inputs(self, *args, **kwargs):
+        real = getattr(self._rdt_model, "_real", None)
+        vision = getattr(real, "vision_model", None)
+        handle = (vision.register_forward_pre_hook(self._encoder_counter_hook("vision"), with_kwargs=True)
+                  if isinstance(vision, nn.Module) else None)
+        try:
+            return self._rdt_model.encode_inputs(*args, **kwargs)
+        finally:
+            if handle is not None:
+                handle.remove()
 
     def get_last_scale(self) -> float:
         return self._last_scale
@@ -1443,6 +1514,7 @@ class RDTSteer:
         )
 
         if should_sample:
+            self._increment_compute("guided_chunks" if use_guidance else "unguided_chunks")
             self._last_visualization_action_candidates = None
             self._last_eds_metrics = None
             self._last_eds_artifacts = None
@@ -1513,7 +1585,7 @@ class RDTSteer:
         except StopIteration:
             dtype = torch.float32
 
-        cond = self._rdt_model.encode_inputs(state_128, state_mask_128, images, text_embed)
+        cond = self._counted_encode_inputs(state_128, state_mask_128, images, text_embed)
         unified_action_dim = int(cond["unified_action_dim"])
         if unified_action_dim != 128:
             raise ValueError(f"Expected unified action dim 128, got {unified_action_dim}")
@@ -1521,12 +1593,13 @@ class RDTSteer:
         x_t = torch.randn(B, pred_horizon, unified_action_dim, device=device, dtype=dtype)
 
         scheduler = self._noise_scheduler
+        self._increment_compute("denoising_invocations")
         scheduler.set_timesteps(self._num_inference_steps)
 
         with torch.no_grad():
             for t in scheduler.timesteps:
-                noise_pred = self._dit(x_t, t, cond)
-                x_t = scheduler.step(noise_pred, t, x_t).prev_sample
+                noise_pred = self._counted_dit(x_t, t, cond)
+                x_t = self._counted_scheduler_step(scheduler, noise_pred, t, x_t).prev_sample
                 x_t = x_t.to(dtype=dtype)
 
         action_mask = cond["action_mask"].expand(B, pred_horizon, unified_action_dim).to(device=device, dtype=dtype)
@@ -1556,7 +1629,7 @@ class RDTSteer:
         except StopIteration:
             dtype = torch.float32
 
-        cond = self._rdt_model.encode_inputs(state_128, state_mask_128, images, text_embed)
+        cond = self._counted_encode_inputs(state_128, state_mask_128, images, text_embed)
         unified_action_dim = int(cond["unified_action_dim"])
         if unified_action_dim != 128:
             raise ValueError(f"Expected unified action dim 128, got {unified_action_dim}")
@@ -1667,10 +1740,11 @@ class RDTSteer:
     ) -> Tensor:
         if keypoints is None or not guidance_fns:
             return torch.zeros(samples.shape[0], device=samples.device, dtype=samples.dtype)
+        self._increment_compute("reward_scoring_batches")
         trajs = self._trajectory_reward_slice(self._rdt_sample_to_trajectory_3d(samples), slice_kind)
         rewards = []
         for b in range(trajs.shape[0]):
-            reward = sum(fn(keypoints, trajs[b : b + 1]) for fn in guidance_fns)
+            reward = sum(self._counted_reward(fn, keypoints, trajs[b : b + 1]) for fn in guidance_fns)
             if torch.is_tensor(reward):
                 rewards.append(reward.detach().to(device=samples.device, dtype=samples.dtype).reshape(()))
             else:
@@ -1730,6 +1804,7 @@ class RDTSteer:
         use_fkd = bool(vls_config.get("use_fkd", False))
         fkd_config = vls_config.get("fkd", None)
         scheduler = self._noise_scheduler
+        self._increment_compute("denoising_invocations")
         scheduler.set_timesteps(self._num_inference_steps)
 
         use_keypoint_guidance = guidance_fns is not None and len(guidance_fns) > 0 and keypoints is not None
@@ -1748,7 +1823,7 @@ class RDTSteer:
 
         for i, t in enumerate(scheduler.timesteps):
             with torch.no_grad():
-                model_output = self._dit(x_t, t, cond)
+                model_output = self._counted_dit(x_t, t, cond)
 
             if use_diversity and int(t.item()) > start_step and x_t.shape[0] > 1:
                 div_grad = self._compute_diversity_gradient(x_t)
@@ -1780,7 +1855,7 @@ class RDTSteer:
                     )
                     model_output = self._apply_keypoint_guidance(model_output, kp_grad, scale)
 
-            step_output = scheduler.step(model_output, t, x_t)
+            step_output = self._counted_scheduler_step(scheduler, model_output, t, x_t)
             x0_for_reward, _ = self._select_fkd_x0_source(
                 model_output=model_output,
                 step_output=step_output,
@@ -2603,11 +2678,12 @@ class RDTSteer:
         del cfg
         population = x_t
         scheduler = self._noise_scheduler
+        self._increment_compute("denoising_invocations")
         scheduler.set_timesteps(self._num_inference_steps)
         with torch.no_grad():
             for t in scheduler.timesteps:
-                model_output = self._dit(population, t, cond)
-                population = scheduler.step(
+                model_output = self._counted_dit(population, t, cond)
+                population = self._counted_scheduler_step(scheduler,
                     model_output,
                     t,
                     population,
@@ -2700,6 +2776,7 @@ class RDTSteer:
         ]
         recorded_after_diversity = False
         scheduler = self._noise_scheduler
+        self._increment_compute("denoising_invocations")
         scheduler.set_timesteps(self._num_inference_steps)
         start_step = self._resolve_start_step(
             scheduler.timesteps,
@@ -2716,7 +2793,7 @@ class RDTSteer:
                 recorded_after_diversity = True
 
             with torch.no_grad():
-                model_output = self._dit(population, t, cond)
+                model_output = self._counted_dit(population, t, cond)
 
             if int(t.item()) > start_step:
                 div_grad, descriptor_evidence = self._compute_eds_diversity_gradient(
@@ -2772,7 +2849,7 @@ class RDTSteer:
                     timestep=int(t.item()),
                     partial_population=population,
                 )
-            population = scheduler.step(model_output, t, population).prev_sample.to(
+            population = self._counted_scheduler_step(scheduler, model_output, t, population).prev_sample.to(
                 dtype=x_t.dtype
             )
             if not torch.isfinite(population).all():
@@ -2898,6 +2975,7 @@ class RDTSteer:
         scheduler = self._noise_scheduler
         if not hasattr(scheduler, "add_noise"):
             raise RuntimeError("EDS requires a scheduler with add_noise()")
+        self._increment_compute("renoise_invocations")
         scheduler.set_timesteps(self._num_inference_steps)
         t = int(max(1, min(t, len(scheduler.timesteps))))
         noise = torch.randn_like(population_trajectories)
@@ -3367,6 +3445,7 @@ class RDTSteer:
         n_trunc_steps: int,
     ) -> Tensor:
         scheduler = self._noise_scheduler
+        self._increment_compute("denoising_invocations")
         scheduler.set_timesteps(self._num_inference_steps)
         n_trunc_steps = int(max(1, min(n_trunc_steps, len(scheduler.timesteps))))
         x_t = noisy_action
@@ -3374,8 +3453,8 @@ class RDTSteer:
 
         with torch.no_grad():
             for t in scheduler.timesteps[-n_trunc_steps:]:
-                model_output = self._dit(x_t, t, cond)
-                x_t = scheduler.step(model_output, t, x_t).prev_sample.to(dtype=noisy_action.dtype)
+                model_output = self._counted_dit(x_t, t, cond)
+                x_t = self._counted_scheduler_step(scheduler, model_output, t, x_t).prev_sample.to(dtype=noisy_action.dtype)
 
         x_t = x_t * mask
         return x_t
@@ -3500,6 +3579,7 @@ class RDTSteer:
         diversity_scale_override: float | None = None,
     ) -> tuple[Tensor, Tensor, dict]:
         scheduler = self._noise_scheduler
+        self._increment_compute("denoising_invocations")
         scheduler.set_timesteps(self._num_inference_steps)
         n_trunc_steps = int(max(1, min(n_trunc_steps, len(scheduler.timesteps))))
         rollout_timesteps = scheduler.timesteps[-n_trunc_steps:]
@@ -3549,7 +3629,7 @@ class RDTSteer:
 
         for local_step, t in enumerate(rollout_timesteps):
             with torch.no_grad():
-                model_output = self._dit(x_t, t, cond)
+                model_output = self._counted_dit(x_t, t, cond)
 
             applied_this_step = False
             if actual_scale > 0.0 and self._eds_rollout_diversity_step_mask(
@@ -3631,7 +3711,7 @@ class RDTSteer:
                     shuffle_seed=shuffle_seed,
                     attempted_diversity_scale=actual_scale,
                 )
-            x_t = scheduler.step(model_output, t, x_t).prev_sample.to(dtype=noisy_action.dtype)
+            x_t = self._counted_scheduler_step(scheduler, model_output, t, x_t).prev_sample.to(dtype=noisy_action.dtype)
             if applied_this_step:
                 after_rbf_population = x_t.detach()
             if not torch.isfinite(x_t).all():
@@ -4559,16 +4639,26 @@ class RDTSteer:
         )
 
     def _eds_qd_descriptor(
-        self, population: Tensor, keypoints: Optional[Tensor]
+        self, population: Tensor, keypoints: Optional[Tensor],
+        descriptor_mode: str = "target_relative_endpoint_xy",
     ) -> Tensor:
         trajectories = self._rdt_sample_to_trajectory_3d(population)
+        if descriptor_mode == EXECUTION_INTENT_DESCRIPTOR:
+            if self._action_chunk_horizon != 8:
+                raise ValueError("Execution-intent QD requires action_chunk_horizon=8")
+            return execution_intent_descriptor(
+                trajectories, keypoints,
+                self._decode_visualization_action_candidates(population),
+            )
         return qd_descriptor(trajectories, keypoints)
 
     @staticmethod
     def _eds_qd_freeze_bounds(
         descriptors: Tensor, cfg: _EDSConfig
     ) -> QDBounds:
-        return qd_freeze_bounds(
+        freeze = (freeze_execution_intent_bounds
+                  if cfg.qd_descriptor == EXECUTION_INTENT_DESCRIPTOR else qd_freeze_bounds)
+        return freeze(
             descriptors,
             quantiles=cfg.qd_bounds_quantiles,
             expand_fraction=cfg.qd_bounds_expand_fraction,
@@ -4615,6 +4705,13 @@ class RDTSteer:
         current_stage: int,
     ) -> Tensor:
         cfg = eds_config
+        execution_intent = cfg.qd_descriptor == EXECUTION_INTENT_DESCRIPTOR
+        if execution_intent and self._action_chunk_horizon != 8:
+            raise ValueError("Execution-intent QD requires action_chunk_horizon=8")
+        def describe_qd(candidates):
+            if execution_intent:
+                return self._eds_qd_descriptor(candidates, keypoints, cfg.qd_descriptor)
+            return self._eds_qd_descriptor(candidates, keypoints)
         loop_start = time.perf_counter()
         adaptive_rbf_enabled = (
             cfg.truncated_rollout_mode == "rbf_diverse"
@@ -4647,6 +4744,8 @@ class RDTSteer:
         metrics.qd_archive_active_for_chunk = metrics.qd_archive_enabled
         metrics.qd_degenerate_fallback_policy = cfg.qd_degenerate_fallback_policy
         metrics.qd_descriptor = cfg.qd_descriptor
+        if execution_intent:
+            metrics.qd_descriptor_axes = [dict(axis) for axis in EXECUTION_INTENT_AXES]
         metrics.qd_grid_shape = list(cfg.qd_grid_shape)
         metrics.qd_cell_capacity = cfg.qd_cell_capacity
         metrics.qd_secondary_lane_mode = cfg.qd_secondary_lane_mode
@@ -4749,10 +4848,10 @@ class RDTSteer:
         ) -> None:
             if not cfg.qd_metrics_observer:
                 return
-            descriptors = self._eds_qd_descriptor(candidates, keypoints)
+            descriptors = describe_qd(candidates)
             record = {
                 "iter_idx": int(iter_idx),
-                "descriptors_xy_m": descriptors.detach().cpu().tolist(),
+                ("descriptor_values" if execution_intent else "descriptors_xy_m"): descriptors.detach().cpu().tolist(),
                 "rewards": [
                     float(value)
                     for value in rewards.detach().float().cpu().tolist()
@@ -4779,7 +4878,7 @@ class RDTSteer:
                 )
                 metrics.qd_degenerate_reward_value = reward_value
         if metrics.qd_archive_active_for_chunk:
-            initial_descriptors = self._eds_qd_descriptor(population, keypoints)
+            initial_descriptors = describe_qd(population)
             qd_bounds = self._eds_qd_freeze_bounds(initial_descriptors, cfg)
             qd_initial_bounds = qd_bounds
             initial_cell_ids, initial_overflow = self._eds_qd_cell_ids(
@@ -4788,6 +4887,7 @@ class RDTSteer:
             qd_archive = QDArchive(
                 grid_shape=cfg.qd_grid_shape,
                 secondary_lane_mode=cfg.qd_secondary_lane_mode,
+                descriptor_mode=cfg.qd_descriptor,
             )
             qd_update_start = time.perf_counter()
             initial_update = qd_archive.update(
@@ -4801,10 +4901,14 @@ class RDTSteer:
             metrics.qd_archive_update_latency_s += float(
                 time.perf_counter() - qd_update_start
             )
-            metrics.qd_bounds_xy_m = [
+            initial_bounds_values = [
                 qd_bounds.lo.detach().float().cpu().tolist(),
                 qd_bounds.hi.detach().float().cpu().tolist(),
             ]
+            if execution_intent:
+                metrics.qd_descriptor_bounds = initial_bounds_values
+            else:
+                metrics.qd_bounds_xy_m = initial_bounds_values
             metrics.qd_bounds_source_initial_checksum = qd_bounds.checksum
             metrics.qd_initial_occupied_cells = len(qd_archive.entries)
             metrics.qd_initial_descriptor_overflow_count = int(
@@ -5056,6 +5160,11 @@ class RDTSteer:
                 qd_parent_cell_ids = allocation.parent_cell_ids.to(
                     device=population.device
                 )
+                if execution_intent:
+                    metrics.qd_parent_descriptor_values_by_iter.append([
+                        qd_archive.entries[int(cell)].descriptor_xy_m.detach().float().cpu().tolist()
+                        for cell in allocation.parent_cell_ids.tolist()
+                    ])
                 anchor_count = allocation.global_quality_anchor_count
                 lane_to_population_source = {
                     "quality_anchor": "qd_global_quality_anchor",
@@ -5668,7 +5777,7 @@ class RDTSteer:
                     or qd_parent_cell_ids is None
                 ):
                     raise RuntimeError("QD archive loop state is incomplete")
-                child_descriptors = self._eds_qd_descriptor(population, keypoints)
+                child_descriptors = describe_qd(population)
                 fixed_initial_cell_ids, raw_initial_overflow = self._eds_qd_cell_ids(
                     child_descriptors, qd_initial_bounds, cfg
                 )
@@ -5714,12 +5823,12 @@ class RDTSteer:
                 child_cell_ids, child_overflow = self._eds_qd_cell_ids(
                     child_descriptors, qd_bounds, cfg
                 )
-                fixed_initial_sse = qd_within_cell_endpoint_sse(
+                fixed_initial_sse = (0.0 if execution_intent else qd_within_cell_endpoint_sse(
                     child_descriptors, fixed_initial_cell_ids
-                )
-                active_sse = qd_within_cell_endpoint_sse(
+                ))
+                active_sse = (0.0 if execution_intent else qd_within_cell_endpoint_sse(
                     child_descriptors, child_cell_ids
-                )
+                ))
                 resolution_improvement = (
                     1.0 - active_sse / fixed_initial_sse
                     if fixed_initial_sse > 0.0
@@ -5739,7 +5848,7 @@ class RDTSteer:
                     time.perf_counter() - qd_update_start
                 )
                 metrics.qd_evaluation_count += cfg.population_size
-                metrics.qd_bounds_xy_m_by_iter.append(
+                (metrics.qd_descriptor_bounds_by_iter if execution_intent else metrics.qd_bounds_xy_m_by_iter).append(
                     [
                         qd_bounds.lo.detach().float().cpu().tolist(),
                         qd_bounds.hi.detach().float().cpu().tolist(),
@@ -5768,15 +5877,10 @@ class RDTSteer:
                 metrics.qd_raw_initial_bounds_overflow_ratio_by_iter.append(
                     float(raw_overflow_count / cfg.population_size)
                 )
-                metrics.qd_fixed_initial_within_cell_endpoint_sse_by_iter.append(
-                    fixed_initial_sse
-                )
-                metrics.qd_active_within_cell_endpoint_sse_by_iter.append(
-                    active_sse
-                )
-                metrics.qd_partition_resolution_improvement_by_iter.append(
-                    resolution_improvement
-                )
+                if not execution_intent:
+                    metrics.qd_fixed_initial_within_cell_endpoint_sse_by_iter.append(fixed_initial_sse)
+                    metrics.qd_active_within_cell_endpoint_sse_by_iter.append(active_sse)
+                    metrics.qd_partition_resolution_improvement_by_iter.append(resolution_improvement)
                 occupied_count = len(qd_archive.entries)
                 archive_rewards = [
                     entry.reward for entry in qd_archive.entries.values()
@@ -5833,9 +5937,12 @@ class RDTSteer:
                 metrics.qd_archive_mean_elite_reward_by_iter.append(
                     float(sum(archive_rewards) / len(archive_rewards))
                 )
-                metrics.qd_archive_endpoint_xy_spread_m_by_iter.append(
-                    qd_archive.endpoint_xy_spread_m()
-                )
+                if execution_intent:
+                    values = qd_archive.elite_tensors()[3].detach().float()
+                    metrics.qd_archive_descriptor_axis_span_by_iter.append(
+                        (values.amax(0) - values.amin(0)).cpu().tolist())
+                else:
+                    metrics.qd_archive_endpoint_xy_spread_m_by_iter.append(qd_archive.endpoint_xy_spread_m())
                 metrics.qd_accounting_violation_count = (
                     qd_archive.accounting_violation_count
                 )
@@ -6540,6 +6647,15 @@ class RDTSteer:
             "qd_initial_archive": qd_initial_artifact,
             "qd_archive_by_iter": qd_archive_artifacts,
         }
+        if execution_intent:
+            self._last_eds_artifacts.pop("qd_bounds_xy_m")
+            self._last_eds_artifacts.pop("qd_final_bounds_xy_m")
+            self._last_eds_artifacts.update({
+                "qd_descriptor": cfg.qd_descriptor,
+                "qd_descriptor_axes": metrics.qd_descriptor_axes,
+                "qd_descriptor_bounds": metrics.qd_descriptor_bounds,
+                "qd_final_descriptor_bounds": metrics.qd_descriptor_bounds_by_iter[-1],
+            })
         if trace_enabled:
             rollout_diversity_info = {
                 key: value
@@ -6824,6 +6940,9 @@ class RDTSteer:
         if B < 2 or self._adapter is None:
             return None
 
+        self._increment_compute("rbf_gradient_calls")
+        self._increment_compute("rbf_gradient_batch_rows", B)
+
         try:
             with torch.enable_grad():
                 x_grad = x_t.detach().requires_grad_(True)
@@ -6874,6 +6993,8 @@ class RDTSteer:
                 "absolute_fallback_used": False,
                 "zero_gradient": False,
             }
+        self._increment_compute("rbf_gradient_calls")
+        self._increment_compute("rbf_gradient_batch_rows", x_t.shape[0])
         with torch.enable_grad():
             x_grad = x_t.detach().requires_grad_(True)
             trajectories = self._rdt_sample_to_trajectory_3d(x_grad)
@@ -6962,7 +7083,7 @@ class RDTSteer:
                 # Mirrors core/diffusion_policy_steer.py keypoint gradient slice.
                 traj_input = trajs[:, : self._action_chunk_horizon, :3]  # (B, H, 3)
 
-                reward = sum(fn(keypoints, traj_input) for fn in guidance_fns)
+                reward = sum(self._counted_reward(fn, keypoints, traj_input) for fn in guidance_fns)
 
                 if isinstance(reward, (int, float)):
                     return None, float(reward)
@@ -7401,10 +7522,22 @@ class RDTSteer:
             raise ValueError(
                 "EDS qd_degenerate_fallback_policy must be none or control_v1"
             )
-        if resolved.qd_descriptor != "target_relative_endpoint_xy":
+        if resolved.qd_descriptor not in {"target_relative_endpoint_xy", EXECUTION_INTENT_DESCRIPTOR}:
             raise ValueError(
-                "EDS qd_descriptor must be target_relative_endpoint_xy"
+                "EDS qd_descriptor must be target_relative_endpoint_xy or target_distance_gripper_duty_v1"
             )
+        if resolved.qd_descriptor == EXECUTION_INTENT_DESCRIPTOR:
+            required_intent = {
+                "qd_archive_mode": "grid_archive", "qd_grid_shape": (4, 4),
+                "qd_cell_capacity": 1, "qd_parent_sampling": "sparse_priority",
+                "qd_bounds_quantiles": (0.05, 0.95), "qd_bounds_expand_fraction": 0.1,
+                "qd_min_axis_span_m": 0.08, "qd_bounds_update_policy": "fixed_initial",
+                "qd_global_quality_anchor_count": 0, "qd_secondary_lane_mode": "none",
+                "qd_degenerate_fallback_policy": "none",
+            }
+            for name, expected in required_intent.items():
+                if getattr(resolved, name) != expected:
+                    raise ValueError(f"Execution-intent QD requires {name}={expected!r}")
         if resolved.qd_grid_shape not in {(3, 3), (4, 4), (5, 5)}:
             raise ValueError("EDS qd_grid_shape is not a preregistered square grid")
         if resolved.qd_cell_capacity != 1:

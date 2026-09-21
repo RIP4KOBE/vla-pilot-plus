@@ -9,6 +9,12 @@ from typing import Iterable
 import torch
 from torch import Tensor
 
+EXECUTION_INTENT_DESCRIPTOR = "target_distance_gripper_duty_v1"
+EXECUTION_INTENT_AXES = (
+    {"name": "target_distance", "unit": "m"},
+    {"name": "positive_gripper_command_duty", "unit": "fraction"},
+)
+
 
 def _finite_tensor(value: Tensor, *, name: str, ndim: int | None = None) -> Tensor:
     if not torch.is_tensor(value):
@@ -63,6 +69,35 @@ def qd_descriptor(trajectories: Tensor, keypoints: Tensor | None) -> Tensor:
     if not bool(torch.isfinite(descriptor).all().item()):
         raise FloatingPointError("QD descriptor contains nonfinite values")
     return descriptor
+
+
+def execution_intent_descriptor(
+    trajectories: Tensor, keypoints: Tensor | None, decoded_actions: Tensor
+) -> Tensor:
+    """Describe the executed t8 endpoint and exact eight-command gripper duty.
+
+    Projected geometry is a current-observation kinematic proxy, not a simulator
+    counterfactual. Decoded gripper commands must already be exactly -1/+1.
+    """
+    trajectories = _finite_tensor(trajectories, name="QD trajectories", ndim=3)
+    decoded_actions = _finite_tensor(decoded_actions, name="QD decoded actions", ndim=3)
+    if trajectories.shape[0] <= 0 or tuple(trajectories.shape[1:]) != (9, 3):
+        raise ValueError("Execution-intent QD requires start plus eight projected positions")
+    if tuple(decoded_actions.shape) != (trajectories.shape[0], 8, 7):
+        raise ValueError("Execution-intent QD requires exactly eight decoded 7D actions")
+    if keypoints is None:
+        raise ValueError("QD descriptor requires keypoints")
+    target = _finite_tensor(keypoints, name="QD keypoints").reshape(-1)
+    if target.numel() < 3:
+        raise ValueError("QD keypoints must contain at least one 3D target")
+    grip = decoded_actions[:, :, 6]
+    if not bool(((grip == -1) | (grip == 1)).all().item()):
+        raise ValueError("QD gripper duty requires deployed binary decoded commands")
+    endpoint = trajectories[:, 8, :3].detach().float()
+    radial = torch.linalg.vector_norm(endpoint - target[:3].detach().to(endpoint), dim=1)
+    duty = (grip > 0).float().mean(dim=1).to(endpoint)
+    result = torch.stack((radial, duty), dim=1)
+    return _finite_tensor(result, name="QD execution-intent descriptor").detach()
 
 
 @dataclass(frozen=True)
@@ -132,6 +167,33 @@ def freeze_bounds(
         json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
     ).hexdigest()
     return QDBounds(lo=lo.detach().clone(), hi=hi.detach().clone(), checksum=checksum)
+
+
+def freeze_execution_intent_bounds(
+    descriptors: Tensor,
+    *,
+    quantiles: tuple[float, float] | list[float],
+    expand_fraction: float,
+    min_axis_span_m: float,
+) -> QDBounds:
+    """Use unchanged historical radial quantiles; duty has fixed [0,1] bounds."""
+    descriptors = _finite_tensor(descriptors, name="QD execution-intent descriptors", ndim=2).detach().float()
+    if descriptors.shape[0] <= 0 or descriptors.shape[1] != 2:
+        raise ValueError("QD execution-intent descriptors must have shape (population, 2)")
+    if bool((descriptors[:, 0] < 0).any()) or bool(((descriptors[:, 1] < 0) | (descriptors[:, 1] > 1)).any()):
+        raise ValueError("QD radial distance must be nonnegative and duty in [0,1]")
+    # Duplicate the meter-valued radial axis to reuse the frozen calculation
+    # exactly; the historical minimum span never applies to the duty axis.
+    radial = freeze_bounds(descriptors[:, :1].expand(-1, 2), quantiles=quantiles,
+                           expand_fraction=expand_fraction, min_axis_span_m=min_axis_span_m)
+    lo, hi = radial.lo.clone(), radial.hi.clone()
+    lo[1], hi[1] = 0.0, 1.0
+    payload = {"descriptor": EXECUTION_INTENT_DESCRIPTOR, "axes": EXECUTION_INTENT_AXES,
+               "radial_checksum": radial.checksum,
+               "descriptors": sorted(descriptors.cpu().tolist()),
+               "lo": lo.cpu().tolist(), "hi": hi.cpu().tolist()}
+    checksum = hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    return QDBounds(lo=lo, hi=hi, checksum=checksum)
 
 
 def expand_bounds(
@@ -288,6 +350,7 @@ class QDArchive:
         *,
         grid_shape: tuple[int, int] | list[int],
         secondary_lane_mode: str = "none",
+        descriptor_mode: str = "target_relative_endpoint_xy",
     ) -> None:
         if secondary_lane_mode not in {"none", "protected_reward_v1"}:
             raise ValueError(
@@ -296,6 +359,9 @@ class QDArchive:
         self.grid_shape = _grid_shape(grid_shape)
         self.cell_count = self.grid_shape[0] * self.grid_shape[1]
         self.secondary_lane_mode = secondary_lane_mode
+        if descriptor_mode not in {"target_relative_endpoint_xy", EXECUTION_INTENT_DESCRIPTOR}:
+            raise ValueError("Unsupported QD archive descriptor mode")
+        self.descriptor_mode = descriptor_mode
         self.entries: dict[int, QDArchiveEntry] = {}
         self.secondary_entries: dict[int, QDArchiveEntry] = {}
         self.cumulative_visits = torch.zeros(self.cell_count, dtype=torch.long)
@@ -645,7 +711,7 @@ class QDArchive:
                 "cell_id": cell,
                 "reward": entry.reward,
                 "cost": entry.cost,
-                "descriptor_xy_m": entry.descriptor_xy_m.detach().cpu().tolist(),
+                ("descriptor_values" if self.descriptor_mode == EXECUTION_INTENT_DESCRIPTOR else "descriptor_xy_m"): entry.descriptor_xy_m.detach().cpu().tolist(),
                 "fingerprint": entry.fingerprint,
                 "source_iter": entry.source_iter,
                 "parent_cell_id": entry.parent_cell_id,

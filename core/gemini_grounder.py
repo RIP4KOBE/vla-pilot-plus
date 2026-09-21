@@ -23,6 +23,55 @@ from utils.logging_utils import SteerLogger
 logger = SteerLogger("GeminiGrounder")
 
 
+class APIRequestCounter:
+    """Observe HTTP send attempts, including SDK retries, without payload data."""
+
+    def __init__(self):
+        self.request_attempts = 0
+        self.sdk_retry_attempts = 0
+        self.observation_available = False
+
+    def on_request(self, request):
+        self.request_attempts += 1
+        # OpenAI 2.8.1 emits this non-secret count on every HTTP attempt.
+        # Read only; neither headers nor retry behavior are modified.
+        try:
+            self.sdk_retry_attempts += int(request.headers.get("x-stainless-retry-count", "0")) > 0
+        except (AttributeError, TypeError, ValueError):
+            pass
+
+    def snapshot(self):
+        return {
+            "request_attempts": int(self.request_attempts),
+            "sdk_retry_attempts": int(self.sdk_retry_attempts),
+            "observation_available": bool(self.observation_available),
+        }
+
+
+def observe_api_requests(client):
+    """Attach an idempotent observer to the existing sync client's HTTP hooks.
+
+    SDK requests/retries and any caller retries pass through the same hook.
+    Only SDK retries are separately classified; caller retries remain included
+    in total request attempts. Unsupported test/custom transports are reported
+    unavailable instead of changing client behavior.
+    """
+    counter = getattr(client, "_qd_ed_http_request_counter", None)
+    if isinstance(counter, APIRequestCounter):
+        return counter
+    counter = APIRequestCounter()
+    http_client = getattr(client, "_client", None)
+    hooks = getattr(http_client, "event_hooks", None)
+    if isinstance(hooks, dict):
+        hooks.setdefault("request", []).append(counter.on_request)
+        counter.observation_available = True
+    try:
+        client._qd_ed_http_request_counter = counter
+    except (AttributeError, TypeError):
+        pass
+    return counter
+
+
 def _image_to_base64(rgb: np.ndarray) -> str:
     if rgb.dtype != np.uint8:
         rgb = (rgb * 255).astype(np.uint8) if rgb.max() <= 1.0 else rgb.astype(np.uint8)
@@ -49,6 +98,7 @@ class GeminiGrounder:
         self.config = config
         self.model = config.get("model", "gemini-2.5-flash")
         self.client = _make_client(config)
+        self.api_request_counter = observe_api_requests(self.client)
         logger.info(f"GeminiGrounder initialized with model: {self.model}")
 
     def detect_objects(self, rgb: np.ndarray, object_names: List[str]) -> List[Dict]:
@@ -142,6 +192,7 @@ class GeminiStageRecognizer:
         self.config = config
         self.model = config.get("model", "gemini-2.5-flash")
         self.client = _make_client(config)
+        self.api_request_counter = observe_api_requests(self.client)
         self._last_result = None
 
         template_path = config.get("stage_template_path")
@@ -200,6 +251,8 @@ class GeminiStageRecognizer:
         error = None
         parse_ok = False
         query_start_s = time.perf_counter()
+        counter = getattr(self, "api_request_counter", None)
+        counter_before = counter.snapshot() if counter is not None else None
         try:
             resp = self.client.chat.completions.create(
                 model=self.model,
@@ -246,6 +299,13 @@ class GeminiStageRecognizer:
             "error": error,
             "query_latency_s": float(time.perf_counter() - query_start_s),
         }
+        if counter_before is not None:
+            counter_after = counter.snapshot()
+            self._last_result.update(
+                api_request_attempts=counter_after["request_attempts"] - counter_before["request_attempts"],
+                api_sdk_retry_attempts=counter_after["sdk_retry_attempts"] - counter_before["sdk_retry_attempts"],
+                api_request_counter_available=counter_after["observation_available"],
+            )
 
         return stage_num, need_guidance
 

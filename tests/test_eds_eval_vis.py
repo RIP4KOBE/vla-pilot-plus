@@ -3,6 +3,7 @@ from pathlib import Path
 
 import imageio.v2 as imageio
 import numpy as np
+import pytest
 import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -152,7 +153,8 @@ def test_save_eds_qualitative_artifacts_falls_back_when_keypoint_draw_fails(
     assert image[0, 0, 1] == 64
 
 
-def test_save_qd_archive_heatmaps_trajectories_and_timeline(tmp_path):
+@pytest.mark.parametrize("execution_intent", [False, True])
+def test_save_qd_archive_heatmaps_trajectories_and_timeline(tmp_path, execution_intent):
     import utils.eds_eval_vis as vis
 
     def state(iter_idx):
@@ -191,7 +193,10 @@ def test_save_qd_archive_heatmaps_trajectories_and_timeline(tmp_path):
         mask_ids=None,
         artifacts={
             "qd_grid_shape": [2, 2],
-            "qd_bounds_xy_m": [[-0.04, -0.04], [0.04, 0.04]],
+            **({"qd_descriptor_bounds": [[0.0, 0.0], [0.4, 1.0]],
+                "qd_descriptor_axes": [{"name": "target_distance", "unit": "m"},
+                                       {"name": "positive_gripper_command_duty", "unit": "fraction"}]}
+               if execution_intent else {"qd_bounds_xy_m": [[-0.04, -0.04], [0.04, 0.04]]}),
             "qd_initial_archive": state(-1),
             "qd_archive_by_iter": [state(i) for i in range(10)],
         },

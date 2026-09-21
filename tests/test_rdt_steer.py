@@ -2217,6 +2217,97 @@ def test_qd_config_defaults_are_legacy_safe_and_match_yaml(stub_steer):
     } == expected
 
 
+def test_execution_intent_qd_full_loop_budget_metadata_and_fresh_target(stub_steer, stub_adapter, monkeypatch):
+    from core.qd_ed import fingerprint_action
+    stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
+                         sample_batch_size=16, policy_config={"action_chunk_horizon": 8})
+    initial = torch.zeros(16, 64, 128)
+    for i in range(16):
+        initial[i, :8, 39] = (.1 + .1 * (i % 4)) / 8
+        initial[i, :8, 10] = -1
+        initial[i, :2 * (i // 4), 10] = 0  # zero must decode positive
+        initial[i, :, 42] = -float(i)
+    def score(samples, **kwargs):
+        costs = samples[:, 0, 42]
+        return costs, {"rewards": -costs}
+    def rollout(**kwargs):
+        children = kwargs["noisy_action"].clone()
+        children[:, :, 42] -= 1
+        costs, info = score(children)
+        return children, costs, info
+    monkeypatch.setattr(stub_steer, "_eds_initial_population", lambda **kwargs: initial.clone())
+    monkeypatch.setattr(stub_steer, "_eds_score_population_as_cost", score)
+    monkeypatch.setattr(stub_steer, "_eds_renoise_reference", lambda samples, steps: samples)
+    monkeypatch.setattr(stub_steer, "_eds_rollout_reference", rollout)
+    cfg = stub_steer._resolve_eds_config_with_reference_defaults(_valid_qd_config(
+        qd_descriptor="target_distance_gripper_duty_v1", qd_parent_sampling="sparse_priority",
+        qd_metrics_observer=True))
+    def run(target):
+        result = stub_steer._eds_guided_denoise_loop(x_t=torch.zeros_like(initial), cond=_rollout_cond(stub_steer),
+            keypoints=target, guidance_fns=None, eds_config=cfg, verbose=False, global_step=0, current_stage=1)
+        return result, stub_steer.get_last_eds_metrics(), stub_steer.get_last_eds_artifacts()
+    selected, metrics, artifacts = run(torch.zeros(1, 3))
+    assert metrics['search_evaluation_count'] == metrics['qd_evaluation_count'] == 176
+    assert metrics['score_call_count'] == 11
+    assert metrics['qd_selected_action_fingerprint'] == fingerprint_action(selected[0])
+    assert all(sum(v.values()) == 16 for v in metrics['qd_parent_slots_by_cell_by_iter'])
+    assert all(v <= 16 for v in metrics['qd_occupied_cells_by_iter'])
+    assert len(metrics['qd_parent_descriptor_values_by_iter']) == 10
+    assert all(len(v) == 16 for v in metrics['qd_parent_descriptor_values_by_iter'])
+    assert metrics['qd_descriptor_axes'][1]['unit'] == 'fraction'
+    assert metrics['qd_descriptor_bounds'][0][1] == 0 and metrics['qd_descriptor_bounds'][1][1] == 1
+    assert 'qd_bounds_xy_m' not in metrics and 'qd_bounds_xy_m' not in artifacts
+    assert all('descriptor_values' in v and 'descriptor_xy_m' not in v for v in artifacts['qd_initial_archive']['archive'])
+    assert all('descriptor_values' in v and 'descriptors_xy_m' not in v for v in metrics['shadow_qd_candidate_stream'])
+    stub_steer.reset_stage()
+    _, changed, _ = run(torch.tensor([[0., 0., 2.]]))
+    assert changed['qd_bounds_source_initial_checksum'] != metrics['qd_bounds_source_initial_checksum']
+    stub_steer.reset()
+    repeated, fresh, _ = run(torch.zeros(1, 3))
+    torch.testing.assert_close(repeated, selected, rtol=0, atol=0)
+    assert fresh['qd_bounds_source_initial_checksum'] == metrics['qd_bounds_source_initial_checksum']
+
+
+def test_compute_counters_measure_actual_calls_and_reset_without_rng_changes(stub_steer, stub_adapter):
+    stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
+                         sample_batch_size=1, policy_config={"action_chunk_horizon": 8})
+    stub_steer.reset_episode_compute_counters()
+    state = torch.get_rng_state().clone()
+    cond = _rollout_cond(stub_steer)
+    samples = torch.zeros(2, 64, 128)
+    stub_steer._counted_dit(samples, torch.tensor(0), cond)
+    values = stub_steer._score_particles(samples, torch.zeros(1, 3),
+        [lambda k, t: t.sum(), lambda k, t: t.sum()], slice_kind='eds')
+    counts = stub_steer.get_episode_compute_counters()
+    assert values.shape == (2,)
+    assert counts['model_forward_calls'] == 1 and counts['model_batch_rows'] == 2
+    assert counts['model_forward_batch_sizes'] == [2]
+    assert counts['reward_calls'] == counts['reward_evaluations'] == 4
+    assert counts['reward_scoring_batches'] == 1
+    assert torch.equal(state, torch.get_rng_state())
+    counts['model_forward_batch_sizes'].append(999)
+    assert stub_steer.get_episode_compute_counters()['model_forward_batch_sizes'] == [2]
+    stub_steer.reset_stage()
+    assert stub_steer.get_episode_compute_counters()['reward_calls'] == 4
+    stub_steer.reset()
+    assert stub_steer.get_episode_compute_counters()['reward_calls'] == 0
+
+
+def test_compute_counters_include_unguided_and_exclude_cached_actions(stub_steer, stub_adapter, mock_batch):
+    stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
+                         sample_batch_size=16, policy_config={"action_chunk_horizon": 8})
+    stub_steer.reset()
+    stub_steer.select_action(mock_batch, use_guidance=False)
+    counts = stub_steer.get_episode_compute_counters()
+    assert counts['unguided_chunks'] == counts['denoising_invocations'] == 1
+    assert counts['model_forward_calls'] == counts['model_denoising_steps'] == 5
+    assert counts['model_batch_rows'] == counts['denoising_step_batch_rows'] == 5
+    assert counts['model_forward_batch_sizes'] == [1] * 5
+    assert counts['reward_calls'] == counts['rbf_gradient_calls'] == 0
+    stub_steer.select_action(mock_batch, use_guidance=False)
+    assert stub_steer.get_episode_compute_counters() == counts
+
+
 def _valid_qd_config(**updates):
     return {
         "population_size": 16,

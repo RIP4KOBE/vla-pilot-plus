@@ -118,6 +118,23 @@ def _main_vls_config(main_config: Any) -> dict:
     return vls_config
 
 
+def _validate_task_cache_identity(program_info, task_id, live_keypoint_map):
+    """Fail closed for opt-in task-bound caches without changing keypoint order."""
+    identity = program_info.get("qd_ed_task_identity")
+    if not isinstance(identity, dict):
+        raise ValueError("Task-bound guidance cache lacks identity metadata")
+    if task_id is None or identity.get("task_id") != task_id:
+        raise ValueError("Guidance cache task ID does not match the current task")
+    target = identity.get("expected_target_object")
+    basket = identity.get("expected_basket_object")
+    if not isinstance(target, str) or not target or not isinstance(basket, str) or not basket:
+        raise ValueError("Guidance cache target/basket identity is incomplete")
+    if live_keypoint_map.get(0) != target:
+        raise ValueError("Guidance keypoint 0 does not match the task target")
+    if basket not in live_keypoint_map.values():
+        raise ValueError("Task basket is missing from the live keypoint mapping")
+
+
 def _adapter_actual_task_id(adapter: Any) -> int | None:
     """Return the dataset task id, preserving filtered LIBERO task ids."""
     current_task_idx = getattr(adapter, "current_task_idx", None)
@@ -413,7 +430,7 @@ from core.env_adapters import create_adapter, BaseEnvAdapter
 from core.keypoint_tracker import KeypointTracker
 from core.keypoint_detector import KeypointDetector
 from core.sam3_segmenter import create_segmenter as create_sam3_segmenter
-from core.gemini_grounder import create_gemini_grounder, create_gemini_stage_recognizer
+from core.gemini_grounder import create_gemini_grounder, create_gemini_stage_recognizer, observe_api_requests
 from vlm_query.vlm_agent import VLMAgent
 from utils.vis_utils import TrajectoryVideoRecorder, add_text_to_image
 from utils.eds_eval_vis import save_eds_qualitative_artifacts
@@ -735,6 +752,7 @@ class Main:
             base_dir=self.output_dir,
             env_type=self.backend,
         )
+        self.vlm_agent.api_request_counter = observe_api_requests(self.vlm_agent.client)
 
         # Initialize Gemini stage recognizer (for real-time stage recognition)
         gemini_config = OmegaConf.to_container(perception_cfg.get('gemini', {}), resolve=True)
@@ -909,6 +927,13 @@ class Main:
         with open(os.path.join(guidance_functions_dir, 'metadata.json'), 'r') as f:
             self.program_info = json.load(f)
 
+        if self.config.get("require_task_cache_identity", False):
+            _validate_task_cache_identity(
+                self.program_info,
+                _adapter_actual_task_id(self.adapter),
+                self.keypoint_id_to_object,
+            )
+
         self.guidance_fns = dict()
         for stage in range(1, self.program_info['num_stages'] + 1):
             load_path = os.path.join(guidance_functions_dir, f'stage{stage}_guidance.txt')
@@ -1001,6 +1026,86 @@ class Main:
             )
         except Exception as e:
             log.warning(f"Failed to append episode metadata to {metadata_path}: {e}")
+
+    def _api_compute_snapshot(self):
+        """Read only counters, never requests, endpoints, headers, or credentials."""
+        snapshot = {}
+        for name, attribute in (
+            ("stage", "gemini_stage_recognizer"),
+            ("guidance", "vlm_agent"),
+            ("grounding", "gemini_grounder"),
+        ):
+            component = getattr(self, attribute, None)
+            counter = getattr(component, "api_request_counter", None)
+            if counter is None:
+                snapshot[name] = {"request_attempts": 0, "sdk_retry_attempts": 0,
+                                  "observation_available": component is None}
+            else:
+                snapshot[name] = counter.snapshot()
+        return snapshot
+
+    def _perception_compute_snapshot(self):
+        detector = getattr(self, "keypoint_detector", None)
+        getter = getattr(detector, "get_compute_counters", None)
+        counters = getter() if callable(getter) else {"dino_forward_calls": 0, "dino_batch_rows": 0}
+        sam = getattr(self, "sam3_segmenter", None)
+        grounder = getattr(self, "gemini_grounder", None)
+        grounder_counter = getattr(grounder, "api_request_counter", None)
+        grounding_observed = bool(grounder_counter and grounder_counter.snapshot()["observation_available"])
+        return {
+            **counters,
+            "observation_available": (detector is None or callable(getter)) and sam is None
+                                     and (grounder is None or grounding_observed),
+            "components": {
+                "dino": "inactive" if detector is None else ("active_observed" if callable(getter) else "active_unobserved"),
+                "sam3": "inactive" if sam is None else "active_unobserved",
+                "grounding": "inactive" if grounder is None else ("active_api_observed" if grounding_observed else "active_unobserved"),
+            },
+        }
+
+    def _begin_episode_compute(self):
+        self._episode_api_compute_start = self._api_compute_snapshot()
+        self._episode_perception_compute_start = self._perception_compute_snapshot()
+
+    def _append_episode_compute(self, *, episode, episode_seed, outcome):
+        """Persist whole-episode counters including prep and handled failures."""
+        before = getattr(self, "_episode_api_compute_start", {})
+        after = self._api_compute_snapshot()
+        provider = {}
+        available = True
+        for name, counts in after.items():
+            start = before.get(name, {"request_attempts": 0, "sdk_retry_attempts": 0,
+                                      "observation_available": False})
+            available = available and counts["observation_available"] and start["observation_available"]
+            provider[f"{name}_api_request_attempts"] = counts["request_attempts"] - start["request_attempts"]
+            provider[f"{name}_api_sdk_retry_attempts"] = counts["sdk_retry_attempts"] - start["sdk_retry_attempts"]
+        provider["provider_request_attempts"] = sum(provider[f"{name}_api_request_attempts"] for name in after)
+        provider["provider_sdk_retry_attempts"] = sum(provider[f"{name}_api_sdk_retry_attempts"] for name in after)
+        getter = getattr(self.policy, "get_episode_compute_counters", None)
+        policy = getter() if callable(getter) else {}
+        perception_after = self._perception_compute_snapshot()
+        perception_before = getattr(self, "_episode_perception_compute_start", {})
+        perception = {key: perception_after[key] - perception_before.get(key, 0)
+                      for key in ("dino_forward_calls", "dino_batch_rows")}
+        record = {
+            **policy, **provider, **perception,
+            "schema": "qd-ed-episode-compute-v1",
+            "episode_id": int(episode), "episode_seed": int(episode_seed),
+            "task_id": _adapter_actual_task_id(self.adapter), "outcome": outcome,
+            "policy_counters_available": callable(getter),
+            "provider_counters_available": bool(available),
+            "perception_counters_available": bool(perception_after["observation_available"]
+                                                  and perception_before.get("observation_available", False)),
+            "perception_components": perception_after["components"],
+            "perception_counter_semantics": "DINO model call attempts and input batch rows, including failures; inactive components are explicit",
+            "provider_counter_semantics": "HTTP send attempts including SDK and caller retries; separate retry counter classifies SDK retries only",
+        }
+        eds_eval_config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
+        path = Path(eds_eval_config.get("output_dir") or self.output_dir) / "episode_compute.jsonl"
+        try:
+            append_jsonl(path, record)
+        except Exception as e:
+            log.warning(f"Failed to append episode compute counters to {path}: {e}")
 
     def _append_safety_event(self, event: dict[str, Any]) -> None:
         """Persist a small, credential-free observation safety event."""
@@ -1134,6 +1239,9 @@ class Main:
                 "evidence": query_result.get("evidence"),
                 "error": query_result.get("error"),
                 "query_latency_s": query_result.get("query_latency_s"),
+                **{key: query_result[key] for key in (
+                    "api_request_attempts", "api_sdk_retry_attempts", "api_request_counter_available"
+                ) if key in query_result},
             })
 
         # Update tracking state
@@ -1165,6 +1273,7 @@ class Main:
                 sampled_seed=sampled_seed,
             )
             self.policy.reset()
+            self._begin_episode_compute()
             self.video_recorder.clear()
             episode_dir = os.path.join(base_output_dir, f'episode_{episode+1}')
             os.makedirs(episode_dir, exist_ok=True)
@@ -1201,6 +1310,7 @@ class Main:
                 fail_marker = os.path.join(episode_dir, f'episode_{episode+1}_fail_error.txt')
                 with open(fail_marker, 'w') as f:
                     f.write("Episode failed due to guidance function error\n")
+                self._append_episode_compute(episode=episode, episode_seed=episode_seed, outcome="preparation_error")
                 continue
 
             # Wrap entire episode execution in try-except
@@ -1222,7 +1332,9 @@ class Main:
                     error=e,
                 )
                 log.warning(f"Skipping episode {episode+1} due to execution error")
+                self._append_episode_compute(episode=episode, episode_seed=episode_seed, outcome="execution_error")
                 continue
+            self._append_episode_compute(episode=episode, episode_seed=episode_seed, outcome="completed")
 
         # Final statistics
         executed_episode_count = episode_num - episode_start_index

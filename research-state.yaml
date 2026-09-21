@@ -13,10 +13,18 @@ project_target:
   required_formal_successes: 5
   achieved: false
 study:
-  status: INTAKE
+  status: WAITING_RUNTIME_PREREQUISITES
   mode: real
   interaction: auto
-candidate: null
+candidate:
+  id: N1
+  arbor_node: '4.1'
+  status: CPU_READY_UNEVALUATED
+  protocol: experiments/iteration_001_execution_intent/protocol.md
+  protocol_commit: 56031d2
+  primary_change: target_distance_gripper_duty_v1
+  online_score: null
+  scientific_decision: PENDING_ONLINE
 budget:
   max_gpu_hours: 48.0
   gpu_hours_consumed: 0.0
@@ -31,6 +39,11 @@ budget:
   aborted: 0
   valid: 0
   running: 0
+  invalid: 0
+  completed: 0
+  gpu_hour_reservations:
+    validation: 14.0
+    formal: 10.0
 historical:
   Q0:
     profile: eds_quality_diversity_sparse_primary
@@ -59,11 +72,44 @@ historical:
   previous_reservations: 98
   previous_gpu_hours: 6.946832055555556
   previous_formal_episodes: 0
-active_iteration: iteration_000_intake
-next_action: Audit scientific evidence, baseline parity, runtime inputs, and frozen
-  splits; await GPU7 admission.
+active_iteration: iteration_001_execution_intent
+next_action: Resolve authorized Stage endpoint/credential binding and wait for exclusive
+  GPU7 admission; run accounted CUDA/EGL probe, then freeze refreshed baseline plan
+  and execute20 paired control episodes. See docs/03_evidence/qd_ed_final/resume.md.
 source_spec_sha256: 3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef
 derived_indexes:
 - .arbor/sessions/rdt-qd-ed-final-20260921T093925Z
 authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
   ledger is append-only event evidence, not a second mutable state.
+online_blockers:
+- type: GPU_ADMISSION
+  gpu: 7
+  observed_external_pid: 1672968
+  required: No external compute process and less than1024MiB before launch; await
+    resource availability.
+- type: STAGE_PROVIDER_BINDING
+  historical_provider: https://api.poe.com/v1
+  model: gemini-2.5-flash
+  current_injected_host: rawchat.cn
+  required: User decision or matching runtime injection; no credential value recorded.
+updated_at: '2026-09-21T10:31:45.715162+00:00'
+seed_plan:
+  path: data/frozen-seed-plan.json
+  sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
+cpu_validation:
+  integrated_passed: 631
+  post_accounting_change_focused_passed: 51
+  online_evidence: false
+prepared_baseline_plan:
+  path: data/qd-ed-final-plan.json
+  episodes: 20
+  frozen: false
+  refresh_source_fingerprints_before_freeze: true
+engineering_baseline_changes:
+- Task-identity-bound guidance cache Stage descriptions; canonical tensor reward guidance
+  remains identical.
+- Owned LIBERO path/dependency bindings instead of stale old-worktree absolute paths.
+- Single-task process with explicit policy_seed and env_seed instead of legacy sequential
+  seed0 RNG stream; same across all arms.
+cuda_egl_context_verified: false
+stage_provider_ready: false

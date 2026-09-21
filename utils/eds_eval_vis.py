@@ -222,6 +222,7 @@ def _save_qd_heatmap(
     *,
     grid_shape: tuple[int, int],
     bounds_xy_m: list[list[float]],
+    descriptor_axes: list[dict[str, str]] | None = None,
 ) -> None:
     grid_x, grid_y = grid_shape
     rewards = np.full((grid_y, grid_x), np.nan, dtype=np.float64)
@@ -238,12 +239,20 @@ def _save_qd_heatmap(
             value = rewards[y, x]
             label = "empty" if not np.isfinite(value) else f"{value:.3g}"
             axis.text(x, y, label, ha="center", va="center", fontsize=8)
-    axis.set_xlabel("cell x")
-    axis.set_ylabel("cell y")
-    axis.set_title(
-        "QD occupancy / elite reward\n"
-        f"bounds lo={bounds_xy_m[0]} hi={bounds_xy_m[1]} m"
-    )
+    if descriptor_axes is None:
+        axis.set_xlabel("cell x")
+        axis.set_ylabel("cell y")
+        axis.set_title(
+            "QD occupancy / elite reward\n"
+            f"bounds lo={bounds_xy_m[0]} hi={bounds_xy_m[1]} m"
+        )
+    else:
+        if len(descriptor_axes) != 2:
+            raise ValueError("QD descriptor axes must name both coordinates")
+        axis.set_xlabel(f"{descriptor_axes[0]['name']} ({descriptor_axes[0]['unit']}) bin")
+        axis.set_ylabel(f"{descriptor_axes[1]['name']} ({descriptor_axes[1]['unit']}) bin")
+        axis.set_title("QD occupancy / elite reward\n"
+                       f"bounds lo={bounds_xy_m[0]} hi={bounds_xy_m[1]}")
     figure.colorbar(image, ax=axis, label="elite reward")
     figure.tight_layout()
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -321,7 +330,8 @@ def _save_qd_qualitative_artifacts(
     ):
         raise ValueError("QD qualitative artifacts require qd_grid_shape")
     grid_shape = (int(raw_grid_shape[0]), int(raw_grid_shape[1]))
-    bounds_xy_m = artifacts.get("qd_bounds_xy_m")
+    descriptor_axes = artifacts.get("qd_descriptor_axes")
+    bounds_xy_m = artifacts.get("qd_descriptor_bounds") if descriptor_axes else artifacts.get("qd_bounds_xy_m")
     if not isinstance(bounds_xy_m, list) or len(bounds_xy_m) != 2:
         raise ValueError("QD qualitative artifacts require qd_bounds_xy_m")
     saved = []
@@ -333,6 +343,7 @@ def _save_qd_qualitative_artifacts(
             state,
             grid_shape=grid_shape,
             bounds_xy_m=bounds_xy_m,
+            descriptor_axes=descriptor_axes,
         )
         saved.append(str(heatmap_path))
         trajectory_path = output_root / f"qd_archive_trajectories_{label}.png"

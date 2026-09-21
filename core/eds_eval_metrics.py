@@ -431,6 +431,11 @@ class EDSChunkMetrics:
     qd_degenerate_fallback_reason: str | None = None
     qd_degenerate_reward_value: float | None = None
     qd_descriptor: str = "target_relative_endpoint_xy"
+    qd_descriptor_axes: list[dict[str, str]] = field(default_factory=list)
+    qd_descriptor_bounds: list[list[float]] = field(default_factory=list)
+    qd_descriptor_bounds_by_iter: list[list[list[float]]] = field(default_factory=list)
+    qd_parent_descriptor_values_by_iter: list[list[list[float]]] = field(default_factory=list)
+    qd_archive_descriptor_axis_span_by_iter: list[list[float]] = field(default_factory=list)
     qd_grid_shape: list[int] = field(default_factory=list)
     qd_cell_capacity: int = 1
     qd_secondary_lane_mode: str = "none"
@@ -511,6 +516,16 @@ class EDSChunkMetrics:
 
     def to_jsonable(self) -> dict[str, Any]:
         payload = _to_json_safe(self)
+        if self.qd_descriptor == "target_relative_endpoint_xy":
+            # Keep legacy JSON shape exactly unchanged.
+            for key in ("qd_descriptor_axes", "qd_descriptor_bounds", "qd_descriptor_bounds_by_iter",
+                        "qd_parent_descriptor_values_by_iter", "qd_archive_descriptor_axis_span_by_iter"):
+                payload.pop(key)
+        else:
+            for key in ("qd_bounds_xy_m", "qd_bounds_xy_m_by_iter", "qd_archive_endpoint_xy_spread_m_by_iter",
+                        "qd_fixed_initial_within_cell_endpoint_sse_by_iter", "qd_active_within_cell_endpoint_sse_by_iter",
+                        "qd_partition_resolution_improvement_by_iter"):
+                payload.pop(key)
         if self.direction_rbf_weights:
             if self.initial_direction_rbf_evidence_by_step and not self.initial_direction_rbf_metrics:
                 payload["initial_direction_rbf_metrics"] = direction_rbf_evidence_summary(

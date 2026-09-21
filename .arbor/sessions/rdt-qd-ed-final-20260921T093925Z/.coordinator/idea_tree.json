@@ -11,7 +11,7 @@
     "eval_retries": 0,
     "eval_retry_base_delay": null,
     "eval_retry_max_delay": null,
-    "dataset_info": "Historical exposed object-swap; new Dev/Validation identities pending freeze. Historical Q0 2/10 and P2 3/10 are not new Dev baselines. GPU7 only; authoritative budget/status in research-state.yaml.",
+    "dataset_info": "Historical exposed object-swap; Dev and unused validation cohorts frozen in data/frozen-seed-plan.json at protocol commit56031d2. Init row0 fixed: stochastic-seed robustness only. New B_dev unknown. Physical GPU7 only; authoritative budget/status research-state.yaml.",
     "metric_direction": "maximize",
     "trunk_branch": "exp/rdt-qd-ed-final-20260921T093925Z",
     "submission_path": null,
@@ -51,7 +51,9 @@
       "children_ids": [],
       "depth": 1,
       "hypothesis": "Mechanism: Reproducible runtime and input identity verification before online evaluation.\nHypothesis: Stale absolute paths and task-ambiguous guidance cache can confound a new control; verifying identities before dispatch isolates infrastructure from QD effects.\nObservable: Dependency, checkpoint, BDDL/init-state/cache and GPU7 admission inventory plus exact runnable evaluation contract; no GPU execution in this audit.\nConflicts: All historical artifacts remain immutable and the protected untracked stage-guidance design remains unread.",
-      "status": "running"
+      "status": "done",
+      "insight": "CPU runtime/input audit complete; canonical reward unchanged, target descriptions repaired in owned copies. Physical GPU7/EGL4 metadata verified; actual context and Stage provider binding remain unverified.",
+      "result": "Zero episodes and zero GPU-hours; no task score. Runtime setup, cache guard, telemetry and accounted GPU7 probe prepared."
     },
     "3": {
       "id": "3",
@@ -59,7 +61,9 @@
       "children_ids": [],
       "depth": 1,
       "hypothesis": "Mechanism: Historical baseline behavior restoration with explicit configuration parity.\nHypothesis: Starting from latest source while disabling later mechanisms can reproduce Q0/C0 semantics only if code-default and profile differences are audited explicitly.\nObservable: Full Q0/C0 override manifests, source-difference classification and minimal regression plan against 5b0898e; no claim of online parity before measurement.\nConflicts: Newer HEAD is not presumed best; causal-envelope, anchor, protected lane and degenerate fallback remain disabled.",
-      "status": "running"
+      "status": "done",
+      "insight": "Q0/C0 restored explicitly;48 differential scenarios exactly match historical archive mechanics. Owned GPU7-only runner preserves scientific failure denominators and protected budgets.",
+      "result": "CPU parity and launcher checks pass; no online parity or success-rate claim."
     },
     "4": {
       "id": "4",
@@ -69,7 +73,9 @@
       ],
       "depth": 1,
       "hypothesis": "Mechanism: Execution-aware behavioral representation for quality-diversity search.\nHypothesis: Manipulation modes lost under endpoint-only geometry can survive when archive equivalence includes executed actuator behavior.\nObservable: Preserved action-intent alternatives and task gains at fixed search budget on preregistered Dev.\nConflicts: Historical H1/H4/H5 proxy gains did not establish task gains; this tests a distinct representation axis without combining those mechanisms.",
-      "status": "pending"
+      "status": "running",
+      "insight": "Execution-aware representation N1 implemented under preregistered protocol; task benefit remains unknown.",
+      "result": "Awaiting corrected-input baseline and candidate Dev."
     },
     "4.1": {
       "id": "4.1",
@@ -77,7 +83,9 @@
       "children_ids": [],
       "depth": 2,
       "hypothesis": "Mechanism: Sixteen-cell radial-distance by executed positive-gripper-duty QD archive.\nHypothesis: Replacing XY-only equivalence separates lower-reward gripper-intent branches during parent search, yielding useful new proposals without extra model evaluations.\nObservable: Correct constant-budget behavior, changed actual parent lineage, N1 Dev>=5/10 and noninferior to same-round P2/Q0 before validation.\nConflicts: H5 secondary trajectory lanes failed; N1 changes equivalence at capacity16 and leaves quality/allocation/EDS switches unchanged; azimuth/timing information loss is explicitly tested.",
-      "status": "running"
+      "status": "running",
+      "insight": "N1 core CPU checks pass. Approximate replay shows27 retained old eliminations but median occupancy16 to4 and substantial new aliasing; no proxy-based promotion.",
+      "result": "CPU implementation and integrated regression PASS; online score null. Waiting for exclusive GPU7 availability and authorized Stage provider binding before corrected-input baseline and preregistered N1 Dev. No KEEP/REJECT or adoption decision."
     }
   }
 }

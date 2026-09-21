@@ -18,6 +18,8 @@ Phase envelopes are reservations, not new independent budgets. Reallocation is p
 
 Attempt lifecycle: reserved -> dispatched -> completed or aborted. Count every dispatched ID once even if aborted before first action. Record valid=true/false independently of task success. Legal task failures are not recovery cases. For a multi-episode process all assigned episode IDs count at dispatch, and unstarted IDs on process failure remain aborted rather than disappearing. Retries get fresh IDs linked to the exact prior scientific identity; never overwrite outputs. GPU-hours are process-time, not summed duplicated per episode when a process runs several.
 
+Runner journal compatibility note: terminal `event: valid` means an adjudicated task outcome; `outcome_valid` separately states scientific validity. Authoritative budget counters distinguish `completed`, scientifically `valid`, and `invalid`. An algorithm error is a completed, invalid, failed sample in the scientific denominator and cannot be retried; its journal terminal name does not make it valid evidence. Infrastructure aborts remain separately counted.
+
 ## Evaluation structure
 
 - Freeze task->seed map before outcomes, build execution order from sorted backend task IDs, and validate observed task IDs. Never zip independent lists.

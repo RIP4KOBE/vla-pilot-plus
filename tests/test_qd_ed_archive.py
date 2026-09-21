@@ -17,7 +17,40 @@ from core.qd_ed import (
     fingerprint_action,
     freeze_bounds,
     qd_descriptor,
+    execution_intent_descriptor,
+    freeze_execution_intent_bounds,
 )
+
+
+def test_execution_intent_uses_t8_full_3d_and_eight_decoded_commands():
+    trajectories = torch.zeros(3, 9, 3)
+    trajectories[:, 7] = 100  # scoring-prefix endpoint must not enter descriptor
+    trajectories[:, 8] = torch.tensor([[3., 4., 0.], [0., 0., 5.], [0., 0., 0.]])
+    actions = torch.zeros(3, 8, 7)
+    actions[:, :, 6] = -1
+    actions[1, :3, 6] = 1
+    actions[2, :, 6] = 1
+    descriptor = execution_intent_descriptor(trajectories, torch.zeros(1, 3), actions)
+    torch.testing.assert_close(descriptor, torch.tensor([[5., 0.], [5., .375], [0., 1.]]))
+    with pytest.raises(ValueError, match="eight"):
+        execution_intent_descriptor(trajectories[:, :8], torch.zeros(1, 3), actions)
+    actions[0, 0, 6] = 0
+    with pytest.raises(ValueError, match="binary"):
+        execution_intent_descriptor(trajectories, torch.zeros(1, 3), actions)
+
+
+def test_execution_intent_bounds_freeze_radial_quantiles_and_keep_fixed_duty_edges():
+    values = torch.tensor([[.1, .375], [.2, .375], [.3, .375], [.4, .375]])
+    kwargs = dict(quantiles=(.05, .95), expand_fraction=.1, min_axis_span_m=.08)
+    bounds = freeze_execution_intent_bounds(values, **kwargs)
+    legacy_radial = freeze_bounds(values[:, :1].expand(-1, 2), **kwargs)
+    assert bounds.lo[0] == legacy_radial.lo[0] and bounds.hi[0] == legacy_radial.hi[0]
+    assert bounds.lo[1] == 0 and bounds.hi[1] == 1
+    assert bounds.checksum == freeze_execution_intent_bounds(values.flip(0), **kwargs).checksum
+    probe = torch.tensor([[.2, 0], [.2, .25], [.2, .5], [.2, .75], [.2, 1.]])
+    ids, _ = cell_ids(probe, bounds, (4, 4))
+    assert (ids // 4).tolist() == [0, 1, 2, 3, 3]
+    assert freeze_execution_intent_bounds(torch.tensor([[.2, 0.], [.2, 1.]]), **kwargs).hi[0] - freeze_execution_intent_bounds(torch.tensor([[.2, 0.], [.2, 1.]]), **kwargs).lo[0] == pytest.approx(.08)
 
 
 def _actions(values: list[float]) -> torch.Tensor:

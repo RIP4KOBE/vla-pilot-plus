@@ -37,19 +37,35 @@ Conflicts: Historical H1/H2/H4/H5 negative outcomes remain valid; no direction i
 ### 2: Mechanism: Reproducible runtime and input identity verification before online evaluation.
 Hypothesis: Stale absolute paths and task-ambiguous guidance cache can confound a new control; verifying identities before dispatch isolates infrastructure from QD effects.
 Observable: Dependency, checkpoint, BDDL/init-state/cache and GPU7 admission inventory plus exact runnable evaluation contract; no GPU execution in this audit.
-Conflicts: All historical artifacts remain immutable and the protected untracked stage-guidance design remains unread. [RUNNING]
+Conflicts: All historical artifacts remain immutable and the protected untracked stage-guidance design remains unread. [DONE]
+
+**Insight**: CPU runtime/input audit complete; canonical reward unchanged, target descriptions repaired in owned copies. Physical GPU7/EGL4 metadata verified; actual context and Stage provider binding remain unverified.
+
+**Result**: Zero episodes and zero GPU-hours; no task score. Runtime setup, cache guard, telemetry and accounted GPU7 probe prepared.
 
 ### 3: Mechanism: Historical baseline behavior restoration with explicit configuration parity.
 Hypothesis: Starting from latest source while disabling later mechanisms can reproduce Q0/C0 semantics only if code-default and profile differences are audited explicitly.
 Observable: Full Q0/C0 override manifests, source-difference classification and minimal regression plan against 5b0898e; no claim of online parity before measurement.
-Conflicts: Newer HEAD is not presumed best; causal-envelope, anchor, protected lane and degenerate fallback remain disabled. [RUNNING]
+Conflicts: Newer HEAD is not presumed best; causal-envelope, anchor, protected lane and degenerate fallback remain disabled. [DONE]
+
+**Insight**: Q0/C0 restored explicitly;48 differential scenarios exactly match historical archive mechanics. Owned GPU7-only runner preserves scientific failure denominators and protected budgets.
+
+**Result**: CPU parity and launcher checks pass; no online parity or success-rate claim.
 
 ### 4: Mechanism: Execution-aware behavioral representation for quality-diversity search.
 Hypothesis: Manipulation modes lost under endpoint-only geometry can survive when archive equivalence includes executed actuator behavior.
 Observable: Preserved action-intent alternatives and task gains at fixed search budget on preregistered Dev.
-Conflicts: Historical H1/H4/H5 proxy gains did not establish task gains; this tests a distinct representation axis without combining those mechanisms. [PENDING]
+Conflicts: Historical H1/H4/H5 proxy gains did not establish task gains; this tests a distinct representation axis without combining those mechanisms. [RUNNING]
+
+**Insight**: Execution-aware representation N1 implemented under preregistered protocol; task benefit remains unknown.
+
+**Result**: Awaiting corrected-input baseline and candidate Dev.
 
 #### 4.1: Mechanism: Sixteen-cell radial-distance by executed positive-gripper-duty QD archive.
 Hypothesis: Replacing XY-only equivalence separates lower-reward gripper-intent branches during parent search, yielding useful new proposals without extra model evaluations.
 Observable: Correct constant-budget behavior, changed actual parent lineage, N1 Dev>=5/10 and noninferior to same-round P2/Q0 before validation.
 Conflicts: H5 secondary trajectory lanes failed; N1 changes equivalence at capacity16 and leaves quality/allocation/EDS switches unchanged; azimuth/timing information loss is explicitly tested. [RUNNING]
+
+**Insight**: N1 core CPU checks pass. Approximate replay shows27 retained old eliminations but median occupancy16 to4 and substantial new aliasing; no proxy-based promotion.
+
+**Result**: CPU implementation and integrated regression PASS; online score null. Waiting for exclusive GPU7 availability and authorized Stage provider binding before corrected-input baseline and preregistered N1 Dev. No KEEP/REJECT or adoption decision.

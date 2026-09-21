@@ -1,0 +1,2050 @@
+{
+  "blockers": [
+    "GPU7 externally occupied; no CUDA/EGL admitted",
+    "Admitted rendering/CUDA probe still required; metadata-only GPU7->EGL4 mapping now verified",
+    "Frozen Stage provider Poe and runtime injected provider do not match; provider decision pending; no API calls",
+    "Live task cache target/keypoint validation not executed; requires an admitted rollout"
+  ],
+  "checkpoint": [
+    {
+      "exists": true,
+      "path": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object/ema/model.safetensors",
+      "realpath": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object/ema/model.safetensors",
+      "sha256": "b4e3631db326689297cd2f0b02d32ade9dc6ee9ae09c03171add64b80e86aaa1",
+      "size_bytes": 2456705456
+    },
+    {
+      "exists": true,
+      "path": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object/config.json",
+      "realpath": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object/config.json",
+      "sha256": "3482cc79b3268ccfca9d8cc9b8e32f3925dc71c3bd60f5e6dfcaa564aecde835",
+      "size_bytes": 919
+    },
+    {
+      "exists": true,
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/configs/policy.yaml",
+      "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/configs/policy.yaml",
+      "sha256": "44a1164f421121edafc47e9880eb0ad97be98732669365f931e0b226bc831cf6",
+      "size_bytes": 1487
+    }
+  ],
+  "completed_utc": "2026-09-21T09:48:31Z",
+  "compute_observability": {
+    "changes_prompt_model_retry_or_rng": false,
+    "counts_caller_retries_in_total": true,
+    "counts_sdk_retries": true,
+    "dino_changes_outputs_or_rng": false,
+    "episode_summary": "eds_eval/episode_compute.jsonl",
+    "hard_termination_caveat": "Missing episode summary remains incomplete telemetry; never impute zero",
+    "inactive_components": "frozen SAM3 and grounding explicitly inactive; active uninstrumented SAM3 reports unavailable",
+    "mock_tests": "API+episode+DINO targeted CPU tests: 11 passed; preceding setup/probe/legacy-Stage/API regression: 32 passed",
+    "payload_or_credential_capture": false,
+    "perception_counter_boundary": "DINOv2 forward_features / DINOv3 model call, before invocation including failures",
+    "perception_episode_semantics": "cumulative detector counter deltas from after policy.reset and before episode preparation",
+    "perception_fields": [
+      "dino_forward_calls",
+      "dino_batch_rows",
+      "perception_counters_available",
+      "perception_components"
+    ],
+    "request_counter_boundary": "existing OpenAI sync-client HTTPX request event hook",
+    "schema": "qd-ed-episode-compute-v1",
+    "separately_classified_retries": "SDK only"
+  },
+  "created_utc": "2026-09-21T09:47:17Z",
+  "credential_policy": "Inherit existing runtime environment only. Never write values to argv, Hydra, manifests, reports, or logs. Do not read historical logs for credentials. No API request performed.",
+  "credential_presence": {
+    "GOOGLE_API_KEY": false,
+    "OPENAI_API_KEY": true,
+    "OPENAI_BASE_URL": true
+  },
+  "cuda_initialized": false,
+  "dinov2": {
+    "repo_files": [
+      {
+        "exists": true,
+        "path": ".github/workflows/lint.yaml",
+        "sha256": "843ad6a49b4b9d5c852ac97c2261038424bc14dc3ccee1f5cdbdc4f79a4fbbaf",
+        "size_bytes": 796
+      },
+      {
+        "exists": true,
+        "path": ".gitignore",
+        "sha256": "ec0cbea6dd54b7483520390b354ae720b9f3c2c44f68571afc86d0b25fd130b2",
+        "size_bytes": 106
+      },
+      {
+        "exists": true,
+        "path": "CODE_OF_CONDUCT.md",
+        "sha256": "b161b3e2ec4712ebf69efc38ef796d2c701a323aac51cf11759d38e9c56c39bd",
+        "size_bytes": 3537
+      },
+      {
+        "exists": true,
+        "path": "CONTRIBUTING.md",
+        "sha256": "4732808845ea471137308b5fbaa7e35c1f3c96113f2fbdf8a0ec6b00d91559b6",
+        "size_bytes": 1239
+      },
+      {
+        "exists": true,
+        "path": "LICENSE",
+        "sha256": "600cc67cc4cb2f5ea317dcfc687ad1c74dc4bec8782bbe9db0afd83513b935b7",
+        "size_bytes": 11359
+      },
+      {
+        "exists": true,
+        "path": "LICENSE_CELL_DINO_CODE",
+        "sha256": "fe7b4ce83b8381cc5b216bbb4af73c570688d1b819c73bbaed8ca401f4677cd6",
+        "size_bytes": 18655
+      },
+      {
+        "exists": true,
+        "path": "LICENSE_CELL_DINO_MODELS",
+        "sha256": "d779b47a4ef8bbfc6c90d14768fe6a0a2c1c08bbc3712084496058bfd83cef4f",
+        "size_bytes": 11487
+      },
+      {
+        "exists": true,
+        "path": "LICENSE_XRAY_DINO_MODEL",
+        "sha256": "ce9efad90c86b5697e1783e56e3c936f6bd23c568c1166ecf07805b65d0891ad",
+        "size_bytes": 9878
+      },
+      {
+        "exists": true,
+        "path": "MODEL_CARD.md",
+        "sha256": "70ca59606bee0a5fbb1baec80e7e29a93cd7cfbe26ca1910c52a852c4aab09d0",
+        "size_bytes": 9152
+      },
+      {
+        "exists": true,
+        "path": "README.md",
+        "sha256": "d1bc2e9686522bbd66ed6123dc81eb36b3a98e8ea9a2ca97778f54a1c641c9e1",
+        "size_bytes": 32799
+      },
+      {
+        "exists": true,
+        "path": "conda-extras.yaml",
+        "sha256": "14b710eedcad4c36d480cf8852bf8862d77aed8038de21dec538704953205394",
+        "size_bytes": 495
+      },
+      {
+        "exists": true,
+        "path": "conda.yaml",
+        "sha256": "4806691bed328df4460ba60b4f2be549529a414bd9137867a7c1cc600b218f21",
+        "size_bytes": 436
+      },
+      {
+        "exists": true,
+        "path": "dinov2/__init__.py",
+        "sha256": "0d2b87b7e71c7f7279ccc4b4f8b541d26071425284a0ea01a5a435fac4511cfe",
+        "size_bytes": 218
+      },
+      {
+        "exists": true,
+        "path": "dinov2/configs/__init__.py",
+        "sha256": "be6503fea5e43bf81c504247a35f731f12541e567b18607152eff102137f8dc0",
+        "size_bytes": 681
+      },
+      {
+        "exists": true,
+        "path": "dinov2/configs/eval/cell_dino/vitl16_channel_adaptive_pretrain.yaml",
+        "sha256": "6afb61e965344ea240675bd38517c36a64022670dd52bfea7c0fd193ee17bef3",
+        "size_bytes": 664
+      },
+      {
+        "exists": true,
+        "path": "dinov2/configs/eval/cell_dino/vitl16_pretrain.yaml",
+        "sha256": "69328d10d124e7ca785d34d92eb252196543b5c033b7eff77b3e77e9490c2ad4",
+        "size_bytes": 260
+      },
+      {
+        "exists": true,
+        "path": "dinov2/configs/eval/vitb14_pretrain.yaml",
+        "sha256": "03d40aabe4f9bc261a9a78c1e25970943c9675a7fe76eeb2c6068a6f98d6ac2e",
+        "size_bytes": 151
+      },
+      {
+        "exists": true,
+        "path": "dinov2/configs/eval/vitb14_reg4_pretrain.yaml",
+        "sha256": "682d34d1c90c1533e32dc5afa26cc51541d6e4308d4a11b793c6e702e5823c7e",
+        "size_bytes": 232
+      },
+      {
+        "exists": true,
+        "path": "dinov2/configs/eval/vitg14_pretrain.yaml",
+        "sha256": "9723c21852aa1ccf6eb822636f39221bc803e666f325a6837271a99ef1dbf95c",
+        "size_bytes": 178
+      },
+      {
+        "exists": true,
+        "path": "dinov2/configs/eval/vitg14_reg4_pretrain.yaml",
+        "sha256": "3da0e06003ee5d6320d66ab9d3a189cd3f088e726ab751d544838e967b767742",
+        "size_bytes": 259
+      },
+      {
+        "exists": true,
+        "path": "dinov2/configs/eval/vitl14_pretrain.yaml",
+        "sha256": "3ac4306146a1ecdd172cc40a957129cfbbc39e4151f189dfaab2ece539b7d46f",
+        "size_bytes": 152
+      },
+      {
+        "exists": true,
+        "path": "dinov2/configs/eval/vitl14_reg4_pretrain.yaml",
+        "sha256": "b9fedf1dc4b0d1c3a16cf74cafd7962fd8960d5944de7077291e862555861c60",
+        "size_bytes": 233
+      },
+      {
+        "exists": true,
+        "path": "dinov2/configs/eval/vits14_pretrain.yaml",
+        "sha256": "d9479987edb86fc9c65091133a377a9b06d90603a7649f4d89fd355f50be351f",
+        "size_bytes": 152
+      },
+      {
+        "exists": true,
+        "path": "dinov2/configs/eval/vits14_reg4_pretrain.yaml",
+        "sha256": "91e1df34dc74d7ead96be9b0d0087fea0e9b5d687782964e192e8fa44919254c",
+        "size_bytes": 233
+      },
+      {
+        "exists": true,
+        "path": "dinov2/configs/ssl_default_config.yaml",
+        "sha256": "96c66043a1113bee3de8e59fa4bde6a7bd4c117c740056c65c6d29a4c709c30f",
+        "size_bytes": 2757
+      },
+      {
+        "exists": true,
+        "path": "dinov2/configs/train/cell_dino/vitl16_boc_hpafov.yaml",
+        "sha256": "ff5b224d4fff05b4138ff2e6c4546adade2a02a8d096e51bc4a7cdd5156f1a93",
+        "size_bytes": 538
+      },
+      {
+        "exists": true,
+        "path": "dinov2/configs/train/cell_dino/vitl16_hpafov.yaml",
+        "sha256": "6d1afbfda85f5a94b433a0197f015ce0417ac15891373bdfb5040881a9005c3a",
+        "size_bytes": 546
+      },
+      {
+        "exists": true,
+        "path": "dinov2/configs/train/cell_dino/vitl16_hpaone.yaml",
+        "sha256": "b5d333b1c0f4a6d7e443c3999b2dff63ef28bcfc22de3afb00fec889e86e6e94",
+        "size_bytes": 540
+      },
+      {
+        "exists": true,
+        "path": "dinov2/configs/train/vitg14.yaml",
+        "sha256": "55dc02f08ecc75e6b92da3b60f90cd7ebcb43f37ee5bfd8bb009c7d05eeff213",
+        "size_bytes": 528
+      },
+      {
+        "exists": true,
+        "path": "dinov2/configs/train/vitl14.yaml",
+        "sha256": "825c11b9a9bfbfe327b0adcd21838e7a1aafa621e3a0b9e4e4787fe260b0378b",
+        "size_bytes": 527
+      },
+      {
+        "exists": true,
+        "path": "dinov2/configs/train/vitl16_short.yaml",
+        "sha256": "ad77b37189f2def02b1aba4b75c23dfce57c612394830689de69d10b58891e8f",
+        "size_bytes": 137
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/__init__.py",
+        "sha256": "a3d422bc188029270a69b231306eed8482093c0317b0ba406867a115f2e67f01",
+        "size_bytes": 561
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/accumulators.py",
+        "sha256": "f7b8677699afbaaef17bb42573db0d45e1bc9a5e6f7da16573672a35f1f9a06f",
+        "size_bytes": 5173
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/adapters.py",
+        "sha256": "1d24004ce6ead1e35408f590867d0b1c09a4a3a65278771f574f1a3ba0d7ccba",
+        "size_bytes": 2066
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/augmentations.py",
+        "sha256": "10e949f266c7cffa57ffc8c5cf9dc094a8e701cdc74f1a3fefd2e02f78f8cdf7",
+        "size_bytes": 3977
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/cell_dino/augmentations.py",
+        "sha256": "b87c8283f717945c8429f220a769aeb0278604a38ded1c75b8adadfa1d2f3ddf",
+        "size_bytes": 3140
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/cell_dino/transforms.py",
+        "sha256": "18f435ff0a346d972a95c66d8b20bb1fee2fa275740e0fcc99253d982f5e3cd8",
+        "size_bytes": 4786
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/collate.py",
+        "sha256": "0d2bb0060094b8c86838ad5af2572a9ff0e66c73660b61be70d60f64b9508570",
+        "size_bytes": 1998
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/datasets/__init__.py",
+        "sha256": "00057731a94738bf3fdbc15af2bcc64f8c21e954e7ff79c0e48dae38b79202f2",
+        "size_bytes": 474
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/datasets/cell_dino/chammi_cp.py",
+        "sha256": "bd35d07dec62ab3b5f99c78d97cdfa3fad8a617db5b844e81ded17142ef90361",
+        "size_bytes": 3099
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/datasets/cell_dino/chammi_hpa.py",
+        "sha256": "dc40cfc28ae02d2275b896189520c85c0c5d8aa9ad1d06f0ed3cd4a760ef488a",
+        "size_bytes": 3075
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/datasets/cell_dino/chammi_wtc.py",
+        "sha256": "e90ddea42e9273495f294ef584c467667bb8002758707cb154da55d37a24dc37",
+        "size_bytes": 2900
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/datasets/cell_dino/hpafov.py",
+        "sha256": "065108a515651ef21411e6951fa64197646e2887c8b772185673d3df65c4a779",
+        "size_bytes": 8719
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/datasets/cell_dino/hpaone.py",
+        "sha256": "16b080fd09d61c8241409d0e444d0b23464f7590f11df612e45efd354526ffe2",
+        "size_bytes": 6388
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/datasets/decoders.py",
+        "sha256": "a43ca26d46b973943ff17c5e6d0d4115cd07e01851e4fc9d46e4b13738da17f8",
+        "size_bytes": 2939
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/datasets/extended.py",
+        "sha256": "4f042450ff939a13d284df30a859a16f8c13ac8e3ece48e3437b8bca473980f0",
+        "size_bytes": 1561
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/datasets/image_net.py",
+        "sha256": "748a6d9f39b1ca9e94a2bdd61a78c40d1655508fcfae40057057fe8c74bb611b",
+        "size_bytes": 10831
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/datasets/image_net_22k.py",
+        "sha256": "e94c0bffc3f1aa78d770c871ecb72fbbf66a5dfcd0703f8319b263708698e351",
+        "size_bytes": 10241
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/loaders.py",
+        "sha256": "1f6c2f709f880c8b94717fc3ee2531f18e034ff98986c0a7e90096dc42b82b6e",
+        "size_bytes": 7059
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/masking.py",
+        "sha256": "4fcbc5aa4cfa069a32200b3eb39f86e09de3ac476afa7a12a2fbdfb160a892c3",
+        "size_bytes": 2945
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/samplers.py",
+        "sha256": "5f19029f6da99de6c81ec5e8d313d85739c66020cf8447b5b35e7f80c9071ebb",
+        "size_bytes": 7645
+      },
+      {
+        "exists": true,
+        "path": "dinov2/data/transforms.py",
+        "sha256": "725823be317c6a549810740c6566a2a448ba1eba85eea87769c10b986dda2e5b",
+        "size_bytes": 3056
+      },
+      {
+        "exists": true,
+        "path": "dinov2/distributed/__init__.py",
+        "sha256": "b6aaa4151999c88a4ff031e786dc66bb2ecbc8b5421ffe72169c9c305c1414e5",
+        "size_bytes": 8576
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/__init__.py",
+        "sha256": "2932e94a2d67be87b717c49468214c1127be7864aedf37f5891d26be7bc1437f",
+        "size_bytes": 195
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/cell_dino/knn.py",
+        "sha256": "1360aaaf72fa561315e269e1c714d431aa6e5aa0ec64abe4d1c26be14b4c1750",
+        "size_bytes": 16788
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/cell_dino/linear.py",
+        "sha256": "0f103e6a5578138c614a445fc36c8555a74751cc5b6a90218fe0a417baf43df8",
+        "size_bytes": 37587
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/cell_dino/utils.py",
+        "sha256": "4117190b6b216f0ad48b2dab91cea55a09a861d27cb8d8993677274b01a76fd6",
+        "size_bytes": 23142
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/depth/__init__.py",
+        "sha256": "2932e94a2d67be87b717c49468214c1127be7864aedf37f5891d26be7bc1437f",
+        "size_bytes": 195
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/depth/models/__init__.py",
+        "sha256": "6d2d9aa7396eafa2c3d04d5609b39c068b210a5ca8368d2f7cd47f5fc3e7d152",
+        "size_bytes": 460
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/depth/models/backbones/__init__.py",
+        "sha256": "e6e25365ad291aad30d8bce4c9f9b906580f204c141d62be4bcc3699e563d901",
+        "size_bytes": 250
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/depth/models/backbones/vision_transformer.py",
+        "sha256": "9aa72220970247ccb8399e5a95d82721679c479e0f0c0096c4ef0bdff4fe6735",
+        "size_bytes": 435
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/depth/models/builder.py",
+        "sha256": "0b1dcd672ba5a6b5acec2fa70cfea70ee280aba264a3236e7c1139976b2d02dc",
+        "size_bytes": 1420
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/depth/models/decode_heads/__init__.py",
+        "sha256": "38268a3d08272273b7a1cf03b88b1eff6604cbef519637476e9652dcef4f43bc",
+        "size_bytes": 258
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/depth/models/decode_heads/decode_head.py",
+        "sha256": "4d163967518b4ef251dbd400792a295033983a7c3eb9ce2b362df32f1bc57046",
+        "size_bytes": 8653
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/depth/models/decode_heads/dpt_head.py",
+        "sha256": "4de04fd7fd8681d0bb5977f250be89d76314f97d626f717d1d09eeff14e059f7",
+        "size_bytes": 10434
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/depth/models/decode_heads/linear_head.py",
+        "sha256": "bf6c448f2635a5db0eb0423bf7854899c1e36f0e0897107c14dfb2bf064d0160",
+        "size_bytes": 3233
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/depth/models/depther/__init__.py",
+        "sha256": "a00bcccdea87b79d23b0085ad3db9728169103c236749dfda09184dc0fefa8aa",
+        "size_bytes": 275
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/depth/models/depther/base.py",
+        "sha256": "59233aeb2bdf0266937213d5d1f12628835bc5a204f11a7b6982838f61adf28f",
+        "size_bytes": 7697
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/depth/models/depther/encoder_decoder.py",
+        "sha256": "96d0d2ff321707888191b52ee9180ef6f38d6b7212f5d604891c764b4b46d248",
+        "size_bytes": 8925
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/depth/models/losses/__init__.py",
+        "sha256": "5dacc4c02607b64ee63906bbda9de9158d59d50fc2d1e4cf360455f6f749bee0",
+        "size_bytes": 264
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/depth/models/losses/gradientloss.py",
+        "sha256": "61d625dd618ca3fb2443d1e831949f1e79c2bc4081d72355ff932a41c8b47f89",
+        "size_bytes": 2540
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/depth/models/losses/sigloss.py",
+        "sha256": "97ff67edf57ebfd6570be45859545580171cfbca489803429005529ccc0e4135",
+        "size_bytes": 2286
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/depth/ops/__init__.py",
+        "sha256": "1640dd76d0d09a1db46df8a1c767ff04d2a0d6004d9c9b6134d80a0f53f6c4e7",
+        "size_bytes": 225
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/depth/ops/wrappers.py",
+        "sha256": "85d58e303eff9a0a306d97101c8b35c24196bfe55e8da019df1e4817411a4dc7",
+        "size_bytes": 1229
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/knn.py",
+        "sha256": "5f59977c5d697579d64b1acb19244d819c54a253cdcf1b023b818418bdf841e1",
+        "size_bytes": 14455
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/linear.py",
+        "sha256": "cd6cb057561ab180557711b20d2f5f4916393a848375b0cefae11ff61d339865",
+        "size_bytes": 21426
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/log_regression.py",
+        "sha256": "273648c0937183af4b2f516b8009e7ef4ffda91b599e8512422e2c3b51829615",
+        "size_bytes": 15138
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/metrics.py",
+        "sha256": "2f436b2a67949955bddce0b6b58d73fe338ba362a3de4834290593f7a134e9aa",
+        "size_bytes": 4422
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation/__init__.py",
+        "sha256": "2932e94a2d67be87b717c49468214c1127be7864aedf37f5891d26be7bc1437f",
+        "size_bytes": 195
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation/hooks/__init__.py",
+        "sha256": "590638a03129a24077f4dff2477b3d9326e234f23590d5c5715c37dff26b5638",
+        "size_bytes": 237
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation/hooks/optimizer.py",
+        "sha256": "1c116c35dfad8fa9abdfa5738c7e621e75c9277304fd009f48c2592571204ab1",
+        "size_bytes": 1415
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation/models/__init__.py",
+        "sha256": "8d3601782bc10c5477243d1d6760c94e78a8ef8e7028476c70ee4781a693fd36",
+        "size_bytes": 277
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation/models/backbones/__init__.py",
+        "sha256": "e6e25365ad291aad30d8bce4c9f9b906580f204c141d62be4bcc3699e563d901",
+        "size_bytes": 250
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation/models/backbones/vision_transformer.py",
+        "sha256": "ed687476a2381bc708c6035b5f77e7b2560baaee36313c55f5e26aa5253adbb7",
+        "size_bytes": 476
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation/models/decode_heads/__init__.py",
+        "sha256": "f440e7a342f485db7c5766359f5b747f0ed810172e89521b218e50057a94c5e4",
+        "size_bytes": 228
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation/models/decode_heads/linear_head.py",
+        "sha256": "14500d7aa301797f77774348bd6912ee2ee3e68909c9f511a2730ff340349340",
+        "size_bytes": 3292
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation/utils/__init__.py",
+        "sha256": "2932e94a2d67be87b717c49468214c1127be7864aedf37f5891d26be7bc1437f",
+        "size_bytes": 195
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation/utils/colormaps.py",
+        "sha256": "5c421de6f63e74b098fa9bd75f5410d816336bb3bcee0194e483682766aa4036",
+        "size_bytes": 7685
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/__init__.py",
+        "sha256": "7fb45f0041dd007542578ecf31414a883a9e028a591f9570eec0d25afd928e9d",
+        "size_bytes": 299
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/core/__init__.py",
+        "sha256": "99e3920edbb8635012e51b583c4264556f540f098a80dee90534a454c34b4c68",
+        "size_bytes": 394
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/core/anchor/__init__.py",
+        "sha256": "cd269c97e28579d99706f3f31241173b22210429249742005b8a00bc8528d366",
+        "size_bytes": 258
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/core/anchor/builder.py",
+        "sha256": "fa8456a4f2941fb3b6bc88d210c6ce43298d0b081d00af9ac0ea9050edf6d16e",
+        "size_bytes": 714
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/core/anchor/point_generator.py",
+        "sha256": "23ff9cf80fef4472cf8a361d2df8f211fab4092925d6bb9cce18bb68a60cd6f0",
+        "size_bytes": 8814
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/core/box/__init__.py",
+        "sha256": "7b0b68761110103819b5e8ef0733327021bcca5ac78168e8f27a5a721b1bfa43",
+        "size_bytes": 287
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/core/box/builder.py",
+        "sha256": "93ad53a18707547dc53c28c52ae616da19e43064d7e4f30240d08ea50dfb955f",
+        "size_bytes": 594
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/core/box/samplers/__init__.py",
+        "sha256": "b3383233672410d9f13fdfb9dc47ae4543a98c45ee2361a0cc825afc5dd00e32",
+        "size_bytes": 261
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/core/box/samplers/base_sampler.py",
+        "sha256": "91fd7bc656e0519b6f732a55a0f00457ba339bd98c6d3393d7ba35280442a1ed",
+        "size_bytes": 3819
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/core/box/samplers/mask_pseudo_sampler.py",
+        "sha256": "3ac44707526239d782a1653ad641d447ecb1003eea399e0a718790a92a476305",
+        "size_bytes": 1647
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/core/box/samplers/mask_sampling_result.py",
+        "sha256": "527d952b5001c86ca285a3f7895d804d12dd47b9d3c07535b6494a8b35e21d39",
+        "size_bytes": 2163
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/core/box/samplers/sampling_result.py",
+        "sha256": "c4b34191ab9589a098b0e46116ca9a53eedeae3adda515b8078f635096b1d492",
+        "size_bytes": 5415
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/core/utils/__init__.py",
+        "sha256": "17ecc2ee748e92194c272e63a0db74dae0bb2ef921cecedc9cffe5c23b86dea9",
+        "size_bytes": 274
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/core/utils/dist_utils.py",
+        "sha256": "a3747a307397dbc10c09838d44fa90438f758977254ed305647ce96bd16bd045",
+        "size_bytes": 519
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/core/utils/misc.py",
+        "sha256": "97409a32ac290d34da2bb7d28a3f6ecbc975537a3aa76060fd16ab5924de400f",
+        "size_bytes": 1324
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/__init__.py",
+        "sha256": "2c8e40b6362d507e4d1ad18700feb53897ec7403e32033065d7927dae6ccf818",
+        "size_bytes": 485
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/backbones/__init__.py",
+        "sha256": "f35535dbddb96f998a9bd1a7734cbc02abb652c18a5c6df7a47e7548ac33440c",
+        "size_bytes": 232
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/backbones/adapter_modules.py",
+        "sha256": "e103c8bdff5c3427a59a0bf84dc70677d5fef5ac9d43445815da16537944ccbe",
+        "size_bytes": 14983
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/backbones/drop_path.py",
+        "sha256": "068b166f953c0939f5479ef1735736116d91bc9942990472b60d104d95f9c83a",
+        "size_bytes": 1145
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/backbones/vit.py",
+        "sha256": "7ad30e14310c5bee54743459f128b076195554760eefd60e1593fbfde2234021",
+        "size_bytes": 20135
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/backbones/vit_adapter.py",
+        "sha256": "cb89b1d4943049c0ee3e3993738fb56806239221dce72345ea054fc7fa8785b0",
+        "size_bytes": 7938
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/builder.py",
+        "sha256": "e96e68e45a5139d16e3238c7f5690d72d4e7838c9fe9fc85273215a3b7a0115f",
+        "size_bytes": 619
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/decode_heads/__init__.py",
+        "sha256": "8bea632762d84b954373d0fb2e35a224786eb4692f2bf6acf4b61b0c5fc89c06",
+        "size_bytes": 242
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/decode_heads/mask2former_head.py",
+        "sha256": "c7b5d0d307da7737ac087b368de5d8160053d2e7fb9c705e805e7930ad9446ad",
+        "size_bytes": 25331
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/losses/__init__.py",
+        "sha256": "ca75161c95771d281968c329697642f7f84e0deaa6ec780262f4fe2c4a33fd4c",
+        "size_bytes": 410
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/losses/cross_entropy_loss.py",
+        "sha256": "b5cf193e70a20c9a0936222dab0546918940b9dee714cac2c4836197ed6bf940",
+        "size_bytes": 11292
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/losses/dice_loss.py",
+        "sha256": "d6dc52a33494d569b98dc165f176c1444060d2f6bd8c8f458aabcea72d2edeee",
+        "size_bytes": 6339
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/losses/match_costs.py",
+        "sha256": "4cccb76ea151a0c38581f73d4da727ecb1d95a4b92ac294680adb588e6534046",
+        "size_bytes": 5348
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/plugins/__init__.py",
+        "sha256": "80ed4eab0a7f3c8a03c96a328a94cd972fb804cff30ccfc68e87b066ffb08fb5",
+        "size_bytes": 261
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/plugins/msdeformattn_pixel_decoder.py",
+        "sha256": "66fc2f5a58638747576492250ce43e076bb119fe54a5e82569f4e6bd88a5a95b",
+        "size_bytes": 10706
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/segmentors/__init__.py",
+        "sha256": "02bc4c748360de2f9b4fe61b112fbd49cfcd943265f0c6f78afc2802b0d11a96",
+        "size_bytes": 263
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/segmentors/encoder_decoder_mask2former.py",
+        "sha256": "06fdad9b0f24a0a3af4e4213bc1beb288fca7ad9010b24b3284103f2b9ea4e04",
+        "size_bytes": 10632
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/utils/__init__.py",
+        "sha256": "091931518ac32103e9ef30be7a7b57839c1970bb4a8658f5bce0643735c73bb2",
+        "size_bytes": 495
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/utils/assigner.py",
+        "sha256": "47d015ce3a022c720fa5c8d37260c1bd39b19f77808b51dae25a0a9c7fdd70f3",
+        "size_bytes": 6368
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/utils/point_sample.py",
+        "sha256": "e4f2dc0a1a4d5db984a590a85a0fb4ef224cfbfa013c1a212ee9cbcb8b49a9ae",
+        "size_bytes": 3889
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/utils/positional_encoding.py",
+        "sha256": "3b07f2b2127f03048dcd10266e3d14818334becb56970a8cfe9ac680ec0b8753",
+        "size_bytes": 6424
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/models/utils/transformer.py",
+        "sha256": "6bc659898dd0d4e75bbb941bb1720f696eb840667cda52fbac46feab1eac20ab",
+        "size_bytes": 41364
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/ops/modules/__init__.py",
+        "sha256": "2b1c15f2a30741376faebf09ac22e3fdf672b768c1717a3b7bbffaa844c0f111",
+        "size_bytes": 425
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/segmentation_m2f/ops/modules/ms_deform_attn.py",
+        "sha256": "ef8d800b0e3139b6ec2dbe22de3a39da653dcc88129bc246239fc47abf6524ec",
+        "size_bytes": 8296
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/setup.py",
+        "sha256": "629eea62ca20ad2694b4979a91fb85e644cda429049580360a3a86be4bbe477c",
+        "size_bytes": 2069
+      },
+      {
+        "exists": true,
+        "path": "dinov2/eval/utils.py",
+        "sha256": "3eb42fa16c97b21c8e69c229e71388b2db04923097912e42c29676c82f03ed44",
+        "size_bytes": 5205
+      },
+      {
+        "exists": true,
+        "path": "dinov2/fsdp/__init__.py",
+        "sha256": "672fc23d385c86530e439c42f8c73abb585a5bb96ce87c6ad5e8fb004e631efa",
+        "size_bytes": 5115
+      },
+      {
+        "exists": true,
+        "path": "dinov2/hub/__init__.py",
+        "sha256": "2932e94a2d67be87b717c49468214c1127be7864aedf37f5891d26be7bc1437f",
+        "size_bytes": 195
+      },
+      {
+        "exists": true,
+        "path": "dinov2/hub/backbones.py",
+        "sha256": "9f5557d6480d99f8edf75544e1eccaf797f32c9f87484d75f41827dc37ac2a77",
+        "size_bytes": 5572
+      },
+      {
+        "exists": true,
+        "path": "dinov2/hub/cell_dino/backbones.py",
+        "sha256": "ca335e59e9dd0eed145933a5021d46a5e6c85eaa3cad72639463b75d940da13d",
+        "size_bytes": 5027
+      },
+      {
+        "exists": true,
+        "path": "dinov2/hub/classifiers.py",
+        "sha256": "e9a178f9f3be659e4b463885453d2d5f9af0c068ac71fb3890d24796e659fd4b",
+        "size_bytes": 8195
+      },
+      {
+        "exists": true,
+        "path": "dinov2/hub/depth/__init__.py",
+        "sha256": "de8f3fbecabae6552ebb8f3d7dee27987b1dbc11e94143c95137c438e86a9123",
+        "size_bytes": 287
+      },
+      {
+        "exists": true,
+        "path": "dinov2/hub/depth/decode_heads.py",
+        "sha256": "04eb9639a4441409b80651c3d019a6e850c32b7e709236ceb6dbbaeb9fa17713",
+        "size_bytes": 29268
+      },
+      {
+        "exists": true,
+        "path": "dinov2/hub/depth/encoder_decoder.py",
+        "sha256": "1baf6f59269fb99faf274900f12910a22e038a3bb6d81c6fc712c0c482041a57",
+        "size_bytes": 13909
+      },
+      {
+        "exists": true,
+        "path": "dinov2/hub/depth/ops.py",
+        "sha256": "85d58e303eff9a0a306d97101c8b35c24196bfe55e8da019df1e4817411a4dc7",
+        "size_bytes": 1229
+      },
+      {
+        "exists": true,
+        "path": "dinov2/hub/depthers.py",
+        "sha256": "55e47611dccc5d000574f9837accdb0babd02abe4eba998bd3bf01361143f0a6",
+        "size_bytes": 8149
+      },
+      {
+        "exists": true,
+        "path": "dinov2/hub/dinotxt.py",
+        "sha256": "318452ea1ff0e34fa811b0fbb1f7281dfe73d2f9a481dc7b4a73fe211828ebb6",
+        "size_bytes": 3004
+      },
+      {
+        "exists": true,
+        "path": "dinov2/hub/text/dinotxt_model.py",
+        "sha256": "7ef7bfceaacfd1566a3984038a691edeaf9b9f42910583e5de62a00e3cf852d0",
+        "size_bytes": 5657
+      },
+      {
+        "exists": true,
+        "path": "dinov2/hub/text/dinov2_wrapper.py",
+        "sha256": "834423f869038ce7c2b1794564018e0d3ca8194faa6d4c17f0d208b1625d0c64",
+        "size_bytes": 2600
+      },
+      {
+        "exists": true,
+        "path": "dinov2/hub/text/text_tower.py",
+        "sha256": "fa591e45ad0e7400290e716ff0ddca102fd646edc2da448807c1006a5b94744f",
+        "size_bytes": 3513
+      },
+      {
+        "exists": true,
+        "path": "dinov2/hub/text/text_transformer.py",
+        "sha256": "7138271bc95251d33a172cead1392434b9f8f7b1401fe1e0b4c37e64ff2bf354",
+        "size_bytes": 2424
+      },
+      {
+        "exists": true,
+        "path": "dinov2/hub/text/tokenizer.py",
+        "sha256": "85078188841107932343123f29104288615b41ca4e5d1eb2d8623e02a8ac749a",
+        "size_bytes": 1662
+      },
+      {
+        "exists": true,
+        "path": "dinov2/hub/text/vision_tower.py",
+        "sha256": "2496418c885c01ba7b7b9172d72906911ad950211c08a6e085ef2ee574405ebb",
+        "size_bytes": 6844
+      },
+      {
+        "exists": true,
+        "path": "dinov2/hub/utils.py",
+        "sha256": "c0533919016531b320bf9aef7cd7001249bc8ef8957cdb29246c15b67d5abdf8",
+        "size_bytes": 1260
+      },
+      {
+        "exists": true,
+        "path": "dinov2/hub/xray_dino/backbones.py",
+        "sha256": "23c4513ac900815772d6076d2dd8c6e8564cd85ec11873c8ebe62e5de0647d03",
+        "size_bytes": 838
+      },
+      {
+        "exists": true,
+        "path": "dinov2/layers/__init__.py",
+        "sha256": "1b55deed39d5ab0b589bef421bbfe06f24a10cd590a0f8403234c9ee4e34109d",
+        "size_bytes": 498
+      },
+      {
+        "exists": true,
+        "path": "dinov2/layers/attention.py",
+        "sha256": "79c7be7a452b3aad96698ec38d5d5150b9f4d8ac084fa93324510dc9f624775d",
+        "size_bytes": 3298
+      },
+      {
+        "exists": true,
+        "path": "dinov2/layers/block.py",
+        "sha256": "60c0ac7dfa4474be313fabfa5a23d82faf6f0cecd4e720a88be35de9788cb636",
+        "size_bytes": 11609
+      },
+      {
+        "exists": true,
+        "path": "dinov2/layers/dino_head.py",
+        "sha256": "9fdb1fa61c0609dc0876f711f9d0d828c33bf9fd972aab3d9c968d44e16b98d1",
+        "size_bytes": 2007
+      },
+      {
+        "exists": true,
+        "path": "dinov2/layers/drop_path.py",
+        "sha256": "b9f8236e86054b9d9a71275efcad2a9ecaa1f86b529d4b8d6109ddb5e806f67a",
+        "size_bytes": 1157
+      },
+      {
+        "exists": true,
+        "path": "dinov2/layers/layer_scale.py",
+        "sha256": "dadd5aafe178f1bf72a205a02a6645c7e635cacbad585d4a7369c200c6e89135",
+        "size_bytes": 1097
+      },
+      {
+        "exists": true,
+        "path": "dinov2/layers/mlp.py",
+        "sha256": "255825c73b60a916dd00eb1e38aacbcdbf316e40d6a005efb46e245b7edb43aa",
+        "size_bytes": 1269
+      },
+      {
+        "exists": true,
+        "path": "dinov2/layers/patch_embed.py",
+        "sha256": "40da6add3d811198ea3e17cb99cdd4e5cda59e369efbbe3d18d89308618cf142",
+        "size_bytes": 2829
+      },
+      {
+        "exists": true,
+        "path": "dinov2/layers/swiglu_ffn.py",
+        "sha256": "3cf7d91d98a9a96184e363f0150c3e798c57f02d989ba4f2602a96583da9d5cd",
+        "size_bytes": 3346
+      },
+      {
+        "exists": true,
+        "path": "dinov2/logging/__init__.py",
+        "sha256": "fff00c7e5d5381b55d8f820ba3a1f8f0902af15dacb3159fe5c6e3b542771c40",
+        "size_bytes": 3284
+      },
+      {
+        "exists": true,
+        "path": "dinov2/logging/helpers.py",
+        "sha256": "5c2ee4b35f6c160836c7f5e7f3db1246662499ecc6ec8e53d06f14fef71504ae",
+        "size_bytes": 6220
+      },
+      {
+        "exists": true,
+        "path": "dinov2/loss/__init__.py",
+        "sha256": "e5ae2143dd98108f81d26c276e2048fa339cde5f5fe369e2d6797acea09912bf",
+        "size_bytes": 314
+      },
+      {
+        "exists": true,
+        "path": "dinov2/loss/dino_clstoken_loss.py",
+        "sha256": "49f0b2b75c2feba83b3fc9dfb40ef5eb4e3db350ab1e12a63d75d3060a88f7df",
+        "size_bytes": 3647
+      },
+      {
+        "exists": true,
+        "path": "dinov2/loss/ibot_patch_loss.py",
+        "sha256": "19c0ffc85c8af01657ad2e6cffc2d4d311415b10807f63c2d6341195c7a62ddb",
+        "size_bytes": 5718
+      },
+      {
+        "exists": true,
+        "path": "dinov2/loss/koleo_loss.py",
+        "sha256": "ddccd75b7985d5e584f0fe6f3fb1ac474b9cbd9a6fd6fb6c6ae471ca479085d1",
+        "size_bytes": 1608
+      },
+      {
+        "exists": true,
+        "path": "dinov2/models/__init__.py",
+        "sha256": "b93329ce676f3eb0c9a7790d1b3b2b114a0855ea8dc76e32e262d1a7dc6c55ae",
+        "size_bytes": 1574
+      },
+      {
+        "exists": true,
+        "path": "dinov2/models/vision_transformer.py",
+        "sha256": "7799a260f2d7d0fe197331d08502fb8c542f9b7424723650f6a39b64fa2639ea",
+        "size_bytes": 16438
+      },
+      {
+        "exists": true,
+        "path": "dinov2/run/__init__.py",
+        "sha256": "2932e94a2d67be87b717c49468214c1127be7864aedf37f5891d26be7bc1437f",
+        "size_bytes": 195
+      },
+      {
+        "exists": true,
+        "path": "dinov2/run/eval/cell_dino/knn.py",
+        "sha256": "944113cdf344910011150a52e7874dce69640e0afb8e438a4c7e582349bbe1ff",
+        "size_bytes": 1724
+      },
+      {
+        "exists": true,
+        "path": "dinov2/run/eval/cell_dino/linear.py",
+        "sha256": "efb20708485a41bacd8db2a6a274988fac3e1e7cfec5290050293a8b587e7601",
+        "size_bytes": 1760
+      },
+      {
+        "exists": true,
+        "path": "dinov2/run/eval/knn.py",
+        "sha256": "21d1ed25bc9206b412e2d17bac150549f69929f5d0c924b7400a72d1bd295c31",
+        "size_bytes": 1660
+      },
+      {
+        "exists": true,
+        "path": "dinov2/run/eval/linear.py",
+        "sha256": "f89eb0a2eccdd2f35e27f7a5ca91ded95e4a5699f57e8e568c58547625f87ac5",
+        "size_bytes": 1689
+      },
+      {
+        "exists": true,
+        "path": "dinov2/run/eval/log_regression.py",
+        "sha256": "b4c4ddd086408c681b8b5642a26858b6c9e1a798c483a5283a983f2cd2b44c46",
+        "size_bytes": 1755
+      },
+      {
+        "exists": true,
+        "path": "dinov2/run/submit.py",
+        "sha256": "64597db2041e9c16a7640eeac00a299cb2761329af980f33f26a6dd025ffb541",
+        "size_bytes": 3304
+      },
+      {
+        "exists": true,
+        "path": "dinov2/run/train/train.py",
+        "sha256": "b469e29aaa460e509d52f19c787aad50963265d242200cad5f9ee3ce85938ba5",
+        "size_bytes": 1665
+      },
+      {
+        "exists": true,
+        "path": "dinov2/thirdparty/CLIP/LICENSE",
+        "sha256": "893951b3bf94db8df1b13e05da5cdeb499400960e4d44a3962a8b33ed0b4f28e",
+        "size_bytes": 1063
+      },
+      {
+        "exists": true,
+        "path": "dinov2/thirdparty/CLIP/clip/simple_tokenizer.py",
+        "sha256": "47b4a3678fed8a7a8b9ca614e7728c33c6ccda5aea3bd2acebf24c081cb25b64",
+        "size_bytes": 4900
+      },
+      {
+        "exists": true,
+        "path": "dinov2/train/__init__.py",
+        "sha256": "64dde70804b782a876524b529b00b9775559314a88d738cf4aee914bd4dbb9c4",
+        "size_bytes": 276
+      },
+      {
+        "exists": true,
+        "path": "dinov2/train/ssl_meta_arch.py",
+        "sha256": "a97cdcc721e9312f5e088f78257dbbeb98cb3af40e3e3b975aefbd6bfd1996c4",
+        "size_bytes": 18616
+      },
+      {
+        "exists": true,
+        "path": "dinov2/train/train.py",
+        "sha256": "04c4829d6cb428df546536cba4b2a313fae38bac084abf82758bf69483b03e89",
+        "size_bytes": 11075
+      },
+      {
+        "exists": true,
+        "path": "dinov2/utils/__init__.py",
+        "sha256": "2932e94a2d67be87b717c49468214c1127be7864aedf37f5891d26be7bc1437f",
+        "size_bytes": 195
+      },
+      {
+        "exists": true,
+        "path": "dinov2/utils/checkpoint.py",
+        "sha256": "36335648d4574417c41e0fe82ddb8cc23653bbbc251b580541167b73a83b8eff",
+        "size_bytes": 2597
+      },
+      {
+        "exists": true,
+        "path": "dinov2/utils/cluster.py",
+        "sha256": "be49f48f01edbc7d209941e1078be309bef7d06631da851cafcfdec7112d269f",
+        "size_bytes": 3014
+      },
+      {
+        "exists": true,
+        "path": "dinov2/utils/config.py",
+        "sha256": "588574a78951ccfe7ffaad9ef7cab53d37e837e3ae98cfc1b6a976189073d87c",
+        "size_bytes": 2211
+      },
+      {
+        "exists": true,
+        "path": "dinov2/utils/dtype.py",
+        "sha256": "610251537bcf55de8961a17dd625560eae5cfa5082e9382bbd9ded86db92e1c6",
+        "size_bytes": 1104
+      },
+      {
+        "exists": true,
+        "path": "dinov2/utils/param_groups.py",
+        "sha256": "ec1daae9eb7c50492091504f97087e3179d46a080d7b7f131967c07cb15cf6d4",
+        "size_bytes": 3761
+      },
+      {
+        "exists": true,
+        "path": "dinov2/utils/utils.py",
+        "sha256": "10bfc824fdb00cf0c4afc0a875b5763ad4c5f33ec38c2515b12528307b789305",
+        "size_bytes": 3240
+      },
+      {
+        "exists": true,
+        "path": "docs/Cell-DINO.png",
+        "sha256": "709d2fba153499262d190e22126b10337a4f76c137849d9f65cd0ade8f8d91aa",
+        "size_bytes": 1101690
+      },
+      {
+        "exists": true,
+        "path": "docs/ChannelAdaptiveDINO.png",
+        "sha256": "29e92f5853abbd9126eab3956022b0e969b83aaaba7e4397d6679f5b279153d2",
+        "size_bytes": 665674
+      },
+      {
+        "exists": true,
+        "path": "docs/README_CELL_DINO.md",
+        "sha256": "b9ec5771aaa41d571f5c2b54300a7f8bf7ab5d75f7679d2a80f260247a71d42f",
+        "size_bytes": 6745
+      },
+      {
+        "exists": true,
+        "path": "docs/README_CHANNEL_ADAPTIVE_DINO.md",
+        "sha256": "d15b88dbf5be7c1e4ec0a5062e33e4ad9c654f7256ec3fb02246a077d74b32ee",
+        "size_bytes": 6648
+      },
+      {
+        "exists": true,
+        "path": "hubconf.py",
+        "sha256": "c1f5090e78ff940b72c076d2bf9c0310d1707c946b3d10e2d6f2b0bdf56a6f64",
+        "size_bytes": 1126
+      },
+      {
+        "exists": true,
+        "path": "notebooks/cell_dino/inference.ipynb",
+        "sha256": "bc64c2a45bd869b78d1ef968117f5550e6303c26dd91368ae50bd9f777f8c541",
+        "size_bytes": 6163
+      },
+      {
+        "exists": true,
+        "path": "notebooks/depth_estimation.ipynb",
+        "sha256": "6e11d2fba89cf4c4ad10d4a63097ca11ecda1e0c345c6e168936495f688eab18",
+        "size_bytes": 671818
+      },
+      {
+        "exists": true,
+        "path": "notebooks/dinotxt.ipynb",
+        "sha256": "ed63fa225501984935b7a8f9ee125f0d27d24319598946bbd371e5eed74d7a77",
+        "size_bytes": 30329
+      },
+      {
+        "exists": true,
+        "path": "notebooks/semantic_segmentation.ipynb",
+        "sha256": "8ab867e5673d0daf6fa29e0fd231c572cba2c61c1347a786401f0469286a6888",
+        "size_bytes": 598694
+      },
+      {
+        "exists": true,
+        "path": "pyproject.toml",
+        "sha256": "02704adaed03163d96bfb301c080fd80fddf35b3145093d404d4390a27e1992c",
+        "size_bytes": 417
+      },
+      {
+        "exists": true,
+        "path": "requirements-dev.txt",
+        "sha256": "fe970368414b041da0776bacee267fd633a30b23d82052f9071c29cf936a041d",
+        "size_bytes": 43
+      },
+      {
+        "exists": true,
+        "path": "requirements-extras.txt",
+        "sha256": "1b3750ae8652a54863a2d6d7d0c708f6b7ced787f57c951aa11f1a9444feaacd",
+        "size_bytes": 40
+      },
+      {
+        "exists": true,
+        "path": "requirements.txt",
+        "sha256": "553faa42e1ad3975631e46df26bcfd76ec3add6beacb9ede3f8ef22393f5eefc",
+        "size_bytes": 213
+      },
+      {
+        "exists": true,
+        "path": "scripts/cell_dino/launcher_knn_eval_on_chammi.sh",
+        "sha256": "e182474e774ad1601676eed7941a0d9a19160b5044d44c8ba715cd50d9ee1a58",
+        "size_bytes": 1328
+      },
+      {
+        "exists": true,
+        "path": "scripts/cell_dino/launcher_linear_eval_on_chammi.sh",
+        "sha256": "4274db201dff60e9f153c163867cbcecca7602030844f431790b60cba237dc1c",
+        "size_bytes": 1430
+      },
+      {
+        "exists": true,
+        "path": "scripts/lint.sh",
+        "sha256": "b75d302b0b33b8dffa2c5f054574efd6de79897fa6a9b2efc374a3abeebfdfff",
+        "size_bytes": 303
+      },
+      {
+        "exists": true,
+        "path": "setup.cfg",
+        "sha256": "b786579a6174d03c4616cc92b016673fefaa440f4556ba7ab961f7de193ed938",
+        "size_bytes": 130
+      },
+      {
+        "exists": true,
+        "path": "setup.py",
+        "sha256": "8ec72d3be027aee099a7b7b1c36c874be6d7ade4dd9eb69baff3975b586820ae",
+        "size_bytes": 2751
+      }
+    ],
+    "repo_tree_sha256": "6b5130a4368bd558fa66624d72bd56703f39a58a2fac18f8920cd2256f114cf9",
+    "root": "/home/hynx/.cache/torch/hub",
+    "trusted_list": {
+      "exists": true,
+      "path": "/home/hynx/.cache/torch/hub/trusted_list",
+      "realpath": "/home/hynx/.cache/torch/hub/trusted_list",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    "weights": {
+      "exists": true,
+      "path": "/home/hynx/.cache/torch/hub/checkpoints/dinov2_vitb14_pretrain.pth",
+      "realpath": "/home/hynx/.cache/torch/hub/checkpoints/dinov2_vitb14_pretrain.pth",
+      "sha256": "0b8b82f85de91b424aded121c7e1dcc2b7bc6d0adeea651bf73a13307fad8c73",
+      "size_bytes": 346378731
+    }
+  },
+  "engineering_remediation": {
+    "canonical_reward_bytes_preserved": true,
+    "cpu_imports": {
+      "cuda_initialized": false,
+      "lerobot_origin": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/lerobot/src/lerobot/__init__.py",
+      "lerobot_processors": true,
+      "rdt_create_model": true
+    },
+    "cpu_tests": "12 passed including metadata binding mocks",
+    "dependencies_populated": true,
+    "libero_config_owned": true,
+    "main_guard_opt_in": "+main.require_task_cache_identity=true",
+    "setup_manifest": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/setup_manifest.json",
+    "stage_extractor_task_caches_verified": 10,
+    "task_bound_guidance_caches": 10
+  },
+  "git_dependencies": [
+    {
+      "available_local_source": "/home/hynx/VLA-Pilot++/third_party/rdt",
+      "dirty_count": 0,
+      "head": "b896f4dcac8ed1c3fae4a056200db267607f131f",
+      "name": "rdt",
+      "new_worktree_empty": true
+    },
+    {
+      "available_local_source": "/home/hynx/VLA-Pilot++/third_party/lerobot",
+      "dirty_count": 0,
+      "head": "715debf6c1723a28f1a57d4274a8c4ec35b6a417",
+      "name": "lerobot",
+      "new_worktree_empty": true
+    },
+    {
+      "available_local_source": "/home/hynx/VLA-Pilot++/third_party/calvin",
+      "dirty_count": 0,
+      "head": "13ec2d33c28b604bfd4324159573cd4a388022d8",
+      "name": "calvin",
+      "new_worktree_empty": true
+    }
+  ],
+  "gpu_mapping": {
+    "admission": "Metadata mapping verified only; external GPU7 process remains. Rendering/CUDA probe not admitted.",
+    "cuda_egl_verified": false,
+    "driver_version": "580.65.06",
+    "drm_pci_verified": false,
+    "egl_device_index": 4,
+    "gpu_probe_performed_by_this_node": false,
+    "historical_gpu7_egl4_holds": true,
+    "legacy_egl_device": 4,
+    "legacy_mapping_verified_this_run": false,
+    "metadata_mapping_verified": true,
+    "metadata_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/egl-device-metadata.json",
+    "metadata_probe_performed_by_this_node": true,
+    "pci_bus_id": "00000000:E1:00.0",
+    "physical_gpu": 7,
+    "uuid": "GPU-48473162-9548-1a19-04aa-ea86c5349187",
+    "worker_limit": 1
+  },
+  "guidance_cache": {
+    "files": [
+      {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_1/vlm_agent/metadata.json",
+        "realpath": "/home/hynx/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_1/vlm_agent/metadata.json",
+        "sha256": "832bff62f9e3b2ec48cec82c99f082970b38c8169373aeb293d3c94a200a28ec",
+        "size_bytes": 1756
+      },
+      {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_1/vlm_agent/output_raw.txt",
+        "realpath": "/home/hynx/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_1/vlm_agent/output_raw.txt",
+        "sha256": "159ba56eb5adfd729daf6737bc258c65d05b0f3b474cf267b1c988536067edd2",
+        "size_bytes": 1431
+      },
+      {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_1/vlm_agent/prompt.txt",
+        "realpath": "/home/hynx/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_1/vlm_agent/prompt.txt",
+        "sha256": "1786da1fed0329c9cd4b6bc88bfe39862f767a56dcdacd472f810c951643f560",
+        "size_bytes": 12474
+      },
+      {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_1/vlm_agent/query_img.png",
+        "realpath": "/home/hynx/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_1/vlm_agent/query_img.png",
+        "sha256": "f415b4634b5ffdd01aeafd3e523e204333810a493b344a5b198d3f744acdc3bf",
+        "size_bytes": 579594
+      },
+      {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_1/vlm_agent/stage1_guidance.txt",
+        "realpath": "/home/hynx/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_1/vlm_agent/stage1_guidance.txt",
+        "sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+        "size_bytes": 979
+      },
+      {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_1/vlm_agent/stage2_guidance.txt",
+        "realpath": "/home/hynx/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_1/vlm_agent/stage2_guidance.txt",
+        "sha256": "ca058cc1dcf87ce5910181800bb2f65b8cd4d92788b27f3b10b1e33dbc103f84",
+        "size_bytes": 194
+      }
+    ],
+    "identity_verdict": "Stage descriptions are alphabet-soup-specific but legacy runners reuse cache for all tasks; metadata mapping differs from live per-task mapping. Runtime task/target binding required before dispatch.",
+    "metadata_keypoint_map": {
+      "0": "alphabet_soup_1_main",
+      "1": "basket_1_main",
+      "10": "milk_1_main",
+      "11": "tomato_sauce_1_main",
+      "12": "butter_1_main",
+      "2": "basket_1_main",
+      "3": "basket_1_main",
+      "4": "basket_1_main",
+      "5": "basket_1_main",
+      "6": "salad_dressing_1_main",
+      "7": "salad_dressing_1_main",
+      "8": "cream_cheese_1_main",
+      "9": "milk_1_main"
+    },
+    "metadata_num_keypoints": 13,
+    "num_stages": 2,
+    "numeric_guidance_target_indices": [
+      0
+    ],
+    "root": "/home/hynx/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_1/vlm_agent",
+    "stage_descriptions": [
+      "# Stage 1: Move gripper to grasp alphabet soup can (keypoint 0).",
+      "# Stage 2: Move gripper with alphabet soup can to basket (keypoint 1). No guidance needed for stage 2."
+    ]
+  },
+  "hf_encoders": [
+    {
+      "cache": "models--google--t5-v1_1-xxl",
+      "files": [
+        {
+          "exists": true,
+          "path": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/snapshots/3db67ab1af984cf10548a73467f0e5bca2aaaeb2/config.json",
+          "realpath": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/blobs/5a439fe1a8c4a05c6b1e4bf6a11821b497bf0136",
+          "sha256": "a58c2192a7166501ad2382c3d7ca3d694a1259b71a23a1925887e5afe7adcbd8",
+          "size_bytes": 593
+        },
+        {
+          "exists": true,
+          "path": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/snapshots/3db67ab1af984cf10548a73467f0e5bca2aaaeb2/pytorch_model.bin",
+          "realpath": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/blobs/c8407a9ae21075667be98f84f4c93e8a7bfc772a352cd2e6998f5916f7181db8",
+          "sha256": "c8407a9ae21075667be98f84f4c93e8a7bfc772a352cd2e6998f5916f7181db8",
+          "size_bytes": 44541587809
+        },
+        {
+          "exists": true,
+          "path": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/snapshots/3db67ab1af984cf10548a73467f0e5bca2aaaeb2/special_tokens_map.json",
+          "realpath": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/blobs/881bdbffc06e471924ecea57f962bc5f8e2a9f21",
+          "sha256": "4720c0fddbe4c5991334f85ad7073d9bd0a294a8ba4641a2f8dab614ca825949",
+          "size_bytes": 1786
+        },
+        {
+          "exists": true,
+          "path": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/snapshots/3db67ab1af984cf10548a73467f0e5bca2aaaeb2/spiece.model",
+          "realpath": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/blobs/4e28ff6ebdf584f5372d9de68867399142435d9a",
+          "sha256": "d60acb128cf7b7f2536e8f38a5b18a05535c9e14c7a355904270e15b0945ea86",
+          "size_bytes": 791656
+        },
+        {
+          "exists": true,
+          "path": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/snapshots/3db67ab1af984cf10548a73467f0e5bca2aaaeb2/tokenizer_config.json",
+          "realpath": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/blobs/b114c318caf72f6e89ea92e0755c41327a453198",
+          "sha256": "b971dce1d2805c2a66da8657156e7114a30501c6ba602fc947c8bf607a3ead2d",
+          "size_bytes": 1857
+        }
+      ],
+      "snapshot": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/snapshots/3db67ab1af984cf10548a73467f0e5bca2aaaeb2"
+    },
+    {
+      "cache": "models--google--siglip-so400m-patch14-384",
+      "files": [
+        {
+          "exists": true,
+          "path": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384/snapshots/9fdffc58afc957d1a03a25b10dba0329ab15c2a3/config.json",
+          "realpath": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384/blobs/a513b447f6b05f640f9980d25f4d8a5cff6cd25d",
+          "sha256": "adc04928d8fd19a61822584fe0cf2e813e5ebac17f3e49fb1ea096860ae6457b",
+          "size_bytes": 576
+        },
+        {
+          "exists": true,
+          "path": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384/snapshots/9fdffc58afc957d1a03a25b10dba0329ab15c2a3/model.safetensors",
+          "realpath": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384/blobs/ea2abad2b7f8a9c1aa5e49a244d5d57ffa71c56f720c94bc5d240ef4d6e1d94a",
+          "sha256": "ea2abad2b7f8a9c1aa5e49a244d5d57ffa71c56f720c94bc5d240ef4d6e1d94a",
+          "size_bytes": 3511950624
+        },
+        {
+          "exists": true,
+          "path": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384/snapshots/9fdffc58afc957d1a03a25b10dba0329ab15c2a3/preprocessor_config.json",
+          "realpath": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384/blobs/051261b5a784a2e7e5f93de1f86d170d69a9efd9",
+          "sha256": "f59da2f87c3cd079bd4f8f3037e81b277c60c498e279a8020331f67a5a3157e8",
+          "size_bytes": 368
+        }
+      ],
+      "snapshot": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384/snapshots/9fdffc58afc957d1a03a25b10dba0329ab15c2a3"
+    }
+  ],
+  "initial_audit_blockers": [
+    "GPU7 externally occupied; no CUDA/EGL admitted",
+    "Empty local RDT and LeRobot gitlink directories; installed LeRobot resolves into historical worktree",
+    "Stale .libero_config absolute paths refer to historical worktree",
+    "Legacy cache/output/DINO seed roots use missing /mnt/data/shared2/zhuoli paths",
+    "Stage cache literal target identity conflicts on nine of ten tasks; task-specific live identity binding not yet implemented",
+    "CUDA-EGL mapping not yet independently verified",
+    "Validation seeds vary policy/keypoint stochasticity but init index remains 0; do not claim unseen layout generalization"
+  ],
+  "input_code": [
+    {
+      "exists": true,
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/main.py",
+      "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/main.py",
+      "sha256": "9b25abd05f8f73a7cda84153f562e249420546746c4bedd639fdc8409b6e107d",
+      "size_bytes": 88700
+    },
+    {
+      "exists": true,
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/env_adapters/libero_adapter.py",
+      "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/env_adapters/libero_adapter.py",
+      "sha256": "5789168f59179599fb37ce88193884ec469db63a1a4f68fde350e90936100f19",
+      "size_bytes": 70776
+    },
+    {
+      "exists": true,
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/keypoint_detector.py",
+      "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/keypoint_detector.py",
+      "sha256": "5fa108f01168ecb1f2433bc53f093701e0079fa6cf35abf910ec0347075d055e",
+      "size_bytes": 28857
+    },
+    {
+      "exists": true,
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/keypoint_tracker.py",
+      "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/keypoint_tracker.py",
+      "sha256": "292d63964b90405769118bda0e1acc9666f8ae076f41abbb7df8e5bf8abc6f45",
+      "size_bytes": 8747
+    },
+    {
+      "exists": true,
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/gemini_grounder.py",
+      "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/gemini_grounder.py",
+      "sha256": "ddba9805043aa6fc3344841f4b9a9cff45a351e1fb45d78e57885a96586725e5",
+      "size_bytes": 12113
+    },
+    {
+      "exists": true,
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/vlm_query/stage_template.txt",
+      "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/vlm_query/stage_template.txt",
+      "sha256": "758d71a441496074410428b005a068a18b6d92273b9278c1181334cf9e67005b",
+      "size_bytes": 3655
+    },
+    {
+      "exists": true,
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/vlm_query/guidance_template_libero.txt",
+      "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/vlm_query/guidance_template_libero.txt",
+      "sha256": "0a11498ed5317170bff8e8cd3909c508ea810e4fa9f006555ef37a50f4459c54",
+      "size_bytes": 3441
+    },
+    {
+      "exists": true,
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/configs/perception.yaml",
+      "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/configs/perception.yaml",
+      "sha256": "ca865064bcc7d9b668c4bc244d816ddf92589b13048fb1ac1b268c494e007b1a",
+      "size_bytes": 2228
+    },
+    {
+      "exists": true,
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/configs/backend/libero.yaml",
+      "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/configs/backend/libero.yaml",
+      "sha256": "e1d1f41f178c7e5968e04b8337c13e8f37b691a7b3e93f9f8e9f7bb5796deb14",
+      "size_bytes": 1341
+    },
+    {
+      "exists": true,
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/.libero_config/config.yaml",
+      "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/.libero_config/config.yaml",
+      "sha256": "57fa9af10e5ec0a0003148538cb02a229ce25701494487396b6ec372d687035f",
+      "size_bytes": 645
+    }
+  ],
+  "libero_tasks": [
+    {
+      "bddl": {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/bddl_files/libero_object_swap/pick_up_the_alphabet_soup_and_place_it_in_the_basket.bddl",
+        "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/bddl_files/libero_object_swap/pick_up_the_alphabet_soup_and_place_it_in_the_basket.bddl",
+        "sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+        "size_bytes": 2123
+      },
+      "cache_literal_target_matches": true,
+      "init": {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/init_files/libero_object_swap/pick_up_the_alphabet_soup_and_place_it_in_the_basket.pruned_init",
+        "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/init_files/libero_object_swap/pick_up_the_alphabet_soup_and_place_it_in_the_basket.pruned_init",
+        "sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+        "size_bytes": 4133
+      },
+      "init_shape": [
+        50,
+        110
+      ],
+      "language": "Pick the alphabet soup and place it in the basket",
+      "name": "pick_up_the_alphabet_soup_and_place_it_in_the_basket",
+      "object_declarations": [
+        "alphabet_soup_1 - alphabet_soup",
+        "basket_1 - basket",
+        "salad_dressing_1 - salad_dressing",
+        "cream_cheese_1 - cream_cheese",
+        "milk_1 - milk",
+        "tomato_sauce_1 - tomato_sauce",
+        "butter_1 - butter"
+      ],
+      "objects_of_interest": [
+        "alphabet_soup_1",
+        "basket_1"
+      ],
+      "task_id": 0,
+      "used_init_index": 0,
+      "used_init_row_dtype": "float64",
+      "used_init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
+      "used_init_row_shape": [
+        110
+      ]
+    },
+    {
+      "bddl": {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/bddl_files/libero_object_swap/pick_up_the_cream_cheese_and_place_it_in_the_basket.bddl",
+        "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/bddl_files/libero_object_swap/pick_up_the_cream_cheese_and_place_it_in_the_basket.bddl",
+        "sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+        "size_bytes": 2114
+      },
+      "cache_literal_target_matches": false,
+      "init": {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/init_files/libero_object_swap/pick_up_the_cream_cheese_and_place_it_in_the_basket.pruned_init",
+        "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/init_files/libero_object_swap/pick_up_the_cream_cheese_and_place_it_in_the_basket.pruned_init",
+        "sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+        "size_bytes": 4191
+      },
+      "init_shape": [
+        50,
+        110
+      ],
+      "language": "Pick the cream cheese and place it in the basket",
+      "name": "pick_up_the_cream_cheese_and_place_it_in_the_basket",
+      "object_declarations": [
+        "cream_cheese_1 - cream_cheese",
+        "basket_1 - basket",
+        "alphabet_soup_1 - alphabet_soup",
+        "milk_1 - milk",
+        "tomato_sauce_1 - tomato_sauce",
+        "butter_1 - butter",
+        "orange_juice_1 - orange_juice"
+      ],
+      "objects_of_interest": [
+        "cream_cheese_1",
+        "basket_1"
+      ],
+      "task_id": 1,
+      "used_init_index": 0,
+      "used_init_row_dtype": "float64",
+      "used_init_row_sha256": "2c0b399c52b759187483bbc0473bad47b366f3e5a3816f8ce98a5d37640a1725",
+      "used_init_row_shape": [
+        110
+      ]
+    },
+    {
+      "bddl": {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/bddl_files/libero_object_swap/pick_up_the_salad_dressing_and_place_it_in_the_basket.bddl",
+        "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/bddl_files/libero_object_swap/pick_up_the_salad_dressing_and_place_it_in_the_basket.bddl",
+        "sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+        "size_bytes": 2129
+      },
+      "cache_literal_target_matches": false,
+      "init": {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/init_files/libero_object_swap/pick_up_the_salad_dressing_and_place_it_in_the_basket.pruned_init",
+        "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/init_files/libero_object_swap/pick_up_the_salad_dressing_and_place_it_in_the_basket.pruned_init",
+        "sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+        "size_bytes": 3374
+      },
+      "init_shape": [
+        50,
+        110
+      ],
+      "language": "Pick the salad dressing and place it in the basket",
+      "name": "pick_up_the_salad_dressing_and_place_it_in_the_basket",
+      "object_declarations": [
+        "salad_dressing_1 - salad_dressing",
+        "basket_1 - basket",
+        "ketchup_1 - ketchup",
+        "alphabet_soup_1 - alphabet_soup",
+        "cream_cheese_1 - cream_cheese",
+        "milk_1 - milk",
+        "tomato_sauce_1 - tomato_sauce"
+      ],
+      "objects_of_interest": [
+        "salad_dressing_1",
+        "basket_1"
+      ],
+      "task_id": 2,
+      "used_init_index": 0,
+      "used_init_row_dtype": "float64",
+      "used_init_row_sha256": "f77a5f5866952552461f703b40f853add2c13d75cbd54cd8fbbaae641db165c1",
+      "used_init_row_shape": [
+        110
+      ]
+    },
+    {
+      "bddl": {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/bddl_files/libero_object_swap/pick_up_the_bbq_sauce_and_place_it_in_the_basket.bddl",
+        "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/bddl_files/libero_object_swap/pick_up_the_bbq_sauce_and_place_it_in_the_basket.bddl",
+        "sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+        "size_bytes": 2144
+      },
+      "cache_literal_target_matches": false,
+      "init": {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/init_files/libero_object_swap/pick_up_the_bbq_sauce_and_place_it_in_the_basket.pruned_init",
+        "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/init_files/libero_object_swap/pick_up_the_bbq_sauce_and_place_it_in_the_basket.pruned_init",
+        "sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+        "size_bytes": 3391
+      },
+      "init_shape": [
+        50,
+        110
+      ],
+      "language": "Pick the bbq sauce and place it in the basket",
+      "name": "pick_up_the_bbq_sauce_and_place_it_in_the_basket",
+      "object_declarations": [
+        "bbq_sauce_1 - bbq_sauce",
+        "basket_1 - basket",
+        "chocolate_pudding_1 - chocolate_pudding",
+        "ketchup_1 - ketchup",
+        "salad_dressing_1 - salad_dressing",
+        "alphabet_soup_1 - alphabet_soup",
+        "cream_cheese_1 - cream_cheese"
+      ],
+      "objects_of_interest": [
+        "bbq_sauce_1",
+        "basket_1"
+      ],
+      "task_id": 3,
+      "used_init_index": 0,
+      "used_init_row_dtype": "float64",
+      "used_init_row_sha256": "faa3e635dd29229f763f8748098f92543b7f680fb4212e7036ec49ba55d57c93",
+      "used_init_row_shape": [
+        110
+      ]
+    },
+    {
+      "bddl": {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/bddl_files/libero_object_swap/pick_up_the_ketchup_and_place_it_in_the_basket.bddl",
+        "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/bddl_files/libero_object_swap/pick_up_the_ketchup_and_place_it_in_the_basket.bddl",
+        "sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+        "size_bytes": 2099
+      },
+      "cache_literal_target_matches": false,
+      "init": {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/init_files/libero_object_swap/pick_up_the_ketchup_and_place_it_in_the_basket.pruned_init",
+        "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/init_files/libero_object_swap/pick_up_the_ketchup_and_place_it_in_the_basket.pruned_init",
+        "sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+        "size_bytes": 4123
+      },
+      "init_shape": [
+        50,
+        110
+      ],
+      "language": "Pick the ketchup and place it in the basket",
+      "name": "pick_up_the_ketchup_and_place_it_in_the_basket",
+      "object_declarations": [
+        "ketchup_1 - ketchup",
+        "basket_1 - basket",
+        "bbq_sauce_1 - bbq_sauce",
+        "salad_dressing_1 - salad_dressing",
+        "alphabet_soup_1 - alphabet_soup",
+        "cream_cheese_1 - cream_cheese",
+        "milk_1 - milk"
+      ],
+      "objects_of_interest": [
+        "ketchup_1",
+        "basket_1"
+      ],
+      "task_id": 4,
+      "used_init_index": 0,
+      "used_init_row_dtype": "float64",
+      "used_init_row_sha256": "e773740b1d2927cb47331e1ff21a056e7118e6aef76681b8001521ff462c10a9",
+      "used_init_row_shape": [
+        110
+      ]
+    },
+    {
+      "bddl": {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/bddl_files/libero_object_swap/pick_up_the_tomato_sauce_and_place_it_in_the_basket.bddl",
+        "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/bddl_files/libero_object_swap/pick_up_the_tomato_sauce_and_place_it_in_the_basket.bddl",
+        "sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+        "size_bytes": 2117
+      },
+      "cache_literal_target_matches": false,
+      "init": {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/init_files/libero_object_swap/pick_up_the_tomato_sauce_and_place_it_in_the_basket.pruned_init",
+        "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/init_files/libero_object_swap/pick_up_the_tomato_sauce_and_place_it_in_the_basket.pruned_init",
+        "sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+        "size_bytes": 4145
+      },
+      "init_shape": [
+        50,
+        110
+      ],
+      "language": "Pick the tomato sauce and place it in the basket",
+      "name": "pick_up_the_tomato_sauce_and_place_it_in_the_basket",
+      "object_declarations": [
+        "tomato_sauce_1 - tomato_sauce",
+        "basket_1 - basket",
+        "milk_1 - milk",
+        "butter_1 - butter",
+        "orange_juice_1 - orange_juice",
+        "chocolate_pudding_1 - chocolate_pudding",
+        "bbq_sauce_1 - bbq_sauce"
+      ],
+      "objects_of_interest": [
+        "tomato_sauce_1",
+        "basket_1"
+      ],
+      "task_id": 5,
+      "used_init_index": 0,
+      "used_init_row_dtype": "float64",
+      "used_init_row_sha256": "b9ce167f1250d75a658ff60926d83963155810d20a06d45bdc84a30faf0f47a4",
+      "used_init_row_shape": [
+        110
+      ]
+    },
+    {
+      "bddl": {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/bddl_files/libero_object_swap/pick_up_the_butter_and_place_it_in_the_basket.bddl",
+        "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/bddl_files/libero_object_swap/pick_up_the_butter_and_place_it_in_the_basket.bddl",
+        "sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+        "size_bytes": 2108
+      },
+      "cache_literal_target_matches": false,
+      "init": {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/init_files/libero_object_swap/pick_up_the_butter_and_place_it_in_the_basket.pruned_init",
+        "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/init_files/libero_object_swap/pick_up_the_butter_and_place_it_in_the_basket.pruned_init",
+        "sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+        "size_bytes": 3390
+      },
+      "init_shape": [
+        50,
+        110
+      ],
+      "language": "Pick the butter and place it in the basket",
+      "name": "pick_up_the_butter_and_place_it_in_the_basket",
+      "object_declarations": [
+        "butter_1 - butter",
+        "basket_1 - basket",
+        "tomato_sauce_1 - tomato_sauce",
+        "orange_juice_1 - orange_juice",
+        "chocolate_pudding_1 - chocolate_pudding",
+        "bbq_sauce_1 - bbq_sauce",
+        "ketchup_1 - ketchup"
+      ],
+      "objects_of_interest": [
+        "butter_1",
+        "basket_1"
+      ],
+      "task_id": 6,
+      "used_init_index": 0,
+      "used_init_row_dtype": "float64",
+      "used_init_row_sha256": "aa4fe30bc10b84fcc2ee6b6d38448fbbf6bae9872c2092b0dd19f9b92aa98e11",
+      "used_init_row_shape": [
+        110
+      ]
+    },
+    {
+      "bddl": {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/bddl_files/libero_object_swap/pick_up_the_milk_and_place_it_in_the_basket.bddl",
+        "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/bddl_files/libero_object_swap/pick_up_the_milk_and_place_it_in_the_basket.bddl",
+        "sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+        "size_bytes": 2102
+      },
+      "cache_literal_target_matches": false,
+      "init": {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/init_files/libero_object_swap/pick_up_the_milk_and_place_it_in_the_basket.pruned_init",
+        "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/init_files/libero_object_swap/pick_up_the_milk_and_place_it_in_the_basket.pruned_init",
+        "sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+        "size_bytes": 4185
+      },
+      "init_shape": [
+        50,
+        110
+      ],
+      "language": "Pick the milk and place it in the basket",
+      "name": "pick_up_the_milk_and_place_it_in_the_basket",
+      "object_declarations": [
+        "milk_1 - milk",
+        "basket_1 - basket",
+        "cream_cheese_1 - cream_cheese",
+        "tomato_sauce_1 - tomato_sauce",
+        "butter_1 - butter",
+        "orange_juice_1 - orange_juice",
+        "chocolate_pudding_1 - chocolate_pudding"
+      ],
+      "objects_of_interest": [
+        "milk_1",
+        "basket_1"
+      ],
+      "task_id": 7,
+      "used_init_index": 0,
+      "used_init_row_dtype": "float64",
+      "used_init_row_sha256": "e7dfc87fb7c0a1315e209abb64da13fea1e37ea489253efeedeee7ea14548914",
+      "used_init_row_shape": [
+        110
+      ]
+    },
+    {
+      "bddl": {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/bddl_files/libero_object_swap/pick_up_the_chocolate_pudding_and_place_it_in_the_basket.bddl",
+        "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/bddl_files/libero_object_swap/pick_up_the_chocolate_pudding_and_place_it_in_the_basket.bddl",
+        "sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+        "size_bytes": 2168
+      },
+      "cache_literal_target_matches": false,
+      "init": {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/init_files/libero_object_swap/pick_up_the_chocolate_pudding_and_place_it_in_the_basket.pruned_init",
+        "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/init_files/libero_object_swap/pick_up_the_chocolate_pudding_and_place_it_in_the_basket.pruned_init",
+        "sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+        "size_bytes": 2590
+      },
+      "init_shape": [
+        50,
+        110
+      ],
+      "language": "Pick the chocolate pudding and place it in the basket",
+      "name": "pick_up_the_chocolate_pudding_and_place_it_in_the_basket",
+      "object_declarations": [
+        "chocolate_pudding_1 - chocolate_pudding",
+        "basket_1 - basket",
+        "orange_juice_1 - orange_juice",
+        "bbq_sauce_1 - bbq_sauce",
+        "ketchup_1 - ketchup",
+        "salad_dressing_1 - salad_dressing",
+        "alphabet_soup_1 - alphabet_soup"
+      ],
+      "objects_of_interest": [
+        "chocolate_pudding_1",
+        "basket_1"
+      ],
+      "task_id": 8,
+      "used_init_index": 0,
+      "used_init_row_dtype": "float64",
+      "used_init_row_sha256": "718f2fb31f45c25f9c3f1bcf7637ba8ec113b0773b6ce829c7f4b3d02c154555",
+      "used_init_row_shape": [
+        110
+      ]
+    },
+    {
+      "bddl": {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/bddl_files/libero_object_swap/pick_up_the_orange_juice_and_place_it_in_the_basket.bddl",
+        "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/bddl_files/libero_object_swap/pick_up_the_orange_juice_and_place_it_in_the_basket.bddl",
+        "sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+        "size_bytes": 2132
+      },
+      "cache_literal_target_matches": false,
+      "init": {
+        "exists": true,
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/init_files/libero_object_swap/pick_up_the_orange_juice_and_place_it_in_the_basket.pruned_init",
+        "realpath": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/third_party/libero_pro/libero/libero/init_files/libero_object_swap/pick_up_the_orange_juice_and_place_it_in_the_basket.pruned_init",
+        "sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+        "size_bytes": 3361
+      },
+      "init_shape": [
+        50,
+        110
+      ],
+      "language": "Pick the orange juice and place it in the basket",
+      "name": "pick_up_the_orange_juice_and_place_it_in_the_basket",
+      "object_declarations": [
+        "orange_juice_1 - orange_juice",
+        "basket_1 - basket",
+        "butter_1 - butter",
+        "chocolate_pudding_1 - chocolate_pudding",
+        "bbq_sauce_1 - bbq_sauce",
+        "ketchup_1 - ketchup",
+        "salad_dressing_1 - salad_dressing"
+      ],
+      "objects_of_interest": [
+        "orange_juice_1",
+        "basket_1"
+      ],
+      "task_id": 9,
+      "used_init_index": 0,
+      "used_init_row_dtype": "float64",
+      "used_init_row_sha256": "d8309b31899377d1051f6d7da47edc747b294842a6fec748aff6c9b822d8797e",
+      "used_init_row_shape": [
+        110
+      ]
+    }
+  ],
+  "mode": "cpu-read-only-audit",
+  "module_origins": {
+    "calvin_env": "/home/hynx/VLA-Pilot++/third_party/calvin/calvin_env/calvin_env/__init__.py",
+    "lerobot": "/home/hynx/VLA-Pilot++/.worktrees/feat/rdt-libero-gt-rollout-reintegration/third_party/lerobot/src/lerobot/__init__.py",
+    "libero": null,
+    "mujoco": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/mujoco/__init__.py",
+    "robosuite": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/__init__.py"
+  },
+  "python": {
+    "executable": "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+    "packages": {
+      "Pillow": "11.3.0",
+      "accelerate": "1.12.0",
+      "diffusers": "0.35.2",
+      "einops": "0.8.1",
+      "gymnasium": "1.2.2",
+      "h5py": "3.15.1",
+      "hydra-core": "1.3.2",
+      "imageio": "2.37.3",
+      "kmeans-pytorch": "0.3",
+      "lerobot": "0.4.2",
+      "mujoco": "3.7.0",
+      "numpy": "2.2.0",
+      "omegaconf": "2.3.0",
+      "openai": "2.8.1",
+      "python-dotenv": "1.2.2",
+      "robosuite": "1.4.0",
+      "safetensors": "0.7.0",
+      "scikit-learn": "1.7.2",
+      "timm": "1.0.20",
+      "torch": "2.7.1",
+      "torchvision": "0.22.1",
+      "transformers": "4.53.3"
+    },
+    "version": "3.12.12 | packaged by conda-forge | (main, Oct 22 2025, 23:25:55) [GCC 14.3.0]"
+  },
+  "schema": "qd-ed-runtime-inventory-v1",
+  "worktree": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z"
+}
