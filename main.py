@@ -12,6 +12,7 @@ Usage:
 """
 
 import os
+import faulthandler
 import inspect
 import warnings
 from pathlib import Path
@@ -1053,6 +1054,33 @@ class Main:
         except Exception as e:
             log.warning(f"Failed to append episode metadata to {metadata_path}: {e}")
 
+    def _enable_phase_diagnostics(self):
+        """Use existing stderr for native-fault Python stacks, without locals."""
+        try:
+            config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
+            if config.get("enabled", False):
+                faulthandler.enable(all_threads=True)
+        except Exception:
+            log.warning("Native-fault stack diagnostics unavailable")
+
+    def _append_phase_timing(self, *, episode, global_step, name, event, elapsed_s):
+        """Best-effort scalar phase markers; never log operation inputs/errors."""
+        if getattr(self, "_phase_timing_write_failed", False):
+            return
+        try:
+            config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
+            if not config.get("enabled", False):
+                return
+            path = Path(config.get("output_dir") or self.output_dir) / "phase_timing.jsonl"
+            append_jsonl(path, {
+                "schema": "qd-ed-phase-timing-v1", "episode": int(episode),
+                "global_step": int(global_step), "name": name, "event": event,
+                "elapsed_s": float(elapsed_s),
+            })
+        except Exception:
+            self._phase_timing_write_failed = True
+            log.warning("Phase timing unavailable; diagnostic writes disabled")
+
     def _api_compute_snapshot(self):
         """Read only counters, never requests, endpoints, headers, or credentials."""
         snapshot = {}
@@ -1459,7 +1487,13 @@ class Main:
         set_episode_context = getattr(self.policy, "set_eds_episode_context", None)
         if callable(set_episode_context):
             set_episode_context(int(episode), int(episode_seed))
+        self._enable_phase_diagnostics()
+        self._append_phase_timing(episode=episode, global_step=0,
+            name="initial_policy_observation", event="enter", elapsed_s=0.0)
+        phase_started_s = time.perf_counter()
         observation = self._get_policy_observation()
+        self._append_phase_timing(episode=episode, global_step=0,
+            name="initial_policy_observation", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
         qpos_violations_since_last_metric = _gripper_qpos_violation_count(observation)
         if qpos_violations_since_last_metric:
             self._append_safety_event(
@@ -1539,6 +1573,10 @@ class Main:
             if generate_new_chunk:
                 execution_horizon_stage_change = False
 
+            if generate_new_chunk:
+                self._append_phase_timing(episode=episode, global_step=global_steps,
+                    name="chunk_keypoints_stage", event="enter", elapsed_s=0.0)
+            phase_started_s = time.perf_counter()
             if generate_new_chunk and self.config.get("use_guidance", True) and hasattr(self, 'guidance_fns'):
                 keypoints = self.keypoint_tracker.get_keypoint_positions()
                 mask_ids = self.keypoint_tracker.get_mask_ids()
@@ -1574,6 +1612,10 @@ class Main:
                 use_guidance = False
                 keypoints = None
                 current_guidance_fns = None
+
+            if generate_new_chunk:
+                self._append_phase_timing(episode=episode, global_step=global_steps,
+                    name="chunk_keypoints_stage", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
 
             guidance_type = str(self.config.get("guidance_type", "vls")).lower()
             if guidance_type not in {"vls", "eds"}:
@@ -1651,9 +1693,13 @@ class Main:
                     )
                 select_kwargs.update(legacy_vls_kwargs)
 
+            self._append_phase_timing(episode=episode, global_step=global_steps,
+                name="select_action_fresh" if generate_new_chunk else "select_action_cached", event="enter", elapsed_s=0.0)
             select_action_start_s = time.perf_counter()
             action_chunk = self.policy.select_action(**select_kwargs)
             select_action_latency_s = float(time.perf_counter() - select_action_start_s)
+            self._append_phase_timing(episode=episode, global_step=global_steps,
+                name="select_action_fresh" if generate_new_chunk else "select_action_cached", event="exit", elapsed_s=select_action_latency_s)
             if hasattr(self.adapter, 'env_postprocessor'):
                 action_transition = {"action": action_chunk}
                 action_transition = self.adapter.env_postprocessor(action_transition)
@@ -1727,6 +1773,10 @@ class Main:
                         )
                     )
 
+            if generate_new_chunk:
+                self._append_phase_timing(episode=episode, global_step=global_steps,
+                    name="diagnostic_artifacts", event="enter", elapsed_s=0.0)
+            phase_started_s = time.perf_counter()
             if (
                 generate_new_chunk
                 and use_guidance
@@ -1853,7 +1903,14 @@ class Main:
                     )
                     pretest_chunks_saved += 1
 
+            if generate_new_chunk:
+                self._append_phase_timing(episode=episode, global_step=global_steps,
+                    name="diagnostic_artifacts", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
+
             # Get image and add status overlay
+            self._append_phase_timing(episode=episode, global_step=global_steps,
+                name="debug_visualization_overlay", event="enter", elapsed_s=0.0)
+            phase_started_s = time.perf_counter()
             if self.config.get("debug_draw_trajectory", False):
                 from utils.vis_utils import draw_action_trajectory_on_vlm_image
                 visualization_action_chunk = _get_visualization_action_chunk(
@@ -1910,8 +1967,20 @@ class Main:
                 ])
 
             image_with_status = add_text_to_image(image, status_text)
+            self._append_phase_timing(episode=episode, global_step=global_steps,
+                name="debug_visualization_overlay", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
+            self._append_phase_timing(episode=episode, global_step=global_steps,
+                name="video_add_frame", event="enter", elapsed_s=0.0)
+            phase_started_s = time.perf_counter()
             self.video_recorder.add_frame(self.adapter.vlm_camera, image_with_status)
+            self._append_phase_timing(episode=episode, global_step=global_steps,
+                name="video_add_frame", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
+            self._append_phase_timing(episode=episode, global_step=global_steps,
+                name="adapter_step", event="enter", elapsed_s=0.0)
+            phase_started_s = time.perf_counter()
             obs, reward, terminated, truncated, info = self.adapter.step(action_chunk[0][action_executed])
+            self._append_phase_timing(episode=episode, global_step=global_steps,
+                name="adapter_step", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
             previous_executed_action = action_chunk[0][action_executed]
             if torch.is_tensor(previous_executed_action):
                 previous_executed_action = previous_executed_action.detach().cpu().clone()
@@ -1926,7 +1995,12 @@ class Main:
             if action_executed == resolved_action_horizon:
                 action_executed = 0
 
+            self._append_phase_timing(episode=episode, global_step=global_steps,
+                name="policy_observation", event="enter", elapsed_s=0.0)
+            phase_started_s = time.perf_counter()
             observation = self._get_policy_observation()
+            self._append_phase_timing(episode=episode, global_step=global_steps,
+                name="policy_observation", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
             global_steps += 1
             current_qpos_violations = _gripper_qpos_violation_count(observation)
             qpos_violations_since_last_metric += current_qpos_violations
