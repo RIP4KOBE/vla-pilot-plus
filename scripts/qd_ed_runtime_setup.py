@@ -95,33 +95,65 @@ def enumerate_egl_devices_metadata() -> list[dict]:
     return result
 
 
-def bind_gpu7_metadata(devices: list[dict], gpu_rows: list[dict]) -> dict:
-    matches = [d for d in devices if d.get('cuda_attribute_ok') is True and d.get('physical_cuda_ordinal') == 7]
-    gpus = [g for g in gpu_rows if str(g.get('index')) == '7']
+def normalized_pci_bus_id(value: str) -> str:
+    """Normalize NVIDIA's eight-digit and sysfs's four-digit PCI domains."""
+    match = re.fullmatch(r'([0-9a-fA-F]+):([0-9a-fA-F]{2}):([0-9a-fA-F]{2})\.([0-7])', str(value))
+    if match is None:
+        raise RuntimeError('Invalid PCI bus identity')
+    domain, bus, device, function = (int(part, 16) for part in match.groups())
+    return f'{domain:04x}:{bus:02x}:{device:02x}.{function:x}'
+
+
+def bind_gpu_metadata(devices: list[dict], gpu_rows: list[dict], physical_gpu: int) -> dict:
+    if type(physical_gpu) is not int or physical_gpu < 0:
+        raise RuntimeError('Physical GPU index must be a nonnegative integer')
+    matches = [d for d in devices if d.get('cuda_attribute_ok') is True and d.get('physical_cuda_ordinal') == physical_gpu]
+    gpus = [g for g in gpu_rows if str(g.get('index')) == str(physical_gpu)]
     if len(matches) != 1 or len(gpus) != 1:
-        raise RuntimeError('GPU7 metadata mapping is absent or ambiguous')
+        raise RuntimeError(f'GPU{physical_gpu} metadata mapping is absent or ambiguous')
     device, gpu = matches[0], gpus[0]
+    if type(device.get('egl_device_index')) is not int or device['egl_device_index'] < 0:
+        raise RuntimeError('Invalid EGL device index')
+    if not str(gpu.get('uuid', '')).startswith('GPU-') or not gpu.get('driver_version'):
+        raise RuntimeError('NVIDIA UUID/driver identity missing')
+    normalized_pci_bus_id(gpu.get('pci_bus_id', ''))
     if device.get('drm_pci_bus_id'):
-        normalize = lambda value: ':'.join(value.lower().split(':')[-2:])
-        if normalize(device['drm_pci_bus_id']) != normalize(gpu['pci_bus_id']):
-            raise RuntimeError('EGL DRM PCI identity conflicts with physical GPU7')
-    return {'physical_gpu': 7, 'egl_device_index': device['egl_device_index'],
+        if normalized_pci_bus_id(device['drm_pci_bus_id']) != normalized_pci_bus_id(gpu['pci_bus_id']):
+            raise RuntimeError(f'EGL DRM PCI identity conflicts with physical GPU{physical_gpu}')
+    result = {'physical_gpu': physical_gpu, 'egl_device_index': device['egl_device_index'],
             'uuid': gpu['uuid'], 'pci_bus_id': gpu['pci_bus_id'], 'driver_version': gpu['driver_version'],
             'drm_pci_verified': bool(device.get('drm_pci_bus_id')),
-            'metadata_mapping_verified': True, 'cuda_egl_verified': False,
-            'historical_gpu7_egl4_holds': device['egl_device_index'] == 4}
+            'metadata_mapping_verified': True, 'cuda_egl_verified': False}
+    if physical_gpu == 7:
+        result['historical_gpu7_egl4_holds'] = device['egl_device_index'] == 4
+    return result
 
 
-def query_gpu7_egl_metadata() -> dict:
+def bind_gpu7_metadata(devices: list[dict], gpu_rows: list[dict]) -> dict:
+    """Compatibility helper for historical GPU7 metadata and its tests."""
+    return bind_gpu_metadata(devices, gpu_rows, 7)
+
+
+def query_gpu_egl_metadata(physical_gpu: int) -> dict:
+    # The NV extension reports ordinals in the process-visible CUDA namespace.
+    # Enumerate without a mask; the real probe independently checks Torch UUID
+    # and the current EGL display under the subsequently frozen one-GPU mask.
+    if 'CUDA_VISIBLE_DEVICES' in os.environ or os.environ.get('CUDA_DEVICE_ORDER') != 'PCI_BUS_ID':
+        raise RuntimeError('Metadata enumeration requires no CUDA_VISIBLE_DEVICES and CUDA_DEVICE_ORDER=PCI_BUS_ID')
     devices = enumerate_egl_devices_metadata()
     raw = subprocess.check_output(['nvidia-smi', '--query-gpu=index,uuid,pci.bus_id,driver_version',
                                    '--format=csv,noheader,nounits'], text=True, timeout=15)
     rows = [dict(zip(['index', 'uuid', 'pci_bus_id', 'driver_version'], [field.strip() for field in row]))
             for row in csv.reader(io.StringIO(raw))]
-    return {**bind_gpu7_metadata(devices, rows), 'devices': devices,
+    return {**bind_gpu_metadata(devices, rows, physical_gpu), 'devices': devices,
             'created_utc': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
+            'metadata_cuda_ordinal_namespace': 'unmasked_pci_bus_id',
             'enumeration_only': True, 'display_or_context_calls': False,
             'allowed_egl_calls': ['eglGetProcAddress', 'eglQueryDevicesEXT', 'eglQueryDeviceAttribEXT', 'eglQueryDeviceStringEXT']}
+
+
+def query_gpu7_egl_metadata() -> dict:
+    return query_gpu_egl_metadata(7)
 
 
 def populate_dependency(source: Path, target: Path, expected_commit: str) -> dict:

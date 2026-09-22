@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Explicit, accounted GPU7 CUDA/EGL admission probe; never runs on import.
+"""Explicit, accounted CUDA/EGL probe for the frozen GPU; never runs on import.
 
 Only `run` can dispatch. The child uses a synthetic static scene, not LIBERO,
 and performs no episode rollout, policy loading, provider call, or download.
@@ -19,6 +19,7 @@ import time
 import uuid
 
 import qd_ed_final_runner as runner
+from qd_ed_runtime_setup import normalized_pci_bus_id
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -30,28 +31,40 @@ def normalized_uuid(value):
 
 def validate_probe_evidence(evidence, mapping):
     require = runner.require
-    require(evidence.get('schema') == 'qd-ed-gpu7-context-probe-v1', 'probe evidence schema mismatch')
-    require(mapping.get('physical_gpu') == 7 and mapping.get('metadata_mapping_verified') is True,
-            'probe requires the verified physical GPU7 metadata mapping')
-    require(evidence.get('physical_gpu') == 7 and evidence.get('torch_logical_device') == 0,
+    physical_gpu = mapping.get('physical_gpu')
+    require(type(physical_gpu) is int and physical_gpu >= 0 and mapping.get('metadata_mapping_verified') is True,
+            'probe requires a verified physical GPU metadata mapping')
+    schema = evidence.get('schema')
+    require(schema == 'qd-ed-gpu-context-probe-v2' or
+            (schema == 'qd-ed-gpu7-context-probe-v1' and physical_gpu == 7), 'probe evidence schema mismatch')
+    require(evidence.get('physical_gpu') == physical_gpu and evidence.get('torch_logical_device') == 0,
             'probe selected the wrong CUDA device')
-    require(evidence.get('cuda_visible_devices') == '7' and
+    require(evidence.get('cuda_visible_devices') == str(physical_gpu) and
             evidence.get('cuda_device_order') == 'PCI_BUS_ID' and
             evidence.get('egl_cuda_ordinal_namespace') == 'process_visible',
-            'probe CUDA ordinal namespace is not the frozen GPU7 mask')
+            'probe CUDA ordinal namespace is not the frozen GPU mask')
     require(normalized_uuid(evidence.get('torch_uuid')) == normalized_uuid(mapping['uuid']),
-            'Torch logical0 UUID differs from physical GPU7')
+            f'Torch logical0 UUID differs from physical GPU{physical_gpu}')
+    if schema == 'qd-ed-gpu-context-probe-v2':
+        require(evidence.get('nvidia_physical_gpu') == physical_gpu and
+                normalized_uuid(evidence.get('nvidia_uuid')) == normalized_uuid(mapping['uuid']),
+                'observed NVIDIA index/UUID differs from frozen GPU mapping')
+        try:
+            pci_matches = normalized_pci_bus_id(evidence.get('nvidia_pci_bus_id', '')) == normalized_pci_bus_id(mapping.get('pci_bus_id', ''))
+        except RuntimeError:
+            pci_matches = False
+        require(pci_matches, 'observed NVIDIA PCI identity differs from frozen GPU mapping')
     require(evidence.get('torch_visible_device_count') == 1 and evidence.get('cuda_kernel_result') == 2.0,
             'CUDA visibility/kernel probe failed')
     # EGL_CUDA_DEVICE_NV is a CUDA ordinal in this process's visible namespace.
-    # With CUDA_VISIBLE_DEVICES=7, physical GPU7 is CUDA logical0. Bind the
+    # With a single physical GPU selected, it becomes CUDA logical0. Bind the
     # actual current display to that ordinal, whose Torch UUID was checked
     # above, and also retain the independently enumerated EGL index binding.
     require(evidence.get('display_egl_device_index') == mapping['egl_device_index'] and
             evidence.get('display_cuda_ordinal') == 0, 'actual EGL display is not bound to visible CUDA logical0')
     require(evidence.get('cuda_associated_egl_devices') == [
                 {'egl_device_index': mapping['egl_device_index'], 'cuda_ordinal': 0}],
-            'EGL CUDA association is absent, conflicting, or ambiguous under the GPU7 mask')
+            'EGL CUDA association is absent, conflicting, or ambiguous under the frozen GPU mask')
     require('nvidia' in evidence.get('gl_vendor', '').lower(), 'EGL renderer is not NVIDIA')
     require(bool(evidence.get('gl_renderer')) and bool(evidence.get('gl_version')), 'OpenGL identity missing')
     require(evidence.get('frame_shape') == [64, 64, 3] and evidence.get('frame_dtype') == 'uint8',
@@ -127,18 +140,29 @@ def child_probe(manifest_path, output, resource_id):
     runner.require(os.environ.get('QD_ED_GPU_PROBE_RESOURCE_ID') == resource_id, 'probe resource identity mismatch')
     runtime = runner.read_json(manifest_path)
     mapping = runtime['gpu_mapping']
-    runner.require(os.environ.get('CUDA_VISIBLE_DEVICES') == '7' and
+    physical_gpu = runner.runtime_gpu(runtime)
+    runner.require(os.environ.get('CUDA_VISIBLE_DEVICES') == str(physical_gpu) and
                    os.environ.get('CUDA_DEVICE_ORDER') == 'PCI_BUS_ID' and
                    os.environ.get('MUJOCO_EGL_DEVICE_ID') == str(mapping['egl_device_index']) and
                    os.environ.get('MUJOCO_GL') == 'egl' and os.environ.get('PYOPENGL_PLATFORM') == 'egl',
                    'probe child device environment mismatch')
-    runner.gpu_admission(expected_uuid=mapping['uuid'])
+    runner.gpu_admission(physical_gpu=physical_gpu, expected_uuid=mapping['uuid'])
+    identity = subprocess.check_output(['nvidia-smi', '-i', str(physical_gpu),
+        '--query-gpu=index,uuid,pci.bus_id', '--format=csv,noheader,nounits'], text=True, timeout=15)
+    identity_rows = [line.split(',') for line in identity.strip().splitlines()]
+    runner.require(len(identity_rows) == 1 and len(identity_rows[0]) == 3,
+                   'NVIDIA physical identity query is absent or ambiguous')
+    identity_index, identity_uuid, identity_pci = [part.strip() for part in identity_rows[0]]
+    runner.require(identity_index == str(physical_gpu) and
+                   normalized_uuid(identity_uuid) == normalized_uuid(mapping['uuid']) and
+                   normalized_pci_bus_id(identity_pci) == normalized_pci_bus_id(mapping['pci_bus_id']),
+                   'NVIDIA physical identity differs from frozen GPU mapping')
 
     import torch
     runner.require(torch.cuda.device_count() == 1, 'probe expected exactly one visible CUDA device')
     properties = torch.cuda.get_device_properties(0)
     runner.require(normalized_uuid(properties.uuid) == normalized_uuid(mapping['uuid']),
-                   'visible Torch logical0 is not physical GPU7')
+                   f'visible Torch logical0 is not physical GPU{physical_gpu}')
     tensor = torch.ones(1, device='cuda:0') + 1
     torch.cuda.synchronize(0)
     cuda_result = float(tensor.item())
@@ -164,8 +188,10 @@ def child_probe(manifest_path, output, resource_id):
             value = GL.glGetString(name)
             return value.decode() if isinstance(value, bytes) else str(value or '')
         evidence = {
-            'schema': 'qd-ed-gpu7-context-probe-v1', 'resource_id': resource_id,
-            'physical_gpu': 7, 'torch_logical_device': 0, 'torch_visible_device_count': torch.cuda.device_count(),
+            'schema': 'qd-ed-gpu-context-probe-v2', 'resource_id': resource_id,
+            'physical_gpu': physical_gpu, 'torch_logical_device': 0, 'torch_visible_device_count': torch.cuda.device_count(),
+            'nvidia_physical_gpu': int(identity_index), 'nvidia_uuid': identity_uuid,
+            'nvidia_pci_bus_id': identity_pci,
             'cuda_visible_devices': os.environ.get('CUDA_VISIBLE_DEVICES'),
             'cuda_device_order': os.environ.get('CUDA_DEVICE_ORDER'),
             'torch_uuid': str(properties.uuid), 'torch_device_name': properties.name,
@@ -197,9 +223,9 @@ def run_probe(manifest_path, *, root=ROOT, timeout=120):
         runner.require(Path(runtime['worktree']).resolve() == root and
                        Path(runtime['artifact_root']).resolve() == Path(state['artifacts']).resolve(), 'probe runtime ownership mismatch')
         runner.owned(manifest_path, runtime['artifact_root'])
-        runner.require(state['gpu_pool'] == [7] and state['max_concurrent_gpu_workers'] == 1, 'probe GPU authorization mismatch')
+        physical_gpu = runner.runtime_gpu(runtime, state)
         mapping = runtime['gpu_mapping']
-        runner.require(mapping['physical_gpu'] == 7 and runtime.get('metadata_mapping_verified') is True,
+        runner.require(mapping.get('metadata_mapping_verified') is True and runtime.get('metadata_mapping_verified') is True,
                        'metadata mapping must be verified before the real probe')
         episode_events = runner.read_events(root / 'data/attempt-ledger.jsonl')
         resources = runner.read_events(root / 'data/gpu-healthcheck-ledger.jsonl')
@@ -213,19 +239,20 @@ def run_probe(manifest_path, *, root=ROOT, timeout=120):
         timeout = runner.check_budget(
             state, episode_events, {'budget_bucket': 'recovery', 'timeout_seconds': timeout}, resources,
             reservation_events=runner.read_events(root / 'data/gpu-hour-reservation-ledger.jsonl'),
+            physical_gpu=physical_gpu,
         )
-        admission = runner.gpu_admission(expected_uuid=mapping['uuid'])
-        resource_id = state['run_name'] + '__gpu7_cuda_egl__' + uuid.uuid4().hex[:12]
+        admission = runner.gpu_admission(physical_gpu=physical_gpu, expected_uuid=mapping['uuid'])
+        resource_id = state['run_name'] + f'__gpu{physical_gpu}_cuda_egl__' + uuid.uuid4().hex[:12]
         output = runner.owned(Path(runtime['artifact_root']) / 'runtime/probes' / resource_id, runtime['artifact_root'])
         output.mkdir(parents=True, exist_ok=False)
-        base = {'resource_id': resource_id, 'kind': 'gpu7_cuda_egl_probe', 'physical_gpu': 7,
+        base = {'resource_id': resource_id, 'kind': 'cuda_egl_probe', 'physical_gpu': physical_gpu,
                 'output_dir': str(output), 'runtime_manifest_sha256': runner.digest(manifest_path),
                 'source_script_sha256': runner.digest(Path(__file__))}
         process, started, finished, dispatched = None, time.monotonic(), None, False
         result, event = {}, 'aborted'
         runner.append_healthcheck_event(root, {**base, 'event': 'reserved', 'time_unix': time.time(), 'admission': admission})
         try:
-            runner.gpu_admission(expected_uuid=mapping['uuid'])
+            runner.gpu_admission(physical_gpu=physical_gpu, expected_uuid=mapping['uuid'])
             env = runner.child_environment(runtime)
             env.update(QD_ED_GPU_PROBE_PARENT_PID=str(os.getpid()), QD_ED_GPU_PROBE_RESOURCE_ID=resource_id)
             command = [str(runner.PYTHON), str(Path(__file__).resolve()), '_child',
@@ -241,7 +268,7 @@ def run_probe(manifest_path, *, root=ROOT, timeout=120):
                     start_ticks = None
                 runner.durable_json(output / 'process.json', {'pid': process.pid, 'resource_id': resource_id,
                     'proc_start_ticks': start_ticks, 'boot_id': Path('/proc/sys/kernel/random/boot_id').read_text().strip(), 'time_unix': time.time()})
-                code = runner.wait_exclusively(process, timeout)
+                code = runner.wait_exclusively(process, timeout, physical_gpu=physical_gpu)
                 finished = time.monotonic()
             runner.require(code == 0, f'GPU probe child exit code{code}')
             result = runner.read_json(output / 'probe-evidence.json')
@@ -257,7 +284,7 @@ def run_probe(manifest_path, *, root=ROOT, timeout=120):
             runner.terminate_owned(process)
             elapsed = (finished or time.monotonic()) - started if dispatched else 0.0
             terminal = {**result, **base, 'event': event, 'time_unix': time.time(), 'gpu_process_wall_seconds': elapsed,
-                        'measurement': 'exclusive GPU7 child process wall time including abort/cleanup'}
+                        'measurement': f'exclusive GPU{physical_gpu} child process wall time including abort/cleanup'}
             runner.append_healthcheck_event(root, terminal)
             runner.durable_json(output / 'healthcheck-result.json', terminal)
         runner.require(event == 'completed', 'GPU probe failed; runtime readiness remains unchanged')
@@ -276,7 +303,7 @@ def run_probe(manifest_path, *, root=ROOT, timeout=120):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest='command', required=True)
-    run = commands.add_parser('run', help='Run only after exclusive GPU7 admission; records GPU-healthcheck usage')
+    run = commands.add_parser('run', help='Run only after exclusive frozen-GPU admission; records GPU-healthcheck usage')
     run.add_argument('--manifest', type=Path, required=True)
     run.add_argument('--timeout', type=int, default=120)
     child = commands.add_parser('_child', help=argparse.SUPPRESS)

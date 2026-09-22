@@ -6,14 +6,14 @@ worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z
 artifacts: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z
 source_commit: 744e08ba4398f2f8e34fb05619c829fc01397f69
 gpu_pool:
-- 7
+- 5
 max_concurrent_gpu_workers: 1
 project_target:
   status: IN_PROGRESS
   required_formal_successes: 5
   achieved: false
 study:
-  status: FREEZING_REPAIRED_N1_CONTROLS
+  status: PREPARING_GPU5_PENDING_ADMISSION
   mode: real
   interaction: auto
 candidate:
@@ -74,16 +74,18 @@ historical:
   previous_gpu_hours: 6.946832055555556
   previous_formal_episodes: 0
 active_iteration: iteration_001_execution_intent
-next_action: Freeze repaired source and 30-cell N1 Dev plan; run the 20 predeclared
-  same-round Q0/P2 controls first. Original baseline cohort closed incomplete, never
-  retry its failed task0 Q0 cell.
+next_action: Bind current user-authorized physicalGPU5, verify actual CUDA/EGL with
+  an accounted zero-step healthcheck, freeze new common runtime/source plan, then
+  run N1 controls. Prior GPU7 attempts/probes remain unchanged and counted.
 source_spec_sha256: 3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef
 derived_indexes:
 - .arbor/sessions/rdt-qd-ed-final-20260921T093925Z
 authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
   ledger is append-only event evidence, not a second mutable state.
-online_blockers: []
-updated_at: '2026-09-22T03:57:56.998355+00:00'
+online_blockers:
+- GPU5 gained external compute PID3816377 before probe admission. No new healthcheck/episode
+  dispatched. Actual CUDA/EGL verification remains pending.
+updated_at: '2026-09-22T04:37:01.603807+00:00'
 seed_plan:
   path: data/frozen-seed-plan.json
   sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
@@ -94,6 +96,8 @@ cpu_validation:
   codex_integration_passed: 673
   codex_integration_seconds: 40.74
   startup_repair_passed: 118
+  gpu5_runner_passed: 61
+  gpu5_probe_metadata_passed: 64
 prepared_baseline_plan:
   path: data/qd-ed-final-plan.json
   episodes: 20
@@ -108,7 +112,7 @@ engineering_baseline_changes:
 - Owned LIBERO path/dependency bindings instead of stale old-worktree absolute paths.
 - Single-task process with explicit policy_seed and env_seed instead of legacy sequential
   seed0 RNG stream; same across all arms.
-cuda_egl_context_verified: true
+cuda_egl_context_verified: false
 stage_provider_ready: true
 runner:
   by_bucket:
@@ -129,12 +133,14 @@ runner:
   last_attempt_id: rdt-qd-ed-final-20260921T093925Z__baseline_dev_t00_q0__49b1a88877f7
   last_event: valid
 gpu_admission_last_observation:
-  physical_index: 7
-  uuid: GPU-48473162-9548-1a19-04aa-ea86c5349187
-  memory_used_mib: 0
+  physical_index: 5
+  uuid: GPU-048017bf-c58f-b622-ca2e-000b668c651b
+  pci_bus_id: 00000000:A1:00.0
+  memory_used_mib: 5
   utilization_percent: 0
+  external_compute_processes: 0
   must_recheck_before_dispatch: true
-  observed_at: '2026-09-22T02:27:59.667031+00:00'
+  observed_at: '2026-09-22T04:31:51.394735+00:00'
 provider_migration_probe:
   artifact: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/codex-stage-production-probe-v2-20260922/result.json
   synthetic_image_only: true
@@ -151,7 +157,7 @@ stage_condition:
   auth_mode: chatgpt
   reasoning_effort: low
   cli_version: 0.155.1
-  runtime_manifest: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/codex-setup-manifest.json
+  runtime_manifest: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/codex-gpu5-setup-manifest.json
   provider_amendment: experiments/iteration_001_execution_intent/codex-provider-amendment.md
   http_request_retry_counts: unobserved_null
   logical_calls_tokens_latency: observed
@@ -171,3 +177,22 @@ closed_baseline:
   not_dispatched: 19
   complete_success_rate: null
   report: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/iteration_000_intake/closed-incomplete-baseline-report.json
+active_plan:
+  path: data/qd-ed-n1-dev-plan.json
+  source_commit: 71b5880c3dac41a5d26ba678b366f962b5a4af1f
+  sha256: 080985fead54fac3806702c0d8db51904ef94c6aa2231b21cecbf38c7f7bcbfd
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/n1-dev-codex-71b5880c3dac.json
+  iteration: N1
+  controls: 20
+  candidate_cells: 10
+  candidate_dispatch_authorized: false
+hardware_migration:
+  previous_physical_gpu: 7
+  authorized_physical_gpu: 5
+  user_instruction: 改用5
+  authorized_at: '2026-09-22T04:31:51.394735+00:00'
+  max_concurrent_gpu_workers: 1
+  earlier_attempts_and_costs_preserved: true
+  egl_device_index: 7
+  metadata_verified: true
+  cuda_egl_verified: false

@@ -137,3 +137,66 @@ def test_gpu_metadata_mapping_rejects_missing_ambiguous_or_conflicting_device(de
     rows = [{'index': '7', 'uuid': 'GPU-test', 'pci_bus_id': '00000000:85:00.0', 'driver_version': 'test'}]
     with pytest.raises(RuntimeError):
         setup.bind_gpu7_metadata(devices, rows)
+
+
+@pytest.mark.parametrize('physical_gpu,egl_index', [(5, 7), (7, 4)])
+def test_selected_gpu_metadata_uses_queried_mapping(physical_gpu, egl_index):
+    rows = [{'index': str(physical_gpu), 'uuid': 'GPU-selected',
+             'pci_bus_id': '00000000:A1:00.0', 'driver_version': 'test'}]
+    devices = [{'egl_device_index': egl_index, 'physical_cuda_ordinal': physical_gpu,
+                'cuda_attribute_ok': True, 'drm_pci_bus_id': '0000:a1:00.0'}]
+    result = setup.bind_gpu_metadata(devices, rows, physical_gpu)
+    assert result['physical_gpu'] == physical_gpu
+    assert result['egl_device_index'] == egl_index
+    assert result['uuid'] == 'GPU-selected'
+    assert result['cuda_egl_verified'] is False
+    assert result['drm_pci_verified'] is True
+    if physical_gpu == 5:
+        assert 'historical_gpu7_egl4_holds' not in result
+
+
+@pytest.mark.parametrize('physical_gpu', [True, -1, '5', None])
+def test_invalid_physical_gpu_is_rejected(physical_gpu):
+    with pytest.raises(RuntimeError, match='nonnegative integer'):
+        setup.bind_gpu_metadata([], [], physical_gpu)
+
+
+@pytest.mark.parametrize('change', [
+    {'index': '7'}, {'uuid': ''}, {'pci_bus_id': 'invalid'},
+    {'pci_bus_id': '00000001:A1:00.0'},
+])
+def test_gpu5_metadata_rejects_spoofed_or_incomplete_identity(change):
+    rows = [{**{'index': '5', 'uuid': 'GPU-selected', 'pci_bus_id': '00000000:A1:00.0',
+                'driver_version': 'test'}, **change}]
+    devices = [{'egl_device_index': 7, 'physical_cuda_ordinal': 5,
+                'cuda_attribute_ok': True, 'drm_pci_bus_id': '0000:a1:00.0'}]
+    with pytest.raises(RuntimeError):
+        setup.bind_gpu_metadata(devices, rows, 5)
+
+
+@pytest.mark.parametrize('mask,order', [('5', 'PCI_BUS_ID'), ('', 'PCI_BUS_ID'), (None, 'FASTEST_FIRST')])
+def test_metadata_query_requires_unmasked_pci_namespace(monkeypatch, mask, order):
+    if mask is None:
+        monkeypatch.delenv('CUDA_VISIBLE_DEVICES', raising=False)
+    else:
+        monkeypatch.setenv('CUDA_VISIBLE_DEVICES', mask)
+    monkeypatch.setenv('CUDA_DEVICE_ORDER', order)
+    monkeypatch.setattr(setup, 'enumerate_egl_devices_metadata', lambda: pytest.fail('must reject before EGL query'))
+    with pytest.raises(RuntimeError, match='requires no CUDA_VISIBLE_DEVICES'):
+        setup.query_gpu_egl_metadata(5)
+
+
+def test_metadata_query_only_uses_metadata_and_records_namespace(monkeypatch):
+    monkeypatch.delenv('CUDA_VISIBLE_DEVICES', raising=False)
+    monkeypatch.setenv('CUDA_DEVICE_ORDER', 'PCI_BUS_ID')
+    devices = [{'egl_device_index': 7, 'physical_cuda_ordinal': 5, 'cuda_attribute_ok': True}]
+    monkeypatch.setattr(setup, 'enumerate_egl_devices_metadata', lambda: devices)
+    monkeypatch.setattr(setup.subprocess, 'check_output', lambda *args, **kwargs:
+                        '5, GPU-selected, 00000000:A1:00.0, mock-driver\n')
+    result = setup.query_gpu_egl_metadata(5)
+    assert result['physical_gpu'] == 5
+    assert result['egl_device_index'] == 7
+    assert result['metadata_cuda_ordinal_namespace'] == 'unmasked_pci_bus_id'
+    assert result['enumeration_only'] is True
+    assert result['display_or_context_calls'] is False
+    assert result['cuda_egl_verified'] is False

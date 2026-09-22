@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Owned, GPU7-only QD/ED evaluation with frozen inputs and attempt accounting.
+"""Owned, single-GPU QD/ED evaluation with frozen inputs and attempt accounting.
 
 No historical runner is imported and no run is resumed implicitly. A plan is
 data, never executable shell text. Each child runs exactly one task/seed/init.
@@ -226,8 +226,9 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
     require(Path(runtime['worktree']).resolve() == root, 'runtime worktree mismatch')
     require(Path(runtime['artifact_root']).resolve() == artifact_root, 'runtime artifact root mismatch')
     stage_overrides(runtime)
+    physical_gpu = runtime_gpu(runtime, state)
     if require_frozen:
-        require(plan.get('egl_mapping_verified') is True and runtime.get('cuda_egl_verified') is True, 'GPU7/EGL mapping not verified')
+        require(plan.get('egl_mapping_verified') is True and runtime.get('cuda_egl_verified') is True, f'GPU{physical_gpu}/EGL mapping not verified')
         require(runtime.get('provider_ready') is True, 'frozen Stage provider is not ready')
     verify_files(runtime['files'],allowed_roots=(root,artifact_root))
     inventory_path = owned(plan['runtime_inventory_path'], root)
@@ -339,6 +340,28 @@ def build_command(plan, manifest, runtime, row, attempt_id):
     return command, output
 
 
+def authorized_gpu(state):
+    """Return the one explicitly authorized physical device; never pick an idle GPU."""
+    pool = state.get('gpu_pool')
+    require(isinstance(pool, list) and len(pool) == 1 and type(pool[0]) is int
+            and pool[0] >= 0 and type(state.get('max_concurrent_gpu_workers')) is int
+            and state['max_concurrent_gpu_workers'] == 1,
+            'GPU policy requires one authorized physical device and one worker')
+    return pool[0]
+
+
+def runtime_gpu(runtime, state=None):
+    mapping = runtime.get('gpu_mapping', {})
+    physical = mapping.get('physical_gpu')
+    egl = mapping.get('egl_device_index')
+    require(type(physical) is int and physical >= 0 and type(egl) is int and egl >= 0,
+            'invalid frozen GPU mapping')
+    if state is not None:
+        require(authorized_gpu(state) == physical,
+                'GPU policy/runtime physical device mismatch')
+    return physical
+
+
 def child_environment(runtime):
     env = dict(os.environ)  # Existing provider credentials are inherited, never serialized.
     if runtime.get('frozen_stage_provider', {}).get('backend') == 'codex_cli':
@@ -346,8 +369,10 @@ def child_environment(runtime):
             env.pop(name, None)
     env.update({k: str(v) for k, v in runtime['environment'].items()})
     mapping=runtime['gpu_mapping']
-    require(mapping['physical_gpu']==7 and type(mapping['egl_device_index']) is int, 'invalid frozen GPU mapping')
-    env.update(CUDA_VISIBLE_DEVICES='7', MUJOCO_EGL_DEVICE_ID=str(mapping['egl_device_index']), MUJOCO_GL='egl',
+    physical_gpu = runtime_gpu(runtime)
+    # Historical p2_render_gpu_index is profile provenance, not a main.py
+    # override. This frozen EGL binding selects the actual renderer device.
+    env.update(CUDA_VISIBLE_DEVICES=str(physical_gpu), MUJOCO_EGL_DEVICE_ID=str(mapping['egl_device_index']), MUJOCO_GL='egl',
                CUDA_DEVICE_ORDER='PCI_BUS_ID', PYOPENGL_PLATFORM='egl', JOBLIB_MULTIPROCESSING='0', PYTHONUNBUFFERED='1')
     return env
 
@@ -433,39 +458,41 @@ def verify_provider(runtime, env, *, root=ROOT, run=subprocess.run):
     require(bool(env.get(credential_source)), 'Stage credential is absent')
 
 
-def gpu_admission(run=subprocess.run, *, expected_uuid=None):
-    apps = run(['nvidia-smi', '-i', '7', '--query-compute-apps=pid', '--format=csv,noheader,nounits'], capture_output=True, text=True, timeout=15)
-    memory = run(['nvidia-smi', '-i', '7', '--query-gpu=memory.used', '--format=csv,noheader,nounits'], capture_output=True, text=True, timeout=15)
-    require(apps.returncode == 0 and memory.returncode == 0, 'GPU7 admission probe failed')
+def gpu_admission(run=subprocess.run, *, physical_gpu=7, expected_uuid=None):
+    require(type(physical_gpu) is int and physical_gpu >= 0, 'invalid physical GPU index')
+    apps = run(['nvidia-smi', '-i', str(physical_gpu), '--query-compute-apps=pid', '--format=csv,noheader,nounits'], capture_output=True, text=True, timeout=15)
+    memory = run(['nvidia-smi', '-i', str(physical_gpu), '--query-gpu=memory.used', '--format=csv,noheader,nounits'], capture_output=True, text=True, timeout=15)
+    require(apps.returncode == 0 and memory.returncode == 0, f'GPU{physical_gpu} admission probe failed')
     pids = [s.strip() for s in apps.stdout.splitlines() if s.strip() and 'no running' not in s.lower()]
-    require(not pids, 'GPU7 has external compute processes')
+    require(not pids, f'GPU{physical_gpu} has external compute processes')
     try:
         used = int(memory.stdout.strip())
     except ValueError as exc:
-        raise GateError('GPU7 memory response invalid') from exc
-    require(0 <= used < 1024, f'GPU7 memory is {used} MiB; requires <1024 MiB')
+        raise GateError(f'GPU{physical_gpu} memory response invalid') from exc
+    require(0 <= used < 1024, f'GPU{physical_gpu} memory is {used} MiB; requires <1024 MiB')
     if expected_uuid:
-        identity=run(['nvidia-smi','-i','7','--query-gpu=uuid','--format=csv,noheader,nounits'],capture_output=True,text=True,timeout=15)
-        require(identity.returncode==0 and identity.stdout.strip()==expected_uuid, 'GPU7 UUID differs from frozen mapping')
-    return {'physical_gpu': 7, 'memory_used_mib': used, 'external_compute_processes': 0}
+        identity=run(['nvidia-smi','-i',str(physical_gpu),'--query-gpu=uuid','--format=csv,noheader,nounits'],capture_output=True,text=True,timeout=15)
+        require(identity.returncode==0 and identity.stdout.strip()==expected_uuid, f'GPU{physical_gpu} UUID differs from frozen mapping')
+    return {'physical_gpu': physical_gpu, 'memory_used_mib': used, 'external_compute_processes': 0}
 
 
-def check_exclusive_gpu(process, run=subprocess.run):
-    probe=run(['nvidia-smi','-i','7','--query-compute-apps=pid','--format=csv,noheader,nounits'],capture_output=True,text=True,timeout=5)
-    require(probe.returncode==0, 'GPU7 exclusivity probe failed')
+def check_exclusive_gpu(process, run=subprocess.run, *, physical_gpu=7):
+    require(type(physical_gpu) is int and physical_gpu >= 0, 'invalid physical GPU index')
+    probe=run(['nvidia-smi','-i',str(physical_gpu),'--query-compute-apps=pid','--format=csv,noheader,nounits'],capture_output=True,text=True,timeout=5)
+    require(probe.returncode==0, f'GPU{physical_gpu} exclusivity probe failed')
     for line in probe.stdout.splitlines():
         if not line.strip() or 'no running' in line.lower():
             continue
-        require(line.strip().isdigit(), 'GPU7 exclusivity probe returned unknown PID')
+        require(line.strip().isdigit(), f'GPU{physical_gpu} exclusivity probe returned unknown PID')
         pid=int(line)
         try:
             own_group=os.getpgid(pid)==process.pid
         except ProcessLookupError:
             continue
-        require(pid==process.pid or own_group, 'external GPU7 process appeared during owned attempt')
+        require(pid==process.pid or own_group, f'external GPU{physical_gpu} process appeared during owned attempt')
 
 
-def wait_exclusively(process, timeout):
+def wait_exclusively(process, timeout, *, physical_gpu=7):
     deadline=time.monotonic()+timeout
     while True:
         remaining=deadline-time.monotonic()
@@ -474,7 +501,7 @@ def wait_exclusively(process, timeout):
         try:
             return process.wait(timeout=min(5.,remaining))
         except subprocess.TimeoutExpired:
-            check_exclusive_gpu(process)
+            check_exclusive_gpu(process, physical_gpu=physical_gpu)
 
 
 @contextlib.contextmanager
@@ -549,9 +576,11 @@ def budget_snapshot(events, resource_events=()):
     return result
 
 
-def check_budget(state, events, row, resource_events=(), reservation_events=()):
+def check_budget(state, events, row, resource_events=(), reservation_events=(), *, physical_gpu=None):
     budget = state['budget']; snap = budget_snapshot(events,resource_events)
-    require(state['gpu_pool'] == [7] and state['max_concurrent_gpu_workers'] == 1, 'GPU policy changed')
+    selected_gpu = authorized_gpu(state)
+    require(physical_gpu is None or (type(physical_gpu) is int and physical_gpu == selected_gpu),
+            'GPU policy/runtime physical device mismatch')
     require(budget['max_episode_attempts'] <= 240 and budget['max_gpu_hours'] <= 48, 'budget exceeds authorization')
     require(snap['running'] == 0, 'unfinished dispatched attempt must be reconciled first')
     require(snap['gpu_healthcheck_inflight']==0, 'unfinished GPU healthcheck reservation must be reconciled first')
@@ -814,7 +843,7 @@ def validate_result(output, row, profile, runtime=None):
 
 def failed_outcome(exc, output, row, *, launch_failed=False, runtime=None):
     monitor_timeout=isinstance(exc,subprocess.TimeoutExpired) and isinstance(exc.cmd,list) and exc.cmd[:1]==['nvidia-smi']
-    infrastructure=(launch_failed and isinstance(exc,OSError)) or monitor_timeout or (isinstance(exc,GateError) and ('GPU7' in str(exc) or 'exclusivity' in str(exc)))
+    infrastructure=(launch_failed and isinstance(exc,OSError)) or monitor_timeout or (isinstance(exc,GateError) and (re.search(r'GPU[0-9]+', str(exc)) is not None or 'exclusivity' in str(exc)))
     event='aborted' if infrastructure or isinstance(exc,KeyboardInterrupt) else 'valid'
     outcome={'reason':str(exc) if isinstance(exc,GateError) else type(exc).__name__,
              'retryable_infrastructure':infrastructure,'success':False,'task_failure':event=='valid',
@@ -868,8 +897,10 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
             plan,manifest,runtime=validate_plan(plan_path,root=root)
             events=read_events(root/'data/attempt-ledger.jsonl')
             check_retry(events,row)
-            timeout=check_budget(read_state(root/'research-state.yaml'),events,row,read_events(root/'data/gpu-healthcheck-ledger.jsonl'),read_events(root/'data/gpu-hour-reservation-ledger.jsonl'))
-            admission=gpu_admission(expected_uuid=runtime['gpu_mapping']['uuid'])
+            state = read_state(root/'research-state.yaml')
+            physical_gpu = runtime_gpu(runtime, state)
+            timeout=check_budget(state,events,row,read_events(root/'data/gpu-healthcheck-ledger.jsonl'),read_events(root/'data/gpu-hour-reservation-ledger.jsonl'),physical_gpu=physical_gpu)
+            admission=gpu_admission(physical_gpu=physical_gpu,expected_uuid=runtime['gpu_mapping']['uuid'])
             attempt_id=f"{plan['run_name']}__{row['episode_key']}__{uuid.uuid4().hex[:12]}"
             command,output=build_command(plan,manifest,runtime,row,attempt_id)
             require(not output.exists(), 'attempt output already exists')
@@ -879,19 +910,21 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                   'runtime_manifest_sha256':plan['runtime_manifest_sha256'],'source_commit':plan['source_commit'],
                   'runtime_inventory_sha256':plan['runtime_inventory_sha256'],
                   'init_row_sha256':row['init_row_sha256'],
-                  'retry_of':row.get('retry_of'),'output_dir':str(output),'physical_gpu':7}
+                  'retry_of':row.get('retry_of'),'output_dir':str(output),'physical_gpu':physical_gpu}
             if runtime.get('frozen_stage_provider', {}).get('backend') == 'codex_cli':
                 base.update(stage_backend='codex_cli', stage_model=runtime['frozen_stage_provider']['model'],
                             stage_condition=CODEX_STAGE_CONDITION)
             append_event(root,{**base,'event':'reserved','time_unix':time.time(),'admission':admission})
-            durable_json(output/'command.json',{'argv':command,'environment_public':{**runtime['environment'],'CUDA_VISIBLE_DEVICES':'7','CUDA_DEVICE_ORDER':'PCI_BUS_ID','MUJOCO_EGL_DEVICE_ID':str(runtime['gpu_mapping']['egl_device_index'])}})
+            durable_json(output/'command.json',{'argv':command,'environment_public':{**runtime['environment'],'CUDA_VISIBLE_DEVICES':str(physical_gpu),'CUDA_DEVICE_ORDER':'PCI_BUS_ID','MUJOCO_EGL_DEVICE_ID':str(runtime['gpu_mapping']['egl_device_index'])}})
             process=None; started=time.monotonic(); process_finished=None; dispatched=False
             outcome={'retryable_infrastructure':False}; final_event='aborted'
             try:
                 # Recheck immediately before dispatch; the global runner lock prevents owned concurrency.
-                gpu_admission(expected_uuid=runtime['gpu_mapping']['uuid'])
+                runtime_gpu(runtime, read_state(root/'research-state.yaml'))
+                gpu_admission(physical_gpu=physical_gpu,expected_uuid=runtime['gpu_mapping']['uuid'])
                 env=child_environment(runtime)
                 verify_provider(runtime,env,root=root)
+                runtime_gpu(runtime, read_state(root/'research-state.yaml'))
                 append_event(root,{**base,'event':'dispatched','time_unix':time.time(),'timeout_seconds':timeout})
                 dispatched=True; started=time.monotonic()
                 with (output/'runner.log').open('w') as log:
@@ -902,7 +935,7 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                         start_ticks=None
                     durable_json(output/'process.json',{'pid':process.pid,'time_unix':time.time(),'attempt_id':attempt_id,
                                  'proc_start_ticks':start_ticks,'boot_id':Path('/proc/sys/kernel/random/boot_id').read_text().strip()})
-                    code=wait_exclusively(process,timeout)
+                    code=wait_exclusively(process,timeout,physical_gpu=physical_gpu)
                     process_finished=time.monotonic()
                 require(code==0, f'child exit code {code}')
                 outcome=validate_result(output,row,manifest['profiles'][row['profile']],runtime); final_event='valid'
@@ -917,7 +950,7 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                 terminate_owned(process)
                 elapsed=(process_finished or time.monotonic())-started if dispatched else 0.0
                 terminal={**base,**outcome,'event':final_event,'time_unix':time.time(),
-                          'gpu_process_wall_seconds':elapsed,'gpu_time_measurement':'exclusive GPU7 process wall-time upper bound, includes startup/abort'}
+                          'gpu_process_wall_seconds':elapsed,'gpu_time_measurement':f'exclusive GPU{physical_gpu} process wall-time upper bound, includes startup/abort'}
                 append_event(root,terminal)
                 durable_json(output/'attempt-result.json',terminal)
                 summaries.append(terminal)
@@ -954,7 +987,9 @@ def reconcile_ledger(plan_path, attempt_id, *, root=ROOT):
             except (FileNotFoundError,ProcessLookupError,PermissionError):
                 continue
             require(not (str(root/'main.py').encode() in args and any(attempt_id.encode() in arg for arg in args)), 'interrupted child is still alive')
-        gpu_admission()
+        physical_gpu = runtime_gpu(runtime, read_state(root/'research-state.yaml'))
+        require(last.get('physical_gpu') == physical_gpu, 'interrupted attempt GPU differs from its frozen runtime')
+        gpu_admission(physical_gpu=physical_gpu,expected_uuid=runtime['gpu_mapping']['uuid'])
         dispatched=next((e for e in group if e['event']=='dispatched'),None)
         rows=[r for r in plan['episodes'] if r['episode_key']==last['episode_key']]
         require(len(rows)==1, 'interrupted episode no longer uniquely in plan')

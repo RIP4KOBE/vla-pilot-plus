@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Launch the frozen GPU7 study using Codex's existing managed ChatGPT login.
+"""Launch the frozen single-GPU study using Codex's existing managed ChatGPT login.
 
 No credential file is read or changed. Alternate API credentials are removed
 only from the child environment; the caller's Poe/account files are untouched.

@@ -216,6 +216,7 @@ def tiny_plan(tmp_path, monkeypatch):
     record=lambda p:{'path':str(p),'sha256':runner.digest(p),'size_bytes':p.stat().st_size}
     runtime={'schema':'qd-ed-runtime-setup-v1','worktree':str(root),'artifact_root':str(artifacts),
              'cuda_egl_verified':True,'provider_ready':True,'files':[record(bddl),record(init)],
+             'gpu_mapping':{'physical_gpu':7,'egl_device_index':4,'uuid':'GPU-fixture'},
              'environment':{'LIBERO_CONFIG_PATH':str(artifacts/'libero_config')},
              'tasks':{'8':{'init_index':0,'cache_dir':str(artifacts/'cache'),'bddl_path':str(bddl),'init_path':str(init)}}}
     runtime_path=artifacts/'runtime.json'; runtime_path.write_text(json.dumps(runtime))
@@ -595,3 +596,157 @@ def test_codex_actual_events_reconcile_tokens_latency_and_invocation_policy(tmp_
     stage_path.write_text(''.join(json.dumps(event) + '\n' for event in events))
     with pytest.raises(runner.GateError, match='event/episode call or token'):
         runner.validate_result(tmp_path, episode, profile, runtime)
+
+
+def test_gpu5_admission_binds_index_and_uuid_without_querying_gpu7():
+    calls = []
+    def probe(args, **kwargs):
+        calls.append(args)
+        return SimpleNamespace(returncode=0, stdout=(
+            'GPU-five\n' if '--query-gpu=uuid' in args else
+            '' if '--query-compute-apps=pid' in args else '0\n'))
+    assert runner.gpu_admission(probe, physical_gpu=5, expected_uuid='GPU-five')['physical_gpu'] == 5
+    assert len(calls) == 3 and all(args[args.index('-i') + 1] == '5' for args in calls)
+    with pytest.raises(runner.GateError, match='GPU5 UUID'):
+        runner.gpu_admission(probe, physical_gpu=5, expected_uuid='GPU-seven')
+
+
+def test_gpu5_exclusivity_and_wait_propagate_selected_device(monkeypatch):
+    process = SimpleNamespace(pid=500)
+    monkeypatch.setattr(runner.os, 'getpgid', lambda pid: 500 if pid == 501 else 600)
+    def shared(args, **kwargs):
+        assert args[args.index('-i') + 1] == '5'
+        return SimpleNamespace(returncode=0, stdout='500\n700\n')
+    with pytest.raises(runner.GateError, match='external GPU5'):
+        runner.check_exclusive_gpu(process, shared, physical_gpu=5)
+    waits = iter([runner.subprocess.TimeoutExpired('owned episode', 5), 0])
+    def wait(**kwargs):
+        result = next(waits)
+        if isinstance(result, Exception):
+            raise result
+        return result
+    process.wait = wait
+    calls = []
+    monkeypatch.setattr(runner, 'check_exclusive_gpu', lambda child, **kwargs: calls.append(kwargs))
+    assert runner.wait_exclusively(process, 30, physical_gpu=5) == 0
+    assert calls == [{'physical_gpu': 5}]
+
+
+@pytest.mark.parametrize('pool', [[7], [5, 7], [], [True], ['5'], [-1]])
+def test_runtime_gpu_refuses_state_mismatch_or_invalid_authorization(pool):
+    current = state(); current['gpu_pool'] = pool
+    with pytest.raises(runner.GateError, match='GPU policy'):
+        runner.runtime_gpu({'gpu_mapping': {'physical_gpu': 5, 'egl_device_index': 2}}, current)
+
+
+def test_gpu5_runtime_changes_only_hardware_binding_preserving_historical_profile(monkeypatch, tmp_path):
+    current = state(); current['gpu_pool'] = [5]
+    runtime = {'environment': {}, 'gpu_mapping': {'physical_gpu': 5, 'egl_device_index': 2}}
+    assert runner.runtime_gpu(runtime, current) == 5
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES', '7')
+    env = runner.child_environment(runtime)
+    assert env['CUDA_VISIBLE_DEVICES'] == '5' and env['MUJOCO_EGL_DEVICE_ID'] == '2'
+    assert runner.os.environ['CUDA_VISIBLE_DEVICES'] == '7'
+    profiles = runner.read_json(runner.ROOT / 'configs/qd_ed_final/baseline_profiles.json')
+    original = copy.deepcopy(profiles)
+    runtime.update(tasks={'8': {'cache_dir': str(tmp_path / 'artifacts/cache')}},
+                   main_overrides=['+main.require_task_cache_identity=true'])
+    command, _ = runner.build_command({'artifact_root': str(tmp_path / 'artifacts'),
+                                      'worktree': str(tmp_path)}, profiles, runtime, row(), 'gpu-five')
+    assert not any('render_gpu_index' in arg for arg in command)
+    assert profiles == original
+    assert profiles['profiles']['Q0']['restored_profile']['p2_render_gpu_index'] == 7
+
+
+def test_gpu5_budget_includes_historical_gpu7_cost_and_requires_runtime_agreement():
+    events = events_for()
+    for event in events:
+        event['physical_gpu'] = 7
+    before = copy.deepcopy(events)
+    current = synced_state(events); current['gpu_pool'] = [5]
+    assert runner.check_budget(current, events, row(), physical_gpu=5) == 100
+    assert runner.budget_snapshot(events)['gpu_hours_consumed'] == pytest.approx(.01)
+    assert events == before
+    with pytest.raises(runner.GateError, match='GPU policy/runtime'):
+        runner.check_budget(current, events, row(), physical_gpu=7)
+
+
+def test_frozen_plan_gpu5_requires_authoritative_state_agreement(tiny_plan):
+    root, path, plan, runtime_path, runtime = tiny_plan
+    runtime['gpu_mapping'].update(physical_gpu=5, egl_device_index=2)
+    runtime_path.write_text(json.dumps(runtime))
+    plan['runtime_manifest_sha256'] = runner.digest(runtime_path)
+    path.write_text(json.dumps(plan))
+    with pytest.raises(runner.GateError, match='GPU policy/runtime'):
+        runner.validate_plan(path, root=root)
+    current = runner.read_state(root / 'research-state.yaml'); current['gpu_pool'] = [5]
+    (root / 'research-state.yaml').write_text(yaml.safe_dump(current))
+    assert runner.validate_plan(path, root=root)[2]['gpu_mapping']['physical_gpu'] == 5
+
+
+def test_gpu5_monitor_failure_remains_infrastructure_without_reclassifying_algorithm_failures(tmp_path):
+    event, outcome = runner.failed_outcome(runner.GateError('external GPU5 process appeared during owned attempt'), tmp_path, row())
+    assert event == 'aborted' and outcome['retryable_infrastructure'] is True
+    event, outcome = runner.failed_outcome(runner.GateError('nonfinite metric'), tmp_path, row())
+    assert event == 'valid' and outcome['retryable_infrastructure'] is False
+
+
+def test_gpu5_dispatch_records_selected_device_at_all_runtime_boundaries(tiny_plan, monkeypatch):
+    root, path, plan, runtime_path, runtime = tiny_plan
+    runtime['gpu_mapping'].update(physical_gpu=5, egl_device_index=2, uuid='GPU-five')
+    runtime_path.write_text(json.dumps(runtime))
+    plan.update(runtime_manifest_sha256=runner.digest(runtime_path), phase_authorization={'dev': True})
+    path.write_text(json.dumps(plan))
+    current = runner.read_state(root / 'research-state.yaml'); current['gpu_pool'] = [5]
+    (root / 'research-state.yaml').write_text(yaml.safe_dump(current))
+    admissions = []; waits = []; children = []
+    monkeypatch.setattr(runner, 'gpu_admission', lambda **kwargs: admissions.append(kwargs) or {'physical_gpu': kwargs['physical_gpu']})
+    monkeypatch.setattr(runner, 'verify_provider', lambda *args, **kwargs: None)
+    def command(_plan, _manifest, _runtime, _row, attempt_id):
+        return ['owned-main'], Path(_plan['artifact_root']) / 'attempts' / attempt_id
+    monkeypatch.setattr(runner, 'build_command', command)
+    (Path(plan['artifact_root']) / 'attempts').mkdir()
+    def launch(command, **kwargs):
+        children.append(kwargs['env'])
+        return SimpleNamespace(pid=99999999, poll=lambda: 0)
+    monkeypatch.setattr(runner.subprocess, 'Popen', launch)
+    monkeypatch.setattr(runner, 'wait_exclusively', lambda child, timeout, **kwargs: waits.append(kwargs) or 0)
+    monkeypatch.setattr(runner, 'validate_result', lambda *args: {'success': False, 'outcome_valid': True})
+    results = runner.run_plan(path, split='dev', iteration=0, root=root)
+    assert admissions == [{'physical_gpu': 5, 'expected_uuid': 'GPU-five'}] * 2
+    assert waits == [{'physical_gpu': 5}]
+    assert children[0]['CUDA_VISIBLE_DEVICES'] == '5' and children[0]['MUJOCO_EGL_DEVICE_ID'] == '2'
+    events = runner.read_events(root / 'data/attempt-ledger.jsonl')
+    assert [event['event'] for event in events] == ['reserved', 'dispatched', 'valid']
+    assert all(event['physical_gpu'] == 5 for event in events)
+    assert 'GPU5' in results[0]['gpu_time_measurement']
+    command_record = runner.read_json(Path(results[0]['output_dir']) / 'command.json')
+    assert command_record['environment_public']['CUDA_VISIBLE_DEVICES'] == '5'
+
+
+def test_gpu5_dead_process_reconciliation_uses_frozen_device_and_preserves_identity(tiny_plan, monkeypatch):
+    root, path, plan, runtime_path, runtime = tiny_plan
+    runtime['gpu_mapping'].update(physical_gpu=5, egl_device_index=7, uuid='GPU-five')
+    runtime_path.write_text(json.dumps(runtime))
+    plan['runtime_manifest_sha256'] = runner.digest(runtime_path)
+    path.write_text(json.dumps(plan))
+    current = runner.read_state(root / 'research-state.yaml'); current['gpu_pool'] = [5]
+    (root / 'research-state.yaml').write_text(yaml.safe_dump(current))
+    output = Path(plan['artifact_root']) / 'attempts' / 'dead_gpu_five'; output.mkdir(parents=True)
+    episode = plan['episodes'][0]
+    base = {'attempt_id': 'dead_gpu_five', 'identity': runner.episode_identity(episode),
+            'episode_key': episode['episode_key'], 'budget_bucket': 'baseline',
+            'physical_gpu': 5, 'output_dir': str(output), 'plan_sha256': runner.digest(path)}
+    runner.append_event(root, {**base, 'event': 'reserved', 'time_unix': 1.})
+    runner.append_event(root, {**base, 'event': 'dispatched', 'time_unix': 2.})
+    calls = []
+    monkeypatch.setattr(runner, 'gpu_admission', lambda **kwargs: calls.append(kwargs) or {})
+    monkeypatch.setattr(runner.time, 'time', lambda: 3.)
+    terminal = runner.reconcile_ledger(path, 'dead_gpu_five', root=root)
+    assert calls == [{'physical_gpu': 5, 'expected_uuid': 'GPU-five'}]
+    assert terminal['physical_gpu'] == 5 and terminal['event'] == 'aborted'
+    assert terminal['gpu_process_wall_seconds'] == 1.
+    before = (root / 'data/attempt-ledger.jsonl').read_bytes()
+    calls.clear()
+    assert runner.reconcile_ledger(path, 'dead_gpu_five', root=root)['state_reconciled_from_existing_terminal']
+    assert not calls and (root / 'data/attempt-ledger.jsonl').read_bytes() == before

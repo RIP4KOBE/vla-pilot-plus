@@ -61,3 +61,25 @@ New authorized cycle from `744e08b`; historical Run045 remains no-adoption. GPU7
 - Startup executor separated Stage/grounding configuration;118 CPU tests passed, including real factory construction without API keys and default-provider regressions. No GPU or network in these tests.
 - Original baseline closed as1 invalid and19 not dispatched; expected20 retained and complete success rates null. Report:`iteration_000_intake/closed-incomplete-baseline-report.json`. No failed identity retry or outcome replacement.
 - Freeze `startup-repair-amendment.md` before further dispatch: the already planned N1 Dev allowance≤30 now runs all Q0/P2 controls first, then N1. New full cohort iteration `N1`, development bucket; identical repaired source/runtime for every arm. This establishes a valid repaired common baseline without spending another20 reserved baseline episodes. No reservation transfer or promotion-threshold change.
+
+### N1 repaired common-source freeze 2026-09-22T04:00:38.011380+00:00
+
+- Source `71b5880c3dac41a5d26ba678b366f962b5a4af1f`; plan `data/qd-ed-n1-dev-plan.json` SHA256 `080985fead54fac3806702c0d8db51904ef94c6aa2231b21cecbf38c7f7bcbfd`; immutable snapshot `frozen_plans/n1-dev-codex-71b5880c3dac.json`.30 complete Hydra configurations composed and checked without GPU; provider login and all input/model/runtime hashes verified. No nonempty credential fields in previews.
+- Existing runtime/profile/seed/provider policy unchanged. First dispatch `n1_dev_t00_q0`; subsequent paired control `n1_dev_t00_c0`. All20 control cells must be valid before any candidate dispatch; candidate and validation/formal gates remain closed.
+
+### GPU admission block 2026-09-22T04:03:35.349714+00:00
+
+- Repaired N1 plan and saved Codex login passed full launcher verification. Runner rejected dispatch because GPU7 acquired external compute PID3726503 (`wholebodywam`), approximately7396MiB process memory. No experiment reservation/dispatch was appended, no GPU sharing/termination occurred, and no owned worker remains live.
+- State WAITING_GPU7; totals unchanged:1 dispatched,0 valid,1 invalid,0 aborted;0.025461891878706712 GPU-hours. Project IN_PROGRESS, N1 task score unknown, validation/formal unopened. Frozen source71b5880 and plan remain ready; recheck admission before first N1-round pair.
+
+### User-authorized hardware change 2026-09-22T04:31:51.394735+00:00
+
+- User explicitly instructs “改用5”; physicalGPU5 only now supersedes the earlier GPU7-only resource restriction for future work in this study. Single exclusive worker, no sharing/preemption/substitution, all budgets and scientific gates unchanged.
+- Initial read-only GPU5 observation: H200NVL, UUID `GPU-048017bf-c58f-b622-ca2e-000b668c651b`, PCI `00000000:A1:00.0`,5MiB/0%, no compute process. This is not actual CUDA/EGL verification; admission must be rechecked.
+- Old GPU7 manifests/plans/probe evidence/failed baseline remain immutable and counted. New GPU5 mapping, healthcheck, source and common N1 plan will be frozen before dispatch. N1 cohort still has zero dispatched cells; no score or seed changes.
+
+### GPU5 binding and initial admission 2026-09-22T04:37:01.603807+00:00
+
+- Runner/launcher CPU checks61 passed; generic metadata/probe checks64 passed. Runtime authorization, admission, exclusivity monitoring, environment and accounting bind the same selected device; historicalGPU7 evidence remains compatible.
+- Read-only enumeration binds GPU5 UUID `GPU-048017bf-c58f-b622-ca2e-000b668c651b`, PCI `00000000:A1:00.0`, EGL7. New manifest:`runtime/codex-gpu5-setup-manifest.json`; originalGPU7 files unchanged. Actual CUDA/EGL readiness is false until a new healthcheck succeeds.
+- Attempted probe was rejected before reservation/dispatch: external compute PID3816377 appeared on GPU5 (612MiB process memory at observation). No healthcheck or episode event was appended, no additional GPU time spent. Budget unchanged1 dispatched/1 invalid and0.025461891878706712 GPU-hours.
