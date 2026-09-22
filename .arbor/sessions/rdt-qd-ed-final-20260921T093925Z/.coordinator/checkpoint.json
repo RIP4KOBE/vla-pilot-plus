@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-09-22T06:19:36.975062+00:00",
+  "timestamp": "2026-09-22T06:39:04.470801+00:00",
   "run_name": "rdt-qd-ed-final-20260921T093925Z",
-  "phase": "REVIEWING_NATIVE_FAILURE",
+  "phase": "NATIVE_DIAGNOSTIC_WAITING_GPU7",
   "source_commit": "8fb001b7903c5e6a2a74a5ef6a7f2845ca7e9fe2",
   "active_plan": {
     "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/resource_queue/89d2dd719e0346bd9011931cc66731a0/plan.json",
@@ -50,6 +50,21 @@
   "in_flight_executors": [],
   "owned_gpu_workers": [],
   "authoritative_state": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/research-state.yaml",
-  "next_action": "Review/test the zero-simulation native B1 policy diagnostic and prospective phase timing patch. Preserve r3 as nonretryable invalid task failure and do not dispatch paired P2/candidate as if the initial control pair passed. Do not automatically reset cohort to erase failure.",
-  "target_achieved": false
+  "next_action": "Freeze and launch only the bounded native B1 diagnostic on physical GPU7; wait for exclusive availability. Do not retry the failed Q0 cell or dispatch P2/candidate/validation/formal.",
+  "target_achieved": false,
+  "native_diagnostic": {
+    "status": "AWAITING_GPU7_QUEUE_FREEZE",
+    "script": "scripts/qd_ed_policy_native_probe.py",
+    "scope": "B1 native inference on deterministic synthetic inputs; no simulator, actions, Stage call or scientific episode",
+    "timeout_seconds": 600,
+    "source_plan_pending_freeze": false,
+    "limitation": "Cannot establish guided-transition or EGL causality",
+    "plan_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-diagnostic-plan.json",
+    "plan_sha256": "fbe1c641d4b1e09a970f0baf67553da6118e957da3f42cfada170f0dc1ebb1f8",
+    "source_commit": "46f243873589f37620a40fee4381e12d06113e7b",
+    "snapshot": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/native-diagnostic-46f243873589.json"
+  },
+  "authorized_gpu_indices": [
+    7
+  ]
 }

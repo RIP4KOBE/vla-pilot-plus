@@ -6,14 +6,14 @@ worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z
 artifacts: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z
 source_commit: 744e08ba4398f2f8e34fb05619c829fc01397f69
 gpu_pool:
-- 6
+- 7
 max_concurrent_gpu_workers: 1
 project_target:
   status: IN_PROGRESS
   required_formal_successes: 5
   achieved: false
 study:
-  status: REVIEWING_NATIVE_FAILURE
+  status: NATIVE_DIAGNOSTIC_WAITING_GPU7
   mode: real
   interaction: auto
 candidate:
@@ -74,10 +74,8 @@ historical:
   previous_gpu_hours: 6.946832055555556
   previous_formal_episodes: 0
 active_iteration: iteration_001_execution_intent
-next_action: Review/test the zero-simulation native B1 policy diagnostic and prospective
-  phase timing patch. Preserve r3 as nonretryable invalid task failure and do not
-  dispatch paired P2/candidate as if the initial control pair passed. Do not automatically
-  reset cohort to erase failure.
+next_action: Freeze and launch only the bounded native B1 diagnostic on physical GPU7;
+  wait for exclusive availability. Do not retry the failed Q0 cell or dispatch P2/candidate/validation/formal.
 source_spec_sha256: 3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef
 derived_indexes:
 - .arbor/sessions/rdt-qd-ed-final-20260921T093925Z
@@ -87,7 +85,7 @@ online_blockers:
 - N1 Q0 control terminated with native SIGABRT after successful Stage query. No ordinary
   retry permitted. Root is preparing an independently accounted zero-simulation B1
   inference diagnostic; native root cause remains Unknown.
-updated_at: '2026-09-22T06:27:02.547214+00:00'
+updated_at: '2026-09-22T06:36:54.904959+00:00'
 seed_plan:
   path: data/frozen-seed-plan.json
   sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
@@ -103,6 +101,8 @@ cpu_validation:
   available_gpu_queue_passed: 26
   monitor_repair_runner_probe_queue_passed: 122
   native_policy_probe_passed: 37
+  native_probe_queue_passed: 17
+  native_probe_queue_integrated_passed: 80
 prepared_baseline_plan:
   path: data/qd-ed-final-plan.json
   episodes: 20
@@ -194,7 +194,7 @@ active_plan:
 hardware_migration:
   previous_physical_gpu: 7
   authorized_physical_gpu: 5
-  user_instruction: 改用5
+  user_instruction: "\u6539\u75285"
   authorized_at: '2026-09-22T04:31:51.394735+00:00'
   max_concurrent_gpu_workers: 1
   earlier_attempts_and_costs_preserved: true
@@ -211,19 +211,13 @@ previous_gpu7_active_plan:
   candidate_cells: 10
   candidate_dispatch_authorized: false
 authorized_gpu_selection:
-  policy: any idle GPU on current server
+  policy: GPU7 only; wait if unavailable
   candidate_indices:
-  - 0
-  - 1
-  - 2
-  - 3
-  - 4
-  - 5
-  - 6
   - 7
-  selected_physical_gpu: 6
-  user_instruction: 帮我使用当前服务器上任何能用的GPU来跑这个任务即可
-  authorized_at: '2026-09-22T04:58:53.637965+00:00'
+  selected_physical_gpu: 7
+  user_instruction: "\u540E\u7EED\u4EFB\u52A1\u90FD\u6536\u655B\u5230GPU7\u4E0A\u5B8C\
+    \u6210"
+  authorized_at: '2026-09-22T06:36:54.904959+00:00'
   single_exclusive_worker: true
   rescan_if_unavailable: true
 resource_queue:
@@ -320,10 +314,31 @@ real_stage_transport_evidence:
   http_requests_retries: null
   task_success_claimed: false
 native_diagnostic:
-  status: CPU_READY_NOT_DISPATCHED
+  status: AWAITING_GPU7_QUEUE_FREEZE
   script: scripts/qd_ed_policy_native_probe.py
   scope: B1 native inference on deterministic synthetic inputs; no simulator, actions,
     Stage call or scientific episode
   timeout_seconds: 600
-  source_plan_pending_freeze: true
+  source_plan_pending_freeze: false
   limitation: Cannot establish guided-transition or EGL causality
+  plan_path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-diagnostic-plan.json
+  plan_sha256: fbe1c641d4b1e09a970f0baf67553da6118e957da3f42cfada170f0dc1ebb1f8
+  source_commit: 46f243873589f37620a40fee4381e12d06113e7b
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/native-diagnostic-46f243873589.json
+gpu_authorization_history:
+- policy: any idle GPU on current server
+  candidate_indices:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  selected_physical_gpu: 6
+  user_instruction: "\u5E2E\u6211\u4F7F\u7528\u5F53\u524D\u670D\u52A1\u5668\u4E0A\u4EFB\
+    \u4F55\u80FD\u7528\u7684GPU\u6765\u8DD1\u8FD9\u4E2A\u4EFB\u52A1\u5373\u53EF"
+  authorized_at: '2026-09-22T04:58:53.637965+00:00'
+  single_exclusive_worker: true
+  rescan_if_unavailable: true

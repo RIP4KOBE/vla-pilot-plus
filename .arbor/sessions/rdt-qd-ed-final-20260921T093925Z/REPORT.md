@@ -1,11 +1,13 @@
 # Interim research checkpoint
 
-Status REVIEWING_NATIVE_FAILURE at 2026-09-22T06:19:36.975062+00:00. No ownedGPUworker/queue is running. Project remainsIN_PROGRESS and no valid scientific outcome exists.
+Status: native diagnostic queue preparation for GPU7 only. No owned GPU worker or queue is running at this checkpoint; later runtime process/status records take precedence. The latest user instruction restricts all subsequent work to physical GPU7, with one exclusive worker and no fallback to other cards.
 
-The any-GPU queue successfully selected GPU6, verified CUDA/EGL context and ran the Q0 recovery for1201.38seconds. One actual Codex Stage query succeeded atstep24, with19.772s latency,10800input/42outputtokens. After guidanceTrue→False, the native process exitedSIGABRT(-6); rootcauseUnknown. No corefile was retained. Adapter audit found no directSIGABRT or parent-environment mutation path. No algorithm change is justified from this trace alone.
+The previous GPU6 recovery ran for 1201.38 seconds and completed one actual Codex Stage query at step24 (19.772 seconds, 10800 input / 42 output tokens). Shortly after guidance switched off, the native process exited with SIGABRT (-6). The cause remains unknown; the sample is invalid and nonretryable.
 
-Totals:5dispatched,3infrastructureaborts,2invalidtaskfailures,0valid,0running,0.4306699061807659GPU-hours. r3 remainsnonretryable; no scientific score or adoption isclaimed. P2/candidate/validation/formal remaingated. ExistingPoecredentialsareunchanged; realCodextransportisverified.
+Current totals: 5 dispatched episodes, 3 infrastructure aborts, 2 invalid task failures, 0 scientifically valid outcomes, 0 running episodes, and 0.4306699061807659 closed GPU-hours including healthchecks. No candidate, validation or formal score exists. The project target is not achieved.
 
-A minimal prospective phase-timing/faulthandler patch and an independently accounted zero-simulation nativeB1 policy diagnostic are beingprepared. They do not erase failedsamples or authorize selective scientificretries. Any usable serverGPU remainsauthorized, oneexclusiveworker; original no-sharing rulepersists.
+The isolated B1 diagnostic passed 37 CPU tests. It uses frozen real RDT/T5/SigLIP models and deterministic synthetic inputs, with no simulator, action execution, Stage call or scientific episode. It charges GPU-process wall time separately and cannot establish guided-transition or EGL causality by itself. The diagnostic queue will execute it once after GPU7 is continuously idle for 120 seconds, then stop for review. All scientific phase gates remain closed.
 
-Authority:research-state.yaml and docs/03_evidence/qd_ed_final/iteration-ledger.md. Resume:docs/03_evidence/qd_ed_final/resume.md. Runtimequeue-history preservesallformerprocess/status/logsnapshots.
+Codex saved-login transport is verified. Poe credentials remain unchanged. The prospective main phase-timing patch is still unapplied. Preserve all historical failures, immutable plans and resource costs.
+
+Authority: research-state.yaml and docs/03_evidence/qd_ed_final/iteration-ledger.md. Resume: docs/03_evidence/qd_ed_final/resume.md.

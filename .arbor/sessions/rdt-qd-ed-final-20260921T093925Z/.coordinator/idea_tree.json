@@ -15,7 +15,17 @@
     "metric_direction": "maximize",
     "trunk_branch": "exp/rdt-qd-ed-final-20260921T093925Z",
     "submission_path": null,
-    "sample_submission_path": null
+    "sample_submission_path": null,
+    "resource_checkpoint": {
+      "timestamp": "2026-09-22T06:39:04.470801+00:00",
+      "authorized_gpu_indices": [
+        7
+      ],
+      "status": "NATIVE_DIAGNOSTIC_WAITING_GPU7",
+      "valid_scientific_outcomes": 0,
+      "native_failure": "SIGABRT r3, nonretryable; root cause Unknown",
+      "next_action": "Freeze and launch only the bounded native B1 diagnostic on physical GPU7; wait for exclusive availability. Do not retry the failed Q0 cell or dispatch P2/candidate/validation/formal."
+    }
   },
   "root_id": "ROOT",
   "max_depth": 3,

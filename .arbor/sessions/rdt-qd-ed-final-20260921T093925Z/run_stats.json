@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-09-22T06:19:36.975062+00:00",
-  "status": "REVIEWING_NATIVE_FAILURE",
+  "timestamp": "2026-09-22T06:39:04.470801+00:00",
+  "status": "NATIVE_DIAGNOSTIC_WAITING_GPU7",
   "budget": {
     "max_gpu_hours": 48.0,
     "gpu_hours_consumed": 0.4306699061807659,
@@ -27,5 +27,8 @@
   "validation_exposed": false,
   "formal_exposed": false,
   "provider_condition": "codex_login_astra_low_v1",
-  "queue_pid": null
+  "queue_pid": null,
+  "authorized_gpu_indices": [
+    7
+  ]
 }
