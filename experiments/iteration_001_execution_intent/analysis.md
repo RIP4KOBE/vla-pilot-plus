@@ -88,3 +88,11 @@ Absolute primary success score for N1: **unmeasured**. Baseline historical Q0 re
 - `scripts/qd_ed_execution_intent_replay.py`: `b602818b3753c6110d2baf9c4d2e9fed5a23f9456829c71912e425bb90280bf1`
 - `configs/qd_ed_final/candidate_n1.json`: `5e74d72f108df53897e790677154c5ca3691b1aeb318297168d3bffcb84bfe3c`
 - `experiments/iteration_001_execution_intent/protocol.md`: `e3d3c2ed50db4a845e4d0713671db225c96f124ca8719d171e5d7006f0a5e0b0`
+
+## Final adjudication — 2026-09-22
+
+The prospective next steps above describe the original executor handoff, not an active queue. The N1 cohort is now **INVALID_NOT_PROMOTABLE**: its original Q0/task0 control is nonretryable invalid, and four dispatches on that one cell plus the remaining 29 unique cells would require 33 attempts, exceeding the frozen 30-attempt cap. Recovery attempts count toward that cap. The required 20 valid original controls were never obtained. N1 itself has zero online evaluations; its algorithm effect and success rate remain Unknown.
+
+All later coordinator diagnostics used physical GPU3. The final native-resource lifecycle probe failed the wrist RGB parity gate before model loading. No diagnostic prototype was accepted as a production repair. A bounded review of the remaining executed-horizon quality direction lacked exact provider-quality reconstruction, actual selection changes and linkage to lawful next observations; historical XY nearest-target argmin differences do not establish quality misranking.
+
+The study is closed under the user specification's bounded-review stop rule as **TARGET_NOT_MET / NO_ADOPTION**. It used 1.0262591123256264 of 48 GPU-hours and 11 episode attempts (8 aborted, 3 invalid, 0 valid). Validation and formal were not started. No cohort retry, new candidate or automatic GPU dispatch remains authorized under this concluded study. Complete outcomes, method, cost limitations and evidence needed for further research are recorded in the [final report](/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/final-report.md).
