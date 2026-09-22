@@ -351,7 +351,7 @@ def bind_plan(plan_path, plan, runtime, device, row, events_path, *, root=ROOT):
     with runner.locked(root / 'data/qd-ed-runner.lock', nonblocking=True):
         pending_gate(root, row)
         # Reverify source and inputs before changing singleton state binding.
-        runner.validate_plan(plan_path, root=root)
+        runner.validate_plan(plan_path, root=root, allow_unverified_gpu=True)
         mapping = current_metadata(physical_gpu, root=root)
         runner.require(mapping['uuid'] == device['uuid'], 'selected GPU inventory identity changed')
         reservation_admission(device)
@@ -472,7 +472,9 @@ def run_queue(plan_path, episode_keys, *, poll_seconds=30, idle_seconds=120, sta
     with runner.locked(root / 'data/qd-ed-available-gpu-queue.lock', nonblocking=True):
         save('starting')
         try:
-            plan, _, runtime = runner.validate_plan(plan_path, root=root)
+            # All frozen source/model/input checks remain active while an
+            # explicitly unverified new device waits for its admitted probe.
+            plan, _, runtime = runner.validate_plan(plan_path, root=root, allow_unverified_gpu=True)
             code_paths = {record['path'] for record in plan['code_files']}
             runner.require({'scripts/qd_ed_available_gpu_queue.py', 'scripts/qd_ed_gpu_probe.py',
                             'scripts/qd_ed_runtime_setup.py'} <= code_paths,

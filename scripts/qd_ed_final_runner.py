@@ -187,7 +187,7 @@ def episode_identity(row):
     return {key: row[key] for key in ('split', 'iteration', 'profile', 'task_id', 'env_seed', 'policy_seed', 'init_index')}
 
 
-def validate_plan(path, *, root=ROOT, require_frozen=True):
+def validate_plan(path, *, root=ROOT, require_frozen=True, allow_unverified_gpu=False):
     root = Path(root).resolve()
     plan = read_json(path)
     require(plan.get('schema') == SCHEMA, 'plan schema mismatch')
@@ -235,7 +235,7 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
     stage_overrides(runtime)
     physical_gpu = runtime_gpu(runtime, state)
     if require_frozen:
-        require(plan.get('egl_mapping_verified') is True and runtime.get('cuda_egl_verified') is True, f'GPU{physical_gpu}/EGL mapping not verified')
+        validate_gpu_readiness(plan, runtime, allow_unverified_gpu=allow_unverified_gpu)
         require(runtime.get('provider_ready') is True, 'frozen Stage provider is not ready')
     verify_files(runtime['files'],allowed_roots=(root,artifact_root))
     inventory_path = owned(plan['runtime_inventory_path'], root)
@@ -303,6 +303,18 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
         owned(task['cache_dir'], artifact_root)
     validate_memcheck(plan)
     return plan, manifest, runtime
+
+
+def validate_gpu_readiness(plan, runtime, *, allow_unverified_gpu=False):
+    """Queue preparation can wait for a probe; real episode dispatch cannot."""
+    if allow_unverified_gpu:
+        require(type(plan.get('egl_mapping_verified')) is bool
+                and type(runtime.get('cuda_egl_verified')) is bool
+                and runtime.get('metadata_mapping_verified') is True,
+                'queued GPU mapping lacks explicit readiness or verified metadata')
+    else:
+        require(plan.get('egl_mapping_verified') is True and runtime.get('cuda_egl_verified') is True,
+                f'GPU{runtime_gpu(runtime)}/EGL mapping not verified')
 
 
 def validate_memcheck(plan):

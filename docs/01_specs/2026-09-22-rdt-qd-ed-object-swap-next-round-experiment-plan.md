@@ -1,16 +1,22 @@
 # RDT + QD + ED：Object-Swap 下一轮实验方案
 
-版本：v3，2026-09-22。状态：**AUTHORIZED / 用户最新指定 GPU5，继续既定测试与条件迭代**。
+版本：v4，2026-09-22。状态：**AUTHORIZED / 用户最新指定 GPU2，继续既定测试与条件迭代**。
 
 初稿的历史状态截点为 2026-09-22 05:03 UTC。用户随后明确授权更新方案、新建 worktree/branch、以 goal 模式测试迭代，并指定 GPU6。执行修订如下；历史快照保留其原时点口径。未调用 Arbor/Orchestra Research skill。
 
-## 最新执行修订：改用 GPU5
+## 最新执行修订：固定 GPU2
+
+用户明确要求终止GPU2现有程序，并确保本次任务后续均使用GPU2。本修订覆盖下文GPU5/GPU6历史设备要求。当前队列、CUDA和EGL均改为仅允许物理GPU2（EGLindex1，CUDAlogical0）；不更换科学输入或重置预算。GPU5等待队列已停止，尚未派发的CUDA memcheck保留原条件标识，待GPU2释放后自动探测并接续。终止PID1502190时系统返回EPERM，sudo要求密码，故当前未成功清理。新队列可在完整冻结输入检查后等待设备，真实CUDA/EGL检查通过前不会启动episode。详见 `experiments/iteration_001_execution_intent/gpu2-migration-amendment.md`。
+
+## 历史执行修订：改用 GPU5
 
 用户明确要求“在GPU5上执行任务”，本修订覆盖下文历史GPU6-only设备要求。CUDA与EGL都固定物理GPU5。已停止尚未派发的GPU6等待队列，按GPU5的UUID/PCI/EGL重新验证和冻结运行清单，再执行同一C0恢复诊断。算法、任务、seed/init、Stage、720步/1800秒限制、累计预算和晋级门保持不变。已有GPU6失败证据全部保留；更换设备本身不代表故障已修复。原worktree/branch/artifact名称含gpu6，仅作为历史标识保留。详见 `experiments/iteration_001_execution_intent/gpu5-migration-amendment.md`。
 
 **GPU5首个诊断结果：** 更换GPU仍在第一次模型搜索后的 `mjr_readPixels` 发生同进程Xid31，自动中止耗时132.65秒。下一步为独立的 `GPU5_EGL_SERIAL_C0` 工程诊断：渲染前显式等待CUDA完成并绑定所属EGL上下文，任务/动作/图像设置保持原样；单次运行计入development额度。190项相关CPU测试通过，GPU有效性尚待验证。见 `experiments/iteration_001_execution_intent/gpu5-egl-serialization-diagnostic.md`。
 
 **09:00 UTC诊断更新：** CUDA同步与EGL重新绑定仍未解决GPU5的Xid31；87.52秒后自动中止，0环境动作。5次渲染入口的上下文均正确，故障后保存图像为噪声。下一步仅运行一次600秒上限的资源生命周期观测，检查上下文创建/释放、缓冲区调整及GC时序；不重复失败条件、不计入算法成功率。详见 `experiments/iteration_001_execution_intent/gpu5-render-lifetime-diagnostic.md`。
+
+**09:24 UTC更新：** 资源生命周期诊断再次复现Xid31，94.42秒自动中止。两次析构均在推理前、上下文均正确；没有支持推理期间误清理的证据。下一项为已冻结的单次GPU5 CUDA memcheck，600秒上限，计development额度，不进入算法比较。当前累计10次派发、8次中止、2次无效、0次有效，0.8081455156GPUh。生命周期审计与CUDA诊断协议分别见 artifact `analysis/gpu5-render-lifetime/audit.json` 和 `experiments/iteration_001_execution_intent/gpu5-cuda-memcheck-diagnostic.md`。
 
 ## 历史执行修订：GPU6 专属运行与原生崩溃诊断
 
