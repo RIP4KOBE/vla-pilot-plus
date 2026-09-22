@@ -76,7 +76,7 @@ def test_queue_waits_then_resumes_after_external_terminal_without_gpu_work(tmp_p
     plan={'episodes':[row],'phase_authorization':{'dev':True},'code_files':[{'path':'scripts/'+name+'.py'}
           for name in ('qd_ed_available_gpu_queue','qd_ed_gpu_probe','qd_ed_runtime_setup')]}
     plan_path=root/'plan.json';plan_path.write_text(json.dumps(plan))
-    runtime={'gpu_mapping':{'physical_gpu':5}}
+    runtime={'gpu_mapping':{'physical_gpu':5,'egl_device_index':7}}
     monkeypatch.setattr(queue.runner,'validate_plan',lambda *a,**k:(copy.deepcopy(plan),{},runtime))
     monkeypatch.setattr(queue.runner,'verify_provider',lambda *a,**k:None)
     monkeypatch.setattr(queue.runner,'child_environment',lambda *a,**k:{})
