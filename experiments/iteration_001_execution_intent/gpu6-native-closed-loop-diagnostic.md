@@ -9,3 +9,11 @@ Use the frozen C0 algorithm, real Codex Stage, model/encoder/input identities an
 Measure initial observation, keypoint/Stage update, fresh/cached policy selection, diagnostic artifact generation, visualization overlay, video append, adapter step and policy observation. The last durable phase entry plus faulthandler output should localize another native failure; phase durations should explain the long delays outside prior select_action calls. Missing native evidence remains Unknown. If this episode completes, inspect whether it traversed the suspect guidance transition before drawing conclusions.
 
 The diagnostic is charged to the common development count and GPU-hours. Validation/formal remain closed; the independent repaired-runtime comparison is not started until the evidence warrants it. Preserve the old incomplete cohorts and all diagnostics, including unsuccessful ones.
+
+## Infrastructure interruption and explicit recovery
+
+Attempt `rdt-qd-ed-final-20260921T093925Z__gpu6_native_c0_t00__6e57273c45b3` was aborted after695.836222 GPU seconds when an external GPU6 process appeared. It completed13 environment steps and was in the step13 visualization phase; no Stage query or native failure was reached. Keep the original terminal infrastructure record and all costs. This does not establish a robot task outcome or a native-crash fix.
+
+The user's explicit instruction to keep scanning GPU6 and use it once completely free supports one linked recovery, `gpu6_native_c0_t00_r1`, with identical iteration/profile/task/seeds/init/scientific settings and the original attempt as `retry_of`. Charge recovery reserve. Wait on CPU with only physical6 eligible, no compute process or detected declared CUDA reservation, memory below1024MiB, and120 seconds continuously observed idle. Do not terminate external work. The queue executes only this recovery and then stops for evidence review; it never retries a dispatched failure by itself.
+
+Measured partial phases: fresh search3.904s atstep0; first diagnostic artifacts20.240s; repeated adapter steps and later visualizations each around21s. Root cause remains Unknown. No CPU quota or GPU throttle indication was observed during spot checks. Do not interpret the unchanged algorithm's very slow rendering/control path as an N1 result. Full30-cell ETA remains conditional on resolving this runtime bottleneck.
