@@ -94,3 +94,19 @@ New authorized cycle from `744e08b`; historical Run045 remains no-adoption. GPU7
 - User authorizes any usable GPU on this server, superseding fixedGPU5/GPU7 restrictions. Still one exclusive worker with per-dispatch identity/admission checks, no sharing/preemption and unchanged scientific/budget gates.
 - Current all-device scan:GPU7 free, other seven have external compute processes. SelectGPU7; existing actual CUDA logical0/EGL4 proof and frozen UUID validate unchanged. No redundant healthcheck needed for this same binding. Previous GPU5 preparation never dispatched a healthcheck or episode.
 - Freeze `available-gpu-amendment.md` and a new source-bound plan; all thirty N1 cells and provider/non-hardware inputs remain identical. No task retries or historical record replacement.
+
+### Available-GPU plan frozen 2026-09-22T05:00:10.407382+00:00
+
+- Source `16f7fae1d948ad8359fa1b64d56352a1914e89ac`; plan `data/qd-ed-n1-dev-available-plan.json` SHA256 `56f41cfe5eabe706076a85c44d093c4aff7252308f11fe2ab7467573da967f5f`; snapshot `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/n1-dev-available-gpu7-16f7fae1d948.json`.30 resolved configs, current GPU7/driver/EGL mapping, model/input/runtime hashes and Codex login verified. First selected control pair:task0 Q0/P2; candidate gate remains closed.
+
+### Counted external-device race 2026-09-22T05:03:31.281023+00:00
+
+- N1-round Q0 task0 attempt `rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0__2b5e035fd6bb` dispatched onGPU7, then external PID3879749 appeared during startup. Existing exclusive monitor stopped only our worker. No Stage query or policy rollout outcome was recorded.
+- Terminal `aborted`, failure_class infrastructure, retryable_infrastructure true;12.277869774959981 GPU seconds charged. Total2 dispatched,1 invalid originalbaseline,1 infrastructureabort; GPU-hours0.028872411260640045. Never reclassify the originalbaseline implementation failure.
+- Prepare explicit linked recovery key `n1_dev_t00_q0_r1`, sameprofile/task/envseed/policyseed/init/iteration, retry_of the exact aborted ID, recovery budgetbucket. This replaces only the unresolved infrastructure attempt for cohort accounting; everyattemptcost remains. All8GPUcards now haveexternalprocesses. A persistent CPU-only availabilityqueue will select anidlecard and run this recovery plusP2, then stopforreview; postdispatcherrors willnotauto-repeat.
+
+### Persistent available-GPU queue implementation 2026-09-22T05:13:23.226072+00:00
+
+- Scoped executor added only `scripts/qd_ed_available_gpu_queue.py` and20 CPU regression tests, all passed in0.23s. No GPU/network or runtime mutation by executor.
+- Queue waits using NVIDIA metadata, selects only explicitly authorized idle cards, records hardware-only new manifests/plans, and uses existing accounted probes/runner. It retains nonhardware/provider/source/seed identities. GPU admission races before any dispatch return to CPU waiting; any error after a dispatched probe/episode stops for review. Source/input/auth drift and exhausted budgets stop explicitly.
+- Current request queued for exact linked infrastructure recovery `n1_dev_t00_q0_r1` plus paired `n1_dev_t00_c0`, then review before remaining controls. Original baseline invalid never retried. A separate user clarification asks whether to relax the original no-sharing rule; no answer yet, so exclusive mode remains mandatory.
