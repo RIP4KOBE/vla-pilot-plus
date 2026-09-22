@@ -57,6 +57,7 @@ CODEX_STAGE_CONDITION = 'codex_login_astra_low_v1'
 GPU_MONITOR_QUERY_TIMEOUT_SECONDS = 15
 # Covers a 15s metadata timeout and two possible 10s child-cleanup waits.
 TERMINATION_GRACE_SECONDS = 40
+MEMCHECK_TOOL = Path('/usr/local/cuda-12.8/compute-sanitizer/compute-sanitizer')
 COMPUTE_FIELDS = (
     'model_forward_calls','model_batch_rows','denoising_invocations','model_denoising_steps',
     'denoising_step_batch_rows','reward_calls','reward_evaluations','reward_scoring_batches',
@@ -300,7 +301,40 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
             require(row.get(field) == matching[0][field], f'episode differs from frozen seed plan: {field}')
         require(digest(task['bddl_path']) == row['bddl_sha256'] and digest(task['init_path']) == row['init_file_sha256'], 'runtime task inputs differ from frozen seed plan')
         owned(task['cache_dir'], artifact_root)
+    validate_memcheck(plan)
     return plan, manifest, runtime
+
+
+def validate_memcheck(plan):
+    diagnostic = plan.get('cuda_memcheck')
+    if diagnostic is None:
+        return
+    require(set(diagnostic) == {'tool_path', 'files'}, 'invalid CUDA memcheck contract')
+    require(diagnostic['tool_path'] == str(MEMCHECK_TOOL), 'unexpected CUDA memcheck executable')
+    require(plan.get('diagnostic_scope', {}).get('kind') == 'cuda_memcheck'
+            and plan['diagnostic_scope'].get('online_algorithm_comparison') is False,
+            'CUDA memcheck requires a diagnostic-only plan')
+    rows = plan.get('episodes', [])
+    require(len(rows) == 1 and rows[0].get('split') == 'dev'
+            and rows[0].get('budget_bucket') == 'development' and not rows[0].get('retry_of')
+            and rows[0].get('iteration') == 'GPU5_CUDA_MEMCHECK_C0'
+            and rows[0].get('profile') == 'C0'
+            and type(rows[0].get('timeout_seconds')) is int
+            and 0 < rows[0]['timeout_seconds'] <= 600,
+            'CUDA memcheck is limited to one bounded development diagnostic')
+    records = diagnostic['files']
+    expected = {str(p) for p in MEMCHECK_TOOL.parent.iterdir() if p.is_file()}
+    require({r['path'] for r in records} == expected and str(MEMCHECK_TOOL) in expected,
+            'CUDA memcheck package fingerprint set changed')
+    verify_files(records, allowed_roots=(MEMCHECK_TOOL.parent,))
+
+
+def instrument_command(command, plan, output):
+    if plan.get('cuda_memcheck') is None:
+        return command
+    validate_memcheck(plan)
+    return [str(MEMCHECK_TOOL), '--tool', 'memcheck', '--target-processes', 'application-only',
+            '--error-exitcode', '86', '--log-file', str(Path(output)/'cuda-memcheck.log'), *command]
 
 
 def selected_rows(plan, split, iteration):
@@ -347,7 +381,7 @@ def build_command(plan, manifest, runtime, row, attempt_id):
     values.update(bindings)
     command = [str(PYTHON), str(Path(plan['worktree']) / 'main.py')]
     command += [f'{key}={hydra(value)}' for key, value in values.items()]
-    return command, output
+    return instrument_command(command, plan, output), output
 
 
 def authorized_gpu(state):

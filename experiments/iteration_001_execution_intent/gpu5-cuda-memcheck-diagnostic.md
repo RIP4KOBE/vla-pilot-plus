@@ -1,0 +1,13 @@
+# GPU5 CUDA memcheck diagnostic
+
+The lifetime observation reproduced Xid31 after94.421861seconds. Both renderer destructors occurred before first policy inference with owned EGL current; no context mismatch or destructor after inference entry was observed. Therefore do not implement a speculative cleanup fix. Source evidence is artifact analysis/gpu5-render-lifetime/audit.json. Root cause remains unknown.
+
+Next hypothesis: an illegal CUDA memory access during first inference might precede the observed graphics fault. Use the already installed CUDA12.8 Compute Sanitizer2025.1.0.0 memcheck, matching this environment's CUDA12.8 toolkit family. This can detect CUDA memory violations; it cannot prove all OpenGL/driver operations correct. Reference: https://docs.nvidia.com/compute-sanitizer/ComputeSanitizer/index.html .
+
+One new engineering condition GPU5_CUDA_MEMCHECK_C0 / gpu5_cuda_memcheck_c0_t00: C0, task0, env+policyseed1969522881, init0, dev/development, no retry_of,600second diagnostic ceiling. GPU5 only with original CUDA/EGL mapping. No N1R comparison, promotion or scientific success-rate substitution. Keep240/48h total limits, study-wide single worker,120second idle admission, protected validation/formal reserves, and Xid31/109 early stop. No automatic retry.
+
+Prefix the unchanged production argv with the exact frozen executable and fixed options: --tool memcheck --target-processes application-only --error-exitcode86 --log-file <owned-attempt>/cuda-memcheck.log. Fingerprint the executable and all sibling runtime tool files; reject missing/changed files, alternate executable, other phases, multi-episode plans or a timeout above600seconds. The Stage CLI child is not instrumented. No core dump, suppression file or dependency upgrade. QD_ED_CUDA_EGL_SERIALIZE=0 and QD_ED_RENDER_LIFETIME=0. Existing phase/Xid observations remain. Sanitizer overhead and timing changes make this diagnostic non-comparable to ordinary episode timing.
+
+The sanitizer launcher and application have different PIDs. A CPU-only launch demonstrated that the application retains the launcher's process group/session; existing exclusivity/termination code admits and terminates that owned group. Kernel monitor still stops any new Xid31/109 on the admitted GPU; do not interpret owned_pid_match=false as external activity without checking application PID/process-group evidence. Record that evidence during the run.
+
+Review CUDA error reports and exact observed phase. A timeout, tool failure, incomplete sanitizer report or Xid with no reported CUDA violation is not a clean memory-check pass and must not be presented as proof of a graphics-only cause. Preserve all outcomes and costs before choosing any further intervention.
