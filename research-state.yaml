@@ -6,14 +6,14 @@ worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z
 artifacts: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z
 source_commit: 744e08ba4398f2f8e34fb05619c829fc01397f69
 gpu_pool:
-- 5
+- 6
 max_concurrent_gpu_workers: 1
 project_target:
   status: IN_PROGRESS
   required_formal_successes: 5
   achieved: false
 study:
-  status: MONITOR_REPAIR_READY
+  status: REVIEWING_NATIVE_FAILURE
   mode: real
   interaction: auto
 candidate:
@@ -28,7 +28,7 @@ candidate:
   ordering_amendment: experiments/iteration_001_execution_intent/startup-repair-amendment.md
 budget:
   max_gpu_hours: 48.0
-  gpu_hours_consumed: 0.09293902437344917
+  gpu_hours_consumed: 0.4306699061807659
   max_episode_attempts: 240
   reserved:
     baseline: 20
@@ -36,12 +36,12 @@ budget:
     validation: 60
     formal: 40
     recovery: 20
-  dispatched: 4
+  dispatched: 5
   aborted: 3
   valid: 0
   running: 0
-  invalid: 1
-  completed: 1
+  invalid: 2
+  completed: 2
   gpu_hour_reservations:
     validation: 14.0
     formal: 10.0
@@ -74,18 +74,20 @@ historical:
   previous_gpu_hours: 6.946832055555556
   previous_formal_episodes: 0
 active_iteration: iteration_001_execution_intent
-next_action: Review bounded NVIDIA metadata timeout repair and tests, freeze identical-science
-  linked r3 plus paired P2, restart one exclusive any-GPU queue. Preserve all prior
-  attempts; no success-based retry.
+next_action: Review/test the zero-simulation native B1 policy diagnostic and prospective
+  phase timing patch. Preserve r3 as nonretryable invalid task failure and do not
+  dispatch paired P2/candidate as if the initial control pair passed. Do not automatically
+  reset cohort to erase failure.
 source_spec_sha256: 3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef
 derived_indexes:
 - .arbor/sessions/rdt-qd-ed-final-20260921T093925Z
 authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
   ledger is append-only event evidence, not a second mutable state.
 online_blockers:
-- NVIDIA metadata monitor timeout under transient server load; executor is reviewing
-  a bounded timeout and budget-margin repair.
-updated_at: '2026-09-22T05:42:11.860401+00:00'
+- N1 Q0 control terminated with native SIGABRT after successful Stage query. No ordinary
+  retry permitted. Root is preparing an independently accounted zero-simulation B1
+  inference diagnostic; native root cause remains Unknown.
+updated_at: '2026-09-22T06:27:02.547214+00:00'
 seed_plan:
   path: data/frozen-seed-plan.json
   sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
@@ -100,6 +102,7 @@ cpu_validation:
   gpu5_probe_metadata_passed: 64
   available_gpu_queue_passed: 26
   monitor_repair_runner_probe_queue_passed: 122
+  native_policy_probe_passed: 37
 prepared_baseline_plan:
   path: data/qd-ed-final-plan.json
   episodes: 20
@@ -122,18 +125,18 @@ runner:
     development: 1
     validation: 0
     formal: 0
-    recovery: 2
-  reserved_attempts: 4
+    recovery: 3
+  reserved_attempts: 5
   gpu_hours_by_bucket:
     baseline: 0.019651524036631195
     development: 0.003410519381933328
     validation: 0.0
     formal: 0.0
-    recovery: 0.06987698095488465
-  gpu_healthcheck_hours: 0.013515868503471008
+    recovery: 0.4076078627622014
+  gpu_healthcheck_hours: 0.01752957883045181
   gpu_healthcheck_inflight: 0
-  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r2__5621b7ebde96
-  last_event: aborted
+  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r3__6df33a24c65f
+  last_event: valid
 gpu_admission_last_observation:
   physical_gpu: 7
   memory_used_mib: 7
@@ -158,7 +161,7 @@ stage_condition:
   auth_mode: chatgpt
   reasoning_effort: low
   cli_version: 0.155.1
-  runtime_manifest: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/resource_queue/31212060cd3f4189a44338edbc965dd6/runtime-manifest.json
+  runtime_manifest: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/resource_queue/89d2dd719e0346bd9011931cc66731a0/runtime-manifest.json
   provider_amendment: experiments/iteration_001_execution_intent/codex-provider-amendment.md
   http_request_retry_counts: unobserved_null
   logical_calls_tokens_latency: observed
@@ -179,14 +182,14 @@ closed_baseline:
   complete_success_rate: null
   report: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/iteration_000_intake/closed-incomplete-baseline-report.json
 active_plan:
-  path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/resource_queue/31212060cd3f4189a44338edbc965dd6/plan.json
-  source_commit: 32d4d97c9773a2099b59c3128b3476e6980e95d5
-  sha256: 981ba8b4172cc236efb81bdb43d1a5b9ea74b79d7073a40155c181ff57b4b178
-  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/resource_queue/31212060cd3f4189a44338edbc965dd6/plan.json
+  path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/resource_queue/89d2dd719e0346bd9011931cc66731a0/plan.json
+  source_commit: 8fb001b7903c5e6a2a74a5ef6a7f2845ca7e9fe2
+  sha256: 6e08d9783d3e66fade7bb75b11da4145b76e186301fb2530bfea86c001e990d3
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/resource_queue/89d2dd719e0346bd9011931cc66731a0/plan.json
   frozen: true
   iteration: N1
   expected_unique_scientific_cells: 30
-  rows_including_recovery: 32
+  rows_including_recovery: 33
   candidate_dispatch_authorized: false
 hardware_migration:
   previous_physical_gpu: 7
@@ -218,12 +221,63 @@ authorized_gpu_selection:
   - 5
   - 6
   - 7
-  selected_physical_gpu: 5
+  selected_physical_gpu: 6
   user_instruction: 帮我使用当前服务器上任何能用的GPU来跑这个任务即可
   authorized_at: '2026-09-22T04:58:53.637965+00:00'
   single_exclusive_worker: true
   rescan_if_unavailable: true
-pending_infrastructure_recovery:
+resource_queue:
+  pid: 3996172
+  proc_start_ticks: '373125345'
+  source_commit: 8fb001b7903c5e6a2a74a5ef6a7f2845ca7e9fe2
+  plan_path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-n1-monitor-recovery-plan.json
+  plan_sha256: 456c2c992c07b528909fdda892ce49890d3e18f17f6bbe99d1e2a736e6ee8f33
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/available-gpu-queue-status.json
+  log_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/available-gpu-queue.log
+  started_at: '2026-09-22T05:43:42.696206+00:00'
+  argv:
+  - /home/hynx/miniconda3/envs/vla-pilot/bin/python
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_available_gpu_queue.py
+  - --plan
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-n1-monitor-recovery-plan.json
+  - --episode-key
+  - n1_dev_t00_q0_r3
+  - --episode-key
+  - n1_dev_t00_c0
+  - --poll-seconds
+  - '30'
+  - --idle-seconds
+  - '120'
+  - --status-path
+  - /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/available-gpu-queue-status.json
+  scope: explicit linked r3 Q0 recovery and paired P2; stop for review
+  idle_stability_seconds: 120
+  status: failed
+  last_verified_at: '2026-09-22T06:19:36.975062+00:00'
+  active_plan_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/resource_queue/89d2dd719e0346bd9011931cc66731a0/plan.json
+  selected_physical_gpu: 6
+  archived_evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/queue-history/8fb001b-native-abort
+prepared_stable_queue_plan:
+  path: data/qd-ed-n1-stable-queue-plan.json
+  source_commit: 32d4d97c9773a2099b59c3128b3476e6980e95d5
+  sha256: 10c280b86d48b25d5e750100103ae1771d1771e87eb22ba26a25b0026420c269
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/n1-stable-queue-32d4d97c9773.json
+  frozen: true
+  iteration: N1
+  expected_unique_scientific_cells: 30
+  rows_including_recovery: 32
+  candidate_dispatch_authorized: false
+prepared_monitor_recovery_plan:
+  path: data/qd-ed-n1-monitor-recovery-plan.json
+  source_commit: 8fb001b7903c5e6a2a74a5ef6a7f2845ca7e9fe2
+  sha256: 456c2c992c07b528909fdda892ce49890d3e18f17f6bbe99d1e2a736e6ee8f33
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/n1-monitor-recovery-8fb001b7903c.json
+  frozen: true
+  iteration: N1
+  expected_unique_scientific_cells: 30
+  rows_including_recovery: 33
+  candidate_dispatch_authorized: false
+last_infrastructure_recovery:
   retry_of: rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r2__5621b7ebde96
   original_episode_key: n1_dev_t00_q0_r2
   new_episode_key: n1_dev_t00_q0_r3
@@ -237,43 +291,39 @@ pending_infrastructure_recovery:
     init_index: 0
   budget_bucket: recovery
   reason: NVIDIA metadata exclusivity query exceeded5-second monitor timeout
-resource_queue:
-  pid: 3969643
-  proc_start_ticks: '373042546'
-  source_commit: 32d4d97c9773a2099b59c3128b3476e6980e95d5
-  plan_path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-n1-stable-queue-plan.json
-  plan_sha256: 10c280b86d48b25d5e750100103ae1771d1771e87eb22ba26a25b0026420c269
-  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/available-gpu-queue-status.json
-  log_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/available-gpu-queue.log
-  started_at: '2026-09-22T05:29:54.705003+00:00'
-  argv:
-  - /home/hynx/miniconda3/envs/vla-pilot/bin/python
-  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_available_gpu_queue.py
-  - --plan
-  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-n1-stable-queue-plan.json
-  - --episode-key
-  - n1_dev_t00_q0_r2
-  - --episode-key
-  - n1_dev_t00_c0
-  - --poll-seconds
-  - '30'
-  - --idle-seconds
-  - '120'
-  - --status-path
-  - /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/available-gpu-queue-status.json
-  scope: explicit linked r2 Q0 recovery and paired P2; stop for review
-  idle_stability_seconds: 120
-  status: failed
-  active_plan_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/resource_queue/31212060cd3f4189a44338edbc965dd6/plan.json
-  selected_physical_gpu: 5
-  archived_evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/queue-history/32d4d97-monitor-timeout
-prepared_stable_queue_plan:
-  path: data/qd-ed-n1-stable-queue-plan.json
-  source_commit: 32d4d97c9773a2099b59c3128b3476e6980e95d5
-  sha256: 10c280b86d48b25d5e750100103ae1771d1771e87eb22ba26a25b0026420c269
-  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/n1-stable-queue-32d4d97c9773.json
-  frozen: true
-  iteration: N1
-  expected_unique_scientific_cells: 30
-  rows_including_recovery: 32
-  candidate_dispatch_authorized: false
+native_failure:
+  attempt_id: rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r3__6df33a24c65f
+  physical_gpu: 6
+  signal: SIGABRT
+  exit_code: -6
+  outcome_valid: false
+  retry_allowed: false
+  stage_successful_queries: 1
+  last_stage_global_step: 24
+  guidance_before: true
+  guidance_after: false
+  root_cause: Unknown
+  core_available: false
+  confirmed_by: apport entry for pid4006998 signal6 corelimit0; no crashfile
+real_stage_transport_evidence:
+  attempt_id: rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r3__6df33a24c65f
+  global_step: 24
+  backend: codex_cli
+  model: gpt-6-astra
+  query_ok: true
+  latency_seconds: 19.772138726897538
+  input_tokens: 10800
+  output_tokens: 42
+  reasoning_output_tokens: 0
+  logical_calls: 1
+  failed_calls: 0
+  http_requests_retries: null
+  task_success_claimed: false
+native_diagnostic:
+  status: CPU_READY_NOT_DISPATCHED
+  script: scripts/qd_ed_policy_native_probe.py
+  scope: B1 native inference on deterministic synthetic inputs; no simulator, actions,
+    Stage call or scientific episode
+  timeout_seconds: 600
+  source_plan_pending_freeze: true
+  limitation: Cannot establish guided-transition or EGL causality
