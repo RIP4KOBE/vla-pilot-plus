@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-09-22T11:41:04.402172+00:00",
-  "status": "GPU3_CONTEXT_LIFETIME_DIAGNOSTIC_READY",
+  "timestamp": "2026-09-22T11:56:29.654730+00:00",
+  "status": "GPU3_NATIVE_RENDER_LIFETIME_DIAGNOSTIC_READY",
   "budget": {
     "max_gpu_hours": 48.0,
-    "gpu_hours_consumed": 1.0018682701858537,
+    "gpu_hours_consumed": 1.0244992566011693,
     "max_episode_attempts": 240,
     "reserved": {
       "baseline": 20,
@@ -83,9 +83,9 @@
     },
     "physical_gpu7_executed": false
   },
-  "source_commit": "c97b1395f14c9d027ed2e88180b0820b7b888e24",
-  "next_action": "Execute one GPU3-only context retirement/recreation diagnostic after stable-idle admission. Six CPU lifecycle tests passed. No scientific score or production repair; this probe includes original B1 synchronization and one extra mj_forward.",
-  "phase": "GPU3_CONTEXT_LIFETIME_DIAGNOSTIC_READY",
+  "source_commit": "5a6290a07f95447a509182329adfe0a4ea4cf5bb",
+  "next_action": "Run one GPU3-only scene-first diagnostic managing native render resources per full render/readback. Helper17/entry3 CPU tests passed; save15raw arrays, require all9canonicalRGB and original5mj_forward. No production patch or scientific dispatch.",
+  "phase": "GPU3_NATIVE_RENDER_LIFETIME_DIAGNOSTIC_READY",
   "owned_gpu_workers": [],
   "target_achieved": false,
   "gpu3_render_queue": {
@@ -346,7 +346,7 @@
     "analysis_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-first-diagnostic/diagnostic-analysis.json"
   },
   "gpu3_context_lifetime_diagnostic": {
-    "status": "CPU_READY_PENDING_ADMISSION",
+    "status": "ABORTED_IMAGE_HASH_MISMATCH_NO_XID",
     "physical_gpu": 3,
     "automatic_retry": false,
     "maximum_gpu_process_seconds": 600,
@@ -358,6 +358,48 @@
     "supervisor": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-context-lifetime.py",
     "supervisor_sha256": "995dcaae05ada01d445aadbee8ed9eae16b30f2216fd71e88a79dd63e78e6e69",
     "status_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-lifetime-diagnostic/status.json",
-    "contract_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-lifetime-diagnostic/frozen-contract.json"
+    "contract_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-lifetime-diagnostic/frozen-contract.json",
+    "tool_session_id": 23017,
+    "source_commit": "5a6290a07f95447a509182329adfe0a4ea4cf5bb",
+    "resource_id": "rdt-qd-ed-final-20260921T093925Z__gpu3_context_lifetime__a426c0351816",
+    "worker_pid": 436246,
+    "worker_proc_start_ticks": "375288263",
+    "supervisor_pid": 432062,
+    "contract_sha256": "cd742189842d2de2217b2c03602dc5829ed29b0a66fde99589decfebacc0ebe0",
+    "result_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-lifetime-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_context_lifetime__a426c0351816/healthcheck-result.json",
+    "gpu_process_wall_seconds": 81.47155109513551,
+    "finite_frame_count": 10,
+    "static_hash_mismatches": [
+      {
+        "phase": "after_prediction_sync",
+        "camera": "agentview",
+        "width": 128,
+        "rgb_sha256": "6bcd547193f484aaf3f5d94cfe77a2f7bcb2ff6aa3ff8cedc909cd9239c8a741",
+        "matches_static": false
+      }
+    ],
+    "prediction_calls": 1,
+    "model_forward_calls": 5,
+    "mj_forward_calls": 6,
+    "owned_xids": [],
+    "cleanup_success": true,
+    "analysis_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-lifetime-diagnostic/diagnostic-analysis.json"
+  },
+  "gpu3_native_render_lifetime_diagnostic": {
+    "status": "CPU_READY_PENDING_ADMISSION",
+    "physical_gpu": 3,
+    "automatic_retry": false,
+    "maximum_gpu_process_seconds": 600,
+    "production_patch_applied": false,
+    "scope": "Original scene-first static/model/B1 order; native resources held only across full render/readback, stable Python scene/camera/options; no extra mj_forward or CUDA operations; zero actions/integration.",
+    "protocol": "experiments/iteration_001_execution_intent/gpu3-native-render-lifetime-diagnostic.md",
+    "script": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-native-render-lifetime.py",
+    "script_sha256": "cf48e493e74f2e44283eff537e1339c6ccb8e1a0ef643cbe4a65b11681c307c5",
+    "helper": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/native-render-lifetime-proposal/native_render_lifetime.py",
+    "helper_sha256": "ebbff19af379a2e0db523ef32df66cb2edbef6e62d74090db45957e4767b55c0",
+    "supervisor": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-native-render-lifetime.py",
+    "supervisor_sha256": "a156aa0e7d752b57e1c4a554991036963c8a420edcb8186479f4a4546f064fd1",
+    "status_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/status.json",
+    "contract_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/frozen-contract.json"
   }
 }
