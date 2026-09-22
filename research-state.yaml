@@ -13,7 +13,7 @@ project_target:
   required_formal_successes: 5
   achieved: false
 study:
-  status: GPU3_MODEL_FIRST_DIAGNOSTIC_READY
+  status: GPU3_CONTEXT_LIFETIME_DIAGNOSTIC_READY
   mode: real
   interaction: auto
 candidate:
@@ -28,7 +28,7 @@ candidate:
   ordering_amendment: experiments/iteration_001_execution_intent/startup-repair-amendment.md
 budget:
   max_gpu_hours: 48.0
-  gpu_hours_consumed: 0.9813987298814271
+  gpu_hours_consumed: 1.0018682701858537
   max_episode_attempts: 240
   reserved:
     baseline: 20
@@ -74,16 +74,16 @@ historical:
   previous_gpu_hours: 6.946832055555556
   previous_formal_episodes: 0
 active_iteration: iteration_001_execution_intent
-next_action: Execute one GPU3-only complete-model-before-first-graphics diagnostic
-  after 120 seconds stable idle; verify unchanged static images and one native B1.
-  CPU tests passed3; scientific gates closed.
+next_action: Execute one GPU3-only context retirement/recreation diagnostic after
+  stable-idle admission. Six CPU lifecycle tests passed. No scientific score or production
+  repair; this probe includes original B1 synchronization and one extra mj_forward.
 source_spec_sha256: 3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef
 derived_indexes:
 - .arbor/sessions/rdt-qd-ed-final-20260921T093925Z
 authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
   ledger is append-only event evidence, not a second mutable state.
 online_blockers: []
-updated_at: '2026-09-22T11:24:25.106698+00:00'
+updated_at: '2026-09-22T11:41:04.402172+00:00'
 seed_plan:
   path: data/frozen-seed-plan.json
   sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
@@ -115,6 +115,7 @@ cpu_validation:
   render_process_supervisor_passed: 9
   render_idle_probe_passed: 5
   model_first_probe_passed: 3
+  context_lifetime_probe_passed: 6
 prepared_baseline_plan:
   path: data/qd-ed-final-plan.json
   episodes: 20
@@ -144,8 +145,8 @@ runner:
     development: 0.2929994372140047
     validation: 0.0
     formal: 0.0
-    recovery: 0.668747768630791
-  gpu_healthcheck_hours: 0.1920397633276621
+    recovery: 0.6892173089352178
+  gpu_healthcheck_hours: 0.2125093036320888
   gpu_healthcheck_inflight: 0
   last_attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu5_cuda_memcheck_c0_t00__66eec8a1ab74
   last_event: valid
@@ -734,7 +735,7 @@ gpu3_render_idle_diagnostic:
   all_static_hashes_match: true
   owned_xids: []
 gpu3_model_first_diagnostic:
-  status: CPU_READY_PENDING_ADMISSION
+  status: ABORTED_OWNED_XID31_AFTER_VALID_B1
   physical_gpu: 3
   automatic_retry: false
   maximum_gpu_process_seconds: 600
@@ -748,3 +749,35 @@ gpu3_model_first_diagnostic:
   supervisor_sha256: e834d28838e0e9c324af42b7fcb8aa67f789f61963e36952b0cc41f5816edfde
   status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-first-diagnostic/status.json
   contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-first-diagnostic/frozen-contract.json
+  tool_session_id: 85251
+  source_commit: c97b1395f14c9d027ed2e88180b0820b7b888e24
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_model_first__256bd92ec777
+  worker_pid: 414431
+  worker_proc_start_ticks: '375188103'
+  supervisor_pid: 411006
+  contract_sha256: cf240423e1bc27969425d963cb9c208bf0a02011fc02abd2591ee66de0e0e1e1
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-first-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_model_first__256bd92ec777/healthcheck-result.json
+  gpu_process_wall_seconds: 73.69034509593621
+  pre_prediction_static_hashes_match: true
+  model_load_seconds: 64.78850958216935
+  prediction_calls: 1
+  model_forward_calls: 5
+  owned_xids:
+  - 31
+  cleanup_success: true
+  analysis_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-first-diagnostic/diagnostic-analysis.json
+gpu3_context_lifetime_diagnostic:
+  status: CPU_READY_PENDING_ADMISSION
+  physical_gpu: 3
+  automatic_retry: false
+  maximum_gpu_process_seconds: 600
+  production_patch_applied: false
+  scope: Retire complete rendering context before original B1, then recreate matching
+    context; fixed static scene, zero actions/integration.
+  protocol: experiments/iteration_001_execution_intent/gpu3-context-lifetime-diagnostic.md
+  script: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-context-lifetime.py
+  script_sha256: 76c600819d57cc7179b3ba75c3f88ba5901053e68f38523ebbbe021c9785784f
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-context-lifetime.py
+  supervisor_sha256: 995dcaae05ada01d445aadbee8ed9eae16b30f2216fd71e88a79dd63e78e6e69
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-lifetime-diagnostic/status.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-lifetime-diagnostic/frozen-contract.json

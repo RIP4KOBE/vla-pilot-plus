@@ -1,9 +1,7 @@
 # Research continuation
 
-Updated 2026-09-22T11:24:25.106698+00:00. Physical GPU3 only; wait if unavailable; no automatic fallback.
+Updated 2026-09-22T11:41:04.402172+00:00. Physical GPU3 only; wait if unavailable; no fallback.
 
-Execute one GPU3-only complete-model-before-first-graphics diagnostic after 120 seconds stable idle; verify unchanged static images and one native B1. CPU tests passed3; scientific gates closed.
+Execute one GPU3-only context retirement/recreation diagnostic after stable-idle admission. Six CPU lifecycle tests passed. No scientific score or production repair; this probe includes original B1 synchronization and one extra mj_forward.
 
-Budget: 0.981398730/48 GPU-hours, 11/240 scientific attempts, 0 valid. Target unmet; candidate N1 unmeasured; validation/formal closed.
-
-Latest evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-idle-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_render_idle__8d9503386162/healthcheck-result.json. No owned GPU worker dispatched yet. Authoritative state: research-state.yaml and docs/03_evidence/qd_ed_final/iteration-ledger.md.
+Budget: 1.001868270/48 GPU-hours; scientific attempts11, valid0. Target unmet; N1 unmeasured; validation/formal closed. No GPU worker dispatched yet.
