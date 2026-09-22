@@ -147,11 +147,14 @@ def test_budget_preserves_100_validation_formal_attempts():
 
 
 def test_budget_uses_remaining_gpu_time_and_refuses_unclosed_attempt():
-    events=events_for(); events[-1]['gpu_process_wall_seconds']=24*3600-37
+    events=events_for(); events[-1]['gpu_process_wall_seconds']=24*3600-47
     validation=events_for('v',bucket='validation'); validation[-1]['gpu_process_wall_seconds']=14*3600
     formal=events_for('f',bucket='formal'); formal[-1]['gpu_process_wall_seconds']=10*3600
     events+=validation+formal
     assert runner.check_budget(synced_state(events),events,row()) in (6,7)
+    events[2]['gpu_process_wall_seconds'] = 24 * 3600 - 37
+    with pytest.raises(runner.GateError, match='termination grace'):
+        runner.check_budget(synced_state(events), events, row())
     events=events_for()[:2]
     with pytest.raises(runner.GateError,match='unfinished'):
         runner.check_budget(synced_state(events),events,row())
@@ -313,6 +316,54 @@ def test_wall_timeout_and_missing_results_are_task_failures_not_retryable(tmp_pa
     assert event=='aborted' and outcome['retryable_infrastructure'] is True
 
 
+def test_exclusivity_monitor_waits_fifteen_seconds_once_and_timeout_stays_infrastructure(tmp_path):
+    calls = []
+    def timed_out(args, **kwargs):
+        calls.append((args, kwargs))
+        raise runner.subprocess.TimeoutExpired(args, kwargs['timeout'],
+                                               output=b'private subprocess output', stderr=b'private stderr')
+    with pytest.raises(runner.subprocess.TimeoutExpired) as caught:
+        runner.check_exclusive_gpu(SimpleNamespace(pid=500), timed_out, physical_gpu=5)
+    assert len(calls) == 1
+    assert calls[0][1]['timeout'] == 15
+    assert calls[0][0][calls[0][0].index('-i') + 1] == '5'
+    event, outcome = runner.failed_outcome(caught.value, tmp_path, row())
+    assert event == 'aborted'
+    assert outcome['retryable_infrastructure'] is True
+    assert outcome['task_failure'] is False and outcome['outcome_valid'] is False
+    assert outcome['failure_detail'] == 'gpu_monitor_timeout'
+    assert outcome['gpu_monitor_timeout'] == {'physical_gpu': 5, 'timeout_seconds': 15}
+    assert outcome['reason'] == 'GPU5 nvidia-smi monitor query timed out after 15 seconds'
+    assert 'private' not in json.dumps(outcome)
+
+
+@pytest.mark.parametrize('gpu,timeout,expected', [
+    ('5', 5, {'physical_gpu': 5, 'timeout_seconds': 5}),
+    ('private-index', 'private-timeout', {'physical_gpu': None, 'timeout_seconds': None}),
+    ('5', float('nan'), {'physical_gpu': 5, 'timeout_seconds': None}),
+])
+def test_monitor_timeout_details_never_serialize_arbitrary_command_or_output(tmp_path, gpu, timeout, expected):
+    error = runner.subprocess.TimeoutExpired(['nvidia-smi', '-i', gpu, 'private-argument'], timeout,
+                                             output='private-stdout', stderr='private-stderr')
+    event, outcome = runner.failed_outcome(error, tmp_path, row())
+    assert event == 'aborted' and outcome['retryable_infrastructure'] is True
+    assert outcome['gpu_monitor_timeout'] == expected
+    assert 'private' not in json.dumps(outcome, allow_nan=False)
+
+
+def test_actual_episode_deadline_remains_nonretryable_scientific_failure(tmp_path):
+    episode = row()
+    episode['timeout_seconds'] = 1800
+    error = runner.subprocess.TimeoutExpired('owned episode', 1800, output='private output')
+    event, outcome = runner.failed_outcome(error, tmp_path, episode)
+    assert event == 'valid' and outcome['failure_class'] == 'task_failure'
+    assert outcome['reason'] == 'TimeoutExpired'
+    assert outcome['task_failure'] is True and outcome['retryable_infrastructure'] is False
+    assert 'gpu_monitor_timeout' not in outcome
+    assert runner.check_budget(state(), [], episode) == 1800
+    assert runner.TERMINATION_GRACE_SECONDS >= runner.GPU_MONITOR_QUERY_TIMEOUT_SECONDS + 20
+
+
 def no_guidance_case(tmp_path,monkeypatch):
     episode=row(); (tmp_path/'.hydra').mkdir(); (tmp_path/'eds_eval').mkdir()
     (tmp_path/'episode_1').mkdir(); (tmp_path/'episode_1/episode_1_fail_fixture.mp4').write_bytes(b'unit-test-decode-boundary')
@@ -418,7 +469,7 @@ def test_all_failed_stage_queries_invalidate_without_removing_denominator(tmp_pa
 def test_gpu_hours_protect_validation_formal_and_reallocation_requires_audit():
     events=events_for('dev',bucket='development'); events[-1]['gpu_process_wall_seconds']=23.9*3600
     current=synced_state(events); episode=row(); episode['timeout_seconds']=1000
-    assert 329<=runner.check_budget(current,events,episode)<=330
+    assert 319<=runner.check_budget(current,events,episode)<=320
     current['budget']['gpu_hour_reservations']={'validation':12.,'formal':8.}
     with pytest.raises(runner.GateError,match='reallocation requires'):
         runner.check_budget(current,events,episode)

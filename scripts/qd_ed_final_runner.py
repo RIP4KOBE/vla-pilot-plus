@@ -50,7 +50,9 @@ RUNTIME_ENV_ALLOW = {
 _HASH_CACHE = {}
 CODEX_CONFIG_KEYS = ('backend', 'model', 'reasoning_effort', 'timeout_seconds', 'cli_path', 'disabled_skill_paths')
 CODEX_STAGE_CONDITION = 'codex_login_astra_low_v1'
-TERMINATION_GRACE_SECONDS = 30  # Includes monitoring-query timeout and child termination.
+GPU_MONITOR_QUERY_TIMEOUT_SECONDS = 15
+# Covers a 15s metadata timeout and two possible 10s child-cleanup waits.
+TERMINATION_GRACE_SECONDS = 40
 COMPUTE_FIELDS = (
     'model_forward_calls','model_batch_rows','denoising_invocations','model_denoising_steps',
     'denoising_step_batch_rows','reward_calls','reward_evaluations','reward_scoring_batches',
@@ -478,7 +480,7 @@ def gpu_admission(run=subprocess.run, *, physical_gpu=7, expected_uuid=None):
 
 def check_exclusive_gpu(process, run=subprocess.run, *, physical_gpu=7):
     require(type(physical_gpu) is int and physical_gpu >= 0, 'invalid physical GPU index')
-    probe=run(['nvidia-smi','-i',str(physical_gpu),'--query-compute-apps=pid','--format=csv,noheader,nounits'],capture_output=True,text=True,timeout=5)
+    probe=run(['nvidia-smi','-i',str(physical_gpu),'--query-compute-apps=pid','--format=csv,noheader,nounits'],capture_output=True,text=True,timeout=GPU_MONITOR_QUERY_TIMEOUT_SECONDS)
     require(probe.returncode==0, f'GPU{physical_gpu} exclusivity probe failed')
     for line in probe.stdout.splitlines():
         if not line.strip() or 'no running' in line.lower():
@@ -849,6 +851,23 @@ def failed_outcome(exc, output, row, *, launch_failed=False, runtime=None):
              'retryable_infrastructure':infrastructure,'success':False,'task_failure':event=='valid',
              'outcome_valid':False,'failure_class':'infrastructure' if infrastructure else 'task_failure',
              'required_cost_telemetry_complete':False}
+    if monitor_timeout:
+        # TimeoutExpired can contain arbitrary argv/stdout/stderr. Retain only
+        # the numeric device/timeout, never its raw string or subprocess data.
+        physical_gpu = None
+        try:
+            value = exc.cmd[exc.cmd.index('-i') + 1]
+            if isinstance(value, str) and re.fullmatch(r'[0-9]{1,6}', value):
+                physical_gpu = int(value)
+        except (ValueError, IndexError):
+            pass
+        seconds = exc.timeout if (type(exc.timeout) in (int, float)
+                  and math.isfinite(exc.timeout) and exc.timeout > 0) else None
+        device_label = f'GPU{physical_gpu}' if physical_gpu is not None else 'GPU'
+        timeout_label = f' after {seconds:g} seconds' if seconds is not None else ''
+        outcome.update(reason=f'{device_label} nvidia-smi monitor query timed out{timeout_label}',
+                       failure_detail='gpu_monitor_timeout',
+                       gpu_monitor_timeout={'physical_gpu': physical_gpu, 'timeout_seconds': seconds})
     try:
         outcome.update(episode_compute(output,row,runtime))
     except (GateError,OSError,ValueError,KeyError):

@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-09-22T05:27:55.330369+00:00",
-  "status": "RESOURCE_QUEUE_PREPARED",
+  "timestamp": "2026-09-22T05:40:47.306070+00:00",
+  "status": "REVIEWING_MONITOR_TIMEOUT",
   "budget": {
     "max_gpu_hours": 48.0,
-    "gpu_hours_consumed": 0.04298842844152306,
+    "gpu_hours_consumed": 0.09293902437344917,
     "max_episode_attempts": 240,
     "reserved": {
       "baseline": 20,
@@ -12,8 +12,8 @@
       "formal": 40,
       "recovery": 20
     },
-    "dispatched": 3,
-    "aborted": 2,
+    "dispatched": 4,
+    "aborted": 3,
     "valid": 0,
     "running": 0,
     "invalid": 1,
