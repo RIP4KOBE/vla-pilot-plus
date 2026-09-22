@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 
 import qd_ed_final_runner as runner
@@ -20,7 +21,16 @@ COST_FIELDS = ('model_forward_calls', 'model_batch_rows', 'denoising_invocations
                'vision_encoder_forward_calls', 'vision_encoder_batch_rows',
                'text_encoder_forward_calls', 'text_encoder_batch_rows',
                'dino_forward_calls', 'dino_batch_rows',
-               'candidate_evaluations', 'score_batches')
+               'candidate_evaluations', 'score_batches',
+               'provider_logical_call_attempts', 'provider_completed_turns', 'provider_failed_calls',
+               'provider_usage_complete_calls', 'provider_input_tokens', 'provider_cached_input_tokens',
+               'provider_output_tokens', 'provider_reasoning_output_tokens', 'provider_call_latency_s')
+
+
+def observed_total(values):
+    """Unknown observations stay unknown, including a known subtotal plus null."""
+    return sum(values) if all(type(value) in (int, float) and math.isfinite(value) and value >= 0
+                              for value in values) else None
 
 def key(identity):
     return json.dumps(identity, sort_keys=True, separators=(',', ':'))
@@ -62,6 +72,11 @@ def summarize(plan, events, split, iteration):
         result = {**identity, 'attempt_ids': [g[0]['attempt_id'] for g in groups],
                   'dispatched_attempts': len(dispatched), 'success': None, 'outcome_valid': False,
                   'required_cost_telemetry_complete': False, 'metric_chunks': 0,
+                  'stage_backend': final.get('stage_backend') if final else None,
+                  'stage_model': final.get('stage_model') if final else None,
+                  'stage_condition': final.get('stage_condition') if final else None,
+                  'provider_http_observation': final.get('provider_http_observation') if final else None,
+                  'provider_token_usage_complete': final.get('provider_token_usage_complete') if final else None,
                   'gpu_process_wall_seconds': sum(g[-1].get('gpu_process_wall_seconds', 0)
                                                   for g in groups if g[-1]['event'] in runner.TERMINAL),
                   'terminal_costs': {field: final.get(field) if final else None for field in COST_FIELDS}}
@@ -97,8 +112,14 @@ def summarize(plan, events, split, iteration):
             'guided_chunks': sum(s['metric_chunks'] for s in cells),
             'dispatched_attempts': sum(s['dispatched_attempts'] for s in cells),
             'gpu_hours_including_recovery': sum(s['gpu_process_wall_seconds'] for s in cells) / 3600,
-            'terminal_cost_totals': {field: sum(s['terminal_costs'][field] for s in cells)
-                                    if all(type(s['terminal_costs'][field]) is int for s in cells) else None
+            'stage_backends': sorted({s['stage_backend'] for s in cells if s['stage_backend'] is not None}),
+            'stage_models': sorted({s['stage_model'] for s in cells if s['stage_model'] is not None}),
+            'stage_conditions': sorted({s['stage_condition'] for s in cells if s['stage_condition'] is not None}),
+            'provider_http_observations': sorted({s['provider_http_observation'] for s in cells
+                                                if s['provider_http_observation'] is not None}),
+            'provider_token_usage_complete': all(s['provider_token_usage_complete'] is True for s in cells)
+                                            if any(s['stage_backend'] == 'codex_cli' for s in cells) else None,
+            'terminal_cost_totals': {field: observed_total([s['terminal_costs'][field] for s in cells])
                                     for field in COST_FIELDS},
             # Missing observations are never dropped into a smaller denominator.
             'success_rate': sum(s['success'] is True for s in cells) / len(cells) if len(completed) == len(cells) else None,
@@ -123,7 +144,7 @@ def summarize(plan, events, split, iteration):
             'split': split, 'iteration': str(iteration), 'profiles': profiles,
             'comparisons': comparisons, 'samples': samples,
             'phase_authorized_by_report': False,
-            'note': 'Task failures remain failures. Terminal cost totals exclude superseded recovery attempts; GPU time includes them. Missing/invalid evidence and scientific QD activity require explicit phase review.'}
+            'note': 'Task failures remain failures. Terminal cost totals exclude superseded recovery attempts; GPU time includes them. Codex logical calls, observed tokens and CLI latency are distinct from unobservable internal HTTP requests/retries; null totals mean unknown. Missing/invalid evidence and scientific QD activity require explicit phase review.'}
 
 
 def main():

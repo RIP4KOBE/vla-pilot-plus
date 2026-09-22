@@ -142,3 +142,93 @@ def test_perception_inactive_and_active_unobserved_are_distinct():
     runner.sam3_segmenter = None
     runner.keypoint_detector = SimpleNamespace()
     assert runner._perception_compute_snapshot()['observation_available'] is False
+
+
+def codex_runner(tmp_path):
+    Runner, recorded = runner_methods()
+    runner = Runner()
+    counts = {
+        'backend': 'codex_cli', 'request_attempts': None, 'sdk_retry_attempts': None,
+        'observation_available': False, 'logical_call_attempts': 0, 'completed_turns': 0,
+        'failed_calls': 0, 'usage_complete_calls': 0, 'input_tokens': 0,
+        'cached_input_tokens': 0, 'output_tokens': 0, 'reasoning_output_tokens': 0,
+        'call_latency_s': 0.0,
+    }
+    runner.gemini_stage_recognizer = SimpleNamespace(
+        api_request_counter=SimpleNamespace(snapshot=lambda: dict(counts)),
+        transport_metadata={'backend': 'codex_cli', 'model': 'gpt-6-astra', 'application_max_attempts': 1},
+    )
+    runner.vlm_agent = SimpleNamespace(cache_only=True)
+    runner.gemini_grounder = None
+    runner.policy = SimpleNamespace(get_episode_compute_counters=lambda: {'model_forward_calls': 7})
+    runner.adapter = SimpleNamespace(task_id=8)
+    runner.config = {'eds_eval': {'output_dir': str(tmp_path)}}
+    return runner, counts, recorded
+
+
+def test_codex_episode_counts_failed_calls_without_inventing_http_requests_or_tokens(tmp_path):
+    runner, counts, recorded = codex_runner(tmp_path)
+    runner._begin_episode_compute()
+    counts.update(logical_call_attempts=3, completed_turns=2, failed_calls=2,
+                  usage_complete_calls=2, input_tokens=100, cached_input_tokens=40,
+                  output_tokens=9, reasoning_output_tokens=None, call_latency_s=21.5)
+    runner._append_episode_compute(episode=0, episode_seed=123, outcome='completed')
+    first = recorded[0][1]
+    assert first['schema'] == 'qd-ed-episode-compute-v2'
+    assert first['provider_counters_available'] is True
+    assert first['provider_logical_counters_available'] is True
+    assert first['provider_http_counters_available'] is False
+    for name in ('stage_api_request_attempts', 'stage_api_sdk_retry_attempts',
+                 'provider_request_attempts', 'provider_sdk_retry_attempts'):
+        assert first[name] is None
+    assert first['guidance_api_request_attempts'] == first['grounding_api_request_attempts'] == 0
+    assert first['provider_logical_call_attempts'] == first['stage_codex_logical_call_attempts'] == 3
+    assert first['provider_completed_turns'] == first['provider_failed_calls'] == 2
+    assert first['provider_usage_complete_calls'] == 2
+    assert first['provider_token_usage_complete'] is False
+    assert first['provider_input_tokens'] == 100
+    assert first['provider_cached_input_tokens'] == 40
+    assert first['provider_output_tokens'] == 9
+    assert first['provider_reasoning_output_tokens'] is None
+    assert first['provider_call_latency_s'] == 21.5
+    assert first['stage_transport']['model'] == 'gpt-6-astra'
+
+    runner._begin_episode_compute()
+    counts.update(logical_call_attempts=4, completed_turns=3, usage_complete_calls=3,
+                  input_tokens=130, cached_input_tokens=50, output_tokens=12,
+                  call_latency_s=31.5)
+    runner._append_episode_compute(episode=1, episode_seed=456, outcome='completed')
+    second = recorded[1][1]
+    assert second['provider_logical_call_attempts'] == second['provider_completed_turns'] == 1
+    assert second['provider_failed_calls'] == 0
+    assert second['provider_input_tokens'] == 30
+    assert second['provider_cached_input_tokens'] == 10
+    assert second['provider_output_tokens'] == 3
+    assert second['provider_call_latency_s'] == 10
+    assert second['provider_token_usage_complete'] is True
+    assert second['provider_reasoning_output_tokens'] is None
+
+
+def test_codex_does_not_treat_unobserved_guidance_as_inactive(tmp_path):
+    runner, counts, recorded = codex_runner(tmp_path)
+    runner.vlm_agent = SimpleNamespace()
+    runner._begin_episode_compute()
+    runner._append_episode_compute(episode=0, episode_seed=123, outcome='preparation_error')
+    record = recorded[0][1]
+    assert record['provider_counters_available'] is False
+    assert record['provider_logical_counters_available'] is False
+    assert record['provider_logical_call_attempts'] is None
+    assert record['provider_token_usage_complete'] is False
+
+
+def test_codex_missing_counter_and_counter_reset_fail_observation(tmp_path):
+    runner, counts, recorded = codex_runner(tmp_path)
+    counts['logical_call_attempts'] = 3
+    runner._begin_episode_compute()
+    counts['logical_call_attempts'] = 0
+    counts.pop('call_latency_s')
+    runner._append_episode_compute(episode=0, episode_seed=123, outcome='execution_error')
+    record = recorded[0][1]
+    assert record['provider_counters_available'] is False
+    assert record['provider_logical_call_attempts'] is None
+    assert record['provider_call_latency_s'] is None

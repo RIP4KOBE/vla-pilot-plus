@@ -447,6 +447,19 @@ from utils.logging_utils import SteerLogger
 log = SteerLogger("Main")
 
 
+class _CachedGuidanceAgent:
+    """Read frozen descriptions without constructing an authenticated API client."""
+
+    cache_only = True
+    _extract_stage_descriptions_from_output = VLMAgent._extract_stage_descriptions_from_output
+
+    def generate_guidance(self, *args, **kwargs):
+        raise RuntimeError("Codex Stage runs require frozen cached guidance; generation is disabled")
+
+    def plan_segmentation(self, *args, **kwargs):
+        raise RuntimeError("Codex Stage runs require adapter segmentation; VLM planning is disabled")
+
+
 def _detect_keypoints_with_retries(
     *,
     adapter: Any,
@@ -705,6 +718,15 @@ class Main:
 
         # Get perception config (loaded from perception.yaml with @package perception)
         perception_cfg = cfg.get('perception', {})
+        gemini_config = OmegaConf.to_container(perception_cfg.get('gemini', {}), resolve=True)
+        codex_stage = gemini_config.get('backend') == 'codex_cli'
+        if codex_stage:
+            cache = self.config.get('cached_functions_dir')
+            if not cache or not Path(cache).is_dir():
+                raise ValueError("Codex Stage requires an existing frozen cached_functions_dir")
+            if any(perception_cfg.get(name, {}).get('enabled', False)
+                   for name in ('sam3', 'gemini_grounding')):
+                raise ValueError("Codex Stage cache-only runs require SAM3 and Gemini grounding disabled")
 
         # Initialize keypoint detector
         kp_config = OmegaConf.to_container(perception_cfg.get('keypoint_detector', {}), resolve=True)
@@ -747,20 +769,24 @@ class Main:
         # Ensure query_template_dir is absolute path
         if vlm_config.get('query_template_dir') and not os.path.isabs(vlm_config['query_template_dir']):
             vlm_config['query_template_dir'] = os.path.join(PROJECT_ROOT, vlm_config['query_template_dir'])
-        self.vlm_agent = VLMAgent(
-            config=vlm_config,
-            base_dir=self.output_dir,
-            env_type=self.backend,
-        )
-        self.vlm_agent.api_request_counter = observe_api_requests(self.vlm_agent.client)
+        if codex_stage:
+            self.vlm_agent = _CachedGuidanceAgent()
+        else:
+            self.vlm_agent = VLMAgent(
+                config=vlm_config,
+                base_dir=self.output_dir,
+                env_type=self.backend,
+            )
+            self.vlm_agent.api_request_counter = observe_api_requests(self.vlm_agent.client)
 
         # Initialize Gemini stage recognizer (for real-time stage recognition)
-        gemini_config = OmegaConf.to_container(perception_cfg.get('gemini', {}), resolve=True)
         if self.config.get("use_vlm_stage_recognition", True):
             try:
                 self.gemini_stage_recognizer = create_gemini_stage_recognizer(gemini_config)
-                log.info("Gemini stage recognizer initialized")
+                log.info(f"Stage recognizer initialized: {gemini_config.get('backend', 'openai_compatible')}")
             except Exception as e:
+                if codex_stage:
+                    raise RuntimeError("Codex Stage initialization failed; provider fallback is disabled") from e
                 log.warning(f"Failed to initialize Gemini stage recognizer: {e}")
                 self.gemini_stage_recognizer = None
         else:
@@ -1038,8 +1064,10 @@ class Main:
             component = getattr(self, attribute, None)
             counter = getattr(component, "api_request_counter", None)
             if counter is None:
+                inactive = component is None or getattr(component, "cache_only", False) is True
                 snapshot[name] = {"request_attempts": 0, "sdk_retry_attempts": 0,
-                                  "observation_available": component is None}
+                                  "observation_available": inactive,
+                                  "backend": "cache_only" if component is not None and inactive else "inactive" if inactive else "unknown"}
             else:
                 snapshot[name] = counter.snapshot()
         return snapshot
@@ -1073,14 +1101,58 @@ class Main:
         after = self._api_compute_snapshot()
         provider = {}
         available = True
+        codex_stage = after.get("stage", {}).get("backend") == "codex_cli"
         for name, counts in after.items():
             start = before.get(name, {"request_attempts": 0, "sdk_retry_attempts": 0,
                                       "observation_available": False})
             available = available and counts["observation_available"] and start["observation_available"]
-            provider[f"{name}_api_request_attempts"] = counts["request_attempts"] - start["request_attempts"]
-            provider[f"{name}_api_sdk_retry_attempts"] = counts["sdk_retry_attempts"] - start["sdk_retry_attempts"]
-        provider["provider_request_attempts"] = sum(provider[f"{name}_api_request_attempts"] for name in after)
-        provider["provider_sdk_retry_attempts"] = sum(provider[f"{name}_api_sdk_retry_attempts"] for name in after)
+            for field in ("request_attempts", "sdk_retry_attempts"):
+                end_value, start_value = counts.get(field), start.get(field)
+                provider[f"{name}_api_{field}"] = (
+                    end_value - start_value if end_value is not None and start_value is not None else None
+                )
+        for field in ("request_attempts", "sdk_retry_attempts"):
+            values = [provider[f"{name}_api_{field}"] for name in after]
+            provider[f"provider_{field}"] = sum(values) if all(value is not None for value in values) else None
+        http_available = bool(available)
+        if codex_stage:
+            fields = ("logical_call_attempts", "completed_turns", "failed_calls", "usage_complete_calls",
+                      "input_tokens", "cached_input_tokens", "output_tokens", "reasoning_output_tokens",
+                      "call_latency_s")
+            logical_available = True
+            for name, counts in after.items():
+                start = before.get(name, {})
+                if counts.get("backend") == "codex_cli":
+                    for field in fields:
+                        end_value, start_value = counts.get(field), start.get(field)
+                        delta = (end_value - start_value
+                                 if isinstance(end_value, (int, float)) and not isinstance(end_value, bool)
+                                 and isinstance(start_value, (int, float)) and not isinstance(start_value, bool)
+                                 and end_value >= start_value else None)
+                        provider[f"{name}_codex_{field}"] = delta
+                    logical_available = logical_available and all(
+                        provider[f"{name}_codex_{field}"] is not None
+                        for field in ("logical_call_attempts", "completed_turns", "failed_calls", "call_latency_s")
+                    )
+                else:
+                    # A known inactive component has zero calls/tokens. An HTTP-only
+                    # component cannot supply CLI logical-call or token observations.
+                    inactive = counts.get("backend") in ("inactive", "cache_only") and start.get("backend") == counts.get("backend")
+                    logical_available = logical_available and inactive
+                    for field in fields:
+                        provider[f"{name}_codex_{field}"] = 0 if inactive else None
+            for field in fields:
+                values = [provider[f"{name}_codex_{field}"] for name in after]
+                provider[f"provider_{field}"] = sum(values) if all(value is not None for value in values) else None
+            provider["provider_logical_counters_available"] = bool(logical_available)
+            attempts = provider["provider_logical_call_attempts"]
+            provider["provider_token_usage_complete"] = (
+                attempts is not None and provider["provider_usage_complete_calls"] == attempts
+                and all(provider[f"provider_{field}"] is not None
+                        for field in ("input_tokens", "cached_input_tokens", "output_tokens"))
+            )
+            provider["stage_transport"] = dict(getattr(self.gemini_stage_recognizer, "transport_metadata", {}))
+            available = logical_available
         getter = getattr(self.policy, "get_episode_compute_counters", None)
         policy = getter() if callable(getter) else {}
         perception_after = self._perception_compute_snapshot()
@@ -1089,16 +1161,23 @@ class Main:
                       for key in ("dino_forward_calls", "dino_batch_rows")}
         record = {
             **policy, **provider, **perception,
-            "schema": "qd-ed-episode-compute-v1",
+            "schema": "qd-ed-episode-compute-v2" if codex_stage else "qd-ed-episode-compute-v1",
             "episode_id": int(episode), "episode_seed": int(episode_seed),
             "task_id": _adapter_actual_task_id(self.adapter), "outcome": outcome,
             "policy_counters_available": callable(getter),
             "provider_counters_available": bool(available),
+            "provider_http_counters_available": http_available,
             "perception_counters_available": bool(perception_after["observation_available"]
                                                   and perception_before.get("observation_available", False)),
             "perception_components": perception_after["components"],
             "perception_counter_semantics": "DINO model call attempts and input batch rows, including failures; inactive components are explicit",
-            "provider_counter_semantics": "HTTP send attempts including SDK and caller retries; separate retry counter classifies SDK retries only",
+            "provider_counter_semantics": (
+                "Codex logical CLI call attempts include failures; completed_turns are transport completions; "
+                "failed_calls include parse failures and may overlap completed_turns. HTTP attempts and retries "
+                "are unavailable (null). Tokens are observed usage subtotals, with completeness recorded separately."
+                if codex_stage else
+                "HTTP send attempts including SDK and caller retries; separate retry counter classifies SDK retries only"
+            ),
         }
         eds_eval_config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
         path = Path(eds_eval_config.get("output_dir") or self.output_dir) / "episode_compute.jsonl"
@@ -1240,7 +1319,10 @@ class Main:
                 "error": query_result.get("error"),
                 "query_latency_s": query_result.get("query_latency_s"),
                 **{key: query_result[key] for key in (
-                    "api_request_attempts", "api_sdk_retry_attempts", "api_request_counter_available"
+                    "api_request_attempts", "api_sdk_retry_attempts", "api_request_counter_available",
+                    "transport", "codex_logical_call_attempts", "codex_completed_turns", "codex_failed_calls",
+                    "codex_usage_complete_calls", "codex_input_tokens", "codex_cached_input_tokens",
+                    "codex_output_tokens", "codex_reasoning_output_tokens", "codex_call_latency_s"
                 ) if key in query_result},
             })
 

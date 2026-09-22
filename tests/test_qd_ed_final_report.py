@@ -70,3 +70,24 @@ def test_unplanned_same_phase_attempt_cannot_be_hidden_from_report():
     p = plan(); row = {**p['episodes'][0], 'env_seed': 999}
     with pytest.raises(report.runner.GateError, match='unplanned scientific sample'):
         report.summarize(p, attempt(row, 'a', success=True), 'dev', '1')
+
+
+def test_codex_report_preserves_unknown_http_and_sums_actual_tokens_and_latency():
+    p = plan(); events = []
+    for i, row in enumerate(p['episodes']):
+        group = attempt(row, str(i))
+        group[-1].update(stage_backend='codex_cli', stage_model='gpt-6-astra',
+                         provider_http_observation='not_observable_through_codex_cli',
+                         provider_token_usage_complete=True, provider_request_attempts=None,
+                         provider_sdk_retry_attempts=None, provider_input_tokens=100,
+                         provider_output_tokens=10, provider_call_latency_s=1.25,
+                         provider_logical_call_attempts=1, provider_reasoning_output_tokens=None)
+        events.extend(group)
+    result = report.summarize(p, events, 'dev', '1')['profiles']['N1']
+    assert result['stage_backends'] == ['codex_cli']
+    assert result['stage_models'] == ['gpt-6-astra']
+    assert result['terminal_cost_totals']['provider_request_attempts'] is None
+    assert result['terminal_cost_totals']['provider_reasoning_output_tokens'] is None
+    assert result['terminal_cost_totals']['provider_input_tokens'] == 200
+    assert result['terminal_cost_totals']['provider_call_latency_s'] == 2.5
+    assert result['provider_token_usage_complete'] is True

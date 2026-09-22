@@ -66,6 +66,6 @@ Hypothesis: Replacing XY-only equivalence separates lower-reward gripper-intent 
 Observable: Correct constant-budget behavior, changed actual parent lineage, N1 Dev>=5/10 and noninferior to same-round P2/Q0 before validation.
 Conflicts: H5 secondary trajectory lanes failed; N1 changes equivalence at capacity16 and leaves quality/allocation/EDS switches unchanged; azimuth/timing information loss is explicitly tested. [RUNNING]
 
-**Insight**: N1 core CPU checks pass. Approximate replay shows27 retained old eliminations but median occupancy16 to4 and substantial new aliasing; no proxy-based promotion.
+**Insight**: N1 scientific score remains unknown. User explicitly authorizes current saved Codex ChatGPT login after Poe401; common provider amendment preregistered for all arms. Adapter, telemetry and frozen binding executors preparing CPU-safe integration; physical GPU7 CUDA/EGL probe passed. No new episode or validation/formal exposure.
 
-**Result**: CPU implementation and integrated regression PASS; online score null. Waiting for exclusive GPU7 availability and authorized Stage provider binding before corrected-input baseline and preregistered N1 Dev. No KEEP/REJECT or adoption decision.
+**Result**: CPU_READY_UNEVALUATED; preparing common Codex Stage backend and repaired Q0/P2 baseline. Existing algorithm hypothesis/promotion gates unchanged.

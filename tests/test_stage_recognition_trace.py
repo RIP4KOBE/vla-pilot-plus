@@ -212,6 +212,35 @@ def _read_events(tmp_path):
     return [json.loads(line) for line in path.read_text().splitlines()]
 
 
+def test_codex_stage_event_preserves_transport_and_unknown_http_counts(tmp_path):
+    class CodexRecognizer:
+        def identify_stage_and_guidance(self, **kwargs):
+            self.last_result = {
+                "ok": True, "raw_response": "Stage 2\nGuidance: no",
+                "parsed_stage": 2, "parsed_guidance": False, "query_latency_s": 2.0,
+                "api_request_attempts": None, "api_sdk_retry_attempts": None,
+                "api_request_counter_available": False,
+                "transport": {"backend": "codex_cli", "model": "gpt-6-astra",
+                              "application_max_attempts": 1},
+                "codex_logical_call_attempts": 1, "codex_completed_turns": 1,
+                "codex_failed_calls": 0, "codex_usage_complete_calls": 1,
+                "codex_input_tokens": 100, "codex_cached_input_tokens": 30,
+                "codex_output_tokens": 9, "codex_reasoning_output_tokens": None,
+                "codex_call_latency_s": 2.0,
+            }
+            return 2, False
+
+    recognizer = CodexRecognizer()
+    runner = _runner(tmp_path, recognizer)
+    runner._update_stage(_trigger_state(), 1.0, 0.8, 0.6)
+    event = _read_events(tmp_path)[0]
+    for key, value in recognizer.last_result.items():
+        if key.startswith(("api_", "codex_")) or key == "transport":
+            assert event[key] == value
+    assert event["query_status"] == "ok"
+    assert event["vlm_query_count"] == 1
+
+
 def test_stage_trigger_appends_auditable_redacted_event(tmp_path):
     secret = "stage-api-secret"
     recognizer = _SuccessfulRecognizer(secret)

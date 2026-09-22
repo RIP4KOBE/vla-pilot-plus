@@ -191,8 +191,7 @@ class GeminiStageRecognizer:
     def __init__(self, config: dict):
         self.config = config
         self.model = config.get("model", "gemini-2.5-flash")
-        self.client = _make_client(config)
-        self.api_request_counter = observe_api_requests(self.client)
+        self._configure_transport(config)
         self._last_result = None
 
         template_path = config.get("stage_template_path")
@@ -202,7 +201,29 @@ class GeminiStageRecognizer:
         with open(template_path, "r") as f:
             self.prompt_template = f.read()
 
-        logger.info(f"GeminiStageRecognizer initialized with model: {self.model}")
+        logger.info(f"StageRecognizer initialized with model: {self.model}")
+
+    def _configure_transport(self, config):
+        self.client = _make_client(config)
+        self.api_request_counter = observe_api_requests(self.client)
+
+    def _request_stage_response(self, content):
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[{"role": "user", "content": content}],
+            max_tokens=256,
+            temperature=0.0,
+        )
+        return response.choices[0].message.content.strip()
+
+    def _record_transport_result(self, counter_before):
+        if counter_before is not None:
+            counter_after = self.api_request_counter.snapshot()
+            self._last_result.update(
+                api_request_attempts=counter_after["request_attempts"] - counter_before["request_attempts"],
+                api_sdk_retry_attempts=counter_after["sdk_retry_attempts"] - counter_before["sdk_retry_attempts"],
+                api_request_counter_available=counter_after["observation_available"],
+            )
 
     @property
     def last_result(self) -> Optional[Dict[str, object]]:
@@ -254,13 +275,7 @@ class GeminiStageRecognizer:
         counter = getattr(self, "api_request_counter", None)
         counter_before = counter.snapshot() if counter is not None else None
         try:
-            resp = self.client.chat.completions.create(
-                model=self.model,
-                messages=[{"role": "user", "content": content}],
-                max_tokens=256,
-                temperature=0.0,
-            )
-            output = resp.choices[0].message.content.strip()
+            output = self._request_stage_response(content)
 
             stage_match = re.search(r"stage\s+(\d+)", output.lower())
             if stage_match:
@@ -282,12 +297,13 @@ class GeminiStageRecognizer:
                 evidence = m.group(1).strip()
 
             if parse_ok:
-                logger.info(f"[Gemini] Stage:{stage_num} Guide:{'ON' if need_guidance else 'OFF'} | {evidence[:80]}")
+                backend = self.config.get("backend", "openai_compatible")
+                logger.info(f"[Stage:{backend}] Stage:{stage_num} Guide:{'ON' if need_guidance else 'OFF'} | {evidence[:80]}")
             else:
                 logger.error(error)
         except Exception as e:
             error = str(e)
-            logger.error(f"Gemini stage recognition failed: {e}")
+            logger.error(f"Stage recognition failed: {e}")
 
         self._last_result = {
             "ok": error is None and parse_ok,
@@ -299,16 +315,16 @@ class GeminiStageRecognizer:
             "error": error,
             "query_latency_s": float(time.perf_counter() - query_start_s),
         }
-        if counter_before is not None:
-            counter_after = counter.snapshot()
-            self._last_result.update(
-                api_request_attempts=counter_after["request_attempts"] - counter_before["request_attempts"],
-                api_sdk_retry_attempts=counter_after["sdk_retry_attempts"] - counter_before["sdk_retry_attempts"],
-                api_request_counter_available=counter_after["observation_available"],
-            )
+        self._record_transport_result(counter_before)
 
         return stage_num, need_guidance
 
 
 def create_gemini_stage_recognizer(config: dict) -> GeminiStageRecognizer:
+    backend = config.get("backend", "openai_compatible")
+    if backend == "codex_cli":
+        from core.codex_stage import CodexStageRecognizer
+        return CodexStageRecognizer(config)
+    if backend != "openai_compatible":
+        raise ValueError("Unknown stage recognition backend")
     return GeminiStageRecognizer(config)

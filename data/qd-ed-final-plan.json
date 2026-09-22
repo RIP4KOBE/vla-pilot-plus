@@ -186,8 +186,8 @@
       "sha256": "64a2f470045ab5be8840eb9758c1d8cb13cc2487d5993f2c47862052f8679494"
     }
   ],
-  "draft_reason": "GPU7 occupied; required provider binding and CUDA/EGL actual render verification pending. Source hashes are a review snapshot only.",
-  "egl_mapping_verified": false,
+  "draft_reason": "Common Codex provider proven; pending complete resolved-config review and source commit/fingerprint freeze.",
+  "egl_mapping_verified": true,
   "episodes": [
     {
       "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
@@ -522,11 +522,13 @@
   "run_name": "rdt-qd-ed-final-20260921T093925Z",
   "runtime_inventory_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/runtime-inventory.json",
   "runtime_inventory_sha256": "44d456203ca168eec9eddfb6834d54347153b2c859eb1b4fc0dea02c15138b83",
-  "runtime_manifest_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/setup_manifest.json",
-  "runtime_manifest_sha256": "8bf2d4915fd4ceb6545b1ffda874246d24e39159fa37c02429e0c41e82e47808",
+  "runtime_manifest_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/codex-setup-manifest.json",
+  "runtime_manifest_sha256": "3b5a492ef755288cc8dc9851eac60282738181a1290dec39b5f356eb4c066b06",
   "schema": "qd-ed-final-plan-v1",
   "seed_plan_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/frozen-seed-plan.json",
   "seed_plan_sha256": "9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1",
-  "source_commit": "56031d2a6136d6d1f0d0cb95c7d42f77a8158da3",
-  "worktree": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z"
+  "source_commit": "caefe9a9ae18a10cac825de137da2b521d04f5b2",
+  "worktree": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z",
+  "stage_condition": "codex_login_astra_low_v1",
+  "provider_amendment": "experiments/iteration_001_execution_intent/codex-provider-amendment.md"
 }

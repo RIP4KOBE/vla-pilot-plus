@@ -36,6 +36,8 @@ REQUIRED_CODE = {
     'configs/qd_ed_final/baseline_profiles.json',
     'core/gemini_grounder.py', 'vlm_query/stage_template.txt',
     'vlm_query/vlm_agent.py', 'scripts/qd_ed_final_report.py',
+    'scripts/qd_ed_codex_launch.py',
+    'core/codex_stage.py', 'core/codex_stage_policy.py',
 }
 REQUIRED_CODE.update(str(p.relative_to(ROOT)) for folder in ('core','utils','vlm_query')
                      for p in (ROOT/folder).rglob('*') if p.is_file() and p.suffix in {'.py','.txt'})
@@ -46,6 +48,8 @@ RUNTIME_ENV_ALLOW = {
     'PYTHONDONTWRITEBYTECODE',
 }
 _HASH_CACHE = {}
+CODEX_CONFIG_KEYS = ('backend', 'model', 'reasoning_effort', 'timeout_seconds', 'cli_path', 'disabled_skill_paths')
+CODEX_STAGE_CONDITION = 'codex_login_astra_low_v1'
 TERMINATION_GRACE_SECONDS = 30  # Includes monitoring-query timeout and child termination.
 COMPUTE_FIELDS = (
     'model_forward_calls','model_batch_rows','denoising_invocations','model_denoising_steps',
@@ -58,6 +62,12 @@ COMPUTE_FIELDS = (
     'text_encoder_forward_calls','text_encoder_batch_rows',
     'dino_forward_calls','dino_batch_rows',
 )
+CODEX_UNKNOWN_HTTP_FIELDS = {
+    'stage_api_request_attempts', 'stage_api_sdk_retry_attempts',
+    'provider_request_attempts', 'provider_sdk_retry_attempts',
+}
+CODEX_COUNT_SUFFIXES = ('logical_call_attempts', 'completed_turns', 'failed_calls',
+                        'usage_complete_calls', 'input_tokens', 'cached_input_tokens', 'output_tokens')
 
 
 class GateError(RuntimeError):
@@ -215,6 +225,7 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
     require(runtime.get('schema') == 'qd-ed-runtime-setup-v1', 'runtime schema mismatch')
     require(Path(runtime['worktree']).resolve() == root, 'runtime worktree mismatch')
     require(Path(runtime['artifact_root']).resolve() == artifact_root, 'runtime artifact root mismatch')
+    stage_overrides(runtime)
     if require_frozen:
         require(plan.get('egl_mapping_verified') is True and runtime.get('cuda_egl_verified') is True, 'GPU7/EGL mapping not verified')
         require(runtime.get('provider_ready') is True, 'frozen Stage provider is not ready')
@@ -291,6 +302,14 @@ def selected_rows(plan, split, iteration):
 def build_command(plan, manifest, runtime, row, attempt_id):
     profile = manifest['profiles'][row['profile']]
     values = dict(profile['static_override_values'])
+    provider_values = stage_overrides(runtime)
+    if provider_values:
+        require(not any(key.startswith(('perception.gemini.', '+perception.gemini.'))
+                        and key not in provider_values for key in values),
+                'unapproved static Codex provider override')
+        require(all(key not in values or values[key] == value for key, value in provider_values.items()),
+                'static/runtime Codex provider binding differs')
+    values.update(provider_values)
     # Explicit per-episode policy RNG replaces historical run seed 0. All arms
     # use this new contract; this is not replay of the sequential historic RNG.
     values['seed'] = row['policy_seed']
@@ -305,7 +324,8 @@ def build_command(plan, manifest, runtime, row, attempt_id):
         'main.eds_eval.output_dir': str(output / 'eds_eval'),
         'main.eds_eval.report_dir': str(Path(plan['worktree']) / 'docs/03_evidence/qd_ed_final'),
         'main.eds_eval.job_id': attempt_id,
-        'main.eds_eval.method_label': profile['historical_label'] + '__input_repaired',
+        'main.eds_eval.method_label': profile['historical_label'] + '__input_repaired' +
+            ('__' + CODEX_STAGE_CONDITION if provider_values else ''),
         'main.eds_mechanism_pretest.output_dir': str(output / 'mechanism'),
         'main.eds_mechanism_pretest.run_id': attempt_id,
     }
@@ -321,6 +341,9 @@ def build_command(plan, manifest, runtime, row, attempt_id):
 
 def child_environment(runtime):
     env = dict(os.environ)  # Existing provider credentials are inherited, never serialized.
+    if runtime.get('frozen_stage_provider', {}).get('backend') == 'codex_cli':
+        for name in codex_removed_environment():
+            env.pop(name, None)
     env.update({k: str(v) for k, v in runtime['environment'].items()})
     mapping=runtime['gpu_mapping']
     require(mapping['physical_gpu']==7 and type(mapping['egl_device_index']) is int, 'invalid frozen GPU mapping')
@@ -329,11 +352,79 @@ def child_environment(runtime):
     return env
 
 
-def verify_provider(runtime, env, *, root=ROOT):
+def codex_policy_module():
+    # This module contains only standard-library public configuration helpers.
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from core import codex_stage_policy
+    return codex_stage_policy
+
+
+def codex_removed_environment():
+    return set(codex_policy_module()._REMOVED_ENVIRONMENT)
+
+
+def codex_public_config(frozen):
+    """Effective public invocation contract, never a hash of account files."""
+    return codex_policy_module().public_invocation_policy(
+        **{key: frozen[key] for key in CODEX_CONFIG_KEYS if key != 'backend'})
+
+
+def codex_public_config_sha256(frozen):
+    return codex_policy_module().policy_sha256(codex_public_config(frozen))
+
+
+def stage_overrides(runtime):
+    frozen = runtime.get('frozen_stage_provider', {})
+    if frozen.get('backend') != 'codex_cli':
+        return {}
+    require(frozen.get('model') == 'gpt-6-astra' and frozen.get('auth_mode') == 'chatgpt',
+            'Codex Stage model/auth differs from authorized contract')
+    require(frozen.get('reasoning_effort') == 'low' and type(frozen.get('timeout_seconds')) is int
+            and frozen['timeout_seconds'] == 90, 'Codex Stage reasoning/timeout differs from frozen contract')
+    require(isinstance(frozen.get('cli_path'), str) and Path(frozen['cli_path']).is_absolute(),
+            'Codex CLI path must be absolute')
+    require(str(Path(frozen['cli_path']).resolve()) == frozen['cli_path'], 'Codex CLI path must identify the resolved executable')
+    require(frozen.get('cli_version') == '0.155.1', 'Codex CLI version differs from frozen contract')
+    disabled = frozen.get('disabled_skill_paths')
+    require(isinstance(disabled, list) and disabled and all(isinstance(path, str) and Path(path).is_absolute()
+            for path in disabled) and disabled == sorted(set(disabled)), 'Codex disabled skill paths must be a nonempty sorted absolute set')
+    require(re.fullmatch(r'[0-9a-f]{64}', str(frozen.get('cli_sha256', ''))) is not None,
+            'Codex CLI fingerprint missing')
+    require(frozen.get('public_config_sha256') == codex_public_config_sha256(frozen),
+            'Codex public invocation fingerprint mismatch')
+    require(not any(key in frozen for key in ('api_key', 'base_url', 'credential_env_name', 'access_token')),
+            'Codex managed login contract must not contain API credentials/endpoints')
+    return {f'perception.gemini.{key}': frozen[key] for key in CODEX_CONFIG_KEYS}
+
+
+def verify_provider(runtime, env, *, root=ROOT, run=subprocess.run):
     frozen=runtime['frozen_stage_provider']
     require(runtime.get('provider_ready') is True, 'Stage provider is not ready')
     perception=read_state(Path(root)/'configs/perception.yaml')['gemini']
     require(perception.get('api_key') is None, 'Stage credentials must remain environment-only')
+    if frozen.get('backend') == 'codex_cli':
+        stage_overrides(runtime)
+        require(not any(env.get(name) for name in codex_removed_environment()), 'Codex child environment contains alternate authentication/provider binding')
+        require(bool(env.get('HOME')), 'Codex managed login HOME is missing')
+        installed = codex_policy_module().discover_disabled_skill_paths(
+            codex_home=env.get('CODEX_HOME') or Path(env['HOME']) / '.codex', user_home=env['HOME'])
+        require(installed == frozen['disabled_skill_paths'], 'Codex installed skill metadata differs from frozen disabled set')
+        cli = Path(frozen['cli_path'])
+        require(cli.is_file() and os.access(cli, os.X_OK) and digest(cli) == frozen['cli_sha256'],
+                'Codex CLI executable changed or is unavailable')
+        # Public CLI status only: never inspect, copy, hash or log auth.json.
+        try:
+            version = run([str(cli), '--version'], capture_output=True, text=True, timeout=15, env=env)
+            login = run([str(cli), 'login', 'status'], capture_output=True, text=True, timeout=15, env=env)
+        except (OSError, subprocess.TimeoutExpired):
+            raise GateError('Codex managed login status unavailable') from None
+        require(version.returncode == 0 and version.stdout.strip() == 'codex-cli ' + frozen['cli_version'],
+                'Codex installed CLI version mismatch')
+        status = (login.stdout + login.stderr).strip().lower()
+        require(login.returncode == 0 and 'logged in using chatgpt' in status,
+                'Codex CLI requires the authorized managed ChatGPT login')
+        return
     effective_url=perception.get('base_url') or env.get('OPENAI_BASE_URL')
     require(isinstance(effective_url,str) and effective_url.rstrip('/')==frozen['base_url'].rstrip('/'), 'Stage provider endpoint differs from frozen contract')
     require(perception.get('model','gemini-2.5-flash')==frozen['model'], 'Stage model differs from frozen contract')
@@ -540,22 +631,72 @@ def append_healthcheck_event(root,event):
         sync_state_from_journal(root,events)
 
 
-def episode_compute(output,row):
+def episode_compute(output,row,runtime=None):
     records=read_events(Path(output)/'eds_eval/episode_compute.jsonl')
     require(len(records)==1, 'exactly one complete episode compute record required')
     record=records[0]
-    require(record.get('schema')=='qd-ed-episode-compute-v1', 'episode compute schema mismatch')
+    codex = (runtime or {}).get('frozen_stage_provider', {}).get('backend') == 'codex_cli'
+    require(record.get('schema') == ('qd-ed-episode-compute-v2' if codex else 'qd-ed-episode-compute-v1'), 'episode compute schema mismatch')
     require(record.get('episode_id')==0 and record.get('task_id')==row['task_id'] and record.get('episode_seed')==row['env_seed'], 'episode compute identity mismatch')
     require(all(record.get(name) is True for name in
                 ('policy_counters_available','provider_counters_available','perception_counters_available')),
             'required cost counters unavailable')
     for key in COMPUTE_FIELDS:
+        if codex and key in CODEX_UNKNOWN_HTTP_FIELDS:
+            require(key in record and record[key] is None, f'Codex HTTP counts must be unknown: {key}')
+            continue
         require(type(record.get(key)) is int and record[key]>=0, f'cost counter missing/invalid: {key}')
     batches=record.get('model_forward_batch_sizes')
     require(isinstance(batches,list) and all(type(n) is int and n>0 for n in batches), 'model batch histogram invalid')
     require(len(batches)==record['model_forward_calls'] and sum(batches)==record['model_batch_rows'], 'model forward/batch accounting mismatch')
-    return {**{key:record[key] for key in COMPUTE_FIELDS},'compute_outcome':record.get('outcome'),
-            'required_cost_telemetry_complete':True}
+    result = {**{key:record[key] for key in COMPUTE_FIELDS},'compute_outcome':record.get('outcome'),
+              'required_cost_telemetry_complete':True}
+    if not codex:
+        return result
+    stage_overrides(runtime)
+    transport = record.get('stage_transport')
+    require(isinstance(transport, dict), 'Codex Stage transport metadata missing')
+    frozen = runtime['frozen_stage_provider']
+    require(all(transport.get(key) == frozen[key] for key in CODEX_CONFIG_KEYS), 'Codex observed Stage transport differs from frozen binding')
+    require(transport.get('auth_mode') == 'chatgpt' and
+            transport.get('public_config_sha256') == frozen['public_config_sha256'],
+            'Codex observed public invocation policy differs from frozen binding')
+    require(transport.get('application_max_attempts') == 1 and
+            transport.get('internal_http_retry_observation_available') is False and
+            transport.get('internal_retry_policy') == 'cli_managed_unknown', 'Codex retry observation contract missing')
+    require(record.get('provider_http_counters_available') is False and
+            record.get('provider_logical_counters_available') is True, 'Codex HTTP/logical observation labels missing')
+    for key in ('guidance_api_request_attempts', 'guidance_api_sdk_retry_attempts',
+                'grounding_api_request_attempts', 'grounding_api_sdk_retry_attempts'):
+        require(record[key] == 0, 'Codex study requires cached guidance and inactive grounding transport')
+    for prefix in ('stage_codex_', 'provider_'):
+        for suffix in CODEX_COUNT_SUFFIXES:
+            key = prefix + suffix
+            require(type(record.get(key)) is int and record[key] >= 0, f'Codex logical/token counter missing/invalid: {key}')
+            result[key] = record[key]
+        attempts = record[prefix + 'logical_call_attempts']
+        require(all(record[prefix + suffix] <= attempts for suffix in ('completed_turns', 'failed_calls', 'usage_complete_calls')),
+                'Codex call accounting exceeds actual logical attempts')
+        require(record[prefix + 'cached_input_tokens'] <= record[prefix + 'input_tokens'], 'Codex cached token accounting mismatch')
+        reasoning = record.get(prefix + 'reasoning_output_tokens')
+        require(reasoning is None or (type(reasoning) is int and reasoning >= 0), 'Codex optional reasoning token counter invalid')
+        latency = record.get(prefix + 'call_latency_s')
+        require(type(latency) in (int, float) and math.isfinite(latency) and latency >= 0,
+                'Codex call latency counter missing/invalid')
+        result[prefix + 'reasoning_output_tokens'] = reasoning
+        result[prefix + 'call_latency_s'] = latency
+    require(all(record['stage_codex_' + suffix] == record['provider_' + suffix]
+                for suffix in (*CODEX_COUNT_SUFFIXES, 'call_latency_s', 'reasoning_output_tokens')),
+            'Codex aggregate/Stage observation accounting mismatch')
+    usage_complete = record['provider_usage_complete_calls'] == record['provider_logical_call_attempts']
+    require(record.get('provider_token_usage_complete') is usage_complete, 'Codex token usage completeness label mismatch')
+    result.update(stage_transport=transport, stage_backend='codex_cli', stage_model=frozen['model'],
+                  stage_condition=CODEX_STAGE_CONDITION,
+                  provider_http_counters_available=False, provider_logical_counters_available=True,
+                  provider_http_observation='not_observable_through_codex_cli',
+                  provider_token_usage_complete=usage_complete,
+                  required_cost_telemetry_complete=usage_complete)
+    return result
 
 
 def validate_video(path):
@@ -578,19 +719,41 @@ def stage_query_summary(output,row):
         require(status in {'ok','error','completed_without_result_metadata','skipped'}, 'Stage query status missing/invalid')
         if status=='ok' and event.get('query_ok') is True:
             successful+=1
-        elif status!='skipped' or event.get('api_request_attempts',0)>0:
+        elif status!='skipped' or (event.get('api_request_attempts') or 0)>0:
             failed+=1
     return {'stage_query_events':len(stages),'stage_successful_queries':successful,'stage_failed_queries':failed,
             'stage_skipped_queries':len(stages)-successful-failed,'stage_activity_observed':successful>0,
             'stage_all_queries_failed':failed>0 and successful==0}
 
 
-def validate_result(output, row, profile):
+def validate_codex_stage_events(output, costs):
+    """Reconcile actual call events with whole-episode logical/token deltas."""
+    actual = [event for event in read_events(Path(output) / 'eds_eval/stage_events.jsonl')
+              if event.get('query_status') != 'skipped']
+    require(len(actual) == costs['provider_logical_call_attempts'], 'Codex Stage event/logical call count mismatch')
+    for event in actual:
+        require(event.get('api_request_attempts') is None and event.get('api_sdk_retry_attempts') is None
+                and event.get('api_request_counter_available') is False, 'Codex Stage event must disclose unobservable HTTP counts')
+        require(event.get('codex_logical_call_attempts') == 1 and event.get('codex_usage_complete_calls') == 1,
+                'Codex Stage event lacks one measured call with complete usage')
+        require(event.get('transport', {}).get('public_config_sha256') == costs['stage_transport']['public_config_sha256'],
+                'Codex Stage event public invocation differs from frozen contract')
+    for suffix in CODEX_COUNT_SUFFIXES:
+        values = [event.get('codex_' + suffix) for event in actual]
+        require(all(type(value) is int and value >= 0 for value in values) and
+                sum(values) == costs['provider_' + suffix], 'Codex Stage event/episode call or token accounting mismatch')
+    latency = [event.get('codex_call_latency_s') for event in actual]
+    require(all(type(value) in (int, float) and math.isfinite(value) and value >= 0 for value in latency) and
+            math.isclose(sum(latency), costs['provider_call_latency_s'], rel_tol=1e-9, abs_tol=1e-6),
+            'Codex Stage event/episode latency accounting mismatch')
+
+
+def validate_result(output, row, profile, runtime=None):
     output=Path(output)
     require(not list(output.glob('episode_*/error.txt')), 'episode error artifact')
     require(not list(output.glob('episode_*/*fail_error.txt')), 'episode preparation/execution failure')
     resolved=read_state(output/'.hydra/config.yaml')
-    for key,value in {**profile['static_override_values'],'seed':row['policy_seed'],
+    for key,value in {**profile['static_override_values'], **stage_overrides(runtime or {}), 'seed':row['policy_seed'],
                        'main.episode_num':1,'main.episode_seed_schedule':[row['env_seed']],
                        'backend.libero.task_ids_filter':[row['task_id']],
                        'main.require_task_cache_identity':True}.items():
@@ -631,7 +794,12 @@ def validate_result(output, row, profile):
     require(not stage_summary['stage_all_queries_failed'], 'all actual Stage queries failed')
     safety=read_events(output/'eds_eval/safety_events.jsonl')
     require(not any(e.get('event')=='gripper_qpos_violation' and e.get('count',0)>0 for e in safety), 'gripper qpos safety violation')
-    costs=episode_compute(output,row)
+    costs=episode_compute(output,row,runtime)
+    require(costs['required_cost_telemetry_complete'], 'Codex token usage incomplete')
+    if costs.get('stage_backend') == 'codex_cli':
+        require(costs['provider_failed_calls'] == 0 and stage_summary['stage_failed_queries'] == 0,
+                'Codex Stage call failure invalidates the frozen transport condition')
+        validate_codex_stage_events(output, costs)
     require(costs['compute_outcome']=='completed', 'episode compute records an execution/preparation failure')
     require(costs['guided_chunks']==len(metrics), 'guided chunk/metric record accounting mismatch')
     require(costs['reward_scoring_batches']>=sum(m['score_call_count'] for m in metrics), 'actual scoring batches cannot be fewer than recorded search batches')
@@ -639,10 +807,12 @@ def validate_result(output, row, profile):
             'metric_chunks':len(metrics),'qd_activity_observed':any(m.get('qd_archive_active_for_chunk') is True for m in metrics),
             'candidate_evaluations':sum(m['search_evaluation_count'] for m in metrics),
             'score_batches':sum(m['score_call_count'] for m in metrics),**stage_summary,
-            **costs,'cost_counter_caveat':'Forward calls are DiT invocations, not encoder inference; provider retry field classifies SDK retries only.'}
+            **costs,'cost_counter_caveat':('Codex logical calls, observed token usage and CLI wall latency are measured; internal HTTP requests/retries and optional reasoning tokens may be unknown.'
+                if costs.get('stage_backend') == 'codex_cli' else
+                'Forward calls are DiT invocations, not encoder inference; provider retry field classifies SDK retries only.')}
 
 
-def failed_outcome(exc, output, row, *, launch_failed=False):
+def failed_outcome(exc, output, row, *, launch_failed=False, runtime=None):
     monitor_timeout=isinstance(exc,subprocess.TimeoutExpired) and isinstance(exc.cmd,list) and exc.cmd[:1]==['nvidia-smi']
     infrastructure=(launch_failed and isinstance(exc,OSError)) or monitor_timeout or (isinstance(exc,GateError) and ('GPU7' in str(exc) or 'exclusivity' in str(exc)))
     event='aborted' if infrastructure or isinstance(exc,KeyboardInterrupt) else 'valid'
@@ -651,7 +821,7 @@ def failed_outcome(exc, output, row, *, launch_failed=False):
              'outcome_valid':False,'failure_class':'infrastructure' if infrastructure else 'task_failure',
              'required_cost_telemetry_complete':False}
     try:
-        outcome.update(episode_compute(output,row))
+        outcome.update(episode_compute(output,row,runtime))
     except (GateError,OSError,ValueError,KeyError):
         pass
     try:
@@ -710,6 +880,9 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                   'runtime_inventory_sha256':plan['runtime_inventory_sha256'],
                   'init_row_sha256':row['init_row_sha256'],
                   'retry_of':row.get('retry_of'),'output_dir':str(output),'physical_gpu':7}
+            if runtime.get('frozen_stage_provider', {}).get('backend') == 'codex_cli':
+                base.update(stage_backend='codex_cli', stage_model=runtime['frozen_stage_provider']['model'],
+                            stage_condition=CODEX_STAGE_CONDITION)
             append_event(root,{**base,'event':'reserved','time_unix':time.time(),'admission':admission})
             durable_json(output/'command.json',{'argv':command,'environment_public':{**runtime['environment'],'CUDA_VISIBLE_DEVICES':'7','CUDA_DEVICE_ORDER':'PCI_BUS_ID','MUJOCO_EGL_DEVICE_ID':str(runtime['gpu_mapping']['egl_device_index'])}})
             process=None; started=time.monotonic(); process_finished=None; dispatched=False
@@ -732,10 +905,10 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                     code=wait_exclusively(process,timeout)
                     process_finished=time.monotonic()
                 require(code==0, f'child exit code {code}')
-                outcome=validate_result(output,row,manifest['profiles'][row['profile']]); final_event='valid'
+                outcome=validate_result(output,row,manifest['profiles'][row['profile']],runtime); final_event='valid'
             except BaseException as exc:
                 # Fail closed: parser/gate/scientific invalidity is never an automatic recovery retry.
-                final_event,outcome=failed_outcome(exc,output,row,launch_failed=dispatched and process is None)
+                final_event,outcome=failed_outcome(exc,output,row,launch_failed=dispatched and process is None,runtime=runtime)
                 if not dispatched:
                     final_event='aborted'; outcome['task_failure']=False; outcome['failure_class']='predispatch_gate'
                 if isinstance(exc,(KeyboardInterrupt,SystemExit)):
@@ -788,9 +961,9 @@ def reconcile_ledger(plan_path, attempt_id, *, root=ROOT):
         outcome={'reason':'interrupted process no longer alive','retryable_infrastructure':True}; event='aborted'
         if (output/'results.txt').exists():
             try:
-                outcome=validate_result(output,rows[0],manifest['profiles'][rows[0]['profile']]); event='valid'
+                outcome=validate_result(output,rows[0],manifest['profiles'][rows[0]['profile']],runtime); event='valid'
             except (GateError,OSError,ValueError,KeyError) as exc:
-                event,outcome=failed_outcome(exc,output,rows[0])
+                event,outcome=failed_outcome(exc,output,rows[0],runtime=runtime)
         terminal={**group[0],**outcome,'event':event,'time_unix':time.time(),
                   'gpu_process_wall_seconds':max(0.,time.time()-dispatched['time_unix']) if dispatched else 0.,
                   'gpu_time_measurement':'conservative upper bound through explicit dead-process reconciliation'}

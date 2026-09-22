@@ -955,6 +955,75 @@ def test_init_components_skips_vlm_when_guidance_disabled(monkeypatch, tmp_path)
     assert runner.video_recorder is not None
 
 
+def _codex_component_runner(monkeypatch, tmp_path):
+    import main
+
+    def forbidden_client(*args, **kwargs):
+        raise AssertionError("Codex cache-only startup must not construct an API client")
+
+    monkeypatch.setattr(main, "VLMAgent", forbidden_client)
+    monkeypatch.setattr(main, "observe_api_requests", forbidden_client)
+    monkeypatch.setattr(main, "KeypointDetector", lambda **kwargs: object())
+    monkeypatch.setattr(main, "KeypointTracker", lambda *args: object())
+    monkeypatch.setattr(main, "TrajectoryVideoRecorder", lambda **kwargs: object())
+    cache = tmp_path / "frozen_cache"
+    cache.mkdir()
+    (cache / "output_raw.txt").write_text("# Stages:\n# 1) Reach the milk\n# 2) Put milk in basket\n")
+    runner = main.Main.__new__(main.Main)
+    runner.config = OmegaConf.create({
+        "use_guidance": True, "use_vlm_stage_recognition": True,
+        "cached_functions_dir": str(cache), "require_task_cache_identity": True,
+    })
+    runner.output_dir = str(tmp_path)
+    runner.backend = "libero"
+    runner.adapter = object()
+    cfg = OmegaConf.create({"perception": {
+        "keypoint_detector": {}, "vlm_agent": {}, "sam3": {"enabled": False},
+        "gemini_grounding": {"enabled": False}, "gemini": {"backend": "codex_cli"},
+    }})
+    return main, runner, cfg, cache
+
+
+def test_codex_components_load_cached_descriptions_without_api_credentials(monkeypatch, tmp_path):
+    main, runner, cfg, cache = _codex_component_runner(monkeypatch, tmp_path)
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
+    recognizer = object()
+    monkeypatch.setattr(main, "create_gemini_stage_recognizer", lambda config: recognizer)
+    runner._init_components(cfg)
+    assert runner.gemini_stage_recognizer is recognizer
+    assert runner.vlm_agent.cache_only is True
+    assert not hasattr(runner.vlm_agent, "client")
+    assert runner.vlm_agent._extract_stage_descriptions_from_output(cache / "output_raw.txt") == (
+        "Stage 1: Reach the milk\nStage 2: Put milk in basket"
+    )
+    assert runner._api_compute_snapshot()["guidance"] == {
+        "backend": "cache_only", "request_attempts": 0, "sdk_retry_attempts": 0,
+        "observation_available": True,
+    }
+    with pytest.raises(RuntimeError, match="generation is disabled"):
+        runner.vlm_agent.generate_guidance(None, None, None)
+    with pytest.raises(RuntimeError, match="planning is disabled"):
+        runner.vlm_agent.plan_segmentation(None, None)
+
+
+@pytest.mark.parametrize("mutation", ["no_cache", "missing_cache", "sam3", "gemini_grounding", "startup_failure"])
+def test_codex_components_reject_unfrozen_fallbacks(monkeypatch, tmp_path, mutation):
+    main, runner, cfg, cache = _codex_component_runner(monkeypatch, tmp_path)
+    if mutation == "no_cache":
+        runner.config.cached_functions_dir = None
+    elif mutation == "missing_cache":
+        runner.config.cached_functions_dir = str(tmp_path / "absent")
+    elif mutation in ("sam3", "gemini_grounding"):
+        cfg.perception[mutation].enabled = True
+    else:
+        def failing_recognizer(config):
+            raise RuntimeError("mock unavailable")
+        monkeypatch.setattr(main, "create_gemini_stage_recognizer", failing_recognizer)
+    with pytest.raises((RuntimeError, ValueError), match="Codex Stage"):
+        runner._init_components(cfg)
+
+
 def test_visualization_action_chunk_prefers_policy_candidates():
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     import main

@@ -17,19 +17,69 @@ spec.loader.exec_module(probe)
 def valid_evidence():
     return {'schema': 'qd-ed-gpu7-context-probe-v1', 'physical_gpu': 7, 'torch_logical_device': 0,
         'torch_uuid': 'GPU-unit-test', 'torch_visible_device_count': 1, 'cuda_kernel_result': 2.,
-        'display_egl_device_index': 4, 'display_cuda_ordinal': 7, 'gl_vendor': 'NVIDIA Corporation',
+        'cuda_visible_devices': '7', 'cuda_device_order': 'PCI_BUS_ID',
+        'display_egl_device_index': 4, 'display_cuda_ordinal': 0,
+        'egl_cuda_ordinal_namespace': 'process_visible',
+        'cuda_associated_egl_devices': [{'egl_device_index': 4, 'cuda_ordinal': 0}],
+        'gl_vendor': 'NVIDIA Corporation',
         'gl_renderer': 'mock NVIDIA GPU', 'gl_version': 'mock OpenGL', 'frame_shape': [64,64,3],
         'frame_dtype': 'uint8', 'frame_nonzero_values': 30, 'frame_std': 1., 'simulation_steps': 0}
 
 
+def valid_mapping():
+    return {'physical_gpu': 7, 'metadata_mapping_verified': True,
+            'uuid': 'GPU-unit-test', 'egl_device_index': 4}
+
+
 @pytest.mark.parametrize('change', [
-    {'torch_uuid': 'GPU-another-device'}, {'display_cuda_ordinal': 0}, {'display_egl_device_index': 0},
+    {'torch_uuid': 'GPU-another-device'}, {'display_cuda_ordinal': 7}, {'display_egl_device_index': 0},
+    {'cuda_visible_devices': '0'}, {'cuda_visible_devices': '7,6'}, {'cuda_device_order': 'FASTEST_FIRST'},
+    {'egl_cuda_ordinal_namespace': 'physical'}, {'torch_visible_device_count': 2},
+    {'cuda_associated_egl_devices': []},
+    {'cuda_associated_egl_devices': [{'egl_device_index': 0, 'cuda_ordinal': 0}]},
+    {'cuda_associated_egl_devices': [{'egl_device_index': 4, 'cuda_ordinal': 7}]},
+    {'cuda_associated_egl_devices': [{'egl_device_index': 4, 'cuda_ordinal': 0},
+                                     {'egl_device_index': 5, 'cuda_ordinal': 0}]},
     {'gl_vendor': 'Mesa'}, {'frame_std': 0}, {'frame_nonzero_values': 0}, {'simulation_steps': 1},
 ])
 def test_rejects_wrong_device_software_renderer_or_empty_frame(change):
     evidence = {**valid_evidence(), **change}
     with pytest.raises(probe.runner.GateError):
-        probe.validate_probe_evidence(evidence, {'uuid': 'GPU-unit-test', 'egl_device_index': 4})
+        probe.validate_probe_evidence(evidence, valid_mapping())
+
+
+def test_masked_egl_logical_zero_requires_both_uuid_and_metadata_binding():
+    probe.validate_probe_evidence(valid_evidence(), valid_mapping())
+    for change in ({'physical_gpu': 6}, {'metadata_mapping_verified': False},
+                   {'uuid': 'GPU-another'}, {'egl_device_index': 5}):
+        with pytest.raises(probe.runner.GateError):
+            probe.validate_probe_evidence(valid_evidence(), {**valid_mapping(), **change})
+
+
+def test_rejected_raw_evidence_is_persisted_before_validation(tmp_path, monkeypatch):
+    evidence = {**valid_evidence(), 'display_cuda_ordinal': 7}
+    original_validator = probe.validate_probe_evidence
+    observed = []
+    def check_after_persist(value, mapping):
+        on_disk = json.loads((tmp_path / 'probe-evidence.json').read_text())
+        assert on_disk['validation_status'] == 'pending'
+        assert on_disk['display_cuda_ordinal'] == 7
+        observed.append(True)
+        original_validator(value, mapping)
+    monkeypatch.setattr(probe, 'validate_probe_evidence', check_after_persist)
+    with pytest.raises(probe.runner.GateError):
+        probe.persist_and_validate_probe_evidence(evidence, valid_mapping(), tmp_path)
+    saved = json.loads((tmp_path / 'probe-evidence.json').read_text())
+    assert observed == [True]
+    assert saved['validation_status'] == 'rejected'
+    assert saved['display_cuda_ordinal'] == 7
+    assert saved['torch_uuid'] == 'GPU-unit-test'
+    assert 'visible CUDA logical0' in saved['validation_error']
+
+
+def test_accepted_evidence_persists_completed_validation(tmp_path):
+    probe.persist_and_validate_probe_evidence(valid_evidence(), valid_mapping(), tmp_path)
+    assert json.loads((tmp_path / 'probe-evidence.json').read_text())['validation_status'] == 'passed'
 
 
 def fixture_runtime(tmp_path, monkeypatch):
@@ -39,7 +89,7 @@ def fixture_runtime(tmp_path, monkeypatch):
     (artifact / 'runtime').mkdir(parents=True)
     runtime = {'worktree': str(root), 'artifact_root': str(artifact), 'metadata_mapping_verified': True,
                'provider_ready': False, 'cuda_egl_verified': False,
-               'gpu_mapping': {'physical_gpu': 7, 'egl_device_index': 4, 'uuid': 'GPU-unit-test'},
+               'gpu_mapping': valid_mapping(),
                'environment': {}}
     path = artifact / 'runtime/setup_manifest.json'
     path.write_text(json.dumps(runtime))

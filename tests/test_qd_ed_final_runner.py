@@ -424,3 +424,174 @@ def test_gpu_hours_protect_validation_formal_and_reallocation_requires_audit():
     policy=[{'event':'gpu_hour_reservations_changed','gpu_hour_reservations':{'validation':12.,'formal':8.},
              'rationale':'prospective paired run cost evidence','time_unix':100.}]
     assert runner.check_budget(current,events,episode,reservation_events=policy)==1000
+
+
+def codex_runtime(tmp_path):
+    cli = tmp_path / 'codex'; cli.write_text('unit-test executable'); cli.chmod(0o700)
+    home = tmp_path / 'account'
+    skill = home / '.codex/skills/fixture'; skill.mkdir(parents=True)
+    (skill / 'SKILL.md').write_text('metadata only; never read by runner')
+    frozen = dict(backend='codex_cli', model='gpt-6-astra', auth_mode='chatgpt',
+                  reasoning_effort='low', timeout_seconds=90, cli_path=str(cli),
+                  cli_version='0.155.1', cli_sha256=runner.digest(cli),
+                  disabled_skill_paths=[str(skill)])
+    frozen['public_config_sha256'] = runner.codex_public_config_sha256(frozen)
+    return dict(provider_ready=True, frozen_stage_provider=frozen,
+                environment={}, gpu_mapping={'physical_gpu': 7, 'egl_device_index': 4})
+
+
+def codex_compute_case(tmp_path, monkeypatch, *, calls=0):
+    episode, profile = no_guidance_case(tmp_path, monkeypatch)
+    runtime = codex_runtime(tmp_path)
+    config_path = tmp_path / '.hydra/config.yaml'
+    resolved = yaml.safe_load(config_path.read_text())
+    frozen = runtime['frozen_stage_provider']
+    resolved['perception'] = {'gemini': {key: frozen[key] for key in runner.CODEX_CONFIG_KEYS}}
+    config_path.write_text(yaml.safe_dump(resolved))
+    path = tmp_path / 'eds_eval/episode_compute.jsonl'
+    record = json.loads(path.read_text())
+    record.update(schema='qd-ed-episode-compute-v2', provider_logical_counters_available=True,
+                  provider_http_counters_available=False, provider_token_usage_complete=True,
+                  stage_transport={**{key: frozen[key] for key in runner.CODEX_CONFIG_KEYS},
+                    'auth_mode': 'chatgpt', 'public_config_sha256': frozen['public_config_sha256'],
+                    'application_max_attempts': 1, 'internal_http_retry_observation_available': False,
+                    'internal_retry_policy': 'cli_managed_unknown'})
+    for key in runner.CODEX_UNKNOWN_HTTP_FIELDS:
+        record[key] = None
+    for prefix in ('stage_codex_', 'provider_'):
+        record.update({prefix + suffix: 0 for suffix in runner.CODEX_COUNT_SUFFIXES})
+        record.update({prefix + key: calls for key in ('logical_call_attempts', 'completed_turns', 'usage_complete_calls')})
+        record.update({prefix + 'input_tokens': calls * 100, prefix + 'cached_input_tokens': calls * 20,
+                       prefix + 'output_tokens': calls * 10, prefix + 'reasoning_output_tokens': None,
+                       prefix + 'call_latency_s': calls * 1.25})
+    path.write_text(json.dumps(record) + '\n')
+    return episode, profile, runtime, path, record
+
+
+def test_codex_child_removes_alternate_api_bindings_only_in_child(tmp_path, monkeypatch):
+    runtime = codex_runtime(tmp_path)
+    for name in runner.codex_removed_environment():
+        monkeypatch.setenv(name, 'unit-test-placeholder')
+    monkeypatch.setenv('HOME', str(tmp_path / 'account'))
+    monkeypatch.setenv('CODEX_HOME', str(tmp_path / 'account/.codex'))
+    env = runner.child_environment(runtime)
+    assert not set(env) & runner.codex_removed_environment()
+    assert env['HOME'] == str(tmp_path / 'account')
+    assert env['CODEX_HOME'] == str(tmp_path / 'account/.codex')
+    assert env['CUDA_VISIBLE_DEVICES'] == '7'
+    assert runner.os.environ['OPENAI_API_KEY'] == 'unit-test-placeholder'
+
+
+def test_codex_provider_requires_managed_login_frozen_binary_and_installed_skill_set(tmp_path):
+    runtime = codex_runtime(tmp_path)
+    (tmp_path / 'configs').mkdir()
+    (tmp_path / 'configs/perception.yaml').write_text('gemini:\n  model: gemini-2.5-flash\n  api_key: null\n')
+    env = {'HOME': str(tmp_path / 'account')}
+    calls = []
+    def fake(argv, **kwargs):
+        calls.append(argv)
+        return SimpleNamespace(returncode=0, stdout='codex-cli 0.155.1\n' if '--version' in argv else '',
+                               stderr='' if '--version' in argv else 'Logged in using ChatGPT\n')
+    runner.verify_provider(runtime, env, root=tmp_path, run=fake)
+    assert [args[1:] for args in calls] == [['--version'], ['login', 'status']]
+    with pytest.raises(runner.GateError, match='alternate authentication'):
+        runner.verify_provider(runtime, {**env, 'CODEX_API_KEY': 'placeholder'}, root=tmp_path, run=fake)
+    def api_login(argv, **kwargs):
+        return SimpleNamespace(returncode=0, stdout='codex-cli 0.155.1' if '--version' in argv else 'Logged in using an API key', stderr='')
+    with pytest.raises(runner.GateError, match='managed ChatGPT'):
+        runner.verify_provider(runtime, env, root=tmp_path, run=api_login)
+    new_skill = tmp_path / 'account/.codex/skills/added'; new_skill.mkdir(); (new_skill / 'SKILL.md').touch()
+    with pytest.raises(runner.GateError, match='skill metadata'):
+        runner.verify_provider(runtime, env, root=tmp_path, run=fake)
+
+
+def test_codex_runtime_overrides_are_common_and_public_policy_changes_fail_closed(tmp_path):
+    runtime = codex_runtime(tmp_path)
+    profiles = {'profiles': {'Q0': {'static_override_values': {'backend': 'libero'}, 'historical_label': 'Q0'}}}
+    runtime.update(tasks={'8': {'cache_dir': str(tmp_path / 'artifacts/cache8')}},
+                   main_overrides=['+main.require_task_cache_identity=true'])
+    plan = {'artifact_root': str(tmp_path / 'artifacts'), 'worktree': str(tmp_path)}
+    command, _ = runner.build_command(plan, profiles, runtime, row(), 'fixture')
+    expected = runner.stage_overrides(runtime)
+    assert all(f'{key}={runner.hydra(value)}' in command for key, value in expected.items())
+    profiles['profiles']['Q0']['static_override_values']['perception.gemini.model'] = 'different'
+    with pytest.raises(runner.GateError, match='static/runtime'):
+        runner.build_command(plan, profiles, runtime, row(), 'fixture')
+    runtime['frozen_stage_provider']['public_config_sha256'] = '0' * 64
+    with pytest.raises(runner.GateError, match='invocation fingerprint'):
+        runner.stage_overrides(runtime)
+
+
+def test_codex_v2_accepts_explicit_unknown_http_and_optional_reasoning(tmp_path, monkeypatch):
+    episode, profile, runtime, path, record = codex_compute_case(tmp_path, monkeypatch)
+    outcome = runner.validate_result(tmp_path, episode, profile, runtime)
+    assert outcome['required_cost_telemetry_complete'] is True
+    assert outcome['provider_request_attempts'] is None
+    assert outcome['provider_reasoning_output_tokens'] is None
+    assert outcome['provider_http_observation'] == 'not_observable_through_codex_cli'
+    with pytest.raises(runner.GateError, match='schema mismatch'):
+        runner.episode_compute(tmp_path, episode)
+    record['provider_request_attempts'] = 0
+    path.write_text(json.dumps(record) + '\n')
+    with pytest.raises(runner.GateError, match='must be unknown'):
+        runner.episode_compute(tmp_path, episode, runtime)
+
+
+def test_codex_missing_usage_preserves_observed_subtotals_but_invalidates_costs(tmp_path, monkeypatch):
+    episode, profile, runtime, path, record = codex_compute_case(tmp_path, monkeypatch, calls=2)
+    record.update(provider_usage_complete_calls=1, stage_codex_usage_complete_calls=1,
+                  provider_token_usage_complete=False)
+    path.write_text(json.dumps(record) + '\n')
+    with pytest.raises(runner.GateError, match='token usage incomplete') as caught:
+        runner.validate_result(tmp_path, episode, profile, runtime)
+    terminal, outcome = runner.failed_outcome(caught.value, tmp_path, episode, runtime=runtime)
+    assert terminal == 'valid' and outcome['success'] is False and outcome['outcome_valid'] is False
+    assert outcome['required_cost_telemetry_complete'] is False
+    assert outcome['provider_input_tokens'] == 200
+    assert outcome['provider_request_attempts'] is None
+
+
+def test_codex_transport_or_counter_drift_cannot_pass_adjudication(tmp_path, monkeypatch):
+    episode, profile, runtime, path, record = codex_compute_case(tmp_path, monkeypatch, calls=1)
+    bad = copy.deepcopy(record); bad['stage_transport']['public_config_sha256'] = '0' * 64
+    path.write_text(json.dumps(bad) + '\n')
+    with pytest.raises(runner.GateError, match='public invocation policy'):
+        runner.episode_compute(tmp_path, episode, runtime)
+    bad = copy.deepcopy(record); bad['provider_input_tokens'] += 1
+    path.write_text(json.dumps(bad) + '\n')
+    with pytest.raises(runner.GateError, match='aggregate/Stage'):
+        runner.episode_compute(tmp_path, episode, runtime)
+    bad = copy.deepcopy(record); bad['provider_failed_calls'] = bad['stage_codex_failed_calls'] = 1
+    path.write_text(json.dumps(bad) + '\n')
+    with pytest.raises(runner.GateError, match='call failure'):
+        runner.validate_result(tmp_path, episode, profile, runtime)
+
+
+def test_codex_skipped_stage_event_allows_null_http_field(tmp_path):
+    (tmp_path / 'eds_eval').mkdir()
+    event = dict(episode_id=0, task_id=8, episode_seed=991, query_status='skipped',
+                 api_request_attempts=None, query_ok=None)
+    (tmp_path / 'eds_eval/stage_events.jsonl').write_text(json.dumps(event) + '\n')
+    summary = runner.stage_query_summary(tmp_path, row())
+    assert summary['stage_skipped_queries'] == 1 and not summary['stage_all_queries_failed']
+
+
+def test_codex_actual_events_reconcile_tokens_latency_and_invocation_policy(tmp_path, monkeypatch):
+    episode, profile, runtime, path, record = codex_compute_case(tmp_path, monkeypatch, calls=2)
+    events = []
+    for _ in range(2):
+        event = dict(episode_id=0, task_id=8, episode_seed=991, query_status='ok', query_ok=True,
+                     api_request_attempts=None, api_sdk_retry_attempts=None,
+                     api_request_counter_available=False, transport=record['stage_transport'])
+        event.update({'codex_' + suffix: record['provider_' + suffix] // 2
+                      for suffix in runner.CODEX_COUNT_SUFFIXES})
+        event['codex_call_latency_s'] = 1.25
+        events.append(event)
+    stage_path = tmp_path / 'eds_eval/stage_events.jsonl'
+    stage_path.write_text(''.join(json.dumps(event) + '\n' for event in events))
+    result = runner.validate_result(tmp_path, episode, profile, runtime)
+    assert result['provider_input_tokens'] == 200 and result['stage_successful_queries'] == 2
+    events[0]['codex_input_tokens'] += 1
+    stage_path.write_text(''.join(json.dumps(event) + '\n' for event in events))
+    with pytest.raises(runner.GateError, match='event/episode call or token'):
+        runner.validate_result(tmp_path, episode, profile, runtime)

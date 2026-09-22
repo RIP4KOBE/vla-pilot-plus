@@ -61,5 +61,10 @@ gemini_grounding:
 # Gemini Stage Recognition (for real-time stage + guidance decisions)
 # ============================================================
 gemini:
+  backend: openai_compatible # codex_cli is an explicit, separately frozen opt-in
   api_key: null             # Reads GOOGLE_API_KEY env var; set in .env
   model: gemini-2.5-flash
+  reasoning_effort: low     # Codex-only transport settings
+  timeout_seconds: 90
+  cli_path: null
+  disabled_skill_paths: null

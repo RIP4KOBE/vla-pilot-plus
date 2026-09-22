@@ -31,14 +31,27 @@ def normalized_uuid(value):
 def validate_probe_evidence(evidence, mapping):
     require = runner.require
     require(evidence.get('schema') == 'qd-ed-gpu7-context-probe-v1', 'probe evidence schema mismatch')
+    require(mapping.get('physical_gpu') == 7 and mapping.get('metadata_mapping_verified') is True,
+            'probe requires the verified physical GPU7 metadata mapping')
     require(evidence.get('physical_gpu') == 7 and evidence.get('torch_logical_device') == 0,
             'probe selected the wrong CUDA device')
+    require(evidence.get('cuda_visible_devices') == '7' and
+            evidence.get('cuda_device_order') == 'PCI_BUS_ID' and
+            evidence.get('egl_cuda_ordinal_namespace') == 'process_visible',
+            'probe CUDA ordinal namespace is not the frozen GPU7 mask')
     require(normalized_uuid(evidence.get('torch_uuid')) == normalized_uuid(mapping['uuid']),
             'Torch logical0 UUID differs from physical GPU7')
     require(evidence.get('torch_visible_device_count') == 1 and evidence.get('cuda_kernel_result') == 2.0,
             'CUDA visibility/kernel probe failed')
+    # EGL_CUDA_DEVICE_NV is a CUDA ordinal in this process's visible namespace.
+    # With CUDA_VISIBLE_DEVICES=7, physical GPU7 is CUDA logical0. Bind the
+    # actual current display to that ordinal, whose Torch UUID was checked
+    # above, and also retain the independently enumerated EGL index binding.
     require(evidence.get('display_egl_device_index') == mapping['egl_device_index'] and
-            evidence.get('display_cuda_ordinal') == 7, 'actual EGL display is not bound to GPU7')
+            evidence.get('display_cuda_ordinal') == 0, 'actual EGL display is not bound to visible CUDA logical0')
+    require(evidence.get('cuda_associated_egl_devices') == [
+                {'egl_device_index': mapping['egl_device_index'], 'cuda_ordinal': 0}],
+            'EGL CUDA association is absent, conflicting, or ambiguous under the GPU7 mask')
     require('nvidia' in evidence.get('gl_vendor', '').lower(), 'EGL renderer is not NVIDIA')
     require(bool(evidence.get('gl_renderer')) and bool(evidence.get('gl_version')), 'OpenGL identity missing')
     require(evidence.get('frame_shape') == [64, 64, 3] and evidence.get('frame_dtype') == 'uint8',
@@ -46,6 +59,22 @@ def validate_probe_evidence(evidence, mapping):
     require(evidence.get('frame_nonzero_values', 0) > 0 and evidence.get('frame_std', 0) > 0,
             'offscreen frame is empty or uniform')
     require(evidence.get('simulation_steps') == 0, 'probe must not perform simulation transitions')
+
+
+def persist_and_validate_probe_evidence(evidence, mapping, output):
+    """Keep raw observations even if an identity/render assertion rejects them."""
+    path = Path(output) / 'probe-evidence.json'
+    evidence['validation_status'] = 'pending'
+    runner.durable_json(path, evidence)
+    try:
+        validate_probe_evidence(evidence, mapping)
+    except runner.GateError as exc:
+        evidence['validation_status'] = 'rejected'
+        evidence['validation_error'] = str(exc)
+        runner.durable_json(path, evidence)
+        raise
+    evidence['validation_status'] = 'passed'
+    runner.durable_json(path, evidence)
 
 
 def current_egl_device_identity():
@@ -81,7 +110,13 @@ def current_egl_device_identity():
     runner.require(bool(enumerate_devices(count.value, devices, ctypes.byref(count))), 'EGL enumeration failed')
     indices = [i for i in range(count.value) if devices[i] == device.value]
     runner.require(len(indices) == 1, 'current EGL display device is ambiguous')
-    return {'display_egl_device_index': indices[0], 'display_cuda_ordinal': ordinal.value}
+    associations = []
+    for index in range(count.value):
+        visible_ordinal = ctypes.c_ssize_t()
+        if device_query(devices[index], 0x323A, ctypes.byref(visible_ordinal)):
+            associations.append({'egl_device_index': index, 'cuda_ordinal': visible_ordinal.value})
+    return {'display_egl_device_index': indices[0], 'display_cuda_ordinal': ordinal.value,
+            'egl_cuda_ordinal_namespace': 'process_visible', 'cuda_associated_egl_devices': associations}
 
 
 def child_probe(manifest_path, output, resource_id):
@@ -131,6 +166,8 @@ def child_probe(manifest_path, output, resource_id):
         evidence = {
             'schema': 'qd-ed-gpu7-context-probe-v1', 'resource_id': resource_id,
             'physical_gpu': 7, 'torch_logical_device': 0, 'torch_visible_device_count': torch.cuda.device_count(),
+            'cuda_visible_devices': os.environ.get('CUDA_VISIBLE_DEVICES'),
+            'cuda_device_order': os.environ.get('CUDA_DEVICE_ORDER'),
             'torch_uuid': str(properties.uuid), 'torch_device_name': properties.name,
             'torch_version': str(torch.__version__), 'torch_cuda_runtime_version': str(torch.version.cuda),
             'mujoco_version': mujoco.__version__, 'cuda_kernel_result': cuda_result,
@@ -141,7 +178,7 @@ def child_probe(manifest_path, output, resource_id):
             'frame_sha256': hashlib.sha256(frame.tobytes()).hexdigest(),
             'simulation_steps': 0, 'time_unix': time.time(),
         }
-        validate_probe_evidence(evidence, mapping)
+        persist_and_validate_probe_evidence(evidence, mapping, output)
         frame_path = Path(output) / 'probe-frame.png'
         Image.fromarray(frame).save(frame_path)
         evidence['frame_png_sha256'] = runner.digest(frame_path)
