@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-09-22T08:55:04.580195+00:00",
+  "timestamp": "2026-09-22T09:31:21.772220+00:00",
   "run_name": "rdt-qd-ed-final-20260921T093925Z",
-  "phase": "GPU3_NATIVE_CONTEXT_REVIEW",
-  "source_commit": "e131ff67f97a5da7fd68d1dd9a8dfe6e08253dea",
+  "phase": "GPU3_SCENE_MODEL_DIAGNOSTIC_PREPARATION",
+  "source_commit": "a5e1236daa8de7eea3a9882028304bdcbc3096e2",
   "active_plan": {
     "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/resource_queue/89d2dd719e0346bd9011931cc66731a0/plan.json",
     "source_commit": "8fb001b7903c5e6a2a74a5ef6a7f2845ca7e9fe2",
@@ -47,10 +47,12 @@
     "selected_physical_gpu": 6,
     "archived_evidence": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/queue-history/8fb001b-native-abort"
   },
-  "in_flight_executors": [],
+  "in_flight_executors": [
+    "available_gpu_queue: CPU-only scene/model probe implementation"
+  ],
   "owned_gpu_workers": [],
   "authoritative_state": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/research-state.yaml",
-  "next_action": "Test current EGL context against existing renderer references around first policy inference in one prospectively frozen bounded engineering diagnostic; preserve all failed identities and no promotion.",
+  "next_action": "One prospective zero-action/zero-integration static-scene plus frozen RDT load and B1 inference diagnostic on GPU3; all scientific promotion remains closed.",
   "target_achieved": false,
   "native_diagnostic": {
     "status": "MATCHING_COMPLETED_GPU6_B1_EVIDENCE_REUSED",

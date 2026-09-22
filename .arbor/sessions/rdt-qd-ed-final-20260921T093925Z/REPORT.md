@@ -1,7 +1,9 @@
-# Interim research checkpoint
+# Research status — in progress
 
-IN_PROGRESS, target not achieved. Physical GPU3 only, one exclusive worker. GPU3 diagnostic `gpu3_native_c0_t00_r2__79342697c4d2` stopped after owned graphics Xid31/109; queue134110 and worker142266 exited. 8 total dispatched attempts,6 aborted,2 invalid,0 scientifically valid; closed GPU cost0.7576063718984369hours. Original failed identities are nonretryable and retained.
+Authoritative state: research-state.yaml and docs/03_evidence/qd_ed_final/iteration-ledger.md. Updated 2026-09-22T09:31:21.772220+00:00.
 
-Next is a separately preregistered bounded context-binding hypothesis test, not a repeated control: experiments/iteration_001_execution_intent/gpu3-context-drift-diagnostic.md. N1 remains unmeasured; validation/formal unexposed. Source and plan for this new diagnostic are pending freeze. No live GPU worker exists at this checkpoint.
+GPU3 only for this continuation. Static real-scene GPU3 rendering passed (12 frames,0 actions/integrations,no Xid); full C0 graphics faults retained. Isolate frozen model coexistence and one B1 prediction next; N1 unmeasured,validation/formal closed.
 
-Authoritative state and cost: research-state.yaml, append-only attempt/healthcheck ledgers. GPU3 rendering and exact-process kernel evidence: artifact runtime/gpu3-render-diagnostic. Earlier GPU5 fault is also preserved. Continue the authorized task within240 attempts/48GPUhours and protected14h/10h reservations; no driver reset or external worker termination.
+Task target is not achieved. Valid current-study episodes: 0; dispatched: 10; closed GPU hours: 0.811014396/48. Historical Q0=2/10 and P2=3/10 are not current controls. Codex saved login is proven working; Poe files are preserved.
+
+Latest static evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-static-scene-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_static_scene__b8f0b3b6214f/healthcheck-result.json. Next protocol: experiments/iteration_001_execution_intent/gpu3-scene-model-diagnostic.md. All prior invalid/aborted identities and costs remain; no promotion or replacement scientific score.
