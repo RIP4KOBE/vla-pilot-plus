@@ -83,3 +83,14 @@ New authorized cycle from `744e08b`; historical Run045 remains no-adoption. GPU7
 - Runner/launcher CPU checks61 passed; generic metadata/probe checks64 passed. Runtime authorization, admission, exclusivity monitoring, environment and accounting bind the same selected device; historicalGPU7 evidence remains compatible.
 - Read-only enumeration binds GPU5 UUID `GPU-048017bf-c58f-b622-ca2e-000b668c651b`, PCI `00000000:A1:00.0`, EGL7. New manifest:`runtime/codex-gpu5-setup-manifest.json`; originalGPU7 files unchanged. Actual CUDA/EGL readiness is false until a new healthcheck succeeds.
 - Attempted probe was rejected before reservation/dispatch: external compute PID3816377 appeared on GPU5 (612MiB process memory at observation). No healthcheck or episode event was appended, no additional GPU time spent. Budget unchanged1 dispatched/1 invalid and0.025461891878706712 GPU-hours.
+
+### GPU5 ready except exclusive context admission 2026-09-22T04:40:02.466796+00:00
+
+- Source `8fdf85b8b4071cff8d57721e183543546d9fc1eb`; draft plan `data/qd-ed-n1-dev-gpu5-plan.json` SHA256 `5ae8bf3acf903e0c335d61f30982734a9cea87c0a2fec4c5f3d3f59bfe214604`.30 full Hydra configs composed; model/input bytes and existing Codex login verified. Child environment explicitlyCUDA_VISIBLE_DEVICES=5,CUDA_DEVICE_ORDER=PCI_BUS_ID,MUJOCO_EGL_DEVICE_ID=7.
+- GPU5 still has external compute PID(s)3816377 and623MiB device memory. No owned worker or actualGPU5 context; no additional healthcheck/episode dispatch or GPU cost. State WAITING_GPU5. The plan remains unfrozen with all phase gates false until the real context probe passes.
+
+### Any available server GPU authorized 2026-09-22T04:58:53.637965+00:00
+
+- User authorizes any usable GPU on this server, superseding fixedGPU5/GPU7 restrictions. Still one exclusive worker with per-dispatch identity/admission checks, no sharing/preemption and unchanged scientific/budget gates.
+- Current all-device scan:GPU7 free, other seven have external compute processes. SelectGPU7; existing actual CUDA logical0/EGL4 proof and frozen UUID validate unchanged. No redundant healthcheck needed for this same binding. Previous GPU5 preparation never dispatched a healthcheck or episode.
+- Freeze `available-gpu-amendment.md` and a new source-bound plan; all thirty N1 cells and provider/non-hardware inputs remain identical. No task retries or historical record replacement.

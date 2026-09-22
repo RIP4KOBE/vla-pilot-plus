@@ -6,14 +6,14 @@ worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z
 artifacts: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z
 source_commit: 744e08ba4398f2f8e34fb05619c829fc01397f69
 gpu_pool:
-- 5
+- 7
 max_concurrent_gpu_workers: 1
 project_target:
   status: IN_PROGRESS
   required_formal_successes: 5
   achieved: false
 study:
-  status: PREPARING_GPU5_PENDING_ADMISSION
+  status: PREPARING_AVAILABLE_GPU_RUN
   mode: real
   interaction: auto
 candidate:
@@ -74,18 +74,16 @@ historical:
   previous_gpu_hours: 6.946832055555556
   previous_formal_episodes: 0
 active_iteration: iteration_001_execution_intent
-next_action: Bind current user-authorized physicalGPU5, verify actual CUDA/EGL with
-  an accounted zero-step healthcheck, freeze new common runtime/source plan, then
-  run N1 controls. Prior GPU7 attempts/probes remain unchanged and counted.
+next_action: Freeze current source and available-GPU N1 plan, then dispatch first
+  Q0/P2 pair on currently idleGPU7. If admission changes, rescan all allowed GPUs
+  instead of requiring another device choice.
 source_spec_sha256: 3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef
 derived_indexes:
 - .arbor/sessions/rdt-qd-ed-final-20260921T093925Z
 authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
   ledger is append-only event evidence, not a second mutable state.
-online_blockers:
-- GPU5 gained external compute PID3816377 before probe admission. No new healthcheck/episode
-  dispatched. Actual CUDA/EGL verification remains pending.
-updated_at: '2026-09-22T04:37:01.603807+00:00'
+online_blockers: []
+updated_at: '2026-09-22T04:58:53.637965+00:00'
 seed_plan:
   path: data/frozen-seed-plan.json
   sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
@@ -112,7 +110,7 @@ engineering_baseline_changes:
 - Owned LIBERO path/dependency bindings instead of stale old-worktree absolute paths.
 - Single-task process with explicit policy_seed and env_seed instead of legacy sequential
   seed0 RNG stream; same across all arms.
-cuda_egl_context_verified: false
+cuda_egl_context_verified: true
 stage_provider_ready: true
 runner:
   by_bucket:
@@ -133,14 +131,13 @@ runner:
   last_attempt_id: rdt-qd-ed-final-20260921T093925Z__baseline_dev_t00_q0__49b1a88877f7
   last_event: valid
 gpu_admission_last_observation:
-  physical_index: 5
-  uuid: GPU-048017bf-c58f-b622-ca2e-000b668c651b
-  pci_bus_id: 00000000:A1:00.0
-  memory_used_mib: 5
-  utilization_percent: 0
+  physical_gpu: 7
+  memory_used_mib: 7
   external_compute_processes: 0
+  physical_index: 7
+  uuid: GPU-48473162-9548-1a19-04aa-ea86c5349187
   must_recheck_before_dispatch: true
-  observed_at: '2026-09-22T04:31:51.394735+00:00'
+  observed_at: '2026-09-22T04:58:53.637965+00:00'
 provider_migration_probe:
   artifact: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/codex-stage-production-probe-v2-20260922/result.json
   synthetic_image_only: true
@@ -157,7 +154,7 @@ stage_condition:
   auth_mode: chatgpt
   reasoning_effort: low
   cli_version: 0.155.1
-  runtime_manifest: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/codex-gpu5-setup-manifest.json
+  runtime_manifest: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/codex-setup-manifest.json
   provider_amendment: experiments/iteration_001_execution_intent/codex-provider-amendment.md
   http_request_retry_counts: unobserved_null
   logical_calls_tokens_latency: observed
@@ -178,14 +175,17 @@ closed_baseline:
   complete_success_rate: null
   report: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/iteration_000_intake/closed-incomplete-baseline-report.json
 active_plan:
-  path: data/qd-ed-n1-dev-plan.json
-  source_commit: 71b5880c3dac41a5d26ba678b366f962b5a4af1f
-  sha256: 080985fead54fac3806702c0d8db51904ef94c6aa2231b21cecbf38c7f7bcbfd
-  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/n1-dev-codex-71b5880c3dac.json
+  path: data/qd-ed-n1-dev-gpu5-plan.json
+  source_commit: 8fdf85b8b4071cff8d57721e183543546d9fc1eb
+  frozen: false
   iteration: N1
   controls: 20
   candidate_cells: 10
   candidate_dispatch_authorized: false
+  requires: Actual exclusive GPU5 CUDA/EGL probe, then refresh manifest hash and freeze
+  sha256: 5ae8bf3acf903e0c335d61f30982734a9cea87c0a2fec4c5f3d3f59bfe214604
+  resolved_config_count: 30
+  cpu_preflight: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/iteration_001_execution_intent/gpu5-cpu-preflight.json
 hardware_migration:
   previous_physical_gpu: 7
   authorized_physical_gpu: 5
@@ -196,3 +196,28 @@ hardware_migration:
   egl_device_index: 7
   metadata_verified: true
   cuda_egl_verified: false
+previous_gpu7_active_plan:
+  path: data/qd-ed-n1-dev-plan.json
+  source_commit: 71b5880c3dac41a5d26ba678b366f962b5a4af1f
+  sha256: 080985fead54fac3806702c0d8db51904ef94c6aa2231b21cecbf38c7f7bcbfd
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/n1-dev-codex-71b5880c3dac.json
+  iteration: N1
+  controls: 20
+  candidate_cells: 10
+  candidate_dispatch_authorized: false
+authorized_gpu_selection:
+  policy: any idle GPU on current server
+  candidate_indices:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  selected_physical_gpu: 7
+  user_instruction: 帮我使用当前服务器上任何能用的GPU来跑这个任务即可
+  authorized_at: '2026-09-22T04:58:53.637965+00:00'
+  single_exclusive_worker: true
+  rescan_if_unavailable: true
