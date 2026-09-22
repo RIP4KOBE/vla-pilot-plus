@@ -48,6 +48,7 @@ RUNTIME_ENV_ALLOW = {
     'TRANSFORMERS_CACHE', 'XDG_CACHE_HOME', 'NUMBA_CACHE_DIR', 'TMPDIR',
     'TOKENIZERS_PARALLELISM', 'HF_HUB_OFFLINE', 'TRANSFORMERS_OFFLINE',
     'PYTHONDONTWRITEBYTECODE',
+    'QD_ED_CUDA_EGL_SERIALIZE',
 }
 _HASH_CACHE = {}
 CODEX_CONFIG_KEYS = ('backend', 'model', 'reasoning_effort', 'timeout_seconds', 'cli_path', 'disabled_skill_paths')
@@ -255,6 +256,8 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
     seeds = read_json(seed_path)
     require(seeds.get('schema') == 'qd-ed-frozen-seed-plan-v1' and seeds['run_name'] == plan['run_name'], 'seed plan identity mismatch')
     require(set(runtime.get('environment', {})) <= RUNTIME_ENV_ALLOW, 'unapproved runtime environment name')
+    require(str(runtime.get('environment', {}).get('QD_ED_CUDA_EGL_SERIALIZE', '0')) in {'0', '1'},
+            'invalid CUDA/EGL diagnostic serialization setting')
     require('LIBERO_CONFIG_PATH' in runtime.get('environment', {}), 'owned LIBERO_CONFIG_PATH missing')
     owned(runtime['environment']['LIBERO_CONFIG_PATH'], artifact_root)
     require(plan.get('input_contract_label') == 'input_repaired', 'task-bound cache repair must be disclosed')
@@ -372,6 +375,8 @@ def child_environment(runtime):
         for name in codex_removed_environment():
             env.pop(name, None)
     env.update({k: str(v) for k, v in runtime['environment'].items()})
+    # This opt-in diagnostic must never leak in from the launching shell.
+    env['QD_ED_CUDA_EGL_SERIALIZE'] = str(runtime['environment'].get('QD_ED_CUDA_EGL_SERIALIZE', '0'))
     mapping=runtime['gpu_mapping']
     physical_gpu = runtime_gpu(runtime)
     # Historical p2_render_gpu_index is profile provenance, not a main.py

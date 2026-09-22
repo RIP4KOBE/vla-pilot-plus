@@ -1,3 +1,15 @@
+# LATEST GPU5 result and next diagnostic
+
+GPU5 C0r1 is terminal INFRASTRUCTURE_ABORT_XID31; child115030 and queue107052 are dead. It ran132.650617s, completed first search5.754640s, then first post-search mjr_readPixels triggered same-PID GRAPHICS Xid31. No environment actions/Stage calls occurred. GPU migration alone did not fix the fault. Audit at artifact`analysis/gpu5-migration/render-fault-audit.json`. Next: separate prospective engineering conditionGPU5_EGL_SERIAL_C0 with opt-in CUDA synchronize+owned-EGL rebinding; see`experiments/iteration_001_execution_intent/gpu5-egl-serialization-diagnostic.md`. Not a replacement for original failed condition; development bucket; one diagnostic then review.
+
+# GPU5 diagnostic dispatched
+
+Actual childPID115030, start ticks374108847, attempt`rdt-qd-ed-final-20260921T093925Z__gpu6_native_c0_t00_r1__03c5d2b4a1df`. CUDA_VISIBLE_DEVICES=5, MUJOCO_EGL_DEVICE_ID=7 verified from allowlisted child environment. Currently initializing Object-Swap; inspect artifact`attempts/rdt-qd-ed-final-20260921T093925Z__gpu6_native_c0_t00_r1__03c5d2b4a1df/runner.log`, `eds_eval/phase_timing.jsonl`, `eds_eval/mujoco_phase_timing.jsonl`, `gpu-kernel-xid.json`, terminal`attempt-result.json`. Do not edit frozen code/HEAD until queue and worker stop. Actual launch1790065657.7Unix;1800s cap.
+
+# ACTIVE GPU5 QUEUE
+
+User explicitly switched to GPU5. New queue PID107052, ticks374086799, frozen HEAD `79cdce092b4e9c32b42634262cc9d1f7e14bec4b`, plan `data/qd-ed-gpu5-c0-xid-plan.json`, SHA256 `e2f82d6afb4bf3f8acbd90675cce631ba59c17caa83a1aeb78a5fc8b553ac940`. Runtime/artifact names retain historicalgpu6 identifier. GPU5 UUIDGPU-048017bf-c58f-b622-ca2e-000b668c651b, EGL7, actual CUDA/EGL probe passed17.995s (resource`rdt-qd-ed-final-20260921T093925Z__gpu5_cuda_egl__e30fffebe9e4`). Queue initial source/model hash check, then30s polls/120s stable idle. Exactly one unchanged legacy recovery key`gpu6_native_c0_t00_r1`, then review. Status/process/log: artifact`runtime/gpu5-c0-xid-queue-*`. Do not edit frozen source or advance HEAD while live. Live progress: tmux`rdt-qd-ed-progress` now displaysGPU5.
+
 # LATEST: user switches to GPU5
 
 GPU5-only now supersedes all older GPU6-only instructions below. The old CPU queue32780 was stopped before any recovery dispatch. Keep this worktree/branch/artifact root and legacy episode key; no budget/outcome reset. Read `experiments/iteration_001_execution_intent/gpu5-migration-amendment.md`. GPU5 stability/context check and new frozen plan are being prepared. No external processes stopped. Goal object wording/status is stale (GPU6/paused); latest user instruction governsGPU5.

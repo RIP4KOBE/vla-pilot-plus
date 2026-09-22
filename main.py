@@ -1083,6 +1083,15 @@ class Main:
             self._phase_timing_write_failed = True
             log.warning("Phase timing unavailable; diagnostic writes disabled")
 
+    def _enable_runtime_render_guard(self):
+        if os.environ.get("QD_ED_CUDA_EGL_SERIALIZE", "0") != "1":
+            return
+        if self.backend != "libero":
+            raise RuntimeError("CUDA/EGL diagnostic guard requires LIBERO")
+        config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
+        from utils.cuda_egl_guard import install
+        install(config.get("output_dir") or self.output_dir)
+
     def _api_compute_snapshot(self):
         """Read only counters, never requests, endpoints, headers, or credentials."""
         snapshot = {}
@@ -1490,6 +1499,7 @@ class Main:
         if callable(set_episode_context):
             set_episode_context(int(episode), int(episode_seed))
         self._enable_phase_diagnostics()
+        self._enable_runtime_render_guard()
         self._append_phase_timing(episode=episode, global_step=0,
             name="initial_policy_observation", event="enter", elapsed_s=0.0)
         phase_started_s = time.perf_counter()

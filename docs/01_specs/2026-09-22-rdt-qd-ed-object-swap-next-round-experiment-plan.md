@@ -8,6 +8,8 @@
 
 用户明确要求“在GPU5上执行任务”，本修订覆盖下文历史GPU6-only设备要求。CUDA与EGL都固定物理GPU5。已停止尚未派发的GPU6等待队列，按GPU5的UUID/PCI/EGL重新验证和冻结运行清单，再执行同一C0恢复诊断。算法、任务、seed/init、Stage、720步/1800秒限制、累计预算和晋级门保持不变。已有GPU6失败证据全部保留；更换设备本身不代表故障已修复。原worktree/branch/artifact名称含gpu6，仅作为历史标识保留。详见 `experiments/iteration_001_execution_intent/gpu5-migration-amendment.md`。
 
+**GPU5首个诊断结果：** 更换GPU仍在第一次模型搜索后的 `mjr_readPixels` 发生同进程Xid31，自动中止耗时132.65秒。下一步为独立的 `GPU5_EGL_SERIAL_C0` 工程诊断：渲染前显式等待CUDA完成并绑定所属EGL上下文，任务/动作/图像设置保持原样；单次运行计入development额度。190项相关CPU测试通过，GPU有效性尚待验证。见 `experiments/iteration_001_execution_intent/gpu5-egl-serialization-diagnostic.md`。
+
 ## 历史执行修订：GPU6 专属运行与原生崩溃诊断
 
 - 新 worktree：`/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z`；新分支：`exp/rdt-qd-ed-gpu6-20260922T063626Z`。按用户指定使用 `.worktree/exp`。
