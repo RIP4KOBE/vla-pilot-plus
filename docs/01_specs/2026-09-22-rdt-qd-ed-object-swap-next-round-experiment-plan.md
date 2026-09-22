@@ -1,10 +1,14 @@
 # RDT + QD + ED：Object-Swap 下一轮实验方案
 
-版本：v2，2026-09-22。状态：**AUTHORIZED / 用户已授权在独立 worktree、goal 模式及 GPU6 上执行测试与条件迭代**。
+版本：v3，2026-09-22。状态：**AUTHORIZED / 用户最新指定 GPU5，继续既定测试与条件迭代**。
 
 初稿的历史状态截点为 2026-09-22 05:03 UTC。用户随后明确授权更新方案、新建 worktree/branch、以 goal 模式测试迭代，并指定 GPU6。执行修订如下；历史快照保留其原时点口径。未调用 Arbor/Orchestra Research skill。
 
-## 执行修订：GPU6 专属运行与原生崩溃诊断
+## 最新执行修订：改用 GPU5
+
+用户明确要求“在GPU5上执行任务”，本修订覆盖下文历史GPU6-only设备要求。CUDA与EGL都固定物理GPU5。已停止尚未派发的GPU6等待队列，按GPU5的UUID/PCI/EGL重新验证和冻结运行清单，再执行同一C0恢复诊断。算法、任务、seed/init、Stage、720步/1800秒限制、累计预算和晋级门保持不变。已有GPU6失败证据全部保留；更换设备本身不代表故障已修复。原worktree/branch/artifact名称含gpu6，仅作为历史标识保留。详见 `experiments/iteration_001_execution_intent/gpu5-migration-amendment.md`。
+
+## 历史执行修订：GPU6 专属运行与原生崩溃诊断
 
 - 新 worktree：`/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z`；新分支：`exp/rdt-qd-ed-gpu6-20260922T063626Z`。按用户指定使用 `.worktree/exp`。
 - 分支基于 `46f243873589f37620a40fee4381e12d06113e7b`，继承 N1、运行器修复及原生推理诊断。Goal 已创建；用户中断后工具状态为 paused，当前轮工作及独立等待队列继续，自动后续 goal 轮次需在界面恢复。目标与开发/验证/正式门槛保持本方案规定。

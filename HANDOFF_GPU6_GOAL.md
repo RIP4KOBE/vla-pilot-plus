@@ -1,3 +1,13 @@
+# LATEST: user switches to GPU5
+
+GPU5-only now supersedes all older GPU6-only instructions below. The old CPU queue32780 was stopped before any recovery dispatch. Keep this worktree/branch/artifact root and legacy episode key; no budget/outcome reset. Read `experiments/iteration_001_execution_intent/gpu5-migration-amendment.md`. GPU5 stability/context check and new frozen plan are being prepared. No external processes stopped. Goal object wording/status is stale (GPU6/paused); latest user instruction governsGPU5.
+
+Verified queue status `waiting` at 2026-09-22T07:42:19.986313+00:00; GPU6 external PID4156326, 78745MiB. Full progress report: artifact `analysis/gpu6-progress-20260922.md`.
+
+# Active frozen queue
+
+New GPU6-only queue PID32780, start ticks373818892. Frozen HEAD `3f50b356ebcaab22814896fdfa873471feb2dd96`, plan `data/qd-ed-gpu6-c0-xid-plan.json`, SHA256 `9f5eaf4b19329e44f297cc54c04bf698f111912630e8db0ead7cec84b7942dd7`. Status/process/log: artifact `runtime/gpu6-c0-xid-queue-*`. Initial startup hashes model bytes; then scans every30s and requires120s continuously free. Exactly one `gpu6_native_c0_t00_r1`; no automatic second attempt or30-cell dispatch. Do not advance HEAD or edit frozen code/config/protocol while queue/worker is alive.280 relevant CPU tests passed; actual journal monitor smoke passed without a GPU context.
+
 # GPU6 execution handoff
 
 Current worktree/branch: `/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z` / `exp/rdt-qd-ed-gpu6-20260922T063626Z`.

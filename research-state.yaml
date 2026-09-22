@@ -6,14 +6,14 @@ worktree: /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z
 artifacts: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z
 source_commit: 744e08ba4398f2f8e34fb05619c829fc01397f69
 gpu_pool:
-- 6
+- 5
 max_concurrent_gpu_workers: 1
 project_target:
   status: IN_PROGRESS
   required_formal_successes: 5
   achieved: false
 study:
-  status: GPU6_XID_DIAGNOSTIC_UPGRADE
+  status: GPU5_MIGRATION_CONTEXT_CHECK_PENDING
   mode: real
   interaction: auto
 candidate:
@@ -74,18 +74,17 @@ historical:
   previous_gpu_hours: 6.946832055555556
   previous_formal_episodes: 0
 active_iteration: iteration_001_execution_intent
-next_action: Refreeze and restart GPU6-only CPU wait queue for exactly one C0 recovery
-  with nested MuJoCo timings and prospective Xid31/109 monitoring; no30-cell batch.
+next_action: Verify GPU5 stable idle and CUDA/EGL mapping; execute the existing undispatched
+  C0 r1 diagnostic on GPU5 with all scientific inputs unchanged.
 source_spec_sha256: 3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef
 derived_indexes:
 - .arbor/sessions/rdt-qd-ed-final-20260921T093925Z
 authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
   ledger is append-only event evidence, not a second mutable state.
 online_blockers:
-- GPU6 external PID4156326 still occupies the device.
-- Kernel evidence binds graphics Xid31/109 to C0 and prior Q0; runtime root cause
-  and repair not yet established.
-updated_at: '2026-09-22T07:36:19.249525+00:00'
+- GPU5 context mapping and prospective diagnostic pending; prior GPU6 graphics faults
+  remain recorded.
+updated_at: '2026-09-22T08:20:45.209863+00:00'
 seed_plan:
   path: data/frozen-seed-plan.json
   sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
@@ -107,6 +106,7 @@ cpu_validation:
   phase_startup_stage_passed: 115
   gpu6_resource_queue_passed: 26
   gpu6_xid_observers_runner_queue_passed: 109
+  gpu6_xid_related_tests_passed: 280
 prepared_baseline_plan:
   path: data/qd-ed-final-plan.json
   episodes: 20
@@ -121,7 +121,7 @@ engineering_baseline_changes:
 - Owned LIBERO path/dependency bindings instead of stale old-worktree absolute paths.
 - Single-task process with explicit policy_seed and env_seed instead of legacy sequential
   seed0 RNG stream; same across all arms.
-cuda_egl_context_verified: true
+cuda_egl_context_verified: false
 stage_provider_ready: true
 runner:
   by_bucket:
@@ -186,22 +186,20 @@ closed_baseline:
   complete_success_rate: null
   report: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/iteration_000_intake/closed-incomplete-baseline-report.json
 active_plan:
-  path: /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-gpu6-c0-recovery-plan.json
-  source_commit: f6bc15fca7d53b156bc78b651fda7baf64b89b7a
-  sha256: a05bc27099fdfa192cb1cc49966c83b985ad1a4fb0a31e4da3d09d0c41c0c452
+  path: /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-gpu6-c0-xid-plan.json
+  source_commit: 3f50b356ebcaab22814896fdfa873471feb2dd96
+  sha256: 9f5eaf4b19329e44f297cc54c04bf698f111912630e8db0ead7cec84b7942dd7
   frozen: true
   iteration: GPU6_NATIVE_C0
   diagnostic_only: true
   candidate_dispatch_authorized: false
 hardware_migration:
-  previous_physical_gpu: 7
+  previous_physical_gpu: 6
   authorized_physical_gpu: 5
-  user_instruction: 改用5
-  authorized_at: '2026-09-22T04:31:51.394735+00:00'
+  user_instruction: 在GPU5上执行任务
+  authorized_at: '2026-09-22T08:20:45.209863+00:00'
   max_concurrent_gpu_workers: 1
   earlier_attempts_and_costs_preserved: true
-  egl_device_index: 7
-  metadata_verified: true
   cuda_egl_verified: false
 previous_gpu7_active_plan:
   path: data/qd-ed-n1-dev-plan.json
@@ -213,12 +211,14 @@ previous_gpu7_active_plan:
   candidate_cells: 10
   candidate_dispatch_authorized: false
 authorized_gpu_selection:
-  policy: physical GPU6 only
+  policy: physical GPU5 only
   candidate_indices:
-  - 6
-  selected_physical_gpu: 6
+  - 5
+  selected_physical_gpu: 5
   single_exclusive_worker: true
   rescan_if_unavailable: true
+  user_instruction: 在GPU5上执行任务
+  authorized_at: '2026-09-22T08:20:45.209863+00:00'
 resource_queue:
   pid: 3996172
   proc_start_ticks: '373125345'
@@ -342,6 +342,14 @@ gpu_authorization_history:
   authorized_at: '2026-09-22T04:58:53.637965+00:00'
   single_exclusive_worker: true
   rescan_if_unavailable: true
+- policy: physical GPU6 only
+  candidate_indices:
+  - 6
+  selected_physical_gpu: 6
+  single_exclusive_worker: true
+  rescan_if_unavailable: true
+  superseded_at: '2026-09-22T08:20:45.209863+00:00'
+  superseded_by: 'Explicit user instruction: 在GPU5上执行任务'
 execution_id: rdt-qd-ed-gpu6-20260922T063626Z
 execution_migration:
   parent_worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z
@@ -393,4 +401,29 @@ gpu6_kernel_audit:
   path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/analysis/gpu6-xid-audit/audit.json
   retrospective_outcomes_changed: false
   new_monitor: prospective only
-  source_pending_freeze: true
+  source_pending_freeze: false
+gpu6_xid_queue:
+  pid: 32780
+  proc_start_ticks: '373818892'
+  argv:
+  - /home/hynx/miniconda3/envs/vla-pilot/bin/python
+  - /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/scripts/qd_ed_available_gpu_queue.py
+  - --plan
+  - /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-gpu6-c0-xid-plan.json
+  - --episode-key
+  - gpu6_native_c0_t00_r1
+  - --poll-seconds
+  - '30'
+  - --idle-seconds
+  - '120'
+  - --status-path
+  - /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/gpu6-c0-xid-queue-status.json
+  source_commit: 3f50b356ebcaab22814896fdfa873471feb2dd96
+  plan_sha256: 9f5eaf4b19329e44f297cc54c04bf698f111912630e8db0ead7cec84b7942dd7
+  physical_gpu: 6
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/gpu6-c0-xid-queue-status.json
+  log_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/gpu6-c0-xid-queue.log
+  started_at_unix: 1790062758.167222
+  scope: CPU wait; exactly one explicit C0 r1 recovery with nested MuJoCo timings
+    and prospective Xid31/109 termination
+  status: administratively_interrupted_before_dispatch
