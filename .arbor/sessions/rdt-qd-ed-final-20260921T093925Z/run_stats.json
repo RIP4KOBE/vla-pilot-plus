@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-09-22T06:39:04.470801+00:00",
-  "status": "NATIVE_DIAGNOSTIC_WAITING_GPU7",
+  "timestamp": "2026-09-22T06:48:30.701031+00:00",
+  "status": "NATIVE_QUEUE_REPAIR_GPU7",
   "budget": {
     "max_gpu_hours": 48.0,
-    "gpu_hours_consumed": 0.4306699061807659,
+    "gpu_hours_consumed": 0.4673441816253277,
     "max_episode_attempts": 240,
     "reserved": {
       "baseline": 20,
@@ -27,8 +27,49 @@
   "validation_exposed": false,
   "formal_exposed": false,
   "provider_condition": "codex_login_astra_low_v1",
-  "queue_pid": null,
+  "queue_pid": 4111605,
   "authorized_gpu_indices": [
     7
-  ]
+  ],
+  "native_resource_queue": {
+    "pid": 4111605,
+    "proc_start_ticks": "373483170",
+    "source_commit": "b43ddd653d94f69b0e42259e31486d9e4db8ef58",
+    "plan_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v1-plan.json",
+    "plan_sha256": "1f42729daf579393c7d292f3f1735b22983f41fcf44188e252e6e2d288860996",
+    "status_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/native-probe-queue-status.json",
+    "log_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/native-probe-queue.log",
+    "started_at": "2026-09-22T06:43:20.949185+00:00",
+    "argv": [
+      "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+      "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_native_probe_queue.py",
+      "--plan",
+      "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v1-plan.json",
+      "--poll-seconds",
+      "30",
+      "--status-path",
+      "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/native-probe-queue-status.json"
+    ],
+    "authorized_physical_gpus": [
+      7
+    ],
+    "scope": "one bounded native diagnostic; no scientific episodes",
+    "status": "failed",
+    "last_verified_at": "2026-09-22T06:47:36.812681+00:00",
+    "reason": "unfinished attempt or healthcheck requires reconciliation",
+    "archived_evidence": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/queue-history/b43ddd6-concurrent-resource-journal"
+  },
+  "native_diagnostic": {
+    "status": "QUEUE_REPAIR_NO_GPU_DISPATCH",
+    "script": "scripts/qd_ed_policy_native_probe.py",
+    "scope": "B1 native inference on deterministic synthetic inputs; no simulator, actions, Stage call or scientific episode",
+    "timeout_seconds": 600,
+    "source_plan_pending_freeze": false,
+    "limitation": "Cannot establish guided-transition or EGL causality",
+    "plan_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v1-plan.json",
+    "plan_sha256": "1f42729daf579393c7d292f3f1735b22983f41fcf44188e252e6e2d288860996",
+    "source_commit": "b43ddd653d94f69b0e42259e31486d9e4db8ef58",
+    "snapshot": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/native-gpu7-queue-b43ddd653d94.json",
+    "physical_gpu": 7
+  }
 }

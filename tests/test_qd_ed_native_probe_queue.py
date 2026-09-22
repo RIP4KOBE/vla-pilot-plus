@@ -236,3 +236,79 @@ def test_completed_resource_must_match_frozen_native_scope(tmp_path, monkeypatch
     monkeypatch.setattr(nq.native, 'run_probe', lambda *a, **k: {**completed(path), 'scope': {}})
     with pytest.raises(nq.runner.GateError, match='resource contract mismatch'):
         nq.run_queue(path, root=root, sleep=lambda _: None, monotonic=clock)
+
+
+def inflight_resource(root):
+    for event in ('reserved', 'dispatched'):
+        nq.runner.append_healthcheck_event(root, {'resource_id': 'externally-owned-resource',
+            'event': event, 'physical_gpu': 6, 'output_dir': '/external-namespace/unchanged'})
+
+
+def test_inflight_journal_waits_on_cpu_without_query_dispatch_or_reconciliation(tmp_path, monkeypatch):
+    root, artifact, path, _, clock = fixture(tmp_path, monkeypatch)
+    inflight_resource(root)
+    ledger = root / 'data/gpu-healthcheck-ledger.jsonl'
+    original = ledger.read_bytes()
+    monkeypatch.setattr(nq.queue, 'inventory', forbid)
+    monkeypatch.setattr(nq.queue, 'bind_plan', forbid)
+    monkeypatch.setattr(nq.runner, 'reconcile_ledger', forbid)
+    waits = []
+    result = nq.run_queue(path, root=root, sleep=waits.append, monotonic=clock, max_polls=2)
+    assert result['status'] == 'waiting_journal' and waits == [30]
+    assert result['scientific_episodes_dispatched'] == 0
+    assert ledger.read_bytes() == original
+    assert not (root / 'data/attempt-ledger.jsonl').exists()
+    assert nq.runner.read_json(artifact / 'runtime/native-probe-queue-status.json')['status'] == 'waiting_journal'
+
+
+def test_owner_terminal_event_allows_fresh_idle_window_then_single_native_probe(tmp_path, monkeypatch):
+    root, artifact, path, _, clock = fixture(tmp_path, monkeypatch)
+    inflight_resource(root)
+    monkeypatch.setattr(nq.queue, 'inventory', lambda: devices(7))
+    monkeypatch.setattr(nq.runner, 'reconcile_ledger', forbid)
+    observed, calls = [], []
+    def owner_finishes(_seconds):
+        phase = nq.runner.read_json(artifact / 'runtime/native-probe-queue-status.json')['status']
+        observed.append(phase)
+        if phase == 'waiting_journal':
+            nq.runner.append_healthcheck_event(root, {'resource_id': 'externally-owned-resource',
+                'event': 'completed', 'gpu_process_wall_seconds': 1.0, 'physical_gpu': 6})
+    def probe(*args, **kwargs):
+        calls.append(True)
+        return completed(path)
+    monkeypatch.setattr(nq.native, 'run_probe', probe)
+    result = nq.run_queue(path, root=root, sleep=owner_finishes, monotonic=clock)
+    assert observed == ['waiting_journal', 'waiting']
+    assert result['status'] == 'completed' and calls == [True]
+    assert result['gpu_inventory'][7]['idle_observed_seconds'] == 120
+    assert not (root / 'data/attempt-ledger.jsonl').exists()
+
+
+@pytest.mark.parametrize('reason', [
+    'unfinished attempt or healthcheck requires reconciliation extra',
+    'native queue source HEAD changed',
+])
+def test_journal_wait_exception_match_is_exact_and_other_gates_still_fail(tmp_path, monkeypatch, reason):
+    root, artifact, path, _, clock = fixture(tmp_path, monkeypatch)
+    def rejected(*args, **kwargs):
+        raise nq.runner.GateError(reason)
+    monkeypatch.setattr(nq, 'waiting_gate', rejected)
+    monkeypatch.setattr(nq.queue, 'inventory', forbid)
+    with pytest.raises(nq.runner.GateError, match=reason):
+        nq.run_queue(path, root=root, sleep=forbid, monotonic=clock)
+    assert nq.runner.read_json(artifact / 'runtime/native-probe-queue-status.json')['status'] == 'failed'
+
+
+def test_same_journal_error_after_resource_dispatch_still_stops(tmp_path, monkeypatch):
+    root, artifact, path, _, clock = fixture(tmp_path, monkeypatch)
+    monkeypatch.setattr(nq.queue, 'inventory', lambda: devices(7))
+    calls = []
+    def failed_native(*args, **kwargs):
+        calls.append(True)
+        inflight_resource(root)
+        raise nq.runner.GateError('unfinished attempt or healthcheck requires reconciliation')
+    monkeypatch.setattr(nq.native, 'run_probe', failed_native)
+    with pytest.raises(nq.runner.GateError, match='requires reconciliation'):
+        nq.run_queue(path, root=root, sleep=lambda _: None, monotonic=clock)
+    assert calls == [True]
+    assert nq.runner.read_json(artifact / 'runtime/native-probe-queue-status.json')['status'] == 'failed'

@@ -182,3 +182,19 @@ The latest instruction supersedes any-GPU authorization for future work. Authori
 ## 2026-09-22T06:39:39.500261+00:00 — GPU7 diagnostic queue reviewed
 
 The independent native queue passed17 focused tests and80 combined CPU tests with the native probe and existing resource selector. Root reviewed the source and test boundaries. It requires all scientific gates false, frozen diagnostic scope/configuration/source, and dynamic GPU authorization. Only GPU7 is authorized. The original undispatched C0 row is used solely as a resource-binding budget/retry preflight anchor; runner.run_plan is never called. CPU waiting allocates no CUDA context; one diagnostic runs after120-second stable idle and then stops. Any dispatched resource failure stops without retry. Thirty-second atomic heartbeat continues during input verification and diagnostic execution. No GPU probe or episode was dispatched by testing.
+
+## 2026-09-22T06:41:08.383396+00:00 — GPU7 native diagnostic queue frozen
+
+Source b43ddd653d94f69b0e42259e31486d9e4db8ef58; plan qd-ed-native-gpu7-queue-v1-plan.json; SHA256 1f42729daf579393c7d292f3f1735b22983f41fcf44188e252e6e2d288860996. The first CPU-only freeze assertion found the older configuration preview wrapped its policy leaves in metadata. A new plain policy-configuration artifact now matches the queue contract exactly; the old preview and unlaunched preliminary plan remain preserved. No GPU process or episode was dispatched. Frozen runtime binds physical7/CUDA0/EGL4 and reuses audited GPU7v2 context proof. Full model-byte verification is performed by queue startup.
+
+## 2026-09-22T06:43:20.949185+00:00 — GPU7 native queue launched
+
+Detached queue PID4111605, start ticks373483170, plan SHA2561f42729daf579393c7d292f3f1735b22983f41fcf44188e252e6e2d288860996. Initial status starting means CPU input/model-byte validation, not a GPU dispatch. OnlyGPU7 authorized. The first launcher refused while a concurrent GPU6 probe from a separate artifact namespace was unfinished. That resource ...74d84549721c completed in15.178619010839611 seconds; its append-only evidence and cost are retained conservatively, without treating it as this continuation or changing GPU7 authorization. Total conservative closed GPU-hours now0.4348861892393325; scientific attempts unchanged5.
+
+## 2026-09-22T06:47:36.812681+00:00 — native queue stopped before GPU dispatch on concurrent unfinished resource
+
+PID4111605 completed full input/model verification and observed GPU7 idle, but a separate-namespace GPU6 native diagnostic ...b689d3b01c36 appeared unfinished in the shared resource journal. The queue stopped before any resource dispatch of its own; archived process/status/log evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/queue-history/b43ddd6-concurrent-resource-journal. Do not bypass the single-worker/reconciliation gate. A minimal CPU-wait repair will keep a queue alive while this exact journal gate remains closed; it will not reconcile another task, ignore other gate failures, run in parallel or retry a dispatched sample.
+
+## 2026-09-22T06:49:51.451825+00:00 — CPU-only journal wait repair reviewed
+
+22 queue CPU tests pass. Root reviewed the14-line control-flow change: only the exact unfinished journal gate at the preselection loop enters waiting_journal, clearing old idle observations and selectedGPU. Other gates and any post-dispatch failure still stop. This is no scientific retry and consumes no GPU while waiting.

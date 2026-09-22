@@ -4,7 +4,7 @@ Authority: `research-state.yaml` and `iteration-ledger.md`. Run `rdt-qd-ed-final
 
 ## Current evidence
 
-Five episodes dispatched: two invalid task failures (original baseline startup and N1 Q0 r3 nativeSIGABRT), three infrastructure aborts. Zero valid outcomes. At this checkpoint no live queue/worker exists; inspect the native queue process/status files for subsequent launch evidence. Closed cost0.4306699061807659 GPU-hours. r3 completed3partialchunks(step0/8/16) and one real Codex Stage query atstep24 (19.772s,10800input/42outputtokens), then crashed. Native causeUnknown; signalconfirmedbyapport butcorelimit0. Neither invalid sample may be ordinarily retried. Candidate/validation/formal remainunmeasured. The zero-simulation policy diagnostic passed37 CPU tests and its GPU7-only durable queue is being frozen; keep it separate from scientificepisodes and chargeitsGPUwalltime.
+Five episodes dispatched: two invalid task failures (original baseline startup and N1 Q0 r3 nativeSIGABRT), three infrastructure aborts. Zero valid outcomes. Native diagnostic queue PID4111605 stopped before GPU dispatch; a CPU-only journal-wait repair is being frozen; inspect its current process lifetime and status before further actions. Conservative closed cost0.4673441816253277 GPU-hours, including the concurrently written separate-namespace GPU6 healthcheck. r3 completed3partialchunks(step0/8/16) and one real Codex Stage query atstep24 (19.772s,10800input/42outputtokens), then crashed. Native causeUnknown; signalconfirmedbyapport butcorelimit0. Neither invalid sample may be ordinarily retried. Candidate/validation/formal remainunmeasured. The zero-simulation policy diagnostic and queue passed80 combined CPU tests; the frozen GPU7-only queue is launched; keep it separate from scientificepisodes and chargeitsGPUwalltime.
 
 N1 protocol was committed in `56031d2` before implementation. It changes only the archive descriptor to target distance and eight-action positive gripper-command duty; CPU proxies are not online success evidence. Review `experiments/iteration_001_execution_intent/analysis.md` and the startup/provider/resource amendments before any scientific decision.
 
@@ -29,3 +29,9 @@ A device change creates a hardware-only child runtime/plan with selected UUID, P
 5. Preserve240 total dispatched attempts and48 GPU-process hours, including all failures, recovery, healthchecks, startup and Codex waiting. Protect validation/formal reservations. Completion requires evidence for the specified formal target; queued work or passing CPU checks is not success.
 
 Arbor authorization continues only for this explicitly invoked task; implicit invocation remains disabled. Never merge or push main.
+
+## Frozen native diagnostic continuation
+
+Plan: `data/qd-ed-native-gpu7-queue-v1-plan.json`; source `b43ddd653d94f69b0e42259e31486d9e4db8ef58`; SHA256 `1f42729daf579393c7d292f3f1735b22983f41fcf44188e252e6e2d288860996`. Queue PID4111605, start ticks373483170. The similarly named preliminary plan without `-v1` failed a CPU-only configuration-shape assertion and was never launched; use only the v1 frozen plan.
+
+Queue statuses: starting = model/input verification; waiting = no admissible GPU7; running_diagnostic = verify actual healthcheck dispatch before claiming inference; completed = exactly one native diagnostic, never whole-study completion; failed = inspect immutable terminal evidence without automatic retry. The P2 row is only a resource preflight anchor and all scientific phase gates are false. Do not mutate code/source HEAD while this queue is alive.

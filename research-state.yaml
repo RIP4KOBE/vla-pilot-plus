@@ -28,7 +28,7 @@ candidate:
   ordering_amendment: experiments/iteration_001_execution_intent/startup-repair-amendment.md
 budget:
   max_gpu_hours: 48.0
-  gpu_hours_consumed: 0.4306699061807659
+  gpu_hours_consumed: 0.4673441816253277
   max_episode_attempts: 240
   reserved:
     baseline: 20
@@ -74,8 +74,9 @@ historical:
   previous_gpu_hours: 6.946832055555556
   previous_formal_episodes: 0
 active_iteration: iteration_001_execution_intent
-next_action: Freeze and launch only the bounded native B1 diagnostic on physical GPU7;
-  wait for exclusive availability. Do not retry the failed Q0 cell or dispatch P2/candidate/validation/formal.
+next_action: Freeze bounded queue handling for CPU-only waiting on unfinished resource
+  journal; then run only one GPU7 diagnostic. No resource dispatch or scientific retry
+  from previous queue.
 source_spec_sha256: 3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef
 derived_indexes:
 - .arbor/sessions/rdt-qd-ed-final-20260921T093925Z
@@ -85,7 +86,7 @@ online_blockers:
 - N1 Q0 control terminated with native SIGABRT after successful Stage query. No ordinary
   retry permitted. Root is preparing an independently accounted zero-simulation B1
   inference diagnostic; native root cause remains Unknown.
-updated_at: '2026-09-22T06:36:54.904959+00:00'
+updated_at: '2026-09-22T06:47:36.812681+00:00'
 seed_plan:
   path: data/frozen-seed-plan.json
   sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
@@ -103,6 +104,7 @@ cpu_validation:
   native_policy_probe_passed: 37
   native_probe_queue_passed: 17
   native_probe_queue_integrated_passed: 80
+  native_probe_queue_journal_wait_passed: 22
 prepared_baseline_plan:
   path: data/qd-ed-final-plan.json
   episodes: 20
@@ -132,8 +134,8 @@ runner:
     development: 0.003410519381933328
     validation: 0.0
     formal: 0.0
-    recovery: 0.4076078627622014
-  gpu_healthcheck_hours: 0.01752957883045181
+    recovery: 0.4442821382067632
+  gpu_healthcheck_hours: 0.05420385427501363
   gpu_healthcheck_inflight: 0
   last_attempt_id: rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r3__6df33a24c65f
   last_event: valid
@@ -314,17 +316,18 @@ real_stage_transport_evidence:
   http_requests_retries: null
   task_success_claimed: false
 native_diagnostic:
-  status: AWAITING_GPU7_QUEUE_FREEZE
+  status: QUEUE_REPAIR_NO_GPU_DISPATCH
   script: scripts/qd_ed_policy_native_probe.py
   scope: B1 native inference on deterministic synthetic inputs; no simulator, actions,
     Stage call or scientific episode
   timeout_seconds: 600
   source_plan_pending_freeze: false
   limitation: Cannot establish guided-transition or EGL causality
-  plan_path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-diagnostic-plan.json
-  plan_sha256: fbe1c641d4b1e09a970f0baf67553da6118e957da3f42cfada170f0dc1ebb1f8
-  source_commit: 46f243873589f37620a40fee4381e12d06113e7b
-  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/native-diagnostic-46f243873589.json
+  plan_path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v1-plan.json
+  plan_sha256: 1f42729daf579393c7d292f3f1735b22983f41fcf44188e252e6e2d288860996
+  source_commit: b43ddd653d94f69b0e42259e31486d9e4db8ef58
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/native-gpu7-queue-b43ddd653d94.json
+  physical_gpu: 7
 gpu_authorization_history:
 - policy: any idle GPU on current server
   candidate_indices:
@@ -342,3 +345,40 @@ gpu_authorization_history:
   authorized_at: '2026-09-22T04:58:53.637965+00:00'
   single_exclusive_worker: true
   rescan_if_unavailable: true
+resource_journal_anomaly:
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu6_cuda_egl__74d84549721c
+  output_namespace: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z
+  observed_terminal: completed
+  wall_seconds: 15.178619010839611
+  note: Written concurrently from a different artifact namespace, not dispatched by
+    this continuation. Preserve append-only evidence and conservatively retain cost;
+    do not broaden GPU7 authorization.
+  additional_resource:
+    resource_id: rdt-qd-ed-final-20260921T093925Z__gpu6_native_b1__b689d3b01c36
+    event: completed
+    wall_seconds: 116.84877258958295
+native_resource_queue:
+  pid: 4111605
+  proc_start_ticks: '373483170'
+  source_commit: b43ddd653d94f69b0e42259e31486d9e4db8ef58
+  plan_path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v1-plan.json
+  plan_sha256: 1f42729daf579393c7d292f3f1735b22983f41fcf44188e252e6e2d288860996
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/native-probe-queue-status.json
+  log_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/native-probe-queue.log
+  started_at: '2026-09-22T06:43:20.949185+00:00'
+  argv:
+  - /home/hynx/miniconda3/envs/vla-pilot/bin/python
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_native_probe_queue.py
+  - --plan
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v1-plan.json
+  - --poll-seconds
+  - '30'
+  - --status-path
+  - /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/native-probe-queue-status.json
+  authorized_physical_gpus:
+  - 7
+  scope: one bounded native diagnostic; no scientific episodes
+  status: failed
+  last_verified_at: '2026-09-22T06:47:36.812681+00:00'
+  reason: unfinished attempt or healthcheck requires reconciliation
+  archived_evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/queue-history/b43ddd6-concurrent-resource-journal

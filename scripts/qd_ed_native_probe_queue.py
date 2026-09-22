@@ -117,7 +117,21 @@ def run_queue(plan_path, *, root=ROOT, poll_seconds=30, status_path=None,
             original_episodes = queue.dispatch_ids(root)
             idle_windows, polls = {}, 0
             while True:
-                candidates = waiting_gate(active_path, plan_hash, plan, row, root)
+                try:
+                    candidates = waiting_gate(active_path, plan_hash, plan, row, root)
+                except runner.GateError as exc:
+                    if str(exc) != 'unfinished attempt or healthcheck requires reconciliation':
+                        raise
+                    # Observe the journal only. Its owner must finish/reconcile;
+                    # no GPU query, binding, reconciliation or dispatch here.
+                    idle_windows.clear()
+                    polls += 1
+                    save('waiting_journal', active_plan_path=str(active_path),
+                         selected_physical_gpu=None, last_resource_reason=str(exc))
+                    if max_polls is not None and polls >= max_polls:
+                        return status
+                    sleep(poll_seconds)
+                    continue
                 runner.require(queue.dispatch_ids(root) == original_episodes,
                                'scientific episode journal changed during native queue')
                 devices = queue.inventory()
