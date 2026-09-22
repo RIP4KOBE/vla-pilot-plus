@@ -48,3 +48,16 @@ New authorized cycle from `744e08b`; historical Run045 remains no-adoption. GPU7
 - A first adapter probe failed closed on a CLI skill-context warning. Local no-inference prompt inspection established that CLI0.155.1 requires disabled skill FILE paths rather than folder paths. Corrected public policy disables116 skills within each Stage invocation; global skill policies remain unchanged.
 - Production-adapter probev2 passed unchanged Stage-template/two-image transport, one turn, complete usage and no tool/warning item.33.5436s,9780 input/69 output/21 reasoning tokens. This is not task-success or quota evidence. Full artifacts and fixed identities in `codex-integration.md`.
 - New runtime manifest is `runtime/codex-setup-manifest.json`; original setup and pre-migration draft remain preserved. Next freeze refreshed source/config plan and dispatch the initial paired baseline cells on exclusive GPU7. At this checkpoint episodes remain0 and GPU-hours0.005810367842075519.
+
+### Counted baseline startup failure 2026-09-22T03:55:55.226809+00:00
+
+- Source `4d9cd5d31e8dde6d298ec10805cde4542d5765a2`; frozen plan SHA256 `2d12ceb95b51a6d8bea317864b801711cdc138fd685382e23d5b4526192432ac`, archived unchanged at `frozen_plans/baseline-codex-4d9cd5d31e8d.json`.
+- Attempt `rdt-qd-ed-final-20260921T093925Z__baseline_dev_t00_q0__49b1a88877f7` dispatched on physical GPU7 and failed before episode execution: zero actions and zero Stage queries. Stage configuration was overwritten by the grounding section, causing the legacy client factory to fail on missing API credentials. The Codex fail-closed guard stopped startup; no credential fallback was added.
+- Retain the terminal invalid failed sample, its baseline denominator cell, and70.7454865318723 GPU seconds. No automatic retry or infrastructure reclassification. Total1 dispatched,0 valid,1 invalid,0 aborted; total GPU-hours0.025461891878706712 including both healthchecks. No scientific robot-success or N1 mechanism inference follows from this failure.
+- A bounded startup routing repair and real-factory CPU regression are assigned to the existing executor. The old source/plan/output remain preserved; any subsequent dispatch requires a newly frozen source version and explicit selection of pending identities.
+
+### Prospective repair/control ordering 2026-09-22T03:57:56.998355+00:00
+
+- Startup executor separated Stage/grounding configuration;118 CPU tests passed, including real factory construction without API keys and default-provider regressions. No GPU or network in these tests.
+- Original baseline closed as1 invalid and19 not dispatched; expected20 retained and complete success rates null. Report:`iteration_000_intake/closed-incomplete-baseline-report.json`. No failed identity retry or outcome replacement.
+- Freeze `startup-repair-amendment.md` before further dispatch: the already planned N1 Dev allowance≤30 now runs all Q0/P2 controls first, then N1. New full cohort iteration `N1`, development bucket; identical repaired source/runtime for every arm. This establishes a valid repaired common baseline without spending another20 reserved baseline episodes. No reservation transfer or promotion-threshold change.

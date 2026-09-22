@@ -1007,6 +1007,95 @@ def test_codex_components_load_cached_descriptions_without_api_credentials(monke
         runner.vlm_agent.plan_segmentation(None, None)
 
 
+def test_codex_startup_real_factory_receives_stage_config_without_grounding_overwrite(monkeypatch, tmp_path):
+    import core.codex_stage as codex_stage
+    import core.gemini_grounder as gemini_grounder
+
+    main, runner, cfg, _ = _codex_component_runner(monkeypatch, tmp_path)
+    for name in ("OPENAI_API_KEY", "GOOGLE_API_KEY", "CODEX_API_KEY"):
+        monkeypatch.delenv(name, raising=False)
+
+    def forbidden_external_call(*args, **kwargs):
+        raise AssertionError("Codex startup must not create a legacy API client or launch a request")
+
+    monkeypatch.setattr(gemini_grounder, "_make_client", forbidden_external_call)
+    monkeypatch.setattr(codex_stage.subprocess, "Popen", forbidden_external_call)
+    cli = tmp_path / "codex"
+    cli.write_text("# CPU initialization fixture; must never execute\n")
+    template = tmp_path / "stage_template.txt"
+    template.write_text("Stage prompt fixture {instruction}")
+    expected = {
+        "backend": "codex_cli", "model": "gpt-6-astra", "api_key": None,
+        "reasoning_effort": "low", "timeout_seconds": 91,
+        "cli_path": str(cli), "disabled_skill_paths": [],
+        "stage_template_path": str(template),
+    }
+    cfg.perception.gemini = expected
+    cfg.perception.gemini_grounding = {
+        "enabled": False, "model": "grounding-model-must-not-route-stage",
+        "api_key": None, "default_objects": ["grounding-only-object"],
+    }
+
+    # Keep the real factory and real Codex constructor: this is the startup
+    # boundary where a shared local variable previously selected the API path.
+    assert main.create_gemini_stage_recognizer is gemini_grounder.create_gemini_stage_recognizer
+    runner._init_components(cfg)
+
+    assert isinstance(runner.gemini_stage_recognizer, codex_stage.CodexStageRecognizer)
+    assert runner.gemini_stage_recognizer.config == expected
+    assert runner.gemini_stage_recognizer.transport_metadata["model"] == "gpt-6-astra"
+    assert runner.gemini_stage_recognizer.timeout_seconds == 91
+    assert runner.gemini_stage_recognizer.prompt_template == template.read_text()
+    assert runner.gemini_stage_recognizer.api_request_counter.snapshot()["logical_call_attempts"] == 0
+    assert runner.gemini_grounder is None
+    assert runner.vlm_agent.cache_only is True
+
+
+@pytest.mark.parametrize("grounding_enabled", [False, True])
+@pytest.mark.parametrize("backend", [None, "openai_compatible"])
+def test_default_stage_and_grounding_configs_remain_distinct(monkeypatch, tmp_path, grounding_enabled, backend):
+    import core.gemini_grounder as gemini_grounder
+
+    main, runner, cfg, _ = _codex_component_runner(monkeypatch, tmp_path)
+    stage_config = {"model": "stage-model", "api_key": None}
+    if backend is not None:
+        stage_config["backend"] = backend
+    cfg.perception.gemini = stage_config
+    cfg.perception.gemini_grounding = {
+        "enabled": grounding_enabled, "model": "grounding-model",
+        "api_key": "unit-test-placeholder", "default_objects": ["grounding-only-object"],
+    }
+    stage_inputs, grounding_inputs = [], []
+    client = SimpleNamespace()
+    monkeypatch.setattr(main, "VLMAgent", lambda **kwargs: SimpleNamespace(client=client))
+    monkeypatch.setattr(main, "observe_api_requests", lambda client: object())
+
+    def stage_client(config):
+        stage_inputs.append(config)
+        return client
+
+    grounder = object()
+    def grounding_factory(config):
+        grounding_inputs.append(config)
+        return grounder
+
+    monkeypatch.setattr(gemini_grounder, "_make_client", stage_client)
+    monkeypatch.setattr(main, "create_gemini_grounder", grounding_factory)
+    runner._init_components(cfg)
+
+    assert type(runner.gemini_stage_recognizer) is gemini_grounder.GeminiStageRecognizer
+    assert stage_inputs == [stage_config]
+    assert runner.gemini_stage_recognizer.model == "stage-model"
+    assert runner.vlm_agent.client is client
+    if grounding_enabled:
+        assert grounding_inputs == [OmegaConf.to_container(cfg.perception.gemini_grounding, resolve=True)]
+        assert runner.gemini_grounder is grounder
+        assert runner.gemini_default_objects == ["grounding-only-object"]
+    else:
+        assert grounding_inputs == []
+        assert runner.gemini_grounder is None
+
+
 @pytest.mark.parametrize("mutation", ["no_cache", "missing_cache", "sam3", "gemini_grounding", "startup_failure"])
 def test_codex_components_reject_unfrozen_fallbacks(monkeypatch, tmp_path, mutation):
     main, runner, cfg, cache = _codex_component_runner(monkeypatch, tmp_path)

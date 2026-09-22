@@ -6,11 +6,11 @@ Artifact root: `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T0939
 
 ## Current scientific position
 
-No online episode has been dispatched. Two accounted synthetic GPU healthchecks consumed0.005810367842075519 GPU-hours; the second verified the actual CUDA/EGL context on physical GPU7. The task target is **unmeasured**, not achieved or scientifically rejected. Historical Q0 remains2/10 and same-round historical P2 remains3/10. CPU diagnostics and tests are not success scores.
+One baseline episode was dispatched and failed during startup before any action or Stage query. It remains an invalid failed denominator cell and cannot be retried. Total GPU cost is0.025461891878706712 hours, including70.7454865318723 seconds for that startup and two synthetic healthchecks. The successful healthcheck verified the actual CUDA/EGL context on physical GPU7. The task target is **unmeasured**, not achieved or scientifically rejected. Historical Q0 remains2/10 and same-round historical P2 remains3/10. CPU diagnostics and tests are not success scores.
 
 N1 protocol was committed in `56031d2` before implementation and outcome exposure. It changes only the archive descriptor to executed-endpoint target distance and eight-action positive gripper-command duty. See `experiments/iteration_001_execution_intent/analysis.md` for implementation checks, approximate historical replay and its substantial spatial-information loss. No promotion from those proxies is authorized.
 
-The prepared baseline plan is `data/qd-ed-final-plan.json`:20 explicit Dev task/seed cells, Q0 and C0/P2 on each task, alternating arm order. It remains **unfrozen** with all phase gates false. It is a review artifact, not permission to launch by toggling flags. All arms use separately disclosed corrected Stage target descriptions, canonical unchanged reward functions, owned runtime paths and per-task policy seeds. Original historical files remain read-only.
+The prepared baseline plan is `data/qd-ed-final-plan.json`:20 explicit Dev task/seed cells, Q0 and C0/P2 on each task, alternating arm order. It was frozen at source `4d9cd5d31e8dde6d298ec10805cde4542d5765a2` and archived at `frozen_plans/baseline-codex-4d9cd5d31e8d.json`. That version exposed a Stage/grounding configuration routing bug during the first startup. Freeze a new continuation after repair; preserve the failed cell and original plan unchanged. All arms use separately disclosed corrected Stage target descriptions, canonical unchanged reward functions, owned runtime paths and per-task policy seeds. Original historical files remain read-only.
 
 ## Required external conditions
 

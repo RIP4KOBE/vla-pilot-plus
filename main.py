@@ -718,8 +718,8 @@ class Main:
 
         # Get perception config (loaded from perception.yaml with @package perception)
         perception_cfg = cfg.get('perception', {})
-        gemini_config = OmegaConf.to_container(perception_cfg.get('gemini', {}), resolve=True)
-        codex_stage = gemini_config.get('backend') == 'codex_cli'
+        stage_config = OmegaConf.to_container(perception_cfg.get('gemini', {}), resolve=True)
+        codex_stage = stage_config.get('backend') == 'codex_cli'
         if codex_stage:
             cache = self.config.get('cached_functions_dir')
             if not cache or not Path(cache).is_dir():
@@ -744,16 +744,16 @@ class Main:
             self.sam3_segmenter = None
 
         # Initialize Gemini grounder if enabled
-        gemini_config = perception_cfg.get('gemini_grounding', {})
-        self.use_gemini = gemini_config.get('enabled', False) if gemini_config else False
+        grounding_config = perception_cfg.get('gemini_grounding', {})
+        self.use_gemini = grounding_config.get('enabled', False) if grounding_config else False
         if self.use_gemini:
-            api_key = gemini_config.get('api_key') or os.environ.get('GOOGLE_API_KEY')
+            api_key = grounding_config.get('api_key') or os.environ.get('GOOGLE_API_KEY')
             if api_key:
-                gemini_dict = OmegaConf.to_container(gemini_config, resolve=True)
-                gemini_dict['api_key'] = api_key
+                grounding_dict = OmegaConf.to_container(grounding_config, resolve=True)
+                grounding_dict['api_key'] = api_key
                 log.info("Initializing Gemini grounder for visual grounding")
-                self.gemini_grounder = create_gemini_grounder(gemini_dict)
-                self.gemini_default_objects = list(gemini_config.get('default_objects', []))
+                self.gemini_grounder = create_gemini_grounder(grounding_dict)
+                self.gemini_default_objects = list(grounding_config.get('default_objects', []))
             else:
                 log.warning("Gemini API key not found - disabling Gemini grounding")
                 self.use_gemini = False
@@ -782,8 +782,8 @@ class Main:
         # Initialize Gemini stage recognizer (for real-time stage recognition)
         if self.config.get("use_vlm_stage_recognition", True):
             try:
-                self.gemini_stage_recognizer = create_gemini_stage_recognizer(gemini_config)
-                log.info(f"Stage recognizer initialized: {gemini_config.get('backend', 'openai_compatible')}")
+                self.gemini_stage_recognizer = create_gemini_stage_recognizer(stage_config)
+                log.info(f"Stage recognizer initialized: {stage_config.get('backend', 'openai_compatible')}")
             except Exception as e:
                 if codex_stage:
                     raise RuntimeError("Codex Stage initialization failed; provider fallback is disabled") from e

@@ -13,7 +13,7 @@ project_target:
   required_formal_successes: 5
   achieved: false
 study:
-  status: READY_TO_FREEZE_BASELINE
+  status: FREEZING_REPAIRED_N1_CONTROLS
   mode: real
   interaction: auto
 candidate:
@@ -25,9 +25,10 @@ candidate:
   primary_change: target_distance_gripper_duty_v1
   online_score: null
   scientific_decision: PENDING_ONLINE
+  ordering_amendment: experiments/iteration_001_execution_intent/startup-repair-amendment.md
 budget:
   max_gpu_hours: 48.0
-  gpu_hours_consumed: 0.005810367842075519
+  gpu_hours_consumed: 0.025461891878706712
   max_episode_attempts: 240
   reserved:
     baseline: 20
@@ -35,12 +36,12 @@ budget:
     validation: 60
     formal: 40
     recovery: 20
-  dispatched: 0
+  dispatched: 1
   aborted: 0
   valid: 0
   running: 0
-  invalid: 0
-  completed: 0
+  invalid: 1
+  completed: 1
   gpu_hour_reservations:
     validation: 14.0
     formal: 10.0
@@ -73,16 +74,16 @@ historical:
   previous_gpu_hours: 6.946832055555556
   previous_formal_episodes: 0
 active_iteration: iteration_001_execution_intent
-next_action: Freeze current Codex common provider source/config plan, verify physical
-  GPU7 admission, run baseline_dev_t00_q0 then paired C0 and remaining registered
-  baseline cells. No new algorithm/provider tuning from online outcomes.
+next_action: Freeze repaired source and 30-cell N1 Dev plan; run the 20 predeclared
+  same-round Q0/P2 controls first. Original baseline cohort closed incomplete, never
+  retry its failed task0 Q0 cell.
 source_spec_sha256: 3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef
 derived_indexes:
 - .arbor/sessions/rdt-qd-ed-final-20260921T093925Z
 authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
   ledger is append-only event evidence, not a second mutable state.
 online_blockers: []
-updated_at: '2026-09-22T03:44:00.391442+00:00'
+updated_at: '2026-09-22T03:57:56.998355+00:00'
 seed_plan:
   path: data/frozen-seed-plan.json
   sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
@@ -92,11 +93,15 @@ cpu_validation:
   online_evidence: false
   codex_integration_passed: 673
   codex_integration_seconds: 40.74
+  startup_repair_passed: 118
 prepared_baseline_plan:
   path: data/qd-ed-final-plan.json
   episodes: 20
-  frozen: false
+  frozen: true
   refresh_source_fingerprints_before_freeze: true
+  source_commit: 4d9cd5d31e8dde6d298ec10805cde4542d5765a2
+  sha256: 2d12ceb95b51a6d8bea317864b801711cdc138fd685382e23d5b4526192432ac
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/baseline-codex-4d9cd5d31e8d.json
 engineering_baseline_changes:
 - Task-identity-bound guidance cache Stage descriptions; canonical tensor reward guidance
   remains identical.
@@ -107,22 +112,22 @@ cuda_egl_context_verified: true
 stage_provider_ready: true
 runner:
   by_bucket:
-    baseline: 0
+    baseline: 1
     development: 0
     validation: 0
     formal: 0
     recovery: 0
-  reserved_attempts: 0
+  reserved_attempts: 1
   gpu_hours_by_bucket:
-    baseline: 0.0
+    baseline: 0.019651524036631195
     development: 0.0
     validation: 0.0
     formal: 0.0
     recovery: 0.005810367842075519
   gpu_healthcheck_hours: 0.005810367842075519
   gpu_healthcheck_inflight: 0
-  last_attempt_id: null
-  last_event: null
+  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__baseline_dev_t00_q0__49b1a88877f7
+  last_event: valid
 gpu_admission_last_observation:
   physical_index: 7
   uuid: GPU-48473162-9548-1a19-04aa-ea86c5349187
@@ -150,3 +155,19 @@ stage_condition:
   provider_amendment: experiments/iteration_001_execution_intent/codex-provider-amendment.md
   http_request_retry_counts: unobserved_null
   logical_calls_tokens_latency: observed
+startup_failure:
+  attempt_id: rdt-qd-ed-final-20260921T093925Z__baseline_dev_t00_q0__49b1a88877f7
+  actions_executed: 0
+  stage_queries: 0
+  outcome_valid: false
+  reason: Stage configuration overwritten by grounding configuration during component
+    initialization
+  retry_allowed: false
+closed_baseline:
+  status: CLOSED_INCOMPLETE_INVALID
+  expected: 20
+  dispatched: 1
+  invalid: 1
+  not_dispatched: 19
+  complete_success_rate: null
+  report: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/iteration_000_intake/closed-incomplete-baseline-report.json
