@@ -13,7 +13,7 @@ project_target:
   required_formal_successes: 5
   achieved: false
 study:
-  status: GPU5_EGL_SERIAL_DIAGNOSTIC_PREPARATION
+  status: GPU5_SERIAL_QUEUE_SHARED_WAIT_REPAIR
   mode: real
   interaction: auto
 candidate:
@@ -74,8 +74,8 @@ historical:
   previous_gpu_hours: 6.946832055555556
   previous_formal_episodes: 0
 active_iteration: iteration_001_execution_intent
-next_action: One prospective GPU5_EGL_SERIAL_C0 diagnostic with explicit CUDA/EGL
-  runtime guard; prior Xid-aborted condition preserved, no automatic retry.
+next_action: Refreeze shared-study waiting fix, then queue the same undispatched GPU5_EGL_SERIAL_C0
+  once; wait for other study owner to close its transaction.
 source_spec_sha256: 3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef
 derived_indexes:
 - .arbor/sessions/rdt-qd-ed-final-20260921T093925Z
@@ -187,11 +187,11 @@ closed_baseline:
   complete_success_rate: null
   report: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/iteration_000_intake/closed-incomplete-baseline-report.json
 active_plan:
-  path: /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-gpu5-c0-xid-plan.json
-  source_commit: 79cdce092b4e9c32b42634262cc9d1f7e14bec4b
-  sha256: e2f82d6afb4bf3f8acbd90675cce631ba59c17caa83a1aeb78a5fc8b553ac940
+  path: /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-gpu5-egl-serial-plan.json
+  source_commit: c1422281ae6b531e7f7be444e7fb2403d5557534
+  sha256: c2edb6580754e2091a1e6cf71c4e7b1331607a20182ceba62779570514b074f1
   frozen: true
-  iteration: GPU6_NATIVE_C0
+  iteration: GPU5_EGL_SERIAL_C0
   diagnostic_only: true
   candidate_dispatch_authorized: false
   physical_gpu: 5
@@ -464,3 +464,28 @@ closed_loop_diagnostic_gpu5:
   physical_gpu: 5
   status: INFRASTRUCTURE_ABORT_XID31
   scientific_comparison_30_cells_started: false
+gpu5_egl_serial_queue:
+  pid: 137591
+  proc_start_ticks: '374187068'
+  argv:
+  - /home/hynx/miniconda3/envs/vla-pilot/bin/python
+  - /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/scripts/qd_ed_available_gpu_queue.py
+  - --plan
+  - /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-gpu5-egl-serial-plan.json
+  - --episode-key
+  - gpu5_egl_serial_c0_t00
+  - --poll-seconds
+  - '30'
+  - --idle-seconds
+  - '120'
+  - --status-path
+  - /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/gpu5-egl-serial-queue-status.json
+  source_commit: c1422281ae6b531e7f7be444e7fb2403d5557534
+  plan_sha256: c2edb6580754e2091a1e6cf71c4e7b1331607a20182ceba62779570514b074f1
+  physical_gpu: 5
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/gpu5-egl-serial-queue-status.json
+  log_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/gpu5-egl-serial-queue.log
+  started_at_unix: 1790066439.9301221
+  scope: GPU5-only, one prospective CUDA/EGL serialized C0 engineering diagnostic,
+    then stop for review
+  status: failed_before_dispatch_shared_transaction

@@ -28,6 +28,7 @@ from qd_ed_runtime_setup import normalized_pci_bus_id
 
 
 ROOT = Path(__file__).resolve().parents[1]
+UNFINISHED_JOURNAL = 'unfinished attempt or healthcheck requires reconciliation'
 HARDWARE_RUNTIME_KEYS = {'gpu_mapping', 'cuda_egl_verified', 'cuda_egl_probe',
                          'metadata_mapping_verified', 'egl_device_metadata_path', 'files'}
 MAPPING_KEYS = ('physical_gpu', 'uuid', 'pci_bus_id', 'driver_version', 'egl_device_index')
@@ -271,18 +272,33 @@ def no_unfinished(root):
     runner.require(all(group[-1]['event'] in runner.TERMINAL
                        for group in runner.event_groups(events).values())
                    and snapshot['gpu_healthcheck_inflight'] == 0,
-                   'unfinished attempt or healthcheck requires reconciliation')
+                   UNFINISHED_JOURNAL)
     return events, resources
 
 
 def pending_gate(root, row):
-    state = runner.read_state(root / 'research-state.yaml')
-    candidates = candidate_indices(state)
-    events, resources = no_unfinished(root)
-    runner.check_retry(events, row)
-    runner.check_budget(state, events, row, resources,
-                        runner.read_events(root / 'data/gpu-hour-reservation-ledger.jsonl'))
-    return state, candidates
+    # Multiple authorized worktrees share journals, but each keeps its own
+    # cached state. Refresh only declared, physically linked shared accounting
+    # and only after the owner has closed every outstanding transaction.
+    with runner.locked(root / 'data/qd-ed-state.lock'):
+        state = runner.read_state(root / 'research-state.yaml')
+        candidates = candidate_indices(state)
+        events, resources = no_unfinished(root)
+        migration = state.get('execution_migration', {})
+        if migration.get('same_study_budget') is True:
+            shared = Path(migration.get('shared_journal_root', ''))
+            runner.require(shared.is_absolute(), 'shared journal root is not absolute')
+            for name in ('attempt-ledger.jsonl', 'gpu-healthcheck-ledger.jsonl',
+                         'gpu-hour-reservation-ledger.jsonl', 'qd-ed-state.lock', 'qd-ed-runner.lock'):
+                path = root / 'data' / name
+                runner.require(path.is_symlink() and path.resolve() == (shared / name).resolve(),
+                               'declared shared journal/lock binding changed')
+            runner.sync_state_from_journal(root, events)
+            state = runner.read_state(root / 'research-state.yaml')
+        runner.check_retry(events, row)
+        runner.check_budget(state, events, row, resources,
+                            runner.read_events(root / 'data/gpu-hour-reservation-ledger.jsonl'))
+        return state, candidates
 
 
 def append_selection(path, event):
@@ -466,13 +482,30 @@ def run_queue(plan_path, episode_keys, *, poll_seconds=30, idle_seconds=120, sta
             for key in episode_keys:
                 runner.require(plan.get('phase_authorization', {}).get(rows[key]['split']) is True,
                                'requested split lacks frozen phase authorization')
-                pending_gate(root, rows[key])
+                try:
+                    pending_gate(root, rows[key])
+                except runner.GateError as exc:
+                    if str(exc) != UNFINISHED_JOURNAL:
+                        raise
             runner.verify_provider(runtime, runner.child_environment(runtime), root=root)
             active_path, polls, idle_windows = Path(plan_path).resolve(), 0, {}
             for key in episode_keys:
                 row = rows[key]
                 while True:
-                    state, candidates = pending_gate(root, row)
+                    try:
+                        state, candidates = pending_gate(root, row)
+                    except runner.GateError as exc:
+                        if str(exc) != UNFINISHED_JOURNAL:
+                            raise
+                        idle_windows.clear()
+                        polls += 1
+                        save('waiting_journal', current_episode_key=key,
+                             active_plan_path=str(active_path), selected_physical_gpu=None,
+                             gpu_inventory=[], last_resource_reason=str(exc))
+                        if max_polls is not None and polls >= max_polls:
+                            return status
+                        sleep(poll_seconds)
+                        continue
                     devices = inventory()
                     update_idle_windows(devices, idle_windows, monotonic(), idle_seconds)
                     device = choose_device(devices, candidates, runner.runtime_gpu(runtime))
