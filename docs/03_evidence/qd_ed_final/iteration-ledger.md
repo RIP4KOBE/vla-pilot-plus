@@ -230,3 +230,7 @@ Root compared completed resource ...b689d3b01c36 to the current frozen native pl
 ## GPU3 continuation authorization 2026-09-22T08:25:04.726856+00:00
 
 User explicitly moved subsequent execution to physical GPU3 only. Previous GPU7 CPU queue is already stopped before any GPU dispatch; all historical device labels and costs are preserved. Timing-only instrumentation applied after 18 CPU tests and unchanged-original-operation AST review. One exact-identity C0 infrastructure recovery is being prepared; invalid N1 Q0 is not retried.
+
+## Concurrent C0 recovery consumed and failed on GPU5
+
+Other worktree dispatched gpu6_native_c0_t00_r1__03c5d2b4a1df from source79cdce092b4e9c32b42634262cc9d1f7e14bec4b on physicalGPU5. Matched graphics Xid31 stopped it after132.6506171328947seconds. Both queue107052 and worker115030 exited without this continuation terminating them. Migration-scope question no longer needed. Preserve its journal terminal infrastructure classification and conservative cost, but causal diagnosis remains Unknown. Revised prospective GPU3 diagnostic r2 links this immediate parent; no duplicate retry of originalparent.
