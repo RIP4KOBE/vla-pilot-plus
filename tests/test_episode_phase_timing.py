@@ -148,3 +148,100 @@ def test_main_phase_separates_original_wall_and_nested_observer_estimate(tmp_pat
     assert captured[0]["observed_wall_s"] == 1.0
     assert captured[0]["nested_observer_s"] == 0.25
     assert captured[0]["elapsed_s"] == 0.75
+
+
+def lifecycle_runner(tmp_path):
+    """Execute real Main lifecycle methods without importing main or GPU code."""
+    import os
+    tree = ast.parse((ROOT / "main.py").read_text())
+    main = next(node for node in tree.body if isinstance(node, ast.ClassDef) and node.name == "Main")
+    names = {"run", "run_test", "_close_render_phase_diagnostics"}
+    methods = [node for node in main.body if isinstance(node, ast.FunctionDef) and node.name in names]
+    cls = ast.ClassDef(name="Runner", bases=[], keywords=[], body=methods, decorator_list=[])
+    namespace = {
+        "os": os,
+        "torch": SimpleNamespace(randint=lambda *a: SimpleNamespace(item=lambda: 321)),
+        "_episode_seed_schedule": lambda *a, **kw: None,
+        "_episode_seed_for_index": lambda *a, **kw: kw["sampled_seed"],
+        "log": SimpleNamespace(info=lambda *a: None, warning=lambda *a: None, error=lambda *a: None),
+    }
+    exec(compile(ast.fix_missing_locations(ast.Module(body=[cls], type_ignores=[])),
+                 "<actual-main-lifecycle-methods>", "exec"), namespace)
+    runner = namespace["Runner"]()
+    runner.config = {"episode_num": 2, "use_guidance": False}
+    runner.output_dir = str(tmp_path)
+    runner.backend = "libero"
+    runner.current_guide_scale = 1.0
+    runner.policy = SimpleNamespace(reset=lambda: None)
+    runner.video_recorder = SimpleNamespace(clear=lambda: None)
+    runner._begin_episode_compute = lambda: None
+    runner._append_episode_compute = lambda **kwargs: None
+    runner._save_execution_failure_video = lambda **kwargs: None
+    return runner
+
+
+@pytest.mark.parametrize("outcome", ["completed", "error", "interrupt"])
+def test_real_run_releases_renderer_hooks_before_reset_and_on_episode_exit(tmp_path, outcome):
+    from core.render_phase_diagnostics import RenderPhaseDiagnostics
+    runner = lifecycle_runner(tmp_path)
+    state = {"current": 0, "context": None}
+    frees, resets, episodes, observers = [], [], [], []
+    class Context:
+        def __init__(self, owner):
+            self.owner = owner
+        def render(self):
+            pass
+        def __del__(self):
+            frees.append((self.owner, state["current"]))
+    state["context"] = Context(0)
+    def install():
+        observer = RenderPhaseDiagnostics(tmp_path / "not-written.jsonl")
+        observer._hook(state["context"], "render", "offscreen_render")
+        observers.append(observer)
+        runner._render_phase_diagnostics = observer
+    install()  # A previous observer exists before run, as on reused Main objects.
+    def reset(*, seed):
+        assert runner._render_phase_diagnostics is None
+        assert "render" not in vars(state["context"])
+        resets.append(seed)
+        state["context"] = None  # Exact old-renderer finalization boundary.
+        state["current"] += 1
+        state["context"] = Context(state["current"])
+    runner.adapter = SimpleNamespace(reset=reset, get_task_info=lambda: {})
+    failure = KeyboardInterrupt() if outcome == "interrupt" else RuntimeError("episode failure")
+    def episode(index, directory, seed):
+        episodes.append(index)
+        install()
+        if outcome != "completed":
+            raise failure
+    runner._run_episode = episode
+    if outcome == "interrupt":
+        with pytest.raises(KeyboardInterrupt) as caught:
+            runner.run()
+        assert caught.value is failure
+    else:
+        runner.run()
+    expected = 1 if outcome == "interrupt" else 2
+    assert resets == [321] * expected
+    assert episodes == list(range(expected))
+    assert frees == [(owner, owner) for owner in range(expected)]
+    assert runner._render_phase_diagnostics is None
+    assert all(observer._hooks == [] for observer in observers)
+    assert "render" not in vars(state["context"])
+    assert not (tmp_path / "not-written.jsonl").exists()
+
+
+def test_real_run_test_closes_previous_observer_before_its_reset(tmp_path):
+    runner = lifecycle_runner(tmp_path)
+    order = []
+    runner._render_phase_diagnostics = SimpleNamespace(close=lambda: order.append("close"))
+    stop = RuntimeError("stop after reset")
+    def observation():
+        raise stop
+    runner.adapter = SimpleNamespace(reset=lambda: order.append("reset"),
+                                     get_keypoint_detection_inputs=observation)
+    with pytest.raises(RuntimeError) as caught:
+        runner.run_test()
+    assert caught.value is stop
+    assert order == ["close", "reset"]
+    assert runner._render_phase_diagnostics is None

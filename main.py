@@ -1063,13 +1063,20 @@ class Main:
         except Exception:
             log.warning("Native-fault stack diagnostics unavailable")
 
+    def _close_render_phase_diagnostics(self):
+        """Release diagnostic renderer references before environment teardown."""
+        observer = getattr(self, "_render_phase_diagnostics", None)
+        self._render_phase_diagnostics = None
+        if observer is not None:
+            try:
+                observer.close()
+            except Exception:
+                log.warning("Render phase timing cleanup unavailable")
+
     def _enable_render_phase_diagnostics(self):
         """Observe existing instances only when EDS diagnostics are enabled."""
         try:
-            previous = getattr(self, "_render_phase_diagnostics", None)
-            if previous is not None:
-                previous.close()
-            self._render_phase_diagnostics = None
+            self._close_render_phase_diagnostics()
             config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
             if not config.get("enabled", False):
                 return
@@ -1418,6 +1425,8 @@ class Main:
             episode_dir = os.path.join(base_output_dir, f'episode_{episode+1}')
             os.makedirs(episode_dir, exist_ok=True)
 
+            # Release old renderer hooks while their environment is still alive.
+            self._close_render_phase_diagnostics()
             # Reset environment
             self.adapter.reset(seed=episode_seed)
 
@@ -1474,6 +1483,8 @@ class Main:
                 log.warning(f"Skipping episode {episode+1} due to execution error")
                 self._append_episode_compute(episode=episode, episode_seed=episode_seed, outcome="execution_error")
                 continue
+            finally:
+                self._close_render_phase_diagnostics()
             self._append_episode_compute(episode=episode, episode_seed=episode_seed, outcome="completed")
 
         # Final statistics
@@ -2085,6 +2096,7 @@ class Main:
 
     def run_test(self):
         """Test segmentation and keypoint detection."""
+        self._close_render_phase_diagnostics()
         self.adapter.reset()
         rgb, depth, points, segmentation, segment_id_to_name = self.adapter.get_keypoint_detection_inputs()
 

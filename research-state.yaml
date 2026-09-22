@@ -13,7 +13,7 @@ project_target:
   required_formal_successes: 5
   achieved: false
 study:
-  status: GPU3_NATIVE_CONTEXT_REVIEW
+  status: GPU3_STATIC_SCENE_REPRODUCTION_PREPARATION
   mode: real
   interaction: auto
 candidate:
@@ -28,7 +28,7 @@ candidate:
   ordering_amendment: experiments/iteration_001_execution_intent/startup-repair-amendment.md
 budget:
   max_gpu_hours: 48.0
-  gpu_hours_consumed: 0.7576063718984369
+  gpu_hours_consumed: 0.7819172209507734
   max_episode_attempts: 240
   reserved:
     baseline: 20
@@ -36,8 +36,8 @@ budget:
     validation: 60
     formal: 40
     recovery: 20
-  dispatched: 8
-  aborted: 6
+  dispatched: 9
+  aborted: 7
   valid: 0
   running: 0
   invalid: 2
@@ -74,16 +74,16 @@ historical:
   previous_gpu_hours: 6.946832055555556
   previous_formal_episodes: 0
 active_iteration: iteration_001_execution_intent
-next_action: Test current EGL context against existing renderer references around
-  first policy inference in one prospectively frozen bounded engineering diagnostic;
-  preserve all failed identities and no promotion.
+next_action: Prepare zero-action real-scene rendering reproduction without neural
+  models to distinguish graphical-scene failure from model interference; preserve
+  all costs and no scientific promotion.
 source_spec_sha256: 3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef
 derived_indexes:
 - .arbor/sessions/rdt-qd-ed-final-20260921T093925Z
 authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
   ledger is append-only event evidence, not a second mutable state.
 online_blockers: []
-updated_at: '2026-09-22T08:50:52.025777+00:00'
+updated_at: '2026-09-22T09:10:48.651780+00:00'
 seed_plan:
   path: data/frozen-seed-plan.json
   sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
@@ -104,6 +104,9 @@ cpu_validation:
   native_probe_queue_journal_wait_passed: 22
   render_phase_timing_proposal_passed: 18
   production_egl_observer_proposal_passed: 17
+  context_drift_and_timing_passed: 26
+  observer_lifecycle_and_dormant_context_passed: 30
+  existing_run_seed_regression_passed: 1
 prepared_baseline_plan:
   path: data/qd-ed-final-plan.json
   episodes: 20
@@ -123,20 +126,20 @@ stage_provider_ready: true
 runner:
   by_bucket:
     baseline: 1
-    development: 2
+    development: 3
     validation: 0
     formal: 0
     recovery: 5
-  reserved_attempts: 8
+  reserved_attempts: 9
   gpu_hours_by_bucket:
     baseline: 0.019651524036631195
-    development: 0.19669835874914293
+    development: 0.22100920780147942
     validation: 0.0
     formal: 0.0
     recovery: 0.5412564891126628
   gpu_healthcheck_hours: 0.06454848380953385
   gpu_healthcheck_inflight: 0
-  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu3_native_c0_t00_r2__79342697c4d2
+  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu5_egl_serial_c0_t00__00baf2a27328
   last_event: aborted
 gpu_admission_last_observation:
   physical_gpu: 7
@@ -380,7 +383,7 @@ resource_journal_anomaly:
     status: aborted
     not_launched_by_this_continuation: true
     gpu_process_wall_seconds: 695.8362217219546
-  scope_question_pending: false
+  scope_question_pending: true
   continuation_decision: User requires continued work until completion; observed GPU6
     attempt already infrastructure-aborted. Preserve evidence/costs; this continuation
     launches only GPU7 and does not stop unrelated external workers.
@@ -391,6 +394,15 @@ resource_journal_anomaly:
     worker_pid: 115030
     queue_pid: 107052
     status: infrastructure_aborted_Xid31
+    not_launched_by_this_continuation: true
+  concurrent_serialization_diagnostic:
+    attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu5_egl_serial_c0_t00__00baf2a27328
+    physical_gpu: 5
+    status: aborted_Xid31
+    source_commit: c6f73da3a5bd8fe091e3058d8c469a0bdb349d17
+    gpu_process_wall_seconds: 87.51905658841133
+    context_matches_before_first_render: true
+    explicit_cuda_sync_and_context_bind_did_not_prevent_fault: true
     not_launched_by_this_continuation: true
 previous_native_resource_queue:
   pid: 4127385
@@ -518,3 +530,40 @@ gpu3_native_failure:
   evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-diagnostic/kernel-observations.json
   causal_status: Unknown; repeated graphics MMU faults and timeout, not explained
     by physical GPU migration or Stage invocation
+prepared_gpu3_context_plan:
+  path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-gpu3-context-drift-plan.json
+  sha256: 0fe02b5667cf4f88728ead4cc7c1e6bc9b304b5801a721260523a7ce0a8fac25
+  source_commit: 37178ab96079e88a6f027b47a09290b3f9a3de02
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/gpu3-context-drift-37178ab96079.json
+  frozen: true
+  episode_key: gpu3_context_drift_c0_t00
+  stop_after: three diagnostic boundaries
+  status: NOT_DISPATCHED_SUPERSEDED_BY_STRONGER_CONCURRENT_EVIDENCE
+gpu3_context_queue:
+  pid: 164924
+  proc_start_ticks: '374286377'
+  argv:
+  - /home/hynx/miniconda3/envs/vla-pilot/bin/python
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_available_gpu_queue.py
+  - --plan
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-gpu3-context-drift-plan.json
+  - --episode-key
+  - gpu3_context_drift_c0_t00
+  - --poll-seconds
+  - '30'
+  - --idle-seconds
+  - '120'
+  - --status-path
+  - /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-drift-diagnostic/queue-status.json
+  physical_gpu: 3
+  plan_sha256: 0fe02b5667cf4f88728ead4cc7c1e6bc9b304b5801a721260523a7ce0a8fac25
+  source_commit: 37178ab96079e88a6f027b47a09290b3f9a3de02
+  supervisor_pid: 164897
+  supervisor_sha256: 72b9138d6c5b8db95b4de18322d5847712fba8ba7b7e78d05d033b1cf6a580a7
+  started_at: '2026-09-22T08:57:13.012324+00:00'
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-drift-diagnostic/queue-status.json
+  log_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-drift-diagnostic/queue.log
+  supervisor_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-drift-diagnostic/supervise.py
+  status: failed_before_dispatch_shared_study_inflight
+  last_verified_at: '2026-09-22T09:10:48.651780+00:00'
+  gpu_dispatched: false

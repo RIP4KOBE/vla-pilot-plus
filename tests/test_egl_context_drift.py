@@ -137,7 +137,7 @@ def test_existing_artifact_is_preserved(tmp_path):
     assert path.read_text()=='existing\n'
 
 
-def test_proposed_integration_preserves_render_calls_result_and_exception(monkeypatch,tmp_path):
+def test_retained_helper_is_inactive_during_production_timing(monkeypatch,tmp_path):
     calls=[]
     queries=[]
     result=object()
@@ -169,7 +169,7 @@ def test_proposed_integration_preserves_render_calls_result_and_exception(monkey
         queries.append(value)
         return {'current_context_is_null':False,'context_matches_reference':True}
     monkeypatch.setattr(render_module,'ContextDriftObserver',
-        lambda path,value: module.ContextDriftObserver(path,value,query=query))
+        lambda path,value: module.ContextDriftObserver(path,value,query=query), raising=False)
     observer=render_module.RenderPhaseDiagnostics(tmp_path/'render_phase_timing.jsonl')
     observer.install(adapter)
     assert queries==[]
@@ -182,8 +182,8 @@ def test_proposed_integration_preserves_render_calls_result_and_exception(monkey
     assert caught.value is failure
     observer.set_phase(0,0,'diagnostic_artifacts','exit')
     observer.close()
-    assert observer._context_drift is None
-    assert queries==[sim]*3
+    assert queries==[]
+    assert not (tmp_path / "egl_context_drift.jsonl").exists()
     assert [call[0] for call in calls]==['render','draw','pixels']*2
     assert all(call[1]==(64,) for call in calls)
     assert all(call[2]=={'height':64} for call in calls[:3])
