@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-09-22T06:48:30.701031+00:00",
+  "timestamp": "2026-09-22T08:27:24.137636+00:00",
   "run_name": "rdt-qd-ed-final-20260921T093925Z",
-  "phase": "NATIVE_QUEUE_REPAIR_GPU7",
-  "source_commit": "b43ddd653d94f69b0e42259e31486d9e4db8ef58",
+  "phase": "PREPARING_GPU3_RENDER_DIAGNOSTIC",
+  "source_commit": "8771eaa74ede4159efb004e0709232175a6c0b8d",
   "active_plan": {
     "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/resource_queue/89d2dd719e0346bd9011931cc66731a0/plan.json",
     "source_commit": "8fb001b7903c5e6a2a74a5ef6a7f2845ca7e9fe2",
@@ -50,38 +50,49 @@
   "in_flight_executors": [],
   "owned_gpu_workers": [],
   "authoritative_state": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/research-state.yaml",
-  "next_action": "Verify native queue startup and waiting heartbeat; leave frozen source unchanged. Only physical GPU7 is authorized. Inspect one diagnostic terminal result before scientific continuation.",
+  "next_action": "Verify physical GPU3 CUDA/EGL binding; freeze and dispatch one instrumented exact-identity C0 infrastructure recovery. Preserve invalid Q0 and closed candidate gates.",
   "target_achieved": false,
   "native_diagnostic": {
-    "status": "QUEUE_REPAIR_NO_GPU_DISPATCH",
+    "status": "MATCHING_COMPLETED_GPU6_B1_EVIDENCE_REUSED",
     "script": "scripts/qd_ed_policy_native_probe.py",
     "scope": "B1 native inference on deterministic synthetic inputs; no simulator, actions, Stage call or scientific episode",
     "timeout_seconds": 600,
     "source_plan_pending_freeze": false,
     "limitation": "Cannot establish guided-transition or EGL causality",
-    "plan_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v1-plan.json",
-    "plan_sha256": "1f42729daf579393c7d292f3f1735b22983f41fcf44188e252e6e2d288860996",
-    "source_commit": "b43ddd653d94f69b0e42259e31486d9e4db8ef58",
-    "snapshot": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/native-gpu7-queue-b43ddd653d94.json",
-    "physical_gpu": 7
+    "plan_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v2-plan.json",
+    "plan_sha256": "1ca7b9d970fc9b014820fc69596ec28100c55aed63a1416d23e7c1873d6d55a5",
+    "source_commit": "8771eaa74ede4159efb004e0709232175a6c0b8d",
+    "snapshot": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/native-gpu7-queue-8771eaa74ede.json",
+    "physical_gpu": 7,
+    "reused_resource_id": "rdt-qd-ed-final-20260921T093925Z__gpu6_native_b1__b689d3b01c36",
+    "matching_checks": {
+      "scope": true,
+      "synthetic_seed_task": true,
+      "policy_configuration": true,
+      "native_script_fingerprint": true,
+      "runtime_inventory": true,
+      "shared_source_fingerprints": true,
+      "evidence_digest": true
+    },
+    "physical_gpu7_executed": false
   },
   "authorized_gpu_indices": [
-    7
+    3
   ],
   "native_resource_queue": {
-    "pid": 4111605,
-    "proc_start_ticks": "373483170",
-    "source_commit": "b43ddd653d94f69b0e42259e31486d9e4db8ef58",
-    "plan_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v1-plan.json",
-    "plan_sha256": "1f42729daf579393c7d292f3f1735b22983f41fcf44188e252e6e2d288860996",
+    "pid": 4193300,
+    "proc_start_ticks": "373729486",
+    "source_commit": "8771eaa74ede4159efb004e0709232175a6c0b8d",
+    "plan_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v2-plan.json",
+    "plan_sha256": "1ca7b9d970fc9b014820fc69596ec28100c55aed63a1416d23e7c1873d6d55a5",
     "status_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/native-probe-queue-status.json",
     "log_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/native-probe-queue.log",
-    "started_at": "2026-09-22T06:43:20.949185+00:00",
+    "started_at": "2026-09-22T07:24:24.103366+00:00",
     "argv": [
       "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
       "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_native_probe_queue.py",
       "--plan",
-      "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v1-plan.json",
+      "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v2-plan.json",
       "--poll-seconds",
       "30",
       "--status-path",
@@ -91,14 +102,14 @@
       7
     ],
     "scope": "one bounded native diagnostic; no scientific episodes",
-    "status": "failed",
-    "last_verified_at": "2026-09-22T06:47:36.812681+00:00",
-    "reason": "unfinished attempt or healthcheck requires reconciliation",
-    "archived_evidence": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/queue-history/b43ddd6-concurrent-resource-journal"
+    "status": "interrupted_before_dispatch_for_nonredundant_diagnosis",
+    "last_verified_at": "2026-09-22T08:17:43.179597+00:00",
+    "heartbeat_unix": 1790062224.3071046,
+    "archived_evidence": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/queue-history/8771eaa-b1-evidence-reused"
   },
   "budget": {
     "max_gpu_hours": 48.0,
-    "gpu_hours_consumed": 0.4673441816253277,
+    "gpu_hours_consumed": 0.6606320209925374,
     "max_episode_attempts": 240,
     "reserved": {
       "baseline": 20,
@@ -107,8 +118,8 @@
       "formal": 40,
       "recovery": 20
     },
-    "dispatched": 5,
-    "aborted": 3,
+    "dispatched": 6,
+    "aborted": 4,
     "valid": 0,
     "running": 0,
     "invalid": 2,
@@ -117,5 +128,7 @@
       "validation": 14.0,
       "formal": 10.0
     }
-  }
+  },
+  "queue_pid": null,
+  "status": "PREPARING_GPU3_RENDER_DIAGNOSTIC"
 }

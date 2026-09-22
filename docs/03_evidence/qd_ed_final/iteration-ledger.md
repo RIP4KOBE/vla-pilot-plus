@@ -198,3 +198,35 @@ PID4111605 completed full input/model verification and observed GPU7 idle, but a
 ## 2026-09-22T06:49:51.451825+00:00 — CPU-only journal wait repair reviewed
 
 22 queue CPU tests pass. Root reviewed the14-line control-flow change: only the exact unfinished journal gate at the preselection loop enters waiting_journal, clearing old idle observations and selectedGPU. Other gates and any post-dispatch failure still stop. This is no scientific retry and consumes no GPU while waiting.
+
+## 2026-09-22T06:51:25.427051+00:00 — journal-aware GPU7 queue launched
+
+Source8771eaa74ede4159efb004e0709232175a6c0b8d; immutable v2 plan SHA2561ca7b9d970fc9b014820fc69596ec28100c55aed63a1416d23e7c1873d6d55a5; detached PID4127385, start ticks373525473. Startup verifies actual model bytes before waiting. Exact unfinished journal gate causes CPU-only waiting with idle history reset. GPU7 alone may dispatch one diagnostic; all scientific gates remain false. Earlier queue failures and separate-namespace resource costs remain preserved.
+
+## 2026-09-22T06:55:26.355675+00:00 — concurrent scientific journal conflict, scope clarification pending
+
+A separate artifact namespace dispatched GPU6 attempt gpu6_native_c0_t00/...6e57273c45b3 under source5cafac6586e2b2d5f05468de466fbd56c8334405 into this journal. It was not launched by this continuation. Global conservative accounting now sees6 dispatches, of which1 is this newly observed concurrent attempt; our queue has dispatched no GPU resource. PID4127385 remains alive with statuswaiting_journal; it must not bypass the journal or original episode-set guards. User was asked whether the separate GPU6 attempt also belongs to the GPU7 migration scope. Do not kill an unconfirmed concurrent task or claim GPU7 inference.
+
+## 2026-09-22T07:24:24.103366+00:00 — user requests persistence until completion; GPU7 continuation resumed
+
+The previously observed GPU6 C0 attempt already infrastructure-aborted after695.8362217219546seconds due to an external process. No external process was terminated by this continuation. Read-only inspection found the GPU6 branch journals symlink to this branch but its state file is separate, explaining the canonical state/ledger mismatch. Canonical accounting was resynced conservatively from append-only records: {'max_gpu_hours': 48.0, 'gpu_hours_consumed': 0.6606320209925374, 'max_episode_attempts': 240, 'reserved': {'baseline': 20, 'development': 100, 'validation': 60, 'formal': 40, 'recovery': 20}, 'dispatched': 6, 'aborted': 4, 'valid': 0, 'running': 0, 'invalid': 2, 'completed': 2, 'gpu_hour_reservations': {'validation': 14.0, 'formal': 10.0}}. PID4127385 had stopped before GPU dispatch on that mismatch; evidence archived. New CPU queue PID4193300, start ticks373729486, uses unchanged frozen8771eaa/v2 plan and physicalGPU7 only. Prior queue startup failures dispatched no resource and are not scientific retries.
+
+## 2026-09-22T07:47:15.346241+00:00 — bounded runtime evidence review and unapplied observer ready
+
+Read-only review of GPU6 C0 source5cafac6:13 completed steps used236.709s visualization overlay and261.282s adapter stepping; fresh policy calls3.904/3.085s; artifacts20.240/41.111s. Last open phase was step13 overlay before external-device abort. No Stage call/nativecrash observed in this diagnostic. Shared paths enter sim.render from rawVLMimage and camera observables during physics substeps; get_observations at the end mostly reads cache. IndependentB1 inference itself took1.222s, total116.849s with loading; it does not resolve transition/rendering cause.
+
+Production create_env passes default render_gpu_device_id=-1, while installed custom EGL context prioritizes numeric MUJOCO_EGL_DEVICE_ID over CUDA masks. Existing C0 command expectedEGL5/CUDA6; no GPU0-misbinding evidence exists. Actual production context identity was not recorded, so remainsUnknown. Synthetic nativeMuJoCo probe is a separate context proof.
+
+Root reviewed unapplied main/shared-render instrumentation patch SHA2567d62df655c630a318c28f28ea7a99765ab1482880a179e3a63fcd7207ae927da:18CPU tests pass, apply-check passes, original-operation Main AST preserved. Instance wrappers retain calls/arguments/results/exceptions; files append without per-record fsync and report measured observer overhead. Nested times are inclusive and must not be summed. Patch remains outside frozen source while native GPU7 queue is live; no new simulator/GPU execution. Production identity query proposal remains separately under review.
+
+## 2026-09-22T07:50:03.582779+00:00 — unapplied production-context observer reviewed
+
+Final artifact patch SHA256ccfe8ede68fe20e9c190078e1864f2fd17c9f3f575a3ff835f8808d134d51f33 passed17CPU mocks/callbacktests and apply-check. It reuses already-loaded raw EGL/GL DLL entrypoints without lazy loading or error-checking wrappers, and gates device attributes on known extension support. Missing exports/display-only versus client extension evidence remainUnknown. It observes once after an existing successful render/read_pixels; no context creation, make_current, render or simulation step is added. Expected values remain separate; physical index/UUID are not fabricated. Python failure isolation is tested; native driver faults/side effects remain a disclosed limit. This is a separately reviewed proposal, not applied orGPU-tested.
+
+## 2026-09-22T08:17:43.179597+00:00 — reuse identical completed B1 evidence and focus GPU7 on pipeline diagnosis
+
+Root compared completed resource ...b689d3b01c36 to the current frozen native plan: identical diagnostic scope, seed/task, policy configuration, native script hash, model/input inventory and all common source fingerprints; evidence hash verifies, output finite[1,64,128],5B1modelcalls, no simulator/Stage/actions. Reuse it only as bare-B1 implementation evidence, not transition/rendering or GPU7 execution evidence. Repeating the same synthetic probe is unnecessary. Owned CPU queue4193300 was terminated whilewaiting, before any resource dispatch, and its evidence archived. No GPUworker/external process was interrupted. Next bounded diagnostic will recover the already infrastructure-aborted C0 identity once onGPU7 with reviewed observational instrumentation; no failed Q0 or cohort reset.
+
+## GPU3 continuation authorization 2026-09-22T08:25:04.726856+00:00
+
+User explicitly moved subsequent execution to physical GPU3 only. Previous GPU7 CPU queue is already stopped before any GPU dispatch; all historical device labels and costs are preserved. Timing-only instrumentation applied after 18 CPU tests and unchanged-original-operation AST review. One exact-identity C0 infrastructure recovery is being prepared; invalid N1 Q0 is not retried.

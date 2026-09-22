@@ -1,17 +1,7 @@
 # Interim research checkpoint
 
-Status: GPU7-only native diagnostic queue PID4111605 stopped before GPU dispatch on an unfinished resource-journal gate. A CPU-only waiting repair is being frozen; runtime process/status records take precedence. The latest user instruction restricts all subsequent work to physical GPU7, with one exclusive worker and no fallback to other cards.
+IN_PROGRESS, target not achieved. Subsequent execution is physical GPU3 only, one exclusive worker. The previous GPU7 CPU queue was stopped before dispatch after matching completed GPU6 B1 evidence was verified for reuse. GPU3 mapping is physical3/CUDA0/EGL0; its real context healthcheck is pending/completing before the episode runtime is frozen.
 
-The previous GPU6 recovery ran for 1201.38 seconds and completed one actual Codex Stage query at step24 (19.772 seconds, 10800 input / 42 output tokens). Shortly after guidance switched off, the native process exited with SIGABRT (-6). The cause remains unknown; the sample is invalid and nonretryable.
+Next: one instrumented exact-identity C0 infrastructure recovery under `experiments/iteration_001_execution_intent/gpu3-render-timing-diagnostic.md`. Native N1 Q0 failure remains invalid and nonretryable. This diagnostic cannot replace a control or promote N1. Validation/formal remain unexposed.
 
-Current totals: 5 dispatched episodes, 3 infrastructure aborts, 2 invalid task failures, 0 scientifically valid outcomes, 0 running episodes, and 0.4673441816253277 conservative closed GPU-hours including healthchecks. No candidate, validation or formal score exists. The project target is not achieved.
-
-The isolated B1 diagnostic and queue passed 80 combined CPU tests. It uses frozen real RDT/T5/SigLIP models and deterministic synthetic inputs, with no simulator, action execution, Stage call or scientific episode. It charges GPU-process wall time separately and cannot establish guided-transition or EGL causality by itself. The diagnostic queue will execute it once after GPU7 is continuously idle for 120 seconds, then stop for review. All scientific phase gates remain closed.
-
-Codex saved-login transport is verified. Poe credentials remain unchanged. The prospective main phase-timing patch is still unapplied. Preserve all historical failures, immutable plans and resource costs.
-
-Authority: research-state.yaml and docs/03_evidence/qd_ed_final/iteration-ledger.md. Resume: docs/03_evidence/qd_ed_final/resume.md.
-
-A concurrent probe from a different GPU6 artifact namespace wrote into the shared resource journal. Its completed15.178619 seconds are retained in conservative accounting; it was not dispatched by this continuation and does not broaden GPU7-only authorization.
-
-The second concurrent separate-namespace GPU6 native resource completed116.84877258958295 seconds; conservative accounting retains this cost too. The GPU7-only queue has not dispatched any GPU resource of its own.
+Authoritative counts and current worker state are in `research-state.yaml` and append-only attempt/healthcheck ledgers. Earlier failures and separately recorded GPU6 resources remain accounted. Official Codex saved-login Stage transport succeeded in a real episode; Poe configuration remains preserved. No task-success claim follows from transport or CPU tests.

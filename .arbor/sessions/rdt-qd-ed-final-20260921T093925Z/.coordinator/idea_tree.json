@@ -11,20 +11,20 @@
     "eval_retries": 0,
     "eval_retry_base_delay": null,
     "eval_retry_max_delay": null,
-    "dataset_info": "Historical exposed object-swap; Dev and unused validation cohorts frozen in data/frozen-seed-plan.json at protocol commit56031d2. Init row0 fixed: stochastic-seed robustness only. New B_dev unknown. Physical GPU7 only; authoritative budget/status research-state.yaml.",
+    "dataset_info": "Historical exposed object-swap; Dev and unused validation cohorts frozen in data/frozen-seed-plan.json at protocol commit56031d2. Init row0 fixed: stochastic-seed robustness only. New B_dev unknown. Physical GPU3 only; authoritative budget/status research-state.yaml.",
     "metric_direction": "maximize",
     "trunk_branch": "exp/rdt-qd-ed-final-20260921T093925Z",
     "submission_path": null,
     "sample_submission_path": null,
     "resource_checkpoint": {
-      "timestamp": "2026-09-22T06:39:04.470801+00:00",
+      "timestamp": "2026-09-22T08:27:24.137636+00:00",
       "authorized_gpu_indices": [
-        7
+        3
       ],
-      "status": "NATIVE_DIAGNOSTIC_WAITING_GPU7",
-      "valid_scientific_outcomes": 0,
-      "native_failure": "SIGABRT r3, nonretryable; root cause Unknown",
-      "next_action": "Freeze and launch only the bounded native B1 diagnostic on physical GPU7; wait for exclusive availability. Do not retry the failed Q0 cell or dispatch P2/candidate/validation/formal."
+      "status": "PREPARING_GPU3_RENDER_DIAGNOSTIC",
+      "queue_pid": null,
+      "scientific_score": null,
+      "scope_question_pending": false
     }
   },
   "root_id": "ROOT",
@@ -84,8 +84,8 @@
       "depth": 1,
       "hypothesis": "Mechanism: Execution-aware behavioral representation for quality-diversity search.\nHypothesis: Manipulation modes lost under endpoint-only geometry can survive when archive equivalence includes executed actuator behavior.\nObservable: Preserved action-intent alternatives and task gains at fixed search budget on preregistered Dev.\nConflicts: Historical H1/H4/H5 proxy gains did not establish task gains; this tests a distinct representation axis without combining those mechanisms.",
       "status": "running",
-      "insight": "Any idle server GPU now authorized. Persistent CPU queue launched for one explicit N1-round Q0 infrastructure recovery and pairedP2, retaining all prior costs. Sourcea7f3f56,20queue CPUtests passed. AllGPUs occupied at lastscan; no sharing authorization. Candidate success unmeasured.",
-      "result": "Awaiting corrected-input baseline and candidate Dev."
+      "insight": "GPU3-only continuation. N1 Q0 native failure retained as invalid/nonretryable; completed matching B1 diagnostic reused. Preparing one instrumented C0 infrastructure recovery to locate renderer/native failure. Candidate unmeasured; no promotion.",
+      "result": "IN_PROGRESS; bounded engineering diagnosis; validation/formal closed."
     },
     "4.1": {
       "id": "4.1",
@@ -94,8 +94,8 @@
       "depth": 2,
       "hypothesis": "Mechanism: Sixteen-cell radial-distance by executed positive-gripper-duty QD archive.\nHypothesis: Replacing XY-only equivalence separates lower-reward gripper-intent branches during parent search, yielding useful new proposals without extra model evaluations.\nObservable: Correct constant-budget behavior, changed actual parent lineage, N1 Dev>=5/10 and noninferior to same-round P2/Q0 before validation.\nConflicts: H5 secondary trajectory lanes failed; N1 changes equivalence at capacity16 and leaves quality/allocation/EDS switches unchanged; azimuth/timing information loss is explicitly tested.",
       "status": "running",
-      "insight": "Any idle server GPU now authorized. Persistent CPU queue launched for one explicit N1-round Q0 infrastructure recovery and pairedP2, retaining all prior costs. Sourcea7f3f56,20queue CPUtests passed. AllGPUs occupied at lastscan; no sharing authorization. Candidate success unmeasured.",
-      "result": "RESOURCE_QUEUE_ACTIVE; candidate unmeasured, originalbaseline invalid retained, N1control infrastructureabort explicitlylinked forrecovery; validation/formal closed."
+      "insight": "GPU3-only continuation. N1 Q0 native failure retained as invalid/nonretryable; completed matching B1 diagnostic reused. Preparing one instrumented C0 infrastructure recovery to locate renderer/native failure. Candidate unmeasured; no promotion.",
+      "result": "IN_PROGRESS; bounded engineering diagnosis; validation/formal closed."
     }
   }
 }
