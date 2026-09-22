@@ -47,9 +47,83 @@ def candidate_indices(state):
     return candidates
 
 
-def inventory(run=subprocess.run):
+def visible_mask_indices(mask, order, devices):
+    """Resolve only explicit UUIDs or provable PCI-ordered CUDA ordinals."""
+    if not mask or mask.strip() == '-1':
+        return set()
+    pci_order = None
+    if order == 'PCI_BUS_ID':
+        try:
+            pci_order = sorted(devices, key=lambda index: normalized_pci_bus_id(devices[index]['pci_bus_id']))
+        except (KeyError, RuntimeError):
+            return set()
+    selected = set()
+    for token in mask.split(','):
+        token = token.strip()
+        if token == '-1':
+            break
+        if token.startswith('GPU-'):
+            matches = [index for index, device in devices.items()
+                       if device['uuid'].lower().startswith(token.lower())]
+            if len(matches) != 1:
+                break
+            selected.add(matches[0])
+        elif token.isdigit() and pci_order is not None and int(token) < len(pci_order):
+            selected.add(pci_order[int(token)])
+        else:
+            break
+    return selected
+
+
+def process_gpu_reservations(devices, *, proc_root=Path('/proc'), own_pid=None):
+    """Read only CUDA mask/order values; never retain process environments."""
+    own_pid = os.getpid() if own_pid is None else own_pid
+    processes = {}
+    for path in Path(proc_root).iterdir():
+        if not path.name.isdigit():
+            continue
+        try:
+            fields = (path / 'stat').read_text().rsplit(')', 1)[1].split()
+            if fields[0] in {'Z', 'X', 'x'}:
+                continue
+            processes[int(path.name)] = (int(fields[1]), fields[19], path)
+        except (OSError, ValueError, IndexError):
+            continue
+    excluded = {own_pid}
+    while True:
+        children = {pid for pid, (parent, _, _) in processes.items() if parent in excluded}
+        enlarged = excluded | children
+        if enlarged == excluded:
+            break
+        excluded = enlarged
+    reservations = {index: [] for index in devices}
+    for pid, (_, started, path) in processes.items():
+        if pid in excluded:
+            continue
+        try:
+            # Linux exposes the environment as a NUL stream. Only these two
+            # allowlisted fields are decoded; no other value is logged/stored.
+            selected = {}
+            with (path / 'environ').open('rb') as stream:
+                for field in stream.read().split(b'\0'):
+                    key, separator, value = field.partition(b'=')
+                    if separator and key in {b'CUDA_VISIBLE_DEVICES', b'CUDA_DEVICE_ORDER'}:
+                        selected[key] = value.decode('ascii', errors='strict')
+            fresh = (path / 'stat').read_text().rsplit(')', 1)[1].split()
+            if fresh[0] in {'Z', 'X', 'x'} or fresh[19] != started:
+                continue
+            indices = visible_mask_indices(selected.get(b'CUDA_VISIBLE_DEVICES', ''),
+                                           selected.get(b'CUDA_DEVICE_ORDER', ''), devices)
+            for index in indices:
+                reservations[index].append(pid)
+        except (OSError, UnicodeError, ValueError, IndexError):
+            continue
+    return {index: sorted(pids) for index, pids in reservations.items()}
+
+
+def inventory(run=subprocess.run, *, reservations=process_gpu_reservations):
     """Only NVIDIA metadata queries: no CUDA imports, allocations, or contexts."""
-    raw = run(['nvidia-smi', '--query-gpu=index,uuid,memory.used',
+    raw = run(['nvidia-smi', '--query-gpu=index,uuid,memory.used,pci.bus_id',
                '--format=csv,noheader,nounits'], capture_output=True, text=True, timeout=15)
     apps = run(['nvidia-smi', '--query-compute-apps=gpu_uuid,pid',
                 '--format=csv,noheader,nounits'], capture_output=True, text=True, timeout=15)
@@ -58,11 +132,12 @@ def inventory(run=subprocess.run):
     devices = {}
     try:
         for fields in csv.reader(io.StringIO(raw.stdout)):
-            index, identity, memory = [value.strip() for value in fields]
+            index, identity, memory, pci = [value.strip() for value in fields]
             index, memory = int(index), int(memory)
             runner.require(index >= 0 and memory >= 0 and identity.startswith('GPU-')
                            and index not in devices, 'invalid GPU inventory identity')
             devices[index] = {'physical_gpu': index, 'uuid': identity,
+                              'pci_bus_id': normalized_pci_bus_id(pci),
                               'memory_used_mib': memory, 'compute_pids': []}
         runner.require(bool(devices) and len({d['uuid'] for d in devices.values()}) == len(devices),
                        'empty or ambiguous GPU inventory')
@@ -75,14 +150,47 @@ def inventory(run=subprocess.run):
             by_uuid[identity]['compute_pids'].append(int(pid))
     except (ValueError, TypeError) as exc:
         raise runner.GateError('invalid available-GPU inventory response') from exc
+    masks = reservations(devices)
+    for index, device in devices.items():
+        device['reserving_pids'] = masks.get(index, [])
     return devices
+
+
+def currently_idle(device):
+    return (not device['compute_pids'] and not device.get('reserving_pids')
+            and device['memory_used_mib'] < 1024)
+
+
+def update_idle_windows(devices, windows, now, idle_seconds):
+    for index in set(windows) - set(devices):
+        windows.pop(index)
+    for index, device in devices.items():
+        identity = (device['uuid'], device.get('pci_bus_id'))
+        previous = windows.get(index)
+        if not currently_idle(device):
+            windows.pop(index, None)
+            elapsed = 0.0
+        else:
+            if previous is None or previous[0] != identity:
+                windows[index] = (identity, now)
+            elapsed = max(0.0, now - windows[index][1])
+        device['idle_observed_seconds'] = elapsed
+        device['idle_stable'] = currently_idle(device) and elapsed >= idle_seconds
 
 
 def choose_device(devices, candidates, preferred):
     runner.require(set(candidates) <= set(devices), 'authorized GPU is missing from this server')
     order = [preferred] + [index for index in candidates if index != preferred]
     return next((devices[index] for index in order
-                 if not devices[index]['compute_pids'] and devices[index]['memory_used_mib'] < 1024), None)
+                 if currently_idle(devices[index]) and devices[index].get('idle_stable', True)), None)
+
+
+def reservation_admission(device):
+    fresh = inventory().get(device['physical_gpu'])
+    runner.require(fresh is not None and fresh['uuid'] == device['uuid'],
+                   'GPU reservation inventory identity changed')
+    runner.require(not fresh.get('reserving_pids'),
+                   f"GPU{device['physical_gpu']} has external GPU reservations")
 
 
 def current_metadata(physical_gpu, *, root=ROOT):
@@ -230,6 +338,7 @@ def bind_plan(plan_path, plan, runtime, device, row, events_path, *, root=ROOT):
         runner.validate_plan(plan_path, root=root)
         mapping = current_metadata(physical_gpu, root=root)
         runner.require(mapping['uuid'] == device['uuid'], 'selected GPU inventory identity changed')
+        reservation_admission(device)
         runner.gpu_admission(physical_gpu=physical_gpu, expected_uuid=mapping['uuid'])
         resources = runner.read_events(root / 'data/gpu-healthcheck-ledger.jsonl')
         proof = find_probe(runtime, mapping, resources, root=root)
@@ -290,7 +399,7 @@ def bind_plan(plan_path, plan, runtime, device, row, events_path, *, root=ROOT):
 
 def is_admission_race(error):
     return isinstance(error, runner.GateError) and bool(re.fullmatch(
-        r'GPU\d+ (?:has external compute processes|memory is \d+ MiB; requires <1024 MiB)', str(error)))
+        r'GPU\d+ (?:has external compute processes|has external GPU reservations|memory is \d+ MiB; requires <1024 MiB)', str(error)))
 
 
 def dispatch_ids(root):
@@ -320,10 +429,12 @@ def undispatched_admission_race(error, new_events, new_resources=()):
             and is_admission_race(runner.GateError(event.get('reason', ''))) for event in resources))
 
 
-def run_queue(plan_path, episode_keys, *, poll_seconds=30, status_path=None, root=ROOT,
-              sleep=time.sleep, max_polls=None):
+def run_queue(plan_path, episode_keys, *, poll_seconds=30, idle_seconds=120, status_path=None, root=ROOT,
+              sleep=time.sleep, monotonic=time.monotonic, max_polls=None):
     root = Path(root).resolve()
     runner.require(type(poll_seconds) is int and 1 <= poll_seconds <= 60, 'poll interval must be 1..60 seconds')
+    runner.require(type(idle_seconds) is int and 0 <= idle_seconds <= 3600,
+                   'idle stability window must be 0..3600 seconds')
     runner.require(bool(episode_keys) and len(set(episode_keys)) == len(episode_keys),
                    'explicit unique episode keys required')
     # Establish the owned status path before deeper validation, allowing a
@@ -335,6 +446,7 @@ def run_queue(plan_path, episode_keys, *, poll_seconds=30, status_path=None, roo
     events_path = status_path.with_name(status_path.stem + '-events.jsonl')
     status = {'schema': 'qd-ed-available-gpu-queue-v1', 'pid': os.getpid(),
               'base_plan_path': str(Path(plan_path).resolve()), 'episode_keys': list(episode_keys),
+              'idle_stability_seconds': idle_seconds,
               'completed_keys': [], 'results': [], 'status': 'starting'}
 
     def save(phase, **values):
@@ -356,12 +468,13 @@ def run_queue(plan_path, episode_keys, *, poll_seconds=30, status_path=None, roo
                                'requested split lacks frozen phase authorization')
                 pending_gate(root, rows[key])
             runner.verify_provider(runtime, runner.child_environment(runtime), root=root)
-            active_path, polls = Path(plan_path).resolve(), 0
+            active_path, polls, idle_windows = Path(plan_path).resolve(), 0, {}
             for key in episode_keys:
                 row = rows[key]
                 while True:
                     state, candidates = pending_gate(root, row)
                     devices = inventory()
+                    update_idle_windows(devices, idle_windows, monotonic(), idle_seconds)
                     device = choose_device(devices, candidates, runner.runtime_gpu(runtime))
                     polls += 1
                     save('waiting' if device is None else 'selected', current_episode_key=key,
@@ -383,6 +496,7 @@ def run_queue(plan_path, episode_keys, *, poll_seconds=30, status_path=None, roo
                         # and the rebound plan validated. A later episode
                         # admission race can safely wait using that new plan.
                         before_probes = probe_dispatch_ids(root)
+                        reservation_admission(device)
                         save('running', selected_physical_gpu=device['physical_gpu'],
                              active_plan_path=str(active_path), active_plan_sha256=runner.digest(active_path))
                         result = runner.run_plan(active_path, split=row['split'], iteration=row['iteration'],
@@ -394,6 +508,7 @@ def run_queue(plan_path, episode_keys, *, poll_seconds=30, status_path=None, roo
                                 and undispatched_admission_race(exc, fresh_events, fresh_resources)):
                             append_selection(events_path, {'event': 'admission_race', 'episode_key': key,
                                              'physical_gpu': device['physical_gpu']})
+                            idle_windows.pop(device['physical_gpu'], None)
                             save('waiting', last_resource_reason='GPU became busy before dispatch')
                             if max_polls is not None and polls >= max_polls:
                                 return status
@@ -403,6 +518,7 @@ def run_queue(plan_path, episode_keys, *, poll_seconds=30, status_path=None, roo
                     status['completed_keys'].append(key)
                     status['results'].extend(result)
                     save('episode_completed')
+                    idle_windows.clear()
                     break
             save('completed')
             return status
@@ -422,12 +538,14 @@ def main(argv=None):
     parser.add_argument('--plan', type=Path, required=True)
     parser.add_argument('--episode-key', action='append', required=True)
     parser.add_argument('--poll-seconds', type=int, default=30)
+    parser.add_argument('--idle-seconds', type=int, default=120,
+                        help='Continuous observed idle time required before selecting a GPU (default: 120)')
     parser.add_argument('--status-path', type=Path)
     args = parser.parse_args(argv)
     signal.signal(signal.SIGTERM, lambda *_: (_ for _ in ()).throw(KeyboardInterrupt()))
     try:
         result = run_queue(args.plan, args.episode_key, poll_seconds=args.poll_seconds,
-                           status_path=args.status_path)
+                           idle_seconds=args.idle_seconds, status_path=args.status_path)
         print(json.dumps({'status': result['status'], 'completed_keys': result['completed_keys']}))
         return 0
     except BaseException as exc:

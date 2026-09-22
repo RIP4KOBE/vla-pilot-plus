@@ -1,0 +1,46 @@
+{
+  "timestamp": "2026-09-22T05:27:55.330369+00:00",
+  "run_name": "rdt-qd-ed-final-20260921T093925Z",
+  "phase": "RESOURCE_QUEUE_PREPARED",
+  "source_commit": "a7f3f56129fdca92f01b1d97b607eb4c1d432814",
+  "active_plan": {
+    "path": "data/qd-ed-n1-recovery-queue-plan.json",
+    "source_commit": "a7f3f56129fdca92f01b1d97b607eb4c1d432814",
+    "sha256": "76dd6c65d473c4b6386c22ff7b8fb364db5cba8c909c51f3e718ae33d9c72b6e",
+    "snapshot": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/n1-recovery-queue-a7f3f56129fd.json",
+    "frozen": true,
+    "iteration": "N1",
+    "expected_unique_scientific_cells": 30,
+    "rows_including_recovery": 31,
+    "candidate_dispatch_authorized": false
+  },
+  "resource_queue": {
+    "pid": 3927573,
+    "source_commit": "a7f3f56129fdca92f01b1d97b607eb4c1d432814",
+    "plan_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-n1-recovery-queue-plan.json",
+    "plan_sha256": "76dd6c65d473c4b6386c22ff7b8fb364db5cba8c909c51f3e718ae33d9c72b6e",
+    "status_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/available-gpu-queue-status.json",
+    "log_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/available-gpu-queue.log",
+    "started_at": "2026-09-22T05:16:08.229181+00:00",
+    "argv": [
+      "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+      "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_available_gpu_queue.py",
+      "--plan",
+      "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-n1-recovery-queue-plan.json",
+      "--episode-key",
+      "n1_dev_t00_q0_r1",
+      "--episode-key",
+      "n1_dev_t00_c0",
+      "--poll-seconds",
+      "30",
+      "--status-path",
+      "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/available-gpu-queue-status.json"
+    ],
+    "scope": "explicit Q0 infrastructure recovery and pairedP2; then stopforreview"
+  },
+  "in_flight_executors": [],
+  "owned_gpu_workers": [],
+  "authoritative_state": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/research-state.yaml",
+  "next_action": "Freeze the reviewed queue source and linked r2 recovery plan, then launch one CPU-only queue for any continuously idle authorized GPU. Keep exclusive admission; review the requested pair before later controls.",
+  "target_achieved": false
+}

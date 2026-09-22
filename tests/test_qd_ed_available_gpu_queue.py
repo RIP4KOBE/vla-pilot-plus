@@ -36,6 +36,7 @@ def mapping(index=7):
 
 def devices(idle=None):
     return {index: {'physical_gpu': index, 'uuid': f'GPU-test-{index}',
+                    'pci_bus_id': f'0000:{index + 1:02x}:00.0', 'reserving_pids': [],
                     'memory_used_mib': 0 if index == idle else 8000,
                     'compute_pids': [] if index == idle else [100 + index]}
             for index in range(8)}
@@ -80,7 +81,7 @@ def test_busy_wait_never_creates_attempts_or_calls_gpu_context(tmp_path, monkeyp
     monkeypatch.setattr(queue.probe, 'run_probe', forbid)
     monkeypatch.setattr(queue.runner, 'run_plan', forbid)
     sleeps = []
-    result = queue.run_queue(path, ['q0'], root=root, sleep=sleeps.append, max_polls=2)
+    result = queue.run_queue(path, ['q0'], root=root, idle_seconds=0, sleep=sleeps.append, max_polls=2)
     assert result['status'] == 'waiting'
     assert sleeps == [30]
     assert result['completed_keys'] == []
@@ -93,16 +94,16 @@ def test_inventory_joins_processes_by_uuid_and_rejects_unknown_identity():
     calls = []
     def run(command, **kwargs):
         calls.append(command)
-        value = '0, GPU-zero, 0\n1, GPU-one, 7\n' if '--query-gpu=index,uuid,memory.used' in command else 'GPU-zero, 123\n'
+        value = '0, GPU-zero, 0, 0000:01:00.0\n1, GPU-one, 7, 0000:02:00.0\n' if '--query-gpu=index,uuid,memory.used,pci.bus_id' in command else 'GPU-zero, 123\n'
         return SimpleNamespace(returncode=0, stdout=value)
-    observed = queue.inventory(run)
+    observed = queue.inventory(run, reservations=lambda _: {})
     assert len(calls) == 2
     assert observed[0]['compute_pids'] == [123]
     assert queue.choose_device(observed, [0, 1], 0)['physical_gpu'] == 1
     def unknown(command, **kwargs):
-        return SimpleNamespace(returncode=0, stdout='0, GPU-zero, 0\n' if '--query-gpu=index,uuid,memory.used' in command else 'GPU-unknown, 123\n')
+        return SimpleNamespace(returncode=0, stdout='0, GPU-zero, 0, 0000:01:00.0\n' if '--query-gpu=index,uuid,memory.used,pci.bus_id' in command else 'GPU-unknown, 123\n')
     with pytest.raises(queue.runner.GateError, match='unknown GPU'):
-        queue.inventory(unknown)
+        queue.inventory(unknown, reservations=lambda _: {})
 
 
 @pytest.mark.parametrize('mutation', [
@@ -181,7 +182,7 @@ def test_admission_race_before_dispatch_returns_to_cpu_wait(tmp_path, monkeypatc
         raise queue.runner.GateError('GPU7 has external compute processes')
     monkeypatch.setattr(queue, 'bind_plan', race)
     monkeypatch.setattr(queue.runner, 'run_plan', forbid)
-    status = queue.run_queue(path, ['q0'], root=root, sleep=lambda _: None, max_polls=2)
+    status = queue.run_queue(path, ['q0'], root=root, idle_seconds=0, sleep=lambda _: None, max_polls=2)
     assert status['status'] == 'waiting' and len(calls) == 2
     assert not (root / 'data/attempt-ledger.jsonl').exists()
 
@@ -199,7 +200,7 @@ def test_dispatched_failure_stops_without_retry(tmp_path, monkeypatch, after_dis
         raise queue.runner.GateError('GPU7 has external compute processes')
     monkeypatch.setattr(queue, 'bind_plan', fail)
     with pytest.raises(queue.runner.GateError):
-        queue.run_queue(path, ['q0'], root=root, sleep=forbid)
+        queue.run_queue(path, ['q0'], root=root, idle_seconds=0, sleep=forbid)
     status = json.loads((artifact / 'runtime/available-gpu-queue-status.json').read_text())
     assert status['status'] == 'failed' and len(calls) == 1
     assert status['completed_keys'] == []
@@ -211,7 +212,7 @@ def test_unexpected_error_stops_and_redacts_exception_body(tmp_path, monkeypatch
         raise ValueError('sensitive provider response')
     monkeypatch.setattr(queue, 'inventory', fail)
     with pytest.raises(ValueError):
-        queue.run_queue(path, ['q0'], root=root, sleep=forbid)
+        queue.run_queue(path, ['q0'], root=root, idle_seconds=0, sleep=forbid)
     status = (artifact / 'runtime/available-gpu-queue-status.json').read_text()
     assert 'sensitive' not in status
     assert json.loads(status)['reason'] == 'ValueError'
@@ -226,7 +227,7 @@ def test_completed_episode_records_result_and_exits(tmp_path, monkeypatch):
         calls.append(kwargs)
         return [{'attempt_id': 'result', 'outcome_valid': True, 'success': False}]
     monkeypatch.setattr(queue.runner, 'run_plan', run)
-    result = queue.run_queue(path, ['q0'], root=root, sleep=forbid)
+    result = queue.run_queue(path, ['q0'], root=root, idle_seconds=0, sleep=forbid)
     assert result['status'] == 'completed'
     assert result['completed_keys'] == ['q0']
     assert result['results'][0]['success'] is False
@@ -244,7 +245,7 @@ def test_episode_admission_race_after_successful_probe_can_wait(tmp_path, monkey
     def race(*args, **kwargs):
         raise queue.runner.GateError('GPU7 has external compute processes')
     monkeypatch.setattr(queue.runner, 'run_plan', race)
-    result = queue.run_queue(path, ['q0'], root=root, sleep=forbid, max_polls=1)
+    result = queue.run_queue(path, ['q0'], root=root, idle_seconds=0, sleep=forbid, max_polls=1)
     assert result['status'] == 'waiting'
     assert not (root / 'data/attempt-ledger.jsonl').exists()
 
@@ -296,7 +297,7 @@ def test_reserved_probe_second_admission_race_unwraps_and_rescans(tmp_path, monk
         raise queue.runner.GateError('GPU probe failed; runtime readiness remains unchanged')
     monkeypatch.setattr(queue.probe, 'run_probe', reserved_then_busy)
     monkeypatch.setattr(queue.runner, 'run_plan', forbid)
-    result = queue.run_queue(path, ['q0'], root=root, sleep=lambda _: None, max_polls=2)
+    result = queue.run_queue(path, ['q0'], root=root, idle_seconds=0, sleep=lambda _: None, max_polls=2)
     assert result['status'] == 'waiting'
     assert len(calls) == 2
     state = queue.runner.read_state(root / 'research-state.yaml')
@@ -344,3 +345,101 @@ def test_hardware_plan_freeze_keeps_scientific_rows_and_records_actual_mask(tmp_
     assert preview['environment_public']['CUDA_VISIBLE_DEVICES'] == '5'
     assert preview['parent_nonhardware_preflight_index'] == plan['preflight_index']
     assert new_plan['frozen_at']
+
+
+def fake_process(proc, pid, parent, env, *, state='S', started='123'):
+    folder = proc / str(pid)
+    folder.mkdir()
+    fields = [state, str(parent)] + ['0'] * 18
+    fields[19] = started
+    (folder / 'stat').write_text(f'{pid} (test process) ' + ' '.join(fields))
+    if env is not None:
+        (folder / 'environ').write_bytes(b'\0'.join(key.encode() + b'=' + value.encode()
+                                                  for key, value in env.items()) + b'\0')
+
+
+def test_uuid_reservation_detects_live_cpu_worker_without_storing_other_env(tmp_path):
+    available = devices(7)
+    fake_process(tmp_path, 200, 1, {'CUDA_VISIBLE_DEVICES': 'GPU-test-7',
+                                    'UNRELATED_SECRET': 'never-persist-this-token'})
+    reservation = queue.process_gpu_reservations(available, proc_root=tmp_path, own_pid=999)
+    assert reservation[7] == [200]
+    for index in available:
+        available[index]['reserving_pids'] = reservation[index]
+    assert not available[7]['compute_pids']
+    assert queue.choose_device(available, list(range(8)), 7) is None
+    serialized = json.dumps(available)
+    assert 'never-persist' not in serialized
+    assert 'UNRELATED_SECRET' not in serialized
+
+
+def test_reservations_ignore_own_descendants_disabled_unset_dead_and_inaccessible(tmp_path):
+    fake_process(tmp_path, 100, 1, {'CUDA_VISIBLE_DEVICES': 'GPU-test-7'})
+    fake_process(tmp_path, 101, 100, {'CUDA_VISIBLE_DEVICES': 'GPU-test-7'})
+    fake_process(tmp_path, 102, 101, {'CUDA_VISIBLE_DEVICES': 'GPU-test-7'})
+    fake_process(tmp_path, 200, 1, {'CUDA_VISIBLE_DEVICES': ''})
+    fake_process(tmp_path, 201, 1, {'CUDA_VISIBLE_DEVICES': '-1'})
+    fake_process(tmp_path, 202, 1, {'OTHER': 'ignored'})
+    fake_process(tmp_path, 203, 1, {'CUDA_VISIBLE_DEVICES': 'GPU-test-7'}, state='Z')
+    fake_process(tmp_path, 204, 1, None)
+    assert not any(queue.process_gpu_reservations(devices(), proc_root=tmp_path, own_pid=100).values())
+
+
+def test_numeric_mask_uses_pci_order_not_nvidia_index_or_unproven_default():
+    available = devices()
+    available[0]['pci_bus_id'], available[7]['pci_bus_id'] = available[7]['pci_bus_id'], available[0]['pci_bus_id']
+    assert queue.visible_mask_indices('0,2', 'PCI_BUS_ID', available) == {7, 2}
+    assert queue.visible_mask_indices('0,2', '', available) == set()
+    assert queue.visible_mask_indices('0,2', 'FASTEST_FIRST', available) == set()
+    assert queue.visible_mask_indices('GPU-test-7', '', available) == {7}
+    assert queue.visible_mask_indices('GPU-test-', '', available) == set()
+    assert queue.visible_mask_indices('0,-1,2', 'PCI_BUS_ID', available) == {7}
+
+
+def test_continuous_idle_window_resets_on_context_reservation_and_identity():
+    available, windows = devices(7), {}
+    queue.update_idle_windows(available, windows, 0, 120)
+    queue.update_idle_windows(available, windows, 119, 120)
+    assert queue.choose_device(available, list(range(8)), 7) is None
+    queue.update_idle_windows(available, windows, 120, 120)
+    assert queue.choose_device(available, list(range(8)), 7)['physical_gpu'] == 7
+    available[7]['reserving_pids'] = [77]
+    queue.update_idle_windows(available, windows, 130, 120)
+    assert 7 not in windows
+    available[7]['reserving_pids'] = []
+    queue.update_idle_windows(available, windows, 150, 120)
+    queue.update_idle_windows(available, windows, 270, 120)
+    assert available[7]['idle_stable']
+    available[7]['uuid'] = 'GPU-replaced'
+    queue.update_idle_windows(available, windows, 280, 120)
+    assert not available[7]['idle_stable']
+    assert available[7]['idle_observed_seconds'] == 0
+    available[7]['compute_pids'] = [88]
+    queue.update_idle_windows(available, windows, 300, 120)
+    assert 7 not in windows
+
+
+def test_default_queue_waits_full_idle_window_before_any_binding(tmp_path, monkeypatch):
+    root, artifact, path, plan, runtime, row = fixture_queue(tmp_path, monkeypatch)
+    monkeypatch.setattr(queue, 'inventory', lambda: devices(7))
+    monkeypatch.setattr(queue, 'bind_plan', forbid)
+    ticks = iter([0, 30, 60, 90])
+    status = queue.run_queue(path, ['q0'], root=root, sleep=lambda _: None,
+                             monotonic=lambda: next(ticks), max_polls=4)
+    assert status['status'] == 'waiting'
+    assert status['idle_stability_seconds'] == 120
+    assert status['gpu_inventory'][7]['idle_observed_seconds'] == 90
+    assert not (root / 'data/attempt-ledger.jsonl').exists()
+
+
+def test_reservation_recheck_before_dispatch_returns_to_wait(tmp_path, monkeypatch):
+    root, artifact, path, plan, runtime, row = fixture_queue(tmp_path, monkeypatch)
+    observed = [devices(7), devices(7)]
+    observed[1][7]['reserving_pids'] = [123]
+    snapshots = iter(observed)
+    monkeypatch.setattr(queue, 'inventory', lambda: next(snapshots))
+    monkeypatch.setattr(queue, 'bind_plan', lambda *a, **k: (path, plan, runtime))
+    monkeypatch.setattr(queue.runner, 'run_plan', forbid)
+    status = queue.run_queue(path, ['q0'], root=root, idle_seconds=0, sleep=forbid, max_polls=1)
+    assert status['status'] == 'waiting'
+    assert not (root / 'data/attempt-ledger.jsonl').exists()

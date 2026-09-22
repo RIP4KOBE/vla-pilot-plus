@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-09-22T05:27:55.330369+00:00",
+  "status": "RESOURCE_QUEUE_PREPARED",
+  "budget": {
+    "max_gpu_hours": 48.0,
+    "gpu_hours_consumed": 0.04298842844152306,
+    "max_episode_attempts": 240,
+    "reserved": {
+      "baseline": 20,
+      "development": 100,
+      "validation": 60,
+      "formal": 40,
+      "recovery": 20
+    },
+    "dispatched": 3,
+    "aborted": 2,
+    "valid": 0,
+    "running": 0,
+    "invalid": 1,
+    "completed": 1,
+    "gpu_hour_reservations": {
+      "validation": 14.0,
+      "formal": 10.0
+    }
+  },
+  "candidate_score": null,
+  "validation_exposed": false,
+  "formal_exposed": false,
+  "provider_condition": "codex_login_astra_low_v1",
+  "queue_pid": null
+}

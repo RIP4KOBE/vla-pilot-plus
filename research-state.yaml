@@ -13,7 +13,7 @@ project_target:
   required_formal_successes: 5
   achieved: false
 study:
-  status: PREPARING_PERSISTENT_GPU_QUEUE
+  status: RESOURCE_QUEUE_PREPARED
   mode: real
   interaction: auto
 candidate:
@@ -28,7 +28,7 @@ candidate:
   ordering_amendment: experiments/iteration_001_execution_intent/startup-repair-amendment.md
 budget:
   max_gpu_hours: 48.0
-  gpu_hours_consumed: 0.028872411260640045
+  gpu_hours_consumed: 0.04298842844152306
   max_episode_attempts: 240
   reserved:
     baseline: 20
@@ -36,8 +36,8 @@ budget:
     validation: 60
     formal: 40
     recovery: 20
-  dispatched: 2
-  aborted: 1
+  dispatched: 3
+  aborted: 2
   valid: 0
   running: 0
   invalid: 1
@@ -74,19 +74,19 @@ historical:
   previous_gpu_hours: 6.946832055555556
   previous_formal_episodes: 0
 active_iteration: iteration_001_execution_intent
-next_action: Freeze queue source +explicitlinkedrecovery plan, start persistent CPU
-  queue for n1_dev_t00_q0_r1 and n1_dev_t00_c0 on any exclusiveidle serverGPU. Sharing
-  permission is unanswered; originalexclusiveconstraint remains.
+next_action: Freeze the reviewed queue source and linked r2 recovery plan, then launch
+  one CPU-only queue for any continuously idle authorized GPU. Keep exclusive admission;
+  review the requested pair before later controls.
 source_spec_sha256: 3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef
 derived_indexes:
 - .arbor/sessions/rdt-qd-ed-final-20260921T093925Z
 authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
   ledger is append-only event evidence, not a second mutable state.
 online_blockers:
-- All8 server GPUs currently have externalcompute processes; firstN1 Q0 control aborted
-  on externalprocess appearance before policy rollout. Explicit linked infrastructure
-  recovery is being queued.
-updated_at: '2026-09-22T05:13:23.226072+00:00'
+- All eight server GPUs currently have external compute processes. The queue will
+  wait for an exclusive device; CPU-visible CUDA masks and a 120-second stable idle
+  window avoid known transient startup gaps.
+updated_at: '2026-09-22T05:27:55.330369+00:00'
 seed_plan:
   path: data/frozen-seed-plan.json
   sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
@@ -99,7 +99,7 @@ cpu_validation:
   startup_repair_passed: 118
   gpu5_runner_passed: 61
   gpu5_probe_metadata_passed: 64
-  available_gpu_queue_passed: 20
+  available_gpu_queue_passed: 26
 prepared_baseline_plan:
   path: data/qd-ed-final-plan.json
   episodes: 20
@@ -122,17 +122,17 @@ runner:
     development: 1
     validation: 0
     formal: 0
-    recovery: 0
-  reserved_attempts: 2
+    recovery: 1
+  reserved_attempts: 3
   gpu_hours_by_bucket:
     baseline: 0.019651524036631195
     development: 0.003410519381933328
     validation: 0.0
     formal: 0.0
-    recovery: 0.005810367842075519
-  gpu_healthcheck_hours: 0.005810367842075519
+    recovery: 0.019926385022958536
+  gpu_healthcheck_hours: 0.009558480909585746
   gpu_healthcheck_inflight: 0
-  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0__2b5e035fd6bb
+  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r1__1eb8b4580e78
   last_event: aborted
 gpu_admission_last_observation:
   physical_gpu: 7
@@ -179,16 +179,15 @@ closed_baseline:
   complete_success_rate: null
   report: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/iteration_000_intake/closed-incomplete-baseline-report.json
 active_plan:
-  path: data/qd-ed-n1-dev-available-plan.json
-  source_commit: 16f7fae1d948ad8359fa1b64d56352a1914e89ac
-  sha256: 56f41cfe5eabe706076a85c44d093c4aff7252308f11fe2ab7467573da967f5f
-  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/n1-dev-available-gpu7-16f7fae1d948.json
+  path: data/qd-ed-n1-recovery-queue-plan.json
+  source_commit: a7f3f56129fdca92f01b1d97b607eb4c1d432814
+  sha256: 76dd6c65d473c4b6386c22ff7b8fb364db5cba8c909c51f3e718ae33d9c72b6e
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/n1-recovery-queue-a7f3f56129fd.json
   frozen: true
   iteration: N1
-  controls: 20
-  candidate_cells: 10
+  expected_unique_scientific_cells: 30
+  rows_including_recovery: 31
   candidate_dispatch_authorized: false
-  physical_gpu: 7
 hardware_migration:
   previous_physical_gpu: 7
   authorized_physical_gpu: 5
@@ -225,9 +224,9 @@ authorized_gpu_selection:
   single_exclusive_worker: true
   rescan_if_unavailable: true
 pending_infrastructure_recovery:
-  retry_of: rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0__2b5e035fd6bb
-  original_episode_key: n1_dev_t00_q0
-  new_episode_key: n1_dev_t00_q0_r1
+  retry_of: rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r1__1eb8b4580e78
+  original_episode_key: n1_dev_t00_q0_r1
+  new_episode_key: n1_dev_t00_q0_r2
   identity:
     env_seed: 1969522881
     init_index: 0
@@ -238,3 +237,27 @@ pending_infrastructure_recovery:
     task_id: 0
   budget_bucket: recovery
   reason: external GPU7 process appeared during owned attempt
+resource_queue:
+  pid: 3927573
+  source_commit: a7f3f56129fdca92f01b1d97b607eb4c1d432814
+  plan_path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-n1-recovery-queue-plan.json
+  plan_sha256: 76dd6c65d473c4b6386c22ff7b8fb364db5cba8c909c51f3e718ae33d9c72b6e
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/available-gpu-queue-status.json
+  log_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/available-gpu-queue.log
+  started_at: '2026-09-22T05:16:08.229181+00:00'
+  argv:
+  - /home/hynx/miniconda3/envs/vla-pilot/bin/python
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_available_gpu_queue.py
+  - --plan
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-n1-recovery-queue-plan.json
+  - --episode-key
+  - n1_dev_t00_q0_r1
+  - --episode-key
+  - n1_dev_t00_c0
+  - --poll-seconds
+  - '30'
+  - --status-path
+  - /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/available-gpu-queue-status.json
+  scope: explicit Q0 infrastructure recovery and pairedP2; then stopforreview
+  status: failed
+  archived_evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/queue-history/a7f3f56-first-recovery

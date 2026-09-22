@@ -110,3 +110,25 @@ New authorized cycle from `744e08b`; historical Run045 remains no-adoption. GPU7
 - Scoped executor added only `scripts/qd_ed_available_gpu_queue.py` and20 CPU regression tests, all passed in0.23s. No GPU/network or runtime mutation by executor.
 - Queue waits using NVIDIA metadata, selects only explicitly authorized idle cards, records hardware-only new manifests/plans, and uses existing accounted probes/runner. It retains nonhardware/provider/source/seed identities. GPU admission races before any dispatch return to CPU waiting; any error after a dispatched probe/episode stops for review. Source/input/auth drift and exhausted budgets stop explicitly.
 - Current request queued for exact linked infrastructure recovery `n1_dev_t00_q0_r1` plus paired `n1_dev_t00_c0`, then review before remaining controls. Original baseline invalid never retried. A separate user clarification asks whether to relax the original no-sharing rule; no answer yet, so exclusive mode remains mandatory.
+
+### Recovery queue source/input freeze 2026-09-22T05:14:28.335787+00:00
+
+- Source `a7f3f56129fdca92f01b1d97b607eb4c1d432814`; plan SHA256 `76dd6c65d473c4b6386c22ff7b8fb364db5cba8c909c51f3e718ae33d9c72b6e`; immutable snapshot `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/n1-recovery-queue-a7f3f56129fd.json`.31 fully resolved rows represent30 unique original scientific cells, including one explicit infrastructure recovery. All model/runtime/input hashes and existing Codex login reverified. Selected recovery/P2 keys only; no candidate dispatch authorized.
+
+### Persistent queue started 2026-09-22T05:17:55.476835+00:00
+
+- Detached CPU queue PID3927573 launched for the explicit Q0 infrastructure recovery and pairedP2. Default polling30seconds over all eight authorized server GPUs. Process record:`runtime/available-gpu-queue-process.json`; status:`runtime/available-gpu-queue-status.json`; queue log:`runtime/available-gpu-queue.log`. No extra GPU/episode dispatch at launch.
+- Sharing clarification unanswered; original section9 exclusive-device constraint remains. Queue status currently `running`; it must reach actual runtime/attempt evidence before claiming model execution. Pair completion is not study completion.
+
+### Second external-device startup conflict 2026-09-22T05:22:06.551622+00:00
+
+- Queue sourcea7f3f56 foundGPU7 temporarily idle, completed actual v2 CUDA/EGL probe `rdt-qd-ed-final-20260921T093925Z__gpu7_cuda_egl__4fafff3673e5` in13.493207043036819s, then dispatched linkedrecovery `rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r1__1eb8b4580e78`. External PID3930135 appeared during RDT loading; the monitor stopped only our worker after37.324454808142036s. No Stage query or policy-rollout outcome. Queue exited failed as designed, not running in background now. Archived queue evidence:`runtime/queue-history/a7f3f56-first-recovery`.
+- Total3 dispatched,1 invalid,2 infrastructureaborted,0 valid; GPU-hours0.04298842844152306. Actual probe and both abort costs remain counted.
+- Read-only diagnostic of ONLY CUDA-visible-device declarations found external CPU-starting workers already naming the eventual GPU UUID before NVIDIA listed a compute context. This explains the apparent idle window. Add conservative declared-device conflict checks and a continuous120s idle window, all CPU-only and before any dispatch. These masks are potential resource conflicts, not proof of an official scheduler lease. No other environment fields may be logged.
+- Root explicitly prepares exact linked `n1_dev_t00_q0_r2` recovery ofr1 using the recovery reserve; no source/seed/profile/task/init changes. Queue itself still never retries dispatched failures. Oldinvalidbaseline remains unretryable. Sharing question remains unanswered.
+
+## 2026-09-22T05:27:55.330369+00:00 — conservative any-GPU queue admission
+
+The two N1 Q0 infrastructure aborts were caused by external processes entering CUDA after a short apparent idle interval. Queue admission now observes accessible live-process CUDA_VISIBLE_DEVICES/CUDA_DEVICE_ORDER declarations (UUID masks or provable PCI_BUS_ID ordinals only), stores only per-device PID metadata, and requires 120 seconds of continuously observed idle state. This is a potential-conflict heuristic, not a scheduler lease. Existing NVIDIA admission and runtime exclusivity monitoring remain in force. No sharing permission has been received. The executor and root each passed all 26 queue CPU tests; no additional GPU probe or episode was dispatched during this repair.
+
+One explicit recovery row n1_dev_t00_q0_r2 is linked to aborted attempt rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r1__1eb8b4580e78, preserving identity and all costs. Only this recovery and paired P2 control may run before root reviews implementation and cost. The queue itself never retries a dispatched failure. Current totals: 3 dispatched, 0 valid, 1 invalid, 2 infrastructure aborts, 0.04298842844152306 GPU-hours including all healthchecks. Source and scientific inputs will be frozen before launch; actual model bytes are rechecked by the queue before dispatch.
