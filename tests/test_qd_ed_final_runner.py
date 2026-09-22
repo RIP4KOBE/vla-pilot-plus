@@ -2,6 +2,7 @@
 import copy
 import importlib.util
 import json
+import sys
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -9,6 +10,7 @@ import pytest
 import yaml
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'scripts'))
 SPEC = importlib.util.spec_from_file_location('qd_ed_final_runner', Path(__file__).resolve().parents[1]/'scripts/qd_ed_final_runner.py')
 runner = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(runner)

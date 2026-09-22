@@ -597,6 +597,7 @@ class Main:
             env_config['instruction'] = self.config.get('instruction')
 
         # Create adapter
+        self._enable_render_lifetime_diagnostics()
         self.adapter = create_adapter(self.backend, env_config)
 
         # Get task info from adapter for guidance adjustment
@@ -1065,8 +1066,24 @@ class Main:
         except Exception:
             log.warning("Native-fault stack diagnostics unavailable")
 
+    def _enable_render_lifetime_diagnostics(self):
+        if os.environ.get("QD_ED_RENDER_LIFETIME", "0") != "1":
+            return
+        if self.backend != "libero":
+            raise RuntimeError("Render lifetime diagnostic requires LIBERO")
+        config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
+        if not config.get("enabled") or not config.get("output_dir"):
+            raise RuntimeError("Render lifetime diagnostic requires an explicit evaluation output")
+        # Load the same adapter module before its constructor creates contexts.
+        from core.env_adapters import libero_adapter
+        from utils.render_lifetime_diagnostics import install
+        self._render_lifetime_emit = install(config["output_dir"])
+
     def _append_phase_timing(self, *, episode, global_step, name, event, elapsed_s):
         """Best-effort scalar phase markers; never log operation inputs/errors."""
+        observer = getattr(self, "_render_lifetime_emit", None)
+        if observer is not None and global_step == 0:
+            observer("episode_phase", name=name, boundary=event, elapsed_s=float(elapsed_s))
         if getattr(self, "_phase_timing_write_failed", False):
             return
         try:

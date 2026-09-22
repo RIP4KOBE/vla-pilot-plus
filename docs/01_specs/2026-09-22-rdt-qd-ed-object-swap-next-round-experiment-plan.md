@@ -10,6 +10,8 @@
 
 **GPU5首个诊断结果：** 更换GPU仍在第一次模型搜索后的 `mjr_readPixels` 发生同进程Xid31，自动中止耗时132.65秒。下一步为独立的 `GPU5_EGL_SERIAL_C0` 工程诊断：渲染前显式等待CUDA完成并绑定所属EGL上下文，任务/动作/图像设置保持原样；单次运行计入development额度。190项相关CPU测试通过，GPU有效性尚待验证。见 `experiments/iteration_001_execution_intent/gpu5-egl-serialization-diagnostic.md`。
 
+**09:00 UTC诊断更新：** CUDA同步与EGL重新绑定仍未解决GPU5的Xid31；87.52秒后自动中止，0环境动作。5次渲染入口的上下文均正确，故障后保存图像为噪声。下一步仅运行一次600秒上限的资源生命周期观测，检查上下文创建/释放、缓冲区调整及GC时序；不重复失败条件、不计入算法成功率。详见 `experiments/iteration_001_execution_intent/gpu5-render-lifetime-diagnostic.md`。
+
 ## 历史执行修订：GPU6 专属运行与原生崩溃诊断
 
 - 新 worktree：`/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z`；新分支：`exp/rdt-qd-ed-gpu6-20260922T063626Z`。按用户指定使用 `.worktree/exp`。
