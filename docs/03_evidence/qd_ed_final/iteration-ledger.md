@@ -256,3 +256,7 @@ Resource rdt-qd-ed-final-20260921T093925Z__gpu3_static_scene__b8f0b3b6214f compl
 ## GPU3 scene plus model result — failure localized before prediction
 
 Resource rdt-qd-ed-final-20260921T093925Z__gpu3_scene_model__c83cfb349cba from source9b1b472 and contract30b237ff4171bf0e49fd0f80e5234868ee73f62dc414e9507386dc34563f11bb aborted after73.72699015820399seconds on ownedPID249138 graphicsXid31. Child exited and onlyownedworker cleaned up.7preloadrenders passed; production import/CUDA identity+seed/load/to/eval/post_init/reset phase67.65424seconds completed with allcompute counters0. Firstpostload128depth frame hadnonfinite depth andchangedRGBhash; guardrefused continuation. NoB1prediction,DINO,Stage,reset,actions orintegration occurred. Thus these are notnecessary to reproduce thisfault; exactsuboperation ofloading remainsUnknown. Allcosts retained inhealthledger,scientificattemptcountunchanged. Next boundedquestion subdivides theloadingphase,not a repeatofinvalidscience.
+
+## 2026-09-22T09:53:10.943336+00:00 — GPU3 restriction reconfirmed
+
+User explicitly requires all subsequent execution of this task on physical GPU3. Persist candidate pool[3],oneexclusiveworker,noautomaticfallback,andwaitifGPU3unavailable. Newhealthcheckchild independently checks CUDA mask3,logicalCUDA0 UUID andEGL0 binding. NoGPUworker is currently dispatched. Loadingprotocol corrected beforedispatch to match actual82981d priorcode: no extra observation-processor import or phase-wrapper installation occurred initsloadingphase; nextprobe doesnotadd eitheroperation.

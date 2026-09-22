@@ -83,7 +83,7 @@ derived_indexes:
 authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
   ledger is append-only event evidence, not a second mutable state.
 online_blockers: []
-updated_at: '2026-09-22T09:47:58.633451+00:00'
+updated_at: '2026-09-22T09:53:10.943336+00:00'
 seed_plan:
   path: data/frozen-seed-plan.json
   sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
@@ -213,14 +213,17 @@ previous_gpu7_active_plan:
   candidate_cells: 10
   candidate_dispatch_authorized: false
 authorized_gpu_selection:
-  policy: GPU3 only; wait if unavailable
+  policy: GPU3 only for all subsequent execution of this task; wait if unavailable;
+    no automatic fallback
   candidate_indices:
   - 3
   selected_physical_gpu: 3
-  user_instruction: "\u5728GPU3\u4E0A\u6267\u884C\u4EFB\u52A1"
+  user_instruction: "\u786E\u4FDD\u5F53\u524D\u4EFB\u52A1\u540E\u7EED\u90FD\u5728\
+    GPU3\u5B8C\u6210"
   authorized_at: '2026-09-22T08:25:04.726856+00:00'
   single_exclusive_worker: true
   rescan_if_unavailable: true
+  reconfirmed_at: '2026-09-22T09:53:10.943336+00:00'
 resource_queue:
   pid: 3996172
   proc_start_ticks: '373125345'
