@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-09-22T08:27:24.137636+00:00",
-  "status": "PREPARING_GPU3_RENDER_DIAGNOSTIC",
+  "timestamp": "2026-09-22T08:55:04.580195+00:00",
+  "status": "GPU3_NATIVE_CONTEXT_REVIEW",
   "budget": {
     "max_gpu_hours": 48.0,
-    "gpu_hours_consumed": 0.6606320209925374,
+    "gpu_hours_consumed": 0.7576063718984369,
     "max_episode_attempts": 240,
     "reserved": {
       "baseline": 20,
@@ -12,8 +12,8 @@
       "formal": 40,
       "recovery": 20
     },
-    "dispatched": 6,
-    "aborted": 4,
+    "dispatched": 8,
+    "aborted": 6,
     "valid": 0,
     "running": 0,
     "invalid": 2,
@@ -83,9 +83,66 @@
     },
     "physical_gpu7_executed": false
   },
-  "source_commit": "8771eaa74ede4159efb004e0709232175a6c0b8d",
-  "next_action": "Verify physical GPU3 CUDA/EGL binding; freeze and dispatch one instrumented exact-identity C0 infrastructure recovery. Preserve invalid Q0 and closed candidate gates.",
-  "phase": "PREPARING_GPU3_RENDER_DIAGNOSTIC",
+  "source_commit": "e131ff67f97a5da7fd68d1dd9a8dfe6e08253dea",
+  "next_action": "Test current EGL context against existing renderer references around first policy inference in one prospectively frozen bounded engineering diagnostic; preserve all failed identities and no promotion.",
+  "phase": "GPU3_NATIVE_CONTEXT_REVIEW",
   "owned_gpu_workers": [],
-  "target_achieved": false
+  "target_achieved": false,
+  "gpu3_render_queue": {
+    "pid": 134110,
+    "proc_start_ticks": "374175557",
+    "source_commit": "e131ff67f97a5da7fd68d1dd9a8dfe6e08253dea",
+    "plan_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-gpu3-c0-render-plan.json",
+    "plan_sha256": "6b434d451cdae49b5c2047d257633616bfb1e55f59d2d34a10d5e2e8042af28a",
+    "status_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-diagnostic/queue-status.json",
+    "log_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-diagnostic/queue.log",
+    "started_at": "2026-09-22T08:38:44.819111+00:00",
+    "argv": [
+      "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+      "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_available_gpu_queue.py",
+      "--plan",
+      "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-gpu3-c0-render-plan.json",
+      "--episode-key",
+      "gpu3_native_c0_t00_r2",
+      "--poll-seconds",
+      "30",
+      "--idle-seconds",
+      "120",
+      "--status-path",
+      "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-diagnostic/queue-status.json"
+    ],
+    "authorized_physical_gpus": [
+      3
+    ],
+    "status": "interrupted_after_owned_Xid31",
+    "scope": "one C0 render diagnostic; continue coordinator after result",
+    "last_verified_at": "2026-09-22T08:50:52.025777+00:00"
+  },
+  "prepared_gpu3_render_plan": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-gpu3-c0-render-plan.json",
+    "sha256": "6b434d451cdae49b5c2047d257633616bfb1e55f59d2d34a10d5e2e8042af28a",
+    "source_commit": "e131ff67f97a5da7fd68d1dd9a8dfe6e08253dea",
+    "snapshot": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/gpu3-c0-render-e131ff67f97a.json",
+    "frozen": true,
+    "episode_key": "gpu3_native_c0_t00_r2",
+    "retry_of": "rdt-qd-ed-final-20260921T093925Z__gpu6_native_c0_t00_r1__03c5d2b4a1df"
+  },
+  "gpu3_native_failure": {
+    "attempt_id": "rdt-qd-ed-final-20260921T093925Z__gpu3_native_c0_t00_r2__79342697c4d2",
+    "physical_gpu": 3,
+    "worker_pid": 142266,
+    "queue_pid": 134110,
+    "owned_xids": [
+      31,
+      109
+    ],
+    "gpu_process_wall_seconds": 179.21637980407104,
+    "retry_allowed": false,
+    "outcome_valid": false,
+    "actions_completed": 1,
+    "fresh_policy_calls": 1,
+    "stage_queries": 0,
+    "evidence": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-diagnostic/kernel-observations.json",
+    "causal_status": "Unknown; repeated graphics MMU faults and timeout, not explained by physical GPU migration or Stage invocation"
+  }
 }

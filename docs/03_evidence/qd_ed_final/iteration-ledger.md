@@ -234,3 +234,11 @@ User explicitly moved subsequent execution to physical GPU3 only. Previous GPU7 
 ## Concurrent C0 recovery consumed and failed on GPU5
 
 Other worktree dispatched gpu6_native_c0_t00_r1__03c5d2b4a1df from source79cdce092b4e9c32b42634262cc9d1f7e14bec4b on physicalGPU5. Matched graphics Xid31 stopped it after132.6506171328947seconds. Both queue107052 and worker115030 exited without this continuation terminating them. Migration-scope question no longer needed. Preserve its journal terminal infrastructure classification and conservative cost, but causal diagnosis remains Unknown. Revised prospective GPU3 diagnostic r2 links this immediate parent; no duplicate retry of originalparent.
+
+## GPU3 render diagnostic result — native graphics fault retained
+
+Attempt gpu3_native_c0_t00_r2__79342697c4d2 (source e131ff6, plan6b434d45) consumed179.21637980407104 GPU seconds and one attempt. Root interrupted only owned queue134110 after exact admitted GPU3/worker142266 graphics Xid31; subsequent Xid109 confirmed context-switch timeout. Queue and worker exited. Ledger terminal aborted/KeyboardInterrupt is nonretryable; preserve it unchanged. One action completed before cleanup; one fresh policy call3.91354seconds; no Stage call. No scientific outcome is valid.
+
+Across28 completed renders, read_pixels summed23.01167seconds (maximum21.29537) while29 host offscreen_render calls summed0.018719seconds;25 physics steps summed0.004087seconds. Inclusive parent/child intervals must not be summed. Several readbacks returned after the graphics fault, so return alone is not evidence of valid images. Diagnostic-artifact phase20.5326seconds contains rendering and CPU visualization; do not attribute it all to the renderer. Physics/controller computation is not the observed21-second step bottleneck.
+
+Static review found robosuite render assumes its constructor/current context remains bound: per-render code does not call make_current. Firstartifact reads image before2Dkeypoint drawing, with no geometry mutation. No explicit EGL/context operation was found in RDT code; actualcurrent context remains Unknown. Next bounded diagnostic tests that concrete hidden precondition; no force-rebind fix, driver change or scientific cohort reset is yet supported.

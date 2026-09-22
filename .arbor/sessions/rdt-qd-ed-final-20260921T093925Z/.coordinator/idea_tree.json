@@ -17,11 +17,11 @@
     "submission_path": null,
     "sample_submission_path": null,
     "resource_checkpoint": {
-      "timestamp": "2026-09-22T08:27:24.137636+00:00",
+      "timestamp": "2026-09-22T08:55:04.580195+00:00",
       "authorized_gpu_indices": [
         3
       ],
-      "status": "PREPARING_GPU3_RENDER_DIAGNOSTIC",
+      "status": "GPU3_NATIVE_CONTEXT_REVIEW",
       "queue_pid": null,
       "scientific_score": null,
       "scope_question_pending": false
@@ -84,7 +84,7 @@
       "depth": 1,
       "hypothesis": "Mechanism: Execution-aware behavioral representation for quality-diversity search.\nHypothesis: Manipulation modes lost under endpoint-only geometry can survive when archive equivalence includes executed actuator behavior.\nObservable: Preserved action-intent alternatives and task gains at fixed search budget on preregistered Dev.\nConflicts: Historical H1/H4/H5 proxy gains did not establish task gains; this tests a distinct representation axis without combining those mechanisms.",
       "status": "running",
-      "insight": "GPU3-only continuation. N1 Q0 native failure retained as invalid/nonretryable; completed matching B1 diagnostic reused. Preparing one instrumented C0 infrastructure recovery to locate renderer/native failure. Candidate unmeasured; no promotion.",
+      "insight": "N1 unevaluated; original Q0 invalid/nonretryable retained. GPU5 and GPU3 C0 engineering diagnostics reproduced owned graphics Xid31; GPU3 additionally109. Context binding precondition under bounded review; no cohort reset or scientific promotion.",
       "result": "IN_PROGRESS; bounded engineering diagnosis; validation/formal closed."
     },
     "4.1": {
@@ -94,7 +94,7 @@
       "depth": 2,
       "hypothesis": "Mechanism: Sixteen-cell radial-distance by executed positive-gripper-duty QD archive.\nHypothesis: Replacing XY-only equivalence separates lower-reward gripper-intent branches during parent search, yielding useful new proposals without extra model evaluations.\nObservable: Correct constant-budget behavior, changed actual parent lineage, N1 Dev>=5/10 and noninferior to same-round P2/Q0 before validation.\nConflicts: H5 secondary trajectory lanes failed; N1 changes equivalence at capacity16 and leaves quality/allocation/EDS switches unchanged; azimuth/timing information loss is explicitly tested.",
       "status": "running",
-      "insight": "GPU3-only continuation. N1 Q0 native failure retained as invalid/nonretryable; completed matching B1 diagnostic reused. Preparing one instrumented C0 infrastructure recovery to locate renderer/native failure. Candidate unmeasured; no promotion.",
+      "insight": "N1 unevaluated; original Q0 invalid/nonretryable retained. GPU5 and GPU3 C0 engineering diagnostics reproduced owned graphics Xid31; GPU3 additionally109. Context binding precondition under bounded review; no cohort reset or scientific promotion.",
       "result": "IN_PROGRESS; bounded engineering diagnosis; validation/formal closed."
     }
   }

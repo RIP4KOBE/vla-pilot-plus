@@ -1,0 +1,350 @@
+{
+  "artifact_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z",
+  "code_files": [
+    {
+      "path": "configs/backend/libero.yaml",
+      "sha256": "e1d1f41f178c7e5968e04b8337c13e8f37b691a7b3e93f9f8e9f7bb5796deb14"
+    },
+    {
+      "path": "configs/config.yaml",
+      "sha256": "be98e1127a93b30864c0f42832ba71adc11b115c34b1e2e0f748e2f3cb5bd55a"
+    },
+    {
+      "path": "configs/perception.yaml",
+      "sha256": "428b7ef08eaca1c284145502938637bfab99967b5519909110f5d83a2d04feb7"
+    },
+    {
+      "path": "configs/policy.yaml",
+      "sha256": "44a1164f421121edafc47e9880eb0ad97be98732669365f931e0b226bc831cf6"
+    },
+    {
+      "path": "configs/qd_ed_final/baseline_profiles.json",
+      "sha256": "75ba829fc29db71ae31669cd803c24fbe8ea96fe347160539a273f9d73551690"
+    },
+    {
+      "path": "configs/qd_ed_final/candidate_n1.json",
+      "sha256": "5e74d72f108df53897e790677154c5ca3691b1aeb318297168d3bffcb84bfe3c"
+    },
+    {
+      "path": "core/__init__.py",
+      "sha256": "233696e00a1ada9a70a50c11160a96884d223df0e7b92aa7ba8bc8a61503efe6"
+    },
+    {
+      "path": "core/codex_stage.py",
+      "sha256": "27adf43302afc455a1b3122f267c7493c212bc83982bdaeba09d89873913da25"
+    },
+    {
+      "path": "core/codex_stage_policy.py",
+      "sha256": "92f78a80651e97390a296e42850aae0b70217afb1c362e9b5d0b8a07b8cbe432"
+    },
+    {
+      "path": "core/diffusion_policy_steer.py",
+      "sha256": "97f0ee3b9159461e15f6b58ea2bd95119a5514872025b4c99594ec6b71815eaa"
+    },
+    {
+      "path": "core/eds_eval_metrics.py",
+      "sha256": "0e07c57167dd92c07a31395f6ebba0b56d0f65bc62f4fb1e4d5fb30549fd6ae0"
+    },
+    {
+      "path": "core/eds_mechanism_trace.py",
+      "sha256": "312087f5c354f81a820f2acb8419c6380e96805de79f1789c5c7ff23a8fcabf3"
+    },
+    {
+      "path": "core/env_adapters/__init__.py",
+      "sha256": "790830ee3d9a8a6a0c59a114fbc77fb50bc158d05e13ff9e2e634ad7f370d9c4"
+    },
+    {
+      "path": "core/env_adapters/base_adapter.py",
+      "sha256": "a5bb4f9e06f458fc38e6cc7486e6c6d268fc67bfaf6fd9f84f90514236144de8"
+    },
+    {
+      "path": "core/env_adapters/calvin_adapter.py",
+      "sha256": "396957c62660edddf9704a24cbef15d9cf5f2bbb4da39ee4b9123c4d240a0541"
+    },
+    {
+      "path": "core/env_adapters/libero_adapter.py",
+      "sha256": "5789168f59179599fb37ce88193884ec469db63a1a4f68fde350e90936100f19"
+    },
+    {
+      "path": "core/fkd_class.py",
+      "sha256": "26ccfa9cf4837ce92baf0a5538ac3339d5c55a4f4f7b8f577366a0dd2a408412"
+    },
+    {
+      "path": "core/gemini_grounder.py",
+      "sha256": "0d1a51c8dbd077f274235ae00c1b3ab538e0f9745d85fd12417e21f57980b1f6"
+    },
+    {
+      "path": "core/keypoint_detector.py",
+      "sha256": "5fa108f01168ecb1f2433bc53f093701e0079fa6cf35abf910ec0347075d055e"
+    },
+    {
+      "path": "core/keypoint_tracker.py",
+      "sha256": "292d63964b90405769118bda0e1acc9666f8ae076f41abbb7df8e5bf8abc6f45"
+    },
+    {
+      "path": "core/pi05_steer.py",
+      "sha256": "ed9146d92bf09af1b1ec99774bd8042c70869ba2246c98ff04d23961ed83e962"
+    },
+    {
+      "path": "core/policy_observation_sampling.py",
+      "sha256": "c7e93e81541c34dd45e22dffc43a24d428d043a56c0dd6766bfd286e2ff07f4d"
+    },
+    {
+      "path": "core/qd_ed.py",
+      "sha256": "4415ea7f16029e2fa2e7528c1f7065ba673b7a5a512723bfa9611f992298daa4"
+    },
+    {
+      "path": "core/rdt_libero_action_converter.py",
+      "sha256": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d"
+    },
+    {
+      "path": "core/rdt_libero_obs_processor.py",
+      "sha256": "5b6f3857be13254e1d2266270f57199578dbc4066566265b147d91cc30bb2d14"
+    },
+    {
+      "path": "core/rdt_policy_steer.py",
+      "sha256": "82c8515542780acc5389d3043d7f25e14e9d23f6149fb067a6dfa99fb9aa584e"
+    },
+    {
+      "path": "core/render_phase_diagnostics.py",
+      "sha256": "5c347b7988056de384f582b0fe12e4dc32d1999577812c83205925d02339804c"
+    },
+    {
+      "path": "core/sam3_segmenter.py",
+      "sha256": "e3f3cdd5a970b738ffcf17c7fd765041195d1b9f40a1d2b3809c1459cb5dce81"
+    },
+    {
+      "path": "core/sam_refiner.py",
+      "sha256": "fbe8a642294895773a3aad1a5e4a9dd21b2af1ad0b09e6d89cecb94b171ad909"
+    },
+    {
+      "path": "core/sam_segmenter.py",
+      "sha256": "c4e243d22adf3becfaa1f94f33e9ff05c1e2962899de4e11a656d2ffb16cb8bf"
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/available-gpu-amendment.md",
+      "sha256": "0098289d2d94b9c4e7f353a540877a64cd680cbc53217773fa47878d17f755c5"
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/codex-provider-amendment.md",
+      "sha256": "0cc80d2f98b3764bcc6e50cc94738fb4d0f1bf62eb5c824d415c2314f68bf26f"
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/gpu3-render-timing-diagnostic.md",
+      "sha256": "ad6309399a3d1bd4becb13bab188ce09e1c5c0ecae38cfbd9f917ae86dd0414c"
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/gpu5-resource-amendment.md",
+      "sha256": "2df464cc889eaa6aa5b6e8c7f401a86069d95428b40e0aad57b8f496b22413bb"
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/gpu7-final-resource-amendment.md",
+      "sha256": "b412917b5ac8c420040691a4431db1c0eb4e17d5ec658a565f4a6ef38b964e23"
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/protocol.md",
+      "sha256": "e3d3c2ed50db4a845e4d0713671db225c96f124ca8719d171e5d7006f0a5e0b0"
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/startup-repair-amendment.md",
+      "sha256": "7edc8d05830c75156e05f3ba687b84b2dbcf00fe3b976a3c605c457710d9ceaa"
+    },
+    {
+      "path": "main.py",
+      "sha256": "5bf6cd988d4d9e1f54bd1d9c27fce866e106fbd0006d73d6425811d023ffe929"
+    },
+    {
+      "path": "scripts/qd_ed_available_gpu_queue.py",
+      "sha256": "368ce389ca383964f5ddc47839d7199247021e4e0f358058c35f2b3a416ecece"
+    },
+    {
+      "path": "scripts/qd_ed_codex_launch.py",
+      "sha256": "91101e37e4fab893d9a8de32b3ff5d910a08fc30caa049e69e4b6a5ffd2127bf"
+    },
+    {
+      "path": "scripts/qd_ed_final_report.py",
+      "sha256": "1e5ced6f6406ed4fd77f28c621d948ff111fcc2efc084dfdd1320366f41ff918"
+    },
+    {
+      "path": "scripts/qd_ed_final_runner.py",
+      "sha256": "c4f1d00d4ed0942d188804efda8e75f4432cc6ce26a289ea847dd2e15122209c"
+    },
+    {
+      "path": "scripts/qd_ed_gpu_probe.py",
+      "sha256": "0d9497b9780e91cb5174cf201917dc6d128eaac08512180ff527faef7dfcb07e"
+    },
+    {
+      "path": "scripts/qd_ed_native_probe_queue.py",
+      "sha256": "79d6153175248459e647989a7faaaf2a216377e7296c9960ddb0cf3f5e4c94a5"
+    },
+    {
+      "path": "scripts/qd_ed_poe_launch.py",
+      "sha256": "86ecaf3d0d1454613ee4bec1337dca7ed81d35ce59cfda1e62d7839a58e39b82"
+    },
+    {
+      "path": "scripts/qd_ed_policy_native_probe.py",
+      "sha256": "1ddddb7f72ea2dc2d297b3aaf9e80af47944f49ccfcb9d73c097ebe97880be92"
+    },
+    {
+      "path": "scripts/qd_ed_runtime_setup.py",
+      "sha256": "ad05efd769034d3f9937aebbba10abc16039a5f1b5026e6bacd808e13d717a9c"
+    },
+    {
+      "path": "tests/test_episode_phase_timing.py",
+      "sha256": "fbb32c9b25d9325a609be6b149a40f6fdc27b34b9766e3cfa5232b183d5a458b"
+    },
+    {
+      "path": "tests/test_render_phase_diagnostics.py",
+      "sha256": "fd6f50bbef56d5c5e35af2a3d3118d243d7e1f9848e244390a5df8184b187a05"
+    },
+    {
+      "path": "utils/__init__.py",
+      "sha256": "debd228bdc6164ea3f2fc49e0ef8aa891754e7748fe91ac21e8ef74b6a72a49f"
+    },
+    {
+      "path": "utils/config_utils.py",
+      "sha256": "d9f2a7665db2ee15f882be442eed791c0300607d2b62c12dfbe8651253c18af5"
+    },
+    {
+      "path": "utils/eds_eval_vis.py",
+      "sha256": "d155d2b2e6e72bd877899c1fdc6f0e57d847ea63d68b55a74a0606c90ab86676"
+    },
+    {
+      "path": "utils/eds_mechanism_pretest_vis.py",
+      "sha256": "a9ccf922bc717f955375455d56cc55f9ac49a439690461de453f2dc1b20af8fc"
+    },
+    {
+      "path": "utils/guidance_utils.py",
+      "sha256": "b0fe9d6d5fc014143f5877918de9bd0986b1688b4a6a90980847b7d15cab0c82"
+    },
+    {
+      "path": "utils/hydra_plugins/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "utils/hydra_plugins/task_searchpath.py",
+      "sha256": "32aa364739836f11f48299bd3e49a59a89a1baa4512f3a6f0bc962496739d218"
+    },
+    {
+      "path": "utils/keypoint_utils.py",
+      "sha256": "fb7730f5dbe6ba72584f9d7204d2578be225dc69655c7c26006a8be9a92d3c1f"
+    },
+    {
+      "path": "utils/logging_utils.py",
+      "sha256": "ad614d71030403937d8699544f9985f1909c8cc4402c43e2c9b16b39f263c2c3"
+    },
+    {
+      "path": "utils/plot_results.py",
+      "sha256": "3c8c26e719aa8742a07a134875b3dfcf0d0b2c1dedc277a8e694de0945787c90"
+    },
+    {
+      "path": "utils/vis_utils.py",
+      "sha256": "6e256ca29aabcb8ffeb852e56c732ec56885394bb8e4e8ca2fd0957e989289b8"
+    },
+    {
+      "path": "vlm_query/guidance_template.txt",
+      "sha256": "ac7a53e64f82e735b295682347cc4775da7c611715798e0d79f8a6fe34cb11c5"
+    },
+    {
+      "path": "vlm_query/guidance_template_calvin.txt",
+      "sha256": "b29b7554b27207269f572a40a4d51f7498d36e3eca4effb94349e32ebce8caee"
+    },
+    {
+      "path": "vlm_query/guidance_template_libero.txt",
+      "sha256": "0a11498ed5317170bff8e8cd3909c508ea810e4fa9f006555ef37a50f4459c54"
+    },
+    {
+      "path": "vlm_query/segmentation_planning_template.txt",
+      "sha256": "975e6905b66e749e351f2282a73e5f30eeee6735643622f74808b2379a938d30"
+    },
+    {
+      "path": "vlm_query/stage_template.txt",
+      "sha256": "758d71a441496074410428b005a068a18b6d92273b9278c1181334cf9e67005b"
+    },
+    {
+      "path": "vlm_query/vlm_agent.py",
+      "sha256": "64a2f470045ab5be8840eb9758c1d8cb13cc2487d5993f2c47862052f8679494"
+    }
+  ],
+  "diagnostic_scope": "One linked full C0 infrastructure recovery; excluded from N1 promotion and repaired cohort",
+  "egl_mapping_verified": true,
+  "episodes": [
+    {
+      "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+      "budget_bucket": "recovery",
+      "env_seed": 1969522881,
+      "episode_key": "gpu3_native_c0_t00_r2",
+      "init_file_sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+      "init_index": 0,
+      "init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
+      "iteration": "GPU6_NATIVE_C0",
+      "policy_seed": 1969522881,
+      "profile": "C0",
+      "retry_of": "rdt-qd-ed-final-20260921T093925Z__gpu6_native_c0_t00_r1__03c5d2b4a1df",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 0,
+      "timeout_seconds": 1800
+    }
+  ],
+  "frozen": true,
+  "input_contract_label": "input_repaired",
+  "ordering_amendment": "experiments/iteration_001_execution_intent/startup-repair-amendment.md",
+  "phase_authorization": {
+    "dev": true,
+    "formal": false,
+    "validation": false
+  },
+  "profiles_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/configs/qd_ed_final/baseline_profiles.json",
+  "profiles_sha256": "75ba829fc29db71ae31669cd803c24fbe8ea96fe347160539a273f9d73551690",
+  "provider_amendment": "experiments/iteration_001_execution_intent/codex-provider-amendment.md",
+  "recovery_note": "Exact linked infrastructure recovery of the GPU6 C0 attempt; physical GPU3 only; unchanged scientific identity and 1800-second timeout.",
+  "recovery_protocol": "experiments/iteration_001_execution_intent/gpu3-render-timing-diagnostic.md",
+  "recovery_provenance": {
+    "base_plan_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v2-plan.json",
+    "base_plan_sha256": "1ca7b9d970fc9b014820fc69596ec28100c55aed63a1416d23e7c1873d6d55a5",
+    "builder_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/build-gpu3-c0-recovery-draft.py",
+    "builder_sha256": "a07c16c9b0a7099f96b9f82cf17d5380ed8fae0b9a403c19a5c35cdf968b3e17",
+    "parent_identity": {
+      "env_seed": 1969522881,
+      "init_index": 0,
+      "iteration": "GPU6_NATIVE_C0",
+      "policy_seed": 1969522881,
+      "profile": "C0",
+      "split": "dev",
+      "task_id": 0
+    },
+    "physical_gpu": 3,
+    "retry_of": "rdt-qd-ed-final-20260921T093925Z__gpu6_native_c0_t00_r1__03c5d2b4a1df",
+    "source_plan_path": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-gpu6-c0-native-plan.json",
+    "source_plan_sha256": "b988ef436b594e064cfd344c7dc49a01c7f5ec0201e5594d3f285755e1af479f"
+  },
+  "resource_amendment": "experiments/iteration_001_execution_intent/gpu3-render-timing-diagnostic.md",
+  "run_name": "rdt-qd-ed-final-20260921T093925Z",
+  "runtime_inventory_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/runtime-inventory.json",
+  "runtime_inventory_sha256": "44d456203ca168eec9eddfb6834d54347153b2c859eb1b4fc0dea02c15138b83",
+  "runtime_manifest_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-diagnostic/runtime-manifest.json",
+  "runtime_manifest_sha256": "2118d25a2e91c170c2842aec7ef11159df6c15a314d1a28153779722f22aea8e",
+  "schema": "qd-ed-final-plan-v1",
+  "scientific_config_files": [
+    "configs/perception.yaml",
+    "configs/qd_ed_final/baseline_profiles.json",
+    "configs/qd_ed_final/candidate_n1.json",
+    "experiments/iteration_001_execution_intent/available-gpu-amendment.md",
+    "experiments/iteration_001_execution_intent/codex-provider-amendment.md",
+    "experiments/iteration_001_execution_intent/gpu3-render-timing-diagnostic.md",
+    "experiments/iteration_001_execution_intent/gpu5-resource-amendment.md",
+    "experiments/iteration_001_execution_intent/gpu7-final-resource-amendment.md",
+    "experiments/iteration_001_execution_intent/protocol.md",
+    "experiments/iteration_001_execution_intent/startup-repair-amendment.md",
+    "vlm_query/stage_template.txt"
+  ],
+  "seed_plan_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/frozen-seed-plan.json",
+  "seed_plan_sha256": "9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1",
+  "source_commit": "e131ff67f97a5da7fd68d1dd9a8dfe6e08253dea",
+  "stage_condition": "codex_login_astra_low_v1",
+  "worktree": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z",
+  "frozen_at": "2026-09-22T08:38:07.923534+00:00",
+  "preflight_index": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-diagnostic/resolved-preview.json",
+  "preflight_index_sha256": "5eb418d59fa9df2d4593bb11fe3af39064709b6d7e77e331cf9dab87307f12b8"
+}

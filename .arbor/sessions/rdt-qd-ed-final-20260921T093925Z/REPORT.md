@@ -1,7 +1,7 @@
 # Interim research checkpoint
 
-IN_PROGRESS, target not achieved. Subsequent execution is physical GPU3 only, one exclusive worker. The previous GPU7 CPU queue was stopped before dispatch after matching completed GPU6 B1 evidence was verified for reuse. GPU3 mapping is physical3/CUDA0/EGL0; its real context healthcheck is pending/completing before the episode runtime is frozen.
+IN_PROGRESS, target not achieved. Physical GPU3 only, one exclusive worker. GPU3 diagnostic `gpu3_native_c0_t00_r2__79342697c4d2` stopped after owned graphics Xid31/109; queue134110 and worker142266 exited. 8 total dispatched attempts,6 aborted,2 invalid,0 scientifically valid; closed GPU cost0.7576063718984369hours. Original failed identities are nonretryable and retained.
 
-Next: one instrumented exact-identity C0 infrastructure recovery under `experiments/iteration_001_execution_intent/gpu3-render-timing-diagnostic.md`. Native N1 Q0 failure remains invalid and nonretryable. This diagnostic cannot replace a control or promote N1. Validation/formal remain unexposed.
+Next is a separately preregistered bounded context-binding hypothesis test, not a repeated control: experiments/iteration_001_execution_intent/gpu3-context-drift-diagnostic.md. N1 remains unmeasured; validation/formal unexposed. Source and plan for this new diagnostic are pending freeze. No live GPU worker exists at this checkpoint.
 
-Authoritative counts and current worker state are in `research-state.yaml` and append-only attempt/healthcheck ledgers. Earlier failures and separately recorded GPU6 resources remain accounted. Official Codex saved-login Stage transport succeeded in a real episode; Poe configuration remains preserved. No task-success claim follows from transport or CPU tests.
+Authoritative state and cost: research-state.yaml, append-only attempt/healthcheck ledgers. GPU3 rendering and exact-process kernel evidence: artifact runtime/gpu3-render-diagnostic. Earlier GPU5 fault is also preserved. Continue the authorized task within240 attempts/48GPUhours and protected14h/10h reservations; no driver reset or external worker termination.

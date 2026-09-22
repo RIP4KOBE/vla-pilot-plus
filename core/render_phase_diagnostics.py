@@ -7,6 +7,8 @@ import json
 import time
 from pathlib import Path
 
+from core.egl_context_drift import ContextDriftObserver
+
 
 class RenderPhaseDiagnostics:
     def __init__(self, path):
@@ -20,8 +22,21 @@ class RenderPhaseDiagnostics:
         self._io_elapsed_s = 0.0
         self._record_count = 0
         self._phase_baseline = (0.0, 0.0, 0)
+        self._context_drift = None
+
+    def _observe_context_drift(self, boundary):
+        if self._context_drift is not None:
+            try:
+                self._context_drift.observe(boundary)
+            except Exception:
+                pass
 
     def set_phase(self, episode, global_step, name, event):
+        if name == "select_action_fresh":
+            if event == "enter":
+                self._observe_context_drift("before_first_policy")
+            elif event == "exit":
+                self._observe_context_drift("after_first_policy")
         if event == "enter":
             self._phase = (int(episode), int(global_step), name)
             self._phase_baseline = (self._observer_elapsed_s, self._io_elapsed_s, self._record_count)
@@ -127,6 +142,10 @@ class RenderPhaseDiagnostics:
         setattr(obj, attribute, observed)
         self._hooks.append((obj, attribute, had_own, own_value, observed))
 
+    def _before_sim_render(self, sim):
+        self._observe_context_drift("before_first_render")
+        self._render_context(sim)
+
     def _render_context(self, sim):
         context = sim._render_context_offscreen
         if context is None:
@@ -142,19 +161,22 @@ class RenderPhaseDiagnostics:
             env = adapter._env[adapter.current_task_idx]
             domain = env._env.env
             sim = domain.sim
+            self._context_drift = ContextDriftObserver(
+                self.path.with_name("egl_context_drift.jsonl"), sim)
             self._hook(env, "_format_raw_obs", "format_raw_obs")
             self._hook(domain, "_pre_action", "controller_pre_action")
             self._hook(domain, "_update_observables", "update_observables")
             self._hook(sim, "forward", "physics_forward")
             self._hook(sim, "step", "physics_step")
             self._render_context(sim)
-            self._hook(sim, "render", "sim_render_total", before=lambda: self._render_context(sim))
+            self._hook(sim, "render", "sim_render_total", before=lambda: self._before_sim_render(sim))
         except Exception:
             self.close()
             raise
 
     def close(self):
         self._phase = None
+        self._context_drift = None
         for obj, attribute, had_own, own_value, observed in reversed(self._hooks):
             try:
                 if vars(obj).get(attribute) is observed:
