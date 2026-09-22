@@ -1,9 +1,9 @@
 # Research status — in progress
 
-Authoritative state: research-state.yaml and docs/03_evidence/qd_ed_final/iteration-ledger.md. Updated 2026-09-22T09:31:21.772220+00:00.
+Updated 2026-09-22T09:47:58.633451+00:00. Authoritative state: research-state.yaml and docs/03_evidence/qd_ed_final/iteration-ledger.md.
 
-GPU3 only for this continuation. Static real-scene GPU3 rendering passed (12 frames,0 actions/integrations,no Xid); full C0 graphics faults retained. Isolate frozen model coexistence and one B1 prediction next; N1 unmeasured,validation/formal closed.
+GPU3 only for this continuation. GPU3 static scene passes; same context faults immediately after frozen model loading before any prediction (all compute counters0). Isolate loading sub-operation; N1 unmeasured,validation/formal closed.
 
-Task target is not achieved. Valid current-study episodes: 0; dispatched: 10; closed GPU hours: 0.811014396/48. Historical Q0=2/10 and P2=3/10 are not current controls. Codex saved login is proven working; Poe files are preserved.
+Target not achieved; valid current-study episodes 0, dispatched 10, closed GPU-hours 0.831494115/48. Historical Q0=2/10 and P2=3/10 are not current controls. No scientific promotion. Codex saved login works; Poe credential/config files preserved.
 
-Latest static evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-static-scene-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_static_scene__b8f0b3b6214f/healthcheck-result.json. Next protocol: experiments/iteration_001_execution_intent/gpu3-scene-model-diagnostic.md. All prior invalid/aborted identities and costs remain; no promotion or replacement scientific score.
+Latest evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-scene-model-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_scene_model__c83cfb349cba/healthcheck-result.json. First postload depth frame nonfinite and exactownedXid31; no model forward or robot actions occurred. The responsible loading sub-operation remains Unknown. The owned worker is gone; next bounded GPU3 diagnostic is under preparation.

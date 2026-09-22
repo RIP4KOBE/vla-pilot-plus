@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-09-22T09:31:21.772220+00:00",
+  "timestamp": "2026-09-22T09:47:58.633451+00:00",
   "status": "GPU3_NATIVE_CONTEXT_REVIEW",
   "budget": {
     "max_gpu_hours": 48.0,
-    "gpu_hours_consumed": 0.8110143956338935,
+    "gpu_hours_consumed": 0.8314941151222836,
     "max_episode_attempts": 240,
     "reserved": {
       "baseline": 20,
@@ -83,9 +83,9 @@
     },
     "physical_gpu7_executed": false
   },
-  "source_commit": "a5e1236daa8de7eea3a9882028304bdcbc3096e2",
-  "next_action": "One prospective zero-action/zero-integration static-scene plus frozen RDT load and B1 inference diagnostic on GPU3; all scientific promotion remains closed.",
-  "phase": "GPU3_SCENE_MODEL_DIAGNOSTIC_PREPARATION",
+  "source_commit": "9b1b4727a50c11ee0a36bb96aa64810807439039",
+  "next_action": "Split the frozen model loading stage to localize graphics corruption occurring before any policy or encoder forward; prepare one new bounded GPU3 zero-integration diagnostic.",
+  "phase": "GPU3_MODEL_LOAD_FAULT_ISOLATION",
   "owned_gpu_workers": [],
   "target_achieved": false,
   "gpu3_render_queue": {
@@ -163,10 +163,27 @@
     "owned_xids": []
   },
   "gpu3_scene_model_diagnostic": {
-    "status": "CPU_PREPARATION",
+    "status": "ABORTED_OWNED_XID31_AFTER_LOAD_BEFORE_PREDICTION",
     "protocol": "experiments/iteration_001_execution_intent/gpu3-scene-model-diagnostic.md",
     "physical_gpu": 3,
     "maximum_gpu_process_seconds": 600,
-    "automatic_retry": false
+    "automatic_retry": false,
+    "tool_session_id": 31926,
+    "script": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-render-model.py",
+    "script_sha256": "82981d32eaf709ac3c7e4232749b92baeb86994fa98bdd49c81347819d715e70",
+    "supervisor": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-scene-model.py",
+    "supervisor_sha256": "01549695362503f2960f1eff80e280d0e70a60e3ab3c0e96816664975f6358d1",
+    "status_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-scene-model-diagnostic/status.json",
+    "source_commit": "9b1b4727a50c11ee0a36bb96aa64810807439039",
+    "resource_id": "rdt-qd-ed-final-20260921T093925Z__gpu3_scene_model__c83cfb349cba",
+    "result_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-scene-model-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_scene_model__c83cfb349cba/healthcheck-result.json",
+    "contract_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-scene-model-diagnostic/frozen-contract.json",
+    "contract_sha256": "30b237ff4171bf0e49fd0f80e5234868ee73f62dc414e9507386dc34563f11bb",
+    "gpu_process_wall_seconds": 73.72699015820399,
+    "prediction_calls": 0,
+    "owned_xids": [
+      31
+    ],
+    "analysis_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-scene-model-diagnostic/diagnostic-analysis.json"
   }
 }
