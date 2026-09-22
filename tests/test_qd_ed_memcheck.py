@@ -58,3 +58,34 @@ def test_missing_library_and_arbitrary_tool_rejected(tmp_path, monkeypatch):
     bad = copy.deepcopy(plan); bad['cuda_memcheck']['tool_path'] = '/tmp/arbitrary'
     with pytest.raises(runner.GateError, match='unexpected CUDA'):
         runner.validate_memcheck(bad)
+
+
+def test_blocking_memcheck_is_distinct_diagnostic_condition(tmp_path, monkeypatch):
+    plan, tool = contract(tmp_path, monkeypatch)
+    plan['cuda_memcheck']['force_blocking_launches'] = True
+    with pytest.raises(runner.GateError, match='bounded development'):
+        runner.validate_memcheck(plan)
+    plan['episodes'][0]['iteration'] = 'GPU2_CUDA_MEMCHECK_BLOCKING_C0'
+    command = ['python', 'main.py', 'task=a b']
+    assert runner.instrument_command(command, plan, tmp_path) == [
+        str(tool), '--tool', 'memcheck', '--target-processes', 'application-only',
+        '--error-exitcode', '86', '--force-blocking-launches',
+        '--log-file', str(tmp_path/'cuda-memcheck.log'), *command]
+    plan['cuda_memcheck']['force_blocking_launches'] = False
+    with pytest.raises(runner.GateError, match='bounded development'):
+        runner.validate_memcheck(plan)
+
+
+@pytest.mark.parametrize('value', ['yes', 1, None, ['--suppressions', '/tmp/ignore']])
+def test_blocking_option_rejects_nonboolean_values(tmp_path, monkeypatch, value):
+    plan, _ = contract(tmp_path, monkeypatch)
+    plan['cuda_memcheck']['force_blocking_launches'] = value
+    with pytest.raises(runner.GateError, match='must be boolean'):
+        runner.validate_memcheck(plan)
+
+
+def test_arbitrary_memcheck_flags_rejected(tmp_path, monkeypatch):
+    plan, _ = contract(tmp_path, monkeypatch)
+    plan['cuda_memcheck']['extra_args'] = ['--report-api-errors', 'no']
+    with pytest.raises(runner.GateError, match='invalid CUDA memcheck contract'):
+        runner.validate_memcheck(plan)

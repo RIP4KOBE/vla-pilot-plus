@@ -6,14 +6,14 @@ worktree: /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z
 artifacts: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z
 source_commit: 744e08ba4398f2f8e34fb05619c829fc01397f69
 gpu_pool:
-- 5
+- 2
 max_concurrent_gpu_workers: 1
 project_target:
   status: IN_PROGRESS
   required_formal_successes: 5
   achieved: false
 study:
-  status: GPU5_SERIAL_QUEUE_SHARED_WAIT_REPAIR
+  status: GPU2_CUDA_MEMCHECK_RUNNING
   mode: real
   interaction: auto
 candidate:
@@ -28,7 +28,7 @@ candidate:
   ordering_amendment: experiments/iteration_001_execution_intent/startup-repair-amendment.md
 budget:
   max_gpu_hours: 48.0
-  gpu_hours_consumed: 0.7078240441750838
+  gpu_hours_consumed: 0.8950695432015023
   max_episode_attempts: 240
   reserved:
     baseline: 20
@@ -36,12 +36,12 @@ budget:
     validation: 60
     formal: 40
     recovery: 20
-  dispatched: 7
-  aborted: 5
+  dispatched: 11
+  aborted: 8
   valid: 0
   running: 0
-  invalid: 2
-  completed: 2
+  invalid: 3
+  completed: 3
   gpu_hour_reservations:
     validation: 14.0
     formal: 10.0
@@ -74,17 +74,17 @@ historical:
   previous_gpu_hours: 6.946832055555556
   previous_formal_episodes: 0
 active_iteration: iteration_001_execution_intent
-next_action: Refreeze shared-study waiting fix, then queue the same undispatched GPU5_EGL_SERIAL_C0
-  once; wait for other study owner to close its transaction.
+next_action: Review current CUDA memcheck result; all subsequent work in this execution
+  remains physicalGPU2 only.
 source_spec_sha256: 3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef
 derived_indexes:
 - .arbor/sessions/rdt-qd-ed-final-20260921T093925Z
 authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
   ledger is append-only event evidence, not a second mutable state.
 online_blockers:
-- GPU5 migration also reproduced GRAPHICS Xid31 in first post-search mjr_readPixels.
-  New serialization guard is unvalidated.
-updated_at: '2026-09-22T08:20:45.209863+00:00'
+- Same-process GPU5 GRAPHICS Xid31 persists after explicit CUDA sync and correct EGL
+  binding. Root cause unknown;0 valid online cells.
+updated_at: '2026-09-22T10:00:26.426344+00:00'
 seed_plan:
   path: data/frozen-seed-plan.json
   sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
@@ -108,6 +108,10 @@ cpu_validation:
   gpu6_xid_observers_runner_queue_passed: 109
   gpu6_xid_related_tests_passed: 280
   cuda_egl_guard_focused_passed: 190
+  shared_queue_focused_passed: 99
+  render_lifetime_focused_passed: 187
+  cuda_memcheck_focused_passed: 114
+  gpu2_unverified_queue_focused_passed: 142
 prepared_baseline_plan:
   path: data/qd-ed-final-plan.json
   episodes: 20
@@ -127,21 +131,21 @@ stage_provider_ready: true
 runner:
   by_bucket:
     baseline: 1
-    development: 2
+    development: 5
     validation: 0
     formal: 0
-    recovery: 4
-  reserved_attempts: 7
+    recovery: 5
+  reserved_attempts: 11
   gpu_hours_by_bucket:
     baseline: 0.019651524036631195
-    development: 0.19669835874914293
+    development: 0.2929994372140047
     validation: 0.0
     formal: 0.0
-    recovery: 0.49147416138930977
-  gpu_healthcheck_hours: 0.06454848380953385
+    recovery: 0.5824185819508663
+  gpu_healthcheck_hours: 0.10571057664773736
   gpu_healthcheck_inflight: 0
-  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu6_native_c0_t00_r1__03c5d2b4a1df
-  last_event: aborted
+  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu5_cuda_memcheck_c0_t00__66eec8a1ab74
+  last_event: valid
 gpu_admission_last_observation:
   physical_gpu: 7
   memory_used_mib: 7
@@ -187,23 +191,24 @@ closed_baseline:
   complete_success_rate: null
   report: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/iteration_000_intake/closed-incomplete-baseline-report.json
 active_plan:
-  path: /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-gpu5-egl-serial-plan.json
-  source_commit: c1422281ae6b531e7f7be444e7fb2403d5557534
-  sha256: c2edb6580754e2091a1e6cf71c4e7b1331607a20182ceba62779570514b074f1
+  path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/resource_queue/1cd691496f8944c59c53c5fdf81425e9/plan.json
+  source_commit: ed15dda3770a46e2bb3412ab4aa0e2ab23b955be
+  sha256: 54d01d73c0e7309dd5e280720d2622afebf93778dd9ec2cd9a0fce7e8353e757
   frozen: true
-  iteration: GPU5_EGL_SERIAL_C0
+  iteration: GPU5_CUDA_MEMCHECK_C0
   diagnostic_only: true
   candidate_dispatch_authorized: false
-  physical_gpu: 5
+  physical_gpu: 2
+  cuda_egl_verified: true
 hardware_migration:
-  previous_physical_gpu: 6
-  authorized_physical_gpu: 5
-  user_instruction: 在GPU5上执行任务
-  authorized_at: '2026-09-22T08:20:45.209863+00:00'
+  previous_physical_gpu: 5
+  authorized_physical_gpu: 2
+  user_instruction: 关掉2卡现在所有的进程，改用2卡执行当前任务
+  authorized_at: '2026-09-22T09:52:56.952339+00:00'
   max_concurrent_gpu_workers: 1
   earlier_attempts_and_costs_preserved: true
   cuda_egl_verified: true
-  egl_device_index: 7
+  egl_device_index: 1
   metadata_verified: true
 previous_gpu7_active_plan:
   path: data/qd-ed-n1-dev-plan.json
@@ -215,14 +220,14 @@ previous_gpu7_active_plan:
   candidate_cells: 10
   candidate_dispatch_authorized: false
 authorized_gpu_selection:
-  policy: physical GPU5 only
+  policy: physical GPU2 only
   candidate_indices:
-  - 5
-  selected_physical_gpu: 5
+  - 2
+  selected_physical_gpu: 2
   single_exclusive_worker: true
   rescan_if_unavailable: true
-  user_instruction: 在GPU5上执行任务
-  authorized_at: '2026-09-22T08:20:45.209863+00:00'
+  user_instruction: 我有sudo权限，帮我关掉GPU2上的程序，确保当前任务后续都在GPU2
+  authorized_at: '2026-09-22T09:52:56.952339+00:00'
 resource_queue:
   pid: 3996172
   proc_start_ticks: '373125345'
@@ -489,3 +494,96 @@ gpu5_egl_serial_queue:
   scope: GPU5-only, one prospective CUDA/EGL serialized C0 engineering diagnostic,
     then stop for review
   status: failed_before_dispatch_shared_transaction
+gpu5_egl_serial_result:
+  attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu5_egl_serial_c0_t00__00baf2a27328
+  status: INFRASTRUCTURE_ABORT_XID31
+  seconds: 87.51905658841133
+  audit: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/analysis/gpu5-egl-serialization/audit.json
+  current_context_already_correct: true
+  fix_effective: false
+gpu5_render_lifetime_result:
+  attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu5_render_lifetime_c0_t00__6c3f2c767df3
+  status: INFRASTRUCTURE_ABORT_XID31
+  seconds: 94.42186084203422
+  audit: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/analysis/gpu5-render-lifetime/audit.json
+  cleanup_context_mismatch_observed: false
+  destructor_during_inference_observed: false
+gpu5_cuda_memcheck_queue:
+  pid: 211022
+  proc_start_ticks: '374449569'
+  source_commit: c22812f063d4884d9d53b53eb96729693cb13d01
+  plan_path: /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-gpu5-cuda-memcheck-plan.json
+  plan_sha256: 8782c590d03624a7ebb539e55fadae67746af5019b06bd84e244d5d3d797ac57
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/gpu5-cuda-memcheck-queue-status.json
+  log_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/gpu5-cuda-memcheck-queue.log
+  started_at: '2026-09-22T09:24:21.567230+00:00'
+  argv:
+  - /home/hynx/miniconda3/envs/vla-pilot/bin/python
+  - /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/scripts/qd_ed_available_gpu_queue.py
+  - --plan
+  - /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-gpu5-cuda-memcheck-plan.json
+  - --episode-key
+  - gpu5_cuda_memcheck_c0_t00
+  - --poll-seconds
+  - '30'
+  - --idle-seconds
+  - '120'
+  - --status-path
+  - /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/gpu5-cuda-memcheck-queue-status.json
+  status: waiting
+  last_gpu_observation:
+    physical_gpu: 5
+    uuid: GPU-048017bf-c58f-b622-ca2e-000b668c651b
+    pci_bus_id: 0000:a1:00.0
+    memory_used_mib: 623
+    compute_pids:
+    - 206283
+    reserving_pids: []
+    idle_observed_seconds: 0.0
+    idle_stable: false
+  last_verified_at: '2026-09-22T09:26:54.486420+00:00'
+gpu2_termination:
+  physical_gpu: 2
+  pid: 1502190
+  expected_start_ticks: '363452636'
+  signals:
+  - SIGTERM
+  time_unix: 1790070933.237705
+  status: stopped
+  sudo_authenticated: true
+  password_persisted: false
+  evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/resource/gpu2-termination-result.json
+  terminated: true
+gpu2_cuda_memcheck_queue:
+  pid: 276899
+  proc_start_ticks: '374627788'
+  source_commit: ed15dda3770a46e2bb3412ab4aa0e2ab23b955be
+  plan_path: /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-gpu2-cuda-memcheck-plan.json
+  plan_sha256: 985b63bafb5a48e7e1a6914f2370553bc47588ce6be4539b09960b97a0b4990f
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/gpu2-cuda-memcheck-queue-status.json
+  log_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/gpu2-cuda-memcheck-queue.log
+  started_at: '2026-09-22T09:54:03.712253+00:00'
+  argv:
+  - /home/hynx/miniconda3/envs/vla-pilot/bin/python
+  - /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/scripts/qd_ed_available_gpu_queue.py
+  - --plan
+  - /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-gpu2-cuda-memcheck-plan.json
+  - --episode-key
+  - gpu5_cuda_memcheck_c0_t00
+  - --poll-seconds
+  - '30'
+  - --idle-seconds
+  - '120'
+  - --status-path
+  - /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/gpu2-cuda-memcheck-queue-status.json
+  status: failed
+  attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu5_cuda_memcheck_c0_t00__66eec8a1ab74
+  actual_binding_evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__gpu5_cuda_memcheck_c0_t00__66eec8a1ab74/actual-gpu2-process-binding.json
+  alive: false
+gpu2_cuda_memcheck_result:
+  attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu5_cuda_memcheck_c0_t00__66eec8a1ab74
+  status: INVALID_CUDA_MEMCHECK_OOM
+  seconds: 164.74296504305676
+  audit: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/analysis/gpu2-cuda-memcheck/audit.json
+  valid_algorithm_outcome: false
+  memory_access_violation_established: false

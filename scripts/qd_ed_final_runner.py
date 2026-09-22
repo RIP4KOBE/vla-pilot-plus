@@ -321,7 +321,10 @@ def validate_memcheck(plan):
     diagnostic = plan.get('cuda_memcheck')
     if diagnostic is None:
         return
-    require(set(diagnostic) == {'tool_path', 'files'}, 'invalid CUDA memcheck contract')
+    require({'tool_path', 'files'} <= set(diagnostic)
+            <= {'tool_path', 'files', 'force_blocking_launches'}, 'invalid CUDA memcheck contract')
+    blocking = diagnostic.get('force_blocking_launches', False)
+    require(type(blocking) is bool, 'CUDA memcheck blocking launch flag must be boolean')
     require(diagnostic['tool_path'] == str(MEMCHECK_TOOL), 'unexpected CUDA memcheck executable')
     require(plan.get('diagnostic_scope', {}).get('kind') == 'cuda_memcheck'
             and plan['diagnostic_scope'].get('online_algorithm_comparison') is False,
@@ -329,7 +332,8 @@ def validate_memcheck(plan):
     rows = plan.get('episodes', [])
     require(len(rows) == 1 and rows[0].get('split') == 'dev'
             and rows[0].get('budget_bucket') == 'development' and not rows[0].get('retry_of')
-            and rows[0].get('iteration') == 'GPU5_CUDA_MEMCHECK_C0'
+            and rows[0].get('iteration') == ('GPU2_CUDA_MEMCHECK_BLOCKING_C0' if blocking
+                                           else 'GPU5_CUDA_MEMCHECK_C0')
             and rows[0].get('profile') == 'C0'
             and type(rows[0].get('timeout_seconds')) is int
             and 0 < rows[0]['timeout_seconds'] <= 600,
@@ -345,8 +349,9 @@ def instrument_command(command, plan, output):
     if plan.get('cuda_memcheck') is None:
         return command
     validate_memcheck(plan)
+    blocking = ['--force-blocking-launches'] if plan['cuda_memcheck'].get('force_blocking_launches') else []
     return [str(MEMCHECK_TOOL), '--tool', 'memcheck', '--target-processes', 'application-only',
-            '--error-exitcode', '86', '--log-file', str(Path(output)/'cuda-memcheck.log'), *command]
+            '--error-exitcode', '86', *blocking, '--log-file', str(Path(output)/'cuda-memcheck.log'), *command]
 
 
 def selected_rows(plan, split, iteration):

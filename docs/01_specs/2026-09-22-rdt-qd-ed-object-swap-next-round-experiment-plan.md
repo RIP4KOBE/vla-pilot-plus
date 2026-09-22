@@ -8,6 +8,12 @@
 
 用户明确要求终止GPU2现有程序，并确保本次任务后续均使用GPU2。本修订覆盖下文GPU5/GPU6历史设备要求。当前队列、CUDA和EGL均改为仅允许物理GPU2（EGLindex1，CUDAlogical0）；不更换科学输入或重置预算。GPU5等待队列已停止，尚未派发的CUDA memcheck保留原条件标识，待GPU2释放后自动探测并接续。终止PID1502190时系统返回EPERM，sudo要求密码，故当前未成功清理。新队列可在完整冻结输入检查后等待设备，真实CUDA/EGL检查通过前不会启动episode。详见 `experiments/iteration_001_execution_intent/gpu2-migration-amendment.md`。
 
+**09:55 UTC清理结果：** sudo认证成功，GPU2占用进程PID1502190已通过SIGTERM终止；复查无计算进程、显存0MiB。此前密码阻塞已解除。GPU2专属队列已启动，按120秒连续空闲确认、真实CUDA/EGL探测、冻结映射、单次600秒CUDA memcheck的顺序自动接续。
+
+**10:02 UTC诊断结果：** GPU2 CUDA/EGL检查通过；CUDA memcheck运行164.74秒后显存耗尽，退出码86，0环境动作、0 Stage调用。报告包含4条CUDA分配错误，没有报告非法内存访问；由于首轮搜索未完成，不能据此判定内存安全或解释既有Xid根因。队列已停止，失败与成本完整保留；30-cell算法比较尚未启动。
+
+**后续单次诊断：** 在相同GPU2、C0与任务输入下，仅增加Compute Sanitizer的 `--force-blocking-launches`，检验降低并发检测开销后能否越过首轮搜索。新条件 `GPU2_CUDA_MEMCHECK_BLOCKING_C0`，development额度、600秒上限，保留原失败，不进入算法成功率或自动重试。串行化会改变时序，不能据此排除原并发路径故障。148项相关CPU测试通过；协议见 `experiments/iteration_001_execution_intent/gpu2-blocking-memcheck-diagnostic.md`。
+
 ## 历史执行修订：改用 GPU5
 
 用户明确要求“在GPU5上执行任务”，本修订覆盖下文历史GPU6-only设备要求。CUDA与EGL都固定物理GPU5。已停止尚未派发的GPU6等待队列，按GPU5的UUID/PCI/EGL重新验证和冻结运行清单，再执行同一C0恢复诊断。算法、任务、seed/init、Stage、720步/1800秒限制、累计预算和晋级门保持不变。已有GPU6失败证据全部保留；更换设备本身不代表故障已修复。原worktree/branch/artifact名称含gpu6，仅作为历史标识保留。详见 `experiments/iteration_001_execution_intent/gpu5-migration-amendment.md`。
