@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-09-22T10:57:06.659212+00:00",
-  "status": "GPU3_RENDER_PROCESS_DIAGNOSTIC_PREPARATION",
+  "timestamp": "2026-09-22T11:08:32.603979+00:00",
+  "status": "GPU3_RENDER_IDLE_CONTROL_PREPARATION",
   "budget": {
     "max_gpu_hours": 48.0,
-    "gpu_hours_consumed": 0.9382152213333435,
+    "gpu_hours_consumed": 0.9583621344463125,
     "max_episode_attempts": 240,
     "reserved": {
       "baseline": 20,
@@ -83,9 +83,9 @@
     },
     "physical_gpu7_executed": false
   },
-  "source_commit": "5192e5d48f978cfe62fefd80e2a3426033b109f5",
-  "next_action": "Dedicated render thread still faults after model load before inference. Prepare one GPU3 diagnostic with a fresh spawned renderer process and model parent, synchronously on the same physical GPU3; scientific gates remain closed.",
-  "phase": "GPU3_RENDER_PROCESS_DIAGNOSTIC_PREPARATION",
+  "source_commit": "c1da591478b155e0bbfa191d1e62ac99dee5b050",
+  "next_action": "Process-isolated renderer still faults on GPU3 after model loading, before any B1. Prepare a no-model static-scene control with a fixed75-second idle interval to distinguish elapsed-time effects. All task GPU work remains physical3; no fallback.",
+  "phase": "GPU3_RENDER_IDLE_CONTROL_PREPARATION",
   "owned_gpu_workers": [],
   "target_achieved": false,
   "gpu3_render_queue": {
@@ -260,7 +260,7 @@
     "cleanup_success": true
   },
   "gpu3_render_process_diagnostic": {
-    "status": "CPU_VERIFIED_PENDING_GPU3_ADMISSION",
+    "status": "ABORTED_RENDERER_XID31_AFTER_MODEL_LOAD",
     "physical_gpu": 3,
     "automatic_retry": false,
     "production_patch_applied": false,
@@ -273,6 +273,34 @@
     "maximum_gpu_process_seconds": 600,
     "maximum_cleanup_seconds": 40,
     "status_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-process-diagnostic/status.json",
-    "contract_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-process-diagnostic/frozen-contract.json"
+    "contract_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-process-diagnostic/frozen-contract.json",
+    "tool_session_id": 5827,
+    "source_commit": "c1da591478b155e0bbfa191d1e62ac99dee5b050",
+    "resource_id": "rdt-qd-ed-final-20260921T093925Z__gpu3_render_process__7a179aced1de",
+    "result_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-process-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_render_process__7a179aced1de/healthcheck-result.json",
+    "contract_sha256": "f7bbb68c2515413a89ce7869dd06a698c1d9224e247a36fb5ebfba9f9dfd5d6c",
+    "gpu_process_wall_seconds": 72.52888720668852,
+    "prediction_calls": 0,
+    "owned_xids": [
+      31
+    ],
+    "cleanup_success": true,
+    "analysis_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-process-diagnostic/diagnostic-analysis.json"
+  },
+  "gpu3_render_idle_diagnostic": {
+    "status": "CPU_VERIFIED_PENDING_GPU3_ADMISSION",
+    "physical_gpu": 3,
+    "automatic_retry": false,
+    "idle_seconds": 75,
+    "maximum_gpu_process_seconds": 180,
+    "model_loads": 0,
+    "scope": "same static scene and cameras before/after75s idle; no CUDA initialization/model/action/integration",
+    "protocol": "experiments/iteration_001_execution_intent/gpu3-render-idle-diagnostic.md",
+    "script": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-render-idle.py",
+    "script_sha256": "ec415acee0e57f29603bdf7dc6771ca6d55bdad31e22c28e9ab1463a6767ad05",
+    "supervisor": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-render-idle.py",
+    "supervisor_sha256": "bde008e92f2bbb96ef1cac1d7887d58a2fd3fd95b8ee2b9813c0da47106a6ae1",
+    "status_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-idle-diagnostic/status.json",
+    "contract_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-idle-diagnostic/frozen-contract.json"
   }
 }

@@ -1,9 +1,9 @@
 # Research continuation
 
-Updated 2026-09-22T10:45:05.150545+00:00. Physical GPU3 only; wait if unavailable; no automatic fallback.
+Updated 2026-09-22T11:05:46.678717+00:00. Physical GPU3 only; wait if unavailable; no automatic fallback.
 
-Dedicated render thread still faults after model load before inference. Prepare one GPU3 diagnostic with a fresh spawned renderer process and model parent, synchronously on the same physical GPU3; scientific gates remain closed.
+Process-isolated renderer still faults on GPU3 after model loading, before any B1. Prepare a no-model static-scene control with a fixed75-second idle interval to distinguish elapsed-time effects. All task GPU work remains physical3; no fallback.
 
-Budget: 0.938215221/48 GPU-hours, 11/240 scientific attempts, 0 valid. Target unmet; candidate N1 unmeasured; validation/formal closed.
+Budget: 0.958362134/48 GPU-hours, 11/240 scientific attempts, 0 valid. Target unmet; candidate N1 unmeasured; validation/formal closed.
 
-Latest evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-thread-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_render_thread__be460ba14398/healthcheck-result.json. No owned GPU worker remains. Authoritative state: research-state.yaml and docs/03_evidence/qd_ed_final/iteration-ledger.md.
+Latest evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-process-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_render_process__7a179aced1de/healthcheck-result.json. Both owned GPU processes cleaned up; no owned GPU worker remains. Authoritative state: research-state.yaml and docs/03_evidence/qd_ed_final/iteration-ledger.md.
