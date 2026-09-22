@@ -260,3 +260,7 @@ Resource rdt-qd-ed-final-20260921T093925Z__gpu3_scene_model__c83cfb349cba from s
 ## 2026-09-22T09:53:10.943336+00:00 — GPU3 restriction reconfirmed
 
 User explicitly requires all subsequent execution of this task on physical GPU3. Persist candidate pool[3],oneexclusiveworker,noautomaticfallback,andwaitifGPU3unavailable. Newhealthcheckchild independently checks CUDA mask3,logicalCUDA0 UUID andEGL0 binding. NoGPUworker is currently dispatched. Loadingprotocol corrected beforedispatch to match actual82981d priorcode: no extra observation-processor import or phase-wrapper installation occurred initsloadingphase; nextprobe doesnotadd eitheroperation.
+
+## GPU3 phase diagnostic — failure before model loading
+
+Resource rdt-qd-ed-final-20260921T093925Z__gpu3_model_load_phases__52ec6c4eb068 (source d9416fb,script741c087a,contractf8713967) aborted after42.836270067840815seconds. Baseline and after-production-import images matched earlier static success. CUDA identity/seeding took10.402814seconds; next128depth readback21.732028seconds returnednonfinite depth andchangedRGBhash. Guard stopped beforefrom_pretrained/T5/checkpoint loading. No model forward,actions or integration occurred. Live and postrun GPU3 kernel checks recorded noXid for this resource. Retain childexit1/imagecontractfailure andcost,not an inventedkernelclassification. Nextprospectiveintervention initializesCUDA beforeanyexplicitapplication scene/context while retainingthenineoriginal loaderboundaries. No algorithm score/promotion.

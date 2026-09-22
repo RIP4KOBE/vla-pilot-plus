@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-09-22T09:47:58.633451+00:00",
+  "timestamp": "2026-09-22T10:11:13.667855+00:00",
   "run_name": "rdt-qd-ed-final-20260921T093925Z",
-  "phase": "GPU3_MODEL_LOAD_FAULT_ISOLATION",
+  "phase": "GPU3_CUDA_FIRST_DIAGNOSTIC_PREPARATION",
   "source_commit": "9b1b4727a50c11ee0a36bb96aa64810807439039",
   "active_plan": {
     "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/resource_queue/89d2dd719e0346bd9011931cc66731a0/plan.json",
@@ -52,7 +52,7 @@
   ],
   "owned_gpu_workers": [],
   "authoritative_state": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/research-state.yaml",
-  "next_action": "Split the frozen model loading stage to localize graphics corruption occurring before any policy or encoder forward; prepare one new bounded GPU3 zero-integration diagnostic.",
+  "next_action": "One GPU3 zero-integration intervention: initialize CUDA before the first scene/context,then repeat the fixed loader-phase observations; full scientific promotion remains closed.",
   "target_achieved": false,
   "native_diagnostic": {
     "status": "MATCHING_COMPLETED_GPU6_B1_EVIDENCE_REUSED",
@@ -111,7 +111,7 @@
   },
   "budget": {
     "max_gpu_hours": 48.0,
-    "gpu_hours_consumed": 0.8314941151222836,
+    "gpu_hours_consumed": 0.8950695432015023,
     "max_episode_attempts": 240,
     "reserved": {
       "baseline": 20,
@@ -120,12 +120,12 @@
       "formal": 40,
       "recovery": 20
     },
-    "dispatched": 10,
+    "dispatched": 11,
     "aborted": 8,
     "valid": 0,
     "running": 0,
-    "invalid": 2,
-    "completed": 2,
+    "invalid": 3,
+    "completed": 3,
     "gpu_hour_reservations": {
       "validation": 14.0,
       "formal": 10.0
@@ -213,5 +213,27 @@
       31
     ],
     "analysis_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-scene-model-diagnostic/diagnostic-analysis.json"
+  },
+  "gpu3_load_phase_diagnostic": {
+    "status": "ABORTED_NONFINITE_DEPTH_AFTER_CUDA_INIT_SEED",
+    "physical_gpu": 3,
+    "source_commit": "d9416fb7bf56c5135ef49c6bdaa9935de9e14e18",
+    "tool_session_id": 95403,
+    "script": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-model-load-phases.py",
+    "script_sha256": "741c087a21228b5dc5f49801c3734b93ed690760a3731eb5c8b6b3138a0775a4",
+    "supervisor": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-model-load-phases.py",
+    "supervisor_sha256": "ab2796fe17200ab1178d9c1befb2fc5cfd49c8a9d4230a9a3181f1c9c1d4c735",
+    "status_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-load-phases-diagnostic/status.json",
+    "contract_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-load-phases-diagnostic/frozen-contract.json",
+    "protocol": "experiments/iteration_001_execution_intent/gpu3-model-load-phases-diagnostic.md",
+    "automatic_retry": false,
+    "resource_id": "rdt-qd-ed-final-20260921T093925Z__gpu3_model_load_phases__52ec6c4eb068",
+    "result_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-load-phases-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_model_load_phases__52ec6c4eb068/healthcheck-result.json",
+    "contract_sha256": "f87139677662de6cf65a47383c7d521b0b9c91b606ef88bac5f3fd8917337f3e",
+    "gpu_process_wall_seconds": 42.836270067840815,
+    "model_loads": 0,
+    "model_forward_calls": 0,
+    "owned_xids": [],
+    "analysis_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-load-phases-diagnostic/diagnostic-analysis.json"
   }
 }
