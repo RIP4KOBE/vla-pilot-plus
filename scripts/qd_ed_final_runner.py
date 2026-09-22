@@ -23,6 +23,7 @@ import time
 import uuid
 
 import yaml
+from qd_ed_gpu_faults import KernelXidMonitor, MonitorError
 
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON = Path('/home/hynx/miniconda3/envs/vla-pilot/bin/python')
@@ -37,6 +38,7 @@ REQUIRED_CODE = {
     'core/gemini_grounder.py', 'vlm_query/stage_template.txt',
     'vlm_query/vlm_agent.py', 'scripts/qd_ed_final_report.py',
     'scripts/qd_ed_codex_launch.py',
+    'scripts/qd_ed_gpu_faults.py',
     'core/codex_stage.py', 'core/codex_stage_policy.py',
 }
 REQUIRED_CODE.update(str(p.relative_to(ROOT)) for folder in ('core','utils','vlm_query')
@@ -494,16 +496,36 @@ def check_exclusive_gpu(process, run=subprocess.run, *, physical_gpu=7):
         require(pid==process.pid or own_group, f'external GPU{physical_gpu} process appeared during owned attempt')
 
 
-def wait_exclusively(process, timeout, *, physical_gpu=7):
+def check_kernel_faults(monitor, physical_gpu):
+    if monitor is not None:
+        try:
+            monitor.check()
+        except MonitorError as exc:
+            raise GateError(f'GPU{physical_gpu} kernel monitor: {exc}') from exc
+
+
+def start_kernel_monitor(runtime, output):
+    physical_gpu = runtime_gpu(runtime)
+    try:
+        return KernelXidMonitor(runtime['gpu_mapping'], output)
+    except MonitorError as exc:
+        raise GateError(f'GPU{physical_gpu} kernel monitor: {exc}') from exc
+
+
+def wait_exclusively(process, timeout, *, physical_gpu=7, fault_monitor=None):
     deadline=time.monotonic()+timeout
     while True:
         remaining=deadline-time.monotonic()
         if remaining<=0:
             raise subprocess.TimeoutExpired('owned episode',timeout)
         try:
-            return process.wait(timeout=min(5.,remaining))
+            code = process.wait(timeout=min(5.,remaining))
         except subprocess.TimeoutExpired:
+            check_kernel_faults(fault_monitor, physical_gpu)
             check_exclusive_gpu(process, physical_gpu=physical_gpu)
+        else:
+            check_kernel_faults(fault_monitor, physical_gpu)
+            return code
 
 
 @contextlib.contextmanager
@@ -944,17 +966,19 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                 env=child_environment(runtime)
                 verify_provider(runtime,env,root=root)
                 runtime_gpu(runtime, read_state(root/'research-state.yaml'))
+                fault_monitor = start_kernel_monitor(runtime, output)
                 append_event(root,{**base,'event':'dispatched','time_unix':time.time(),'timeout_seconds':timeout})
                 dispatched=True; started=time.monotonic()
                 with (output/'runner.log').open('w') as log:
                     process=subprocess.Popen(command,cwd=root,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+                    fault_monitor.pid = process.pid
                     try:
                         start_ticks=Path(f'/proc/{process.pid}/stat').read_text().rsplit(')',1)[1].split()[19]
                     except FileNotFoundError:
                         start_ticks=None
                     durable_json(output/'process.json',{'pid':process.pid,'time_unix':time.time(),'attempt_id':attempt_id,
                                  'proc_start_ticks':start_ticks,'boot_id':Path('/proc/sys/kernel/random/boot_id').read_text().strip()})
-                    code=wait_exclusively(process,timeout,physical_gpu=physical_gpu)
+                    code=wait_exclusively(process,timeout,physical_gpu=physical_gpu,fault_monitor=fault_monitor)
                     process_finished=time.monotonic()
                 require(code==0, f'child exit code {code}')
                 outcome=validate_result(output,row,manifest['profiles'][row['profile']],runtime); final_event='valid'

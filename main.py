@@ -1060,6 +1060,8 @@ class Main:
             config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
             if config.get("enabled", False):
                 faulthandler.enable(all_threads=True)
+                from utils.mujoco_phase_diagnostics import install
+                install(config.get("output_dir") or self.output_dir)
         except Exception:
             log.warning("Native-fault stack diagnostics unavailable")
 

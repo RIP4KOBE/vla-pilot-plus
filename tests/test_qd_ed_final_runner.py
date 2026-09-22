@@ -753,6 +753,8 @@ def test_gpu5_dispatch_records_selected_device_at_all_runtime_boundaries(tiny_pl
     admissions = []; waits = []; children = []
     monkeypatch.setattr(runner, 'gpu_admission', lambda **kwargs: admissions.append(kwargs) or {'physical_gpu': kwargs['physical_gpu']})
     monkeypatch.setattr(runner, 'verify_provider', lambda *args, **kwargs: None)
+    monitor = SimpleNamespace(pid=None, check=lambda: None)
+    monkeypatch.setattr(runner, 'start_kernel_monitor', lambda *args: monitor)
     def command(_plan, _manifest, _runtime, _row, attempt_id):
         return ['owned-main'], Path(_plan['artifact_root']) / 'attempts' / attempt_id
     monkeypatch.setattr(runner, 'build_command', command)
@@ -765,7 +767,8 @@ def test_gpu5_dispatch_records_selected_device_at_all_runtime_boundaries(tiny_pl
     monkeypatch.setattr(runner, 'validate_result', lambda *args: {'success': False, 'outcome_valid': True})
     results = runner.run_plan(path, split='dev', iteration=0, root=root)
     assert admissions == [{'physical_gpu': 5, 'expected_uuid': 'GPU-five'}] * 2
-    assert waits == [{'physical_gpu': 5}]
+    assert waits == [{'physical_gpu': 5, 'fault_monitor': monitor}]
+    assert monitor.pid == 99999999
     assert children[0]['CUDA_VISIBLE_DEVICES'] == '5' and children[0]['MUJOCO_EGL_DEVICE_ID'] == '2'
     events = runner.read_events(root / 'data/attempt-ledger.jsonl')
     assert [event['event'] for event in events] == ['reserved', 'dispatched', 'valid']
