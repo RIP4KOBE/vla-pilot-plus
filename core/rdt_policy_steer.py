@@ -32,6 +32,9 @@ from core.eds_eval_metrics import (
 from core.eds_mechanism_trace import EDSMechanismTrace, EDSParticleStage
 from core.env_adapters import BaseEnvAdapter
 from core.fkd_class import FKD
+from core.qd_executed_feedback import (
+    MODE as FEEDBACK_MODE, ExecutedFeedbackHistory, FeedbackContract, executed_feedback_quality,
+)
 from core.qd_executed_quality import (
     ExecutedPrefixContract, executed_prefix_quality, recognize_executed_prefix_provider,
 )
@@ -1352,6 +1355,8 @@ class RDTSteer:
 
     def reset(self) -> None:
         self.reset_episode_compute_counters()
+        if hasattr(self, "_executed_feedback"):
+            self._executed_feedback.clear("episode_reset", reset=True)
         self.reset_eds_chunk_memory("episode_reset")
         self._cached_action_chunk = None
         self._cached_action_steps_remaining = 0
@@ -1382,6 +1387,8 @@ class RDTSteer:
         self._eds_episode_seed = int(episode_seed)
 
     def reset_stage(self) -> None:
+        if hasattr(self, "_executed_feedback"):
+            self._executed_feedback.clear("stage_change")
         self.reset_eds_chunk_memory("stage_change")
         self._stage_init_reward = None
 
@@ -1510,6 +1517,7 @@ class RDTSteer:
         verbose: bool = False,
         global_step: int = 0,
         current_stage: int = 1,
+        execution_feedback_context: dict | None = None,
     ) -> Tensor:
         if self._obs_processor is None:
             raise RuntimeError("RDTSteer.post_init must be called before select_action")
@@ -1522,6 +1530,10 @@ class RDTSteer:
         )
 
         if should_sample:
+            self._execution_feedback_context = execution_feedback_context
+            feedback_mode = (eds_config or {}).get("qd_quality_mode") == FEEDBACK_MODE
+            if hasattr(self, "_executed_feedback") and (not feedback_mode or not use_guidance):
+                self._executed_feedback.clear("guidance_off_or_mode_changed")
             self._increment_compute("guided_chunks" if use_guidance else "unguided_chunks")
             self._last_visualization_action_candidates = None
             self._last_eds_metrics = None
@@ -1569,6 +1581,10 @@ class RDTSteer:
                 )
 
             self._cached_action_chunk = self._postprocess_actions(raw)
+            if feedback_mode and hasattr(self, "_executed_feedback"):
+                feedback_started = time.perf_counter()
+                self._executed_feedback.bind_decode(raw, self._cached_action_chunk, ACTIVE_ACTION_INDICES_SORTED)
+                self.record_execution_feedback_overhead("selected_decode_binding", time.perf_counter() - feedback_started)
             evidence = getattr(self, "_decision_evidence", None)
             if evidence is not None:
                 evidence.record("policy_action_decode", selected_latent=raw,
@@ -1577,6 +1593,49 @@ class RDTSteer:
 
         self._cached_action_steps_remaining = max(0, self._cached_action_steps_remaining - 1)
         return self._cached_action_chunk
+
+    def record_execution_feedback_overhead(self, scope, seconds):
+        if not hasattr(self, "_episode_compute"):
+            self.reset_episode_compute_counters()
+        timings = self._episode_compute.setdefault("execution_feedback_seconds_by_scope", {})
+        timings[scope] = timings.get(scope, 0.) + float(seconds)
+
+    def commit_executed_feedback(self, action_chunk, execution_horizon, global_step):
+        history = getattr(self, "_executed_feedback", None)
+        if history is not None:
+            started = time.perf_counter()
+            try:
+                history.commit(action_chunk, execution_horizon, global_step)
+            finally:
+                self.record_execution_feedback_overhead("commit_binding", time.perf_counter() - started)
+            evidence = getattr(self, "_decision_evidence", None)
+            if evidence is not None:
+                plan = history.pending
+                evidence.record("execution_feedback_commit", global_step=global_step,
+                    committed=plan is not None and plan.get("committed", False), history_reason=history.reason,
+                    selected_native_sha256=None if plan is None else plan["selected_native_sha256"])
+
+    def execution_feedback_pending(self):
+        history = getattr(self, "_executed_feedback", None)
+        return history is not None and (history.pending is not None or history.completed is not None)
+
+    def acknowledge_executed_feedback(self, **packet):
+        history = getattr(self, "_executed_feedback", None)
+        if history is not None:
+            plan = history.pending
+            selected_native_sha256 = None if plan is None else plan["selected_native_sha256"]
+            try:
+                completed = history.acknowledge(**packet)
+            except Exception:
+                history.clear("acknowledgement_error")
+                raise
+            evidence = getattr(self, "_decision_evidence", None)
+            if evidence is not None:
+                evidence.record("execution_feedback_ack", global_step=packet["global_step"],
+                    execution_index=packet["execution_index"], actual_endpoint=packet["endpoint"], action=packet["action"],
+                    terminated=packet["terminated"], truncated=packet["truncated"],
+                    completed=completed, history_reason=history.reason,
+                    selected_native_sha256=selected_native_sha256)
 
     # ── Unguided path ─────────────────────────────────────────────────────────
 
@@ -1754,7 +1813,8 @@ class RDTSteer:
         if keypoints is None or not guidance_fns:
             return torch.zeros(samples.shape[0], device=samples.device, dtype=samples.dtype)
         self._increment_compute("reward_scoring_batches")
-        full_trajs = self._rdt_sample_to_trajectory_3d(samples)
+        full_trajs = self._rdt_sample_to_trajectory_3d(samples,
+            **({"origin_out": projection_out} if projection_out is not None and projection_out.get("capture_origin") else {}))
         trajs = self._trajectory_reward_slice(full_trajs, slice_kind)
         if projection_out is not None:
             if self._adapter is None:
@@ -1949,7 +2009,7 @@ class RDTSteer:
         guidance_fns: Optional[List[Callable]],
         reward_mode: str = "normal",
         shuffle_seed: int = 0,
-        qd_quality_contract: ExecutedPrefixContract | None = None,
+        qd_quality_contract: ExecutedPrefixContract | FeedbackContract | None = None,
     ) -> tuple[Tensor, dict]:
         reward_mode = str(reward_mode or "normal")
         valid_modes = {"normal", "zero", "shuffled_keypoints", "inverted"}
@@ -1974,7 +2034,8 @@ class RDTSteer:
             )
             scoring_keypoints = keypoints.index_select(0, perm)
 
-        projection_out = {} if qd_quality_contract is not None else None
+        projection_out = ({"capture_origin": True} if isinstance(qd_quality_contract, FeedbackContract)
+                          else {} if qd_quality_contract is not None else None)
         if qd_quality_contract is not None:
             if reward_mode != "normal":
                 raise RuntimeError("N2 canonical quality requires original normal reward mode")
@@ -1997,8 +2058,18 @@ class RDTSteer:
                 raise FloatingPointError("N2 original provider reward is nonfinite")
             quality_info["raw_rewards"] = rewards.detach().clone()
             quality_info["qd_scored_actions"] = samples.detach().clone()
-            rewards = executed_prefix_quality(projection_out["projected_xyz"], scoring_keypoints,
-                                              target_index=qd_quality_contract.target_index)
+            if isinstance(qd_quality_contract, FeedbackContract):
+                qd_quality_contract.record(samples, projection_out["projected_xyz"],
+                                           projection_out["source_origins"], rewards)
+                if qd_quality_contract.active:
+                    quality_started = time.perf_counter()
+                    rewards = executed_feedback_quality(projection_out["projected_xyz"], scoring_keypoints,
+                        target_index=qd_quality_contract.target_index, residual_previous=qd_quality_contract.residual)
+                    qd_quality_contract.overhead_seconds += time.perf_counter() - quality_started
+                # No eligible history: retain the exact already-computed raw tensor.
+            else:
+                rewards = executed_prefix_quality(projection_out["projected_xyz"], scoring_keypoints,
+                                                  target_index=qd_quality_contract.target_index)
             if rewards.shape != quality_info["raw_rewards"].shape or rewards.dtype != samples.dtype:
                 raise RuntimeError("N2 canonical quality/raw association mismatch")
         costs = -rewards
@@ -2006,7 +2077,7 @@ class RDTSteer:
         if evidence is not None:
             evidence.record("effective_quality", scoring_batch_id=evidence.scoring_batch_id,
                             reward_mode=reward_mode, quality=rewards, costs=costs,
-                            **({"quality_mode": "executed_prefix_v1",
+                            **({"quality_mode": getattr(qd_quality_contract, "mode", "executed_prefix_v1"),
                                 "raw_provider_quality": quality_info["raw_rewards"],
                                 "target_index": qd_quality_contract.target_index,
                                 "provider_identity": qd_quality_contract.identity}
@@ -3433,7 +3504,7 @@ class RDTSteer:
         cfg: Optional[_EDSConfig] = None,
         iter_idx: int = 0,
         diversity_scale_override: float | None = None,
-        qd_quality_contract: ExecutedPrefixContract | None = None,
+        qd_quality_contract: ExecutedPrefixContract | FeedbackContract | None = None,
     ) -> tuple[Tensor, Tensor, dict]:
         if (
             cfg is not None
@@ -3489,7 +3560,7 @@ class RDTSteer:
         reward_mode: str = "normal",
         shuffle_seed: int = 0,
         cfg: Optional[_EDSConfig] = None,
-        qd_quality_contract: ExecutedPrefixContract | None = None,
+        qd_quality_contract: ExecutedPrefixContract | FeedbackContract | None = None,
     ) -> tuple[Tensor, Tensor, dict]:
         x_t = self._eds_denoise_noisy_population(
             cond=cond,
@@ -3605,7 +3676,7 @@ class RDTSteer:
         reward_mode: str,
         shuffle_seed: int,
         attempted_diversity_scale: float | None = None,
-        qd_quality_contract: ExecutedPrefixContract | None = None,
+        qd_quality_contract: ExecutedPrefixContract | FeedbackContract | None = None,
     ) -> tuple[Tensor, Tensor, dict]:
         detail = []
         if step_idx is not None:
@@ -3651,7 +3722,7 @@ class RDTSteer:
         cfg: _EDSConfig,
         iter_idx: int,
         diversity_scale_override: float | None = None,
-        qd_quality_contract: ExecutedPrefixContract | None = None,
+        qd_quality_contract: ExecutedPrefixContract | FeedbackContract | None = None,
     ) -> tuple[Tensor, Tensor, dict]:
         scheduler = self._noise_scheduler
         self._increment_compute("denoising_invocations")
@@ -4786,12 +4857,26 @@ class RDTSteer:
         current_stage: int,
     ) -> Tensor:
         cfg = eds_config
+        feedback_setup_started = time.perf_counter() if cfg.qd_quality_mode == FEEDBACK_MODE else None
         quality_contract = None
         quality_reason = "provider_mode"
-        if cfg.qd_quality_mode == "executed_prefix_v1":
+        if cfg.qd_quality_mode in {"executed_prefix_v1", FEEDBACK_MODE}:
             if self._action_chunk_horizon != 8:
                 raise ValueError("Executed-prefix quality requires action_chunk_horizon=8")
             quality_contract, quality_reason = recognize_executed_prefix_provider(guidance_fns, keypoints)
+            if cfg.qd_quality_mode == FEEDBACK_MODE:
+                if not hasattr(self, "_executed_feedback"):
+                    self._executed_feedback = ExecutedFeedbackHistory()
+                if quality_contract is None:
+                    self._executed_feedback.clear(quality_reason)
+                elif not getattr(self._adapter, "supports_execution_feedback_origin", False):
+                    self._executed_feedback.clear("projection_origin_unavailable")
+                    quality_contract, quality_reason = None, "projection_origin_unavailable"
+                else:
+                    quality_contract = self._executed_feedback.begin(quality_contract, stage=current_stage,
+                        global_step=global_step, tracker=getattr(self, "_execution_feedback_context", None))
+        if feedback_setup_started is not None:
+            self.record_execution_feedback_overhead("semantic_context_begin", time.perf_counter() - feedback_setup_started)
         quality_kwargs = ({"qd_quality_contract": quality_contract} if quality_contract is not None else {})
         execution_intent = cfg.qd_descriptor == EXECUTION_INTENT_DESCRIPTOR
         if execution_intent and self._action_chunk_horizon != 8:
@@ -4826,6 +4911,13 @@ class RDTSteer:
         if quality_contract is not None:
             metrics.qd_quality_target_index = quality_contract.target_index
             metrics.qd_quality_identity = dict(quality_contract.identity)
+        if isinstance(quality_contract, FeedbackContract):
+            metrics.qd_feedback_active = quality_contract.active
+            metrics.qd_feedback_reason = quality_contract.reason
+            metrics.qd_feedback_context = quality_contract.context
+            metrics.qd_feedback_previous = quality_contract.previous_record()
+        elif cfg.qd_quality_mode == FEEDBACK_MODE:
+            metrics.qd_feedback_reason = quality_reason
         metrics.initial_diversity_descriptor_mode = cfg.initial_diversity_descriptor_mode
         metrics.rollout_diversity_descriptor_mode = cfg.rollout_diversity_descriptor_mode
         metrics.direction_rbf_weights = [
@@ -6622,7 +6714,18 @@ class RDTSteer:
             metrics.qd_selected_raw_reward = float(stage_raw_rewards[best_idx].item())
             metrics.qd_final_best_raw_reward = float(stage_raw_rewards.max().item())
             metrics.qd_selected_raw_gap = metrics.qd_selected_raw_reward - metrics.qd_final_best_raw_reward
+        if isinstance(quality_contract, FeedbackContract):
+            feedback_selection_started = time.perf_counter()
+            metrics.qd_feedback_selected = self._executed_feedback.select(quality_contract, selected)
+            metrics.qd_feedback_overhead_seconds = quality_contract.overhead_seconds
+            metrics.qd_feedback_reason = quality_contract.reason
+            self.record_execution_feedback_overhead("selected_native_binding", time.perf_counter() - feedback_selection_started)
+            self.record_execution_feedback_overhead("canonical_native_copy_and_quality", quality_contract.overhead_seconds)
         evidence = getattr(self, "_decision_evidence", None)
+        if evidence is not None and isinstance(quality_contract, FeedbackContract):
+            evidence.record("execution_feedback_selection", active=quality_contract.active,
+                context=quality_contract.context, previous=quality_contract.previous_record(),
+                selected=metrics.qd_feedback_selected, reason=quality_contract.reason)
         if evidence is not None:
             evidence.record("final_selection", population=population, selected_latent=selected,
                             selected_index=best_idx, selected_quality=metrics.selected_reward,
@@ -7075,7 +7178,7 @@ class RDTSteer:
         H = self._action_chunk_horizon
         return sample[:, :H, RDT_GUIDED_ACTION_INDICES].to(dtype=sample.dtype)
 
-    def _rdt_sample_to_trajectory_3d(self, sample: Tensor) -> Tensor:
+    def _rdt_sample_to_trajectory_3d(self, sample: Tensor, *, origin_out: dict | None = None) -> Tensor:
         actions = self._decode_rdt_actions_for_guidance(sample)
         B = actions.shape[0]
         if self._adapter is None:
@@ -7088,8 +7191,14 @@ class RDTSteer:
             )
 
         trajs = []
+        if origin_out is not None:
+            origin_out["source_origins"] = []
         for b in range(B):
-            traj = self._adapter.delta_actions_to_ee_trajectory(actions[b]).to(device=sample.device, dtype=sample.dtype)
+            metadata = {} if origin_out is not None else None
+            traj = self._adapter.delta_actions_to_ee_trajectory(actions[b],
+                **({"origin_out": metadata} if metadata is not None else {})).to(device=sample.device, dtype=sample.dtype)
+            if origin_out is not None:
+                origin_out["source_origins"].append(metadata["source_origin"])
             trajs.append(traj)
         return torch.stack(trajs, dim=0)
 
@@ -7702,9 +7811,9 @@ class RDTSteer:
         _validate_direction_rbf_config(resolved.__dict__)
         if resolved.qd_archive_mode not in {"none", "grid_archive"}:
             raise ValueError("EDS qd_archive_mode must be one of none, grid_archive")
-        if resolved.qd_quality_mode not in {"provider", "executed_prefix_v1"}:
-            raise ValueError("EDS qd_quality_mode must be provider or executed_prefix_v1")
-        if resolved.qd_quality_mode == "executed_prefix_v1":
+        if resolved.qd_quality_mode not in {"provider", "executed_prefix_v1", FEEDBACK_MODE}:
+            raise ValueError("EDS qd_quality_mode must be provider, executed_prefix_v1 or executed_feedback_v1")
+        if resolved.qd_quality_mode in {"executed_prefix_v1", FEEDBACK_MODE}:
             required_quality = {
                 "reward_mode": "normal", "qd_descriptor": "target_relative_endpoint_xy",
                 "qd_grid_shape": (4, 4), "qd_cell_capacity": 1,

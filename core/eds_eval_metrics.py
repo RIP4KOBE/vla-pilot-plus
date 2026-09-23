@@ -437,6 +437,13 @@ class EDSChunkMetrics:
     qd_quality_identity: dict = field(default_factory=dict)
     qd_quality_batches: list[dict] = field(default_factory=list)
     qd_quality_changed_candidates: int = 0
+    qd_feedback_active: bool = False
+    qd_feedback_reason: str = "not_requested"
+    qd_feedback_context: dict = field(default_factory=dict)
+    qd_feedback_previous: dict = field(default_factory=dict)
+    qd_feedback_selected: dict = field(default_factory=dict)
+    qd_feedback_overhead_seconds: float = 0.0
+    qd_feedback_overhead_scope: str = "canonical_native_copy_and_quality_only"
     qd_selected_raw_reward: float | None = None
     qd_final_best_raw_reward: float | None = None
     qd_selected_raw_gap: float | None = None
@@ -527,6 +534,10 @@ class EDSChunkMetrics:
 
     def to_jsonable(self) -> dict[str, Any]:
         payload = _to_json_safe(self)
+        if self.qd_quality_mode != "executed_feedback_v1":
+            for key in list(payload):
+                if key.startswith("qd_feedback_"):
+                    payload.pop(key)
         if self.qd_quality_mode == "provider":
             for key in list(payload):
                 if key.startswith("qd_quality_") or key in {

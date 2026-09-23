@@ -121,6 +121,7 @@ main:
     qd_archive_mode: none
     qd_degenerate_fallback_policy: none
     qd_descriptor: target_relative_endpoint_xy
+    # Optional executed_prefix_v1 (N2) / executed_feedback_v1 (N3); default unchanged.
     qd_quality_mode: provider
     qd_grid_shape: [4, 4]
     qd_cell_capacity: 1

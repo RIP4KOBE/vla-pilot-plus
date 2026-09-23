@@ -23,6 +23,7 @@ class KeypointInfo:
     local_pos: np.ndarray  # local coordinates relative to the attached object (link frame)
     segment_index: int = 0  # segment index in the segmentation mask
     object_name: str = ""  # object name
+    initial_pose_available: bool = False
 
 
 class KeypointTracker:
@@ -58,6 +59,8 @@ class KeypointTracker:
         self.adapter = adapter
         self._keypoints: Optional[np.ndarray] = None
         self._keypoint_registry: Dict[int, KeypointInfo] = {}
+        self._feedback_registry_generation = 0
+        self._feedback_tracking = {}
     
     def register_keypoints(
         self, 
@@ -79,6 +82,8 @@ class KeypointTracker:
         
         assert keypoints.shape[1] == 3, f"Keypoints must be (N, 3), got {keypoints.shape}"
         
+        self._feedback_registry_generation += 1
+        self._feedback_tracking = {}
         self._keypoints = keypoints.copy()
         self._keypoint_registry = {}
         
@@ -120,7 +125,8 @@ class KeypointTracker:
                 initial_world_pos=keypoint.copy(),
                 local_pos=local_pos,
                 segment_index=segment_index,
-                object_name=object_name
+                object_name=object_name,
+                initial_pose_available=pose is not None,
             )
 
         key_points_objects_map = {
@@ -159,6 +165,7 @@ class KeypointTracker:
             "Keypoints have not been registered yet. Call register_keypoints() first."
         
         positions = []
+        tracking = {}
         
         for idx in range(len(self._keypoints)):
             info = self._keypoint_registry[idx]
@@ -166,6 +173,7 @@ class KeypointTracker:
             if info.segment_index == 0:
                 # Background - return initial position
                 positions.append(info.initial_world_pos)
+                tracking[str(idx)] = {"valid": True, "status": "static_background"}
             else:
                 # Get the current pose of the object from the adapter
                 current_pose = self.adapter.get_object_pose_by_segment(info.segment_index)
@@ -174,13 +182,22 @@ class KeypointTracker:
                     # Convert local coordinates to world coordinates
                     world_pos = self._compute_world_position(info.local_pos, current_pose)
                     positions.append(world_pos)
+                    tracking[str(idx)] = {"valid": info.initial_pose_available,
+                        "status": "tracked" if info.initial_pose_available else "initial_pose_unavailable"}
                 else:
                     # Cannot get pose, return initial position
                     log.warning(f"Could not get pose for keypoint {idx} (segment {info.segment_index})")
                     positions.append(info.initial_world_pos)
+                    tracking[str(idx)] = {"valid": False, "status": "current_pose_fallback"}
         
+        self._feedback_tracking = tracking
         return np.array(positions)
     
+    def execution_feedback_tracking_snapshot(self) -> dict:
+        """Passive metadata from the last existing lookup; performs no pose queries."""
+        return {"instance_id": id(self), "generation": self._feedback_registry_generation,
+                "targets": {k: dict(v) for k, v in self._feedback_tracking.items()}}
+
     def get_object_name_by_keypoint(self, keypoint_idx: int) -> Optional[str]:
         """
         Get the name of the object the keypoint is attached to.
@@ -207,6 +224,8 @@ class KeypointTracker:
         """Reset the tracker, clearing all registered keypoints."""
         self._keypoints = None
         self._keypoint_registry = {}
+        self._feedback_registry_generation += 1
+        self._feedback_tracking = {}
     
     def visualize_keypoints(self):
         """Print keypoint information (for debugging)."""
