@@ -13,7 +13,7 @@ project_target:
   required_formal_successes: 5
   achieved: false
 study:
-  status: PREPARING_GPU3_OBSERVED_C0_Q0_DEVELOPMENT
+  status: PREPARING_FINAL_SOURCE_OBSERVED_PAIRS_GPU3
   mode: real
   interaction: auto
   automatic_continuation: true
@@ -34,7 +34,7 @@ candidate:
     exceeding the frozen30attempt cap. No retry or rename can repair this cohort.
 budget:
   max_gpu_hours: 48.0
-  gpu_hours_consumed: 1.918701980682917
+  gpu_hours_consumed: 2.0923382505737504
   max_episode_attempts: 240
   reserved:
     baseline: 20
@@ -42,12 +42,12 @@ budget:
     validation: 60
     formal: 40
     recovery: 20
-  dispatched: 17
+  dispatched: 19
   aborted: 10
-  valid: 3
-  running: 0
+  valid: 4
+  running: 1
   invalid: 4
-  completed: 7
+  completed: 8
   gpu_hour_reservations:
     validation: 14.0
     formal: 10.0
@@ -89,7 +89,7 @@ derived_indexes:
 authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
   ledger is append-only event evidence, not a second mutable state.
 online_blockers: []
-updated_at: '2026-09-23T05:55:17.940993+00:00'
+updated_at: '2026-09-23T06:12:02.696837+00:00'
 seed_plan:
   path: data/frozen-seed-plan.json
   sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
@@ -143,21 +143,21 @@ stage_provider_ready: true
 runner:
   by_bucket:
     baseline: 1
-    development: 11
+    development: 13
     validation: 0
     formal: 0
     recovery: 5
-  reserved_attempts: 17
+  reserved_attempts: 19
   gpu_hours_by_bucket:
     baseline: 0.019651524036631195
-    development: 1.1620860368271286
+    development: 1.335722306717962
     validation: 0.0
     formal: 0.0
     recovery: 0.7369644198191572
   gpu_healthcheck_hours: 0.2602564145160282
   gpu_healthcheck_inflight: 0
-  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__freshboot_c0_t00_20260923__47a4507eacbe
-  last_event: valid
+  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__n1s_dev_t00_c0__80e82d381eb9
+  last_event: dispatched
 gpu_admission_last_observation:
   physical_gpu: 3
   physical_index: 3
@@ -972,7 +972,7 @@ continuation:
     summary_path: docs/03_evidence/qd_ed_final/continuation_20260923/freshboot-model-first/production-c0-result-summary.json
     summary_sha256: 90372e96bc360b44e71305e2f9bc884e55eaa411d90157d6945c45090151c32b
   decision_evidence_implementation:
-    status: INTEGRATED_CPU_REVIEWED
+    status: INTEGRATED_PROVIDER_IDENTITY_REVIEWED
     worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923
     commits:
     - 516cd92cddeb35e30ba568f92ae9ad5c86b2bb44
@@ -980,11 +980,12 @@ continuation:
     - 1ec9682290c2fe72f8ca7f50931015cd6119c522
     integrated_into_production: false
     gpu_validated: false
-    integrated_commit: 1be836b
+    integrated_commit: 1b3553d
     online_equivalence_proven: false
+    identity_fix_cpu_tests_passed: 36
   observed_pairs:
     arbor_node: '5.6'
-    status: PROTOCOL_ACCEPTED_PENDING_FREEZE
+    status: READY_FOR_FINAL_SOURCE_CPU_FREEZE
     protocol: docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/prospective-protocol.md
     tasks:
     - 0
@@ -997,4 +998,8 @@ continuation:
     observation_condition: decision_observed_v1
     budget_bucket: development
     automatic_retry: false
+    analysis_definition: docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft.md
+    analysis_source_commit: 0ea423a
+    provider_map_schema: qd-ed-provider-target-map-v2
+    preparation_gpu_dispatches: 0
 current_owned_workers: []
