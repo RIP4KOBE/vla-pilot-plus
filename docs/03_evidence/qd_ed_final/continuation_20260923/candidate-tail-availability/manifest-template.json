@@ -1,0 +1,11 @@
+{
+  "schema": "qd-ed-candidate-tail-input-v1",
+  "script_sha256": "<reviewed final check_candidates.py SHA256>",
+  "protocol_sha256": "981534d1e561dfe888b8cbeac92e4b14ba7fa3ecdaef04d498b7e1760d7f0ff5",
+  "plan": {"path": "<exact frozen plan.json>", "sha256": "ac123471db9fa9468661238982b3bdb5cb1a68010ec8261e0e5b12239c57e7e8"},
+  "authorization": {"path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/supplemental-identity-v3/authorization.json", "sha256": "6b6d42304f238ed2d88a1689a2ba6becf01761df67c57941b89dc1c26e0a47b6"},
+  "target_map": {"path": "<explicit supplemental-map-v3.json>", "sha256": "b7ccff3644c4adfa0b2ac3b0b695048f0da97660c46ea1a433491ad8305e49ae"},
+  "terminal": {"path": "<completed task0 attempt-result.json>", "sha256": "<sha256>"},
+  "audit": {"path": "<same complete attempt>/eds_eval/decision-evidence-audit.json", "sha256": "<sha256>"},
+  "supplemental_analysis": {"path": "<explicit authorized task0 supplemental selected-decision-analysis.json>", "sha256": "<sha256>"}
+}
