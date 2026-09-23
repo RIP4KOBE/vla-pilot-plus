@@ -488,6 +488,12 @@ def codex_stage_condition(runtime):
     require(mode in {'legacy_text', 'json_schema_v1'}, 'unknown frozen Stage output format')
     event_policy = frozen.get('event_policy', 'strict_v1')
     require(event_policy in {'strict_v1', 'completed_reconnect_v1'}, 'unknown frozen Stage event policy')
+    timeout = frozen.get('timeout_seconds', 90)
+    require(type(timeout) is int and timeout in {90, 180}, 'unknown frozen Stage timeout')
+    if timeout == 180:
+        require(mode == 'json_schema_v1' and event_policy == 'completed_reconnect_v1',
+                '180-second Stage timeout requires structured reconnect contract')
+        return 'codex_login_astra_low_json_reconnect_180s_v1'
     if event_policy == 'completed_reconnect_v1':
         require(mode == 'json_schema_v1', 'reconnect policy requires structured output')
         return 'codex_login_astra_low_json_reconnect_v1'
@@ -506,7 +512,7 @@ def stage_overrides(runtime):
     require(frozen.get('model') == 'gpt-6-astra' and frozen.get('auth_mode') == 'chatgpt',
             'Codex Stage model/auth differs from authorized contract')
     require(frozen.get('reasoning_effort') == 'low' and type(frozen.get('timeout_seconds')) is int
-            and frozen['timeout_seconds'] == 90, 'Codex Stage reasoning/timeout differs from frozen contract')
+            and frozen['timeout_seconds'] in {90, 180}, 'Codex Stage reasoning/timeout differs from frozen contract')
     require(isinstance(frozen.get('cli_path'), str) and Path(frozen['cli_path']).is_absolute(),
             'Codex CLI path must be absolute')
     require(str(Path(frozen['cli_path']).resolve()) == frozen['cli_path'], 'Codex CLI path must identify the resolved executable')

@@ -34,7 +34,7 @@ def events(answer=ANSWER, usage=None):
 
 
 def make(monkeypatch, tmp_path, event_list=None, returncode=0, timeout=False, raw=None,
-         output_format="legacy_text", event_policy="strict_v1"):
+         output_format="legacy_text", event_policy="strict_v1", timeout_seconds=90):
     calls = []
     cli = tmp_path / "codex"
     cli.touch()
@@ -70,7 +70,7 @@ def make(monkeypatch, tmp_path, event_list=None, returncode=0, timeout=False, ra
     recognizer = CodexStageRecognizer({
         "backend": "codex_cli", "model": "gpt-6-astra", "cli_path": str(cli),
         "stage_template_path": str(template), "disabled_skill_paths": ["/active/one"],
-        "timeout_seconds": 90,
+        "timeout_seconds": timeout_seconds,
         "output_format": output_format,
         "event_policy": event_policy,
     })
@@ -300,16 +300,33 @@ def test_nonzero_exit_keeps_usage_but_is_failed(monkeypatch, tmp_path):
     assert recognizer.last_result["raw_response"] == ANSWER
 
 
-def test_timeout_terminates_owned_process_and_accounts_partial_events(monkeypatch, tmp_path):
+@pytest.mark.parametrize('timeout_seconds', [90, 180])
+def test_timeout_terminates_owned_process_and_accounts_partial_events(monkeypatch, tmp_path, timeout_seconds):
     stopped = []
     monkeypatch.setattr(module, "_stop_owned_process", lambda process: stopped.append(process))
-    recognizer, calls = make(monkeypatch, tmp_path, timeout=True, event_list=events()[:2])
+    recognizer, calls = make(monkeypatch, tmp_path, timeout=True, event_list=events()[:2],
+        timeout_seconds=timeout_seconds, output_format='json_schema_v1', event_policy='completed_reconnect_v1')
     assert identify(recognizer) == (1, True)
     assert stopped == calls
     assert recognizer.last_result["error"] == "codex_timeout"
     assert recognizer.last_result["codex_usage_complete_calls"] == 0
     assert recognizer.last_result["codex_completed_turns"] == 0
+    assert len(calls) == recognizer.last_result['codex_logical_call_attempts'] == 1
+    assert calls[0].timeout == timeout_seconds
+    assert recognizer.last_result['transport']['process_timed_out'] is True
     assert not Path(calls[0].kwargs["cwd"]).exists()
+
+
+def test_180_second_call_uses_one_invocation_and_complete_usage(monkeypatch, tmp_path):
+    answer = json.dumps({'stage': 2, 'guidance': 'no', 'evidence': 'held'})
+    recognizer, calls = make(monkeypatch, tmp_path, event_list=events(answer=answer),
+        timeout_seconds=180, output_format='json_schema_v1', event_policy='completed_reconnect_v1')
+    assert identify(recognizer) == (2, False)
+    assert calls[0].timeout == 180
+    assert len(calls) == recognizer.last_result['codex_logical_call_attempts'] == 1
+    assert recognizer.last_result['codex_usage_complete_calls'] == 1
+    assert recognizer.last_result['transport']['timeout_seconds'] == 180
+    assert recognizer.last_result['transport']['process_timed_out'] is False
 
 
 def test_malformed_stream_does_not_drop_observed_prior_usage(monkeypatch, tmp_path):

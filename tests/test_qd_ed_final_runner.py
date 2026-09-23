@@ -592,6 +592,66 @@ def test_reconnect_policy_requires_frozen_hash_override_and_observed_binding(tmp
         runner.stage_overrides(runtime)
 
 
+def test_180_second_stage_requires_new_hash_and_observed_timeout_binding(tmp_path, monkeypatch):
+    episode, _, runtime, path, record = codex_compute_case(tmp_path, monkeypatch)
+    frozen = runtime['frozen_stage_provider']
+    frozen.update(output_format='json_schema_v1', event_policy='completed_reconnect_v1')
+    frozen['public_config_sha256'] = runner.codex_public_config_sha256(frozen)
+    old_hash = frozen['public_config_sha256']
+    frozen['timeout_seconds'] = 180
+    with pytest.raises(runner.GateError, match='fingerprint'):
+        runner.stage_overrides(runtime)
+    frozen['public_config_sha256'] = runner.codex_public_config_sha256(frozen)
+    assert frozen['public_config_sha256'] != old_hash
+    assert runner.codex_stage_condition(runtime) == 'codex_login_astra_low_json_reconnect_180s_v1'
+    assert runner.stage_overrides(runtime)['perception.gemini.timeout_seconds'] == 180
+    config_path = tmp_path / '.hydra/config.yaml'
+    config = yaml.safe_load(config_path.read_text())
+    config['perception']['gemini']['timeout_seconds'] = 180
+    config_path.write_text(yaml.safe_dump(config))
+    record['stage_transport'].update(public_config_sha256=frozen['public_config_sha256'],
+        output_format='json_schema_v1', event_policy='completed_reconnect_v1',
+        output_schema_sha256=runner.codex_public_config(frozen)['output_schema_sha256'])
+    path.write_text(json.dumps(record) + '\n')
+    with pytest.raises(runner.GateError, match='observed Stage transport'):
+        runner.episode_compute(tmp_path, episode, runtime)
+    record['stage_transport']['timeout_seconds'] = 180
+    path.write_text(json.dumps(record) + '\n')
+    assert runner.episode_compute(tmp_path, episode, runtime)['stage_condition'] == 'codex_login_astra_low_json_reconnect_180s_v1'
+
+
+@pytest.mark.parametrize('mode,policy,timeout', [
+    ('legacy_text', 'strict_v1', 180), ('json_schema_v1', 'strict_v1', 180),
+    ('json_schema_v1', 'completed_reconnect_v1', 120),
+    ('json_schema_v1', 'completed_reconnect_v1', 180.0),
+    ('json_schema_v1', 'completed_reconnect_v1', True),
+])
+def test_stage_timeout_does_not_allow_unregistered_conditions(tmp_path, mode, policy, timeout):
+    runtime = codex_runtime(tmp_path)
+    runtime['frozen_stage_provider'].update(output_format=mode, event_policy=policy, timeout_seconds=timeout)
+    with pytest.raises(runner.GateError, match='timeout'):
+        runner.stage_overrides(runtime)
+
+
+@pytest.mark.parametrize('profile', ['C0', 'Q0', 'N1'])
+def test_180_second_binding_is_common_to_all_three_profiles(tmp_path, profile):
+    runtime = codex_runtime(tmp_path)
+    frozen = runtime['frozen_stage_provider']
+    frozen.update(timeout_seconds=180, output_format='json_schema_v1', event_policy='completed_reconnect_v1')
+    frozen['public_config_sha256'] = runner.codex_public_config_sha256(frozen)
+    runtime.update(tasks={'8': {'cache_dir': str(tmp_path / 'artifacts/cache8')}},
+                   main_overrides=['+main.require_task_cache_identity=true'])
+    profiles = {'profiles': {profile: {'static_override_values': {'backend': 'libero'}, 'historical_label': profile}}}
+    plan = {'artifact_root': str(tmp_path / 'artifacts'), 'worktree': str(tmp_path)}
+    episode = row(); episode['profile'] = profile
+    command, _ = runner.build_command(plan, profiles, runtime, episode, 'fixture')
+    assert 'perception.gemini.timeout_seconds=180' in command
+    assert 'perception.gemini.event_policy=completed_reconnect_v1' in command
+    profiles['profiles'][profile]['static_override_values']['perception.gemini.timeout_seconds'] = 90
+    with pytest.raises(runner.GateError, match='static/runtime'):
+        runner.build_command(plan, profiles, runtime, episode, 'fixture')
+
+
 def test_codex_provider_requires_managed_login_frozen_binary_and_installed_skill_set(tmp_path):
     runtime = codex_runtime(tmp_path)
     (tmp_path / 'configs').mkdir()
