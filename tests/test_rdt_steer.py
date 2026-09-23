@@ -9690,3 +9690,149 @@ def test_select_particle_keeps_first_when_single_particle(stub_steer, stub_adapt
     )
 
     torch.testing.assert_close(selected, samples)
+
+
+@pytest.mark.parametrize(("method_name", "pretest", "terminal"), [
+    ("C0", True, True), ("Q0", False, False),
+])
+def test_decision_evidence_audit_accepts_actual_main_policy_adapter_cpu_path(
+    stub_steer, mock_batch, tmp_path, method_name, pretest, terminal,
+):
+    """Production methods generate every event; only native/model dependencies are stubs."""
+    import ast
+    import __future__
+    import importlib.util
+    import logging
+    import os
+    import time
+    from types import SimpleNamespace
+    from omegaconf import DictConfig, ListConfig, OmegaConf
+    from core.eds_eval_metrics import append_jsonl
+    from core.eds_mechanism_trace import build_run_id, save_mechanism_trace
+
+    root = Path(__file__).resolve().parents[1]
+    # AST-loading excludes main's import-time .env/native setup, retaining unedited
+    # Main.run/_run_episode, evidence lifecycle, compute writer and scalar helpers.
+    source = ast.parse((root / "main.py").read_text())
+    nodes = [n for n in source.body if (
+        isinstance(n, ast.FunctionDef) and n.name != "main"
+    ) or (isinstance(n, ast.ClassDef) and n.name == "Main") or (
+        isinstance(n, ast.Assign) and all(isinstance(t, ast.Name) and t.id.startswith("_")
+                                         and t.id.upper() == t.id for t in n.targets)
+    )]
+    namespace = {"np": np, "torch": torch, "Path": Path, "os": os, "time": time,
+        "inspect": inspect, "json": json, "OmegaConf": OmegaConf,
+        "DictConfig": DictConfig, "ListConfig": ListConfig,
+        "append_jsonl": append_jsonl, "build_run_id": build_run_id,
+        "save_mechanism_trace": save_mechanism_trace,
+        "add_text_to_image": lambda image, text: image,
+        "log": logging.getLogger("decision-evidence-cpu-integration")}
+    exec(compile(ast.Module(body=nodes, type_ignores=[]), str(root / "main.py"), "exec",
+                 flags=__future__.annotations.compiler_flag), namespace)
+    Main = namespace["Main"]
+
+    adapter_tree = ast.parse((root / "core/env_adapters/libero_adapter.py").read_text())
+    def production_method(class_name, name):
+        cls = next(n for n in adapter_tree.body if isinstance(n, ast.ClassDef) and n.name == class_name)
+        node = next(n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name == name)
+        scope = {"np": np, "torch": torch}
+        exec(compile(ast.Module(body=[node], type_ignores=[]), "libero_adapter.py", "exec",
+                     flags=__future__.annotations.compiler_flag), scope)
+        return scope[name]
+
+    position = np.array([.125, .25, .5], dtype=np.float64)
+    native_calls = []
+    class Native:
+        def step(self, action):
+            native_calls.append("step")
+            position[:] += action[:3] * .01
+            return {"robot0_eef_pos": position}, float(terminal), terminal, {}
+        def check_success(self):
+            native_calls.append("check_success")
+            return terminal
+    class Inner:
+        step = production_method("LiberoEnv", "step")
+        task = "stub task"
+        task_id = 0
+        _max_episode_steps = 2
+        _env = Native()
+        _format_raw_obs = staticmethod(lambda raw: raw)
+        def reset(self):
+            native_calls.append("terminal_reset")
+            position[:] = 999  # The observer must retain the terminal, pre-reset EEF.
+    class Adapter(_LiberoAdapter):
+        delta_actions_to_ee_trajectory = production_method("LiberoAdapter", "delta_actions_to_ee_trajectory")
+        step = production_method("LiberoAdapter", "step")
+        _env = [Inner()]
+        current_task_idx = 0
+        episode_step = 0
+        vlm_camera = "agentview"
+        suite_name = "cpu_only"
+        env_postprocessor = staticmethod(lambda transition: transition)
+        get_task_description = staticmethod(lambda: "stub task")
+        get_task_info = staticmethod(lambda: {"task_id": 0})
+        get_vlm_image = staticmethod(lambda: np.zeros((8, 8, 3), dtype=np.uint8))
+        get_ee_pose_world = staticmethod(lambda: SimpleNamespace(position=position))
+        def reset(self, **kwargs):
+            native_calls.append("episode_reset")
+    adapter = Adapter()
+    stub_steer.post_init(adapter=adapter, postprocessor=lambda action: action,
+                        sample_batch_size=16, policy_config={"action_chunk_horizon": 8})
+    config = _valid_qd_config(qd_archive_mode="none" if method_name == "C0" else "grid_archive")
+    runner = Main.__new__(Main)
+    runner.policy, runner.policy_type, runner.adapter = stub_steer, "rdt", adapter
+    runner.backend, runner.output_dir = "libero", str(tmp_path)
+    runner.current_guide_scale = 1.
+    runner.config = OmegaConf.create({
+        "episode_num": 1, "episode_seed_schedule": [7],
+        "use_guidance": True, "guidance_type": "eds", "eds_config": config,
+        "execution_horizon_mode": "fixed", "decision_evidence": {"enabled": True},
+        "eds_eval": {"enabled": True, "write_metrics": True,
+                     "save_qualitative": False, "output_dir": str(tmp_path)},
+        "eds_mechanism_pretest": {"enabled": pretest, "first_chunk_only": True,
+            "save_single_step": True, "save_full_process": True,
+            "save_tensors": True, "plot_3d": False, "max_full_process_iters": 10},
+    })
+    runner._get_policy_observation = lambda: mock_batch
+    runner._append_episode_metadata = lambda **kwargs: None
+    runner._enable_phase_diagnostics = lambda: None
+    runner._enable_render_phase_diagnostics = lambda: None
+    runner._close_render_phase_diagnostics = lambda: None
+    runner._update_stage = lambda state, *args: state
+    runner.perform_task_for_episode = lambda episode_dir: None
+    runner.keypoint_tracker = SimpleNamespace(
+        get_keypoint_positions=lambda: np.array([[.2, .3, .5]], dtype=np.float64),
+        get_mask_ids=lambda: np.array([0]))
+    def provider(keypoints, trajectories):
+        return -((trajectories[:, -1, :3] - keypoints[0]) ** 2).sum()
+    runner.guidance_fns = {1: [provider]}
+    runner.video_recorder = SimpleNamespace(clear=lambda: None,
+        add_frame=lambda *args: None, save_video=lambda **kwargs: None)
+    torch.manual_seed(934)
+    runner.run()
+
+    spec = importlib.util.spec_from_file_location("actual_path_evidence_audit", root / "scripts/audit_decision_evidence.py")
+    audit = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(audit)
+    episode_dir = tmp_path / "decision_evidence" / "episode_000"
+    report = audit.audit_episode(episode_dir, tmp_path / "episode_compute.jsonl")
+    assert report["accepted"], report
+    assert report["original_execution_outcome"] == "completed"
+    assert report["observed_scoring_roles"]["canonical_initial"] == 1
+    assert report["observed_scoring_roles"]["canonical_offspring"] == 10
+    assert (report["observed_scoring_roles"].get("auxiliary_pretest", 0) > 0) == pretest
+    if method_name == "Q0":
+        assert report["observed_counts"]["archive_parent_allocation"] == 10
+    else:
+        assert "archive_parent_allocation" not in report["observed_counts"]
+    assert report["observed_counts"]["pre_reset_outcome"] == (1 if terminal else 2)
+    assert native_calls.count("step") == (1 if terminal else 2)
+    assert native_calls.count("terminal_reset") == int(terminal)
+    assert runner.success_count == int(terminal)
+    assert all(row["points_including_t0"] == 9 for row in report["projection_dtypes"])
+    if terminal:
+        persisted = []
+        for path in sorted(episode_dir.glob("bundle_*.pt")):
+            persisted.extend(torch.load(path, weights_only=True)["events"])
+        outcome = next(r for r in persisted if r["event"] == "pre_reset_outcome")
+        assert (outcome["values"]["observation"]["robot0_eef_pos"] < 999).all()
