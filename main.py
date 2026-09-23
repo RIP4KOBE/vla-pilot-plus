@@ -1054,6 +1054,31 @@ class Main:
         except Exception as e:
             log.warning(f"Failed to append episode metadata to {metadata_path}: {e}")
 
+    def _enable_decision_evidence(self, episode):
+        from core.decision_evidence import DecisionEvidence
+        if self.policy_type != "rdt" or (self.config.get("use_guidance", True)
+                and self.config.get("guidance_type", "vls") != "eds"):
+            raise ValueError("decision evidence currently supports RDT EDS or unguided RDT")
+        config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
+        evidence = DecisionEvidence(
+            Path(config.get("output_dir") or self.output_dir) / "decision_evidence",
+            episode=episode,
+        )
+        self._decision_evidence = evidence
+        self.policy._decision_evidence = evidence
+        self.adapter._decision_evidence = evidence
+        return evidence
+
+    def _close_decision_evidence(self):
+        evidence = getattr(self, "_decision_evidence", None)
+        if evidence is not None:
+            evidence.close()
+            self.policy._decision_evidence = None
+            self.adapter._decision_evidence = None
+            for env in getattr(self.adapter, "_env", ()):
+                if getattr(env, "_decision_evidence", None) is evidence:
+                    env._decision_evidence = None
+
     def _enable_phase_diagnostics(self):
         """Use existing stderr for native-fault Python stacks, without locals."""
         try:
@@ -1244,6 +1269,9 @@ class Main:
                 "HTTP send attempts including SDK and caller retries; separate retry counter classifies SDK retries only"
             ),
         }
+        evidence = getattr(self, "_decision_evidence", None)
+        if evidence is not None:
+            record["decision_evidence"] = evidence.status()
         eds_eval_config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
         path = Path(eds_eval_config.get("output_dir") or self.output_dir) / "episode_compute.jsonl"
         try:
@@ -1419,6 +1447,8 @@ class Main:
                 episode_index=episode,
                 sampled_seed=sampled_seed,
             )
+            if getattr(self, "_decision_evidence", None) is not None:
+                self._decision_evidence = None
             self.policy.reset()
             self._begin_episode_compute()
             self.video_recorder.clear()
@@ -1484,6 +1514,8 @@ class Main:
                 self._append_episode_compute(episode=episode, episode_seed=episode_seed, outcome="execution_error")
                 continue
             finally:
+                if getattr(self, "_decision_evidence", None) is not None:
+                    self._close_decision_evidence()
                 self._close_render_phase_diagnostics()
             self._append_episode_compute(episode=episode, episode_seed=episode_seed, outcome="completed")
 
@@ -1525,6 +1557,10 @@ class Main:
 
     def _run_episode(self, episode: int, episode_dir: str, episode_seed: int):
         """Run a single episode with the current configuration."""
+        evidence = None
+        evidence_config = self.config.get("decision_evidence", {}) or {}
+        if evidence_config.get("enabled", False):
+            evidence = self._enable_decision_evidence(episode)
         set_episode_context = getattr(self.policy, "set_eds_episode_context", None)
         if callable(set_episode_context):
             set_episode_context(int(episode), int(episode_seed))
@@ -1738,6 +1774,10 @@ class Main:
             self._append_phase_timing(episode=episode, global_step=global_steps,
                 name="select_action_fresh" if generate_new_chunk else "select_action_cached", event="enter", elapsed_s=0.0)
             select_action_start_s = time.perf_counter()
+            if evidence is not None and generate_new_chunk:
+                evidence.begin_decision(global_step=global_steps, stage=current_stage,
+                                        use_guidance=use_guidance, keypoints=keypoints,
+                                        providers=current_guidance_fns)
             action_chunk = self.policy.select_action(**select_kwargs)
             select_action_latency_s = float(time.perf_counter() - select_action_start_s)
             self._append_phase_timing(episode=episode, global_step=global_steps,
@@ -1815,6 +1855,9 @@ class Main:
                         )
                     )
 
+            if evidence is not None and generate_new_chunk:
+                evidence.commit_decision(action_chunk=action_chunk,
+                                         execution_horizon=resolved_action_horizon)
             if generate_new_chunk:
                 self._append_phase_timing(episode=episode, global_step=global_steps,
                     name="diagnostic_artifacts", event="enter", elapsed_s=0.0)
@@ -2020,7 +2063,12 @@ class Main:
             self._append_phase_timing(episode=episode, global_step=global_steps,
                 name="adapter_step", event="enter", elapsed_s=0.0)
             phase_started_s = time.perf_counter()
+            if evidence is not None:
+                evidence.dispatch(global_step=global_steps, execution_index=action_executed + 1)
             obs, reward, terminated, truncated, info = self.adapter.step(action_chunk[0][action_executed])
+            if evidence is not None:
+                evidence.step_returned(terminated=terminated, truncated=truncated,
+                                       success=info.get("success", False))
             self._append_phase_timing(episode=episode, global_step=global_steps,
                 name="adapter_step", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
             previous_executed_action = action_chunk[0][action_executed]
@@ -2067,6 +2115,8 @@ class Main:
                 self.video_recorder.save_video(save_path=video_path, success=is_success, behavior_name=behavior_name)
                 break
 
+        if evidence is not None:
+            evidence.finish()
         log.info(f"Episode {episode+1} finished, success: {info.get('success', False)}, steps: {global_steps}")
 
     def _plot_behavior_stats(self):

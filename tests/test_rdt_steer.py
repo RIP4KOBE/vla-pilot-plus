@@ -6302,10 +6302,13 @@ def test_eds_legacy_parent_loop_preserves_seeded_final_population(
     torch.testing.assert_close(selected, expected_selected)
 
 
+@pytest.mark.parametrize("decision_evidence", [False, True])
 def test_qd_loop_bypasses_legacy_selector_preserves_archive_and_selects_global_best(
     stub_steer,
     stub_adapter,
     monkeypatch,
+    tmp_path,
+    decision_evidence,
 ):
     from core.qd_ed import fingerprint_action
 
@@ -6358,6 +6361,19 @@ def test_qd_loop_bypasses_legacy_selector_preserves_archive_and_selects_global_b
         _valid_qd_config()
     )
 
+    from core.decision_evidence import DecisionEvidence
+    evidence = DecisionEvidence(tmp_path, episode=0) if decision_evidence else None
+    stub_steer._decision_evidence = evidence
+    allocations = []
+    allocate = stub_steer._eds_qd_allocate_parent_slots
+    def observed_allocate(*args, **kwargs):
+        result = allocate(*args, **kwargs)
+        allocations.append(result)
+        return result
+    monkeypatch.setattr(stub_steer, "_eds_qd_allocate_parent_slots", observed_allocate)
+    if evidence:
+        evidence.begin_decision(global_step=24, stage=1, use_guidance=True,
+                                keypoints=torch.zeros(1, 3), providers=[])
     selected = stub_steer._eds_guided_denoise_loop(
         x_t=torch.zeros_like(initial),
         cond=cond,
@@ -6401,6 +6417,25 @@ def test_qd_loop_bypasses_legacy_selector_preserves_archive_and_selects_global_b
     assert metrics["qd_selected_reward"] == pytest.approx(1015.0)
     assert len(artifacts["qd_archive_by_iter"]) == 10
     assert artifacts["qd_bounds_xy_m"] == metrics["qd_bounds_xy_m"]
+
+    if evidence:
+        evidence.flush()
+        events = torch.load(next(evidence.root.glob("bundle_*.pt")), weights_only=True)["events"]
+        rows = [item["values"] for item in events if item["event"] == "archive_parent_allocation"]
+        pools = [item["values"] for item in events if item["event"] == "parent_allocation"]
+        assert len(rows) == len(pools) == len(allocations) == 10
+        for row, pool, actual in zip(rows, pools, allocations):
+            assert row["parent_fingerprints"] == list(actual.parent_fingerprints)
+            assert row["parent_lanes"] == list(actual.parent_lanes)
+            assert row["weights"] == {str(k): v for k, v in actual.weights.items()}
+            assert row["slot_counts"] == {str(k): v for k, v in actual.slot_counts.items()}
+            assert torch.equal(row["parent_cell_ids"], actual.parent_cell_ids)
+            assert torch.equal(row["parent_rewards"], actual.parent_rewards)
+            assert row["original_archive_occurrences"] is None
+            assert pool["original_archive_occurrences"] is None
+            assert pool["source_fingerprints"] == list(actual.parent_fingerprints)
+            assert "already allocated" in pool["source_identity_scope"]
+        assert not evidence.status()["complete"]
 
 
 @pytest.mark.parametrize(
@@ -8222,6 +8257,134 @@ def test_eds_loop_caches_visualization_candidates_best_first(
         torch.sort(saved["ed_population"][:, 0, 39]).values,
         torch.tensor([10.0, 20.0, 30.0]),
     )
+
+
+@pytest.mark.parametrize("pretest", [False, True])
+def test_decision_evidence_is_passive_for_real_stub_select_action(
+    stub_steer, stub_adapter, mock_batch, tmp_path, monkeypatch, pretest,
+):
+    from core.decision_evidence import DecisionEvidence
+    from core.qd_ed import fingerprint_action
+
+    stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
+                         sample_batch_size=3, policy_config={"action_chunk_horizon": 8})
+    calls = []
+    original_project = stub_adapter.delta_actions_to_ee_trajectory
+    def project(seq):
+        calls.append("project")
+        return original_project(seq)
+    monkeypatch.setattr(stub_adapter, "delta_actions_to_ee_trajectory", project)
+    original_dit = stub_steer._dit
+    def dit(*args, **kwargs):
+        calls.append("model")
+        return original_dit(*args, **kwargs)
+    # _dit can be a registered nn.Module, so wrap its forward when applicable.
+    if isinstance(original_dit, nn.Module):
+        original_forward = original_dit.forward
+        def forward(*args, **kwargs):
+            calls.append("model")
+            return original_forward(*args, **kwargs)
+        monkeypatch.setattr(original_dit, "forward", forward)
+    else:
+        monkeypatch.setattr(stub_steer, "_dit", dit)
+    def reward(keypoints, traj):
+        calls.append("provider")
+        return torch.sum(traj[:, -1, 0])
+    def run(enabled):
+        stub_steer.reset()
+        calls.clear()
+        rec = DecisionEvidence(tmp_path / str(enabled), episode=0) if enabled else None
+        stub_steer._decision_evidence = rec
+        if rec:
+            rec.begin_decision(global_step=0, stage=1, use_guidance=True,
+                               keypoints=torch.zeros(1, 3), providers=[reward])
+        torch.manual_seed(734)
+        action = stub_steer.select_action(mock_batch, generate_new_chunk=True,
+            use_guidance=True, guidance_type="eds",
+            eds_config={"population_size": 3, "cem_iters": 2, "temperature": .1,
+                        "qd_metrics_observer": True,
+                        "mechanism_pretest": {"enabled": pretest, "first_chunk_only": True,
+                            "save_single_step": True, "save_full_process": True,
+                            "save_tensors": True, "max_full_process_iters": 2}},
+            guidance_fns=[reward], keypoints=np.zeros((1, 3), dtype=np.float32))
+        counters = stub_steer.get_episode_compute_counters()
+        if rec:
+            rec.commit_decision(action_chunk=action, execution_horizon=8)
+            rec.finish()
+        return action.clone(), torch.random.get_rng_state().clone(), list(calls), counters, rec
+    before = run(False)
+    after = run(True)
+    assert torch.equal(before[0], after[0]) and torch.equal(before[1], after[1])
+    assert before[2] == after[2]
+    # Language caching is outside this observer; both model/scoring counters agree.
+    for key in ("model_forward_calls", "model_batch_rows", "denoising_invocations",
+                "model_denoising_steps", "reward_calls", "reward_evaluations", "reward_scoring_batches"):
+        assert before[3][key] == after[3][key]
+    records = []
+    for path in sorted(after[4].root.glob("bundle_*.pt")):
+        records.extend(torch.load(path, map_location="cpu", weights_only=True)["events"])
+    final = next(x["values"] for x in records if x["event"] == "final_selection")
+    decode = next(x["values"] for x in records if x["event"] == "policy_action_decode")
+    assert fingerprint_action(final["selected_latent"][0]) == fingerprint_action(decode["selected_latent"][0])
+    assert sum(x["event"] == "provider_return" for x in records) == after[3]["reward_calls"]
+    scored = {x["sequence"]: x["values"] for x in records if x["event"] == "scoring_inputs"}
+    assert [v["scoring_scope"]["iter_idx"] for v in scored.values()
+            if v["scoring_scope"]["role"] == "canonical_offspring"] == [0, 1]
+    assert sum(v["scoring_scope"]["role"].startswith("canonical_") for v in scored.values()) == 3
+    auxiliary = [v for v in scored.values() if v["scoring_scope"]["role"] == "auxiliary_pretest"]
+    assert bool(auxiliary) == pretest
+    assert all(v["scoring_scope"]["iter_idx"] == 0 for v in auxiliary)
+    for event in records:
+        if event["event"] in ("provider_return", "effective_quality"):
+            value = event["values"]
+            assert value["scoring_scope"] == scored[value["scoring_batch_id"]]["scoring_scope"]
+    batches = [x["values"] for x in records if x["event"] == "canonical_candidate_batch"]
+    assert [b["iter_idx"] for b in batches] == [-1, 0, 1]
+    assert all(b["canonical_fingerprints"] == [fingerprint_action(row) for row in b["candidates"]]
+               for b in batches)
+    assert len({oid for b in batches for oid in b["occurrence_ids"]}) == 9
+    assert len([x for x in records if x["event"] == "parent_allocation"]) == 2
+    assert all(x["values"]["projected_xyz"].shape[1] == 9
+               and x["values"]["provider_input_xyz"].shape[1] == 7
+               for x in records if x["event"] == "scoring_inputs")
+
+
+def test_decision_evidence_retains_raw_provider_dtype_and_actual_quality(
+    stub_steer, stub_adapter, tmp_path,
+):
+    from core.decision_evidence import DecisionEvidence
+    stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
+                         sample_batch_size=2, policy_config={"action_chunk_horizon": 8})
+    calls = []
+    def first(keypoints, trajectories):
+        calls.append("first")
+        return trajectories.double().sum() + 0.000123456789
+    def second(keypoints, trajectories):
+        calls.append("second")
+        return torch.tensor(.25, dtype=torch.float32)
+    sample = torch.zeros(2, 64, 128, dtype=torch.bfloat16)
+    sample[1, :8, 39] = 1
+    kwargs = {"keypoints": torch.zeros(1, 3), "guidance_fns": [first, second], "reward_mode": "normal"}
+    expected, _ = stub_steer._eds_score_population_as_cost(sample, **kwargs)
+    off_calls = list(calls); calls.clear()
+    rec = DecisionEvidence(tmp_path, episode=0)
+    rec.begin_decision(global_step=0, stage=1, use_guidance=True,
+                       keypoints=kwargs["keypoints"], providers=kwargs["guidance_fns"])
+    stub_steer._decision_evidence = rec
+    costs, _ = stub_steer._eds_score_population_as_cost(sample, **kwargs)
+    rec.flush()
+    assert torch.equal(costs, expected) and calls == off_calls == ["first", "second", "first", "second"]
+    records = torch.load(next(rec.root.glob("bundle_*.pt")), map_location="cpu", weights_only=True)["events"]
+    returns = [x["values"] for x in records if x["event"] == "provider_return"]
+    assert [x["result"].dtype for x in returns] == [torch.float64, torch.float32] * 2
+    assert [x["candidate_index"] for x in returns] == [0, 0, 1, 1]
+    assert [x["provider_ordinal"] for x in returns] == [0, 1, 0, 1]
+    # XY-nearest is candidate0, while the real provider prefers candidate1.
+    assert int(torch.argmin(costs)) == 1
+    quality = next(x["values"] for x in records if x["event"] == "effective_quality")
+    assert quality["quality"].dtype == torch.bfloat16
+    assert torch.equal(quality["quality"], -costs)
+    assert not rec.status()["complete"]  # Scoring alone is not a complete decision.
 
 
 def test_eds_loop_records_deployment_counters(stub_steer, stub_adapter, mock_batch):
