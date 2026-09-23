@@ -1,0 +1,27 @@
+{
+  "command": "CUDA_VISIBLE_DEVICES='' PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. /home/hynx/miniconda3/envs/vla-pilot/bin/python docs/03_evidence/qd_ed_final/continuation_20260923/candidate-tail-availability/test_candidates.py",
+  "coverage": [
+    "negative original quality tradeoff and exact ties; auxiliary excluded",
+    "original quality-preserving alternative without new tolerance",
+    "same fingerprint differing projection remains Unknown",
+    "nonnormal, target and command mismatches excluded",
+    "all eligible decisions retained independently of actual A/B witnesses"
+  ],
+  "created_utc": "2026-09-23T07:13:18.300628+00:00",
+  "files_sha256": {
+    "README.md": "4f46809794ce36c528090c2e0980624edfe46517df8c3cc151eab02b5498cfab",
+    "check_candidates.py": "4f43e92efecb30ef9f7c5a25913e9e0297b3d9d46e3cd3dc059404555b073b09",
+    "manifest-template.json": "c7b16984bf2c026fccd235a972c7ce5e133a36bd934000c9b492fce5f12e5788",
+    "protocol.md": "981534d1e561dfe888b8cbeac92e4b14ba7fa3ecdaef04d498b7e1760d7f0ff5",
+    "test_candidates.py": "ff670df21a35d541c57db947021dbb1e390368bdbdf8c06ef27a659e96c1e843"
+  },
+  "gpu_model_provider_projector_simulator_network_calls": false,
+  "input_kind": "synthetic disposable CPU fixture bundles only",
+  "real_bundle_authorization": "pending root review of final script digest",
+  "real_runtime_bundles_read": false,
+  "schema": "qd-ed-candidate-tail-cpu-validation-v1",
+  "status": "PASS",
+  "syntax_compile": "PASS without bytecode output",
+  "test_seconds": 0.083,
+  "tests": 5
+}
