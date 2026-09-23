@@ -1,0 +1,20 @@
+{
+  "schema": "n3-post-dev-cpu-validation-v1",
+  "test_count": 17,
+  "passed": 17,
+  "exit_code": 0,
+  "elapsed_seconds": 1.93,
+  "command": "CUDA_VISIBLE_DEVICES='' PYTHONDONTWRITEBYTECODE=1 /home/hynx/miniconda3/envs/vla-pilot/bin/python -m pytest -q -p no:cacheprovider docs/03_evidence/qd_ed_final/continuation_20260923/n3-post-dev-diagnostic-preparation/test_read_full_dev.py",
+  "stdout": ".................                                                        [100%]\n17 passed in 1.93s\n",
+  "reader_sha256": "54acac4ff3ca6414ff1b80f52de91fe3a43a3f326bc402e65514168f54c6f6b7",
+  "test_sha256": "e825eb4a918b003d319c889b53ac7d57ce528f0fee915707e2bbbb8674448a83",
+  "protocol_sha256": "8157d29e07df388ad8e5a28abce1a8ef825eb2ff1923ee13da55976f7937bca4",
+  "dependency_manifest_sha256": "f37989596a2ab1060d11798f6c14d0df66055c34d212a9b39377917365d0b5de",
+  "scope": "new wrapper/admission/lifecycle/native-tie synthetic cases only; prior scientific helper suites not repeated",
+  "actual_episode_payload_reads": 0,
+  "fresh_audit_calls": 0,
+  "GPU_work": false,
+  "actual_read_authorized": false,
+  "independent_review_status": "PASS: five additional wrapper-only synthetic checks; see independent-review-reference-v1.json",
+  "source_closure_change": "Required frozen converter SHA added; explicit missing-converter inventory rejection test passed. No reader/formula change."
+}

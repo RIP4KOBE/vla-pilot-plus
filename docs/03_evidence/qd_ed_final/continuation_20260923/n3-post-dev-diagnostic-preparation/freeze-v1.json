@@ -1,0 +1,61 @@
+{
+  "schema": "n3-post-dev-preparation-freeze-v1",
+  "status": "CPU_TESTED_INDEPENDENTLY_REVIEWED_BEFORE_ACTUAL_READ",
+  "source_commit": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+  "files": {
+    "read_full_dev.py": "54acac4ff3ca6414ff1b80f52de91fe3a43a3f326bc402e65514168f54c6f6b7",
+    "protocol-v1.md": "8157d29e07df388ad8e5a28abce1a8ef825eb2ff1923ee13da55976f7937bca4",
+    "dependencies-v1.json": "f37989596a2ab1060d11798f6c14d0df66055c34d212a9b39377917365d0b5de",
+    "input-schema-v1.json": "274d5992f59ca61e16f7fc887f97a3e3ab51a03b3db922bf6ce0c37c2689a7f6",
+    "test_read_full_dev.py": "e825eb4a918b003d319c889b53ac7d57ce528f0fee915707e2bbbb8674448a83",
+    "README.md": "2acd2f9b6958338aa027edbea5f78300049e24e9b5bb5af20de70dbb51813e96",
+    "cpu-validation-v1.json": "d097a1b4c6a52cf4545d6735e74b6df6f9bd0f8076396d68f28ec9096be5be9b",
+    "independent-review-reference-v1.json": "eed08b9484af9c8dbdc03d0f24f28507be7b0dbd55c47f9d3e4ee22c2007f6e5"
+  },
+  "runtime_modules": {
+    "task0": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/read_closed_loop.py",
+      "sha256": "1212c3c9675403dc0e8f3b97948ab8d6d9a5f873ccfa615564041da3fe5c309f"
+    },
+    "chronology": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/full-dev-closed-loop-preparation/read_full_dev.py",
+      "sha256": "b19331ff6861210056858d56da6dcbd2d6a24f06fc91e24dcc1beb0d4df18b3e"
+    },
+    "tracking": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/selected-tracking-preparation/read_selected_tracking.py",
+      "sha256": "a33714747a47415c8a8d64ba3297a016550e95b6f54a174a1654875603deec26"
+    },
+    "first3": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-first3-review-preparation/review_first3.py",
+      "sha256": "a2ee7ae750805d84810badc08333c7944f8cd4b895e0ce0d23dfb1d5a90ab9b0"
+    },
+    "report": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_n3_report.py",
+      "sha256": "62b9afbbe6d8909d6414cdc9423237f2815a5274e3f076cfc1b3226d9998a79a"
+    }
+  },
+  "reviewed_source_sha256": {
+    "main.py": "f9add8568d45ec799e4030b1108f069f4af88bf3b63c62d7f836d59539a427a7",
+    "core/rdt_policy_steer.py": "05d9afca7cea50ea943fd8a32f4cd888c6d37df353ec4f896c51f0c5e2e4a144",
+    "core/qd_ed.py": "5c86385a8271c3311aa715332d1307850b18ec37486f20ac53c19747fe4f207b",
+    "core/qd_executed_quality.py": "d83dbd53e75708f3a6e71cab9c0814dc82a42c68898d53cb370df37d9a8c946b",
+    "core/qd_executed_feedback.py": "33d1e38212741ccbf24e150c2b9739cc026ed553925ab7084d9e8b8d32e090ab",
+    "core/decision_evidence.py": "3af145738e3b22a8bec7484d0c33ba9a81dffbf58335b61682eb0ddf43b3cb8c",
+    "core/eds_eval_metrics.py": "574038725988ad258960af27d83a36ad81898e550888592d775c14b6df4754b2",
+    "core/keypoint_tracker.py": "c60b6f8badb420bf98ae8908cb20b3f51b1c41ffa5df9d3e214f8247f0a2aa66",
+    "core/env_adapters/libero_adapter.py": "f2130791c4c975603d8bab4fad4739374cbbba967df2fa2334ea881b6557d6bf",
+    "scripts/audit_decision_evidence.py": "dcfffa225b16f40cc00ac4bd21eae1d080cc113668dbeabc240d2ccda50fddd6",
+    "experiments/iteration_003_executed_feedback/protocol.md": "05c83a8eb3801d4a4c4f41bee28c531505a7767aa56ba482399013068679b931",
+    "scripts/qd_ed_n3_report.py": "62b9afbbe6d8909d6414cdc9423237f2815a5274e3f076cfc1b3226d9998a79a",
+    "scripts/qd_ed_n3_plan.py": "ca967ad486092f72b93cd169895b137efdba1411f6a62487a1d21b9e9c557bb1",
+    "core/rdt_libero_action_converter.py": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d"
+  },
+  "author_wrapper_tests": 17,
+  "independent_wrapper_tests": 5,
+  "actual_input_manifest_created": false,
+  "actual_read_authorized": false,
+  "actual_episode_payload_reads": 0,
+  "fresh_audit_calls": 0,
+  "required_later_authority": "Separate root authorization after complete30 accepted report and reviewed unchanged audit/status/index snapshots; root-confirmed existing Dev gate failure; exact metadata module SHAs and new output.",
+  "source_scope": "isolated E preparation artifacts only; no W/scientific source/plan/ledger modification"
+}

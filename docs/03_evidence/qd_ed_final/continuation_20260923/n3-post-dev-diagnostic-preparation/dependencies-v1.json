@@ -1,0 +1,80 @@
+{
+  "schema": "n3-post-dev-dependencies-v1",
+  "source_commit": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+  "python_version": "3.12.12",
+  "torch_version": "2.7.1+cu126",
+  "modules": {
+    "task0": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/read_closed_loop.py",
+      "sha256": "1212c3c9675403dc0e8f3b97948ab8d6d9a5f873ccfa615564041da3fe5c309f"
+    },
+    "chronology": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/full-dev-closed-loop-preparation/read_full_dev.py",
+      "sha256": "b19331ff6861210056858d56da6dcbd2d6a24f06fc91e24dcc1beb0d4df18b3e"
+    },
+    "tracking": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/selected-tracking-preparation/read_selected_tracking.py",
+      "sha256": "a33714747a47415c8a8d64ba3297a016550e95b6f54a174a1654875603deec26"
+    },
+    "first3": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-first3-review-preparation/review_first3.py",
+      "sha256": "a2ee7ae750805d84810badc08333c7944f8cd4b895e0ce0d23dfb1d5a90ab9b0"
+    },
+    "report": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_n3_report.py",
+      "sha256": "62b9afbbe6d8909d6414cdc9423237f2815a5274e3f076cfc1b3226d9998a79a"
+    }
+  },
+  "reviewed_source_sha256": {
+    "main.py": "f9add8568d45ec799e4030b1108f069f4af88bf3b63c62d7f836d59539a427a7",
+    "core/rdt_policy_steer.py": "05d9afca7cea50ea943fd8a32f4cd888c6d37df353ec4f896c51f0c5e2e4a144",
+    "core/qd_ed.py": "5c86385a8271c3311aa715332d1307850b18ec37486f20ac53c19747fe4f207b",
+    "core/qd_executed_quality.py": "d83dbd53e75708f3a6e71cab9c0814dc82a42c68898d53cb370df37d9a8c946b",
+    "core/qd_executed_feedback.py": "33d1e38212741ccbf24e150c2b9739cc026ed553925ab7084d9e8b8d32e090ab",
+    "core/decision_evidence.py": "3af145738e3b22a8bec7484d0c33ba9a81dffbf58335b61682eb0ddf43b3cb8c",
+    "core/eds_eval_metrics.py": "574038725988ad258960af27d83a36ad81898e550888592d775c14b6df4754b2",
+    "core/keypoint_tracker.py": "c60b6f8badb420bf98ae8908cb20b3f51b1c41ffa5df9d3e214f8247f0a2aa66",
+    "core/env_adapters/libero_adapter.py": "f2130791c4c975603d8bab4fad4739374cbbba967df2fa2334ea881b6557d6bf",
+    "scripts/audit_decision_evidence.py": "dcfffa225b16f40cc00ac4bd21eae1d080cc113668dbeabc240d2ccda50fddd6",
+    "experiments/iteration_003_executed_feedback/protocol.md": "05c83a8eb3801d4a4c4f41bee28c531505a7767aa56ba482399013068679b931",
+    "scripts/qd_ed_n3_report.py": "62b9afbbe6d8909d6414cdc9423237f2815a5274e3f076cfc1b3226d9998a79a",
+    "scripts/qd_ed_n3_plan.py": "ca967ad486092f72b93cd169895b137efdba1411f6a62487a1d21b9e9c557bb1",
+    "core/rdt_libero_action_converter.py": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d"
+  },
+  "called_functions": {
+    "task0": [
+      "one",
+      "actual_steps",
+      "provider_signature",
+      "motion_summary"
+    ],
+    "chronology": [
+      "chronology",
+      "motion",
+      "joined_stage"
+    ],
+    "tracking": [
+      "pruned",
+      "describe",
+      "temporal_pair"
+    ],
+    "first3": [
+      "analyze_active"
+    ],
+    "report": [
+      "validate_record_identity"
+    ]
+  },
+  "closure": "Imported modules use stdlib and Torch. No module CLI/run/admit/dependencies function is called. report.validate_record_identity has no local imports or file reads. No auditor is imported or invoked.",
+  "actual_inputs": "late-bound only by separate root authorization; none supplied here",
+  "test_sources": {
+    "selected_tracking_fixture": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/selected-tracking-preparation/test_selected_tracking.py",
+      "sha256": "17840cc96b4480ffce8075f1f227439db648f6a512b1ed06f9e67780acdbed25"
+    },
+    "first3_fixture": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-first3-review-preparation/test_review_first3.py",
+      "sha256": "d78290399bbfa6b4b5e1efa56726a65082a69695926bc56e32f6ba2c8f937a4f"
+    }
+  }
+}

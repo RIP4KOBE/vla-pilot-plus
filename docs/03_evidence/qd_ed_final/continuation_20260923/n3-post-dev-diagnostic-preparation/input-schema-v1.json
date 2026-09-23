@@ -1,0 +1,39 @@
+{
+  "document_role": "Structural preparation only, not an actual input manifest or authorization",
+  "reference": {"path": "absolute canonical file under owned artifact root", "sha256": "64 lowercase hex digits"},
+  "manifest": {
+    "schema": "n3-post-dev-input-v1",
+    "matrix_report": "reference to root-reviewed complete original N3 matrix report",
+    "matrix_report_input": "reference exactly bound in that report",
+    "cells": "exactly30 unique accepted representatives, any order; each entry below"
+  },
+  "cell": {
+    "attempt_id": "exact accepted representative ID from matrix",
+    "metadata": "reference to eds_eval/episode_metadata.jsonl",
+    "status": "reference to episode_000/status.json",
+    "index": "reference to episode_000/events.jsonl",
+    "stage_events": "one of present {status:present,reference:ref} or absent {status:not_recorded,path:canonical expected path}"
+  },
+  "later_root_authorization": {
+    "schema": "n3-post-dev-read-authorization-v1",
+    "status": "authorized",
+    "trigger": "root_confirmed_existing_dev_gate_failed",
+    "completed_cohort_reviewed": true,
+    "freeze": "reference to separately reviewed freeze-v1.json",
+    "manifest": "reference to later exact input manifest",
+    "reviewed_matrix_report": "same reference as manifest.matrix_report",
+    "reviewed_metadata_sources": "object with exact report and plan relative paths and reviewed SHA values",
+    "output": "new canonical directory under continuation_20260923/n3-post-dev-analysis",
+    "completed_audit_snapshots": "exactly30 entries; fields below"
+  },
+  "completed_audit_snapshot": {
+    "attempt_id": "accepted representative ID",
+    "audit": "original accepted complete audit reference from matrix",
+    "status": "same reference as manifest cell.status",
+    "index": "same reference as manifest cell.index",
+    "auditor_sha256": "frozen N3 source inventory scripts/audit_decision_evidence.py SHA",
+    "binding": "root_verified_unchanged_after_complete_frozen_audit"
+  },
+  "actual_references_supplied": false,
+  "actual_read_authorized": false
+}
