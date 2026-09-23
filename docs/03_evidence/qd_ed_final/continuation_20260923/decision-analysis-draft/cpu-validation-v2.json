@@ -1,0 +1,20 @@
+{
+  "actual_map_load": "2 entries and 3 file hashes verified",
+  "cuda_initialized": false,
+  "files_sha256": {
+    "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft.md": "ae8d8ea8b209edc00f2d3f869eb881626d35603ef3cc1967539594958d33c1ea",
+    "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/README.md": "84a4dbfceaa5afa8dcb6cd4bac0c23e2fbdec1801df6fae28b0c69aced82a170",
+    "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/analyze_episode.py": "26fb0952507b41694cb7b6d56991caef5afbb5b71aa0f13f4356cb731676e0b1",
+    "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/provider-target-review/README.md": "b253adfbb67f5128c2c2d59f74f0e7e0b5448416df9d1e2d3488b22c6e10d847",
+    "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/provider-target-review/static-output/provider-target-map-v2.json": "26fe347f9f343723943927b5bed84339f59fa284252698594dcb207f8cfc0585",
+    "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/provider-target-review/static-output/review.json": "e3ab0144c64069d5ce5b6bea2ea8c208195442312e4a4893ee58a7369cc77ed6",
+    "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/provider-target-review/static_review.py": "5184b804429ceeac6b7153a68c1a5bb1e71ace0eb0a8ecb066e3b05be3cf67c0",
+    "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/test_analysis.py": "a33c7c762b22e7f3ae88b598fb8ddbe7ac1c54c460dc4d47a15c19d525103551"
+  },
+  "identity_correction": "shared wrapper SHA is descriptive; original code+loader text+path required",
+  "provider_function_executions": 0,
+  "runtime_episodes_read": 0,
+  "schema": "qd-ed-cpu-analysis-implementation-check-v2",
+  "scientific_hypotheses_diagnostics_thresholds": "unchanged",
+  "test_result": "15 passed in 1.42s"
+}

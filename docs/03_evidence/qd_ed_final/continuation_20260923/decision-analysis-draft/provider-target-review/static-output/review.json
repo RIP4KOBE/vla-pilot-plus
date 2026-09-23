@@ -1,0 +1,82 @@
+{
+  "compile_dont_inherit": true,
+  "compile_flags": 0,
+  "compile_optimize": 0,
+  "generator_sha256": "5184b804429ceeac6b7153a68c1a5bb1e71ace0eb0a8ecb066e3b05be3cf67c0",
+  "marshal_version": 4,
+  "optimize": 0,
+  "provider_function_executions": 0,
+  "python": "3.12.12 | packaged by conda-forge | (main, Oct 22 2025, 23:25:55) [GCC 14.3.0]",
+  "reviewed_file_sha256": {
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/utils/guidance_utils.py": "b0fe9d6d5fc014143f5877918de9bd0986b1688b4a6a90980847b7d15cab0c82",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_0/metadata.json": "a5b9c0d1ba05811c76990cc4864be2ddc7aec56f0e69ad7fdcb713f19538bec3",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_0/stage1_guidance.txt": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_0/stage2_guidance.txt": "ca058cc1dcf87ce5910181800bb2f65b8cd4d92788b27f3b10b1e33dbc103f84",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_5/metadata.json": "47ff47fd3014874585345bd8cc93a2f8fb3096a9f30631d4959238c56a3838e5",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_5/stage1_guidance.txt": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_5/stage2_guidance.txt": "ca058cc1dcf87ce5910181800bb2f65b8cd4d92788b27f3b10b1e33dbc103f84"
+  },
+  "reviews": [
+    {
+      "keypoint_metadata_label": "alphabet_soup_1_main",
+      "objective": "negative normalized positive-weight squared EEF distance over provider input",
+      "original_code_sha256": "64bfc5d573100a463facb1849937b4fbd895070028584e2f0d8d3d3aa21dcfe6",
+      "original_function_name": "stage1_guidance",
+      "runtime_identity_status": "NOT_OBSERVED; pending exact original-code/text/path match",
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_0/stage1_guidance.txt",
+      "source_sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+      "source_text_sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+      "stage": 1,
+      "static_compile_filename": "<string>",
+      "target_kind": "fixed_keypoint_0",
+      "task_id": 0
+    },
+    {
+      "keypoint_metadata_label": null,
+      "objective": "constant 0 on trajectory device; no keypoint read",
+      "original_code_sha256": "83ea6176054c2c82bbd3f94f1f3eb2c91a1169357f7eed6672b148868aff9a40",
+      "original_function_name": "stage2_guidance",
+      "runtime_identity_status": "NOT_OBSERVED; pending exact original-code/text/path match",
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_0/stage2_guidance.txt",
+      "source_sha256": "ca058cc1dcf87ce5910181800bb2f65b8cd4d92788b27f3b10b1e33dbc103f84",
+      "source_text_sha256": "ca058cc1dcf87ce5910181800bb2f65b8cd4d92788b27f3b10b1e33dbc103f84",
+      "stage": 2,
+      "static_compile_filename": "<string>",
+      "target_kind": "none_constant_reward",
+      "task_id": 0
+    },
+    {
+      "keypoint_metadata_label": "tomato_sauce_1_main",
+      "objective": "negative normalized positive-weight squared EEF distance over provider input",
+      "original_code_sha256": "64bfc5d573100a463facb1849937b4fbd895070028584e2f0d8d3d3aa21dcfe6",
+      "original_function_name": "stage1_guidance",
+      "runtime_identity_status": "NOT_OBSERVED; pending exact original-code/text/path match",
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_5/stage1_guidance.txt",
+      "source_sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+      "source_text_sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+      "stage": 1,
+      "static_compile_filename": "<string>",
+      "target_kind": "fixed_keypoint_0",
+      "task_id": 5
+    },
+    {
+      "keypoint_metadata_label": null,
+      "objective": "constant 0 on trajectory device; no keypoint read",
+      "original_code_sha256": "83ea6176054c2c82bbd3f94f1f3eb2c91a1169357f7eed6672b148868aff9a40",
+      "original_function_name": "stage2_guidance",
+      "runtime_identity_status": "NOT_OBSERVED; pending exact original-code/text/path match",
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_5/stage2_guidance.txt",
+      "source_sha256": "ca058cc1dcf87ce5910181800bb2f65b8cd4d92788b27f3b10b1e33dbc103f84",
+      "source_text_sha256": "ca058cc1dcf87ce5910181800bb2f65b8cd4d92788b27f3b10b1e33dbc103f84",
+      "stage": 2,
+      "static_compile_filename": "<string>",
+      "target_kind": "none_constant_reward",
+      "task_id": 5
+    }
+  ],
+  "runtime_episodes_read": 0,
+  "schema": "qd-ed-static-provider-source-review-v1",
+  "torch_imported": false,
+  "wrapper_code_sha256_static_candidate": "9aa73259855323be75b05aafc50220f7a98fcff156329ac17c60378a6d25d8eb",
+  "wrapper_limitation": "same wrapper bytecode for every captured original function; insufficient target identity"
+}

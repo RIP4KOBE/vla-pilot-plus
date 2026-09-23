@@ -95,11 +95,12 @@ def test_bfloat16_precision_is_not_falsely_promoted_to_float64():
 
 
 def test_target_requires_reviewed_nonzero_index_and_exact_scoring_keypoints():
-    code = 'a' * 64
-    context = {'providers': [{'code_sha256': code}],
+    identity = {'code_sha256': 'a' * 64, 'original_code_sha256': 'b' * 64,
+                'source_text_sha256': 'c' * 64, 'source_path': '/synthetic/provider.txt'}
+    context = {'providers': [identity],
                'keypoints': torch.tensor([[50., 50., 50.], [1., 2., 3.]], dtype=torch.float64)}
     projected = {'keypoints': context['keypoints'].to(torch.bfloat16)}
-    mapping = {code: {'keypoint_index': 1, 'target_expression': 'keypoints[1]'}}
+    mapping = {a.provider_identity(identity): {'keypoint_index': 1, 'target_expression': 'keypoints[1]'}}
     assert a.resolve_target(context, projected, {})[0] is None
     assert a.resolve_target(context, projected, mapping)[0] == [1., 2., 3.]
     assert a.resolve_target(context, {'keypoints': projected['keypoints'].flip(0)}, mapping)[0] is None
@@ -110,14 +111,14 @@ def test_target_requires_reviewed_nonzero_index_and_exact_scoring_keypoints():
 def test_target_map_source_hash_and_review_are_required(tmp_path):
     source = tmp_path / 'synthetic_provider_source.py'
     source.write_text('def synthetic_provider(keypoints, trajectory):\n    return keypoints[1]\n')
-    entry = {'provider_code_sha256': 'a' * 64, 'keypoint_index': 1,
+    entry = {'original_code_sha256': 'a' * 64, 'source_text_sha256': a.digest(source), 'keypoint_index': 1,
              'source_path': str(source), 'source_sha256': a.digest(source),
              'target_expression': 'keypoints[1]', 'reviewed_against_frozen_provider_source': True,
-             'target_selection': 'fixed_keypoint_index'}
+             'target_selection': 'fixed_keypoint_index', 'source_text_transform': 'identity'}
     path = tmp_path / 'synthetic-target-map.json'
-    path.write_text(json.dumps({'schema': 'qd-ed-provider-target-map-v1', 'entries': [entry]}))
+    path.write_text(json.dumps({'schema': 'qd-ed-provider-target-map-v2', 'entries': [entry]}))
     mapping, hashes = a.load_target_map(path)
-    assert mapping['a' * 64]['keypoint_index'] == 1 and len(hashes) == 2
+    assert mapping[a.provider_identity(entry)]['keypoint_index'] == 1 and len(hashes) == 2
     source.write_text(source.read_text() + '# changed\n')
     with pytest.raises(ValueError, match='SHA mismatch'):
         a.load_target_map(path)
@@ -136,7 +137,7 @@ def test_existing_collector_cpu_fixture_passes_actual_auditor_without_invented_s
     assert decision['selected_projected_xyz'][8][0] == 1.125
     assert len(decision['selected_projection_associations']) == 2  # Auxiliary excluded.
     assert all(x['scope']['role'].startswith('canonical_') for x in decision['selected_projection_associations'])
-    assert decision['unknown_reasons'] == ['target_unknown_no_reviewed_provider_mapping',
+    assert decision['unknown_reasons'] == ['target_unknown_original_provider_source_identity_incomplete',
                                          'step7_to8_unknown_for_short_actual_prefix']
     assert result['original_execution_outcome'] == 'completed'
     json.dumps(result, allow_nan=False)
@@ -157,13 +158,15 @@ def test_approach_interpretation_and_command_identity_control_eligibility(tmp_pa
     rec, compute = fixture.episode(tmp_path)
     events = fixture.audit.load_events(rec.root, json.loads((rec.root / 'status.json').read_text()))
     context = next(r['values'] for r in events if r['event'] == 'decision_context')
-    code = context['providers'][0]['code_sha256']
+    context['providers'][0].update(original_code_sha256='a' * 64, source_text_sha256='b' * 64,
+                                   source_path='/synthetic/provider.txt')
+    identity = a.provider_identity(context['providers'][0])
     # An intentionally synthetic semantic annotation for eligibility plumbing only.
-    mapping = {code: {'keypoint_index': 0, 'distance_progress_interpretation': 'descriptive_only'}}
+    mapping = {identity: {'keypoint_index': 0, 'distance_progress_interpretation': 'descriptive_only'}}
     result = a.analyze_events(events, input_kind='synthetic_unit_fixture', target_map=mapping)
     assert result['decisions'][0]['frozen_target'] == [0., 0., 0.]
     assert not result['decisions'][0]['hypothesis_eligible']
-    mapping[code]['distance_progress_interpretation'] = 'approach_proxy'
+    mapping[identity]['distance_progress_interpretation'] = 'approach_proxy'
     result = a.analyze_events(events, input_kind='synthetic_unit_fixture', target_map=mapping)
     assert result['decisions'][0]['hypothesis_eligible']
     sent = next(r['values'] for r in events if r['event'] == 'executed_action')
@@ -171,6 +174,29 @@ def test_approach_interpretation_and_command_identity_control_eligibility(tmp_pa
     result = a.analyze_events(events, input_kind='synthetic_unit_fixture', target_map=mapping)
     assert not result['decisions'][0]['hypothesis_eligible']
     assert 'actual_translation_changed_after_decode' in result['decisions'][0]['hypothesis_ineligible_reasons']
+
+
+def test_shared_wrapper_different_original_or_source_never_shares_target():
+    first = {'code_sha256': 'a' * 64, 'original_code_sha256': 'b' * 64,
+             'source_text_sha256': 'c' * 64, 'source_path': '/synthetic/stage1.txt'}
+    context = {'providers': [first], 'keypoints': torch.tensor([[1., 2., 3.]])}
+    projected = {'keypoints': context['keypoints'].clone()}
+    mapping = {a.provider_identity(first): {'keypoint_index': 0}}
+    assert a.resolve_target(context, projected, mapping)[0] == [1., 2., 3.]
+    for field, changed in [('original_code_sha256', 'd' * 64), ('source_text_sha256', 'e' * 64),
+                           ('source_path', '/synthetic/stage2.txt')]:
+        second = {**first, field: changed}
+        context['providers'] = [second]
+        assert a.resolve_target(context, projected, mapping)[0] is None
+    context['providers'] = [{'code_sha256': first['code_sha256']}]
+    assert a.resolve_target(context, projected, mapping)[2] == 'target_unknown_original_provider_source_identity_incomplete'
+
+
+def test_shared_wrapper_v1_map_is_explicitly_refused(tmp_path):
+    path = tmp_path / 'unsafe-v1-map.json'
+    path.write_text(json.dumps({'schema': 'qd-ed-provider-target-map-v1', 'entries': []}))
+    with pytest.raises(ValueError, match='shared-wrapper v1 is unsafe'):
+        a.load_target_map(path)
 
 
 def test_tampered_bundle_is_refused_by_existing_auditor(tmp_path):
