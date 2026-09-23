@@ -69,19 +69,29 @@ def ulp_norm(value):
     return max(1e-9, norm(gap.double().reshape(-1).tolist()))
 
 
+def provider_identity(provider):
+    """Shared wrapper bytecode cannot identify the wrapped reward semantics."""
+    values = [provider.get('original_code_sha256'), provider.get('source_text_sha256')]
+    if not all(isinstance(v, str) and len(v) == 64 and all(c in '0123456789abcdef' for c in v) for v in values):
+        return None
+    source_path = provider.get('source_path')
+    if not isinstance(source_path, str) or not Path(source_path).is_absolute():
+        return None
+    return (*values, source_path)
+
+
 def load_target_map(path):
     """Verify explicitly reviewed metadata; never execute or infer provider semantics."""
     if path is None:
         return {}, {}
     path = Path(path).resolve()
     data = json.loads(path.read_text())
-    require(data.get('schema') == 'qd-ed-provider-target-map-v1', 'target map schema invalid')
+    require(data.get('schema') == 'qd-ed-provider-target-map-v2', 'target map schema invalid; shared-wrapper v1 is unsafe')
     entries, hashes = {}, {str(path): digest(path)}
     for entry in data['entries']:
-        code = entry.get('provider_code_sha256')
-        require(isinstance(code, str) and len(code) == 64 and all(c in '0123456789abcdef' for c in code),
-                'provider code SHA invalid')
-        require(code not in entries, 'duplicate provider target mapping')
+        identity = provider_identity(entry)
+        require(identity is not None, 'original provider code/source identity incomplete')
+        require(identity not in entries, 'duplicate original-provider/source target mapping')
         require(type(entry.get('keypoint_index')) is int and entry['keypoint_index'] >= 0,
                 'keypoint index invalid')
         require(entry.get('reviewed_against_frozen_provider_source') is True
@@ -97,8 +107,11 @@ def load_target_map(path):
         require(source.suffix in {'.py', '.txt'}, 'target source must be an explicitly reviewed Python/text file')
         actual = digest(source)
         require(actual == entry['source_sha256'], 'reviewed provider source SHA mismatch')
+        require(entry.get('source_text_transform') == 'identity', 'minimal map only supports verified unchanged loader source text')
+        require(hashlib.sha256(source.read_text(encoding='utf-8').encode('utf-8')).hexdigest() == entry['source_text_sha256'],
+                'reviewed source text differs from recorded loader text identity')
         hashes[str(source)] = actual
-        entries[code] = dict(entry)
+        entries[identity] = dict(entry)
     return entries, hashes
 
 
@@ -108,7 +121,10 @@ def resolve_target(context, projected, target_map):
     providers = context.get('providers', [])
     if len(providers) != 1:
         return None, None, 'target_unknown_no_unique_provider'
-    entry = target_map.get(providers[0].get('code_sha256'))
+    identity = provider_identity(providers[0])
+    if identity is None:
+        return None, None, 'target_unknown_original_provider_source_identity_incomplete'
+    entry = target_map.get(identity)
     if entry is None:
         return None, None, 'target_unknown_no_reviewed_provider_mapping'
     points = context.get('keypoints')
@@ -123,7 +139,7 @@ def resolve_target(context, projected, target_map):
         return None, None, 'target_unknown_scoring_keypoints_differ_from_context'
     if not torch.isfinite(points[index]).all():
         return None, None, 'target_unknown_nonfinite_keypoint'
-    return plain(points[index]), dict(entry), None
+    return plain(points[index]), {**entry, 'runtime_original_code_text_path_match': True}, None
 
 
 def selected_projection(rows, event_lookup):
@@ -275,6 +291,7 @@ def analyze_events(events, *, input_kind, target_map=None):
         current = {'decision_id': decision_id, 'global_step': rows[0]['global_step'],
             'stage': context['stage'], 'guidance': bool(context['use_guidance']),
             'provider_code_sha256': [x.get('code_sha256') for x in context['providers']],
+            'provider_identities': context['providers'],
             'frozen_target': target, 'target_review': target_review,
             'target_scope': 'reviewed provider keypoint at decision time; not contemporaneous object pose',
             'committed_execution_horizon': committed['execution_horizon'],
@@ -331,7 +348,8 @@ def analyze_events(events, *, input_kind, target_map=None):
     grouped = defaultdict(list)
     for row in decisions:
         key = json.dumps({'stage': row['stage'], 'guidance': row['guidance'],
-                          'provider_code_sha256': row['provider_code_sha256']}, sort_keys=True)
+                          'provider_code_sha256': row['provider_code_sha256'],
+                          'provider_identities': row['provider_identities']}, sort_keys=True)
         grouped[key].append(row)
     strata = []
     for key, rows in grouped.items():
@@ -349,7 +367,7 @@ def analyze_events(events, *, input_kind, target_map=None):
             'step7_to8_joint_regression_witness_ids': [r['decision_id'] for r in full if r['diagnostics']['step7_to8']['both_regress_robust']],
             'step7_to8_reversal_witnesses': sum(r['diagnostics']['step7_to8']['positive_progress_reversed'] for r in full)})
     require(not torch.cuda.is_initialized(), 'unexpected CUDA initialization')
-    return {'schema': 'qd-ed-selected-decision-analysis-v1', 'input_kind': input_kind,
+    return {'schema': 'qd-ed-selected-decision-analysis-v2', 'input_kind': input_kind,
         'decisions': decisions, 'strata': strata,
         'causal_limit': 'selected executed actions only; target-relative EEF proxy is not task or grasp success',
         'promotion_status': 'NOT_EVALUATED; single-episode descriptive output is not a candidate gate',

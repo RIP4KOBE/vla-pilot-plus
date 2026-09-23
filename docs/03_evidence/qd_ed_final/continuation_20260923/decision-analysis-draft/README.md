@@ -21,12 +21,14 @@ The reviewed map format is:
 
 ```json
 {
-  "schema": "qd-ed-provider-target-map-v1",
+  "schema": "qd-ed-provider-target-map-v2",
   "entries": [
     {
-      "provider_code_sha256": "<64 lowercase hex from this decision's recorded provider>",
+      "original_code_sha256": "<64 lowercase hex matching the actual original provider code>",
+      "source_text_sha256": "<64 lowercase hex matching the loader's recorded UTF8 source text>",
       "source_path": "/absolute/frozen/cached/reward_function.py",
       "source_sha256": "<SHA256 of the reviewed source bytes>",
+      "source_text_transform": "identity",
       "target_selection": "fixed_keypoint_index",
       "keypoint_index": 2,
       "target_expression": "<exact source expression identifying this keypoint>",
@@ -38,7 +40,7 @@ The reviewed map format is:
 }
 ```
 
-This is a schema example, **not an actual mapping**; index 2 is illustrative and must not be used without source review. Omit `distance_progress_interpretation` or set it to `descriptive_only` if distance is merely a geometric proxy; distances can still be reported, but the two approach hypotheses stay ineligible. No provider code is executed. The code-SHA/source-SHA association and semantic statement must be established by explicit review of the actual loader/cache provenance; the analyzer only verifies the binding and recorded data, and cannot prove a false annotation correct. Review cannot silently add a provider target where the source is conditional or ambiguous. One-provider fixed-index targets are supported; multiple providers, missing identity, reordered scoring keypoints and unavailable source are Unknown/rejected as appropriate. Do not point this map at credentials or unrelated source files.
+This is a schema example, **not an actual mapping**; index 2 is illustrative and must not be used without source review. Omit `distance_progress_interpretation` or set it to `descriptive_only` if distance is merely a geometric proxy; distances can still be reported, but the two approach hypotheses stay ineligible. No provider code is executed. The original-code/source-text identity and semantic statement must be established by explicit review of the actual loader/cache provenance; the analyzer only verifies the binding and recorded data, and cannot prove a false annotation correct. A pre-data review found that the original `code_sha256` is the shared device wrapper: map-v1 is therefore explicitly refused. Stage/task labels never override an original-code/source-text/path mismatch. Missing any of these three identity fields yields Unknown. The minimal map supports only source text verified unchanged by the loader; a transformed file needs an explicitly reviewed extension, not an assumed raw/text hash equivalence. Static compile/marshal yields a proposed original hash, which must exactly match the runtime recorded hash before use. Review cannot silently add a provider target where the source is conditional or ambiguous. One-provider fixed-index targets are supported; multiple providers, missing identity, reordered scoring keypoints and unavailable source are Unknown/rejected as appropriate. Do not point this map at credentials or unrelated source files.
 
 JSON contains every actual decision and execution prefix, raw postprocessed command signs, gripper qpos/qvel if recorded, source and projection dtypes, canonical equal-value associations, associated provider returns/quality, per-prefix EEF errors, target distances if resolved, actual/projected step7→8 change, and the full-prefix versus through-step7 diagnostics. It includes strata and witness IDs without selecting a candidate. `hypothesis_eligible` excludes transformed translations, a non-normal reward mode, unresolved/non-approach targets and the wrong provider slice. `unknown_reasons` and `hypothesis_ineligible_reasons` preserve these exclusions. A raw numerical witness is only descriptive if hypothesis_eligible is false. Equal fingerprints are a content association, not recovered archive ancestry. Unexecuted counterfactual outcomes and physical grasp success remain Unknown.
 

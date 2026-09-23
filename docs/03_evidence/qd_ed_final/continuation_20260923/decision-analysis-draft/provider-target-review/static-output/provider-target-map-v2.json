@@ -1,0 +1,47 @@
+{
+  "entries": [
+    {
+      "approach_review_basis": "reward = -(all_dists ** 2 * weights).sum(dim=1); all weights are positive and normalized; all_dists = torch.norm(action_sequence - target_pos, dim=-1)",
+      "distance_progress_interpretation": "approach_proxy",
+      "expected_shared_wrapper_code_sha256": "9aa73259855323be75b05aafc50220f7a98fcff156329ac17c60378a6d25d8eb",
+      "keypoint_index": 0,
+      "keypoint_metadata_label": "alphabet_soup_1_main",
+      "loader_source_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/utils/guidance_utils.py",
+      "loader_source_sha256": "b0fe9d6d5fc014143f5877918de9bd0986b1688b4a6a90980847b7d15cab0c82",
+      "objective_limit": "weighted whole scored prefix, not endpoint-only, grasp, contact or live-object success",
+      "original_code_sha256": "64bfc5d573100a463facb1849937b4fbd895070028584e2f0d8d3d3aa21dcfe6",
+      "reviewed_against_frozen_provider_source": true,
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_0/stage1_guidance.txt",
+      "source_sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+      "source_text_sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+      "source_text_transform": "identity",
+      "stage_for_review_only": 1,
+      "static_original_hash_status": "pending exact runtime identity match",
+      "target_expression": "target_idx = torch.tensor([0], ...); target_pos = keypoints[target_idx][0]",
+      "target_selection": "fixed_keypoint_index",
+      "task_id_for_review_only": 0
+    },
+    {
+      "approach_review_basis": "reward = -(all_dists ** 2 * weights).sum(dim=1); all weights are positive and normalized; all_dists = torch.norm(action_sequence - target_pos, dim=-1)",
+      "distance_progress_interpretation": "approach_proxy",
+      "expected_shared_wrapper_code_sha256": "9aa73259855323be75b05aafc50220f7a98fcff156329ac17c60378a6d25d8eb",
+      "keypoint_index": 0,
+      "keypoint_metadata_label": "tomato_sauce_1_main",
+      "loader_source_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/utils/guidance_utils.py",
+      "loader_source_sha256": "b0fe9d6d5fc014143f5877918de9bd0986b1688b4a6a90980847b7d15cab0c82",
+      "objective_limit": "weighted whole scored prefix, not endpoint-only, grasp, contact or live-object success",
+      "original_code_sha256": "64bfc5d573100a463facb1849937b4fbd895070028584e2f0d8d3d3aa21dcfe6",
+      "reviewed_against_frozen_provider_source": true,
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_5/stage1_guidance.txt",
+      "source_sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+      "source_text_sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+      "source_text_transform": "identity",
+      "stage_for_review_only": 1,
+      "static_original_hash_status": "pending exact runtime identity match",
+      "target_expression": "target_idx = torch.tensor([0], ...); target_pos = keypoints[target_idx][0]",
+      "target_selection": "fixed_keypoint_index",
+      "task_id_for_review_only": 5
+    }
+  ],
+  "schema": "qd-ed-provider-target-map-v2"
+}
