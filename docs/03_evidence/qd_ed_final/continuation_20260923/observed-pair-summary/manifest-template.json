@@ -1,0 +1,13 @@
+{
+  "schema": "qd-ed-observed-pair-summary-input-v1",
+  "plan": {
+    "path": "<exact absolute path to the frozen observed-pair plan>",
+    "sha256": "ac123471db9fa9468661238982b3bdb5cb1a68010ec8261e0e5b12239c57e7e8"
+  },
+  "episodes": {
+    "observed_pairs_t00_c0_20260923": null,
+    "observed_pairs_t00_q0_20260923": null,
+    "observed_pairs_t05_c0_20260923": null,
+    "observed_pairs_t05_q0_20260923": null
+  }
+}
