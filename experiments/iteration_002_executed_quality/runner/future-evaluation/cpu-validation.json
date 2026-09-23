@@ -1,0 +1,57 @@
+{
+  "integration_limit": "R contains older production core; merge only enumerated tooling after Dev closes, verify exact selected Dev production hashes, rerun existing archive-grid/none fp32/bf16 full-loop Q8/raw-Stage regression. No execution release or actual reservation event is produced.",
+  "nonrunnable_by_default": true,
+  "production_changes": [],
+  "schema": "qd-ed-n2-future-evaluation-cpu-validation-v1",
+  "scope": "isolated CPU preparation; only synthetic protected-phase inputs; no W/GPU/model/provider/actual protected outcomes",
+  "source_files": [
+    {
+      "path": "scripts/qd_ed_final_runner.py",
+      "sha256": "a3a621e17ae61b6af977c60b5e4adcb7706509342fd97fac5954e0a6c61cb6cb"
+    },
+    {
+      "path": "scripts/qd_ed_available_gpu_queue.py",
+      "sha256": "5ca5788c8b0dae40e4fb639a61e080d786705bbaa24c61754033e697017e2ab5"
+    },
+    {
+      "path": "scripts/qd_ed_n2_evaluation.py",
+      "sha256": "efa7b4070ffad62e936172ce0db2117ab185b48c6e732ffed89b2ddb413d5c05"
+    },
+    {
+      "path": "scripts/qd_ed_n2_evaluation_report.py",
+      "sha256": "63c0e941231998db96b2c95c588dc3d6f94c231e800f0a6eaf0e6c672727a3c9"
+    },
+    {
+      "path": "scripts/qd_ed_n2_evaluate.py",
+      "sha256": "f6ff7e6d3cacc29f879c8255151b741a2f03675a050af5779666461404f6a45d"
+    },
+    {
+      "path": "configs/qd_ed_final/n2_evaluation_profiles.json",
+      "sha256": "b8695cddf9a4ec3c7c5e94f9dd418e9d35ad5fd6759f485215283afaea3a1694"
+    },
+    {
+      "path": "tests/test_qd_ed_n2_evaluation.py",
+      "sha256": "eddeaded340421dae78a321b4ad41f28b85350fba6af7a72654e0207b0a29e8e"
+    },
+    {
+      "path": "experiments/iteration_002_executed_quality/runner/future-evaluation/protocol-v1.md",
+      "sha256": "75766ff02c4722c25f772e647937fc68cf9a3361129791585430115595f0e8fa"
+    },
+    {
+      "path": "experiments/iteration_002_executed_quality/runner/future-evaluation/budget-entry-clarification-v1.md",
+      "sha256": "9b1ccf9932f8fe2bf637d0e2a4674fae866740424ef523d83d665bac8c14c77c"
+    },
+    {
+      "path": "experiments/iteration_002_executed_quality/runner/future-evaluation/gap-review.md",
+      "sha256": "3f695e2ed64ecd0fbed0f2dd6c3030dc386667d8c5663ceddbc50e8e8f899f3d"
+    },
+    {
+      "path": "experiments/iteration_002_executed_quality/runner/future-evaluation/README.md",
+      "sha256": "4d4630a7cf182de25fbb622566c646d1db9aad3502eb28050abd2cf8cfacb97a"
+    }
+  ],
+  "tests": {
+    "command": "CUDA_VISIBLE_DEVICES='' PYTHONDONTWRITEBYTECODE=1 /home/hynx/miniconda3/envs/vla-pilot/bin/python -m pytest -q tests/test_qd_ed_final_runner.py tests/test_qd_ed_n2_plan.py tests/test_qd_ed_n2_supervise.py tests/test_qd_ed_n2_evaluation.py tests/test_qd_ed_available_gpu_queue.py",
+    "passed": 134
+  }
+}

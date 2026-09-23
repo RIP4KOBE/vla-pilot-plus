@@ -220,6 +220,14 @@ def n2_support():
     return module
 
 
+def n2_evaluation_support():
+    directory=str(Path(__file__).parent)
+    if directory not in sys.path:
+        sys.path.insert(0,directory)
+    import qd_ed_n2_evaluation
+    return qd_ed_n2_evaluation
+
+
 def validate_plan(path, *, root=ROOT, require_frozen=True):
     root = Path(root).resolve()
     plan = read_json(path)
@@ -320,7 +328,14 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
             require(row.get(field) == matching[0][field], f'episode differs from frozen seed plan: {field}')
         require(digest(task['bddl_path']) == row['bddl_sha256'] and digest(task['init_path']) == row['init_file_sha256'], 'runtime task inputs differ from frozen seed plan')
         owned(task['cache_dir'], artifact_root)
-    if 'N2' in plan.get('candidate_profiles', {}) or plan.get('n2_cohort') is not None:
+    if plan.get('n2_evaluation') is not None:
+        n2_evaluation_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+        phase=plan['n2_evaluation']['phase']
+        if plan.get('frozen') is True and plan['phase_authorization'].get(phase) is True:
+            # Also gates direct generic queue/validate entry before an automatic
+            # hardware probe could precede the per-episode admission check.
+            n2_evaluation_support().reviewed_promotion(plan,read_events(root/'data/attempt-ledger.jsonl'),root,globals())
+    elif 'N2' in plan.get('candidate_profiles', {}) or plan.get('n2_cohort') is not None:
         n2_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
     return plan, manifest, runtime
 
@@ -608,7 +623,7 @@ def budget_snapshot(events, resource_events=()):
     return result
 
 
-def check_budget(state, events, row, resource_events=(), reservation_events=(), *, physical_gpu=None):
+def check_budget(state, events, row, resource_events=(), reservation_events=(), *, physical_gpu=None, evaluation_context=None):
     budget = state['budget']; snap = budget_snapshot(events,resource_events)
     selected_gpu = authorized_gpu(state)
     require(physical_gpu is None or (type(physical_gpu) is int and physical_gpu == selected_gpu),
@@ -634,7 +649,11 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
         require(bool(reservation_events) and reservation_events[-1].get('event')=='gpu_hour_reservations_changed' and
                 reservation_events[-1].get('gpu_hour_reservations')==reservations and
                 bool(reservation_events[-1].get('rationale')) and 'time_unix' in reservation_events[-1], 'GPU-hour reallocation requires matching reservation ledger event')
-    protected_hours=sum(max(0.,hours-snap['gpu_hours_by_bucket'][name]) for name,hours in reservations.items() if name!=bucket)
+    hour_bucket=bucket
+    if evaluation_context is not None:
+        hour_bucket=n2_evaluation_support().hour_reservation_exclusion(
+            evaluation_context,state,events,row,resource_events,reservation_events,globals())
+    protected_hours=sum(max(0.,hours-snap['gpu_hours_by_bucket'][name]) for name,hours in reservations.items() if name!=hour_bucket)
     available=int((budget['max_gpu_hours']-snap['gpu_hours_consumed']-protected_hours)*3600)-TERMINATION_GRACE_SECONDS
     require(available>0, 'GPU budget cannot cover process termination grace')
     return min(row['timeout_seconds'],available)
@@ -644,6 +663,8 @@ def check_retry(events, row):
     groups = event_groups(events)
     prior = [g for g in groups.values() if g[0]['identity'] == episode_identity(row) and any(e['event']=='dispatched' for e in g)]
     n2_exception = bool(row.get('n2_recovery_contract')) and n2_support().retry_exception(events, row, globals())
+    if row.get('n2_evaluation_recovery_contract'):
+        n2_exception = n2_evaluation_support().retry_exception(events, row, globals())
     require(not any(g[-1]['event'] == 'valid' for g in prior) or n2_exception, 'legal completed outcome cannot be retried')
     if prior:
         retry_of = row.get('retry_of')
@@ -941,6 +962,8 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
     root=Path(root)
     with locked(root/'data/qd-ed-runner.lock',nonblocking=True):
         plan,manifest,runtime=validate_plan(plan_path,root=root)
+        if plan.get('n2_evaluation') is not None:
+            n2_evaluation_support().require_scope(plan,root,globals())
         require(plan.get('phase_authorization', {}).get(split) is True, f'{split} has not passed its preregistered phase gate')
         rows=selected_rows(plan,split,iteration)
         if episode_keys:
@@ -955,11 +978,19 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
             state = read_state(root/'research-state.yaml')
             physical_gpu = runtime_gpu(runtime, state)
             resources=read_events(root/'data/gpu-healthcheck-ledger.jsonl')
-            timeout=check_budget(state,events,row,resources,read_events(root/'data/gpu-hour-reservation-ledger.jsonl'),physical_gpu=physical_gpu)
+            evaluation_context=None
+            if plan.get('n2_evaluation') is not None:
+                evaluation_context=n2_evaluation_support().validated_budget_context(plan,runtime,row,events,resources,root,globals())
+            timeout=check_budget(state,events,row,resources,read_events(root/'data/gpu-hour-reservation-ledger.jsonl'),
+                physical_gpu=physical_gpu,evaluation_context=evaluation_context)
             n2_base={}
             if plan.get('n2_cohort') is not None:
                 require(timeout==1800, 'N2 requires its full frozen episode timeout')
                 n2_base=n2_support().admission(plan,runtime,row,events,resources,root,globals())
+            elif plan.get('n2_evaluation') is not None:
+                require(timeout==1800, 'protected N2 evaluation requires full 1800s plus cleanup; no clipping')
+                n2_evaluation_support().allocate(plan,events,root,globals())
+                n2_base=evaluation_context.base
             admission=gpu_admission(physical_gpu=physical_gpu,expected_uuid=runtime['gpu_mapping']['uuid'])
             attempt_id=f"{plan['run_name']}__{row['episode_key']}__{uuid.uuid4().hex[:12]}"
             command,output=build_command(plan,manifest,runtime,row,attempt_id)
@@ -1004,6 +1035,10 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                 final_event,outcome=failed_outcome(exc,output,row,launch_failed=dispatched and process is None,runtime=runtime)
                 if dispatched and plan.get('n2_cohort') is not None:
                     eligibility=n2_support().transport_recovery_eligibility(exc,outcome,plan,row,runtime,globals())
+                    if eligibility is not None:
+                        outcome['n2_recovery_eligibility']=eligibility
+                elif dispatched and plan.get('n2_evaluation') is not None:
+                    eligibility=n2_evaluation_support().transport_eligibility(exc,outcome,plan,globals())
                     if eligibility is not None:
                         outcome['n2_recovery_eligibility']=eligibility
                 if not dispatched:
