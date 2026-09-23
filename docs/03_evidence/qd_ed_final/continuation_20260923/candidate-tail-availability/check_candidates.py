@@ -96,11 +96,15 @@ def analyze_decision(rows, selected_analysis, target_map, a):
         for score in scores:
             scored = score['values']
             if (score['sequence'] >= batch['sequence'] or scored['scoring_scope']['iter_idx'] != value['iter_idx']
+                    or scored['samples'].shape != value['candidates'].shape
+                    or scored['samples'].dtype != value['candidates'].dtype
                     or not torch.equal(scored['samples'],value['candidates'])):
                 continue
             effective = a.one([row for row in rows if row['event']=='effective_quality'
                 and row['values']['scoring_batch_id']==score['sequence']], 'effective_quality')['values']
-            if torch.equal(effective['quality'],value['effective_quality']):
+            if (effective['quality'].shape == value['effective_quality'].shape
+                    and effective['quality'].dtype == value['effective_quality'].dtype
+                    and torch.equal(effective['quality'],value['effective_quality'])):
                 matches.append((score,effective))
         for index, sample in enumerate(value['candidates']):
             fp = a.fingerprint(sample)

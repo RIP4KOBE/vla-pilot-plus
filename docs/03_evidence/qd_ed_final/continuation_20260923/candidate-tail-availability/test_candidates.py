@@ -61,6 +61,23 @@ class Tests(unittest.TestCase):
         self.assertTrue(report['any_distinct_fingerprint_nonflagged_quality_ge_selected'])
         self.assertEqual(report['best_known_quality_minus_actual_selected'],0.)
 
+    def test_equal_values_with_different_native_dtype_cannot_join(self):
+        original=copy.deepcopy(self.rows)
+        for event,field in [('scoring_inputs','samples'),('effective_quality','quality')]:
+            with self.subTest(event=event):
+                self.rows=copy.deepcopy(original)
+                for row in self.rows:
+                    if row['event']==event:
+                        before=row['values'][field]
+                        after=before.to(torch.float64 if before.dtype!=torch.float64 else torch.float32)
+                        self.assertTrue(torch.equal(before,after))
+                        self.assertNotEqual(before.dtype,after.dtype)
+                        row['values'][field]=after
+                report=self.run_fixture()
+                self.assertEqual(report['summary']['known_tail_occurrences'],0)
+                self.assertTrue(all('canonical_to_scoring_batch_match_missing_or_ambiguous' in row['unknown_reasons']
+                                    for row in report['candidates']))
+
     def test_repeated_fingerprint_different_projection_is_unknown_not_cherry_picked(self):
         scores=[row for row in self.rows if row['event']=='scoring_inputs' and
                 row['values']['scoring_scope']['role']=='canonical_offspring']
