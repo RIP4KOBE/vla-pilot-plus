@@ -201,6 +201,15 @@ def expand_candidate(candidate_id, candidate, baseline):
                 'N2 must change only qd_quality_mode to executed_prefix_v1')
         require(candidate.get('only_algorithm_change') == {field: {'before': 'provider', 'after': 'executed_prefix_v1'}},
                 'N2 declared algorithm delta differs')
+    elif contract == 'n3_executed_feedback_only_v1':
+        require(candidate_id == 'N3', 'N3 contract requires N3 identity')
+        field = 'qd_quality_mode'
+        require(original.get(field, 'provider') == 'provider', 'N3 baseline quality is not provider')
+        require(set(profile) == set(original) | {field} and profile.get(field) == 'executed_feedback_v1'
+                and {k:v for k,v in profile.items() if k != field} == {k:v for k,v in original.items() if k != field},
+                'N3 must change only qd_quality_mode to executed_feedback_v1')
+        require(candidate.get('only_algorithm_change') == {field: {'before': 'provider', 'after': 'executed_feedback_v1'}},
+                'N3 declared algorithm delta differs')
     else:
         raise GateError('unknown candidate algorithm contract')
     active = copy.deepcopy(baseline)
@@ -218,6 +227,19 @@ def n2_support():
     spec = importlib.util.spec_from_file_location('qd_ed_n2_plan_contract', Path(__file__).with_name('qd_ed_n2_plan.py'))
     module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
     return module
+
+
+_N3_SUPPORT = None
+
+
+def n3_support():
+    # Preserve a single in-process supervisor capability; N2 is not consulted.
+    global _N3_SUPPORT
+    if _N3_SUPPORT is None:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('qd_ed_n3_plan_contract', Path(__file__).with_name('qd_ed_n3_plan.py'))
+        _N3_SUPPORT = importlib.util.module_from_spec(spec); spec.loader.exec_module(_N3_SUPPORT)
+    return _N3_SUPPORT
 
 
 def validate_plan(path, *, root=ROOT, require_frozen=True):
@@ -322,6 +344,8 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
         owned(task['cache_dir'], artifact_root)
     if 'N2' in plan.get('candidate_profiles', {}) or plan.get('n2_cohort') is not None:
         n2_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if 'N3' in plan.get('candidate_profiles', {}) or plan.get('n3_cohort') is not None:
+        n3_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
     return plan, manifest, runtime
 
 
@@ -641,6 +665,8 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
 
 
 def check_retry(events, row):
+    if str(row.get('iteration')) == 'N3_EXECUTED_FEEDBACK_DEV_20260923' or row.get('n3_recovery_contract') is not None:
+        return n3_support().check_retry(events, row, globals())
     groups = event_groups(events)
     prior = [g for g in groups.values() if g[0]['identity'] == episode_identity(row) and any(e['event']=='dispatched' for e in g)]
     n2_exception = bool(row.get('n2_recovery_contract')) and n2_support().retry_exception(events, row, globals())
@@ -850,6 +876,8 @@ def validate_result(output, row, profile, runtime=None):
         require(record.get('qd_archive_enabled') is (eds['qd_archive_mode']=='grid_archive'), 'QD enabled identity mismatch')
         if eds.get('qd_quality_mode','provider')=='executed_prefix_v1':
             require(record.get('qd_quality_mode')=='executed_prefix_v1', 'N2 requested quality mode identity mismatch')
+        if eds.get('qd_quality_mode','provider')=='executed_feedback_v1':
+            require(record.get('qd_quality_mode')=='executed_feedback_v1', 'N3 requested quality mode identity mismatch')
         for key in ('nonfinite_count','gripper_qpos_violation_count','qd_accounting_violation_count','qd_elite_monotonicity_violation_count','qd_final_selection_mismatch_count','qd_secondary_invariant_violation_count'):
             require(type(record.get(key)) is int and record[key]==0, f'metric violation or missing field: {key}')
         require(type(record.get('action_mask_violation_max')) in (int,float) and math.isfinite(record['action_mask_violation_max']) and 0<=record['action_mask_violation_max']<=1e-6, 'action mask violation or missing field')
@@ -941,6 +969,8 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
     root=Path(root)
     with locked(root/'data/qd-ed-runner.lock',nonblocking=True):
         plan,manifest,runtime=validate_plan(plan_path,root=root)
+        if plan.get('n3_cohort') is not None:
+            n3_support().require_scope(plan, root, globals())
         require(plan.get('phase_authorization', {}).get(split) is True, f'{split} has not passed its preregistered phase gate')
         rows=selected_rows(plan,split,iteration)
         if episode_keys:
@@ -960,6 +990,10 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
             if plan.get('n2_cohort') is not None:
                 require(timeout==1800, 'N2 requires its full frozen episode timeout')
                 n2_base=n2_support().admission(plan,runtime,row,events,resources,root,globals())
+            if plan.get('n3_cohort') is not None:
+                n3_support().require_scope(plan, root, globals(), row)
+                n3_support().protected_budget(state, events, resources, row, timeout, globals())
+                n2_base=n3_support().admission(plan,runtime,row,events,resources,root,globals())
             admission=gpu_admission(physical_gpu=physical_gpu,expected_uuid=runtime['gpu_mapping']['uuid'])
             attempt_id=f"{plan['run_name']}__{row['episode_key']}__{uuid.uuid4().hex[:12]}"
             command,output=build_command(plan,manifest,runtime,row,attempt_id)
@@ -1006,6 +1040,10 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                     eligibility=n2_support().transport_recovery_eligibility(exc,outcome,plan,row,runtime,globals())
                     if eligibility is not None:
                         outcome['n2_recovery_eligibility']=eligibility
+                if dispatched and plan.get('n3_cohort') is not None:
+                    eligibility=n3_support().transport_recovery_eligibility(exc,outcome,plan,row,runtime,globals())
+                    if eligibility is not None:
+                        outcome['n3_recovery_eligibility']=eligibility
                 if not dispatched:
                     final_event='aborted'; outcome['task_failure']=False; outcome['failure_class']='predispatch_gate'
                 if isinstance(exc,(KeyboardInterrupt,SystemExit)):
@@ -1015,6 +1053,8 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                 elapsed=(process_finished or time.monotonic())-started if dispatched else 0.0
                 terminal={**base,**outcome,'event':final_event,'time_unix':time.time(),
                           'gpu_process_wall_seconds':elapsed,'gpu_time_measurement':f'exclusive GPU{physical_gpu} process wall-time upper bound, includes startup/abort'}
+                if plan.get('n3_cohort') is not None:
+                    terminal['n3_episode_dispatched']=dispatched
                 append_event(root,terminal)
                 durable_json(output/'attempt-result.json',terminal)
                 summaries.append(terminal)

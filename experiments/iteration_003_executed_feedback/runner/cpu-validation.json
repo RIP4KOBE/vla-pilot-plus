@@ -1,0 +1,78 @@
+{
+  "actual_outcomes_read": false,
+  "ast_parse": "PASS",
+  "base_commit": "6f3c260cc5f62fe87ce7e937ffa29358574afb26",
+  "cpu_only": true,
+  "cuda_visible_devices": "",
+  "diff_check": "PASS",
+  "files": [
+    {
+      "path": "configs/qd_ed_final/candidate_n3.json",
+      "sha256": "73fbd63c723b0844306dd784acdb409cf45b9bc53e780c3acb81264731522a22"
+    },
+    {
+      "path": "configs/qd_ed_final/n3_observed_baseline_profiles.json",
+      "sha256": "69117707517f28dab0a9c56d388dbb95eb6b0cf938ebda71beaac7a3545c935c"
+    },
+    {
+      "path": "experiments/iteration_003_executed_feedback/runner/README.md",
+      "sha256": "34820224197f81b7ba370b28f0226b0a63c10c82fcbd11cc0b5412a143f80ec0"
+    },
+    {
+      "path": "scripts/qd_ed_available_gpu_queue.py",
+      "sha256": "f4f329551ba7178800ff160facaafa1c2b2b0a182be63c1300d086d26022a5e7"
+    },
+    {
+      "path": "scripts/qd_ed_final_runner.py",
+      "sha256": "9d1ab138644510edae3eb0c7d3b13e8d1dbfcdb3fc02bd92e232a67d21f993ea"
+    },
+    {
+      "path": "scripts/qd_ed_n3_plan.py",
+      "sha256": "009034e754589aa06c99a4fc067888bfc89bb46cf96b534b3c1d2a08f2ac272e"
+    },
+    {
+      "path": "scripts/qd_ed_n3_report.py",
+      "sha256": "0bf346586d5c014369c34f9359a73ea0c5fb8e3b8f55490d7cfe2e8941a97656"
+    },
+    {
+      "path": "scripts/qd_ed_n3_supervise.py",
+      "sha256": "23682b0b853c7c0f330f239f5a97d889e62c73bf8034493beeff6a0a81922a7a"
+    },
+    {
+      "path": "tests/test_qd_ed_n3_plan.py",
+      "sha256": "9b3a181e945461db7efa586186a69600a4a26598b634b308a214a4d55a6fd726"
+    },
+    {
+      "path": "tests/test_qd_ed_n3_report.py",
+      "sha256": "f65e6c3df8cb8951962a2293719461cd4c75f4bd0b0ee89d5451a0dda5db54b7"
+    },
+    {
+      "path": "tests/test_qd_ed_n3_supervise.py",
+      "sha256": "469486ba8831f0267bac7e9fe51e5ec6d0b7041a141f93cc1ca9372840ab16ae"
+    }
+  ],
+  "gpu_provider_models_called": false,
+  "integration_pending": [
+    "N3 production and specialized native feedback auditor from separate worktree",
+    "Root final source/runtime/model/config freeze",
+    "Authorized conditional recorded activity evidence",
+    "First3 native bundle correctness/activity review before remaining27 release"
+  ],
+  "n2_source_and_profiles_unchanged": true,
+  "no_phase_promotion": true,
+  "production_core_main_unchanged": true,
+  "protocol_sha256": "05c83a8eb3801d4a4c4f41bee28c531505a7767aa56ba482399013068679b931",
+  "schema": "qd-ed-n3-runner-cpu-validation-v1",
+  "state_journal_mutated": false,
+  "tests": [
+    "tests/test_qd_ed_n3_plan.py",
+    "tests/test_qd_ed_n3_supervise.py",
+    "tests/test_qd_ed_n3_report.py",
+    "tests/test_qd_ed_n2_plan.py::test_closed_N2_delta_leaves_both_original_controls_unchanged",
+    "tests/test_qd_ed_n2_plan.py::test_exact_transport_exception_keeps_terminal_and_rejects_old_or_drifted_records",
+    "tests/test_qd_ed_final_runner.py::test_legal_task_failure_is_not_a_retryable_infrastructure_failure",
+    "tests/test_qd_ed_final_runner.py::test_dispatched_attempts_and_aborted_time_count_once"
+  ],
+  "tests_passed": 56,
+  "wall_seconds": 0.6
+}
