@@ -1,0 +1,3924 @@
+{
+  "cases": [
+    {
+      "actual_loader_definition": {
+        "fields": {
+          "co_argcount": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_cellvars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_code": {
+            "value": {
+              "hex": "97007c016a000000000000000000000000000000000000006401190000007d02740200000000000000006a050000000000000000000000000000000000007c027c016a06000000000000000000000000000000000000ac02ab020000000000007d037409000000000000000064037c027a050000ab010000000000007d04740200000000000000006a0b0000000000000000000000000000000000007c037c046b5c0000740200000000000000006a0d00000000000000000000000000000000000064047c016a06000000000000000000000000000000000000ac02ab02000000000000740200000000000000006a0d00000000000000000000000000000000000064057c016a06000000000000000000000000000000000000ac02ab02000000000000ab030000000000007d057c057c056a0f000000000000000000000000000000000000ab000000000000007a0b00007d05740200000000000000006a0d00000000000000000000000000000000000064066701740200000000000000006a100000000000000000000000000000000000007c006a06000000000000000000000000000000000000ac07ab030000000000007d067c007c06190000006406190000007d07740200000000000000006a130000000000000000000000000000000000007c017c077a0a00006408ac09ab020000000000007d087c08640a7a0800007c057a0500006a0f0000000000000000000000000000000000006401ac09ab010000000000000b007d097c096a15000000000000000000000000000000000000ab000000000000005300",
+              "type": "bytes"
+            },
+            "value_sha256": "ed4eeb7bf621ad6a9d3156a01758e1fb82589dfe982a4eca747e911eed931d1d"
+          },
+          "co_consts": {
+            "value": {
+              "items": [
+                {
+                  "type": "NoneType",
+                  "value": null
+                },
+                {
+                  "type": "int",
+                  "value": 1
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "hex": "0x1.6666666666666p-1",
+                  "type": "float"
+                },
+                {
+                  "hex": "0x1.8000000000000p+1",
+                  "type": "float"
+                },
+                {
+                  "hex": "0x1.0000000000000p+0",
+                  "type": "float"
+                },
+                {
+                  "type": "int",
+                  "value": 0
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "dtype"
+                    },
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "type": "int",
+                  "value": -1
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "dim"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "type": "int",
+                  "value": 2
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "9cafdc89f1db1b1d5c8697522b6b21626fcd11cb0944b12d383b78aa6ffc4fbe"
+          },
+          "co_exceptiontable": {
+            "value": {
+              "hex": "",
+              "type": "bytes"
+            },
+            "value_sha256": "25752a85b1260d00c28d63bd89262d9f20e27594e3351e6dca7eecd94bc4ac38"
+          },
+          "co_filename": {
+            "value": {
+              "type": "str",
+              "value": "<string>"
+            },
+            "value_sha256": "6b25568b69fe613874be7072e6d5bce26a096d7085430dcc1cc6d292e2d5ec55"
+          },
+          "co_firstlineno": {
+            "value": {
+              "type": "int",
+              "value": 1
+            },
+            "value_sha256": "a8c8e3340be5028fb9d36fae8f1fb3fefe45792a42806adff6317ab0a341baee"
+          },
+          "co_flags": {
+            "value": {
+              "type": "int",
+              "value": 3
+            },
+            "value_sha256": "66325f9c1b71c06d478b49d8c602f35a60780cc7b3b9fc493635bbe15c2e1da2"
+          },
+          "co_freevars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_kwonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_linetable": {
+            "value": {
+              "hex": "8000e00817d7081dd1081d9861d108208041dc1015970c910c9851a07fd7273dd1273d900cd3103e8049dc1215906398419167932c804bf406000f148f6b896bd80811905bd10820dc080d8f0c890c9053a01fd72137d12137880cd30838dc080d8f0c890c9053a01fd72137d12137880cd30838f307040f068047f00a000f1698079f0b990b9b0dd10e258047f406001217971c911c98719863ac15af1aa91ab849d73c4cd13c4c901cd3114d804ad8111a983ad11126a071d11129804af406001116970a910a983fa85ad11b37b852900ad310408049d80f189841897ea007d10f27d70e2cd10e2cb011d00e2cd30e33d00d338046d80b118f3b893b8b3dd00418",
+              "type": "bytes"
+            },
+            "value_sha256": "846b4e4e8bb5569ae09beead4d919af0b2c06a968de8d05b8a52b5f7b1d889a1"
+          },
+          "co_lnotab": {
+            "value": {
+              "hex": "02021e0142011c031e010801400140fd0a0526036201100334013201",
+              "type": "bytes"
+            },
+            "value_sha256": "15255ee72e6ed53b5b3e76cc7d22613283de7ff855fbd5ca023b6cad02ce152e"
+          },
+          "co_name": {
+            "value": {
+              "type": "str",
+              "value": "stage1_guidance"
+            },
+            "value_sha256": "1f790c492c5610c8a415a56ae5d15bf7a229cb0e29863a09f2152cf95448887f"
+          },
+          "co_names": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "shape"
+                },
+                {
+                  "type": "str",
+                  "value": "torch"
+                },
+                {
+                  "type": "str",
+                  "value": "arange"
+                },
+                {
+                  "type": "str",
+                  "value": "device"
+                },
+                {
+                  "type": "str",
+                  "value": "int"
+                },
+                {
+                  "type": "str",
+                  "value": "where"
+                },
+                {
+                  "type": "str",
+                  "value": "tensor"
+                },
+                {
+                  "type": "str",
+                  "value": "sum"
+                },
+                {
+                  "type": "str",
+                  "value": "long"
+                },
+                {
+                  "type": "str",
+                  "value": "norm"
+                },
+                {
+                  "type": "str",
+                  "value": "mean"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "d57c4f507ca1a37baef3f68c188cf644a8b19388017338b27fed0bede529f06e"
+          },
+          "co_nlocals": {
+            "value": {
+              "type": "int",
+              "value": 10
+            },
+            "value_sha256": "ccf72dc0df26306b84ca46ee6b7dcc47186b6a9586e320424e4a42d3806a47b0"
+          },
+          "co_posonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_qualname": {
+            "value": {
+              "type": "str",
+              "value": "stage1_guidance"
+            },
+            "value_sha256": "1f790c492c5610c8a415a56ae5d15bf7a229cb0e29863a09f2152cf95448887f"
+          },
+          "co_stacksize": {
+            "value": {
+              "type": "int",
+              "value": 8
+            },
+            "value_sha256": "251e24fc5192ac5196f3cca353b7ec7805c6e25750ff665378e7e097447677f8"
+          },
+          "co_varnames": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "keypoints"
+                },
+                {
+                  "type": "str",
+                  "value": "action_sequence"
+                },
+                {
+                  "type": "str",
+                  "value": "T"
+                },
+                {
+                  "type": "str",
+                  "value": "timesteps"
+                },
+                {
+                  "type": "str",
+                  "value": "final_start"
+                },
+                {
+                  "type": "str",
+                  "value": "weights"
+                },
+                {
+                  "type": "str",
+                  "value": "target_idx"
+                },
+                {
+                  "type": "str",
+                  "value": "target_pos"
+                },
+                {
+                  "type": "str",
+                  "value": "all_dists"
+                },
+                {
+                  "type": "str",
+                  "value": "reward"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "ea5a9d7780600fa217846c1aa6ebbb6340cfd74123d79866a59bd877f52bd717"
+          }
+        },
+        "marshal_length": 1195,
+        "marshal_sha256": "a6efff2bb46ca4038d30b63cbcdf340a126b10efeffa0830288ba0879b8484fa",
+        "value_structure_sha256": "22fc6724f564a73694bfb71cdabe4f5a07f51653fc7b12854ee5c28cd5bc2fbe"
+      },
+      "all_public_code_field_values_equal": true,
+      "future_annotations_control": {
+        "fields": {
+          "co_argcount": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_cellvars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_code": {
+            "value": {
+              "hex": "97007c016a000000000000000000000000000000000000006401190000007d02740200000000000000006a050000000000000000000000000000000000007c027c016a06000000000000000000000000000000000000ac02ab020000000000007d037409000000000000000064037c027a050000ab010000000000007d04740200000000000000006a0b0000000000000000000000000000000000007c037c046b5c0000740200000000000000006a0d00000000000000000000000000000000000064047c016a06000000000000000000000000000000000000ac02ab02000000000000740200000000000000006a0d00000000000000000000000000000000000064057c016a06000000000000000000000000000000000000ac02ab02000000000000ab030000000000007d057c057c056a0f000000000000000000000000000000000000ab000000000000007a0b00007d05740200000000000000006a0d00000000000000000000000000000000000064066701740200000000000000006a100000000000000000000000000000000000007c006a06000000000000000000000000000000000000ac07ab030000000000007d067c007c06190000006406190000007d07740200000000000000006a130000000000000000000000000000000000007c017c077a0a00006408ac09ab020000000000007d087c08640a7a0800007c057a0500006a0f0000000000000000000000000000000000006401ac09ab010000000000000b007d097c096a15000000000000000000000000000000000000ab000000000000005300",
+              "type": "bytes"
+            },
+            "value_sha256": "ed4eeb7bf621ad6a9d3156a01758e1fb82589dfe982a4eca747e911eed931d1d"
+          },
+          "co_consts": {
+            "value": {
+              "items": [
+                {
+                  "type": "NoneType",
+                  "value": null
+                },
+                {
+                  "type": "int",
+                  "value": 1
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "hex": "0x1.6666666666666p-1",
+                  "type": "float"
+                },
+                {
+                  "hex": "0x1.8000000000000p+1",
+                  "type": "float"
+                },
+                {
+                  "hex": "0x1.0000000000000p+0",
+                  "type": "float"
+                },
+                {
+                  "type": "int",
+                  "value": 0
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "dtype"
+                    },
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "type": "int",
+                  "value": -1
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "dim"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "type": "int",
+                  "value": 2
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "9cafdc89f1db1b1d5c8697522b6b21626fcd11cb0944b12d383b78aa6ffc4fbe"
+          },
+          "co_exceptiontable": {
+            "value": {
+              "hex": "",
+              "type": "bytes"
+            },
+            "value_sha256": "25752a85b1260d00c28d63bd89262d9f20e27594e3351e6dca7eecd94bc4ac38"
+          },
+          "co_filename": {
+            "value": {
+              "type": "str",
+              "value": "<string>"
+            },
+            "value_sha256": "6b25568b69fe613874be7072e6d5bce26a096d7085430dcc1cc6d292e2d5ec55"
+          },
+          "co_firstlineno": {
+            "value": {
+              "type": "int",
+              "value": 1
+            },
+            "value_sha256": "a8c8e3340be5028fb9d36fae8f1fb3fefe45792a42806adff6317ab0a341baee"
+          },
+          "co_flags": {
+            "value": {
+              "type": "int",
+              "value": 16777219
+            },
+            "value_sha256": "03d53c19ee2666a59ed96c498c4353699aa812e89f6d9d98f8c368e9a4867fec"
+          },
+          "co_freevars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_kwonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_linetable": {
+            "value": {
+              "hex": "8000e00817d7081dd1081d9861d108208041dc1015970c910c9851a07fd7273dd1273d900cd3103e8049dc1215906398419167932c804bf406000f148f6b896bd80811905bd10820dc080d8f0c890c9053a01fd72137d12137880cd30838dc080d8f0c890c9053a01fd72137d12137880cd30838f307040f068047f00a000f1698079f0b990b9b0dd10e258047f406001217971c911c98719863ac15af1aa91ab849d73c4cd13c4c901cd3114d804ad8111a983ad11126a071d11129804af406001116970a910a983fa85ad11b37b852900ad310408049d80f189841897ea007d10f27d70e2cd10e2cb011d00e2cd30e33d00d338046d80b118f3b893b8b3dd00418",
+              "type": "bytes"
+            },
+            "value_sha256": "846b4e4e8bb5569ae09beead4d919af0b2c06a968de8d05b8a52b5f7b1d889a1"
+          },
+          "co_lnotab": {
+            "value": {
+              "hex": "02021e0142011c031e010801400140fd0a0526036201100334013201",
+              "type": "bytes"
+            },
+            "value_sha256": "15255ee72e6ed53b5b3e76cc7d22613283de7ff855fbd5ca023b6cad02ce152e"
+          },
+          "co_name": {
+            "value": {
+              "type": "str",
+              "value": "stage1_guidance"
+            },
+            "value_sha256": "1f790c492c5610c8a415a56ae5d15bf7a229cb0e29863a09f2152cf95448887f"
+          },
+          "co_names": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "shape"
+                },
+                {
+                  "type": "str",
+                  "value": "torch"
+                },
+                {
+                  "type": "str",
+                  "value": "arange"
+                },
+                {
+                  "type": "str",
+                  "value": "device"
+                },
+                {
+                  "type": "str",
+                  "value": "int"
+                },
+                {
+                  "type": "str",
+                  "value": "where"
+                },
+                {
+                  "type": "str",
+                  "value": "tensor"
+                },
+                {
+                  "type": "str",
+                  "value": "sum"
+                },
+                {
+                  "type": "str",
+                  "value": "long"
+                },
+                {
+                  "type": "str",
+                  "value": "norm"
+                },
+                {
+                  "type": "str",
+                  "value": "mean"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "d57c4f507ca1a37baef3f68c188cf644a8b19388017338b27fed0bede529f06e"
+          },
+          "co_nlocals": {
+            "value": {
+              "type": "int",
+              "value": 10
+            },
+            "value_sha256": "ccf72dc0df26306b84ca46ee6b7dcc47186b6a9586e320424e4a42d3806a47b0"
+          },
+          "co_posonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_qualname": {
+            "value": {
+              "type": "str",
+              "value": "stage1_guidance"
+            },
+            "value_sha256": "1f790c492c5610c8a415a56ae5d15bf7a229cb0e29863a09f2152cf95448887f"
+          },
+          "co_stacksize": {
+            "value": {
+              "type": "int",
+              "value": 8
+            },
+            "value_sha256": "251e24fc5192ac5196f3cca353b7ec7805c6e25750ff665378e7e097447677f8"
+          },
+          "co_varnames": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "keypoints"
+                },
+                {
+                  "type": "str",
+                  "value": "action_sequence"
+                },
+                {
+                  "type": "str",
+                  "value": "T"
+                },
+                {
+                  "type": "str",
+                  "value": "timesteps"
+                },
+                {
+                  "type": "str",
+                  "value": "final_start"
+                },
+                {
+                  "type": "str",
+                  "value": "weights"
+                },
+                {
+                  "type": "str",
+                  "value": "target_idx"
+                },
+                {
+                  "type": "str",
+                  "value": "target_pos"
+                },
+                {
+                  "type": "str",
+                  "value": "all_dists"
+                },
+                {
+                  "type": "str",
+                  "value": "reward"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "ea5a9d7780600fa217846c1aa6ebbb6340cfd74123d79866a59bd877f52bd717"
+          }
+        },
+        "marshal_length": 1195,
+        "marshal_sha256": "d2d0cbfecbd8266eb95d6bb70a3e5c2a08c1e3f815eceb6e7210a0fa4f6ccc82",
+        "value_structure_sha256": "6b90e9f6256ae82ddc2fc6c0d221830bad5a642a393bbd0f084e3595c5233c84"
+      },
+      "interned_filename_compile": {
+        "fields": {
+          "co_argcount": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_cellvars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_code": {
+            "value": {
+              "hex": "97007c016a000000000000000000000000000000000000006401190000007d02740200000000000000006a050000000000000000000000000000000000007c027c016a06000000000000000000000000000000000000ac02ab020000000000007d037409000000000000000064037c027a050000ab010000000000007d04740200000000000000006a0b0000000000000000000000000000000000007c037c046b5c0000740200000000000000006a0d00000000000000000000000000000000000064047c016a06000000000000000000000000000000000000ac02ab02000000000000740200000000000000006a0d00000000000000000000000000000000000064057c016a06000000000000000000000000000000000000ac02ab02000000000000ab030000000000007d057c057c056a0f000000000000000000000000000000000000ab000000000000007a0b00007d05740200000000000000006a0d00000000000000000000000000000000000064066701740200000000000000006a100000000000000000000000000000000000007c006a06000000000000000000000000000000000000ac07ab030000000000007d067c007c06190000006406190000007d07740200000000000000006a130000000000000000000000000000000000007c017c077a0a00006408ac09ab020000000000007d087c08640a7a0800007c057a0500006a0f0000000000000000000000000000000000006401ac09ab010000000000000b007d097c096a15000000000000000000000000000000000000ab000000000000005300",
+              "type": "bytes"
+            },
+            "value_sha256": "ed4eeb7bf621ad6a9d3156a01758e1fb82589dfe982a4eca747e911eed931d1d"
+          },
+          "co_consts": {
+            "value": {
+              "items": [
+                {
+                  "type": "NoneType",
+                  "value": null
+                },
+                {
+                  "type": "int",
+                  "value": 1
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "hex": "0x1.6666666666666p-1",
+                  "type": "float"
+                },
+                {
+                  "hex": "0x1.8000000000000p+1",
+                  "type": "float"
+                },
+                {
+                  "hex": "0x1.0000000000000p+0",
+                  "type": "float"
+                },
+                {
+                  "type": "int",
+                  "value": 0
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "dtype"
+                    },
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "type": "int",
+                  "value": -1
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "dim"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "type": "int",
+                  "value": 2
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "9cafdc89f1db1b1d5c8697522b6b21626fcd11cb0944b12d383b78aa6ffc4fbe"
+          },
+          "co_exceptiontable": {
+            "value": {
+              "hex": "",
+              "type": "bytes"
+            },
+            "value_sha256": "25752a85b1260d00c28d63bd89262d9f20e27594e3351e6dca7eecd94bc4ac38"
+          },
+          "co_filename": {
+            "value": {
+              "type": "str",
+              "value": "<string>"
+            },
+            "value_sha256": "6b25568b69fe613874be7072e6d5bce26a096d7085430dcc1cc6d292e2d5ec55"
+          },
+          "co_firstlineno": {
+            "value": {
+              "type": "int",
+              "value": 1
+            },
+            "value_sha256": "a8c8e3340be5028fb9d36fae8f1fb3fefe45792a42806adff6317ab0a341baee"
+          },
+          "co_flags": {
+            "value": {
+              "type": "int",
+              "value": 3
+            },
+            "value_sha256": "66325f9c1b71c06d478b49d8c602f35a60780cc7b3b9fc493635bbe15c2e1da2"
+          },
+          "co_freevars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_kwonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_linetable": {
+            "value": {
+              "hex": "8000e00817d7081dd1081d9861d108208041dc1015970c910c9851a07fd7273dd1273d900cd3103e8049dc1215906398419167932c804bf406000f148f6b896bd80811905bd10820dc080d8f0c890c9053a01fd72137d12137880cd30838dc080d8f0c890c9053a01fd72137d12137880cd30838f307040f068047f00a000f1698079f0b990b9b0dd10e258047f406001217971c911c98719863ac15af1aa91ab849d73c4cd13c4c901cd3114d804ad8111a983ad11126a071d11129804af406001116970a910a983fa85ad11b37b852900ad310408049d80f189841897ea007d10f27d70e2cd10e2cb011d00e2cd30e33d00d338046d80b118f3b893b8b3dd00418",
+              "type": "bytes"
+            },
+            "value_sha256": "846b4e4e8bb5569ae09beead4d919af0b2c06a968de8d05b8a52b5f7b1d889a1"
+          },
+          "co_lnotab": {
+            "value": {
+              "hex": "02021e0142011c031e010801400140fd0a0526036201100334013201",
+              "type": "bytes"
+            },
+            "value_sha256": "15255ee72e6ed53b5b3e76cc7d22613283de7ff855fbd5ca023b6cad02ce152e"
+          },
+          "co_name": {
+            "value": {
+              "type": "str",
+              "value": "stage1_guidance"
+            },
+            "value_sha256": "1f790c492c5610c8a415a56ae5d15bf7a229cb0e29863a09f2152cf95448887f"
+          },
+          "co_names": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "shape"
+                },
+                {
+                  "type": "str",
+                  "value": "torch"
+                },
+                {
+                  "type": "str",
+                  "value": "arange"
+                },
+                {
+                  "type": "str",
+                  "value": "device"
+                },
+                {
+                  "type": "str",
+                  "value": "int"
+                },
+                {
+                  "type": "str",
+                  "value": "where"
+                },
+                {
+                  "type": "str",
+                  "value": "tensor"
+                },
+                {
+                  "type": "str",
+                  "value": "sum"
+                },
+                {
+                  "type": "str",
+                  "value": "long"
+                },
+                {
+                  "type": "str",
+                  "value": "norm"
+                },
+                {
+                  "type": "str",
+                  "value": "mean"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "d57c4f507ca1a37baef3f68c188cf644a8b19388017338b27fed0bede529f06e"
+          },
+          "co_nlocals": {
+            "value": {
+              "type": "int",
+              "value": 10
+            },
+            "value_sha256": "ccf72dc0df26306b84ca46ee6b7dcc47186b6a9586e320424e4a42d3806a47b0"
+          },
+          "co_posonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_qualname": {
+            "value": {
+              "type": "str",
+              "value": "stage1_guidance"
+            },
+            "value_sha256": "1f790c492c5610c8a415a56ae5d15bf7a229cb0e29863a09f2152cf95448887f"
+          },
+          "co_stacksize": {
+            "value": {
+              "type": "int",
+              "value": 8
+            },
+            "value_sha256": "251e24fc5192ac5196f3cca353b7ec7805c6e25750ff665378e7e097447677f8"
+          },
+          "co_varnames": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "keypoints"
+                },
+                {
+                  "type": "str",
+                  "value": "action_sequence"
+                },
+                {
+                  "type": "str",
+                  "value": "T"
+                },
+                {
+                  "type": "str",
+                  "value": "timesteps"
+                },
+                {
+                  "type": "str",
+                  "value": "final_start"
+                },
+                {
+                  "type": "str",
+                  "value": "weights"
+                },
+                {
+                  "type": "str",
+                  "value": "target_idx"
+                },
+                {
+                  "type": "str",
+                  "value": "target_pos"
+                },
+                {
+                  "type": "str",
+                  "value": "all_dists"
+                },
+                {
+                  "type": "str",
+                  "value": "reward"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "ea5a9d7780600fa217846c1aa6ebbb6340cfd74123d79866a59bd877f52bd717"
+          }
+        },
+        "marshal_length": 1195,
+        "marshal_sha256": "a6efff2bb46ca4038d30b63cbcdf340a126b10efeffa0830288ba0879b8484fa",
+        "value_structure_sha256": "22fc6724f564a73694bfb71cdabe4f5a07f51653fc7b12854ee5c28cd5bc2fbe"
+      },
+      "loader_identity": {
+        "code_sha256": "38a837e02ebb206c1740d92b01333eef42562bb504773c9decd6d9ca1ef00dbd",
+        "ordinal": 0,
+        "original_code_sha256": "a6efff2bb46ca4038d30b63cbcdf340a126b10efeffa0830288ba0879b8484fa",
+        "original_identity_origin": "loader_attached_original",
+        "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_0/stage1_guidance.txt",
+        "source_text_origin": "loader_attached_text",
+        "source_text_sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830"
+      },
+      "marshal_byte_differences": [
+        {
+          "loader_byte": 218,
+          "loader_context_hex": "2020202020202020da083c737472696e673eda0f7374616765315f67",
+          "offset": 891,
+          "static_byte": 250,
+          "static_context_hex": "2020202020202020fa083c737472696e673eda0f7374616765315f67"
+        }
+      ],
+      "same_filename_object": false,
+      "same_filename_value": true,
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_0/stage1_guidance.txt",
+      "source_sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+      "source_text_sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+      "source_text_transform": "identity",
+      "stage_for_review_only": 1,
+      "static": {
+        "fields": {
+          "co_argcount": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_cellvars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_code": {
+            "value": {
+              "hex": "97007c016a000000000000000000000000000000000000006401190000007d02740200000000000000006a050000000000000000000000000000000000007c027c016a06000000000000000000000000000000000000ac02ab020000000000007d037409000000000000000064037c027a050000ab010000000000007d04740200000000000000006a0b0000000000000000000000000000000000007c037c046b5c0000740200000000000000006a0d00000000000000000000000000000000000064047c016a06000000000000000000000000000000000000ac02ab02000000000000740200000000000000006a0d00000000000000000000000000000000000064057c016a06000000000000000000000000000000000000ac02ab02000000000000ab030000000000007d057c057c056a0f000000000000000000000000000000000000ab000000000000007a0b00007d05740200000000000000006a0d00000000000000000000000000000000000064066701740200000000000000006a100000000000000000000000000000000000007c006a06000000000000000000000000000000000000ac07ab030000000000007d067c007c06190000006406190000007d07740200000000000000006a130000000000000000000000000000000000007c017c077a0a00006408ac09ab020000000000007d087c08640a7a0800007c057a0500006a0f0000000000000000000000000000000000006401ac09ab010000000000000b007d097c096a15000000000000000000000000000000000000ab000000000000005300",
+              "type": "bytes"
+            },
+            "value_sha256": "ed4eeb7bf621ad6a9d3156a01758e1fb82589dfe982a4eca747e911eed931d1d"
+          },
+          "co_consts": {
+            "value": {
+              "items": [
+                {
+                  "type": "NoneType",
+                  "value": null
+                },
+                {
+                  "type": "int",
+                  "value": 1
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "hex": "0x1.6666666666666p-1",
+                  "type": "float"
+                },
+                {
+                  "hex": "0x1.8000000000000p+1",
+                  "type": "float"
+                },
+                {
+                  "hex": "0x1.0000000000000p+0",
+                  "type": "float"
+                },
+                {
+                  "type": "int",
+                  "value": 0
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "dtype"
+                    },
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "type": "int",
+                  "value": -1
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "dim"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "type": "int",
+                  "value": 2
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "9cafdc89f1db1b1d5c8697522b6b21626fcd11cb0944b12d383b78aa6ffc4fbe"
+          },
+          "co_exceptiontable": {
+            "value": {
+              "hex": "",
+              "type": "bytes"
+            },
+            "value_sha256": "25752a85b1260d00c28d63bd89262d9f20e27594e3351e6dca7eecd94bc4ac38"
+          },
+          "co_filename": {
+            "value": {
+              "type": "str",
+              "value": "<string>"
+            },
+            "value_sha256": "6b25568b69fe613874be7072e6d5bce26a096d7085430dcc1cc6d292e2d5ec55"
+          },
+          "co_firstlineno": {
+            "value": {
+              "type": "int",
+              "value": 1
+            },
+            "value_sha256": "a8c8e3340be5028fb9d36fae8f1fb3fefe45792a42806adff6317ab0a341baee"
+          },
+          "co_flags": {
+            "value": {
+              "type": "int",
+              "value": 3
+            },
+            "value_sha256": "66325f9c1b71c06d478b49d8c602f35a60780cc7b3b9fc493635bbe15c2e1da2"
+          },
+          "co_freevars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_kwonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_linetable": {
+            "value": {
+              "hex": "8000e00817d7081dd1081d9861d108208041dc1015970c910c9851a07fd7273dd1273d900cd3103e8049dc1215906398419167932c804bf406000f148f6b896bd80811905bd10820dc080d8f0c890c9053a01fd72137d12137880cd30838dc080d8f0c890c9053a01fd72137d12137880cd30838f307040f068047f00a000f1698079f0b990b9b0dd10e258047f406001217971c911c98719863ac15af1aa91ab849d73c4cd13c4c901cd3114d804ad8111a983ad11126a071d11129804af406001116970a910a983fa85ad11b37b852900ad310408049d80f189841897ea007d10f27d70e2cd10e2cb011d00e2cd30e33d00d338046d80b118f3b893b8b3dd00418",
+              "type": "bytes"
+            },
+            "value_sha256": "846b4e4e8bb5569ae09beead4d919af0b2c06a968de8d05b8a52b5f7b1d889a1"
+          },
+          "co_lnotab": {
+            "value": {
+              "hex": "02021e0142011c031e010801400140fd0a0526036201100334013201",
+              "type": "bytes"
+            },
+            "value_sha256": "15255ee72e6ed53b5b3e76cc7d22613283de7ff855fbd5ca023b6cad02ce152e"
+          },
+          "co_name": {
+            "value": {
+              "type": "str",
+              "value": "stage1_guidance"
+            },
+            "value_sha256": "1f790c492c5610c8a415a56ae5d15bf7a229cb0e29863a09f2152cf95448887f"
+          },
+          "co_names": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "shape"
+                },
+                {
+                  "type": "str",
+                  "value": "torch"
+                },
+                {
+                  "type": "str",
+                  "value": "arange"
+                },
+                {
+                  "type": "str",
+                  "value": "device"
+                },
+                {
+                  "type": "str",
+                  "value": "int"
+                },
+                {
+                  "type": "str",
+                  "value": "where"
+                },
+                {
+                  "type": "str",
+                  "value": "tensor"
+                },
+                {
+                  "type": "str",
+                  "value": "sum"
+                },
+                {
+                  "type": "str",
+                  "value": "long"
+                },
+                {
+                  "type": "str",
+                  "value": "norm"
+                },
+                {
+                  "type": "str",
+                  "value": "mean"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "d57c4f507ca1a37baef3f68c188cf644a8b19388017338b27fed0bede529f06e"
+          },
+          "co_nlocals": {
+            "value": {
+              "type": "int",
+              "value": 10
+            },
+            "value_sha256": "ccf72dc0df26306b84ca46ee6b7dcc47186b6a9586e320424e4a42d3806a47b0"
+          },
+          "co_posonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_qualname": {
+            "value": {
+              "type": "str",
+              "value": "stage1_guidance"
+            },
+            "value_sha256": "1f790c492c5610c8a415a56ae5d15bf7a229cb0e29863a09f2152cf95448887f"
+          },
+          "co_stacksize": {
+            "value": {
+              "type": "int",
+              "value": 8
+            },
+            "value_sha256": "251e24fc5192ac5196f3cca353b7ec7805c6e25750ff665378e7e097447677f8"
+          },
+          "co_varnames": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "keypoints"
+                },
+                {
+                  "type": "str",
+                  "value": "action_sequence"
+                },
+                {
+                  "type": "str",
+                  "value": "T"
+                },
+                {
+                  "type": "str",
+                  "value": "timesteps"
+                },
+                {
+                  "type": "str",
+                  "value": "final_start"
+                },
+                {
+                  "type": "str",
+                  "value": "weights"
+                },
+                {
+                  "type": "str",
+                  "value": "target_idx"
+                },
+                {
+                  "type": "str",
+                  "value": "target_pos"
+                },
+                {
+                  "type": "str",
+                  "value": "all_dists"
+                },
+                {
+                  "type": "str",
+                  "value": "reward"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "ea5a9d7780600fa217846c1aa6ebbb6340cfd74123d79866a59bd877f52bd717"
+          }
+        },
+        "marshal_length": 1195,
+        "marshal_sha256": "64bfc5d573100a463facb1849937b4fbd895070028584e2f0d8d3d3aa21dcfe6",
+        "value_structure_sha256": "22fc6724f564a73694bfb71cdabe4f5a07f51653fc7b12854ee5c28cd5bc2fbe"
+      },
+      "target_kind": "fixed_keypoint_0",
+      "task_id_for_review_only": 0
+    },
+    {
+      "actual_loader_definition": {
+        "fields": {
+          "co_argcount": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_cellvars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_code": {
+            "value": {
+              "hex": "9700740000000000000000006a0300000000000000000000000000000000000064017c016a04000000000000000000000000000000000000ac02ab020000000000005300",
+              "type": "bytes"
+            },
+            "value_sha256": "7185e6341e0bb406525226b775137d1c66d9cf08274003a6f916cb52fcf27d56"
+          },
+          "co_consts": {
+            "value": {
+              "items": [
+                {
+                  "type": "NoneType",
+                  "value": null
+                },
+                {
+                  "hex": "0x0.0p+0",
+                  "type": "float"
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "7295462b763168f36ee5ba16e9d2cb5b21b152932703afac49f339b799392b4f"
+          },
+          "co_exceptiontable": {
+            "value": {
+              "hex": "",
+              "type": "bytes"
+            },
+            "value_sha256": "25752a85b1260d00c28d63bd89262d9f20e27594e3351e6dca7eecd94bc4ac38"
+          },
+          "co_filename": {
+            "value": {
+              "type": "str",
+              "value": "<string>"
+            },
+            "value_sha256": "6b25568b69fe613874be7072e6d5bce26a096d7085430dcc1cc6d292e2d5ec55"
+          },
+          "co_firstlineno": {
+            "value": {
+              "type": "int",
+              "value": 1
+            },
+            "value_sha256": "a8c8e3340be5028fb9d36fae8f1fb3fefe45792a42806adff6317ab0a341baee"
+          },
+          "co_flags": {
+            "value": {
+              "type": "int",
+              "value": 3
+            },
+            "value_sha256": "66325f9c1b71c06d478b49d8c602f35a60780cc7b3b9fc493635bbe15c2e1da2"
+          },
+          "co_freevars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_kwonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_linetable": {
+            "value": {
+              "hex": "8000e40b108f3c893c9803a04fd7243ad1243a883cd30b3bd0043b",
+              "type": "bytes"
+            },
+            "value_sha256": "10e3cff0dc0f44194ff2d2281411293042121463de2bc45da2031227297bb6e0"
+          },
+          "co_lnotab": {
+            "value": {
+              "hex": "0202",
+              "type": "bytes"
+            },
+            "value_sha256": "e865fb2769f9034574fa56d53676bf705ec3e4a188d2cd6fda26024391eca301"
+          },
+          "co_name": {
+            "value": {
+              "type": "str",
+              "value": "stage2_guidance"
+            },
+            "value_sha256": "b9b8caf4760132288da94ca7f585bc2050a175805728f216fb3c053f90b35d2d"
+          },
+          "co_names": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "torch"
+                },
+                {
+                  "type": "str",
+                  "value": "tensor"
+                },
+                {
+                  "type": "str",
+                  "value": "device"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "5de24a32b347744ab4eb8e9632b6d698fe507b984d1c172809f65b94a3dc5b61"
+          },
+          "co_nlocals": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_posonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_qualname": {
+            "value": {
+              "type": "str",
+              "value": "stage2_guidance"
+            },
+            "value_sha256": "b9b8caf4760132288da94ca7f585bc2050a175805728f216fb3c053f90b35d2d"
+          },
+          "co_stacksize": {
+            "value": {
+              "type": "int",
+              "value": 4
+            },
+            "value_sha256": "7b1b01c895c93bcf97d8dbca659e5916278f9894348660ee1a6abf69129c06c9"
+          },
+          "co_varnames": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "keypoints"
+                },
+                {
+                  "type": "str",
+                  "value": "action_sequence"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "2ba1ad61037aff670493949424a4c2d4cb6d7b5a07825fa59119fa33075c685f"
+          }
+        },
+        "marshal_length": 248,
+        "marshal_sha256": "0a648f81c0572e440ea64777199d1e22bcefcce77ed74e31757a8d7cbe8a0a00",
+        "value_structure_sha256": "1716c2d2f459c03d5b159ee530c25f54dac3ce46e0ec117e13af9e4c6dfa593f"
+      },
+      "all_public_code_field_values_equal": true,
+      "future_annotations_control": {
+        "fields": {
+          "co_argcount": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_cellvars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_code": {
+            "value": {
+              "hex": "9700740000000000000000006a0300000000000000000000000000000000000064017c016a04000000000000000000000000000000000000ac02ab020000000000005300",
+              "type": "bytes"
+            },
+            "value_sha256": "7185e6341e0bb406525226b775137d1c66d9cf08274003a6f916cb52fcf27d56"
+          },
+          "co_consts": {
+            "value": {
+              "items": [
+                {
+                  "type": "NoneType",
+                  "value": null
+                },
+                {
+                  "hex": "0x0.0p+0",
+                  "type": "float"
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "7295462b763168f36ee5ba16e9d2cb5b21b152932703afac49f339b799392b4f"
+          },
+          "co_exceptiontable": {
+            "value": {
+              "hex": "",
+              "type": "bytes"
+            },
+            "value_sha256": "25752a85b1260d00c28d63bd89262d9f20e27594e3351e6dca7eecd94bc4ac38"
+          },
+          "co_filename": {
+            "value": {
+              "type": "str",
+              "value": "<string>"
+            },
+            "value_sha256": "6b25568b69fe613874be7072e6d5bce26a096d7085430dcc1cc6d292e2d5ec55"
+          },
+          "co_firstlineno": {
+            "value": {
+              "type": "int",
+              "value": 1
+            },
+            "value_sha256": "a8c8e3340be5028fb9d36fae8f1fb3fefe45792a42806adff6317ab0a341baee"
+          },
+          "co_flags": {
+            "value": {
+              "type": "int",
+              "value": 16777219
+            },
+            "value_sha256": "03d53c19ee2666a59ed96c498c4353699aa812e89f6d9d98f8c368e9a4867fec"
+          },
+          "co_freevars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_kwonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_linetable": {
+            "value": {
+              "hex": "8000e40b108f3c893c9803a04fd7243ad1243a883cd30b3bd0043b",
+              "type": "bytes"
+            },
+            "value_sha256": "10e3cff0dc0f44194ff2d2281411293042121463de2bc45da2031227297bb6e0"
+          },
+          "co_lnotab": {
+            "value": {
+              "hex": "0202",
+              "type": "bytes"
+            },
+            "value_sha256": "e865fb2769f9034574fa56d53676bf705ec3e4a188d2cd6fda26024391eca301"
+          },
+          "co_name": {
+            "value": {
+              "type": "str",
+              "value": "stage2_guidance"
+            },
+            "value_sha256": "b9b8caf4760132288da94ca7f585bc2050a175805728f216fb3c053f90b35d2d"
+          },
+          "co_names": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "torch"
+                },
+                {
+                  "type": "str",
+                  "value": "tensor"
+                },
+                {
+                  "type": "str",
+                  "value": "device"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "5de24a32b347744ab4eb8e9632b6d698fe507b984d1c172809f65b94a3dc5b61"
+          },
+          "co_nlocals": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_posonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_qualname": {
+            "value": {
+              "type": "str",
+              "value": "stage2_guidance"
+            },
+            "value_sha256": "b9b8caf4760132288da94ca7f585bc2050a175805728f216fb3c053f90b35d2d"
+          },
+          "co_stacksize": {
+            "value": {
+              "type": "int",
+              "value": 4
+            },
+            "value_sha256": "7b1b01c895c93bcf97d8dbca659e5916278f9894348660ee1a6abf69129c06c9"
+          },
+          "co_varnames": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "keypoints"
+                },
+                {
+                  "type": "str",
+                  "value": "action_sequence"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "2ba1ad61037aff670493949424a4c2d4cb6d7b5a07825fa59119fa33075c685f"
+          }
+        },
+        "marshal_length": 248,
+        "marshal_sha256": "0c05c98b865087118773579237cbcd6f58c0dd7f05205a30b2efa7607e94c57d",
+        "value_structure_sha256": "9067affbeec172b05838cd8734c03e4f9c070baf140cbc4ff11b6a8e9c632921"
+      },
+      "interned_filename_compile": {
+        "fields": {
+          "co_argcount": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_cellvars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_code": {
+            "value": {
+              "hex": "9700740000000000000000006a0300000000000000000000000000000000000064017c016a04000000000000000000000000000000000000ac02ab020000000000005300",
+              "type": "bytes"
+            },
+            "value_sha256": "7185e6341e0bb406525226b775137d1c66d9cf08274003a6f916cb52fcf27d56"
+          },
+          "co_consts": {
+            "value": {
+              "items": [
+                {
+                  "type": "NoneType",
+                  "value": null
+                },
+                {
+                  "hex": "0x0.0p+0",
+                  "type": "float"
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "7295462b763168f36ee5ba16e9d2cb5b21b152932703afac49f339b799392b4f"
+          },
+          "co_exceptiontable": {
+            "value": {
+              "hex": "",
+              "type": "bytes"
+            },
+            "value_sha256": "25752a85b1260d00c28d63bd89262d9f20e27594e3351e6dca7eecd94bc4ac38"
+          },
+          "co_filename": {
+            "value": {
+              "type": "str",
+              "value": "<string>"
+            },
+            "value_sha256": "6b25568b69fe613874be7072e6d5bce26a096d7085430dcc1cc6d292e2d5ec55"
+          },
+          "co_firstlineno": {
+            "value": {
+              "type": "int",
+              "value": 1
+            },
+            "value_sha256": "a8c8e3340be5028fb9d36fae8f1fb3fefe45792a42806adff6317ab0a341baee"
+          },
+          "co_flags": {
+            "value": {
+              "type": "int",
+              "value": 3
+            },
+            "value_sha256": "66325f9c1b71c06d478b49d8c602f35a60780cc7b3b9fc493635bbe15c2e1da2"
+          },
+          "co_freevars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_kwonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_linetable": {
+            "value": {
+              "hex": "8000e40b108f3c893c9803a04fd7243ad1243a883cd30b3bd0043b",
+              "type": "bytes"
+            },
+            "value_sha256": "10e3cff0dc0f44194ff2d2281411293042121463de2bc45da2031227297bb6e0"
+          },
+          "co_lnotab": {
+            "value": {
+              "hex": "0202",
+              "type": "bytes"
+            },
+            "value_sha256": "e865fb2769f9034574fa56d53676bf705ec3e4a188d2cd6fda26024391eca301"
+          },
+          "co_name": {
+            "value": {
+              "type": "str",
+              "value": "stage2_guidance"
+            },
+            "value_sha256": "b9b8caf4760132288da94ca7f585bc2050a175805728f216fb3c053f90b35d2d"
+          },
+          "co_names": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "torch"
+                },
+                {
+                  "type": "str",
+                  "value": "tensor"
+                },
+                {
+                  "type": "str",
+                  "value": "device"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "5de24a32b347744ab4eb8e9632b6d698fe507b984d1c172809f65b94a3dc5b61"
+          },
+          "co_nlocals": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_posonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_qualname": {
+            "value": {
+              "type": "str",
+              "value": "stage2_guidance"
+            },
+            "value_sha256": "b9b8caf4760132288da94ca7f585bc2050a175805728f216fb3c053f90b35d2d"
+          },
+          "co_stacksize": {
+            "value": {
+              "type": "int",
+              "value": 4
+            },
+            "value_sha256": "7b1b01c895c93bcf97d8dbca659e5916278f9894348660ee1a6abf69129c06c9"
+          },
+          "co_varnames": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "keypoints"
+                },
+                {
+                  "type": "str",
+                  "value": "action_sequence"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "2ba1ad61037aff670493949424a4c2d4cb6d7b5a07825fa59119fa33075c685f"
+          }
+        },
+        "marshal_length": 248,
+        "marshal_sha256": "0a648f81c0572e440ea64777199d1e22bcefcce77ed74e31757a8d7cbe8a0a00",
+        "value_structure_sha256": "1716c2d2f459c03d5b159ee530c25f54dac3ce46e0ec117e13af9e4c6dfa593f"
+      },
+      "loader_identity": {
+        "code_sha256": "38a837e02ebb206c1740d92b01333eef42562bb504773c9decd6d9ca1ef00dbd",
+        "ordinal": 0,
+        "original_code_sha256": "0a648f81c0572e440ea64777199d1e22bcefcce77ed74e31757a8d7cbe8a0a00",
+        "original_identity_origin": "loader_attached_original",
+        "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_0/stage2_guidance.txt",
+        "source_text_origin": "loader_attached_text",
+        "source_text_sha256": "ca058cc1dcf87ce5910181800bb2f65b8cd4d92788b27f3b10b1e33dbc103f84"
+      },
+      "marshal_byte_differences": [
+        {
+          "loader_byte": 218,
+          "loader_context_hex": "6573020000002020da083c737472696e673eda0f7374616765325f67",
+          "offset": 175,
+          "static_byte": 250,
+          "static_context_hex": "6573020000002020fa083c737472696e673eda0f7374616765325f67"
+        }
+      ],
+      "same_filename_object": false,
+      "same_filename_value": true,
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_0/stage2_guidance.txt",
+      "source_sha256": "ca058cc1dcf87ce5910181800bb2f65b8cd4d92788b27f3b10b1e33dbc103f84",
+      "source_text_sha256": "ca058cc1dcf87ce5910181800bb2f65b8cd4d92788b27f3b10b1e33dbc103f84",
+      "source_text_transform": "identity",
+      "stage_for_review_only": 2,
+      "static": {
+        "fields": {
+          "co_argcount": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_cellvars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_code": {
+            "value": {
+              "hex": "9700740000000000000000006a0300000000000000000000000000000000000064017c016a04000000000000000000000000000000000000ac02ab020000000000005300",
+              "type": "bytes"
+            },
+            "value_sha256": "7185e6341e0bb406525226b775137d1c66d9cf08274003a6f916cb52fcf27d56"
+          },
+          "co_consts": {
+            "value": {
+              "items": [
+                {
+                  "type": "NoneType",
+                  "value": null
+                },
+                {
+                  "hex": "0x0.0p+0",
+                  "type": "float"
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "7295462b763168f36ee5ba16e9d2cb5b21b152932703afac49f339b799392b4f"
+          },
+          "co_exceptiontable": {
+            "value": {
+              "hex": "",
+              "type": "bytes"
+            },
+            "value_sha256": "25752a85b1260d00c28d63bd89262d9f20e27594e3351e6dca7eecd94bc4ac38"
+          },
+          "co_filename": {
+            "value": {
+              "type": "str",
+              "value": "<string>"
+            },
+            "value_sha256": "6b25568b69fe613874be7072e6d5bce26a096d7085430dcc1cc6d292e2d5ec55"
+          },
+          "co_firstlineno": {
+            "value": {
+              "type": "int",
+              "value": 1
+            },
+            "value_sha256": "a8c8e3340be5028fb9d36fae8f1fb3fefe45792a42806adff6317ab0a341baee"
+          },
+          "co_flags": {
+            "value": {
+              "type": "int",
+              "value": 3
+            },
+            "value_sha256": "66325f9c1b71c06d478b49d8c602f35a60780cc7b3b9fc493635bbe15c2e1da2"
+          },
+          "co_freevars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_kwonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_linetable": {
+            "value": {
+              "hex": "8000e40b108f3c893c9803a04fd7243ad1243a883cd30b3bd0043b",
+              "type": "bytes"
+            },
+            "value_sha256": "10e3cff0dc0f44194ff2d2281411293042121463de2bc45da2031227297bb6e0"
+          },
+          "co_lnotab": {
+            "value": {
+              "hex": "0202",
+              "type": "bytes"
+            },
+            "value_sha256": "e865fb2769f9034574fa56d53676bf705ec3e4a188d2cd6fda26024391eca301"
+          },
+          "co_name": {
+            "value": {
+              "type": "str",
+              "value": "stage2_guidance"
+            },
+            "value_sha256": "b9b8caf4760132288da94ca7f585bc2050a175805728f216fb3c053f90b35d2d"
+          },
+          "co_names": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "torch"
+                },
+                {
+                  "type": "str",
+                  "value": "tensor"
+                },
+                {
+                  "type": "str",
+                  "value": "device"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "5de24a32b347744ab4eb8e9632b6d698fe507b984d1c172809f65b94a3dc5b61"
+          },
+          "co_nlocals": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_posonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_qualname": {
+            "value": {
+              "type": "str",
+              "value": "stage2_guidance"
+            },
+            "value_sha256": "b9b8caf4760132288da94ca7f585bc2050a175805728f216fb3c053f90b35d2d"
+          },
+          "co_stacksize": {
+            "value": {
+              "type": "int",
+              "value": 4
+            },
+            "value_sha256": "7b1b01c895c93bcf97d8dbca659e5916278f9894348660ee1a6abf69129c06c9"
+          },
+          "co_varnames": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "keypoints"
+                },
+                {
+                  "type": "str",
+                  "value": "action_sequence"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "2ba1ad61037aff670493949424a4c2d4cb6d7b5a07825fa59119fa33075c685f"
+          }
+        },
+        "marshal_length": 248,
+        "marshal_sha256": "83ea6176054c2c82bbd3f94f1f3eb2c91a1169357f7eed6672b148868aff9a40",
+        "value_structure_sha256": "1716c2d2f459c03d5b159ee530c25f54dac3ce46e0ec117e13af9e4c6dfa593f"
+      },
+      "target_kind": "none_constant_reward",
+      "task_id_for_review_only": 0
+    },
+    {
+      "actual_loader_definition": {
+        "fields": {
+          "co_argcount": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_cellvars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_code": {
+            "value": {
+              "hex": "97007c016a000000000000000000000000000000000000006401190000007d02740200000000000000006a050000000000000000000000000000000000007c027c016a06000000000000000000000000000000000000ac02ab020000000000007d037409000000000000000064037c027a050000ab010000000000007d04740200000000000000006a0b0000000000000000000000000000000000007c037c046b5c0000740200000000000000006a0d00000000000000000000000000000000000064047c016a06000000000000000000000000000000000000ac02ab02000000000000740200000000000000006a0d00000000000000000000000000000000000064057c016a06000000000000000000000000000000000000ac02ab02000000000000ab030000000000007d057c057c056a0f000000000000000000000000000000000000ab000000000000007a0b00007d05740200000000000000006a0d00000000000000000000000000000000000064066701740200000000000000006a100000000000000000000000000000000000007c006a06000000000000000000000000000000000000ac07ab030000000000007d067c007c06190000006406190000007d07740200000000000000006a130000000000000000000000000000000000007c017c077a0a00006408ac09ab020000000000007d087c08640a7a0800007c057a0500006a0f0000000000000000000000000000000000006401ac09ab010000000000000b007d097c096a15000000000000000000000000000000000000ab000000000000005300",
+              "type": "bytes"
+            },
+            "value_sha256": "ed4eeb7bf621ad6a9d3156a01758e1fb82589dfe982a4eca747e911eed931d1d"
+          },
+          "co_consts": {
+            "value": {
+              "items": [
+                {
+                  "type": "NoneType",
+                  "value": null
+                },
+                {
+                  "type": "int",
+                  "value": 1
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "hex": "0x1.6666666666666p-1",
+                  "type": "float"
+                },
+                {
+                  "hex": "0x1.8000000000000p+1",
+                  "type": "float"
+                },
+                {
+                  "hex": "0x1.0000000000000p+0",
+                  "type": "float"
+                },
+                {
+                  "type": "int",
+                  "value": 0
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "dtype"
+                    },
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "type": "int",
+                  "value": -1
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "dim"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "type": "int",
+                  "value": 2
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "9cafdc89f1db1b1d5c8697522b6b21626fcd11cb0944b12d383b78aa6ffc4fbe"
+          },
+          "co_exceptiontable": {
+            "value": {
+              "hex": "",
+              "type": "bytes"
+            },
+            "value_sha256": "25752a85b1260d00c28d63bd89262d9f20e27594e3351e6dca7eecd94bc4ac38"
+          },
+          "co_filename": {
+            "value": {
+              "type": "str",
+              "value": "<string>"
+            },
+            "value_sha256": "6b25568b69fe613874be7072e6d5bce26a096d7085430dcc1cc6d292e2d5ec55"
+          },
+          "co_firstlineno": {
+            "value": {
+              "type": "int",
+              "value": 1
+            },
+            "value_sha256": "a8c8e3340be5028fb9d36fae8f1fb3fefe45792a42806adff6317ab0a341baee"
+          },
+          "co_flags": {
+            "value": {
+              "type": "int",
+              "value": 3
+            },
+            "value_sha256": "66325f9c1b71c06d478b49d8c602f35a60780cc7b3b9fc493635bbe15c2e1da2"
+          },
+          "co_freevars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_kwonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_linetable": {
+            "value": {
+              "hex": "8000e00817d7081dd1081d9861d108208041dc1015970c910c9851a07fd7273dd1273d900cd3103e8049dc1215906398419167932c804bf406000f148f6b896bd80811905bd10820dc080d8f0c890c9053a01fd72137d12137880cd30838dc080d8f0c890c9053a01fd72137d12137880cd30838f307040f068047f00a000f1698079f0b990b9b0dd10e258047f406001217971c911c98719863ac15af1aa91ab849d73c4cd13c4c901cd3114d804ad8111a983ad11126a071d11129804af406001116970a910a983fa85ad11b37b852900ad310408049d80f189841897ea007d10f27d70e2cd10e2cb011d00e2cd30e33d00d338046d80b118f3b893b8b3dd00418",
+              "type": "bytes"
+            },
+            "value_sha256": "846b4e4e8bb5569ae09beead4d919af0b2c06a968de8d05b8a52b5f7b1d889a1"
+          },
+          "co_lnotab": {
+            "value": {
+              "hex": "02021e0142011c031e010801400140fd0a0526036201100334013201",
+              "type": "bytes"
+            },
+            "value_sha256": "15255ee72e6ed53b5b3e76cc7d22613283de7ff855fbd5ca023b6cad02ce152e"
+          },
+          "co_name": {
+            "value": {
+              "type": "str",
+              "value": "stage1_guidance"
+            },
+            "value_sha256": "1f790c492c5610c8a415a56ae5d15bf7a229cb0e29863a09f2152cf95448887f"
+          },
+          "co_names": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "shape"
+                },
+                {
+                  "type": "str",
+                  "value": "torch"
+                },
+                {
+                  "type": "str",
+                  "value": "arange"
+                },
+                {
+                  "type": "str",
+                  "value": "device"
+                },
+                {
+                  "type": "str",
+                  "value": "int"
+                },
+                {
+                  "type": "str",
+                  "value": "where"
+                },
+                {
+                  "type": "str",
+                  "value": "tensor"
+                },
+                {
+                  "type": "str",
+                  "value": "sum"
+                },
+                {
+                  "type": "str",
+                  "value": "long"
+                },
+                {
+                  "type": "str",
+                  "value": "norm"
+                },
+                {
+                  "type": "str",
+                  "value": "mean"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "d57c4f507ca1a37baef3f68c188cf644a8b19388017338b27fed0bede529f06e"
+          },
+          "co_nlocals": {
+            "value": {
+              "type": "int",
+              "value": 10
+            },
+            "value_sha256": "ccf72dc0df26306b84ca46ee6b7dcc47186b6a9586e320424e4a42d3806a47b0"
+          },
+          "co_posonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_qualname": {
+            "value": {
+              "type": "str",
+              "value": "stage1_guidance"
+            },
+            "value_sha256": "1f790c492c5610c8a415a56ae5d15bf7a229cb0e29863a09f2152cf95448887f"
+          },
+          "co_stacksize": {
+            "value": {
+              "type": "int",
+              "value": 8
+            },
+            "value_sha256": "251e24fc5192ac5196f3cca353b7ec7805c6e25750ff665378e7e097447677f8"
+          },
+          "co_varnames": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "keypoints"
+                },
+                {
+                  "type": "str",
+                  "value": "action_sequence"
+                },
+                {
+                  "type": "str",
+                  "value": "T"
+                },
+                {
+                  "type": "str",
+                  "value": "timesteps"
+                },
+                {
+                  "type": "str",
+                  "value": "final_start"
+                },
+                {
+                  "type": "str",
+                  "value": "weights"
+                },
+                {
+                  "type": "str",
+                  "value": "target_idx"
+                },
+                {
+                  "type": "str",
+                  "value": "target_pos"
+                },
+                {
+                  "type": "str",
+                  "value": "all_dists"
+                },
+                {
+                  "type": "str",
+                  "value": "reward"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "ea5a9d7780600fa217846c1aa6ebbb6340cfd74123d79866a59bd877f52bd717"
+          }
+        },
+        "marshal_length": 1195,
+        "marshal_sha256": "a6efff2bb46ca4038d30b63cbcdf340a126b10efeffa0830288ba0879b8484fa",
+        "value_structure_sha256": "22fc6724f564a73694bfb71cdabe4f5a07f51653fc7b12854ee5c28cd5bc2fbe"
+      },
+      "all_public_code_field_values_equal": true,
+      "future_annotations_control": {
+        "fields": {
+          "co_argcount": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_cellvars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_code": {
+            "value": {
+              "hex": "97007c016a000000000000000000000000000000000000006401190000007d02740200000000000000006a050000000000000000000000000000000000007c027c016a06000000000000000000000000000000000000ac02ab020000000000007d037409000000000000000064037c027a050000ab010000000000007d04740200000000000000006a0b0000000000000000000000000000000000007c037c046b5c0000740200000000000000006a0d00000000000000000000000000000000000064047c016a06000000000000000000000000000000000000ac02ab02000000000000740200000000000000006a0d00000000000000000000000000000000000064057c016a06000000000000000000000000000000000000ac02ab02000000000000ab030000000000007d057c057c056a0f000000000000000000000000000000000000ab000000000000007a0b00007d05740200000000000000006a0d00000000000000000000000000000000000064066701740200000000000000006a100000000000000000000000000000000000007c006a06000000000000000000000000000000000000ac07ab030000000000007d067c007c06190000006406190000007d07740200000000000000006a130000000000000000000000000000000000007c017c077a0a00006408ac09ab020000000000007d087c08640a7a0800007c057a0500006a0f0000000000000000000000000000000000006401ac09ab010000000000000b007d097c096a15000000000000000000000000000000000000ab000000000000005300",
+              "type": "bytes"
+            },
+            "value_sha256": "ed4eeb7bf621ad6a9d3156a01758e1fb82589dfe982a4eca747e911eed931d1d"
+          },
+          "co_consts": {
+            "value": {
+              "items": [
+                {
+                  "type": "NoneType",
+                  "value": null
+                },
+                {
+                  "type": "int",
+                  "value": 1
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "hex": "0x1.6666666666666p-1",
+                  "type": "float"
+                },
+                {
+                  "hex": "0x1.8000000000000p+1",
+                  "type": "float"
+                },
+                {
+                  "hex": "0x1.0000000000000p+0",
+                  "type": "float"
+                },
+                {
+                  "type": "int",
+                  "value": 0
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "dtype"
+                    },
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "type": "int",
+                  "value": -1
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "dim"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "type": "int",
+                  "value": 2
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "9cafdc89f1db1b1d5c8697522b6b21626fcd11cb0944b12d383b78aa6ffc4fbe"
+          },
+          "co_exceptiontable": {
+            "value": {
+              "hex": "",
+              "type": "bytes"
+            },
+            "value_sha256": "25752a85b1260d00c28d63bd89262d9f20e27594e3351e6dca7eecd94bc4ac38"
+          },
+          "co_filename": {
+            "value": {
+              "type": "str",
+              "value": "<string>"
+            },
+            "value_sha256": "6b25568b69fe613874be7072e6d5bce26a096d7085430dcc1cc6d292e2d5ec55"
+          },
+          "co_firstlineno": {
+            "value": {
+              "type": "int",
+              "value": 1
+            },
+            "value_sha256": "a8c8e3340be5028fb9d36fae8f1fb3fefe45792a42806adff6317ab0a341baee"
+          },
+          "co_flags": {
+            "value": {
+              "type": "int",
+              "value": 16777219
+            },
+            "value_sha256": "03d53c19ee2666a59ed96c498c4353699aa812e89f6d9d98f8c368e9a4867fec"
+          },
+          "co_freevars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_kwonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_linetable": {
+            "value": {
+              "hex": "8000e00817d7081dd1081d9861d108208041dc1015970c910c9851a07fd7273dd1273d900cd3103e8049dc1215906398419167932c804bf406000f148f6b896bd80811905bd10820dc080d8f0c890c9053a01fd72137d12137880cd30838dc080d8f0c890c9053a01fd72137d12137880cd30838f307040f068047f00a000f1698079f0b990b9b0dd10e258047f406001217971c911c98719863ac15af1aa91ab849d73c4cd13c4c901cd3114d804ad8111a983ad11126a071d11129804af406001116970a910a983fa85ad11b37b852900ad310408049d80f189841897ea007d10f27d70e2cd10e2cb011d00e2cd30e33d00d338046d80b118f3b893b8b3dd00418",
+              "type": "bytes"
+            },
+            "value_sha256": "846b4e4e8bb5569ae09beead4d919af0b2c06a968de8d05b8a52b5f7b1d889a1"
+          },
+          "co_lnotab": {
+            "value": {
+              "hex": "02021e0142011c031e010801400140fd0a0526036201100334013201",
+              "type": "bytes"
+            },
+            "value_sha256": "15255ee72e6ed53b5b3e76cc7d22613283de7ff855fbd5ca023b6cad02ce152e"
+          },
+          "co_name": {
+            "value": {
+              "type": "str",
+              "value": "stage1_guidance"
+            },
+            "value_sha256": "1f790c492c5610c8a415a56ae5d15bf7a229cb0e29863a09f2152cf95448887f"
+          },
+          "co_names": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "shape"
+                },
+                {
+                  "type": "str",
+                  "value": "torch"
+                },
+                {
+                  "type": "str",
+                  "value": "arange"
+                },
+                {
+                  "type": "str",
+                  "value": "device"
+                },
+                {
+                  "type": "str",
+                  "value": "int"
+                },
+                {
+                  "type": "str",
+                  "value": "where"
+                },
+                {
+                  "type": "str",
+                  "value": "tensor"
+                },
+                {
+                  "type": "str",
+                  "value": "sum"
+                },
+                {
+                  "type": "str",
+                  "value": "long"
+                },
+                {
+                  "type": "str",
+                  "value": "norm"
+                },
+                {
+                  "type": "str",
+                  "value": "mean"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "d57c4f507ca1a37baef3f68c188cf644a8b19388017338b27fed0bede529f06e"
+          },
+          "co_nlocals": {
+            "value": {
+              "type": "int",
+              "value": 10
+            },
+            "value_sha256": "ccf72dc0df26306b84ca46ee6b7dcc47186b6a9586e320424e4a42d3806a47b0"
+          },
+          "co_posonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_qualname": {
+            "value": {
+              "type": "str",
+              "value": "stage1_guidance"
+            },
+            "value_sha256": "1f790c492c5610c8a415a56ae5d15bf7a229cb0e29863a09f2152cf95448887f"
+          },
+          "co_stacksize": {
+            "value": {
+              "type": "int",
+              "value": 8
+            },
+            "value_sha256": "251e24fc5192ac5196f3cca353b7ec7805c6e25750ff665378e7e097447677f8"
+          },
+          "co_varnames": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "keypoints"
+                },
+                {
+                  "type": "str",
+                  "value": "action_sequence"
+                },
+                {
+                  "type": "str",
+                  "value": "T"
+                },
+                {
+                  "type": "str",
+                  "value": "timesteps"
+                },
+                {
+                  "type": "str",
+                  "value": "final_start"
+                },
+                {
+                  "type": "str",
+                  "value": "weights"
+                },
+                {
+                  "type": "str",
+                  "value": "target_idx"
+                },
+                {
+                  "type": "str",
+                  "value": "target_pos"
+                },
+                {
+                  "type": "str",
+                  "value": "all_dists"
+                },
+                {
+                  "type": "str",
+                  "value": "reward"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "ea5a9d7780600fa217846c1aa6ebbb6340cfd74123d79866a59bd877f52bd717"
+          }
+        },
+        "marshal_length": 1195,
+        "marshal_sha256": "d2d0cbfecbd8266eb95d6bb70a3e5c2a08c1e3f815eceb6e7210a0fa4f6ccc82",
+        "value_structure_sha256": "6b90e9f6256ae82ddc2fc6c0d221830bad5a642a393bbd0f084e3595c5233c84"
+      },
+      "interned_filename_compile": {
+        "fields": {
+          "co_argcount": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_cellvars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_code": {
+            "value": {
+              "hex": "97007c016a000000000000000000000000000000000000006401190000007d02740200000000000000006a050000000000000000000000000000000000007c027c016a06000000000000000000000000000000000000ac02ab020000000000007d037409000000000000000064037c027a050000ab010000000000007d04740200000000000000006a0b0000000000000000000000000000000000007c037c046b5c0000740200000000000000006a0d00000000000000000000000000000000000064047c016a06000000000000000000000000000000000000ac02ab02000000000000740200000000000000006a0d00000000000000000000000000000000000064057c016a06000000000000000000000000000000000000ac02ab02000000000000ab030000000000007d057c057c056a0f000000000000000000000000000000000000ab000000000000007a0b00007d05740200000000000000006a0d00000000000000000000000000000000000064066701740200000000000000006a100000000000000000000000000000000000007c006a06000000000000000000000000000000000000ac07ab030000000000007d067c007c06190000006406190000007d07740200000000000000006a130000000000000000000000000000000000007c017c077a0a00006408ac09ab020000000000007d087c08640a7a0800007c057a0500006a0f0000000000000000000000000000000000006401ac09ab010000000000000b007d097c096a15000000000000000000000000000000000000ab000000000000005300",
+              "type": "bytes"
+            },
+            "value_sha256": "ed4eeb7bf621ad6a9d3156a01758e1fb82589dfe982a4eca747e911eed931d1d"
+          },
+          "co_consts": {
+            "value": {
+              "items": [
+                {
+                  "type": "NoneType",
+                  "value": null
+                },
+                {
+                  "type": "int",
+                  "value": 1
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "hex": "0x1.6666666666666p-1",
+                  "type": "float"
+                },
+                {
+                  "hex": "0x1.8000000000000p+1",
+                  "type": "float"
+                },
+                {
+                  "hex": "0x1.0000000000000p+0",
+                  "type": "float"
+                },
+                {
+                  "type": "int",
+                  "value": 0
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "dtype"
+                    },
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "type": "int",
+                  "value": -1
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "dim"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "type": "int",
+                  "value": 2
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "9cafdc89f1db1b1d5c8697522b6b21626fcd11cb0944b12d383b78aa6ffc4fbe"
+          },
+          "co_exceptiontable": {
+            "value": {
+              "hex": "",
+              "type": "bytes"
+            },
+            "value_sha256": "25752a85b1260d00c28d63bd89262d9f20e27594e3351e6dca7eecd94bc4ac38"
+          },
+          "co_filename": {
+            "value": {
+              "type": "str",
+              "value": "<string>"
+            },
+            "value_sha256": "6b25568b69fe613874be7072e6d5bce26a096d7085430dcc1cc6d292e2d5ec55"
+          },
+          "co_firstlineno": {
+            "value": {
+              "type": "int",
+              "value": 1
+            },
+            "value_sha256": "a8c8e3340be5028fb9d36fae8f1fb3fefe45792a42806adff6317ab0a341baee"
+          },
+          "co_flags": {
+            "value": {
+              "type": "int",
+              "value": 3
+            },
+            "value_sha256": "66325f9c1b71c06d478b49d8c602f35a60780cc7b3b9fc493635bbe15c2e1da2"
+          },
+          "co_freevars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_kwonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_linetable": {
+            "value": {
+              "hex": "8000e00817d7081dd1081d9861d108208041dc1015970c910c9851a07fd7273dd1273d900cd3103e8049dc1215906398419167932c804bf406000f148f6b896bd80811905bd10820dc080d8f0c890c9053a01fd72137d12137880cd30838dc080d8f0c890c9053a01fd72137d12137880cd30838f307040f068047f00a000f1698079f0b990b9b0dd10e258047f406001217971c911c98719863ac15af1aa91ab849d73c4cd13c4c901cd3114d804ad8111a983ad11126a071d11129804af406001116970a910a983fa85ad11b37b852900ad310408049d80f189841897ea007d10f27d70e2cd10e2cb011d00e2cd30e33d00d338046d80b118f3b893b8b3dd00418",
+              "type": "bytes"
+            },
+            "value_sha256": "846b4e4e8bb5569ae09beead4d919af0b2c06a968de8d05b8a52b5f7b1d889a1"
+          },
+          "co_lnotab": {
+            "value": {
+              "hex": "02021e0142011c031e010801400140fd0a0526036201100334013201",
+              "type": "bytes"
+            },
+            "value_sha256": "15255ee72e6ed53b5b3e76cc7d22613283de7ff855fbd5ca023b6cad02ce152e"
+          },
+          "co_name": {
+            "value": {
+              "type": "str",
+              "value": "stage1_guidance"
+            },
+            "value_sha256": "1f790c492c5610c8a415a56ae5d15bf7a229cb0e29863a09f2152cf95448887f"
+          },
+          "co_names": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "shape"
+                },
+                {
+                  "type": "str",
+                  "value": "torch"
+                },
+                {
+                  "type": "str",
+                  "value": "arange"
+                },
+                {
+                  "type": "str",
+                  "value": "device"
+                },
+                {
+                  "type": "str",
+                  "value": "int"
+                },
+                {
+                  "type": "str",
+                  "value": "where"
+                },
+                {
+                  "type": "str",
+                  "value": "tensor"
+                },
+                {
+                  "type": "str",
+                  "value": "sum"
+                },
+                {
+                  "type": "str",
+                  "value": "long"
+                },
+                {
+                  "type": "str",
+                  "value": "norm"
+                },
+                {
+                  "type": "str",
+                  "value": "mean"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "d57c4f507ca1a37baef3f68c188cf644a8b19388017338b27fed0bede529f06e"
+          },
+          "co_nlocals": {
+            "value": {
+              "type": "int",
+              "value": 10
+            },
+            "value_sha256": "ccf72dc0df26306b84ca46ee6b7dcc47186b6a9586e320424e4a42d3806a47b0"
+          },
+          "co_posonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_qualname": {
+            "value": {
+              "type": "str",
+              "value": "stage1_guidance"
+            },
+            "value_sha256": "1f790c492c5610c8a415a56ae5d15bf7a229cb0e29863a09f2152cf95448887f"
+          },
+          "co_stacksize": {
+            "value": {
+              "type": "int",
+              "value": 8
+            },
+            "value_sha256": "251e24fc5192ac5196f3cca353b7ec7805c6e25750ff665378e7e097447677f8"
+          },
+          "co_varnames": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "keypoints"
+                },
+                {
+                  "type": "str",
+                  "value": "action_sequence"
+                },
+                {
+                  "type": "str",
+                  "value": "T"
+                },
+                {
+                  "type": "str",
+                  "value": "timesteps"
+                },
+                {
+                  "type": "str",
+                  "value": "final_start"
+                },
+                {
+                  "type": "str",
+                  "value": "weights"
+                },
+                {
+                  "type": "str",
+                  "value": "target_idx"
+                },
+                {
+                  "type": "str",
+                  "value": "target_pos"
+                },
+                {
+                  "type": "str",
+                  "value": "all_dists"
+                },
+                {
+                  "type": "str",
+                  "value": "reward"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "ea5a9d7780600fa217846c1aa6ebbb6340cfd74123d79866a59bd877f52bd717"
+          }
+        },
+        "marshal_length": 1195,
+        "marshal_sha256": "a6efff2bb46ca4038d30b63cbcdf340a126b10efeffa0830288ba0879b8484fa",
+        "value_structure_sha256": "22fc6724f564a73694bfb71cdabe4f5a07f51653fc7b12854ee5c28cd5bc2fbe"
+      },
+      "loader_identity": {
+        "code_sha256": "38a837e02ebb206c1740d92b01333eef42562bb504773c9decd6d9ca1ef00dbd",
+        "ordinal": 0,
+        "original_code_sha256": "a6efff2bb46ca4038d30b63cbcdf340a126b10efeffa0830288ba0879b8484fa",
+        "original_identity_origin": "loader_attached_original",
+        "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_5/stage1_guidance.txt",
+        "source_text_origin": "loader_attached_text",
+        "source_text_sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830"
+      },
+      "marshal_byte_differences": [
+        {
+          "loader_byte": 218,
+          "loader_context_hex": "2020202020202020da083c737472696e673eda0f7374616765315f67",
+          "offset": 891,
+          "static_byte": 250,
+          "static_context_hex": "2020202020202020fa083c737472696e673eda0f7374616765315f67"
+        }
+      ],
+      "same_filename_object": false,
+      "same_filename_value": true,
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_5/stage1_guidance.txt",
+      "source_sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+      "source_text_sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+      "source_text_transform": "identity",
+      "stage_for_review_only": 1,
+      "static": {
+        "fields": {
+          "co_argcount": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_cellvars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_code": {
+            "value": {
+              "hex": "97007c016a000000000000000000000000000000000000006401190000007d02740200000000000000006a050000000000000000000000000000000000007c027c016a06000000000000000000000000000000000000ac02ab020000000000007d037409000000000000000064037c027a050000ab010000000000007d04740200000000000000006a0b0000000000000000000000000000000000007c037c046b5c0000740200000000000000006a0d00000000000000000000000000000000000064047c016a06000000000000000000000000000000000000ac02ab02000000000000740200000000000000006a0d00000000000000000000000000000000000064057c016a06000000000000000000000000000000000000ac02ab02000000000000ab030000000000007d057c057c056a0f000000000000000000000000000000000000ab000000000000007a0b00007d05740200000000000000006a0d00000000000000000000000000000000000064066701740200000000000000006a100000000000000000000000000000000000007c006a06000000000000000000000000000000000000ac07ab030000000000007d067c007c06190000006406190000007d07740200000000000000006a130000000000000000000000000000000000007c017c077a0a00006408ac09ab020000000000007d087c08640a7a0800007c057a0500006a0f0000000000000000000000000000000000006401ac09ab010000000000000b007d097c096a15000000000000000000000000000000000000ab000000000000005300",
+              "type": "bytes"
+            },
+            "value_sha256": "ed4eeb7bf621ad6a9d3156a01758e1fb82589dfe982a4eca747e911eed931d1d"
+          },
+          "co_consts": {
+            "value": {
+              "items": [
+                {
+                  "type": "NoneType",
+                  "value": null
+                },
+                {
+                  "type": "int",
+                  "value": 1
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "hex": "0x1.6666666666666p-1",
+                  "type": "float"
+                },
+                {
+                  "hex": "0x1.8000000000000p+1",
+                  "type": "float"
+                },
+                {
+                  "hex": "0x1.0000000000000p+0",
+                  "type": "float"
+                },
+                {
+                  "type": "int",
+                  "value": 0
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "dtype"
+                    },
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "type": "int",
+                  "value": -1
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "dim"
+                    }
+                  ],
+                  "type": "tuple"
+                },
+                {
+                  "type": "int",
+                  "value": 2
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "9cafdc89f1db1b1d5c8697522b6b21626fcd11cb0944b12d383b78aa6ffc4fbe"
+          },
+          "co_exceptiontable": {
+            "value": {
+              "hex": "",
+              "type": "bytes"
+            },
+            "value_sha256": "25752a85b1260d00c28d63bd89262d9f20e27594e3351e6dca7eecd94bc4ac38"
+          },
+          "co_filename": {
+            "value": {
+              "type": "str",
+              "value": "<string>"
+            },
+            "value_sha256": "6b25568b69fe613874be7072e6d5bce26a096d7085430dcc1cc6d292e2d5ec55"
+          },
+          "co_firstlineno": {
+            "value": {
+              "type": "int",
+              "value": 1
+            },
+            "value_sha256": "a8c8e3340be5028fb9d36fae8f1fb3fefe45792a42806adff6317ab0a341baee"
+          },
+          "co_flags": {
+            "value": {
+              "type": "int",
+              "value": 3
+            },
+            "value_sha256": "66325f9c1b71c06d478b49d8c602f35a60780cc7b3b9fc493635bbe15c2e1da2"
+          },
+          "co_freevars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_kwonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_linetable": {
+            "value": {
+              "hex": "8000e00817d7081dd1081d9861d108208041dc1015970c910c9851a07fd7273dd1273d900cd3103e8049dc1215906398419167932c804bf406000f148f6b896bd80811905bd10820dc080d8f0c890c9053a01fd72137d12137880cd30838dc080d8f0c890c9053a01fd72137d12137880cd30838f307040f068047f00a000f1698079f0b990b9b0dd10e258047f406001217971c911c98719863ac15af1aa91ab849d73c4cd13c4c901cd3114d804ad8111a983ad11126a071d11129804af406001116970a910a983fa85ad11b37b852900ad310408049d80f189841897ea007d10f27d70e2cd10e2cb011d00e2cd30e33d00d338046d80b118f3b893b8b3dd00418",
+              "type": "bytes"
+            },
+            "value_sha256": "846b4e4e8bb5569ae09beead4d919af0b2c06a968de8d05b8a52b5f7b1d889a1"
+          },
+          "co_lnotab": {
+            "value": {
+              "hex": "02021e0142011c031e010801400140fd0a0526036201100334013201",
+              "type": "bytes"
+            },
+            "value_sha256": "15255ee72e6ed53b5b3e76cc7d22613283de7ff855fbd5ca023b6cad02ce152e"
+          },
+          "co_name": {
+            "value": {
+              "type": "str",
+              "value": "stage1_guidance"
+            },
+            "value_sha256": "1f790c492c5610c8a415a56ae5d15bf7a229cb0e29863a09f2152cf95448887f"
+          },
+          "co_names": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "shape"
+                },
+                {
+                  "type": "str",
+                  "value": "torch"
+                },
+                {
+                  "type": "str",
+                  "value": "arange"
+                },
+                {
+                  "type": "str",
+                  "value": "device"
+                },
+                {
+                  "type": "str",
+                  "value": "int"
+                },
+                {
+                  "type": "str",
+                  "value": "where"
+                },
+                {
+                  "type": "str",
+                  "value": "tensor"
+                },
+                {
+                  "type": "str",
+                  "value": "sum"
+                },
+                {
+                  "type": "str",
+                  "value": "long"
+                },
+                {
+                  "type": "str",
+                  "value": "norm"
+                },
+                {
+                  "type": "str",
+                  "value": "mean"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "d57c4f507ca1a37baef3f68c188cf644a8b19388017338b27fed0bede529f06e"
+          },
+          "co_nlocals": {
+            "value": {
+              "type": "int",
+              "value": 10
+            },
+            "value_sha256": "ccf72dc0df26306b84ca46ee6b7dcc47186b6a9586e320424e4a42d3806a47b0"
+          },
+          "co_posonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_qualname": {
+            "value": {
+              "type": "str",
+              "value": "stage1_guidance"
+            },
+            "value_sha256": "1f790c492c5610c8a415a56ae5d15bf7a229cb0e29863a09f2152cf95448887f"
+          },
+          "co_stacksize": {
+            "value": {
+              "type": "int",
+              "value": 8
+            },
+            "value_sha256": "251e24fc5192ac5196f3cca353b7ec7805c6e25750ff665378e7e097447677f8"
+          },
+          "co_varnames": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "keypoints"
+                },
+                {
+                  "type": "str",
+                  "value": "action_sequence"
+                },
+                {
+                  "type": "str",
+                  "value": "T"
+                },
+                {
+                  "type": "str",
+                  "value": "timesteps"
+                },
+                {
+                  "type": "str",
+                  "value": "final_start"
+                },
+                {
+                  "type": "str",
+                  "value": "weights"
+                },
+                {
+                  "type": "str",
+                  "value": "target_idx"
+                },
+                {
+                  "type": "str",
+                  "value": "target_pos"
+                },
+                {
+                  "type": "str",
+                  "value": "all_dists"
+                },
+                {
+                  "type": "str",
+                  "value": "reward"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "ea5a9d7780600fa217846c1aa6ebbb6340cfd74123d79866a59bd877f52bd717"
+          }
+        },
+        "marshal_length": 1195,
+        "marshal_sha256": "64bfc5d573100a463facb1849937b4fbd895070028584e2f0d8d3d3aa21dcfe6",
+        "value_structure_sha256": "22fc6724f564a73694bfb71cdabe4f5a07f51653fc7b12854ee5c28cd5bc2fbe"
+      },
+      "target_kind": "fixed_keypoint_0",
+      "task_id_for_review_only": 5
+    },
+    {
+      "actual_loader_definition": {
+        "fields": {
+          "co_argcount": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_cellvars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_code": {
+            "value": {
+              "hex": "9700740000000000000000006a0300000000000000000000000000000000000064017c016a04000000000000000000000000000000000000ac02ab020000000000005300",
+              "type": "bytes"
+            },
+            "value_sha256": "7185e6341e0bb406525226b775137d1c66d9cf08274003a6f916cb52fcf27d56"
+          },
+          "co_consts": {
+            "value": {
+              "items": [
+                {
+                  "type": "NoneType",
+                  "value": null
+                },
+                {
+                  "hex": "0x0.0p+0",
+                  "type": "float"
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "7295462b763168f36ee5ba16e9d2cb5b21b152932703afac49f339b799392b4f"
+          },
+          "co_exceptiontable": {
+            "value": {
+              "hex": "",
+              "type": "bytes"
+            },
+            "value_sha256": "25752a85b1260d00c28d63bd89262d9f20e27594e3351e6dca7eecd94bc4ac38"
+          },
+          "co_filename": {
+            "value": {
+              "type": "str",
+              "value": "<string>"
+            },
+            "value_sha256": "6b25568b69fe613874be7072e6d5bce26a096d7085430dcc1cc6d292e2d5ec55"
+          },
+          "co_firstlineno": {
+            "value": {
+              "type": "int",
+              "value": 1
+            },
+            "value_sha256": "a8c8e3340be5028fb9d36fae8f1fb3fefe45792a42806adff6317ab0a341baee"
+          },
+          "co_flags": {
+            "value": {
+              "type": "int",
+              "value": 3
+            },
+            "value_sha256": "66325f9c1b71c06d478b49d8c602f35a60780cc7b3b9fc493635bbe15c2e1da2"
+          },
+          "co_freevars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_kwonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_linetable": {
+            "value": {
+              "hex": "8000e40b108f3c893c9803a04fd7243ad1243a883cd30b3bd0043b",
+              "type": "bytes"
+            },
+            "value_sha256": "10e3cff0dc0f44194ff2d2281411293042121463de2bc45da2031227297bb6e0"
+          },
+          "co_lnotab": {
+            "value": {
+              "hex": "0202",
+              "type": "bytes"
+            },
+            "value_sha256": "e865fb2769f9034574fa56d53676bf705ec3e4a188d2cd6fda26024391eca301"
+          },
+          "co_name": {
+            "value": {
+              "type": "str",
+              "value": "stage2_guidance"
+            },
+            "value_sha256": "b9b8caf4760132288da94ca7f585bc2050a175805728f216fb3c053f90b35d2d"
+          },
+          "co_names": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "torch"
+                },
+                {
+                  "type": "str",
+                  "value": "tensor"
+                },
+                {
+                  "type": "str",
+                  "value": "device"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "5de24a32b347744ab4eb8e9632b6d698fe507b984d1c172809f65b94a3dc5b61"
+          },
+          "co_nlocals": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_posonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_qualname": {
+            "value": {
+              "type": "str",
+              "value": "stage2_guidance"
+            },
+            "value_sha256": "b9b8caf4760132288da94ca7f585bc2050a175805728f216fb3c053f90b35d2d"
+          },
+          "co_stacksize": {
+            "value": {
+              "type": "int",
+              "value": 4
+            },
+            "value_sha256": "7b1b01c895c93bcf97d8dbca659e5916278f9894348660ee1a6abf69129c06c9"
+          },
+          "co_varnames": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "keypoints"
+                },
+                {
+                  "type": "str",
+                  "value": "action_sequence"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "2ba1ad61037aff670493949424a4c2d4cb6d7b5a07825fa59119fa33075c685f"
+          }
+        },
+        "marshal_length": 248,
+        "marshal_sha256": "0a648f81c0572e440ea64777199d1e22bcefcce77ed74e31757a8d7cbe8a0a00",
+        "value_structure_sha256": "1716c2d2f459c03d5b159ee530c25f54dac3ce46e0ec117e13af9e4c6dfa593f"
+      },
+      "all_public_code_field_values_equal": true,
+      "future_annotations_control": {
+        "fields": {
+          "co_argcount": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_cellvars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_code": {
+            "value": {
+              "hex": "9700740000000000000000006a0300000000000000000000000000000000000064017c016a04000000000000000000000000000000000000ac02ab020000000000005300",
+              "type": "bytes"
+            },
+            "value_sha256": "7185e6341e0bb406525226b775137d1c66d9cf08274003a6f916cb52fcf27d56"
+          },
+          "co_consts": {
+            "value": {
+              "items": [
+                {
+                  "type": "NoneType",
+                  "value": null
+                },
+                {
+                  "hex": "0x0.0p+0",
+                  "type": "float"
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "7295462b763168f36ee5ba16e9d2cb5b21b152932703afac49f339b799392b4f"
+          },
+          "co_exceptiontable": {
+            "value": {
+              "hex": "",
+              "type": "bytes"
+            },
+            "value_sha256": "25752a85b1260d00c28d63bd89262d9f20e27594e3351e6dca7eecd94bc4ac38"
+          },
+          "co_filename": {
+            "value": {
+              "type": "str",
+              "value": "<string>"
+            },
+            "value_sha256": "6b25568b69fe613874be7072e6d5bce26a096d7085430dcc1cc6d292e2d5ec55"
+          },
+          "co_firstlineno": {
+            "value": {
+              "type": "int",
+              "value": 1
+            },
+            "value_sha256": "a8c8e3340be5028fb9d36fae8f1fb3fefe45792a42806adff6317ab0a341baee"
+          },
+          "co_flags": {
+            "value": {
+              "type": "int",
+              "value": 16777219
+            },
+            "value_sha256": "03d53c19ee2666a59ed96c498c4353699aa812e89f6d9d98f8c368e9a4867fec"
+          },
+          "co_freevars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_kwonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_linetable": {
+            "value": {
+              "hex": "8000e40b108f3c893c9803a04fd7243ad1243a883cd30b3bd0043b",
+              "type": "bytes"
+            },
+            "value_sha256": "10e3cff0dc0f44194ff2d2281411293042121463de2bc45da2031227297bb6e0"
+          },
+          "co_lnotab": {
+            "value": {
+              "hex": "0202",
+              "type": "bytes"
+            },
+            "value_sha256": "e865fb2769f9034574fa56d53676bf705ec3e4a188d2cd6fda26024391eca301"
+          },
+          "co_name": {
+            "value": {
+              "type": "str",
+              "value": "stage2_guidance"
+            },
+            "value_sha256": "b9b8caf4760132288da94ca7f585bc2050a175805728f216fb3c053f90b35d2d"
+          },
+          "co_names": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "torch"
+                },
+                {
+                  "type": "str",
+                  "value": "tensor"
+                },
+                {
+                  "type": "str",
+                  "value": "device"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "5de24a32b347744ab4eb8e9632b6d698fe507b984d1c172809f65b94a3dc5b61"
+          },
+          "co_nlocals": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_posonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_qualname": {
+            "value": {
+              "type": "str",
+              "value": "stage2_guidance"
+            },
+            "value_sha256": "b9b8caf4760132288da94ca7f585bc2050a175805728f216fb3c053f90b35d2d"
+          },
+          "co_stacksize": {
+            "value": {
+              "type": "int",
+              "value": 4
+            },
+            "value_sha256": "7b1b01c895c93bcf97d8dbca659e5916278f9894348660ee1a6abf69129c06c9"
+          },
+          "co_varnames": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "keypoints"
+                },
+                {
+                  "type": "str",
+                  "value": "action_sequence"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "2ba1ad61037aff670493949424a4c2d4cb6d7b5a07825fa59119fa33075c685f"
+          }
+        },
+        "marshal_length": 248,
+        "marshal_sha256": "0c05c98b865087118773579237cbcd6f58c0dd7f05205a30b2efa7607e94c57d",
+        "value_structure_sha256": "9067affbeec172b05838cd8734c03e4f9c070baf140cbc4ff11b6a8e9c632921"
+      },
+      "interned_filename_compile": {
+        "fields": {
+          "co_argcount": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_cellvars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_code": {
+            "value": {
+              "hex": "9700740000000000000000006a0300000000000000000000000000000000000064017c016a04000000000000000000000000000000000000ac02ab020000000000005300",
+              "type": "bytes"
+            },
+            "value_sha256": "7185e6341e0bb406525226b775137d1c66d9cf08274003a6f916cb52fcf27d56"
+          },
+          "co_consts": {
+            "value": {
+              "items": [
+                {
+                  "type": "NoneType",
+                  "value": null
+                },
+                {
+                  "hex": "0x0.0p+0",
+                  "type": "float"
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "7295462b763168f36ee5ba16e9d2cb5b21b152932703afac49f339b799392b4f"
+          },
+          "co_exceptiontable": {
+            "value": {
+              "hex": "",
+              "type": "bytes"
+            },
+            "value_sha256": "25752a85b1260d00c28d63bd89262d9f20e27594e3351e6dca7eecd94bc4ac38"
+          },
+          "co_filename": {
+            "value": {
+              "type": "str",
+              "value": "<string>"
+            },
+            "value_sha256": "6b25568b69fe613874be7072e6d5bce26a096d7085430dcc1cc6d292e2d5ec55"
+          },
+          "co_firstlineno": {
+            "value": {
+              "type": "int",
+              "value": 1
+            },
+            "value_sha256": "a8c8e3340be5028fb9d36fae8f1fb3fefe45792a42806adff6317ab0a341baee"
+          },
+          "co_flags": {
+            "value": {
+              "type": "int",
+              "value": 3
+            },
+            "value_sha256": "66325f9c1b71c06d478b49d8c602f35a60780cc7b3b9fc493635bbe15c2e1da2"
+          },
+          "co_freevars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_kwonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_linetable": {
+            "value": {
+              "hex": "8000e40b108f3c893c9803a04fd7243ad1243a883cd30b3bd0043b",
+              "type": "bytes"
+            },
+            "value_sha256": "10e3cff0dc0f44194ff2d2281411293042121463de2bc45da2031227297bb6e0"
+          },
+          "co_lnotab": {
+            "value": {
+              "hex": "0202",
+              "type": "bytes"
+            },
+            "value_sha256": "e865fb2769f9034574fa56d53676bf705ec3e4a188d2cd6fda26024391eca301"
+          },
+          "co_name": {
+            "value": {
+              "type": "str",
+              "value": "stage2_guidance"
+            },
+            "value_sha256": "b9b8caf4760132288da94ca7f585bc2050a175805728f216fb3c053f90b35d2d"
+          },
+          "co_names": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "torch"
+                },
+                {
+                  "type": "str",
+                  "value": "tensor"
+                },
+                {
+                  "type": "str",
+                  "value": "device"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "5de24a32b347744ab4eb8e9632b6d698fe507b984d1c172809f65b94a3dc5b61"
+          },
+          "co_nlocals": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_posonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_qualname": {
+            "value": {
+              "type": "str",
+              "value": "stage2_guidance"
+            },
+            "value_sha256": "b9b8caf4760132288da94ca7f585bc2050a175805728f216fb3c053f90b35d2d"
+          },
+          "co_stacksize": {
+            "value": {
+              "type": "int",
+              "value": 4
+            },
+            "value_sha256": "7b1b01c895c93bcf97d8dbca659e5916278f9894348660ee1a6abf69129c06c9"
+          },
+          "co_varnames": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "keypoints"
+                },
+                {
+                  "type": "str",
+                  "value": "action_sequence"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "2ba1ad61037aff670493949424a4c2d4cb6d7b5a07825fa59119fa33075c685f"
+          }
+        },
+        "marshal_length": 248,
+        "marshal_sha256": "0a648f81c0572e440ea64777199d1e22bcefcce77ed74e31757a8d7cbe8a0a00",
+        "value_structure_sha256": "1716c2d2f459c03d5b159ee530c25f54dac3ce46e0ec117e13af9e4c6dfa593f"
+      },
+      "loader_identity": {
+        "code_sha256": "38a837e02ebb206c1740d92b01333eef42562bb504773c9decd6d9ca1ef00dbd",
+        "ordinal": 0,
+        "original_code_sha256": "0a648f81c0572e440ea64777199d1e22bcefcce77ed74e31757a8d7cbe8a0a00",
+        "original_identity_origin": "loader_attached_original",
+        "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_5/stage2_guidance.txt",
+        "source_text_origin": "loader_attached_text",
+        "source_text_sha256": "ca058cc1dcf87ce5910181800bb2f65b8cd4d92788b27f3b10b1e33dbc103f84"
+      },
+      "marshal_byte_differences": [
+        {
+          "loader_byte": 218,
+          "loader_context_hex": "6573020000002020da083c737472696e673eda0f7374616765325f67",
+          "offset": 175,
+          "static_byte": 250,
+          "static_context_hex": "6573020000002020fa083c737472696e673eda0f7374616765325f67"
+        }
+      ],
+      "same_filename_object": false,
+      "same_filename_value": true,
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_5/stage2_guidance.txt",
+      "source_sha256": "ca058cc1dcf87ce5910181800bb2f65b8cd4d92788b27f3b10b1e33dbc103f84",
+      "source_text_sha256": "ca058cc1dcf87ce5910181800bb2f65b8cd4d92788b27f3b10b1e33dbc103f84",
+      "source_text_transform": "identity",
+      "stage_for_review_only": 2,
+      "static": {
+        "fields": {
+          "co_argcount": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_cellvars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_code": {
+            "value": {
+              "hex": "9700740000000000000000006a0300000000000000000000000000000000000064017c016a04000000000000000000000000000000000000ac02ab020000000000005300",
+              "type": "bytes"
+            },
+            "value_sha256": "7185e6341e0bb406525226b775137d1c66d9cf08274003a6f916cb52fcf27d56"
+          },
+          "co_consts": {
+            "value": {
+              "items": [
+                {
+                  "type": "NoneType",
+                  "value": null
+                },
+                {
+                  "hex": "0x0.0p+0",
+                  "type": "float"
+                },
+                {
+                  "items": [
+                    {
+                      "type": "str",
+                      "value": "device"
+                    }
+                  ],
+                  "type": "tuple"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "7295462b763168f36ee5ba16e9d2cb5b21b152932703afac49f339b799392b4f"
+          },
+          "co_exceptiontable": {
+            "value": {
+              "hex": "",
+              "type": "bytes"
+            },
+            "value_sha256": "25752a85b1260d00c28d63bd89262d9f20e27594e3351e6dca7eecd94bc4ac38"
+          },
+          "co_filename": {
+            "value": {
+              "type": "str",
+              "value": "<string>"
+            },
+            "value_sha256": "6b25568b69fe613874be7072e6d5bce26a096d7085430dcc1cc6d292e2d5ec55"
+          },
+          "co_firstlineno": {
+            "value": {
+              "type": "int",
+              "value": 1
+            },
+            "value_sha256": "a8c8e3340be5028fb9d36fae8f1fb3fefe45792a42806adff6317ab0a341baee"
+          },
+          "co_flags": {
+            "value": {
+              "type": "int",
+              "value": 3
+            },
+            "value_sha256": "66325f9c1b71c06d478b49d8c602f35a60780cc7b3b9fc493635bbe15c2e1da2"
+          },
+          "co_freevars": {
+            "value": {
+              "items": [],
+              "type": "tuple"
+            },
+            "value_sha256": "e9729d5702a67d523058b2b4e973076ca98bc8ed3380b2ae076c526647db8fd0"
+          },
+          "co_kwonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_linetable": {
+            "value": {
+              "hex": "8000e40b108f3c893c9803a04fd7243ad1243a883cd30b3bd0043b",
+              "type": "bytes"
+            },
+            "value_sha256": "10e3cff0dc0f44194ff2d2281411293042121463de2bc45da2031227297bb6e0"
+          },
+          "co_lnotab": {
+            "value": {
+              "hex": "0202",
+              "type": "bytes"
+            },
+            "value_sha256": "e865fb2769f9034574fa56d53676bf705ec3e4a188d2cd6fda26024391eca301"
+          },
+          "co_name": {
+            "value": {
+              "type": "str",
+              "value": "stage2_guidance"
+            },
+            "value_sha256": "b9b8caf4760132288da94ca7f585bc2050a175805728f216fb3c053f90b35d2d"
+          },
+          "co_names": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "torch"
+                },
+                {
+                  "type": "str",
+                  "value": "tensor"
+                },
+                {
+                  "type": "str",
+                  "value": "device"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "5de24a32b347744ab4eb8e9632b6d698fe507b984d1c172809f65b94a3dc5b61"
+          },
+          "co_nlocals": {
+            "value": {
+              "type": "int",
+              "value": 2
+            },
+            "value_sha256": "765148704b654eb1c0aeb76b0f5de0678f367635f8c82866182c8b6fde1d07a5"
+          },
+          "co_posonlyargcount": {
+            "value": {
+              "type": "int",
+              "value": 0
+            },
+            "value_sha256": "a76ddea3c350274fb39896f51ca5b064c27d067bbafee2cd3a58909b4ebe9c30"
+          },
+          "co_qualname": {
+            "value": {
+              "type": "str",
+              "value": "stage2_guidance"
+            },
+            "value_sha256": "b9b8caf4760132288da94ca7f585bc2050a175805728f216fb3c053f90b35d2d"
+          },
+          "co_stacksize": {
+            "value": {
+              "type": "int",
+              "value": 4
+            },
+            "value_sha256": "7b1b01c895c93bcf97d8dbca659e5916278f9894348660ee1a6abf69129c06c9"
+          },
+          "co_varnames": {
+            "value": {
+              "items": [
+                {
+                  "type": "str",
+                  "value": "keypoints"
+                },
+                {
+                  "type": "str",
+                  "value": "action_sequence"
+                }
+              ],
+              "type": "tuple"
+            },
+            "value_sha256": "2ba1ad61037aff670493949424a4c2d4cb6d7b5a07825fa59119fa33075c685f"
+          }
+        },
+        "marshal_length": 248,
+        "marshal_sha256": "83ea6176054c2c82bbd3f94f1f3eb2c91a1169357f7eed6672b148868aff9a40",
+        "value_structure_sha256": "1716c2d2f459c03d5b159ee530c25f54dac3ce46e0ec117e13af9e4c6dfa593f"
+      },
+      "target_kind": "none_constant_reward",
+      "task_id_for_review_only": 5
+    }
+  ],
+  "collector_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/decision_evidence.py",
+  "collector_sha256": "3af145738e3b22a8bec7484d0c33ba9a81dffbf58335b61682eb0ddf43b3cb8c",
+  "compile": {
+    "dont_inherit": true,
+    "flags": 0,
+    "optimize": 0
+  },
+  "completed_identity_comparisons": [
+    {
+      "derived_original_code_sha256": "a6efff2bb46ca4038d30b63cbcdf340a126b10efeffa0830288ba0879b8484fa",
+      "exact_match": true,
+      "observed_count": 29,
+      "observed_original_code_sha256": "a6efff2bb46ca4038d30b63cbcdf340a126b10efeffa0830288ba0879b8484fa",
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_0/stage1_guidance.txt"
+    }
+  ],
+  "completed_summary_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/analysis/t00-c0/run_20260923T063829Z/interpretation-summary.json",
+  "completed_summary_sha256": "33d017b44e793075b5b3d308c6e49f54c2ecf48dc700473d4614db6d8aaf1195",
+  "counts": {
+    "provider_function_calls": 0,
+    "reviewed_provider_definitions": 4,
+    "target_entries": 2,
+    "validation_calls": 0
+  },
+  "cuda_initialized": false,
+  "frozen_exact_target_matches_preserved": 0,
+  "generator_sha256": "e0547e51c6565f9554f859926540e99d0b86dfc19d234864c6b8fc66aadac9e0",
+  "limitation": "code-field equivalence is CPU reconstruction; runtime recorded only raw code/source/path identities",
+  "loader_future_flags": 0,
+  "loader_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/utils/guidance_utils.py",
+  "loader_sha256": "b0fe9d6d5fc014143f5877918de9bd0986b1688b4a6a90980847b7d15cab0c82",
+  "marshal_version": 4,
+  "old_map_sha256": "26fe347f9f343723943927b5bed84339f59fa284252698594dcb207f8cfc0585",
+  "old_review_sha256": "e3ab0144c64069d5ce5b6bea2ea8c208195442312e4a4893ee58a7369cc77ed6",
+  "optimize": 0,
+  "python": "3.12.12 | packaged by conda-forge | (main, Oct 22 2025, 23:25:55) [GCC 14.3.0]",
+  "real_torch_or_numpy_imported": false,
+  "runtime_code_fields_available": false,
+  "schema": "qd-ed-provider-identity-correction-reproduction-v1",
+  "wrapper_variation_cause": "Unknown; not used for supplemental target identity"
+}
