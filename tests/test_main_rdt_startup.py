@@ -1383,3 +1383,81 @@ def test_main_run_observer_failure_preserves_original_outcome(monkeypatch, tmp_p
     status = on.episode_compute_records[0]["decision_evidence"]
     assert status["failed"] and not status["complete"]
     assert not (tmp_path / "on" / "episode_1" / "error.txt").exists()
+
+
+def test_n3_real_main_ack_copies_pre_reset_native_eef_without_collector(monkeypatch, tmp_path):
+    import types
+    import main
+    from core.qd_executed_feedback import ExecutedFeedbackHistory
+    from core.rdt_policy_steer import RDTSteer
+    from test_qd_executed_feedback import semantic, tracker
+    original_run = main.Main._run_episode
+    monkeypatch.setattr(main.Main, "perform_task_for_episode", lambda self, episode_dir: None)
+    collected = []
+    def run_with_feedback(self, *args, **kwargs):
+        if self.config.eds_config.get("qd_quality_mode") != "executed_feedback_v1":
+            return original_run(self, *args, **kwargs)
+        policy = self.policy
+        policy._executed_feedback = ExecutedFeedbackHistory()
+        for name in ("commit_executed_feedback", "execution_feedback_pending", "acknowledge_executed_feedback",
+                     "record_execution_feedback_overhead", "reset_episode_compute_counters"):
+            setattr(policy, name, types.MethodType(getattr(RDTSteer, name), policy))
+        self.keypoint_tracker.execution_feedback_tracking_snapshot = tracker
+        original_select = policy.select_action
+        contracts = []
+        def select(*, guidance_type=None, **kw):
+            chunk = original_select(guidance_type=guidance_type, **kw)
+            if kw["generate_new_chunk"]:
+                c = policy._executed_feedback.begin(semantic(), stage=kw["current_stage"],
+                    global_step=kw["global_step"], tracker=kw["execution_feedback_context"])
+                selected = torch.zeros(1, 64, 128, dtype=torch.bfloat16)
+                c.record(selected, torch.zeros(1, 9, 3, dtype=torch.bfloat16),
+                         [torch.tensor([.001234, .002345, .003456], dtype=torch.float32)], torch.zeros(1, dtype=torch.bfloat16))
+                policy._executed_feedback.select(c, selected)
+                policy._executed_feedback.bind_decode(selected.float(), chunk, [10, 39, 40, 41, 42, 43, 44])
+                contracts.append(c)
+            return chunk
+        policy.select_action = select
+        original_step = self.adapter.step
+        latest = []
+        expected = []
+        def step(action):
+            _, reward, terminated, truncated, info = original_step(action)
+            eef = torch.tensor([[.123456789123 + self.adapter.steps / 17, -.0123456789123, .098765432198]], dtype=torch.float64)
+            latest[:] = [eef]
+            expected.append(eef.clone().reshape(3))
+            return {"observation.robot_state": {"eef": {"pos": eef}}}, reward, terminated, truncated, info
+        self.adapter.step = step
+        def preprocess():
+            if latest:
+                latest[0].fill_(-999)  # Would corrupt an un-copied acknowledgement.
+            return {}
+        self._get_policy_observation = preprocess
+        result = original_run(self, *args, **kwargs)
+        collected.append((policy, contracts, expected))
+        return result
+    monkeypatch.setattr(main.Main, "_run_episode", run_with_feedback)
+    baseline, _, _ = _run_execution_horizon_episode(monkeypatch, tmp_path / "baseline", mode="fixed",
+        target_distances=[.1], max_steps=18, run_via_main=True)
+    candidate, _, _ = _run_execution_horizon_episode(monkeypatch, tmp_path / "candidate", mode="fixed",
+        target_distances=[.1], max_steps=18, run_via_main=True,
+        config_overrides={"eds_config": {"qd_quality_mode": "executed_feedback_v1"}})
+    assert candidate.adapter.executed_rows == baseline.adapter.executed_rows
+    policy, contracts, expected = collected[0]
+    assert len(contracts) == 3 and [c.active for c in contracts] == [False, True, True]
+    assert contracts[1].previous["actual_endpoint"].dtype == torch.float64
+    assert torch.equal(contracts[1].previous["actual_endpoint"], expected[7])
+    assert torch.equal(contracts[2].previous["actual_endpoint"], expected[15])
+    assert policy._executed_feedback.pending is None and policy._executed_feedback.completed is None
+    assert not getattr(policy, "_decision_evidence", None)
+    assert not torch.cuda.is_initialized()
+
+
+def test_n3_main_ignores_missing_eef_when_no_feedback_is_pending():
+    import main
+    calls = []
+    policy = SimpleNamespace(execution_feedback_pending=lambda: False,
+                             acknowledge_executed_feedback=lambda **kw: calls.append(kw))
+    main._acknowledge_execution_feedback(policy, {}, global_step=0, execution_index=1,
+        action=torch.zeros(7), terminated=False, truncated=False)
+    assert not calls

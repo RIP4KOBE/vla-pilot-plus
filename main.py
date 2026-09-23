@@ -60,6 +60,27 @@ warnings.filterwarnings('ignore', category=UserWarning, message='.*xFormers.*')
 warnings.filterwarnings('ignore', category=UserWarning, message='.*env.get_obs.*')
 
 
+def _acknowledge_execution_feedback(policy, observation, *, global_step, execution_index,
+                                    action, terminated, truncated):
+    """Copy existing pre-reset nested raw EEF before any policy preprocessing."""
+    if not policy.execution_feedback_pending():
+        return
+    started = time.perf_counter()
+    try:
+        try:
+            endpoint = observation["observation.robot_state"]["eef"]["pos"]
+        except (KeyError, TypeError, AttributeError):
+            endpoint = None
+        if torch.is_tensor(endpoint) and tuple(endpoint.shape) in {(3,), (1, 3)}:
+            endpoint = endpoint.detach().reshape(3).cpu().clone()
+        else:
+            endpoint = None  # Unknown before activation; policy handles active contradictions.
+        policy.acknowledge_executed_feedback(global_step=global_step, execution_index=execution_index,
+            action=action, endpoint=endpoint, terminated=terminated, truncated=truncated)
+    finally:
+        policy.record_execution_feedback_overhead("main_eef_copy_and_ack", time.perf_counter() - started)
+
+
 def _config_section_to_dict(section: Any, section_name: str) -> dict:
     """Return a fresh plain dict for optional grouped config sections."""
     if section is None:
@@ -1771,6 +1792,12 @@ class Main:
                     )
                 select_kwargs.update(legacy_vls_kwargs)
 
+            feedback_enabled = (self.policy_type == "rdt" and guidance_type == "eds"
+                                and eds_config.get("qd_quality_mode") == "executed_feedback_v1")
+            if feedback_enabled:
+                tracker = getattr(self, "keypoint_tracker", None)
+                snapshot = getattr(tracker, "execution_feedback_tracking_snapshot", None)
+                select_kwargs["execution_feedback_context"] = snapshot() if callable(snapshot) else None
             self._append_phase_timing(episode=episode, global_step=global_steps,
                 name="select_action_fresh" if generate_new_chunk else "select_action_cached", event="enter", elapsed_s=0.0)
             select_action_start_s = time.perf_counter()
@@ -1855,6 +1882,8 @@ class Main:
                         )
                     )
 
+            if feedback_enabled and generate_new_chunk:
+                self.policy.commit_executed_feedback(action_chunk, resolved_action_horizon, global_steps)
             if evidence is not None and generate_new_chunk:
                 evidence.commit_decision(action_chunk=action_chunk,
                                          execution_horizon=resolved_action_horizon)
@@ -2066,6 +2095,10 @@ class Main:
             if evidence is not None:
                 evidence.dispatch(global_step=global_steps, execution_index=action_executed + 1)
             obs, reward, terminated, truncated, info = self.adapter.step(action_chunk[0][action_executed])
+            if feedback_enabled:
+                _acknowledge_execution_feedback(self.policy, obs, global_step=global_steps,
+                    execution_index=action_executed + 1, action=action_chunk[0][action_executed],
+                    terminated=terminated, truncated=truncated)
             if evidence is not None:
                 evidence.step_returned(terminated=terminated, truncated=truncated,
                                        success=info.get("success", False))

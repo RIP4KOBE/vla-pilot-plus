@@ -2459,7 +2459,7 @@ def test_n2_unknown_provider_is_exact_q0_and_fresh_after_reset(stub_steer, stub_
     monkeypatch.setattr(stub_steer, "_eds_initial_population", lambda **kw: initial.clone())
     cond = _rollout_cond(stub_steer)
     results = []
-    for mode in ("provider", "executed_prefix_v1", "provider"):
+    for mode in ("provider", "executed_prefix_v1", "executed_feedback_v1", "provider"):
         stub_steer.reset()
         torch.manual_seed(8391)
         cfg = stub_steer._resolve_eds_config_with_reference_defaults(_valid_qd_config(
@@ -2470,7 +2470,8 @@ def test_n2_unknown_provider_is_exact_q0_and_fresh_after_reset(stub_steer, stub_
                         torch.get_rng_state(), stub_steer.get_episode_compute_counters(), stub_steer._last_raw_reward))
     for item in results[1:]:
         assert torch.equal(item[0], results[0][0]) and torch.equal(item[3], results[0][3])
-        assert item[4:] == results[0][4:]
+        assert {k: v for k, v in item[4].items() if k != "execution_feedback_seconds_by_scope"} == results[0][4]
+        assert item[5:] == results[0][5:]
         assert torch.equal(item[1]["final_scores"], results[0][1]["final_scores"])
         assert item[1]["qd_initial_archive"]["archive"] == results[0][1]["qd_initial_archive"]["archive"]
         assert item[2]["qd_selected_action_fingerprint"] == results[0][2]["qd_selected_action_fingerprint"]
@@ -2478,9 +2479,20 @@ def test_n2_unknown_provider_is_exact_q0_and_fresh_after_reset(stub_steer, stub_
     assert results[1][2]["qd_quality_reason"] == "not_weighted_distance_template"
 
 
-def test_n2_auxiliary_trace_sites_keep_original_quality(stub_steer, stub_adapter, monkeypatch):
+@pytest.mark.parametrize("quality_mode", ["executed_prefix_v1", "executed_feedback_v1"])
+def test_n2_auxiliary_trace_sites_keep_original_quality(stub_steer, stub_adapter, monkeypatch, quality_mode):
     stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
                          sample_batch_size=16, policy_config={"action_chunk_horizon": 8})
+    if quality_mode == "executed_feedback_v1":
+        original_project = stub_adapter.delta_actions_to_ee_trajectory
+        def project(actions, *, origin_out=None):
+            if origin_out is not None:
+                origin_out["source_origin"] = torch.zeros(3)
+            return original_project(actions)
+        monkeypatch.setattr(stub_adapter, "delta_actions_to_ee_trajectory", project)
+        stub_adapter.supports_execution_feedback_origin = True
+        stub_steer._execution_feedback_context = {"instance_id": 13, "generation": 1,
+            "targets": {"1": {"valid": True, "status": "tracked"}}}
     initial = torch.linspace(-.12, .19, 16 * 64 * 128).reshape(16, 64, 128)
     monkeypatch.setattr(stub_steer, "_eds_initial_population", lambda **kw: initial.clone())
     stub_steer._last_eds_initial_sampler_trace_stages = [("initial_pretest", initial * 2)]
@@ -2498,7 +2510,7 @@ def test_n2_auxiliary_trace_sites_keep_original_quality(stub_steer, stub_adapter
     monkeypatch.setattr(stub_steer, "_observe_eds_score_call", mark)
     monkeypatch.setattr(stub_steer, "_eds_score_population_as_cost", score)
     cfg = stub_steer._resolve_eds_config_with_reference_defaults(_valid_qd_config(
-        qd_parent_sampling="sparse_priority", qd_quality_mode="executed_prefix_v1",
+        qd_parent_sampling="sparse_priority", qd_quality_mode=quality_mode,
         mechanism_pretest={"enabled": True, "first_chunk_only": True}))
     stub_steer._eds_guided_denoise_loop(x_t=torch.zeros_like(initial), cond=_rollout_cond(stub_steer),
         keypoints=torch.tensor([[8., 8., 8.], [.1, -.2, .3]]), guidance_fns=[_n2_fixture_provider()],
@@ -10014,3 +10026,137 @@ def test_decision_evidence_audit_accepts_actual_main_policy_adapter_cpu_path(
             persisted.extend(torch.load(path, weights_only=True)["events"])
         outcome = next(r for r in persisted if r["event"] == "pre_reset_outcome")
         assert (outcome["values"]["observation"]["robot0_eef_pos"] < 999).all()
+
+
+@pytest.mark.parametrize("archive", ["grid_archive", "none"])
+@pytest.mark.parametrize("dtype", [torch.float32, torch.bfloat16])
+def test_n3_full_loop_feedback_native_raw_stage_and_176_11(stub_steer, stub_adapter, monkeypatch, archive, dtype):
+    from core.qd_executed_feedback import executed_displacement_residual, native_identity
+    from core.rdt_libero_action_converter import ACTIVE_ACTION_INDICES_SORTED
+    stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
+                         sample_batch_size=16, policy_config={"action_chunk_horizon": 8})
+    stub_adapter.supports_execution_feedback_origin = True
+    old_project = stub_adapter.delta_actions_to_ee_trajectory
+    calls = []
+    def project(actions, *, origin_out=None):
+        calls.append(origin_out is not None)
+        if origin_out is not None:
+            origin_out["source_origin"] = torch.zeros(3, dtype=torch.float32)
+        return old_project(actions)
+    monkeypatch.setattr(stub_adapter, "delta_actions_to_ee_trajectory", project)
+    fn = _n2_fixture_provider()
+    points = torch.tensor([[9., 9., 9.], [.13, -.21, .39]], dtype=dtype)
+    initial = torch.linspace(-.12, .19, 16 * 64 * 128).reshape(16, 64, 128).to(dtype)
+    monkeypatch.setattr(stub_steer, "_eds_initial_population", lambda **kw: initial.clone())
+    context = {"instance_id": 13, "generation": 3, "targets": {"1": {"status": "tracked", "valid": True}}}
+    records = []
+    for mode in ("provider", "executed_feedback_v1"):
+        stub_steer.reset()
+        stub_steer._execution_feedback_context = context
+        torch.manual_seed(19923)
+        calls.clear()
+        cfg = stub_steer._resolve_eds_config_with_reference_defaults(_valid_qd_config(
+            qd_archive_mode=archive, qd_parent_sampling="sparse_priority", qd_quality_mode=mode))
+        selected = stub_steer._eds_guided_denoise_loop(x_t=torch.zeros_like(initial), cond=_rollout_cond(stub_steer),
+            keypoints=points, guidance_fns=[fn], eds_config=cfg, verbose=False, global_step=0, current_stage=1)
+        records.append((selected.clone(), stub_steer.get_last_eds_metrics(),
+            stub_steer.get_episode_compute_counters(), torch.get_rng_state(), len(calls), stub_steer._last_raw_reward))
+    # No eligible predecessor: exact original quality, selected action, RNG and call counts.
+    assert torch.equal(records[0][0], records[1][0]) and torch.equal(records[0][3], records[1][3])
+    assert records[0][2] == {k: v for k, v in records[1][2].items() if k != "execution_feedback_seconds_by_scope"}
+    assert records[0][4:] == records[1][4:]
+    assert records[1][1]["qd_quality_changed_candidates"] == 0
+    assert not records[1][1]["qd_feedback_active"]
+    history = stub_steer._executed_feedback
+    plan = history.pending
+    assert native_identity(selected[0]) == plan["selected_native_sha256"]
+    actions = stub_steer._postprocess_actions(selected.float())
+    history.bind_decode(selected.float(), actions, ACTIVE_ACTION_INDICES_SORTED)
+    stub_steer.commit_executed_feedback(actions, 8, 0)
+    endpoint = torch.tensor([.254381983743, -.2432813471, .06281798131], dtype=torch.float64)
+    expected_residual = executed_displacement_residual(plan["projection"], plan["origin"], endpoint)
+    for i in range(8):
+        stub_steer.acknowledge_executed_feedback(global_step=i, execution_index=i+1,
+            action=actions[0, i], endpoint=endpoint, terminated=False, truncated=False)
+    stub_steer.reset_episode_compute_counters()
+    calls.clear()
+    metadata = []
+    original_metadata = stub_steer._eds_update_guidance_metadata_from_cost
+    def update(best, costs):
+        metadata.append((best.clone(), costs.clone()))
+        return original_metadata(best, costs)
+    monkeypatch.setattr(stub_steer, "_eds_update_guidance_metadata_from_cost", update)
+    torch.manual_seed(19923)
+    selected = stub_steer._eds_guided_denoise_loop(x_t=torch.zeros_like(initial), cond=_rollout_cond(stub_steer),
+        keypoints=points, guidance_fns=[fn], eds_config=cfg, verbose=False, global_step=8, current_stage=1)
+    metrics = stub_steer.get_last_eds_metrics()
+    assert metrics["qd_feedback_active"] and metrics["qd_quality_changed_candidates"] > 0
+    assert metrics["qd_feedback_previous"]["ack_count"] == 8
+    assert metrics["qd_feedback_previous"]["residual"]["values"] == expected_residual.tolist()
+    assert metrics["qd_feedback_context"]["global_step"] == 8
+    assert metrics["score_call_count"] == 11 and metrics["search_evaluation_count"] == 176
+    assert sum(calls) == 176  # Optional origin data piggybacks on canonical projection only.
+    assert {k: v for k, v in stub_steer.get_episode_compute_counters().items()
+            if k != "execution_feedback_seconds_by_scope"} == records[0][2]
+    assert len(calls) == records[0][4]
+    expected_raw = fn(points, stub_steer._rdt_sample_to_trajectory_3d(selected)[:, 1:8]).to(dtype).item()
+    assert stub_steer._last_raw_reward == metrics["qd_selected_raw_reward"] == expected_raw
+    assert metadata[-1][0].item() == -expected_raw
+    assert metadata[-1][1].dtype == (torch.float32 if archive == "grid_archive" else dtype)
+    assert not torch.cuda.is_initialized()
+
+
+def test_n3_real_search_and_ack_bundles_pass_specialized_audit(stub_steer, stub_adapter, monkeypatch, tmp_path):
+    from core.decision_evidence import DecisionEvidence
+    from core.rdt_libero_action_converter import ACTIVE_ACTION_INDICES_SORTED
+    from scripts.audit_decision_evidence import audit_episode
+    stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
+                         sample_batch_size=16, policy_config={"action_chunk_horizon": 8})
+    recorder = DecisionEvidence(tmp_path, episode=0)
+    stub_steer._decision_evidence = recorder
+    stub_adapter.supports_execution_feedback_origin = True
+    old_project = stub_adapter.delta_actions_to_ee_trajectory
+    def project(actions, *, origin_out=None):
+        origin = torch.zeros(3, dtype=torch.float32)
+        if origin_out is not None: origin_out["source_origin"] = origin.clone()
+        result = old_project(actions)
+        recorder.record("projection_origin", source_eef_position=origin, cast_eef_start=result[0])
+        return result
+    monkeypatch.setattr(stub_adapter, "delta_actions_to_ee_trajectory", project)
+    fn = _n2_fixture_provider()
+    keypoints = torch.tensor([[9., 9., 9.], [.1, -.2, .3]], dtype=torch.bfloat16)
+    initial = torch.linspace(-.12, .19, 16 * 64 * 128).reshape(16, 64, 128).bfloat16()
+    monkeypatch.setattr(stub_steer, "_eds_initial_population", lambda **kw: initial.clone())
+    cfg = stub_steer._resolve_eds_config_with_reference_defaults(_valid_qd_config(
+        qd_parent_sampling="sparse_priority", qd_quality_mode="executed_feedback_v1"))
+    stub_steer._execution_feedback_context = {"instance_id": 13, "generation": 1,
+        "targets": {"1": {"valid": True, "status": "tracked"}}}
+    for start in (0, 8):
+        recorder.begin_decision(global_step=start, stage=1, use_guidance=True, keypoints=keypoints, providers=[fn])
+        selected = stub_steer._eds_guided_denoise_loop(x_t=torch.zeros_like(initial), cond=_rollout_cond(stub_steer),
+            keypoints=keypoints, guidance_fns=[fn], eds_config=cfg, verbose=False, global_step=start, current_stage=1)
+        raw = selected.float()
+        actions = stub_steer._postprocess_actions(raw)
+        stub_steer._executed_feedback.bind_decode(raw, actions, ACTIVE_ACTION_INDICES_SORTED)
+        recorder.record("policy_action_decode", selected_latent=raw, action_chunk=actions)
+        stub_steer.commit_executed_feedback(actions, 8, start)
+        recorder.commit_decision(action_chunk=actions, execution_horizon=8)
+        for i in range(8):
+            terminal = start == 8 and i == 7
+            endpoint = np.array([.039712389 + (start + i) / 31, -.083274243, .03142343], dtype=np.float64)
+            recorder.dispatch(global_step=start + i, execution_index=i + 1)
+            recorder.record("executed_action", action_numpy=actions[0, i].numpy())
+            recorder.pre_reset_outcome({"robot0_eef_pos": endpoint}, reward=0., terminated=terminal, success=False)
+            stub_steer.acknowledge_executed_feedback(global_step=start + i, execution_index=i + 1,
+                action=actions[0, i], endpoint=None if terminal else torch.from_numpy(endpoint).clone(),
+                terminated=terminal, truncated=False)
+            recorder.step_returned(terminated=terminal, truncated=False, success=False)
+    recorder.finish()
+    compute = tmp_path / "episode_compute.jsonl"
+    compute.write_text(json.dumps({"episode_id": 0, "outcome": "completed", "decision_evidence": recorder.status()}) + "\n")
+    result = audit_episode(recorder.root, compute)
+    assert result["accepted"], result["errors"]
+    assert result["n3_feedback_audit"]["checked_decisions"] == 2
+    assert result["n3_feedback_audit"]["active_previous_ack_verified"] == 1
+    assert result["n3_feedback_audit"]["complete_nonterminal_prefixes"] == 1
+    assert not torch.cuda.is_initialized()

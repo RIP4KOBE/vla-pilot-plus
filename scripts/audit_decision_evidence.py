@@ -60,6 +60,134 @@ def load_events(root, status):
     return events
 
 
+def _native_sha(value):
+    value = value.detach().cpu().contiguous()
+    prefix = f"{value.dtype}:{tuple(value.shape)}:".encode()
+    return hashlib.sha256(prefix + value.reshape(-1).view(torch.uint8).numpy().tobytes()).hexdigest()
+
+
+def _native_record(value):
+    return {"dtype": str(value.dtype), "shape": list(value.shape),
+            "sha256": _native_sha(value), "values": value.tolist()}
+
+
+def _audit_n3_feedback(kinds, context, final, events, previous):
+    """N3-only native provenance gate on already SHA-verified CPU events."""
+    def one(kind):
+        require(len(kinds[kind]) == 1, "n3_missing_or_duplicate_" + kind)
+        return kinds[kind][0]
+    selection = one("execution_feedback_selection")
+    feedback = selection["values"]
+    selected, current = feedback["selected"], feedback["context"]
+    require(type(feedback["active"]) is bool and type(selected["eligible"]) is bool, "n3_activity_invalid")
+    require(current["global_step"] == context["global_step"] == selected["start_global_step"]
+            and current["stage"] == context["values"]["stage"], "n3_context_step_or_stage_mismatch")
+    require(len(context["values"]["providers"]) == 1 and current["provider_identity"]["source_text_sha256"]
+            == context["values"]["providers"][0]["source_text_sha256"], "n3_provider_source_mismatch")
+    require(selected["selected_native_sha256"] == _native_sha(final["selected_latent"][0]), "n3_selected_native_identity_mismatch")
+    matched = []
+    for score in kinds["scoring_inputs"]:
+        value = score["values"]
+        if value["scoring_scope"]["role"] not in {"canonical_initial", "canonical_offspring", "canonical_population"}:
+            continue
+        aggregates = [r["values"]["aggregate_before_reward_mode"] for r in kinds["scoring_aggregate"]
+                      if r["values"]["scoring_batch_id"] == score["sequence"]]
+        effective = [r["values"] for r in kinds["effective_quality"]
+                     if r["values"]["scoring_batch_id"] == score["sequence"]][0]
+        require(effective["provider_identity"] == current["provider_identity"]
+                and effective["target_index"] == current["target_index"], "n3_semantic_context_mismatch")
+        if not feedback["active"]:
+            require(effective["quality"].dtype == aggregates[0].dtype
+                    and torch.equal(effective["quality"], aggregates[0]), "n3_inactive_quality_not_raw")
+        for index, sample in enumerate(value["samples"]):
+            if _native_sha(sample) != selected["selected_native_sha256"]:
+                continue
+            origin = events[value["projection_origin_sequences"][index] - 1]["values"]["source_eef_position"]
+            projection = value["projected_xyz"][index]
+            raw = aggregates[0][index]
+            matched.append((projection, origin, raw))
+    require(bool(matched), "n3_selected_canonical_association_missing")
+    association = [selected["projection"] == _native_record(p) and selected["source_origin"] == _native_record(o)
+                   and selected["raw_provider_quality"] == _native_record(r) for p, o, r in matched]
+    require(any(association), "n3_selected_projection_origin_or_raw_mismatch")
+    if selected["eligible"]:
+        require(all(association), "n3_eligible_selected_association_ambiguous")
+        tracker = current["tracker_snapshot"]
+        target = tracker["targets"][str(current["target_index"])]
+        require(current["target_valid"] is True and target["valid"] is True
+                and target["status"] == current["target_status"] in {"tracked", "static_background"}
+                and tracker["instance_id"] == current["registry_instance_id"]
+                and tracker["generation"] == current["registry_generation"], "n3_target_registry_invalid")
+    require(selected["raw_provider_quality"]["values"] == final["selected_raw_provider_quality"], "n3_selected_raw_stage_mismatch")
+    if feedback["active"]:
+        require(selected["eligible"] and previous is not None, "n3_active_without_complete_predecessor")
+        expected_previous = {k: v for k, v in previous["completed"].items() if k != "context"}
+        require(feedback["previous"] == expected_previous, "n3_previous_not_actual_completed_ack")
+        old = previous["context"]
+        fields = ("episode_generation", "stage", "provider_identity", "target_index", "registry_instance_id", "registry_generation")
+        require(all(old[k] == current[k] for k in fields) and old["target_valid"] is True
+                and current["global_step"] == previous["completed"]["end_global_step"] + 1,
+                "n3_feedback_continuity_mismatch")
+    else:
+        require(feedback["previous"] == {}, "n3_inactive_has_previous")
+    commit = one("execution_feedback_commit")
+    require(selection["sequence"] < commit["sequence"] < one("decision_committed")["sequence"], "n3_commit_order_invalid")
+    require(commit["values"]["global_step"] == current["global_step"], "n3_commit_step_mismatch")
+    acks = kinds["execution_feedback_ack"]
+    require(type(commit["values"]["committed"]) is bool and isinstance(commit["values"]["history_reason"], str)
+            and bool(commit["values"]["history_reason"]), "n3_commit_status_unknown")
+    if not commit["values"]["committed"]:
+        require(not feedback["active"] and not acks, "n3_active_or_ack_without_commit")
+        return None
+    require(selected["eligible"] and commit["values"]["selected_native_sha256"] == selected["selected_native_sha256"], "n3_commit_selected_mismatch")
+    require(one("decision_committed")["values"]["execution_horizon"] == 8, "n3_committed_prefix_not_eight")
+    dispatches, outcomes, returned = kinds["action_dispatch"], kinds["pre_reset_outcome"], kinds["step_returned"]
+    sent = kinds["executed_action"]
+    chunk = one("decision_committed")["values"]["action_chunk"]
+    clear_reasons = {"actual_endpoint_missing_or_invalid", "acknowledged_action_identity_mismatch",
+                     "duplicate_missing_or_out_of_order_ack"}
+    explicit_inactive_clear = (not feedback["active"] and bool(acks)
+        and acks[-1]["values"].get("history_reason") in clear_reasons)
+    require(len(dispatches) == len(outcomes) == len(returned) == len(sent)
+            and (len(acks) == len(dispatches) or (explicit_inactive_clear and 0 < len(acks) < len(dispatches))),
+            "n3_ack_coverage_mismatch")
+    completed = None
+    for index, (ack, dispatch, outcome, result) in enumerate(zip(acks, dispatches, outcomes, returned), 1):
+        av = ack["values"]
+        endpoint = outcome["values"]["observation"]["robot0_eef_pos"]
+        require(outcome["sequence"] < ack["sequence"] < result["sequence"], "n3_ack_order_invalid")
+        if explicit_inactive_clear and index == len(acks):
+            # Explicitly recorded pre-activation clear supplies no endpoint/residual proof.
+            # Existing generic execution evidence remains checked; no absent event is inferred.
+            require(av["completed"] is None, "n3_inactive_clear_has_completion")
+            return None
+        require(av["global_step"] == dispatch["global_step"] == outcome["global_step"] == result["global_step"]
+                and av["execution_index"] == dispatch["values"]["execution_index"] == index
+                and av["selected_native_sha256"] == selected["selected_native_sha256"], "n3_ack_identity_or_step_mismatch")
+        require(tensor(av["action"]) and _native_record(av["action"]) == _native_record(chunk[0, index - 1])
+                == _native_record(sent[index - 1]["values"]["action_numpy"]), "n3_ack_not_actual_committed_action")
+        require(av["terminated"] == result["values"]["terminated"] and av["truncated"] == result["values"]["truncated"], "n3_ack_terminal_mismatch")
+        terminal = av["terminated"] or av["truncated"]
+        if terminal:
+            # Existing automatic reset can mutate the returned nested view. It is never p8 history.
+            require(av["completed"] is None, "n3_completed_before_eight_or_terminal")
+            continue
+        require(tensor(av["actual_endpoint"]) and _native_record(av["actual_endpoint"]) == _native_record(endpoint), "n3_ack_not_native_pre_reset_endpoint")
+        if index == 8:
+            projection, origin, _ = next(row for row, ok in zip(matched, association) if ok)
+            residual = (endpoint.double() - origin.double()) - (projection[8].double() - projection[0].double())
+            expected = {"context": current, "selected_native_sha256": selected["selected_native_sha256"],
+                "start_global_step": current["global_step"], "end_global_step": av["global_step"], "ack_count": 8,
+                "feedback_was_active": feedback["active"], "terminated": False, "truncated": False,
+                "projection": _native_record(projection), "source_origin": _native_record(origin),
+                "actual_endpoint": _native_record(endpoint), "residual": _native_record(residual)}
+            require(av["completed"] == expected, "n3_completed_residual_or_identity_mismatch")
+            completed = expected
+        else:
+            require(av["completed"] is None, "n3_completed_before_eight_or_terminal")
+    return None if completed is None else {"context": current, "completed": completed}
+
+
 def audit_episode(episode_dir, episode_compute_file):
     report = {"schema": "qd-ed-decision-evidence-audit-v1", "accepted": False,
               "episode_dir": str(Path(episode_dir).resolve()),
@@ -97,6 +225,7 @@ def audit_episode(episode_dir, episode_compute_file):
         dtype_rows, scope_counts = [], Counter()
         expected_step, episode_ended, reset_sequence = 0, False, 0
         previous_decision, previous_stage = None, None
+        previous_feedback_certificate = None
         for decision_id, context in contexts.items():
             context_value = context["values"]
             require(context_value["previous_decision_id"] == previous_decision
@@ -128,15 +257,19 @@ def audit_episode(episode_dir, episode_compute_file):
             require(decoded["selected_canonical_fingerprint"] == fingerprints(decoded["selected_latent"])[0], "decoded_fingerprint_mismatch")
             guided = context["values"]["use_guidance"] and bool(context["values"]["providers"])
             candidate_rows = kinds["canonical_candidate_batch"]
-            n2_active = any(r["values"].get("quality_mode") == "executed_prefix_v1"
-                            for kind in ("canonical_candidate_batch", "effective_quality", "final_selection")
-                            for r in kinds[kind])
+            dual_modes = {r["values"].get("quality_mode")
+                          for kind in ("canonical_candidate_batch", "effective_quality", "final_selection")
+                          for r in kinds[kind] if r["values"].get("quality_mode") in
+                          {"executed_prefix_v1", "executed_feedback_v1"}}
+            require(len(dual_modes) <= 1, "dual_quality_mixed_modes")
+            dual_mode = next(iter(dual_modes), None)
+            dual_active = dual_mode is not None
             known_candidates = defaultdict(list)
             known_dual_quality = defaultdict(list)
             for item in candidate_rows:
                 value = item["values"]
-                if n2_active:
-                    require(value.get("quality_mode") == "executed_prefix_v1", "n2_canonical_mode_missing")
+                if dual_active:
+                    require(value.get("quality_mode") == dual_mode, "n2_canonical_mode_missing")
                 require(tensor(value["candidates"]), "candidate_tensor_invalid")
                 fps = fingerprints(value["candidates"])
                 require(fps == value["canonical_fingerprints"], "candidate_fingerprint_mismatch")
@@ -144,7 +277,7 @@ def audit_episode(episode_dir, episode_compute_file):
                 require(tensor(value["effective_quality"]) and value["effective_quality"].shape == (len(fps),), "candidate_quality_invalid")
                 for fp, quality in zip(fps, value["effective_quality"]):
                     known_candidates[fp].append(quality.item())
-                if value.get("quality_mode") == "executed_prefix_v1":
+                if value.get("quality_mode") == dual_mode and dual_active:
                     raw = value.get("raw_provider_quality")
                     require(tensor(raw) and raw.shape == value["effective_quality"].shape
                             and raw.dtype == value["effective_quality"].dtype, "n2_candidate_raw_invalid")
@@ -157,8 +290,8 @@ def audit_episode(episode_dir, episode_compute_file):
                 require(fp == final["selected_canonical_fingerprint"] == decoded["selected_canonical_fingerprint"], "selected_decode_mismatch")
                 require(fp == fingerprints(final["population"])[final["selected_index"]], "selected_pool_mismatch")
                 require(fp in known_candidates and final["selected_quality"] in known_candidates[fp], "selected_quality_not_observed")
-                if n2_active:
-                    require(final.get("quality_mode") == "executed_prefix_v1", "n2_final_mode_missing")
+                if dual_active:
+                    require(final.get("quality_mode") == dual_mode, "n2_final_mode_missing")
                     raw = final.get("raw_provider_quality")
                     expected_raw_dtype = torch.float32 if final["selection_rule"] == "archive_global_best" else final["population"].dtype
                     require(tensor(raw) and raw.shape == (len(final["population"]),)
@@ -223,9 +356,9 @@ def audit_episode(episode_dir, episode_compute_file):
                     and torch.equal(effective[0]["quality"], -effective[0]["costs"]), "effective_quality_cost_mismatch")
                 require(tensor(aggregates[0]["aggregate_before_reward_mode"])
                     and aggregates[0]["aggregate_before_reward_mode"].shape == (samples.shape[0],), "aggregate_quality_invalid")
-                if n2_active and scope["role"] in ("canonical_initial", "canonical_offspring", "canonical_population"):
-                    require(effective[0].get("quality_mode") == "executed_prefix_v1", "n2_effective_mode_missing")
-                if effective[0].get("quality_mode") == "executed_prefix_v1":
+                if dual_active and scope["role"] in ("canonical_initial", "canonical_offspring", "canonical_population"):
+                    require(effective[0].get("quality_mode") == dual_mode, "n2_effective_mode_missing")
+                if effective[0].get("quality_mode") == dual_mode and dual_active:
                     require(scope["role"] in ("canonical_initial", "canonical_offspring", "canonical_population"), "n2_auxiliary_quality_changed")
                     raw = effective[0].get("raw_provider_quality")
                     aggregate = aggregates[0]["aggregate_before_reward_mode"]
@@ -280,6 +413,24 @@ def audit_episode(episode_dir, episode_compute_file):
                         episode_ended = bool(value["terminated"] or value["truncated"])
                         pending = None
             require(pending is None and prefixes > 0, "unfinished_or_unexecuted_decision")
+            if dual_mode == "executed_feedback_v1":
+                previous_feedback_certificate = _audit_n3_feedback(
+                    kinds, context, final, events, previous_feedback_certificate)
+                gate = report.setdefault("n3_feedback_audit", {"schema": "n3-native-feedback-audit-v1",
+                    "checked_decisions": 0, "active_previous_ack_verified": 0, "inactive_decisions": 0,
+                    "uncommitted_clears": 0, "inactive_ack_clears_unknown": 0, "complete_nonterminal_prefixes": 0,
+                    "scope": "recognized N3 decisions; native canonical selected projection/origin/raw; nonterminal acknowledged command/EEF; immediate complete predecessor/residual; explicit inactive clears and terminal endpoints are excluded from usable feedback; no task-effect claim"})
+                gate["checked_decisions"] += 1
+                gate["active_previous_ack_verified" if kinds["execution_feedback_selection"][0]["values"]["active"] else "inactive_decisions"] += 1
+                gate["uncommitted_clears"] += int(not kinds["execution_feedback_commit"][0]["values"]["committed"])
+                gate["complete_nonterminal_prefixes"] += int(previous_feedback_certificate is not None)
+                acknowledgements = kinds["execution_feedback_ack"]
+                gate["inactive_ack_clears_unknown"] += int(bool(acknowledgements) and
+                    acknowledgements[-1]["values"].get("history_reason") in {
+                        "actual_endpoint_missing_or_invalid", "acknowledged_action_identity_mismatch",
+                        "duplicate_missing_or_out_of_order_ack"})
+            else:
+                previous_feedback_certificate = None
         require(episode_ended, "episode_terminal_return_missing")
         report["projection_dtypes"] = dtype_rows
         report["observed_scoring_roles"] = dict(scope_counts)

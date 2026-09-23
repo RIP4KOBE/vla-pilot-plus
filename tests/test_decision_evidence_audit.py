@@ -217,3 +217,15 @@ def test_n2_audit_fails_closed_on_mixed_modes_or_raw_dtype(tmp_path, corruption,
     rewrite(rec.root, corrupt)
     result = audit.audit_episode(rec.root, compute)
     assert not result["accepted"] and result["errors"] == [expected]
+
+
+def test_n3_dual_quality_requires_dedicated_feedback_evidence(tmp_path):
+    rec, compute = episode(tmp_path, auxiliary=True, n2=True)
+    def convert(row):
+        if row["values"].get("quality_mode") != "executed_prefix_v1": return False
+        row["values"]["quality_mode"] = "executed_feedback_v1"
+        return True
+    # The rewrite helper edits only its first match; convert all relevant bundles explicitly.
+    for _ in range(5):
+        rewrite(rec.root, convert)
+    assert audit.audit_episode(rec.root, compute)["errors"] == ["n3_missing_or_duplicate_execution_feedback_selection"]

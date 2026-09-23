@@ -967,6 +967,8 @@ def _libero_task_index_for_episode(
 
 
 class LiberoAdapter(BaseEnvAdapter):
+    supports_execution_feedback_origin = True
+
     def __init__(self, env: None, env_config: dict, device: str = "cuda"):
         super().__init__(env, env_config, device)
 
@@ -1627,6 +1629,7 @@ class LiberoAdapter(BaseEnvAdapter):
     def delta_actions_to_ee_trajectory(
         self,
         action_sequence: Union[torch.Tensor, np.ndarray],
+        *, origin_out: dict | None = None,
     ) -> torch.Tensor:
         """
         Transform delta action sequence to 3D trajectory of end-effector.
@@ -1651,6 +1654,9 @@ class LiberoAdapter(BaseEnvAdapter):
 
         # Get starting position as tensor
         start_position = self.get_ee_pose_world().position
+        if origin_out is not None:
+            # Reuse this exact source value, before the original native cast.
+            origin_out["source_origin"] = torch.as_tensor(start_position).detach().cpu().clone()
         start_pos = torch.tensor(
             start_position,
             device=device,
