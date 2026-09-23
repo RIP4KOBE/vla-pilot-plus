@@ -1,0 +1,26 @@
+{
+  "schema": "n3-first3-synthetic-validation-v1",
+  "scope": "explicit synthetic fixtures only, no actual episode payload reads",
+  "command": "CUDA_VISIBLE_DEVICES='' PYTHONDONTWRITEBYTECODE=1 /home/hynx/miniconda3/envs/vla-pilot/bin/python -m pytest docs/03_evidence/qd_ed_final/continuation_20260923/n3-first3-review-preparation/test_review_first3.py -q",
+  "exit_code": 0,
+  "passed": 32,
+  "seconds": 1.46,
+  "counts": "32 includes earlier26 plus6 targeted ordering/duplicate regressions; not additive performance evidence",
+  "python": "3.12.12",
+  "torch": "2.7.1+cu126",
+  "cuda_initialized": false,
+  "files": {
+    "review_first3.py": "207561761dfb0ec5d0c004cbd2c652f48aa5a19581a244c7eaed20312570bab7",
+    "test_review_first3.py": "36011dce5baf6b4a97c19ad69cf3a39ee88ddd870cf7ca3a88f0fc7049293ab9"
+  },
+  "coverage": [
+    "exact comparator ties/reversals/splits/merges and offsets",
+    "duplicate native identities and conflict rejection",
+    "BF16/FP32 archive scalar preservation",
+    "all176 and actual10x16 parent slots with prior-only identities",
+    "future/duplicate archive/scoring/parent/effective/final event rejection",
+    "inactive/unsupported non-qualification",
+    "authorization/source/metadata closure/representative/audit/index/bundle rejection before decode"
+  ],
+  "limit": "admission tests mock reviewed production metadata helper calls; root/independent production tests remain required, no actual episode acceptance inferred"
+}

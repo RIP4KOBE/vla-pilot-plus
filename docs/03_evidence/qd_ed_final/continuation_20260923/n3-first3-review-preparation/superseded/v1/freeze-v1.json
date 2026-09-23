@@ -1,0 +1,42 @@
+{
+  "schema": "n3-first3-review-freeze-v1",
+  "status": "frozen_cpu_only_actual_read_unapproved",
+  "purpose": "prospective first accepted task0 C0/Q0/N3 correctness and actual native search activity; no performance gate",
+  "files": {
+    "README.md": "7afc16220f65e2747d0019da0d27c4711d773d8457be1f2586019a562e097ead",
+    "inputs-template.json": "a990b6b0e4ab637bf6887412c19623e785398836ab4232e1a978df55d4ce9d60",
+    "protocol-v1.md": "3bcb283e71b48ba91953fee676751bf3b67d8667fb7f330cd5b120e677fe3fe8",
+    "review_first3.py": "207561761dfb0ec5d0c004cbd2c652f48aa5a19581a244c7eaed20312570bab7",
+    "root-read-authorization-template.json": "cab3713c57c22301a219077105cde2640da0d02fc35d6b1a276df50d134d4c02",
+    "source-review-v1.json": "f8581a10a6c697c6909a0ec4d6c3fe481d6bbef644fa13827df42546c57b6f85",
+    "test_review_first3.py": "36011dce5baf6b4a97c19ad69cf3a39ee88ddd870cf7ca3a88f0fc7049293ab9",
+    "validation-v1.json": "133a8303e1200e859450c097d3548adc28a81b5191dd7657686dea2cd8046ee5"
+  },
+  "reviewed_source_sha256": {
+    "main.py": "f9add8568d45ec799e4030b1108f069f4af88bf3b63c62d7f836d59539a427a7",
+    "core/rdt_policy_steer.py": "05d9afca7cea50ea943fd8a32f4cd888c6d37df353ec4f896c51f0c5e2e4a144",
+    "core/qd_ed.py": "5c86385a8271c3311aa715332d1307850b18ec37486f20ac53c19747fe4f207b",
+    "core/qd_executed_quality.py": "d83dbd53e75708f3a6e71cab9c0814dc82a42c68898d53cb370df37d9a8c946b",
+    "core/qd_executed_feedback.py": "33d1e38212741ccbf24e150c2b9739cc026ed553925ab7084d9e8b8d32e090ab",
+    "core/decision_evidence.py": "3af145738e3b22a8bec7484d0c33ba9a81dffbf58335b61682eb0ddf43b3cb8c",
+    "core/eds_eval_metrics.py": "574038725988ad258960af27d83a36ad81898e550888592d775c14b6df4754b2",
+    "core/keypoint_tracker.py": "c60b6f8badb420bf98ae8908cb20b3f51b1c41ffa5df9d3e214f8247f0a2aa66",
+    "core/env_adapters/libero_adapter.py": "f2130791c4c975603d8bab4fad4739374cbbba967df2fa2334ea881b6557d6bf",
+    "scripts/audit_decision_evidence.py": "dcfffa225b16f40cc00ac4bd21eae1d080cc113668dbeabc240d2ccda50fddd6",
+    "experiments/iteration_003_executed_feedback/protocol.md": "05c83a8eb3801d4a4c4f41bee28c531505a7767aa56ba482399013068679b931"
+  },
+  "reviewed_science_source_commit": "1583bc22d3f04929cf66b965acce0eb2eae4cbac",
+  "late_bound_metadata_gate_paths": [
+    "scripts/qd_ed_n3_report.py",
+    "scripts/qd_ed_n3_plan.py"
+  ],
+  "late_binding_authority": "read authorization reviewed_metadata_gate_sources from root after final-source review; required inventory/git/live equality before import",
+  "actual_episode_reads_authorized": false,
+  "test_evidence": "validation-v1.json",
+  "limits": [
+    "Actual normalized Stage input is not separately recorded",
+    "Canonical consumed order changes do not prove a changed parent/replacement/proposal",
+    "No physical outcome or task benefit inferred",
+    "Root alone releases any checkpoint"
+  ]
+}

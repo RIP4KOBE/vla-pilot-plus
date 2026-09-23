@@ -1,0 +1,27 @@
+{
+  "schema": "n3-first3-synthetic-validation-v2",
+  "scope": "explicit synthetic fixtures only, no actual episode payload reads",
+  "command": "CUDA_VISIBLE_DEVICES='' PYTHONDONTWRITEBYTECODE=1 /home/hynx/miniconda3/envs/vla-pilot/bin/python -m pytest docs/03_evidence/qd_ed_final/continuation_20260923/n3-first3-review-preparation/test_review_first3.py -q",
+  "exit_code": 0,
+  "passed": 39,
+  "seconds": 1.58,
+  "counts": "39 includes the prior32 plus7 selected-final-consumer regressions; overlapping implementation observations, not performance evidence",
+  "python": "3.12.12",
+  "torch": "2.7.1+cu126",
+  "cuda_initialized": false,
+  "files": {
+    "review_first3.py": "a2ee7ae750805d84810badc08333c7944f8cd4b895e0ce0d23dfb1d5a90ab9b0",
+    "test_review_first3.py": "d78290399bbfa6b4b5e1efa56726a65082a69695926bc56e32f6ba2c8f937a4f"
+  },
+  "coverage": [
+    "exact comparator ties/reversals/splits/merges and offsets",
+    "duplicate native identities and conflict rejection",
+    "BF16/FP32 archive scalar preservation",
+    "all176 and actual10x16 parent slots with prior-only identities",
+    "future/duplicate archive/scoring/parent/effective/final event rejection",
+    "inactive/unsupported non-qualification",
+    "authorization/source/metadata closure/representative/audit/index/bundle rejection before decode",
+    "selected-relative global final reward/tie ordering only; canonical/singleton and nonselected-only comparison changes cannot qualify; selected split/merge and strict gap are separated"
+  ],
+  "limit": "admission tests mock reviewed production metadata helper calls; root/independent production tests remain required, no actual episode acceptance inferred"
+}

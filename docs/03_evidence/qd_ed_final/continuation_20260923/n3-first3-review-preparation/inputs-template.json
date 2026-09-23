@@ -1,0 +1,92 @@
+{
+  "schema": "n3-first3-review-inputs-v1",
+  "matrix_report": {
+    "path": "ROOT_FILL_ABSOLUTE_MATRIX_REPORT",
+    "sha256": "ROOT_FILL_SHA256_MATRIX_REPORT"
+  },
+  "matrix_report_input": {
+    "path": "ROOT_FILL_ABSOLUTE_MATRIX_REPORT_INPUT",
+    "sha256": "ROOT_FILL_SHA256_MATRIX_REPORT_INPUT"
+  },
+  "source_root": "ROOT_FILL_FINAL_WORKTREE",
+  "source_commit": "ROOT_FILL_FINAL_COMMIT",
+  "cells": [
+    {
+      "profile": "C0",
+      "attempt_id": "ROOT_FILL_ACCEPTED_C0",
+      "references": {
+        "terminal": {
+          "path": "ROOT_FILL_ABSOLUTE_C0_TERMINAL",
+          "sha256": "ROOT_FILL_SHA256_C0_TERMINAL"
+        },
+        "audit": {
+          "path": "ROOT_FILL_ABSOLUTE_C0_AUDIT",
+          "sha256": "ROOT_FILL_SHA256_C0_AUDIT"
+        },
+        "compute": {
+          "path": "ROOT_FILL_ABSOLUTE_C0_COMPUTE",
+          "sha256": "ROOT_FILL_SHA256_C0_COMPUTE"
+        },
+        "metrics": {
+          "path": "ROOT_FILL_ABSOLUTE_C0_METRICS",
+          "sha256": "ROOT_FILL_SHA256_C0_METRICS"
+        }
+      }
+    },
+    {
+      "profile": "Q0",
+      "attempt_id": "ROOT_FILL_ACCEPTED_Q0",
+      "references": {
+        "terminal": {
+          "path": "ROOT_FILL_ABSOLUTE_Q0_TERMINAL",
+          "sha256": "ROOT_FILL_SHA256_Q0_TERMINAL"
+        },
+        "audit": {
+          "path": "ROOT_FILL_ABSOLUTE_Q0_AUDIT",
+          "sha256": "ROOT_FILL_SHA256_Q0_AUDIT"
+        },
+        "compute": {
+          "path": "ROOT_FILL_ABSOLUTE_Q0_COMPUTE",
+          "sha256": "ROOT_FILL_SHA256_Q0_COMPUTE"
+        },
+        "metrics": {
+          "path": "ROOT_FILL_ABSOLUTE_Q0_METRICS",
+          "sha256": "ROOT_FILL_SHA256_Q0_METRICS"
+        }
+      }
+    },
+    {
+      "profile": "N3",
+      "attempt_id": "ROOT_FILL_ACCEPTED_N3",
+      "references": {
+        "terminal": {
+          "path": "ROOT_FILL_ABSOLUTE_N3_TERMINAL",
+          "sha256": "ROOT_FILL_SHA256_N3_TERMINAL"
+        },
+        "audit": {
+          "path": "ROOT_FILL_ABSOLUTE_N3_AUDIT",
+          "sha256": "ROOT_FILL_SHA256_N3_AUDIT"
+        },
+        "compute": {
+          "path": "ROOT_FILL_ABSOLUTE_N3_COMPUTE",
+          "sha256": "ROOT_FILL_SHA256_N3_COMPUTE"
+        },
+        "metrics": {
+          "path": "ROOT_FILL_ABSOLUTE_N3_METRICS",
+          "sha256": "ROOT_FILL_SHA256_N3_METRICS"
+        }
+      }
+    }
+  ],
+  "n3_episode": {
+    "episode_dir": "ROOT_FILL_ACCEPTED_N3_EPISODE",
+    "status": {
+      "path": "ROOT_FILL_ABSOLUTE_N3_STATUS",
+      "sha256": "ROOT_FILL_SHA256_N3_STATUS"
+    },
+    "index": {
+      "path": "ROOT_FILL_ABSOLUTE_N3_EVENTS_INDEX",
+      "sha256": "ROOT_FILL_SHA256_N3_EVENTS_INDEX"
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "schema": "n3-first3-read-authorization-v1",
+  "status": "pending",
+  "freeze": {
+    "path": "ROOT_FILL_ABSOLUTE_FREEZE",
+    "sha256": "ROOT_FILL_SHA256_FREEZE"
+  },
+  "manifest": {
+    "path": "ROOT_FILL_ABSOLUTE_INPUTS",
+    "sha256": "ROOT_FILL_SHA256_INPUTS"
+  },
+  "output": "ROOT_FILL_NEW_OUTPUT_DIRECTORY",
+  "reviewed_matrix_report": {
+    "path": "ROOT_FILL_ABSOLUTE_MATRIX_REPORT",
+    "sha256": "ROOT_FILL_SHA256_MATRIX_REPORT"
+  },
+  "reviewed_metadata_gate_sources": {
+    "scripts/qd_ed_n3_report.py": "ROOT_FILL_REVIEWED_FINAL_SHA",
+    "scripts/qd_ed_n3_plan.py": "ROOT_FILL_REVIEWED_FINAL_SHA"
+  },
+  "n3_audit_snapshot": {
+    "audit": {
+      "path": "ROOT_FILL_ABSOLUTE_N3_AUDIT",
+      "sha256": "ROOT_FILL_SHA256_N3_AUDIT"
+    },
+    "status": {
+      "path": "ROOT_FILL_ABSOLUTE_N3_STATUS",
+      "sha256": "ROOT_FILL_SHA256_N3_STATUS"
+    },
+    "index": {
+      "path": "ROOT_FILL_ABSOLUTE_N3_EVENTS_INDEX",
+      "sha256": "ROOT_FILL_SHA256_N3_EVENTS_INDEX"
+    },
+    "auditor_sha256": "ROOT_FILL_FROZEN_AUDITOR_SHA",
+    "binding": "root_verified_unchanged_after_complete_frozen_audit"
+  }
+}
