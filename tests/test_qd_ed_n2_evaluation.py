@@ -556,3 +556,122 @@ def test_release_rejects_partial_failed_or_unaudited_validation(evaluation,monke
     inventory=save(artifact/'empty-health-inventory.json',{'schema':'qd-ed-settled-healthcheck-inventory-v1','resources':[]})
     with pytest.raises((r.GateError,ValueError),match='recomputed validation|rejected audit|numeric failure'):
         e.prepare_reservation_release(plan,events,[],root,r,healthcheck_inventory=inventory,rationale='cannot release',time_unix=1.)
+
+
+def test_report_joins_recovery_to_its_immutable_derived_plan(evaluation,monkeypatch):
+    root,base,_,old_report=validation_report_fixture(evaluation,monkeypatch)
+    manifest=copy.deepcopy(old_report['input_manifest']);base_ref=manifest['base_plan']
+    base_bytes=Path(base_ref['path']).read_bytes();original_spec=manifest['attempts'][0]
+    good=r.read_json(original_spec['terminal']['path']);original=copy.deepcopy(good)
+    original.update(outcome_valid=False,success=False,reason=n.TRANSPORT_GATE,provider_failed_calls=1,
+        stage_failed_queries=1,gpu_process_wall_seconds=12.)
+    original['n2_recovery_eligibility']=e.transport_eligibility(r.GateError(n.TRANSPORT_GATE),original,base,r)
+    original_spec['terminal']=save(Path(original_spec['terminal']['path']),original)
+    row=base['episodes'][0];revision=copy.deepcopy(base)
+    retry={**row,'episode_key':row['episode_key']+'_r1','budget_bucket':'recovery','retry_of':original['attempt_id'],
+        'n2_evaluation_recovery_contract':e.binding(base)}
+    retry['recovery_release']=save(Path(base['artifact_root'])/'appended-recovery-certificate.json',{
+        'schema':'qd-ed-n2-evaluation-recovery-v1','retry_of':original['attempt_id'],
+        'frozen_identity':e.binding(base),'original_terminal':original_spec['terminal']})
+    revision['episodes'].append(retry)
+    revision_ref=save(Path(base['artifact_root'])/'validation-derived-recovery-plan.json',revision)
+    out=Path(base['artifact_root'])/'accepted-validation-recovery'
+    terminal={**good,'attempt_id':'validation-recovered','episode_key':retry['episode_key'],
+        'retry_of':original['attempt_id'],'budget_bucket':'recovery','plan_sha256':revision_ref['sha256'],
+        'output_dir':str(out),'time_unix':1000,'gpu_process_wall_seconds':25.}
+    tref=save(out/'attempt-result.json',terminal)
+    cp=out/'eds_eval/episode_compute.jsonl';cp.parent.mkdir(parents=True,exist_ok=True)
+    cp.write_bytes(Path(original_spec['compute']['path']).read_bytes())
+    mp=out/'eds_eval/eds_metrics.jsonl';mp.write_bytes(Path(original_spec['metrics']['path']).read_bytes())
+    audit=r.read_json(original_spec['audit']['path'])
+    audit.update(episode_dir=str(out/'eds_eval/decision_evidence/episode_000'),episode_compute_file=str(cp))
+    manifest['plan_revisions']=[revision_ref]
+    manifest['attempts'][0]={'terminal':original_spec['terminal']}
+    manifest['attempts'].append({'terminal':tref,'audit':save(out/'eds_eval/decision-evidence-audit.json',audit),
+        'compute':{'path':str(cp),'sha256':r.digest(cp)},'metrics':{'path':str(mp),'sha256':r.digest(mp)}})
+    report,attempts,reported_base=er.recompute(manifest,root,r)
+    assert len(attempts)==61 and report['complete'] and report['numeric_pass']
+    first=report['cells'][0]
+    assert [a['terminal']['attempt_id'] for a in first['attempts']]==[original['attempt_id'],'validation-recovered']
+    assert first['attempts'][0]['terminal']['event']=='valid' and first['attempts'][0]['terminal']['outcome_valid'] is False
+    assert first['valid_attempt_id']=='validation-recovered'
+    assert report['profiles']['C0']['all_attempt_gpu_seconds']['complete_total']==19*10+12+25
+    assert Path(base_ref['path']).read_bytes()==base_bytes and reported_base==base
+    assert retry['episode_key'] not in {x['episode_key'] for x in base['episodes']}
+    missing=copy.deepcopy(manifest);missing.pop('plan_revisions')
+    with pytest.raises((r.GateError,ValueError,KeyError)):
+        er.recompute(missing,root,r)
+
+
+def selected_dev_revision(plan,root,*,core_change=False,source_change=False,checkpoint=False):
+    """Rebind internally consistent source mapping/certificates, never fake a pass."""
+    selected=e.read_ref(plan['n2_evaluation']['dev_plan'],plan,r)
+    if source_change:selected['source_commit']='another-Dev-source'
+    if core_change:
+        (root/'core/qd_ed.py').write_text('changed prospective algorithm bytes\n')
+        next(x for x in selected['code_files'] if x['path']=='core/qd_ed.py')['sha256']=r.digest(root/'core/qd_ed.py')
+    if checkpoint:
+        selected['n2_cohort']['checkpoint']={'status':'reviewed_remaining_cells'}
+        # An undispatched, prospective linked row may exist in a later selected
+        # plan without changing its source or the complete report's base plan.
+        row=selected['episodes'][0]
+        selected['episodes'].append({**row,'episode_key':row['episode_key']+'_planned_recovery',
+            'retry_of':'unused-fixture-parent','budget_bucket':'recovery',
+            'n2_recovery_contract':n.binding(selected,r.read_json(selected['runtime_manifest_path']))})
+    plan['n2_evaluation']['dev_plan']=save(Path(plan['artifact_root'])/'selected-Dev-revision.json',selected)
+    before={x['path']:x['sha256'] for x in selected['code_files']}
+    production=[{'path':p,'sha256':before[p]} for p in sorted(set(before)-e.TOOLING)]
+    c=plan['n2_evaluation'];c['source_mapping'].update(dev_source_commit=selected['source_commit'],production_files=production)
+    for record in plan['code_files']:
+        if record['path'] in before and record['path'] not in e.TOOLING:record['sha256']=before[record['path']]
+    c['candidate_fingerprint']=e.sha_json({'production_files':production,'candidate_profiles':selected['candidate_profiles'],
+        'runtime_manifest_sha256':selected['runtime_manifest_sha256'],'runtime_inventory_sha256':selected['runtime_inventory_sha256'],
+        'seed_plan_sha256':selected['seed_plan_sha256']})
+    cert=e.read_ref(c['promotion_certificate'],plan,r);review=e.read_ref(cert['review'],plan,r)
+    review['candidate_fingerprint']=c['candidate_fingerprint']
+    cert.update(candidate_fingerprint=c['candidate_fingerprint'],target_binding=e.binding(plan),
+        review=save(Path(plan['artifact_root'])/'rebound-review.json',review))
+    c['promotion_certificate']=save(Path(plan['artifact_root'])/'rebound-certificate.json',cert)
+    return selected
+
+
+@pytest.mark.parametrize('change',['core','source','core_and_source'])
+def test_promotion_cannot_reuse_old_pass_for_changed_selected_Dev_source(evaluation,monkeypatch,change):
+    root,plan,events,_,_=dev_promotion(evaluation,monkeypatch)
+    selected_dev_revision(plan,root,core_change=change in {'core','core_and_source'},source_change=change in {'source','core_and_source'})
+    e.validate_contract(plan,evaluation[2],evaluation[3],evaluation[4],root,r)
+    with pytest.raises(r.GateError,match='reported Dev source differs'):
+        e.reviewed_promotion(plan,events,root,r)
+
+
+def test_promotion_allows_checkpoint_recovery_plan_revision_with_same_Dev_source(evaluation,monkeypatch):
+    root,plan,events,report,cert=dev_promotion(evaluation,monkeypatch)
+    selected=selected_dev_revision(plan,root,checkpoint=True)
+    e.validate_contract(plan,evaluation[2],evaluation[3],evaluation[4],root,r)
+    e.reviewed_promotion(plan,events,root,r)
+    # Also exercise the reported revision list, which must bind every admitted
+    # source even when this revision has no additional dispatched attempt.
+    cert=e.read_ref(plan['n2_evaluation']['promotion_certificate'],plan,r)
+    report['input_manifest']['plan_revisions']=[plan['n2_evaluation']['dev_plan']]
+    cert['report']=save(Path(plan['artifact_root'])/'report-with-checkpoint-revision.json',report)
+    review=e.read_ref(cert['review'],plan,r);review['report']=cert['report']
+    cert['review']=save(Path(plan['artifact_root'])/'review-with-checkpoint-revision.json',review)
+    plan['n2_evaluation']['promotion_certificate']=save(Path(plan['artifact_root'])/'certificate-with-checkpoint-revision.json',cert)
+    e.reviewed_promotion(plan,events,root,r)
+    changed=copy.deepcopy(selected)
+    next(x for x in changed['code_files'] if x['path']=='core/qd_ed.py')['sha256']='another-algorithm'
+    report['input_manifest']['plan_revisions']=[save(Path(plan['artifact_root'])/'bad-reported-revision.json',changed)]
+    cert['report']=save(Path(plan['artifact_root'])/'bad-reported-source.json',report)
+    plan['n2_evaluation']['promotion_certificate']=save(Path(plan['artifact_root'])/'bad-reported-source-certificate.json',cert)
+    with pytest.raises(r.GateError,match='reported Dev source differs'):
+        e.reviewed_promotion(plan,events,root,r)
+
+
+def test_formal_cannot_switch_selected_Dev_source_after_validation(evaluation,monkeypatch):
+    root,plan,events=certified_formal(evaluation,monkeypatch)
+    # Identical production bytes but another claimed Dev HEAD used to bypass
+    # fingerprint-only comparison. The validation report still binds old Dev.
+    selected_dev_revision(plan,root,source_change=True)
+    e.validate_contract(plan,evaluation[2],evaluation[3],evaluation[4],root,r)
+    with pytest.raises(r.GateError,match='validation Dev source differs'):
+        e.reviewed_promotion(plan,events,root,r)

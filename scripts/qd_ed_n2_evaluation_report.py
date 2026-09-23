@@ -26,14 +26,21 @@ def terminal_check(t,plan,plan_sha,r):
     return row
 
 
-def summarize(plan,attempts,r,d):
+def summarize(plan,attempts,r,d,*,validated_rows=None):
     phase=plan['n2_evaluation']['phase'];limits=e.PHASES[phase]
     originals=[x for x in plan['episodes'] if not x.get('retry_of')]
     bykey={x['episode_key']:x for x in plan['episodes']};grouped=defaultdict(list)
     r.require(len(attempts)<=limits['originals']+limits['recoveries'] and
         len({a['terminal']['attempt_id'] for a in attempts})==len(attempts),'duplicate/excess evaluation attempts')
+    if validated_rows is not None:
+        r.require(set(validated_rows)=={a['terminal']['attempt_id'] for a in attempts},
+                  'evaluation report validated row inventory differs')
     for attempt in attempts:
-        row=bykey[attempt['terminal']['episode_key']]
+        terminal=attempt['terminal']
+        row=(validated_rows[terminal['attempt_id']] if validated_rows is not None else bykey.get(terminal['episode_key']))
+        r.require(row is not None and row['episode_key']==terminal['episode_key']
+            and r.episode_identity(row)==terminal['identity'] and row.get('retry_of')==terminal.get('retry_of'),
+            'evaluation report lacks exact validated terminal plan row')
         grouped[e.cell(row)].append(attempt)
     r.require(set(grouped)<={e.cell(x) for x in originals},'outside evaluation matrix')
     cells=[];recoveries=0
@@ -97,7 +104,10 @@ def recompute(manifest,root,r):
     r.require([x for x in base['episodes'] if not x.get('retry_of')]==e.rows(seeds,phase),'evaluation report original matrix differs')
     for ref in manifest.get('plan_revisions',[]):
         p=d.read_ref(ref)
-        r.require(e.binding(p)==e.binding(base) and [x for x in p['episodes'] if not x.get('retry_of')]==e.rows(seeds,phase),
+        r.require(e.binding(p)==e.binding(base) and e.source_identity(p,r)==e.source_identity(base,r)
+            and e.source_identity(e.read_ref(p['n2_evaluation']['dev_plan'],p,r),r)
+                ==e.source_identity(e.read_ref(base['n2_evaluation']['dev_plan'],base,r),r)
+            and [x for x in p['episodes'] if not x.get('retry_of')]==e.rows(seeds,phase),
             'evaluation report revision differs')
         plans[ref['sha256']]=p
     for p in plans.values():
@@ -112,7 +122,13 @@ def recompute(manifest,root,r):
             r.require(all(x.get('qd_archive_active_for_chunk') is False for x in records),'QD ablation unexpectedly active')
             terminal=copy.deepcopy(terminal);terminal['identity']['profile']='N2'
         return original_metrics(records,terminal,audit,compute)
-    d.validate_terminal=lambda terminal,plan,sha:terminal_check(terminal,plan,sha,r)
+    validated_rows={}
+    def validate_terminal(terminal,plan,sha):
+        row=terminal_check(terminal,plan,sha,r)
+        r.require(terminal['attempt_id'] not in validated_rows,'duplicate validated terminal attempt')
+        validated_rows[terminal['attempt_id']]=row
+        return row
+    d.validate_terminal=validate_terminal
     d.summarize_metrics=metrics
     attempts=[]
     for spec in manifest['attempts']:
@@ -130,7 +146,7 @@ def recompute(manifest,root,r):
             row=next(x for x in current_plan['episodes'] if x['episode_key']==terminal['episode_key'])
             original=d.read_ref(by_id[terminal['retry_of']]['references']['terminal'])
             e.recovery_release(current_plan,row,original,r)
-    return summarize(base,attempts,r,d),attempts,base
+    return summarize(base,attempts,r,d,validated_rows=validated_rows),attempts,base
 
 
 def main():

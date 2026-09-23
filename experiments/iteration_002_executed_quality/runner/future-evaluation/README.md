@@ -21,6 +21,11 @@ scripts, `n2_evaluation_profiles.json` and the two protocol documents. All other
 Dev `code_files` must still exist with identical hashes, including algorithm,
 Stage, action, model, environment, perception, collector and auditor bytes.
 Tests/docs are separate commit evidence, not permission to change production.
+Promotion also binds every reported Dev base/revision to the selected Dev
+source HEAD and complete code-file inventory. A checkpoint/recovery plan may
+have a different plan SHA with the same source; a different algorithm or Dev
+source identity cannot inherit the older passing report. Formal retains this
+binding to the Dev source recorded by its validation evidence.
 The isolated R branch predates the integrated N2 core; it deliberately does not
 replace that core. Integrate only these files, then verify the production map.
 
@@ -143,7 +148,10 @@ Input schema `qd-ed-n2-evaluation-report-input-v1` binds this report script SHA,
 protocol SHA, explicit base/revision plan references, and `attempts` with the
 same terminal/audit/compute/metrics references as the frozen Dev reporter. Cell
 identity additionally includes the seed block; no two-block/task collapse.
-Every original/recovery terminal and episode cost remains represented. Shared
+Each terminal is joined to its own SHA-validated base or derived plan row
+before full-cell aggregation; appended recovery keys never fall back to the
+original base plan. Every original/recovery terminal and episode cost remains
+represented. Shared
 health costs remain in the authoritative global ledger/budget snapshot; prior
 proofs are reused references, never charged a second time. Missing/invalid cells
 stay Unknown; complete 20/arm or10/arm denominators are fixed. Reports do not issue

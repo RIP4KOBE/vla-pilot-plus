@@ -85,6 +85,14 @@ def evaluation_profiles(observed,candidate,r):
     return result
 
 
+def source_identity(plan,runner):
+    """Exact recorded source identity; plan release/recovery rows may differ."""
+    r=api(runner);records=plan['code_files']
+    files={x['path']:x['sha256'] for x in records}
+    r.require(len(files)==len(records),'duplicate frozen source record')
+    return {'source_commit':plan['source_commit'],'code_files':files}
+
+
 def scientific_mapping(plan,root,r):
     c=plan['n2_evaluation'];base=read_ref(c['dev_plan'],plan,r)
     before={x['path']:x['sha256'] for x in base['code_files']}
@@ -216,6 +224,7 @@ def reviewed_promotion(plan,events,root,runner):
         and certificate.get('budget_clarification_sha256')==CLARIFICATION_SHA
         and certificate.get('target_binding')==binding(plan),'promotion certificate identity differs')
     report=read_ref(certificate.get('report'),plan,r)
+    selected_base=read_ref(c['dev_plan'],plan,r)
     if c['phase']=='validation':
         d=frozen_report(r);m=report['input_manifest'];r.require(m['script_sha256']==DEV_REPORT_SHA,'promotion reporter differs')
         authorization=d.read_ref(m['authorization'])
@@ -230,6 +239,8 @@ def reviewed_promotion(plan,events,root,runner):
             r.require(d.plan_contract(revision)==d.plan_contract(base) and all(revision[k]==base[k] for k in d.BINDING)
                 and revision['candidate_profiles']==base['candidate_profiles'],'promotion Dev revision identity differs')
             plans[reference['sha256']]=revision
+        r.require(all(source_identity(p,r)==source_identity(selected_base,r) for p in plans.values()),
+                  'promotion reported Dev source differs from selected Dev source')
         attempts=[d.load_attempt(spec,plans) for spec in m['attempts']]
         computed=d.summarize(base,attempts)
         r.require(all(report.get(k)==value for k,value in computed.items()),'promotion report differs from recomputed Dev evidence')
@@ -241,8 +252,10 @@ def reviewed_promotion(plan,events,root,runner):
         r.require(all(report.get(k)==value for k,value in computed.items()),'promotion report differs from recomputed validation evidence')
         r.require(base['n2_evaluation']['phase']=='validation' and computed['complete'] and computed['numeric_pass'] is True,'validation promotion incomplete/numeric failure')
         r.require(base['n2_evaluation']['candidate_fingerprint']==c['candidate_fingerprint'],'candidate changed between validation/formal')
+        reported_dev=read_ref(base['n2_evaluation']['dev_plan'],plan,r)
+        r.require(source_identity(reported_dev,r)==source_identity(selected_base,r),
+                  'promotion validation Dev source differs from selected Dev source')
         predecessor=PHASES['validation']['cohort_id']
-    selected_base=read_ref(c['dev_plan'],plan,r)
     r.require(all(base[k]==selected_base[k] for k in ('candidate_profiles','runtime_manifest_sha256','runtime_inventory_sha256','seed_plan_sha256')),
               'promotion evidence does not bind selected candidate inputs')
     observations=[a['metrics'] for a in attempts if a['status']=='complete_valid' and a['terminal']['identity']['profile']=='N2']
