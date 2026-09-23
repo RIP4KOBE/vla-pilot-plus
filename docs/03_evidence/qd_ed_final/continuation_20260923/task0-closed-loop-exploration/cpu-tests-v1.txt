@@ -1,0 +1,17 @@
+test_all_reactivations_retained (test_read_closed_loop.SyntheticTests.test_all_reactivations_retained) ... ok
+test_contiguous_net_and_path (test_read_closed_loop.SyntheticTests.test_contiguous_net_and_path) ... ok
+test_cpu_only (test_read_closed_loop.SyntheticTests.test_cpu_only) ... ok
+test_dispatch_preserves_pre_reset_not_returned_reset (test_read_closed_loop.SyntheticTests.test_dispatch_preserves_pre_reset_not_returned_reset) ... ok
+test_gap_excluded_and_net_unknown (test_read_closed_loop.SyntheticTests.test_gap_excluded_and_net_unknown) ... ok
+test_keypoint_only_same_index (test_read_closed_loop.SyntheticTests.test_keypoint_only_same_index) ... ok
+test_native_dtype_is_part_of_identity (test_read_closed_loop.SyntheticTests.test_native_dtype_is_part_of_identity) ... ok
+test_no_stage_prose_allowlist (test_read_closed_loop.SyntheticTests.test_no_stage_prose_allowlist) ... ok
+test_reset_never_bridges (test_read_closed_loop.SyntheticTests.test_reset_never_bridges) ... ok
+test_selected_quality_keeps_raw_separate (test_read_closed_loop.SyntheticTests.test_selected_quality_keeps_raw_separate) ... ok
+test_signs_not_grasps (test_read_closed_loop.SyntheticTests.test_signs_not_grasps) ... ok
+test_wrapper_hash_not_semantic_identity (test_read_closed_loop.SyntheticTests.test_wrapper_hash_not_semantic_identity) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.009s
+
+OK

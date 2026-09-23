@@ -1,0 +1,81 @@
+{
+  "schema": "n2-closed-loop-read-preparation-v1",
+  "status": "PROPOSED_SCOPE_NO_SCIENTIFIC_READS_THIS_TASK",
+  "source_commit": "525506ca3198f54d86dadf84bbb76eb64926d87a",
+  "sources": {
+    "main.py": {
+      "sha256": "258d66b3040be8750beb9e0eab47a7b607db7cbe00d167726664526554fdec57",
+      "reviewed_sites": [
+        "977-995 gripper accessor",
+        "1295-1424 Stage triggers/events",
+        "1659-1693 keypoint/Stage update",
+        "1780 decision context",
+        "2085 execution-index reset"
+      ]
+    },
+    "core/decision_evidence.py": {
+      "sha256": "3af145738e3b22a8bec7484d0c33ba9a81dffbf58335b61682eb0ddf43b3cb8c",
+      "reviewed_sites": [
+        "175-204 context",
+        "248-265 pre-reset observations",
+        "272-294 hash-index persistence"
+      ]
+    },
+    "core/keypoint_tracker.py": {
+      "sha256": "292d63964b90405769118bda0e1acc9666f8ae076f41abbb7df8e5bf8abc6f45",
+      "reviewed_sites": [
+        "62-129 registry",
+        "146-182 current/fallback keypoints"
+      ]
+    },
+    "core/env_adapters/libero_adapter.py": {
+      "sha256": "029657074f6fc783beebc3b4a1431faceee51f970e4d79f0ead3796b6dd2f508",
+      "reviewed_sites": [
+        "1394 object pose by segment",
+        "1627 projection",
+        "1695 actual command"
+      ]
+    },
+    "core/rdt_policy_steer.py": {
+      "sha256": "cf5d50870738f94c6c8cb211e8e0557e2db5e67639da7c2bf545d54e9ed17bdc",
+      "reviewed_sites": [
+        "1745 scoring projection",
+        "1981 canonical raw/Q8 separation",
+        "6622 selected raw",
+        "6985 raw-to-Stage"
+      ]
+    },
+    "scripts/audit_decision_evidence.py": {
+      "sha256": "c5936a251bc8145093392136fc8b06779c499cb456953d1079fc4e26c68e1b95",
+      "reviewed_sites": [
+        "native evidence completeness audit"
+      ]
+    },
+    "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/analyze_episode.py": {
+      "sha256": "26fb0952507b41694cb7b6d56991caef5afbb5b71aa0f13f4356cb731676e0b1",
+      "reviewed_sites": [
+        "61 native ULP",
+        "145 selected projection",
+        "188 dispatch join",
+        "215 numerical diagnostics"
+      ]
+    }
+  },
+  "protocol_sha256": "30fa1999aaa3cafc3713b81bf118f49c6a5c2b4b6b1704099f266be0375035dd",
+  "authorized_attempt_suffixes_proposed": [
+    "3cc1e46f83d0",
+    "28dd3c7a9e74",
+    "45c5f8694f85"
+  ],
+  "actual_input_hashes": "NOT_READ_PENDING_ROOT_APPROVAL",
+  "critical_unknown": [
+    "actual normalized Stage argument",
+    "per-step object pose/contact/grasp",
+    "tracker fallback occurrence flag",
+    "unique original archive insertion ancestry",
+    "runtime projector counter",
+    "unguided projected trajectory and provider quality",
+    "counterfactual candidate/Stage outcomes"
+  ],
+  "no_changes_to_ongoing_cohort": true
+}

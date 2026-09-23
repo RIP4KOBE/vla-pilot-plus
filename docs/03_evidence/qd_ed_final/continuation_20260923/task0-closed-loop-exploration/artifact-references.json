@@ -1,0 +1,142 @@
+{
+  "schema": "task0-closed-loop-archive-v1",
+  "frozen_production_source": "525506ca3198f54d86dadf84bbb76eb64926d87a",
+  "status": "post-outcome descriptive Dev exploration; ongoing cohort unchanged",
+  "preserved_byte_identical": [
+    {
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/read_closed_loop.py",
+      "archive_name": "read_closed_loop.py",
+      "sha256": "1212c3c9675403dc0e8f3b97948ab8d6d9a5f873ccfa615564041da3fe5c309f",
+      "bytes": 27072
+    },
+    {
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/test_read_closed_loop.py",
+      "archive_name": "test_read_closed_loop.py",
+      "sha256": "faac8cf871e658137926ebecacc2325facab4cd83237ce9d429361ee0a83c6bc",
+      "bytes": 5674
+    },
+    {
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/describe_saved_output.py",
+      "archive_name": "describe_saved_output.py",
+      "sha256": "f3555f027839a14395601b73ddbda4672fb23440fdd003cf1773db3a600b9180",
+      "bytes": 8298
+    },
+    {
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/describe_stage_associations.py",
+      "archive_name": "describe_stage_associations.py",
+      "sha256": "9710322a2bc0fd8345b2ed92d1dc2418bf386486641080d025eedea633d0f596",
+      "bytes": 4132
+    },
+    {
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/freeze-v1.json",
+      "archive_name": "freeze-v1.json",
+      "sha256": "5c6cfed4eb2286b3ca2494e189aeb3dc6f31af0cd4ec2ce120cea2aab55adec1",
+      "bytes": 1661
+    },
+    {
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/cpu-tests-v1.txt",
+      "archive_name": "cpu-tests-v1.txt",
+      "sha256": "7aaeaf26539db62f60c4c476e08c4fb0e6429e3d926af89b2008609b26a4647f",
+      "bytes": 1427
+    },
+    {
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-preparation-v1/read-protocol-v1.md",
+      "archive_name": "read-protocol-v1.md",
+      "sha256": "30fa1999aaa3cafc3713b81bf118f49c6a5c2b4b6b1704099f266be0375035dd",
+      "bytes": 11864
+    },
+    {
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-preparation-v1/read-protocol-v2.md",
+      "archive_name": "read-protocol-v2.md",
+      "sha256": "97a5a46ead5b91a8da3e5171b91ead6061cc89fe54433804e2e1f7ccdfa7f127",
+      "bytes": 11874
+    },
+    {
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-preparation-v1/source-schema-v1.json",
+      "archive_name": "source-schema-v1.json",
+      "sha256": "9347c3a381baa44791d70a35d430fe96f1064b6241b0d38b93d905e2fb813012",
+      "bytes": 2792
+    },
+    {
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-preparation-v1/root-read-authorization-v1.json",
+      "archive_name": "root-read-authorization-v1.json",
+      "sha256": "5301e7ee421148b5cf0dd470c0f24b1a3977ec5d2146e52050ab717cea7d2b0b",
+      "bytes": 5479
+    },
+    {
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/output-v1/findings-v3.md",
+      "archive_name": "findings-v3.md",
+      "sha256": "e1b7fb423ad2733a838bc775b0b5d903ddfcf3d2e5e06cd60373e6fc70bece96",
+      "bytes": 7471
+    }
+  ],
+  "large_output_references": [
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/output-v1/c0-fresh-audit.json",
+      "sha256": "aaec9b206c9b55d20399b69fa67812ab7b3041a518f6743f3132be87839f32f7",
+      "bytes": 92752
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/output-v1/closed-loop-sequence.json",
+      "sha256": "b8a7c7bce23975ff1f421c7e7cd87eccc7d2517549301f4a81fb34189d1affa4",
+      "bytes": 5261187
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/output-v1/comparison.md",
+      "sha256": "2e3e799dd514e6054549d2a3707705f41b14e0777db965769c684aef8032bc6e",
+      "bytes": 14809
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/output-v1/descriptive-extract-v1.json",
+      "sha256": "70cebc69e03bf9a2d60d057d9fba179389cc71132a42d4b5c5deaeee99761e31",
+      "bytes": 5944
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/output-v1/findings-v1.md",
+      "sha256": "1eb4066744a93782e1cc70e7006ef3bb1849baac0122a96f50b0e585a9b65e1f",
+      "bytes": 5780
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/output-v1/findings-v2.md",
+      "sha256": "4324859ec0442eeb22c99f6695d1f115f0a6d49fc31064aac08658e92b74f583",
+      "bytes": 6942
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/output-v1/findings-v3.md",
+      "sha256": "e1b7fb423ad2733a838bc775b0b5d903ddfcf3d2e5e06cd60373e6fc70bece96",
+      "bytes": 7471
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/output-v1/inputs-and-audit.json",
+      "sha256": "dfddb2ff80734cabf7a819beef213ded8ab3410a02cc0a6b49ebced48fe70910",
+      "bytes": 1992774
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/output-v1/n2-fresh-audit.json",
+      "sha256": "c2d233cdb7fa1b9af1493f414f407ddecd73c21a007dc5e98a5c63b75da4feae",
+      "bytes": 10849
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/output-v1/q0-fresh-audit.json",
+      "sha256": "28bd13d7d722ba377e26e17dbbc826d623f34debf04a35577a19e582cee8bdc8",
+      "bytes": 165668
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/output-v1/stage-gripper-associations-v1.json",
+      "sha256": "70fb64227a710b1ce50b5277bf9fec242b121df6d5637c5432d15f36266e43d7",
+      "bytes": 31546
+    }
+  ],
+  "scientific_execution_count": 1,
+  "synthetic_tests": 12,
+  "fresh_accepted_episodes": 3,
+  "independent_source_review": {
+    "reviewer": "/root/codex_stage_adapter",
+    "result": "no blocker; source only; no actual output read or execution by reviewer",
+    "interpretation_note": "EEF can use preceding contiguous observation; qpos start is first within-run observation; command flips exclude run boundary",
+    "note_incorporated": "findings-v3.md"
+  },
+  "no_gpu_model_provider_projector_simulator_calls": true,
+  "target_map": null,
+  "optional_projection_analysis": "not evaluated"
+}

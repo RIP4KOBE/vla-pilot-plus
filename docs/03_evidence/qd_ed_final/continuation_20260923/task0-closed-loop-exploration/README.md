@@ -1,0 +1,13 @@
+# Task0 closed-loop explanatory analysis archive
+
+This archive preserves the actual executed CPU reader, 12 synthetic tests, their pre-read freeze, the source-schema hashes, exact-ID corrected protocol, root authorization and final human findings. Every copied file is byte-identical to its artifact-root original; hashes and large-output references are in `artifact-references.json`. Frozen production source was `525506ca3198f54d86dadf84bbb76eb64926d87a`; this work did not edit that worktree or change algorithms, plans, cohort gates, authoritative state or ledgers.
+
+One scientific read execution admitted exactly the accepted task0 C0, Q0 recovery1 and N2 roots named in the authorization. It verified complete current audits and all bundle hashes, loaded tensors on CPU with weights_only, and kept CUDA uninitialized. Original files were rehashed afterward and were unchanged. `closed-loop-sequence.json` and its complete input hash manifest remain at the A paths bound in the references file; no large episode artifacts are copied into Git. Raw Stage prose, images, invalid attempts, other cells and evaluation outcomes were outside scope.
+
+The reader and test hashes were frozen before that execution. `describe_saved_output.py` and `describe_stage_associations.py` only format or join the already saved, hash-bound sequence, with no additional attempt reads. Findings v2 added the root-requested existing-output Stage/gripper join; v3 appended the independent review's interval interpretation note. Earlier findings and all unchanged outputs remain in A and are referenced. No reader rerun or data-fitting followed the review.
+
+The independent source review found no blocking issue. EEF motion can include the preceding contiguous post-action observation; gripper qpos start is instead the run's first post-action observation; command sign changes exclude the cross-boundary flip. These timestamps must not be conflated. Target-aware, grasp/contact, normalized Stage input and counterfactual quantities remain Unknown. Optional projection tracking analysis was not evaluated.
+
+The key observation is first OFF at N2=24, C0=24, Q0=16, followed by zero, seven and five reactivations respectively. It is not evidence of an initially earlier N2 cutoff or a causal account of task failure. Consult `findings-v3.md` for the measured EEF/command sequence and all limitations.
+
+The preserved scripts contain the original absolute W/A bindings and intentionally retain their exact bytes. Reproduction requires those frozen inputs and an exclusive new output directory; it must not overwrite output-v1 or existing authorization/audits. This archive does not itself authorize new scientific reads or online dispatch.

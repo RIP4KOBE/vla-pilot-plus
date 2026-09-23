@@ -1,0 +1,38 @@
+{
+  "status": "CPU_TESTED_FROZEN_BEFORE_SCIENTIFIC_READ",
+  "created_at": "2026-09-23T10:18:02.836059+00:00",
+  "source_commit": "525506ca3198f54d86dadf84bbb76eb64926d87a",
+  "reader_sha256": "1212c3c9675403dc0e8f3b97948ab8d6d9a5f873ccfa615564041da3fe5c309f",
+  "files": [
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/read_closed_loop.py",
+      "sha256": "1212c3c9675403dc0e8f3b97948ab8d6d9a5f873ccfa615564041da3fe5c309f"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/test_read_closed_loop.py",
+      "sha256": "faac8cf871e658137926ebecacc2325facab4cd83237ce9d429361ee0a83c6bc"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/cpu-tests-v1.txt",
+      "sha256": "7aaeaf26539db62f60c4c476e08c4fb0e6429e3d926af89b2008609b26a4647f"
+    }
+  ],
+  "test_command": [
+    "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1",
+    "-p",
+    "test_read_closed_loop.py",
+    "-v"
+  ],
+  "test_returncode": 0,
+  "synthetic_tests": 12,
+  "python": "3.12.12 | packaged by conda-forge | (main, Oct 22 2025, 23:25:55) [GCC 14.3.0]",
+  "torch": "2.7.1+cu126",
+  "cuda_initialized": false,
+  "CUDA_VISIBLE_DEVICES": "",
+  "scope": "synthetic tests only; no actual attempt inputs loaded for this freeze"
+}
