@@ -119,7 +119,8 @@
         "5.1",
         "5.2",
         "5.3",
-        "5.4"
+        "5.4",
+        "5.5"
       ],
       "depth": 1,
       "hypothesis": "Mechanism: Causal measurement and executable common conditions for QD-ED research.\nHypothesis: Reliable shared execution and exact decision-to-observation evidence resolve the invalid-measurement bottleneck before algorithm comparisons.\nObservable: Valid Dev controls and reproducible actual quality/selection/progress evidence; no inferred success scores from diagnostics.\nConflicts: Prior N1 cohort remains invalid and historical proxy gains remain insufficient; user requires continued recovery and targeted evidence collection.",
@@ -151,8 +152,9 @@
       "children_ids": [],
       "depth": 2,
       "hypothesis": "Mechanism: Minimal independent MuJoCo and staged CUDA differential control.\nHypothesis: A tiny static scene with isolated CUDA initialization/allocation/compute distinguishes generic GL-CUDA interaction faults from LIBERO/RDT-specific resource state.\nObservable: Frozen raw RGB/depth and device identities across bounded stages on GPU3, with exact owned-Xid attribution and zero task actions.\nConflicts: Production and prior lifecycle failures remain invalid; minimal-control success does not imply full evaluation is valid or hardware is healthy.",
-      "status": "running",
-      "insight": "Executor prepares minimal static MuJoCo plus staged CUDA control and shared-budget supervisor; GPU launch remains owned by coordinator after protocol/code freeze."
+      "status": "pending",
+      "insight": "Executor prepares minimal static MuJoCo plus staged CUDA control and shared-budget supervisor; GPU launch remains owned by coordinator after protocol/code freeze.",
+      "result": "Implementation CPU-reviewed: 38 tests pass, no GPU dispatched. Deferred because unchanged full-model B1/render control passed after reboot; retain prospective fallback if new production evidence warrants."
     },
     "5.4": {
       "id": "5.4",
@@ -160,7 +162,18 @@
       "children_ids": [],
       "depth": 2,
       "hypothesis": "Mechanism: Original model-first control after an externally initiated device/driver reset.\nHypothesis: Fresh boot may remove the preexisting graphics fault without application changes, which must be checked before attributing future repair effects.\nObservable: One exact original model-first/B1/render workflow under boot2a1fa95f on GPU3 with unchanged image and compute gates.\nConflicts: Old failures stay recorded; this is a new external condition, not a retry to replace a scientific outcome or proof of hardware health.",
-      "status": "running"
+      "status": "done",
+      "insight": "External fresh boot restores the unchanged bounded GPU3 model-first B1/render path; old failures remain. No root cause or production-episode health established.",
+      "result": "Resource be47760b9287 completed: 73.088664569 GPU-process seconds, exact original prediction hash, all three camera hashes identical across B1 and to static reference, 10 finite/nonuniform frames, no owned Xid. Zero actions or scientific episodes."
+    },
+    "5.5": {
+      "id": "5.5",
+      "parent_id": "5",
+      "children_ids": [],
+      "depth": 2,
+      "hypothesis": "Mechanism: Complete production C0 common-condition validation under the externally renewed boot.\nHypothesis: A passing unchanged zero-action model-first control leaves scene-first production, guided search, perception and action/reset interactions untested; one original full dev episode can discriminate that remaining runtime bottleneck.\nObservable: One prospective GPU3 C0 episode provides original outcome and complete finite action/search/Stage/perception/cost evidence with no owned Xid; task success is reported without an algorithm-improvement claim.\nConflicts: Pruned 4 and 4.1 remain invalid closed cohorts. This engineering dev identity has no retry_of and replaces none of their samples; all shared budgets and validation/formal reserves remain unchanged.",
+      "status": "running",
+      "result": "Prospective full C0 protocol and boot/Xid supervisor preparation; GPU dispatch not yet authorized by a frozen plan."
     }
   }
 }

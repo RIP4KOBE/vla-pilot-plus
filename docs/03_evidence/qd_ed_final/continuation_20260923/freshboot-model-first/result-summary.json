@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "source_commit": "c050470608c7103fb45a7bde16ef2f833cdc7ab9",
+  "resource_id": "rdt-qd-ed-final-20260921T093925Z__gpu3_freshboot_model_first__be47760b9287",
+  "result_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-model-first/rdt-qd-ed-final-20260921T093925Z__gpu3_freshboot_model_first__be47760b9287/healthcheck-result.json",
+  "result_sha256": "c510a6e5c6a3735612d93cc576f9b61670bac6f25c88a17edecd2b4a8c5fe5e5",
+  "contract_sha256": "7871dce7f04d8e94b82a7ed5975390898eb75261d6319fb635ffe64bbf77012c",
+  "physical_gpu": 3,
+  "gpu_process_wall_seconds": 73.08866456900023,
+  "prediction_sha256": "e47036194c7e9007cf4d17b3fbc18ac7b2afb4227551624e14eb5f8ebd90f7ca",
+  "frame_count": 10,
+  "owned_xids": [],
+  "scientific_episodes": 0,
+  "interpretation": "External fresh boot restores this unchanged bounded model-first/B1/render path; production episode and root cause remain unproven. Prior failures preserved."
+}

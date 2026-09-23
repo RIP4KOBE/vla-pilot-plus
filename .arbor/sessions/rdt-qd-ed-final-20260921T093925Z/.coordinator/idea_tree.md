@@ -75,14 +75,16 @@ Conflicts: H5 secondary trajectory lanes failed; N1 changes equivalence at capac
 ### 5: Mechanism: Causal measurement and executable common conditions for QD-ED research.
 Hypothesis: Reliable shared execution and exact decision-to-observation evidence resolve the invalid-measurement bottleneck before algorithm comparisons.
 Observable: Valid Dev controls and reproducible actual quality/selection/progress evidence; no inferred success scores from diagnostics.
-Conflicts: Prior N1 cohort remains invalid and historical proxy gains remain insufficient; user requires continued recovery and targeted evidence collection. [PENDING]
+Conflicts: Prior N1 cohort remains invalid and historical proxy gains remain insufficient; user requires continued recovery and targeted evidence collection. [RUNNING]
 
 #### 5.1: Mechanism: Differential audit of native render state and model interaction.
 Hypothesis: The pre-model wrist-image drift in resource72a4dc721056 exposes a resource-state discrepancy that ordering-only probes did not isolate.
 Observable: Exact source-level discrepancy and a bounded prospective repair/diagnostic contract preserving physics and image semantics on physical GPU3.
-Conflicts: Preserve all old Xid/image-parity failures; no retroactive threshold relaxation or production patch without evidence. [RUNNING]
+Conflicts: Preserve all old Xid/image-parity failures; no retroactive threshold relaxation or production patch without evidence. [DONE]
 
-**Insight**: Executor performs CPU differential native-state audit; no GPU authority delegated.
+**Insight**: Preserve first-frame failure; prospective paired same-camera arrays would distinguish transient versus persistent native reconstruction differences. External reboot now warrants exact original workflow control first.
+
+**Result**: CPU audit only: latest image drift occurs before CUDA; constructor cross-run frame differences lack physical-state equality proof. No verified native cause or production repair.
 
 #### 5.2: Mechanism: Full-precision decision-to-observation evidence contract.
 Hypothesis: Actual provider quality, candidate identity and executed-horizon geometry linked to lawful next observations can distinguish real selection errors from XY-only proxy differences.
@@ -94,11 +96,24 @@ Conflicts: Historical17/220 XY argmin differences are not quality misranking; no
 #### 5.3: Mechanism: Minimal independent MuJoCo and staged CUDA differential control.
 Hypothesis: A tiny static scene with isolated CUDA initialization/allocation/compute distinguishes generic GL-CUDA interaction faults from LIBERO/RDT-specific resource state.
 Observable: Frozen raw RGB/depth and device identities across bounded stages on GPU3, with exact owned-Xid attribution and zero task actions.
-Conflicts: Production and prior lifecycle failures remain invalid; minimal-control success does not imply full evaluation is valid or hardware is healthy. [RUNNING]
+Conflicts: Production and prior lifecycle failures remain invalid; minimal-control success does not imply full evaluation is valid or hardware is healthy. [PENDING]
 
 **Insight**: Executor prepares minimal static MuJoCo plus staged CUDA control and shared-budget supervisor; GPU launch remains owned by coordinator after protocol/code freeze.
+
+**Result**: Implementation CPU-reviewed: 38 tests pass, no GPU dispatched. Deferred because unchanged full-model B1/render control passed after reboot; retain prospective fallback if new production evidence warrants.
 
 #### 5.4: Mechanism: Original model-first control after an externally initiated device/driver reset.
 Hypothesis: Fresh boot may remove the preexisting graphics fault without application changes, which must be checked before attributing future repair effects.
 Observable: One exact original model-first/B1/render workflow under boot2a1fa95f on GPU3 with unchanged image and compute gates.
-Conflicts: Old failures stay recorded; this is a new external condition, not a retry to replace a scientific outcome or proof of hardware health. [PENDING]
+Conflicts: Old failures stay recorded; this is a new external condition, not a retry to replace a scientific outcome or proof of hardware health. [DONE]
+
+**Insight**: External fresh boot restores the unchanged bounded GPU3 model-first B1/render path; old failures remain. No root cause or production-episode health established.
+
+**Result**: Resource be47760b9287 completed: 73.088664569 GPU-process seconds, exact original prediction hash, all three camera hashes identical across B1 and to static reference, 10 finite/nonuniform frames, no owned Xid. Zero actions or scientific episodes.
+
+#### 5.5: Mechanism: Complete production C0 common-condition validation under the externally renewed boot.
+Hypothesis: A passing unchanged zero-action model-first control leaves scene-first production, guided search, perception and action/reset interactions untested; one original full dev episode can discriminate that remaining runtime bottleneck.
+Observable: One prospective GPU3 C0 episode provides original outcome and complete finite action/search/Stage/perception/cost evidence with no owned Xid; task success is reported without an algorithm-improvement claim.
+Conflicts: Pruned 4 and 4.1 remain invalid closed cohorts. This engineering dev identity has no retry_of and replaces none of their samples; all shared budgets and validation/formal reserves remain unchanged. [RUNNING]
+
+**Result**: Prospective full C0 protocol and boot/Xid supervisor preparation; GPU dispatch not yet authorized by a frozen plan.

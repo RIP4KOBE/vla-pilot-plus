@@ -1,0 +1,13 @@
+{
+  "scope": "CPU-only; no GPU execution or journal/state changes",
+  "tests_passed": 38,
+  "elapsed_seconds": 0.74,
+  "command": "CUDA_VISIBLE_DEVICES='' PYTHONDONTWRITEBYTECODE=1 /home/hynx/miniconda3/envs/vla-pilot/bin/python -m pytest -q docs/03_evidence/qd_ed_final/continuation_20260923/minimal-gl-cuda/test_minimal_gl_cuda.py -p no:cacheprovider",
+  "file_sha256": {
+    "minimal_gl_cuda_worker.py": "bcad52d33798c7f9220cb93b5ac5ca7d6cc69f75b9a871f5181482f0c1329c9c",
+    "supervise_minimal_gl_cuda.py": "debecc0f3c07212f88aee887598c9110b1de84976cd98eb29d3bd3e493c1a123",
+    "scene.xml": "288be8b5672ec927551dee54bf2590d03e863359f0dd1a84135e5447599ff50e",
+    "test_minimal_gl_cuda.py": "63d496ea034fc2e94abd422138c7b0e42d005641fa5d89aa6f639592c24691b1",
+    "README.md": "21e96f7c98b5d07b56921d53cea2056aa89c4194227c2e5c67491beabfdb36b6"
+  }
+}

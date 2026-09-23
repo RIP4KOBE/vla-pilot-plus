@@ -1,9 +1,11 @@
 # Active research continuation
 
-Updated 2026-09-23T04:48:59.327445+00:00. User requires continued autonomous algorithm optimization until target attainment or user stop. Target remains unmet; prior September22 negative report is a historical checkpoint. PhysicalGPU3 only, one worker, no fallback.
+Updated 2026-09-23T05:09:50.026102+00:00. User requires continued autonomous algorithm optimization until target attainment or user stop, within the existing numerical budget. Target remains unmet. The September22 negative report is a historical checkpoint. Physical GPU3 only, one worker, no fallback.
 
-Cumulative shared ledger: 14/240 episode attempts,0valid,1.112292009403/48GPU-hours. Validation/formal remain unexposed and protected. Old N1 cohort remains invalid and is not reopened.
+Cumulative shared ledger: 14/240 episode attempts, 1 valid, 1.3767836063454173/48 GPU-hours. The one valid external GPU2 episode was unsuccessful. Validation/formal remain protected. Old N1 cohort remains invalid and is not reopened.
 
-Server reboot04:19:42UTC and externally restored data mounts are recorded as new engineering conditions. Next: Run one exact original model-first/B1/render control on physical GPU3 under the new boot; preserve old failures, then continue full common-condition evaluation if valid or minimal GL/CUDA isolation if not. In parallel implement zero-extra-call decision evidence collector on isolated executor branch.
+Node5.4 **PASS**: unchanged model-first/B1/render worker on fresh boot completed on GPU3 (resource be47760b9287), exact original prediction and all three camera hashes, 10 valid frames, no owned Xid; charged73.088664569seconds, zero task episodes. This establishes bounded restored behavior, not a root cause or a completed production episode.
 
-CPU work continues in isolated evidence-collector executor branch; minimal GL/CUDA control is also being prepared. Authoritative state: research-state.yaml. No new GPU resource has been dispatched yet in this continuation.
+Node5.5 is preparing one prospective original full production C0 development episode with new boot/prerequisite/Xid supervision. Node5.2 observational evidence code is under CPU validation and review on its isolated branch. Node5.3 minimal GL/CUDA code passed38CPU checks but remains unexecuted and deferred because the stronger unchanged B1/render control passed.
+
+Authoritative state: research-state.yaml; evidence and decisions: docs/03_evidence/qd_ed_final/iteration-ledger.md. No currently owned GPU child after the completed control.

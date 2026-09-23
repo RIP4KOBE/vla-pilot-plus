@@ -13,7 +13,7 @@ project_target:
   required_formal_successes: 5
   achieved: false
 study:
-  status: RUNNING_FRESHBOOT_ENGINEERING_CONTROL
+  status: PREPARING_FRESHBOOT_PRODUCTION_C0
   mode: real
   interaction: auto
   automatic_continuation: true
@@ -34,7 +34,7 @@ candidate:
     exceeding the frozen30attempt cap. No retry or rename can repair this cohort.
 budget:
   max_gpu_hours: 48.0
-  gpu_hours_consumed: 1.1122920094031952
+  gpu_hours_consumed: 1.3767836063454173
   max_episode_attempts: 240
   reserved:
     baseline: 20
@@ -44,10 +44,10 @@ budget:
     recovery: 20
   dispatched: 14
   aborted: 9
-  valid: 0
-  running: 1
+  valid: 1
+  running: 0
   invalid: 4
-  completed: 4
+  completed: 5
   gpu_hour_reservations:
     validation: 14.0
     formal: 10.0
@@ -80,17 +80,17 @@ historical:
   previous_gpu_hours: 6.946832055555556
   previous_formal_episodes: 0
 active_iteration: iteration_001_execution_intent
-next_action: Run one exact original model-first/B1/render control on physical GPU3
-  under the new boot; preserve old failures, then continue full common-condition evaluation
-  if valid or minimal GL/CUDA isolation if not. In parallel implement zero-extra-call
-  decision evidence collector on isolated executor branch.
+next_action: Freeze and run one original production C0 dev episode on GPU3 with fresh-boot
+  prerequisites and owned Xid supervision, then integrate CPU-reviewed decision evidence
+  for same-condition algorithm comparisons. Minimal GL/CUDA control stays deferred
+  because the stronger unchanged application B1/render control passed.
 source_spec_sha256: 3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef
 derived_indexes:
 - .arbor/sessions/rdt-qd-ed-final-20260921T093925Z
 authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
   ledger is append-only event evidence, not a second mutable state.
 online_blockers: []
-updated_at: '2026-09-23T04:48:59.327445+00:00'
+updated_at: '2026-09-23T05:07:13.945462+00:00'
 seed_plan:
   path: data/frozen-seed-plan.json
   sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
@@ -151,14 +151,14 @@ runner:
   reserved_attempts: 14
   gpu_hours_by_bucket:
     baseline: 0.019651524036631195
-    development: 0.3759784723721289
+    development: 0.6201676624896288
     validation: 0.0
     formal: 0.0
-    recovery: 0.7166620129944349
-  gpu_healthcheck_hours: 0.23995400769130593
+    recovery: 0.7369644198191572
+  gpu_healthcheck_hours: 0.2602564145160282
   gpu_healthcheck_inflight: 0
   last_attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu2_post_reboot_c0_t00__3b58560be246
-  last_event: dispatched
+  last_event: valid
 gpu_admission_last_observation:
   physical_gpu: 3
   physical_index: 3
@@ -925,7 +925,7 @@ continuation:
   storage_status: RESTORED_EXTERNALLY
   storage_restored_observation: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/continuation_20260923/storage-restored-observation.json
   freshboot_model_first:
-    status: READY_FOR_GPU3_ADMISSION
+    status: PASS
     physical_gpu: 3
     boot_id: 2a1fa95f-ab0d-488c-a298-fc488ddd2af7
     protocol: experiments/iteration_001_execution_intent/gpu3-freshboot-model-first-control.md
@@ -934,3 +934,18 @@ continuation:
     output_root: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-model-first
     maximum_seconds: 600
     automatic_retry: false
+    resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_freshboot_model_first__be47760b9287
+    source_commit: c050470608c7103fb45a7bde16ef2f833cdc7ab9
+    contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-model-first/frozen-contract.json
+    status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-model-first/status.json
+    result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-model-first/rdt-qd-ed-final-20260921T093925Z__gpu3_freshboot_model_first__be47760b9287/healthcheck-result.json
+    gpu_process_wall_seconds: 73.08866456900023
+    task_score: null
+    owned_xids: 0
+  user_confirmed_external_reboot: true
+  freshboot_production_c0:
+    status: PREPARING_PROTOCOL_AND_SUPERVISOR
+    arbor_node: '5.5'
+    physical_gpu: 3
+    episode_key: freshboot_c0_t00_20260923
+    algorithm_score: null

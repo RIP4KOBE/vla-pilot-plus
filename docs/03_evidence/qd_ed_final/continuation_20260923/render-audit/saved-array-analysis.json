@@ -1,0 +1,92 @@
+{
+  "analysis_boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+  "arrays": [
+    {
+      "array_sha256": "28a6ee31b7f3160728615023e4a09cb9ec79d5c533bc3de3aa94cf624aad6115",
+      "camera_key": "agentview:128:128:depth",
+      "canonical_pixel_difference": null,
+      "canonical_rgb_matches": true,
+      "canonical_rgb_sha256": "28a6ee31b7f3160728615023e4a09cb9ec79d5c533bc3de3aa94cf624aad6115",
+      "dtype": "uint8",
+      "finite": true,
+      "kind": "rgb",
+      "maximum": 244.0,
+      "mean": 101.60821533203125,
+      "minimum": 0.0,
+      "npy_sha256": "a2e63534b8e6266560a9b6e1c7f631f5c66f9832bd6cb9169167a2fd3d56e3da",
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_native_render_lifetime__72a4dc721056/frames/before_model_load/agentview_128x128_rgb.npy",
+      "reason": "canonical raw pixel array was not saved; hash mismatch gives no magnitude",
+      "shape": [
+        128,
+        128,
+        3
+      ],
+      "std": 31.700469512398342
+    },
+    {
+      "array_sha256": "f8b39a1f43d1aedb4568fb895df0e6a91866aa46458cb33fefa293fd626b6156",
+      "camera_key": "agentview:128:128:depth",
+      "canonical_depth_equal": null,
+      "dtype": "float32",
+      "finite": true,
+      "kind": "depth",
+      "maximum": 0.9962193965911865,
+      "mean": 0.9908946752548218,
+      "minimum": 0.9856613278388977,
+      "npy_sha256": "5ac90f76852c2a6e2cccdc1e3f3f5960f6427273f996e673772aa2a86840e2c7",
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_native_render_lifetime__72a4dc721056/frames/before_model_load/agentview_128x128_depth.npy",
+      "reason": "canonical depth raw array and depth hash were not recorded",
+      "shape": [
+        128,
+        128
+      ],
+      "std": 0.0031337786931544542
+    },
+    {
+      "array_sha256": "bcd03c3ccf03bab7400d8d34273453c399c59aabc79ffd79174616d26b54f029",
+      "camera_key": "robot0_eye_in_hand:128:128:depth",
+      "canonical_pixel_difference": null,
+      "canonical_rgb_matches": false,
+      "canonical_rgb_sha256": "5b7c11d173b84e2d877f0ec7f105d0e9f1e1a31d985c8934571c2ef0a76456a9",
+      "dtype": "uint8",
+      "finite": true,
+      "kind": "rgb",
+      "maximum": 221.0,
+      "mean": 99.80824788411458,
+      "minimum": 0.0,
+      "npy_sha256": "d701bf509324ac84f2a897d55543faecd73c1295aedc43b5e1f3310340723c3c",
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_native_render_lifetime__72a4dc721056/frames/before_model_load/robot0_eye_in_hand_128x128_rgb.npy",
+      "reason": "canonical raw pixel array was not saved; hash mismatch gives no magnitude",
+      "shape": [
+        128,
+        128,
+        3
+      ],
+      "std": 40.385858574012865
+    },
+    {
+      "array_sha256": "fc21194dcc751f9dc6c052295da0d9b28d5c5e2db6dc18d5ca55e94ae233f621",
+      "camera_key": "robot0_eye_in_hand:128:128:depth",
+      "canonical_depth_equal": null,
+      "dtype": "float32",
+      "finite": true,
+      "kind": "depth",
+      "maximum": 0.9710769653320312,
+      "mean": 0.9369174838066101,
+      "minimum": 0.7463290691375732,
+      "npy_sha256": "624e5e59abaa8cd3db8745dc12d05542e5a12a2e6fea65de17d9cd088654459e",
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_native_render_lifetime__72a4dc721056/frames/before_model_load/robot0_eye_in_hand_128x128_depth.npy",
+      "reason": "canonical depth raw array and depth hash were not recorded",
+      "shape": [
+        128,
+        128
+      ],
+      "std": 0.06911037117242813
+    }
+  ],
+  "historical_resource_id": "rdt-qd-ed-final-20260921T093925Z__gpu3_native_render_lifetime__72a4dc721056",
+  "mode": "CPU saved-array analysis, no rendering",
+  "old_failure_reclassified": false,
+  "source_contract_sha256": "535ebb5115237529d775fde8e1b334552d811d94fd90a95e549ed71eaebcca78",
+  "source_events_sha256": "79b06c81b8fd9d15b4e95dfec44053d229f4e5619e4021a647db412abba89453"
+}
