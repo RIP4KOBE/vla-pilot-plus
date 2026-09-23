@@ -478,12 +478,19 @@ def codex_public_config(frozen):
     """Effective public invocation contract, never a hash of account files."""
     return codex_policy_module().public_invocation_policy(
         **{key: frozen[key] for key in CODEX_CONFIG_KEYS if key != 'backend'},
-        output_format=frozen.get('output_format', 'legacy_text'))
+        output_format=frozen.get('output_format', 'legacy_text'),
+        event_policy=frozen.get('event_policy', 'strict_v1'))
 
 
 def codex_stage_condition(runtime):
-    mode = runtime.get('frozen_stage_provider', {}).get('output_format', 'legacy_text')
+    frozen = runtime.get('frozen_stage_provider', {})
+    mode = frozen.get('output_format', 'legacy_text')
     require(mode in {'legacy_text', 'json_schema_v1'}, 'unknown frozen Stage output format')
+    event_policy = frozen.get('event_policy', 'strict_v1')
+    require(event_policy in {'strict_v1', 'completed_reconnect_v1'}, 'unknown frozen Stage event policy')
+    if event_policy == 'completed_reconnect_v1':
+        require(mode == 'json_schema_v1', 'reconnect policy requires structured output')
+        return 'codex_login_astra_low_json_reconnect_v1'
     return 'codex_login_astra_low_json_v1' if mode == 'json_schema_v1' else CODEX_STAGE_CONDITION
 
 
@@ -516,6 +523,8 @@ def stage_overrides(runtime):
     overrides = {f'perception.gemini.{key}': frozen[key] for key in CODEX_CONFIG_KEYS}
     if 'output_format' in frozen:
         overrides['perception.gemini.output_format'] = frozen['output_format']
+    if 'event_policy' in frozen:
+        overrides['perception.gemini.event_policy'] = frozen['event_policy']
     return overrides
 
 
@@ -809,6 +818,8 @@ def episode_compute(output,row,runtime=None):
     mode = frozen.get('output_format', 'legacy_text')
     require(transport.get('output_format', 'legacy_text') == mode,
             'Codex observed Stage output format differs from frozen binding')
+    require(transport.get('event_policy', 'strict_v1') == frozen.get('event_policy', 'strict_v1'),
+            'Codex observed Stage event policy differs from frozen binding')
     if mode == 'json_schema_v1':
         require(transport.get('output_schema_sha256') == codex_public_config(frozen)['output_schema_sha256'],
                 'Codex observed Stage output schema differs from frozen binding')

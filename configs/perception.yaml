@@ -69,3 +69,4 @@ gemini:
   cli_path: null
   disabled_skill_paths: null
   output_format: legacy_text # Codex JSON schema requires a separately frozen opt-in
+  event_policy: strict_v1 # Completed reconnect notices require a separate frozen opt-in

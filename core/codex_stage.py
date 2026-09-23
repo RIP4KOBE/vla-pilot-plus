@@ -7,9 +7,11 @@ No account token or credential file is opened by this adapter.
 from __future__ import annotations
 
 import base64
+import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import tempfile
@@ -72,6 +74,7 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         self.model = str(config.get("model", "gpt-6-astra"))
         self.reasoning_effort = str(config.get("reasoning_effort", "low"))
         self.output_format = config.get("output_format", "legacy_text")
+        self.event_policy = config.get("event_policy", "strict_v1")
         self.timeout_seconds = float(config.get("timeout_seconds", 90))
         if not 0 < self.timeout_seconds <= 600:
             raise ValueError("Codex Stage timeout must be in (0, 600] seconds")
@@ -86,6 +89,7 @@ class CodexStageRecognizer(GeminiStageRecognizer):
             model=self.model, reasoning_effort=self.reasoning_effort,
             timeout_seconds=self.timeout_seconds, cli_path=self.cli_path,
             output_format=self.output_format,
+            event_policy=self.event_policy,
             disabled_skill_paths=(config["disabled_skill_paths"] if config.get("disabled_skill_paths") is not None
                                   else discover_disabled_skill_paths()),
         )
@@ -104,6 +108,8 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         if self.output_format == "json_schema_v1":
             self.transport_metadata.update(output_format=self.output_format,
                 output_schema_sha256=self.public_policy["output_schema_sha256"])
+        if self.event_policy != "strict_v1":
+            self.transport_metadata["event_policy"] = self.event_policy
 
     def _command(self, directory, image_paths):
         policy = self.public_policy
@@ -153,12 +159,15 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         event_types = []
         item_types = []
         usages = []
-        for event in events:
+        errors = []
+        completed = False
+        for event_index, event in enumerate(events):
             kind = event.get("type")
             event_types.append(kind if isinstance(kind, str) else "invalid")
             if kind == "turn.started":
                 starts += 1
             elif kind == "turn.completed":
+                completed = True
                 self.api_request_counter.values["completed_turns"] += 1
                 usage = event.get("usage")
                 required = ("input_tokens", "cached_input_tokens", "output_tokens")
@@ -190,6 +199,24 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                         error_code = "codex_empty_response"
                     else:
                         messages.append(text.strip())
+            elif kind == "error":
+                message = event.get("message")
+                match = re.fullmatch(
+                    r"Reconnecting\.\.\. ([1-9][0-9]{0,2})/([1-9][0-9]{0,2})(?:[ \n][^\x00]*)?",
+                    message,
+                ) if isinstance(message, str) else None
+                reconnect = bool(match and int(match[1]) <= int(match[2]))
+                errors.append({
+                    "event_index": event_index,
+                    "classification": "numbered_reconnecting_notice" if reconnect else "unrecognized_error",
+                    "message_sha256": hashlib.sha256(message.encode(errors="replace")).hexdigest() if isinstance(message, str) else None,
+                    "message_length": len(message) if isinstance(message, str) else None,
+                    "attempt": int(match[1]) if reconnect else None,
+                    "maximum": int(match[2]) if reconnect else None,
+                })
+                if not (self.event_policy == "completed_reconnect_v1" and reconnect
+                        and starts == 1 and not completed and not messages):
+                    error_code = "codex_unexpected_event"
             elif kind not in ("thread.started",):
                 error_code = "codex_unexpected_event"
         complete_turns = sum(kind == "turn.completed" for kind in event_types)
@@ -198,6 +225,7 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         self._call_transport.update(
             event_types=event_types, item_types=item_types, observed_usage=usages,
             completed_turns=complete_turns,
+            error_events=errors,
         )
         if starts == complete_turns == len(usages) == 1 and stream_error is None:
             self.api_request_counter.values["usage_complete_calls"] += 1
@@ -272,6 +300,8 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                         process.communicate(input="\n\n".join(texts), timeout=self.timeout_seconds)
                     except subprocess.TimeoutExpired:
                         _stop_owned_process(process)
+                        self._call_transport.update(process_returncode=process.returncode,
+                                                    process_timed_out=True)
                         events_file.seek(0)
                         partial = events_file.read(_MAX_EVENTS_BYTES + 1)
                         if len(partial) <= _MAX_EVENTS_BYTES:
@@ -284,6 +314,8 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                         _stop_owned_process(process)
                         raise
                     events_file.seek(0)
+                    self._call_transport.update(process_returncode=process.returncode,
+                                                process_timed_out=False)
                     raw_events = events_file.read(_MAX_EVENTS_BYTES + 1)
                     if len(raw_events) > _MAX_EVENTS_BYTES:
                         raise CodexStageError("codex_event_stream_too_large")

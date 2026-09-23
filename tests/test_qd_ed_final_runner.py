@@ -570,6 +570,28 @@ def test_structured_stage_costs_bind_observed_format_and_schema(tmp_path, monkey
     assert runner.episode_compute(tmp_path, episode, runtime)['stage_condition'] == 'codex_login_astra_low_json_v1'
 
 
+def test_reconnect_policy_requires_frozen_hash_override_and_observed_binding(tmp_path, monkeypatch):
+    episode, _, runtime, path, record = codex_compute_case(tmp_path, monkeypatch)
+    frozen = runtime['frozen_stage_provider']
+    frozen.update(output_format='json_schema_v1', event_policy='completed_reconnect_v1')
+    with pytest.raises(runner.GateError, match='fingerprint'):
+        runner.stage_overrides(runtime)
+    frozen['public_config_sha256'] = runner.codex_public_config_sha256(frozen)
+    assert runner.stage_overrides(runtime)['perception.gemini.event_policy'] == 'completed_reconnect_v1'
+    record['stage_transport'].update(public_config_sha256=frozen['public_config_sha256'],
+        output_format='json_schema_v1',
+        output_schema_sha256=runner.codex_public_config(frozen)['output_schema_sha256'])
+    path.write_text(json.dumps(record) + '\n')
+    with pytest.raises(runner.GateError, match='event policy'):
+        runner.episode_compute(tmp_path, episode, runtime)
+    record['stage_transport']['event_policy'] = 'completed_reconnect_v1'
+    path.write_text(json.dumps(record) + '\n')
+    assert runner.episode_compute(tmp_path, episode, runtime)['stage_condition'] == 'codex_login_astra_low_json_reconnect_v1'
+    frozen['event_policy'] = 'unknown'
+    with pytest.raises(runner.GateError, match='event policy'):
+        runner.stage_overrides(runtime)
+
+
 def test_codex_provider_requires_managed_login_frozen_binary_and_installed_skill_set(tmp_path):
     runtime = codex_runtime(tmp_path)
     (tmp_path / 'configs').mkdir()

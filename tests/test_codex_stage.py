@@ -34,7 +34,7 @@ def events(answer=ANSWER, usage=None):
 
 
 def make(monkeypatch, tmp_path, event_list=None, returncode=0, timeout=False, raw=None,
-         output_format="legacy_text"):
+         output_format="legacy_text", event_policy="strict_v1"):
     calls = []
     cli = tmp_path / "codex"
     cli.touch()
@@ -72,6 +72,7 @@ def make(monkeypatch, tmp_path, event_list=None, returncode=0, timeout=False, ra
         "stage_template_path": str(template), "disabled_skill_paths": ["/active/one"],
         "timeout_seconds": 90,
         "output_format": output_format,
+        "event_policy": event_policy,
     })
     return recognizer, calls
 
@@ -186,6 +187,67 @@ def test_output_format_is_explicit_frozen_choice_and_legacy_stays_unconstrained(
     assert policy_sha256(public_invocation_policy(**kwargs, output_format='json_schema_v1')) != policy_sha256(recognizer.public_policy)
     with pytest.raises(ValueError, match='output format'):
         public_invocation_policy(**kwargs, output_format='json')
+
+
+@pytest.mark.parametrize('notice', ['Reconnecting... 1/5', 'Reconnecting... 2/5\nstream disconnected: private detail',
+                                  'Reconnecting... 1/5 (stream disconnected: private detail)'])
+def test_explicit_reconnect_can_complete_once_with_cost_and_redacted_notice(monkeypatch, tmp_path, notice):
+    answer = json.dumps({'stage': 2, 'guidance': 'no', 'evidence': 'held'})
+    stream = events(answer=answer)
+    stream.insert(2, {'type': 'error', 'message': notice})
+    recognizer, calls = make(monkeypatch, tmp_path, event_list=stream,
+                             output_format='json_schema_v1', event_policy='completed_reconnect_v1')
+    assert identify(recognizer) == (2, False)
+    result = recognizer.last_result
+    assert len(calls) == result['codex_logical_call_attempts'] == 1
+    assert result['codex_usage_complete_calls'] == 1
+    assert result['codex_failed_calls'] == 0
+    assert result['transport']['process_returncode'] == 0
+    assert result['transport']['process_timed_out'] is False
+    assert result['transport']['error_events'][0]['classification'] == 'numbered_reconnecting_notice'
+    assert len(result['transport']['error_events'][0]['message_sha256']) == 64
+    assert 'private detail' not in json.dumps(result)
+
+
+@pytest.mark.parametrize('change', ['strict', 'unknown', 'missing_message', 'bad_count', 'before_start',
+                                   'after_completion', 'after_message', 'nonzero', 'turn_failed',
+                                   'missing_completion', 'invalid_json', 'timeout'])
+def test_reconnect_does_not_bypass_other_failure_gates(monkeypatch, tmp_path, change):
+    answer = json.dumps({'stage': 2, 'guidance': 'no', 'evidence': 'held'})
+    stream = events(answer=answer if change != 'invalid_json' else ANSWER)
+    notice = {'type': 'error', 'message': 'Reconnecting... 1/5'}
+    if change == 'unknown': notice['message'] = 'unclassified private server error'
+    if change == 'missing_message': notice.pop('message')
+    if change == 'bad_count': notice['message'] = 'Reconnecting... 6/5'
+    index = {'before_start': 0, 'after_completion': 4, 'after_message': 3}.get(change, 2)
+    stream.insert(index, notice)
+    if change == 'turn_failed': stream.insert(3, {'type': 'turn.failed', 'error': {'message': 'private'}})
+    if change == 'missing_completion': stream.pop()
+    if change == 'timeout': monkeypatch.setattr(module, '_stop_owned_process', lambda process: None)
+    recognizer, calls = make(monkeypatch, tmp_path, event_list=stream,
+        returncode=1 if change == 'nonzero' else 0, timeout=change == 'timeout',
+        output_format='json_schema_v1',
+        event_policy='strict_v1' if change == 'strict' else 'completed_reconnect_v1')
+    assert identify(recognizer) == (1, True)
+    assert len(calls) == 1
+    assert recognizer.last_result['codex_failed_calls'] == 1
+    assert 'private' not in json.dumps(recognizer.last_result)
+    assert recognizer.last_result['transport']['process_returncode'] == (1 if change == 'nonzero' else 0)
+
+
+def test_reconnect_policy_changes_only_local_acceptance_contract(monkeypatch, tmp_path):
+    recognizer, _ = make(monkeypatch, tmp_path, output_format='json_schema_v1')
+    old = recognizer.public_policy
+    kwargs = dict(model='gpt-6-astra', reasoning_effort='low', timeout_seconds=90,
+                  cli_path=recognizer.cli_path, disabled_skill_paths=['/active/one'], output_format='json_schema_v1')
+    new = public_invocation_policy(**kwargs, event_policy='completed_reconnect_v1')
+    assert policy_sha256(old) != policy_sha256(new)
+    assert {k: v for k, v in new.items() if k not in {'event_policy', 'reconnect_acceptance'}} == old
+    with pytest.raises(ValueError, match='event policy'):
+        public_invocation_policy(**kwargs, event_policy='unknown')
+    kwargs['output_format'] = 'legacy_text'
+    with pytest.raises(ValueError, match='structured output'):
+        public_invocation_policy(**kwargs, event_policy='completed_reconnect_v1')
 
 
 def test_cli_policy_disables_tools_skills_and_preserves_builtin_system_prompt(monkeypatch, tmp_path):

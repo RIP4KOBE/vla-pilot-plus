@@ -47,10 +47,15 @@ STAGE_OUTPUT_SCHEMA = {
 
 
 def public_invocation_policy(*, model, reasoning_effort, timeout_seconds, cli_path,
-                             disabled_skill_paths=(), output_format="legacy_text"):
+                             disabled_skill_paths=(), output_format="legacy_text",
+                             event_policy="strict_v1"):
     """Credential-free, deterministic full wrapper policy for freeze hashes."""
     if output_format not in {"legacy_text", "json_schema_v1"}:
         raise ValueError("Unknown Codex Stage output format")
+    if event_policy not in {"strict_v1", "completed_reconnect_v1"}:
+        raise ValueError("Unknown Codex Stage event policy")
+    if event_policy != "strict_v1" and output_format != "json_schema_v1":
+        raise ValueError("Reconnect policy requires structured output")
     policy = {
         "backend": "codex_cli", "auth_mode": "chatgpt", "model": str(model),
         "reasoning_effort": str(reasoning_effort),
@@ -97,6 +102,12 @@ def public_invocation_policy(*, model, reasoning_effort, timeout_seconds, cli_pa
             "conforming to the supplied output schema: stage is the nonnegative stage number, "
             "guidance is yes or no, and evidence is a brief nonempty observation. "
             "This JSON format supersedes the three-line output format in the user prompt.")
+    if event_policy != "strict_v1":
+        policy["event_policy"] = event_policy
+        policy["reconnect_acceptance"] = (
+            "explicit_numbered_reconnecting_notice_inside_single_turn_then_"
+            "one_complete_usage_one_schema_message_exit_zero_no_other_error"
+        )
     return policy
 
 
