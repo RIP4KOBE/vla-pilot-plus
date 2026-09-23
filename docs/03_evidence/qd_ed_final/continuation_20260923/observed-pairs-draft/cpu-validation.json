@@ -1,0 +1,23 @@
+{
+  "GPU_dispatches": 0,
+  "compiled": true,
+  "copied_support_AST_differences": [
+    "Monitor",
+    "shared_runner_lease"
+  ],
+  "model_provider_calls": 0,
+  "note": "Prepare now uses a read-only deep-copied budget view from the locked terminal episode/resource journals; actual runner checks cover stale counters and protected/total GPU-hour rejection. Run's persistent synchronization is unchanged. No plan generated or frozen by this preparation.",
+  "omitted_original_CLI": "main",
+  "original_support_sha256": "771594e0bef8f1eb3bab28ee03df4c5f0b507fd4ff64ec1b9e193f92a0fcdfdd",
+  "production_source_edits": 0,
+  "state_or_ledger_writes": 0,
+  "status": "CPU_ONLY_PROPOSAL",
+  "tests": {
+    "test_observed_pairs.py": {
+      "passed": 6
+    },
+    "test_supervisor_support.py": {
+      "passed": 10
+    }
+  }
+}
