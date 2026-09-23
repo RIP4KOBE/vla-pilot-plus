@@ -225,3 +225,87 @@ def test_terminal_outcome_is_persisted_before_actual_adapter_reset_failure(tmp_p
     status = json.loads((rec.root / "status.json").read_text())
     assert status["complete"] is False and status["pending_action"] is True
     assert rec._pending == []  # Already flushed; the test did not rescue it via close().
+
+
+def test_loaded_shared_wrappers_keep_distinct_original_and_source_identity(tmp_path):
+    import marshal
+    from utils.guidance_utils import load_functions_from_txt
+
+    texts = [
+        'def reward(keypoints, trajectory_3d):\n    calls.append("distance")\n    return -np.linalg.norm(trajectory_3d[:, -1] - keypoints[0])\n',
+        'def reward(keypoints, trajectory_3d):\n    calls.append("constant")\n    return torch.zeros((), device=trajectory_3d.device)\n',
+    ]
+    providers, paths, calls = [], [], []
+    for index, text in enumerate(texts):
+        path = tmp_path / f"stage{index + 1}.txt"
+        path.write_text(text)
+        fn = load_functions_from_txt(path, validate=False)[0]
+        fn._guidance_original_func.__globals__["calls"] = calls
+        providers.append(fn)
+        paths.append(str(path))
+        path.unlink()  # Identity must use attached metadata, never reopen the file.
+    assert providers[0].__code__ is providers[1].__code__
+    rng_before = torch.random.get_rng_state().clone()
+    rec = DecisionEvidence(tmp_path / "evidence", episode=0)
+    rec.begin_decision(global_step=0, stage=1, use_guidance=True,
+                       keypoints=torch.zeros(1, 3), providers=providers)
+    rec.flush()
+    assert not rec.failed and calls == []
+    assert torch.equal(torch.random.get_rng_state(), rng_before)
+    identity = next(e["values"]["providers"] for e in read_events(rec.root) if e["event"] == "decision_context")
+    assert identity[0]["code_sha256"] == identity[1]["code_sha256"]
+    assert identity[0]["original_code_sha256"] != identity[1]["original_code_sha256"]
+    assert identity[0]["source_text_sha256"] != identity[1]["source_text_sha256"]
+    for item, fn, path in zip(identity, providers, paths):
+        assert item["original_code_sha256"] == hashlib.sha256(marshal.dumps(fn._guidance_original_func.__code__)).hexdigest()
+        assert item["source_text_sha256"] == hashlib.sha256(fn._guidance_source_text.encode("utf-8")).hexdigest()
+        assert item["source_path"] == path
+        assert item["original_identity_origin"] == "loader_attached_original"
+        assert item["source_text_origin"] == "loader_attached_text"
+        assert "source_text" not in item
+    # Loader's attached text includes its existing np→torch conversion, not raw file bytes.
+    assert identity[0]["source_text_sha256"] != hashlib.sha256(texts[0].encode("utf-8")).hexdigest()
+
+
+def test_direct_provider_code_available_but_source_is_explicitly_unknown(tmp_path):
+    def direct(keypoints, trajectories):
+        raise AssertionError("identity must not execute provider")
+    rec = DecisionEvidence(tmp_path, episode=0)
+    rec.begin_decision(global_step=0, stage=1, use_guidance=True, keypoints=None, providers=[direct])
+    rec.flush()
+    item = read_events(rec.root)[0]["values"]["providers"][0]
+    assert item["original_code_sha256"] == item["code_sha256"]
+    assert item["original_identity_origin"] == "direct_callable"
+    assert item["source_text_sha256"] is None and item["source_path"] is None
+    assert item["source_text_origin"] == "unknown"
+
+
+@pytest.mark.parametrize("failure", ["invalid_type", "invalid_code", "attribute_error"])
+def test_provider_metadata_failure_invalidates_only_evidence(tmp_path, failure):
+    calls = []
+    if failure == "invalid_type":
+        def provider(*args):
+            calls.append("provider")
+        provider._guidance_source_text = object()
+    elif failure == "invalid_code":
+        class Provider:
+            __code__ = "not a code object"
+            def __call__(self, *args):
+                calls.append("provider")
+        provider = Provider()
+    else:
+        class Provider:
+            @property
+            def _guidance_source_text(self):
+                raise ValueError("metadata unavailable")
+            def __call__(self, *args):
+                calls.append("provider")
+        provider = Provider()
+    rec = DecisionEvidence(tmp_path, episode=0)
+    before = torch.random.get_rng_state().clone()
+    rec.begin_decision(global_step=0, stage=1, use_guidance=True, keypoints=None, providers=[provider])
+    # The original policy may still finish its decision; observer callbacks do not raise.
+    rec.commit_decision(action_chunk=torch.zeros(1, 8, 7), execution_horizon=8)
+    status = rec.finish()
+    assert status["failed"] and not status["complete"] and calls == []
+    assert torch.equal(before, torch.random.get_rng_state())

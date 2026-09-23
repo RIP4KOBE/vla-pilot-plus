@@ -12,6 +12,7 @@ import marshal
 import os
 from pathlib import Path
 import time
+from types import CodeType
 
 import numpy as np
 import torch
@@ -41,6 +42,30 @@ def _fingerprints(cpu_batch):
     """Same canonical bytes as QD; applied only to the observer's CPU copy."""
     return [hashlib.sha256(row.float().contiguous().numpy().astype("<f4", copy=False).tobytes()).hexdigest()
             for row in cpu_batch]
+
+
+def _provider_identity(fn, ordinal):
+    """Hash existing code/loader metadata; never call a provider or reopen source."""
+    code = getattr(fn, "__code__", None)
+    missing = object()
+    original = getattr(fn, "_guidance_original_func", missing)
+    origin = "direct_callable" if original is missing else "loader_attached_original"
+    original_code = getattr(fn if original is missing else original, "__code__", None)
+    if any(value is not None and not isinstance(value, CodeType) for value in (code, original_code)):
+        raise TypeError("guidance code metadata must be code or unknown")
+    source_text = getattr(fn, "_guidance_source_text", None)
+    source_path = getattr(fn, "_guidance_source_path", None)
+    if source_text is not None and not isinstance(source_text, str):
+        raise TypeError("guidance source text metadata must be text or unknown")
+    if source_path is not None and not isinstance(source_path, str):
+        raise TypeError("guidance source path metadata must be text or unknown")
+    return {"ordinal": ordinal,
+            "code_sha256": hashlib.sha256(marshal.dumps(code)).hexdigest() if code is not None else None,
+            "original_code_sha256": hashlib.sha256(marshal.dumps(original_code)).hexdigest() if original_code is not None else None,
+            "original_identity_origin": origin,
+            "source_text_sha256": hashlib.sha256(source_text.encode("utf-8")).hexdigest() if source_text is not None else None,
+            "source_text_origin": "loader_attached_text" if source_text is not None else "unknown",
+            "source_path": source_path}
 
 
 class DecisionEvidence:
@@ -89,7 +114,7 @@ class DecisionEvidence:
                 "decisions": self._decisions, "committed_decisions": self._committed,
                 "pending_action": self._dispatch_pending, "bundles": self._bundle,
                 "observer_wall_s": self.overhead_s, "bytes_written": self.bytes_written,
-                "observer_wall_scope": "snapshot, fingerprint, bundle serialization and flush; excludes status and scalar bookkeeping",
+                "observer_wall_scope": "snapshot, payload fingerprint, bundle serialization and flush; excludes provider identity, status and scalar bookkeeping",
                 "precision": "source tensor dtype; no precision reconstructed",
                 "scope": "observed decisions and executed prefixes only"}
 
@@ -164,11 +189,11 @@ class DecisionEvidence:
         self._projection_origins = []
         self._requires_quality = bool(use_guidance and providers)
         self._provider_ids = {id(fn): index for index, fn in enumerate(providers or ())}
-        identities = []
-        for index, fn in enumerate(providers or ()):
-            code = getattr(fn, "__code__", None)
-            identities.append({"ordinal": index,
-                "code_sha256": hashlib.sha256(marshal.dumps(code)).hexdigest() if code is not None else None})
+        try:
+            identities = [_provider_identity(fn, index) for index, fn in enumerate(providers or ())]
+        except Exception as error:
+            self._fail(error)
+            return
         self.record("decision_context", stage=self.stage, previous_stage=previous_stage,
                     previous_decision_id=previous_decision_id,
                     stage_changed=previous_stage is not None and previous_stage != self.stage,
