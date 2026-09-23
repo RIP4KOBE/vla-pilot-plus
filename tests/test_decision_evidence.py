@@ -149,14 +149,12 @@ def test_missing_pre_reset_or_required_policy_hook_rejects_completeness(tmp_path
     begin(rec)
     rec.dispatch(global_step=0, execution_index=1)
     rec.step_returned(terminated=True, truncated=False, success=True)
-    with pytest.raises(DecisionEvidenceIncomplete):
-        rec.finish()
+    assert rec.finish()["complete"] is False
     assert json.loads((rec.root / "status.json").read_text())["complete"] is False
     other = DecisionEvidence(tmp_path / "policy", episode=0)
     other.begin_decision(global_step=0, stage=1, use_guidance=False, keypoints=None, providers=[])
     other.commit_decision(action_chunk=torch.zeros(1, 8, 7), execution_horizon=8)
-    with pytest.raises(DecisionEvidenceIncomplete):
-        other.finish()
+    assert other.finish()["complete"] is False
 
 
 def test_write_failure_does_not_replace_original_error_or_claim_complete(tmp_path, monkeypatch):
@@ -191,3 +189,39 @@ def test_pending_dispatch_and_stage_boundary_never_invent_eight_outcomes(tmp_pat
     assert contexts[1]["reset_sequence"] == 0
     assert sum(e["event"] == "pre_reset_outcome" for e in events) == 1
     assert rec.status()["pending_action"] and not rec.status()["complete"]
+
+
+def test_terminal_outcome_is_persisted_before_actual_adapter_reset_failure(tmp_path):
+    inner_step = method("core/env_adapters/libero_adapter.py", "LiberoEnv", "step")
+    rec = DecisionEvidence(tmp_path, episode=0)
+    begin(rec)
+    rec.dispatch(global_step=0, execution_index=1)
+    position = np.array([.125, .25, .5], dtype=np.float64)
+    raw = {"robot0_eef_pos": position}
+    calls = []
+    class ResetAbort(BaseException):
+        pass
+    def reset():
+        calls.append("reset")
+        # No close/finish/step_returned has run, yet terminal evidence is on disk.
+        events = read_events(rec.root)
+        terminal = next(e for e in events if e["event"] == "pre_reset_outcome")
+        boundary = next(e for e in events if e["event"] == "automatic_reset_boundary")
+        assert terminal["values"]["observation"]["robot0_eef_pos"].tolist() == [.125, .25, .5]
+        assert boundary["values"]["reset_will_follow"] is True
+        assert boundary["values"]["reset_completed"] is None
+        assert not any(e["event"] == "step_returned" for e in events)
+        position[:] = 99
+        raise ResetAbort()
+    def step(action):
+        calls.append("step")
+        return raw, 1., True, {}
+    env = SimpleNamespace(_env=SimpleNamespace(step=step, check_success=lambda: True),
+        task="task", task_id=0, _format_raw_obs=lambda obs: obs,
+        _decision_evidence=rec, reset=reset)
+    with pytest.raises(ResetAbort):
+        inner_step(env, np.zeros(7, dtype=np.float32))
+    assert calls == ["step", "reset"]
+    status = json.loads((rec.root / "status.json").read_text())
+    assert status["complete"] is False and status["pending_action"] is True
+    assert rec._pending == []  # Already flushed; the test did not rescue it via close().
