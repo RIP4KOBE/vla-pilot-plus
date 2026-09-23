@@ -1,0 +1,189 @@
+[
+  {
+    "first_gripper_value": -1.0,
+    "global_step": 16,
+    "guidance_after": false,
+    "guidance_before": true,
+    "last_gripper_value": -1.0,
+    "query_ok": true,
+    "query_status": "ok",
+    "stage_after": 1,
+    "stage_before": 1
+  },
+  {
+    "first_gripper_value": 1.0,
+    "global_step": 32,
+    "guidance_after": false,
+    "guidance_before": false,
+    "last_gripper_value": -1.0,
+    "query_ok": true,
+    "query_status": "ok",
+    "stage_after": 2,
+    "stage_before": 1
+  },
+  {
+    "first_gripper_value": -1.0,
+    "global_step": 112,
+    "guidance_after": true,
+    "guidance_before": false,
+    "last_gripper_value": -1.0,
+    "query_ok": true,
+    "query_status": "ok",
+    "stage_after": 1,
+    "stage_before": 2
+  },
+  {
+    "first_gripper_value": 1.0,
+    "global_step": 128,
+    "guidance_after": true,
+    "guidance_before": true,
+    "last_gripper_value": -1.0,
+    "query_ok": true,
+    "query_status": "ok",
+    "stage_after": 1,
+    "stage_before": 1
+  },
+  {
+    "first_gripper_value": -1.0,
+    "global_step": 152,
+    "guidance_after": true,
+    "guidance_before": true,
+    "last_gripper_value": -1.0,
+    "query_ok": true,
+    "query_status": "ok",
+    "stage_after": 1,
+    "stage_before": 1
+  },
+  {
+    "first_gripper_value": 1.0,
+    "global_step": 160,
+    "guidance_after": true,
+    "guidance_before": true,
+    "last_gripper_value": -1.0,
+    "query_ok": true,
+    "query_status": "ok",
+    "stage_after": 1,
+    "stage_before": 1
+  },
+  {
+    "first_gripper_value": -1.0,
+    "global_step": 400,
+    "guidance_after": false,
+    "guidance_before": true,
+    "last_gripper_value": -1.0,
+    "query_ok": true,
+    "query_status": "ok",
+    "stage_after": 0,
+    "stage_before": 1
+  },
+  {
+    "first_gripper_value": 1.0,
+    "global_step": 408,
+    "guidance_after": false,
+    "guidance_before": false,
+    "last_gripper_value": 1.0,
+    "query_ok": true,
+    "query_status": "ok",
+    "stage_after": 2,
+    "stage_before": 0
+  },
+  {
+    "first_gripper_value": -1.0,
+    "global_step": 496,
+    "guidance_after": true,
+    "guidance_before": false,
+    "last_gripper_value": -1.0,
+    "query_ok": true,
+    "query_status": "ok",
+    "stage_after": 1,
+    "stage_before": 2
+  },
+  {
+    "first_gripper_value": 1.0,
+    "global_step": 504,
+    "guidance_after": true,
+    "guidance_before": true,
+    "last_gripper_value": -1.0,
+    "query_ok": true,
+    "query_status": "ok",
+    "stage_after": 1,
+    "stage_before": 1
+  },
+  {
+    "first_gripper_value": -1.0,
+    "global_step": 512,
+    "guidance_after": false,
+    "guidance_before": true,
+    "last_gripper_value": -1.0,
+    "query_ok": true,
+    "query_status": "ok",
+    "stage_after": 1,
+    "stage_before": 1
+  },
+  {
+    "first_gripper_value": 1.0,
+    "global_step": 536,
+    "guidance_after": true,
+    "guidance_before": false,
+    "last_gripper_value": 1.0,
+    "query_ok": true,
+    "query_status": "ok",
+    "stage_after": 1,
+    "stage_before": 1
+  },
+  {
+    "first_gripper_value": -1.0,
+    "global_step": 592,
+    "guidance_after": false,
+    "guidance_before": true,
+    "last_gripper_value": -1.0,
+    "query_ok": true,
+    "query_status": "ok",
+    "stage_after": 0,
+    "stage_before": 1
+  },
+  {
+    "first_gripper_value": 1.0,
+    "global_step": 616,
+    "guidance_after": true,
+    "guidance_before": false,
+    "last_gripper_value": -1.0,
+    "query_ok": true,
+    "query_status": "ok",
+    "stage_after": 1,
+    "stage_before": 0
+  },
+  {
+    "first_gripper_value": -1.0,
+    "global_step": 624,
+    "guidance_after": false,
+    "guidance_before": true,
+    "last_gripper_value": -1.0,
+    "query_ok": true,
+    "query_status": "ok",
+    "stage_after": 0,
+    "stage_before": 1
+  },
+  {
+    "first_gripper_value": 1.0,
+    "global_step": 680,
+    "guidance_after": true,
+    "guidance_before": false,
+    "last_gripper_value": -1.0,
+    "query_ok": true,
+    "query_status": "ok",
+    "stage_after": 1,
+    "stage_before": 0
+  },
+  {
+    "first_gripper_value": 1.0,
+    "global_step": 712,
+    "guidance_after": false,
+    "guidance_before": true,
+    "last_gripper_value": -1.0,
+    "query_ok": true,
+    "query_status": "ok",
+    "stage_after": 2,
+    "stage_before": 1
+  }
+]

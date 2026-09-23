@@ -1,0 +1,76 @@
+{
+  "schema": "gpu3-freshboot-production-c0-summary-v1",
+  "engineering_coverage": "PASS",
+  "target_achieved": false,
+  "task_outcome": "VALID_UNSUCCESSFUL",
+  "executed_steps": 720,
+  "owned_xids": [],
+  "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+  "episode": {
+    "attempt_id": "rdt-qd-ed-final-20260921T093925Z__freshboot_c0_t00_20260923__47a4507eacbe",
+    "episode_key": "freshboot_c0_t00_20260923",
+    "identity": {
+      "env_seed": 1969522881,
+      "init_index": 0,
+      "iteration": "FRESHBOOT_C0_20260923",
+      "policy_seed": 1969522881,
+      "profile": "C0",
+      "split": "dev",
+      "task_id": 0
+    },
+    "source_commit": "ea0cd8b5b7b9fa2aa2a8d2475de766121c03a74b",
+    "plan_sha256": "dcd425bd5cb884b8f06a6a80667ef1e29f30abe0688b9c8e11382292ec828d97",
+    "physical_gpu": 3,
+    "outcome_valid": true,
+    "success": false,
+    "task_failure": true,
+    "gpu_process_wall_seconds": 775.2034471839997,
+    "guided_chunks": 29,
+    "unguided_chunks": 61,
+    "model_forward_calls": 914,
+    "model_batch_rows": 10049,
+    "reward_calls": 7424,
+    "reward_scoring_batches": 464,
+    "score_batches": 319,
+    "candidate_evaluations": 5104,
+    "provider_logical_call_attempts": 28,
+    "provider_failed_calls": 0,
+    "provider_call_latency_s": 561.5086792579987,
+    "dino_forward_calls": 1,
+    "required_cost_telemetry_complete": true
+  },
+  "limitations": [
+    "One development task, not performance improvement or root-cause identification.",
+    "Observer was not yet integrated; no matched comparison with subsequent observed arms."
+  ],
+  "artifacts": [
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__freshboot_c0_t00_20260923__47a4507eacbe/results.txt",
+      "sha256": "4bafde49333204b035b3bf82cec2ae320084ccccee60d7508ff3115c4163683c"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__freshboot_c0_t00_20260923__47a4507eacbe/process.json",
+      "sha256": "f5bb3e266858748bbd04b3b4869949f807d6bf27ffc004a600612d17ffbba257"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__freshboot_c0_t00_20260923__47a4507eacbe/freshboot-kernel-monitor.json",
+      "sha256": "04142cd89bf16b39bb60670b75bf1f9265fc0f435afcd790ca4c9094fc8ef406"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__freshboot_c0_t00_20260923__47a4507eacbe/eds_eval/episode_compute.jsonl",
+      "sha256": "e649916690d97634a37c80f471b2b5c8ece29ee478f3179e29b609663f004fea"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__freshboot_c0_t00_20260923__47a4507eacbe/eds_eval/eds_metrics.jsonl",
+      "sha256": "550ce19fc3b8abd4175f92e5023e3e80f60eecdfb9265fb09daf6883af2cc81e"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__freshboot_c0_t00_20260923__47a4507eacbe/eds_eval/stage_events.jsonl",
+      "sha256": "a9cca76e70b210ba9fc29be38898716e2c09756d5134d021a790b126eea7a38f"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__freshboot_c0_t00_20260923__47a4507eacbe/eds_eval/phase_timing.jsonl",
+      "sha256": "67d75e46f2b39ef36da7467555aaf212ba781998c795c04babda03ae4f6e445a"
+    }
+  ]
+}

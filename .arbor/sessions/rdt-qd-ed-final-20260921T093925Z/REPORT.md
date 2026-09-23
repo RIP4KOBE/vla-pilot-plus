@@ -1,11 +1,13 @@
 # Active research continuation
 
-Updated 2026-09-23T05:09:50.026102+00:00. User requires continued autonomous algorithm optimization until target attainment or user stop, within the existing numerical budget. Target remains unmet. The September22 negative report is a historical checkpoint. Physical GPU3 only, one worker, no fallback.
+Updated2026-09-23. User requires continuous autonomous optimization until target attainment or user stop within the numerical budget. Target is not met. GPU3 only, one owned worker, no fallback.
 
-Cumulative shared ledger: 14/240 episode attempts, 1 valid, 1.3767836063454173/48 GPU-hours. The one valid external GPU2 episode was unsuccessful. Validation/formal remain protected. Old N1 cohort remains invalid and is not reopened.
+Node5.5 full original production C0 completed, source ea0cd8b, attempt47a4507eacbe:720 actual steps,29guided/61unguided chunks,28successful Stage calls,1DINO forward,no owned Xid. Engineering coverage PASS, valid task result0/1. Charged775.2034471839997seconds. The fresh boot supports restored execution; exact root cause remains unknown. No current root-owned GPU worker.
 
-Node5.4 **PASS**: unchanged model-first/B1/render worker on fresh boot completed on GPU3 (resource be47760b9287), exact original prediction and all three camera hashes, 10 valid frames, no owned Xid; charged73.088664569seconds, zero task episodes. This establishes bounded restored behavior, not a root cause or a completed production episode.
+Shared ledger:17/240 dispatched,3valid,10aborted,4invalid,0running;1.918701980682917/48GPU-hours charged. Independent GPU2 records retain external attribution. Validation/formal reserves remain protected.
 
-Node5.5 is preparing one prospective original full production C0 development episode with new boot/prerequisite/Xid supervision. Node5.2 observational evidence code is under CPU validation and review on its isolated branch. Node5.3 minimal GL/CUDA code passed38CPU checks but remains unexecuted and deferred because the stronger unchanged B1/render control passed.
+Next: integrate CPU-reviewed native-dtype passive observer and separate integrity auditor, then freeze four same-condition observed C0/Q0 episodes on exposed dev tasks0 and5. These are diagnostic development data, not validation or a renamed N1 cohort. Use actual selected action/EEF feedback to select one QD/ED mechanism and continue optimization. No current algorithm success claim.
 
-Authoritative state: research-state.yaml; evidence and decisions: docs/03_evidence/qd_ed_final/iteration-ledger.md. No currently owned GPU child after the completed control.
+Node5.2 implementation has actual Main/RDT/adapter CPU integration evidence for C0 terminal success and Q0 step truncation. Node5.3 minimal GL/CUDA control remains deferred after stronger successful controls. Historical September22 final report and invalid N1 cohort remain intact.
+
+Authority: research-state.yaml and docs/03_evidence/qd_ed_final/iteration-ledger.md.

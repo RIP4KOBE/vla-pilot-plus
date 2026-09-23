@@ -1,0 +1,172 @@
+{
+  "analysis_script_sha256": "d05081c0f6ce71f3abfdc7e20cd7a240e89b5ac82b7ca1aea23baec810e948a3",
+  "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_q0__f27eacd7e033",
+  "compute": {
+    "dino_forward_calls": 1,
+    "guided_chunks": 52,
+    "model_batch_rows": 17662,
+    "model_forward_calls": 1282,
+    "outcome": "completed",
+    "reward_calls": 13312,
+    "reward_scoring_batches": 832,
+    "stage_codex_call_latency_s": 367.79547386399963,
+    "stage_codex_completed_turns": 17,
+    "stage_codex_failed_calls": 0,
+    "stage_codex_logical_call_attempts": 17,
+    "unguided_chunks": 38
+  },
+  "cpu_safety": {
+    "cuda_initialized_after": false,
+    "cuda_initialized_before": false,
+    "cuda_visible_devices": "",
+    "loaded_tensor_files": 2,
+    "no_provider_or_simulation_evaluation": true,
+    "torch_load_map_location": "cpu",
+    "weights_only": true
+  },
+  "external_c0_context_only": {
+    "attempt_id": "rdt-qd-ed-final-20260921T093925Z__gpu2_post_reboot_c0_t00__3b58560be246",
+    "matched_comparison": false,
+    "success": false,
+    "summary_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/external-valid-c0-readonly/observation-summary.json"
+  },
+  "gpu_process_wall_seconds": 629.0952789799999,
+  "input_sha256": {
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/qd_ed.py": "4415ea7f16029e2fa2e7528c1f7065ba673b7a5a512723bfa9611f992298daa4",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/rdt_libero_action_converter.py": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/external-valid-c0-readonly/observation-summary.json": "5862a3244fee135172a3400fc2bf757c76895fe2c7977f8e46c85b7ada817e9b",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_q0__f27eacd7e033/attempt-result.json": "04985631a15ab8fc82f3f4de6f0b5596080e3bd9535bfa3a17b8ec6ba9e8baeb",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_q0__f27eacd7e033/eds_eval/eds_metrics.jsonl": "533d26209e84a28749303e768632d081f33ff65267d9174be7d170a89487ab8f",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_q0__f27eacd7e033/eds_eval/episode_compute.jsonl": "c407bdb28cfbc32eb2f8f24837603f9ed0a5738735ec5b2ed0bf68f6100522cd",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_q0__f27eacd7e033/eds_eval/episode_metadata.jsonl": "b6b785e25090ff0c13297e2c596ed90130acecb3cdd72654b9d12a25c17fbde1",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_q0__f27eacd7e033/eds_eval/qualitative/episode_000/chunk_000000/tensors/mechanism_trace.pt": "b4989c58d9b2be2c118d4a05ace0409f258f8b078d4ae4f834abfc70c539f811",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_q0__f27eacd7e033/eds_eval/qualitative/episode_000/chunk_000008/tensors/mechanism_trace.pt": "229439fde138746a92b430e1fbc1e3a94ab1a37cd49ee532b313b554b94dd6d5",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_q0__f27eacd7e033/eds_eval/stage_events.jsonl": "8cb1cb96bd8b4dad50a99f0af4ad71d3460db151e166f854c79c3b00d90993b2"
+  },
+  "missing_evidence": [
+    "actual per-action EEF/gripper outcomes and contemporaneous object/target poses",
+    "complete raw candidate actions/projections for 50 of the 52 guided chunks",
+    "full t0..t8 native-precision projection and actual t8 XYZ for saved traces",
+    "raw per-provider returns with canonical scoring occurrence linkage",
+    "final decoded dispatched action to each step outcome linkage, including terminal before automatic reset",
+    "outcomes of unexecuted candidates and within-cell discarded alternatives",
+    "a matched current-root C0/Q0 comparison and subsequent independent algorithm evidence"
+  ],
+  "outcome_valid": true,
+  "physical_gpu": 2,
+  "qd": {
+    "active_chunks": 52,
+    "archive_insertions": 818,
+    "archive_rejections": 7587,
+    "archive_replacements": 747,
+    "best_archive_elite_missing_parent_slot_iterations": 146,
+    "bounds_policy": "fixed_initial",
+    "canonical_candidate_occurrences": 9152,
+    "cell_capacity": 1,
+    "descriptor": "target_relative_endpoint_xy",
+    "fallback_chunks": 0,
+    "final_occupied": {
+      "count": 52,
+      "max": 16,
+      "mean": 15.73076923076923,
+      "median": 16.0,
+      "min": 14
+    },
+    "grid_shape": [
+      4,
+      4
+    ],
+    "initial_insertions": 575,
+    "initial_occupied": {
+      "count": 52,
+      "max": 14,
+      "mean": 11.057692307692308,
+      "median": 11.0,
+      "min": 9
+    },
+    "parent_sampling": "sparse_priority",
+    "population_best_below_retained_archive_best_iterations": 444,
+    "replay_checks": {
+      "matched_final_selections": 52,
+      "matched_iteration_archives": 520
+    },
+    "secondary_lane": "none"
+  },
+  "quality": {
+    "all_equal_canonical_batches": 0,
+    "canonical_batches": 572,
+    "final_vs_initial_equal_chunks": 14,
+    "final_vs_initial_improved_chunks": 38,
+    "final_vs_initial_worse_chunks": 0,
+    "interpretation": "stored provider/search quality only, not task success or between-stage calibrated score",
+    "selected_source_iter_counts": {
+      "-1": 14,
+      "0": 12,
+      "1": 2,
+      "2": 2,
+      "3": 4,
+      "4": 1,
+      "5": 3,
+      "6": 2,
+      "7": 3,
+      "8": 5,
+      "9": 4
+    },
+    "within_chunk_quality_gain": {
+      "count": 52,
+      "max": 0.0517578125,
+      "mean": 0.0058602002950815055,
+      "median": 0.0003070831298828125,
+      "min": 0.0
+    }
+  },
+  "scope": "one externally exposed valid dev Q0 on GPU2; no matched GPU3 or C0 performance comparison",
+  "source_commit": "9ba5f628a6b13dde4f707876ff8312b49a46c319",
+  "stage": {
+    "events": 17,
+    "guidance_toggles": 11,
+    "interpretation": "observed Stage switches; correctness and causality are not inferred",
+    "query_ok_count": 17,
+    "stage_after_counts": {
+      "0": 3,
+      "1": 11,
+      "2": 3
+    }
+  },
+  "success": false,
+  "trace_mechanism": {
+    "canonical_action_rows_verified": 352,
+    "descriptor_t8_xy_distance_m": {
+      "count": 320,
+      "max": 0.25726549321740905,
+      "mean": 0.060926768239013794,
+      "median": 0.0500921854813534,
+      "min": 0.0010918300671385692
+    },
+    "different_stored_t7_z_discard_events": 319,
+    "discard_event_reasons": {
+      "evicted_prior_elite": 46,
+      "rejected_current_candidate": 274
+    },
+    "discard_events": 320,
+    "discarded_with_higher_stored_quality": 0,
+    "distinct_action_discard_events": 320,
+    "events_are_not_independent": true,
+    "gripper_pattern_diff_discard_events": 0,
+    "gripper_pattern_diff_quality_ties": 0,
+    "interpretation": "Observed archive compression of alternatives; no evidence discarded alternatives would succeed",
+    "positive_duty_diff_discard_events": 0,
+    "quality_tie_discard_events": 0,
+    "stored_t7_z_difference_m": {
+      "count": 320,
+      "max": 0.3564453125,
+      "mean": 0.0921142578125,
+      "median": 0.072998046875,
+      "min": 0.0
+    },
+    "traced_global_steps": [
+      0,
+      8
+    ]
+  }
+}

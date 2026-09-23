@@ -1,0 +1,74 @@
+[
+  {
+    "actual_t8_z_available": false,
+    "canonical_rows_verified": 176,
+    "decoded_eight_command_gripper_patterns": {
+      "--------": 176
+    },
+    "global_step": 0,
+    "selected": {
+      "cell": 15,
+      "fingerprint": "2e79ec61e9265bd78db22e0f22f0ca5f81c8c99ba135e0ac5d2917d19ec37cbd",
+      "gripper_pattern": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "iter_idx": 7,
+      "positive_gripper_duty": 0.0,
+      "raw_t8_dz": -0.4453125,
+      "reward": -0.006683349609375,
+      "row": 8,
+      "step": 0,
+      "stored_t7_z": 0.08203125,
+      "xy": [
+        0.0517578125,
+        0.04443359375
+      ]
+    },
+    "source_actions_dtype": "bfloat16",
+    "stored_projection_points": "t1..t7, seven XYZ points",
+    "trace_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_q0__f27eacd7e033/eds_eval/qualitative/episode_000/chunk_000000/tensors/mechanism_trace.pt"
+  },
+  {
+    "actual_t8_z_available": false,
+    "canonical_rows_verified": 176,
+    "decoded_eight_command_gripper_patterns": {
+      "--------": 176
+    },
+    "global_step": 8,
+    "selected": {
+      "cell": 8,
+      "fingerprint": "fe50d34f0e7e986954f5d325582c69b1756f27a21192c7f5aecd1e14f93c012c",
+      "gripper_pattern": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "iter_idx": 7,
+      "positive_gripper_duty": 0.0,
+      "raw_t8_dz": -0.80859375,
+      "reward": -0.001251220703125,
+      "row": 14,
+      "step": 8,
+      "stored_t7_z": 0.05615234375,
+      "xy": [
+        -0.0048828125,
+        0.00537109375
+      ]
+    },
+    "source_actions_dtype": "bfloat16",
+    "stored_projection_points": "t1..t7, seven XYZ points",
+    "trace_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_q0__f27eacd7e033/eds_eval/qualitative/episode_000/chunk_000008/tensors/mechanism_trace.pt"
+  }
+]

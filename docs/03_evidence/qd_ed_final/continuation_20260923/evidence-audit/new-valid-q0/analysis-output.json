@@ -1,0 +1,114 @@
+{
+  "qd": {
+    "active_chunks": 52,
+    "canonical_candidate_occurrences": 9152,
+    "archive_insertions": 818,
+    "archive_replacements": 747,
+    "archive_rejections": 7587,
+    "initial_insertions": 575,
+    "replay_checks": {
+      "matched_iteration_archives": 520,
+      "matched_final_selections": 52
+    },
+    "grid_shape": [
+      4,
+      4
+    ],
+    "cell_capacity": 1,
+    "descriptor": "target_relative_endpoint_xy",
+    "parent_sampling": "sparse_priority",
+    "bounds_policy": "fixed_initial",
+    "secondary_lane": "none",
+    "fallback_chunks": 0,
+    "best_archive_elite_missing_parent_slot_iterations": 146,
+    "population_best_below_retained_archive_best_iterations": 444,
+    "initial_occupied": {
+      "count": 52,
+      "min": 9,
+      "max": 14,
+      "mean": 11.057692307692308,
+      "median": 11.0
+    },
+    "final_occupied": {
+      "count": 52,
+      "min": 14,
+      "max": 16,
+      "mean": 15.73076923076923,
+      "median": 16.0
+    }
+  },
+  "quality": {
+    "final_vs_initial_improved_chunks": 38,
+    "final_vs_initial_equal_chunks": 14,
+    "final_vs_initial_worse_chunks": 0,
+    "within_chunk_quality_gain": {
+      "count": 52,
+      "min": 0.0,
+      "max": 0.0517578125,
+      "mean": 0.0058602002950815055,
+      "median": 0.0003070831298828125
+    },
+    "all_equal_canonical_batches": 0,
+    "canonical_batches": 572,
+    "selected_source_iter_counts": {
+      "7": 3,
+      "9": 4,
+      "4": 1,
+      "8": 5,
+      "-1": 14,
+      "0": 12,
+      "5": 3,
+      "2": 2,
+      "6": 2,
+      "3": 4,
+      "1": 2
+    },
+    "interpretation": "stored provider/search quality only, not task success or between-stage calibrated score"
+  },
+  "trace_mechanism": {
+    "traced_global_steps": [
+      0,
+      8
+    ],
+    "canonical_action_rows_verified": 352,
+    "discard_events": 320,
+    "distinct_action_discard_events": 320,
+    "discard_event_reasons": {
+      "rejected_current_candidate": 274,
+      "evicted_prior_elite": 46
+    },
+    "quality_tie_discard_events": 0,
+    "gripper_pattern_diff_discard_events": 0,
+    "positive_duty_diff_discard_events": 0,
+    "gripper_pattern_diff_quality_ties": 0,
+    "discarded_with_higher_stored_quality": 0,
+    "different_stored_t7_z_discard_events": 319,
+    "stored_t7_z_difference_m": {
+      "count": 320,
+      "min": 0.0,
+      "max": 0.3564453125,
+      "mean": 0.0921142578125,
+      "median": 0.072998046875
+    },
+    "descriptor_t8_xy_distance_m": {
+      "count": 320,
+      "min": 0.0010918300671385692,
+      "max": 0.25726549321740905,
+      "mean": 0.060926768239013794,
+      "median": 0.0500921854813534
+    },
+    "events_are_not_independent": true,
+    "interpretation": "Observed archive compression of alternatives; no evidence discarded alternatives would succeed"
+  },
+  "stage": {
+    "events": 17,
+    "query_ok_count": 17,
+    "stage_after_counts": {
+      "1": 11,
+      "2": 3,
+      "0": 3
+    },
+    "guidance_toggles": 11,
+    "interpretation": "observed Stage switches; correctness and causality are not inferred"
+  }
+}

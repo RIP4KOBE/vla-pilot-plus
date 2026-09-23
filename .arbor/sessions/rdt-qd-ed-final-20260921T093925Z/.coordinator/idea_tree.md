@@ -91,7 +91,9 @@ Hypothesis: Actual provider quality, candidate identity and executed-horizon geo
 Observable: Audit of available data and minimal observational instrumentation specification with exact ranking reconstruction and no online lookahead.
 Conflicts: Historical17/220 XY argmin differences are not quality misranking; no N1 rename, privileged evaluator input or external reward change. [RUNNING]
 
-**Insight**: Executor audits full-precision decision evidence and observational logging, CPU only; no algorithm or GPU dispatch yet.
+**Insight**: Native-dtype passive collector and separate integrity audit implemented; actual Main/RDT/adapter CPU paths pass for C0 terminal success and Q0 step truncation. GPU integration waits for the currently frozen production control. Targeted observed C0/Q0 dev tasks0/5 planned, without counterfactual or task-success claims.
+
+**Branch**: 2c4a591add2f697e60fb6292a8fd8f1222134a4e
 
 #### 5.3: Mechanism: Minimal independent MuJoCo and staged CUDA differential control.
 Hypothesis: A tiny static scene with isolated CUDA initialization/allocation/compute distinguishes generic GL-CUDA interaction faults from LIBERO/RDT-specific resource state.
@@ -114,6 +116,10 @@ Conflicts: Old failures stay recorded; this is a new external condition, not a r
 #### 5.5: Mechanism: Complete production C0 common-condition validation under the externally renewed boot.
 Hypothesis: A passing unchanged zero-action model-first control leaves scene-first production, guided search, perception and action/reset interactions untested; one original full dev episode can discriminate that remaining runtime bottleneck.
 Observable: One prospective GPU3 C0 episode provides original outcome and complete finite action/search/Stage/perception/cost evidence with no owned Xid; task success is reported without an algorithm-improvement claim.
-Conflicts: Pruned 4 and 4.1 remain invalid closed cohorts. This engineering dev identity has no retry_of and replaces none of their samples; all shared budgets and validation/formal reserves remain unchanged. [RUNNING]
+Conflicts: Pruned 4 and 4.1 remain invalid closed cohorts. This engineering dev identity has no retry_of and replaces none of their samples; all shared budgets and validation/formal reserves remain unchanged. [DONE]
 
-**Result**: Prospective full C0 protocol and boot/Xid supervisor preparation; GPU dispatch not yet authorized by a frozen plan.
+**Insight**: Full original production execution restored on GPU3:720 actual steps,29 guided/61 unguided chunks,28 successful Stage calls,1 DINO forward, no owned Xid and complete cost counters. Valid task outcome0/1; no performance improvement or root-cause claim. Continue observed mechanism diagnosis.
+
+**Result**: {"engineering_coverage":"PASS","success_count":0,"episodes":1,"gpu_process_wall_seconds":775.2034471839997,"attempt_id":"rdt-qd-ed-final-20260921T093925Z__freshboot_c0_t00_20260923__47a4507eacbe"}
+
+**Branch**: ea0cd8b5b7b9fa2aa2a8d2475de766121c03a74b

@@ -13,7 +13,7 @@ project_target:
   required_formal_successes: 5
   achieved: false
 study:
-  status: WAITING_SHARED_RUNNER_FOR_GPU3_PRODUCTION_C0
+  status: INTEGRATING_DECISION_EVIDENCE_FOR_GPU3_OBSERVED_DEVELOPMENT
   mode: real
   interaction: auto
   automatic_continuation: true
@@ -34,7 +34,7 @@ candidate:
     exceeding the frozen30attempt cap. No retry or rename can repair this cohort.
 budget:
   max_gpu_hours: 48.0
-  gpu_hours_consumed: 1.551532294950973
+  gpu_hours_consumed: 1.918701980682917
   max_episode_attempts: 240
   reserved:
     baseline: 20
@@ -42,12 +42,12 @@ budget:
     validation: 60
     formal: 40
     recovery: 20
-  dispatched: 16
-  aborted: 9
-  valid: 2
-  running: 1
+  dispatched: 17
+  aborted: 10
+  valid: 3
+  running: 0
   invalid: 4
-  completed: 6
+  completed: 7
   gpu_hour_reservations:
     validation: 14.0
     formal: 10.0
@@ -80,17 +80,16 @@ historical:
   previous_gpu_hours: 6.946832055555556
   previous_formal_episodes: 0
 active_iteration: iteration_001_execution_intent
-next_action: Freeze and run one original production C0 dev episode on GPU3 with fresh-boot
-  prerequisites and owned Xid supervision, then integrate CPU-reviewed decision evidence
-  for same-condition algorithm comparisons. Minimal GL/CUDA control stays deferred
-  because the stronger unchanged application B1/render control passed.
+next_action: Integrate reviewed observer and freeze four observed C0/Q0 task0/task5
+  development episodes on GPU3, then use actual execution evidence to select one QD/ED
+  mechanism.
 source_spec_sha256: 3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef
 derived_indexes:
 - .arbor/sessions/rdt-qd-ed-final-20260921T093925Z
 authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
   ledger is append-only event evidence, not a second mutable state.
 online_blockers: []
-updated_at: '2026-09-23T05:24:07.399383+00:00'
+updated_at: '2026-09-23T05:49:09.341230+00:00'
 seed_plan:
   path: data/frozen-seed-plan.json
   sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
@@ -144,21 +143,21 @@ stage_provider_ready: true
 runner:
   by_bucket:
     baseline: 1
-    development: 10
+    development: 11
     validation: 0
     formal: 0
     recovery: 5
-  reserved_attempts: 16
+  reserved_attempts: 17
   gpu_hours_by_bucket:
     baseline: 0.019651524036631195
-    development: 0.7949163510951843
+    development: 1.1620860368271286
     validation: 0.0
     formal: 0.0
     recovery: 0.7369644198191572
   gpu_healthcheck_hours: 0.2602564145160282
   gpu_healthcheck_inflight: 0
-  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_c0__fc39e13b4f1d
-  last_event: dispatched
+  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__freshboot_c0_t00_20260923__47a4507eacbe
+  last_event: valid
 gpu_admission_last_observation:
   physical_gpu: 3
   physical_index: 3
@@ -214,7 +213,7 @@ active_plan:
 hardware_migration:
   previous_physical_gpu: 7
   authorized_physical_gpu: 5
-  user_instruction: 改用5
+  user_instruction: "\u6539\u75285"
   authorized_at: '2026-09-22T04:31:51.394735+00:00'
   max_concurrent_gpu_workers: 1
   earlier_attempts_and_costs_preserved: true
@@ -236,7 +235,8 @@ authorized_gpu_selection:
   candidate_indices:
   - 3
   selected_physical_gpu: 3
-  user_instruction: 确保当前任务后续都在GPU3完成
+  user_instruction: "\u786E\u4FDD\u5F53\u524D\u4EFB\u52A1\u540E\u7EED\u90FD\u5728\
+    GPU3\u5B8C\u6210"
   authorized_at: '2026-09-22T08:25:04.726856+00:00'
   single_exclusive_worker: true
   rescan_if_unavailable: true
@@ -369,7 +369,8 @@ gpu_authorization_history:
   - 6
   - 7
   selected_physical_gpu: 6
-  user_instruction: 帮我使用当前服务器上任何能用的GPU来跑这个任务即可
+  user_instruction: "\u5E2E\u6211\u4F7F\u7528\u5F53\u524D\u670D\u52A1\u5668\u4E0A\u4EFB\
+    \u4F55\u80FD\u7528\u7684GPU\u6765\u8DD1\u8FD9\u4E2A\u4EFB\u52A1\u5373\u53EF"
   authorized_at: '2026-09-22T04:58:53.637965+00:00'
   single_exclusive_worker: true
   rescan_if_unavailable: true
@@ -377,7 +378,8 @@ gpu_authorization_history:
   candidate_indices:
   - 7
   selected_physical_gpu: 7
-  user_instruction: 后续任务都收敛到GPU7上完成
+  user_instruction: "\u540E\u7EED\u4EFB\u52A1\u90FD\u6536\u655B\u5230GPU7\u4E0A\u5B8C\
+    \u6210"
   authorized_at: '2026-09-22T06:36:54.904959+00:00'
   single_exclusive_worker: true
   rescan_if_unavailable: true
@@ -474,7 +476,11 @@ native_resource_queue:
   heartbeat_unix: 1790062224.3071046
   archived_evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/queue-history/8771eaa-b1-evidence-reused
 user_persistence_instruction:
-  text: 记住你的任务是在当前会话中自己持续迭代优化算法以完成我设定的任务目标，除非我说停止，否则自己优化无需停止直到达成任务目标
+  text: "\u8BB0\u4F4F\u4F60\u7684\u4EFB\u52A1\u662F\u5728\u5F53\u524D\u4F1A\u8BDD\u4E2D\
+    \u81EA\u5DF1\u6301\u7EED\u8FED\u4EE3\u4F18\u5316\u7B97\u6CD5\u4EE5\u5B8C\u6210\
+    \u6211\u8BBE\u5B9A\u7684\u4EFB\u52A1\u76EE\u6807\uFF0C\u9664\u975E\u6211\u8BF4\
+    \u505C\u6B62\uFF0C\u5426\u5219\u81EA\u5DF1\u4F18\u5316\u65E0\u9700\u505C\u6B62\
+    \u76F4\u5230\u8FBE\u6210\u4EFB\u52A1\u76EE\u6807"
   recorded_at: '2026-09-23T04:07:12.266326+00:00'
   interpretation: Continue autonomous engineering recovery, targeted evidence collection
     and QD-ED algorithm iteration; do not end the overall objective because a candidate/cohort
@@ -944,19 +950,34 @@ continuation:
     owned_xids: 0
   user_confirmed_external_reboot: true
   freshboot_production_c0:
-    status: PREDISPATCH_DEFERRED_EXTERNAL_RUNNER
+    status: COMPLETED_ENGINEERING_PASS_TASK_UNSUCCESSFUL
     arbor_node: '5.5'
     physical_gpu: 3
     episode_key: freshboot_c0_t00_20260923
     algorithm_score: null
-    source_commit: 8579ee301cc15283e78a94f7e0e9ddb306554c0a
-    plan_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-c0/plan.frozen.json
-    plan_sha256: 77869088e4232d5d712b3628ac87a36c991a567afa497d19daae16b6624e21f1
-    queue_status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-c0/queue-status.json
-    unified_exec_session_id: 40257
+    source_commit: ea0cd8b5b7b9fa2aa2a8d2475de766121c03a74b
+    plan_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-c0/plan.v2.frozen.json
+    plan_sha256: dcd425bd5cb884b8f06a6a80667ef1e29f30abe0688b9c8e11382292ec828d97
+    queue_status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-c0/queue-status-v2.json
+    unified_exec_session_id: 6962
     owned_episode_dispatches: 0
     queue_failure_reason: unfinished attempt or healthcheck requires reconciliation
     external_active_attempt: rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_c0__fc39e13b4f1d
-    next_step: Add safe shared-lock waiting and reentrant owned-lock handling; preserve
-      old frozen plan/status; same unconsumed prospective episode key, no scientific
-      retry.
+    next_step: Acquire real shared runner lock after external work ends, reconcile
+      only terminal state, retain lock through GPU3 idle/admission/one original C0
+      episode.
+    engineering_coverage: PASS
+    success: false
+    attempt_id: rdt-qd-ed-final-20260921T093925Z__freshboot_c0_t00_20260923__47a4507eacbe
+    summary_path: docs/03_evidence/qd_ed_final/continuation_20260923/freshboot-model-first/production-c0-result-summary.json
+    summary_sha256: 90372e96bc360b44e71305e2f9bc884e55eaa411d90157d6945c45090151c32b
+  decision_evidence_implementation:
+    status: CPU_REVIEWED_REAL_PATH_INTEGRATION_TESTS_PASSED_PENDING_GPU3_INTEGRATION
+    worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923
+    commits:
+    - 516cd92cddeb35e30ba568f92ae9ad5c86b2bb44
+    - f4b52d7
+    - 1ec9682290c2fe72f8ca7f50931015cd6119c522
+    integrated_into_production: false
+    gpu_validated: false
+current_owned_workers: []

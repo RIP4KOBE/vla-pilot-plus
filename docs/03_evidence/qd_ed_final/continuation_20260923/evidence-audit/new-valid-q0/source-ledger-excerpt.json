@@ -1,0 +1,59 @@
+[
+  {
+    "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_q0__f27eacd7e033",
+    "event": "reserved",
+    "gpu_process_wall_seconds": null,
+    "identity": {
+      "env_seed": 1969522881,
+      "init_index": 0,
+      "iteration": "N1R",
+      "policy_seed": 1969522881,
+      "profile": "Q0",
+      "split": "dev",
+      "task_id": 0
+    },
+    "outcome_valid": null,
+    "output_dir": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_q0__f27eacd7e033",
+    "physical_gpu": 2,
+    "source_commit": "9ba5f628a6b13dde4f707876ff8312b49a46c319",
+    "success": null
+  },
+  {
+    "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_q0__f27eacd7e033",
+    "event": "dispatched",
+    "gpu_process_wall_seconds": null,
+    "identity": {
+      "env_seed": 1969522881,
+      "init_index": 0,
+      "iteration": "N1R",
+      "policy_seed": 1969522881,
+      "profile": "Q0",
+      "split": "dev",
+      "task_id": 0
+    },
+    "outcome_valid": null,
+    "output_dir": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_q0__f27eacd7e033",
+    "physical_gpu": 2,
+    "source_commit": "9ba5f628a6b13dde4f707876ff8312b49a46c319",
+    "success": null
+  },
+  {
+    "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_q0__f27eacd7e033",
+    "event": "valid",
+    "gpu_process_wall_seconds": 629.0952789799999,
+    "identity": {
+      "env_seed": 1969522881,
+      "init_index": 0,
+      "iteration": "N1R",
+      "policy_seed": 1969522881,
+      "profile": "Q0",
+      "split": "dev",
+      "task_id": 0
+    },
+    "outcome_valid": true,
+    "output_dir": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_q0__f27eacd7e033",
+    "physical_gpu": 2,
+    "source_commit": "9ba5f628a6b13dde4f707876ff8312b49a46c319",
+    "success": false
+  }
+]
