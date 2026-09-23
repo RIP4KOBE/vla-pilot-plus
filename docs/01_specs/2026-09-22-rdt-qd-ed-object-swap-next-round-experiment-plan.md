@@ -4,6 +4,10 @@
 
 初稿的历史状态截点为 2026-09-22 05:03 UTC。用户随后明确授权更新方案、新建 worktree/branch、以 goal 模式测试迭代，并指定 GPU6。执行修订如下；历史快照保留其原时点口径。未调用 Arbor/Orchestra Research skill。
 
+## 2026-09-23 执行状态核查
+
+GPU2同步内存诊断队列于9月22日10:14 UTC因共享运行锁竞争退出，尚未派发对应episode；此后未持续执行。原Goal为paused。队列已修复为在自身尚无GPU派发时等待共享锁，相关151项CPU测试通过；保留旧失败日志与同一个未派发条件，重新冻结调度代码后接续单次600秒诊断，仍限定GPU2。另一分支于9月22日12:20 UTC保存TARGET_NOT_MET收尾报告，原关闭cohort和当时成本快照全部保留。本次接续不改写旧结果、不自动启动N1R/Validation/Formal；共享成本继续累计。
+
 ## 最新执行修订：固定 GPU2
 
 用户明确要求终止GPU2现有程序，并确保本次任务后续均使用GPU2。本修订覆盖下文GPU5/GPU6历史设备要求。当前队列、CUDA和EGL均改为仅允许物理GPU2（EGLindex1，CUDAlogical0）；不更换科学输入或重置预算。GPU5等待队列已停止，尚未派发的CUDA memcheck保留原条件标识，待GPU2释放后自动探测并接续。终止PID1502190时系统返回EPERM，sudo要求密码，故当前未成功清理。新队列可在完整冻结输入检查后等待设备，真实CUDA/EGL检查通过前不会启动episode。详见 `experiments/iteration_001_execution_intent/gpu2-migration-amendment.md`。

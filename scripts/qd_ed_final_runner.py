@@ -81,6 +81,12 @@ class GateError(RuntimeError):
     pass
 
 
+class LockBusyError(GateError):
+    def __init__(self, path):
+        self.lock_path = Path(path).resolve()
+        super().__init__('another owned runner holds the lock')
+
+
 def require(condition, message):
     if not condition:
         raise GateError(message)
@@ -594,7 +600,7 @@ def locked(path, *, nonblocking=False):
         try:
             fcntl.flock(stream, fcntl.LOCK_EX | (fcntl.LOCK_NB if nonblocking else 0))
         except BlockingIOError as exc:
-            raise GateError('another owned runner holds the lock') from exc
+            raise LockBusyError(path) from exc
         try:
             yield
         finally:

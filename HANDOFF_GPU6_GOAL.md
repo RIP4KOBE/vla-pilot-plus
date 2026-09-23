@@ -1,3 +1,11 @@
+# 2026-09-23: queue had stopped before dispatch; repairing lock wait
+
+Priorqueue314500 failed2026-09-22T10:14:08UTC atsharedrunnerlock acquisition. gpu2_cuda_memcheck_blocking_c0_t00 haszero reserved/dispatched records andremains pending. GPU2currentlyidle; noownedworkers. Goalpaused. Parentbranch closedat2026-09-22T12:20:20UTC withTARGET_NOT_MET; report andallclosedcohorts preserved. Currentbranch continuation islimitedto thealready authorized, undispatched600sGPU2blockingmemcheck, noN1R/validation/formal dispatch. Sharedcosts synchronized; noreset. Audit`/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/analysis/gpu2-queue-resume-20260923/audit.json`. LockBusyError distinguishesexactlock; queuewaitsonsharedcontention onlybefore itsownGPUwork, refusespostdispatchretry.
+
+# ACTIVE: GPU2 blocking-launch CUDA memcheck queue
+
+QueuePID314500, ticks374729787, frozenHEAD`90cbc3971461b9ed1a91818a5085f4489c3213e2`, plan`data/qd-ed-gpu2-blocking-memcheck-plan.json`, SHA256`dccace904196bc218ed45b45ce5cd1447f0859639529ec776388c98b0d8995ba`. Exactlyone prospectiveGPU2_CUDA_MEMCHECK_BLOCKING_C0/task0C0/seed1969522881/init0/development600s. Fixed --force-blocking-launches tests sanitizer memory overhead; no algorithm change or success-rate evidence.148CPUtests passed; full frozen validation passed. GPU2/EGL1 only,120s idle admission, sharedsingleworker/costaccounting. Status/process/logprefix`runtime/gpu2-blocking-memcheck-queue`. Monitor`rdt-qd-ed-progress`. Do not edit frozen source/HEAD while live. PreviousOOM result staysinvalid.
+
 # LATEST: GPU2 memcheck ended with out-of-memory, queue stopped
 
 GPU2-only remains authorized and verified. Attempt `rdt-qd-ed-final-20260921T093925Z__gpu5_cuda_memcheck_c0_t00__66eec8a1ab74` exited86 after164.742965s; zero environment actions andStage calls. Four reported CUDA API allocation errors, no reported invalid memory access; incomplete first EDS search, not a clean memcheck pass or valid algorithm result. Bothqueue276899 andproductionPython285052 exited. Audit`/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/analysis/gpu2-cuda-memcheck/audit.json`. Original ledger event label valid means terminal execution accounting here; outcome_valid=false, scientific result invalid. Preserve journals/costs.

@@ -443,3 +443,58 @@ def test_reservation_recheck_before_dispatch_returns_to_wait(tmp_path, monkeypat
     status = queue.run_queue(path, ['q0'], root=root, idle_seconds=0, sleep=forbid, max_polls=1)
     assert status['status'] == 'waiting'
     assert not (root / 'data/attempt-ledger.jsonl').exists()
+
+
+@pytest.mark.parametrize('race_site', ['bind', 'run'])
+def test_shared_runner_lock_waits_and_resumes_without_duplicate_dispatch(tmp_path, monkeypatch, race_site):
+    root, artifact, path, plan, runtime, row = fixture_queue(tmp_path, monkeypatch)
+    monkeypatch.setattr(queue, 'inventory', lambda: devices(7))
+    monkeypatch.setattr(queue, 'reservation_admission', lambda *a: None)
+    state_path = artifact / 'runtime/available-gpu-queue-status.json'
+    held = queue.runner.locked(root / 'data/qd-ed-runner.lock', nonblocking=True)
+    held.__enter__()
+    calls, sleeps = [], []
+    def bind(*args, **kwargs):
+        calls.append('bind')
+        if race_site == 'bind':
+            with queue.runner.locked(root / 'data/qd-ed-runner.lock', nonblocking=True):
+                pass
+        return path, plan, runtime
+    def run(*args, **kwargs):
+        with queue.runner.locked(root / 'data/qd-ed-runner.lock', nonblocking=True):
+            calls.append('dispatch')
+        return [{'outcome_valid': True}]
+    def sleep(seconds):
+        sleeps.append(seconds)
+        assert json.loads(state_path.read_text())['status'] == 'waiting_runner'
+        assert 'dispatch' not in calls
+        held.__exit__(None, None, None)
+    monkeypatch.setattr(queue, 'bind_plan', bind)
+    monkeypatch.setattr(queue.runner, 'run_plan', run)
+    try:
+        result = queue.run_queue(path, ['q0'], root=root, idle_seconds=0, sleep=sleep, max_polls=2)
+    finally:
+        if not sleeps:
+            held.__exit__(None, None, None)
+    assert result['status'] == 'completed'
+    assert sleeps == [30] and calls.count('dispatch') == 1
+    assert result['completed_keys'] == ['q0']
+
+
+def test_shared_wait_distinguishes_foreign_dispatch_and_own_gpu_work(tmp_path):
+    root = tmp_path / 'worktree'
+    artifact = tmp_path / 'artifact'
+    busy = queue.runner.LockBusyError(root / 'data/qd-ed-runner.lock')
+    foreign = {'event': 'dispatched', 'output_dir': str(tmp_path / 'other-study/attempt')}
+    own = {'event': 'dispatched', 'output_dir': str(artifact / 'attempt')}
+    kwargs = {'root': root, 'artifact': artifact}
+    assert queue.undispatched_shared_wait(busy, [foreign], [], **kwargs)
+    assert queue.undispatched_shared_wait(queue.runner.GateError(queue.UNFINISHED_JOURNAL),
+                                        [], [foreign], **kwargs)
+    assert not queue.undispatched_shared_wait(busy, [own], [], **kwargs)
+    assert not queue.undispatched_shared_wait(busy, [], [own], **kwargs)
+    assert not queue.undispatched_shared_wait(busy, [{'event': 'dispatched'}], [], **kwargs)
+    assert not queue.undispatched_shared_wait(queue.runner.LockBusyError(root / 'data/other.lock'),
+                                            [], [], **kwargs)
+    assert not queue.undispatched_shared_wait(queue.runner.GateError('frozen file changed'),
+                                            [], [], **kwargs)

@@ -445,6 +445,22 @@ def undispatched_admission_race(error, new_events, new_resources=()):
             and is_admission_race(runner.GateError(event.get('reason', ''))) for event in resources))
 
 
+def undispatched_shared_wait(error, new_events, new_resources, *, root, artifact):
+    """Only transient shared-study contention before our own GPU dispatch can wait."""
+    shared_lock = (isinstance(error, runner.LockBusyError)
+                   and error.lock_path == (root / 'data/qd-ed-runner.lock').resolve())
+    if not shared_lock and str(error) != UNFINISHED_JOURNAL:
+        return False
+    for event in (*new_events, *new_resources):
+        if event.get('event') != 'dispatched':
+            continue
+        output = event.get('output_dir')
+        # Missing ownership evidence must fail closed, never hide a dispatch.
+        if not output or Path(output).resolve().is_relative_to(artifact):
+            return False
+    return True
+
+
 def run_queue(plan_path, episode_keys, *, poll_seconds=30, idle_seconds=120, status_path=None, root=ROOT,
               sleep=time.sleep, monotonic=time.monotonic, max_polls=None):
     root = Path(root).resolve()
@@ -539,6 +555,15 @@ def run_queue(plan_path, episode_keys, *, poll_seconds=30, idle_seconds=120, sta
                     except runner.GateError as exc:
                         fresh_events = runner.read_events(root / 'data/attempt-ledger.jsonl')[event_count:]
                         fresh_resources = runner.read_events(root / 'data/gpu-healthcheck-ledger.jsonl')[resource_count:]
+                        if undispatched_shared_wait(exc, fresh_events, fresh_resources,
+                                                    root=root, artifact=artifact):
+                            idle_windows.clear()
+                            save('waiting_runner', selected_physical_gpu=None,
+                                 last_resource_reason=str(exc))
+                            if max_polls is not None and polls >= max_polls:
+                                return status
+                            sleep(poll_seconds)
+                            continue
                         if (dispatch_ids(root) == before and probe_dispatch_ids(root) == before_probes
                                 and undispatched_admission_race(exc, fresh_events, fresh_resources)):
                             append_selection(events_path, {'event': 'admission_race', 'episode_key': key,
