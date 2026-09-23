@@ -25,6 +25,10 @@ from qd_ed_runtime_setup import normalized_pci_bus_id
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def current_boot_id():
+    return Path('/proc/sys/kernel/random/boot_id').read_text().strip()
+
+
 def normalized_uuid(value):
     return str(value).lower().removeprefix('gpu-')
 
@@ -189,6 +193,7 @@ def child_probe(manifest_path, output, resource_id):
             return value.decode() if isinstance(value, bytes) else str(value or '')
         evidence = {
             'schema': 'qd-ed-gpu-context-probe-v2', 'resource_id': resource_id,
+            'boot_id': current_boot_id(),
             'physical_gpu': physical_gpu, 'torch_logical_device': 0, 'torch_visible_device_count': torch.cuda.device_count(),
             'nvidia_physical_gpu': int(identity_index), 'nvidia_uuid': identity_uuid,
             'nvidia_pci_bus_id': identity_pci,
@@ -246,6 +251,7 @@ def run_probe(manifest_path, *, root=ROOT, timeout=120):
         output = runner.owned(Path(runtime['artifact_root']) / 'runtime/probes' / resource_id, runtime['artifact_root'])
         output.mkdir(parents=True, exist_ok=False)
         base = {'resource_id': resource_id, 'kind': 'cuda_egl_probe', 'physical_gpu': physical_gpu,
+                'boot_id': current_boot_id(),
                 'output_dir': str(output), 'runtime_manifest_sha256': runner.digest(manifest_path),
                 'source_script_sha256': runner.digest(Path(__file__))}
         process, started, finished, dispatched = None, time.monotonic(), None, False
@@ -273,6 +279,7 @@ def run_probe(manifest_path, *, root=ROOT, timeout=120):
             runner.require(code == 0, f'GPU probe child exit code{code}')
             result = runner.read_json(output / 'probe-evidence.json')
             runner.require(result.get('resource_id') == resource_id, 'probe evidence resource mismatch')
+            runner.require(result.get('boot_id') == base['boot_id'], 'probe evidence boot identity mismatch')
             validate_probe_evidence(result, mapping)
             runner.require(runner.digest(output / 'probe-frame.png') == result['frame_png_sha256'], 'probe frame fingerprint mismatch')
             event = 'completed'

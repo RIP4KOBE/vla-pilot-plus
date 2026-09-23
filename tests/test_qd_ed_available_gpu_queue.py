@@ -153,12 +153,15 @@ def test_probe_reuse_requires_exact_hardware_source_ledger_and_frame(tmp_path, m
     folder = artifact / 'runtime/probe'
     folder.mkdir()
     (folder / 'probe-frame.png').write_bytes(b'frame')
-    evidence = {'resource_id': 'proof', 'frame_png_sha256': queue.runner.digest(folder / 'probe-frame.png')}
+    monkeypatch.setattr(queue.probe, 'current_boot_id', lambda: 'current-boot')
+    evidence = {'resource_id': 'proof', 'boot_id': 'current-boot',
+                'frame_png_sha256': queue.runner.digest(folder / 'probe-frame.png')}
     evidence_path = folder / 'probe-evidence.json'
     evidence_path.write_text(json.dumps(evidence))
     runtime.update(cuda_egl_verified=True, cuda_egl_probe={'resource_id': 'proof',
                    'evidence_path': str(evidence_path), 'evidence_sha256': queue.runner.digest(evidence_path)})
     events = [{'event': 'completed', 'resource_id': 'proof',
+               'boot_id': 'current-boot',
                'source_script_sha256': queue.runner.digest(root / 'scripts/qd_ed_gpu_probe.py')}]
     validations = []
     monkeypatch.setattr(queue.probe, 'validate_probe_evidence', lambda *args: validations.append(args))
@@ -169,6 +172,16 @@ def test_probe_reuse_requires_exact_hardware_source_ledger_and_frame(tmp_path, m
         assert queue.reusable_probe(runtime, {**mapping(), key: value}, events, root=root) is None
     assert queue.reusable_probe(runtime, mapping(), [{**events[0], 'source_script_sha256': 'old'}], root=root) is None
     assert queue.reusable_probe(runtime, mapping(), [{**events[0], 'event': 'aborted'}], root=root) is None
+    for old_boot in (None, 'previous-boot'):
+        assert queue.reusable_probe(runtime, mapping(), [{**events[0], 'boot_id': old_boot}], root=root) is None
+        evidence_path.write_text(json.dumps({**evidence, 'boot_id': old_boot}))
+        runtime['cuda_egl_probe']['evidence_sha256'] = queue.runner.digest(evidence_path)
+        assert queue.reusable_probe(runtime, mapping(), events, root=root) is None
+    evidence_path.write_text(json.dumps(evidence))
+    runtime['cuda_egl_probe']['evidence_sha256'] = queue.runner.digest(evidence_path)
+    monkeypatch.setattr(queue.probe, 'current_boot_id', lambda: 'next-boot')
+    assert queue.reusable_probe(runtime, mapping(), events, root=root) is None
+    monkeypatch.setattr(queue.probe, 'current_boot_id', lambda: 'current-boot')
     (folder / 'probe-frame.png').write_bytes(b'modified')
     assert queue.reusable_probe(runtime, mapping(), events, root=root) is None
 

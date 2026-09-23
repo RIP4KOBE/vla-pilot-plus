@@ -220,7 +220,7 @@ def same_mapping(left, right):
 
 
 def reusable_probe(runtime, mapping, health_events, *, root=ROOT):
-    """Accept only actual, accounted evidence with matching current probe code."""
+    """Accept accounted evidence from this boot with matching probe code."""
     if not same_mapping(runtime.get('gpu_mapping', {}), mapping):
         return None
     reference = runtime.get('cuda_egl_probe', {})
@@ -237,6 +237,9 @@ def reusable_probe(runtime, mapping, health_events, *, root=ROOT):
             return None
         evidence = runner.read_json(evidence_path)
         if evidence.get('resource_id') != reference['resource_id']:
+            return None
+        boot_id = probe.current_boot_id()
+        if evidence.get('boot_id') != boot_id or matching[-1].get('boot_id') != boot_id:
             return None
         probe.validate_probe_evidence(evidence, mapping)
         if runner.digest(evidence_path.parent / 'probe-frame.png') != evidence['frame_png_sha256']:

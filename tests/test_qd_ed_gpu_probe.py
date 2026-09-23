@@ -16,7 +16,8 @@ spec.loader.exec_module(probe)
 
 def valid_evidence(physical_gpu=7):
     egl = 7 if physical_gpu == 5 else 4
-    return {'schema': 'qd-ed-gpu-context-probe-v2', 'physical_gpu': physical_gpu, 'torch_logical_device': 0,
+    return {'schema': 'qd-ed-gpu-context-probe-v2', 'boot_id': probe.current_boot_id(),
+        'physical_gpu': physical_gpu, 'torch_logical_device': 0,
         'torch_uuid': 'GPU-unit-test', 'torch_visible_device_count': 1, 'cuda_kernel_result': 2.,
         'nvidia_physical_gpu': physical_gpu, 'nvidia_uuid': 'GPU-unit-test',
         'nvidia_pci_bus_id': '00000000:A1:00.0',
