@@ -138,5 +138,94 @@ class Tests(unittest.TestCase):
         self.manifest['episodes']['external-gpu2-row']=None
         with self.assertRaisesRegex(ValueError,'four predetermined keys'): s.summarize(self.manifest)
 
+    def invalid(self, index):
+        refs = self.complete(index)
+        terminal_path = Path(refs['terminal']['path'])
+        terminal = json.loads(terminal_path.read_text())
+        terminal.update(outcome_valid=False, success=False, task_failure=True,
+            failure_class='task_failure', compute_outcome='completed',
+            reason='Codex Stage call failure invalidates the frozen transport condition',
+            stage_condition='synthetic-frozen-stage', stage_failed_queries=1,
+            failure_details={'original_event': 'codex_unexpected_event'},
+            gpu_process_wall_seconds=1046.059246728)
+        # No audit/analysis file exists for this terminal-only admission route.
+        Path(refs['audit']['path']).unlink()
+        Path(refs['analysis']['path']).unlink()
+        reference = {'status': 'terminal_invalid', 'terminal': self.write(terminal_path, terminal)}
+        self.manifest['episodes'][s.KEYS[index]] = reference
+        return reference, terminal
+
+    def test_valid_event_invalid_outcome_closes_without_audit_or_paired_inference(self):
+        for index in range(3):
+            self.complete(index, eligible=False)
+        reference, terminal = self.invalid(3)
+        report = s.summarize(self.manifest)
+        self.assertEqual(report['status'], 'closed_incomplete_comparison')
+        self.assertEqual((report['complete_valid_episodes'], report['terminal_invalid_episodes'],
+                          report['pending_episodes']), (3, 1, 0))
+        invalid = report['rows'][3]
+        self.assertEqual(invalid['original_terminal'], terminal)
+        self.assertEqual(invalid['original_outcome']['event'], 'valid')
+        self.assertIs(invalid['original_outcome']['outcome_valid'], False)
+        self.assertIs(invalid['original_outcome']['task_failure'], True)
+        self.assertIsNone(invalid['audit'])
+        self.assertIsNone(invalid['mechanism'])
+        self.assertIsNone(invalid['costs']['provider_request_attempts'])
+        self.assertEqual(invalid['input_references'], reference)
+        self.assertTrue(all(pair['status'] == 'closed_incomplete_comparison' for pair in report['pairs']))
+        self.assertTrue(all('original_success' not in pair and 'episode_witness_presence' not in pair
+                            for pair in report['pairs']))
+        self.assertEqual(report['completed_episode_gpu_wall_seconds'], 33)
+        self.assertEqual(report['terminal_invalid_gpu_wall_seconds'], 1046.059246728)
+        self.assertAlmostEqual(report['recorded_terminal_gpu_wall_seconds'], 1079.059246728)
+        markdown = s.render_markdown(report)
+        self.assertIn('terminal-invalid 1/4, pending 0/4', markdown)
+        self.assertIn(terminal['reason'], markdown)
+        self.assertIn('ineligible for the frozen comparison', markdown)
+
+    def test_invalid_terminal_retains_all_frozen_identity_and_cost_gates(self):
+        reference, terminal = self.invalid(3)
+        for key, value, expected in [
+            ('physical_gpu', 2, 'cannot be pooled'),
+            ('plan_sha256', 'wrong-plan', 'frozen condition differs'),
+            ('source_commit', 'wrong-source', 'frozen condition differs'),
+            ('episode_key', s.KEYS[0], 'scientific identity differs'),
+            ('outcome_valid', True, 'invalid original terminal'),
+            ('event', 'dispatched', 'invalid original terminal'),
+            ('reason', '', 'terminal reason required'),
+            ('gpu_process_wall_seconds', -1, 'GPU cost invalid')]:
+            with self.subTest(key=key):
+                modified = {**terminal, key: value}
+                self.manifest['episodes'][s.KEYS[3]] = {'status': 'terminal_invalid',
+                    'terminal': self.write(Path(reference['terminal']['path']), modified)}
+                with self.assertRaisesRegex(ValueError, expected):
+                    s.summarize(self.manifest)
+
+    def test_invalid_terminal_rejects_manual_audit_or_any_analysis_reference(self):
+        reference, _ = self.invalid(3)
+        for forbidden in ('audit', 'analysis'):
+            with self.subTest(forbidden=forbidden):
+                self.manifest['episodes'][s.KEYS[3]] = {
+                    **reference, forbidden: {'path': '/not-readable/manual-or-supplement.json', 'sha256': '0'*64}}
+                with self.assertRaisesRegex(ValueError, 'only terminal reference; no audit or analysis'):
+                    s.summarize(self.manifest)
+        self.manifest['episodes'][s.KEYS[3]] = reference
+        report = s.summarize(self.manifest)
+        self.assertEqual(report['status'], 'pending_matrix')
+        self.assertEqual((report['terminal_invalid_episodes'], report['pending_episodes']), (1, 3))
+
+    def test_closed_invalid_matrix_still_rejects_supplemental_map_in_valid_rows(self):
+        refs = self.complete(0)
+        self.complete(1)
+        self.complete(2)
+        self.invalid(3)
+        path = Path(refs['analysis']['path'])
+        analysis = json.loads(path.read_text())
+        analysis['input_sha256'].pop(str(Path(self.plan['worktree']) / s.TARGET_MAP))
+        analysis['input_sha256']['/explicit/supplemental-map-v3.json'] = 'supplemental-map-sha'
+        self.manifest['episodes'][s.KEYS[0]]['analysis'] = self.write(path, analysis)
+        with self.assertRaisesRegex(ValueError, 'supplemental maps cannot be pooled'):
+            s.summarize(self.manifest)
+
 
 if __name__=='__main__': unittest.main()
