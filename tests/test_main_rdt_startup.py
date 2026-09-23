@@ -394,6 +394,8 @@ def _run_execution_horizon_episode(
     termination_kind="terminated",
     postprocessor=None,
     mechanism_trace=None,
+    success=False,
+    run_via_main=False,
 ):
     import main
 
@@ -501,9 +503,9 @@ def _run_execution_horizon_episode(
             evidence = getattr(self, "_decision_evidence", None)
             if evidence is not None:
                 evidence.pre_reset_outcome({"robot0_eef_pos": np.array([self.steps, 0., 0.])},
-                    reward=0., terminated=terminated, success=False)
+                    reward=0., terminated=terminated, success=success)
             return {}, 0.0, terminated, truncated, {
-                "success": False,
+                "success": success,
                 "behavior_name": "timeout",
             }
 
@@ -563,7 +565,17 @@ def _run_execution_horizon_episode(
         return updated
 
     runner._update_stage = update_stage
-    runner._run_episode(episode=0, episode_dir=str(tmp_path), episode_seed=7)
+    if run_via_main:
+        runner.config.episode_num = 1
+        runner.backend = "libero"
+        policy.reset = lambda: None
+        runner.video_recorder.clear = lambda: None
+        runner.adapter.reset = lambda **kwargs: None
+        runner.adapter.get_task_info = lambda: {}
+        runner.run()
+    else:
+        runner._run_episode(episode=0, episode_dir=str(tmp_path), episode_seed=7)
+    runner.episode_compute_records = [r for r in appended if "outcome" in r]
     metrics_records = [record for record in appended if "execution_horizon_resolved" in record]
     return runner, policy, metrics_records
 
@@ -1338,3 +1350,36 @@ def test_guidance_toggle_without_memory_hook_is_valid_for_vls_policy(tmp_path):
 
     assert updated["current_stage"] == 1
     assert updated["use_guidance"] is False
+
+
+@pytest.mark.parametrize("failure", ["bundle_write", "initial_status_write", "missing_hook"])
+@pytest.mark.parametrize("success", [False, True])
+def test_main_run_observer_failure_preserves_original_outcome(monkeypatch, tmp_path, failure, success):
+    from core.decision_evidence import DecisionEvidence
+    off, off_policy, _ = _run_execution_horizon_episode(
+        monkeypatch, tmp_path / "off", mode="fixed", target_distances=[.1],
+        use_guidance=False, max_steps=2, success=success, run_via_main=True)
+    def fail(*args, **kwargs):
+        raise OSError("observer write failure")
+    if failure == "bundle_write":
+        monkeypatch.setattr(torch, "save", fail)
+    elif failure == "initial_status_write":
+        monkeypatch.setattr(DecisionEvidence, "_write_status", fail)
+    else:
+        original_record = DecisionEvidence.record
+        def drop_hook(self, event, **values):
+            if event != "policy_action_decode":
+                return original_record(self, event, **values)
+        monkeypatch.setattr(DecisionEvidence, "record", drop_hook)
+    on, on_policy, _ = _run_execution_horizon_episode(
+        monkeypatch, tmp_path / "on", mode="fixed", target_distances=[.1],
+        use_guidance=False, max_steps=2, success=success, run_via_main=True,
+        config_overrides={"decision_evidence": {"enabled": True}})
+    assert on.adapter.executed_rows == off.adapter.executed_rows
+    assert on_policy.select_flags == off_policy.select_flags
+    assert on.success_count == off.success_count == int(success)
+    assert len(on.episode_compute_records) == len(off.episode_compute_records) == 1
+    assert on.episode_compute_records[0]["outcome"] == off.episode_compute_records[0]["outcome"] == "completed"
+    status = on.episode_compute_records[0]["decision_evidence"]
+    assert status["failed"] and not status["complete"]
+    assert not (tmp_path / "on" / "episode_1" / "error.txt").exists()

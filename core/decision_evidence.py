@@ -48,9 +48,7 @@ class DecisionEvidence:
 
     def __init__(self, output_dir, *, episode):
         self.root = Path(output_dir) / f"episode_{int(episode):03d}"
-        self.root.mkdir(parents=True, exist_ok=True)
-        if (self.root / "status.json").exists():
-            raise DecisionEvidenceIncomplete("evidence episode directory already exists")
+        self._status_writable = False
         self.episode = int(episode)
         self.decision_id = None
         self.global_step = None
@@ -75,7 +73,14 @@ class DecisionEvidence:
         self._decision_events = set()
         self._requires_quality = False
         self._projection_origins = []
-        self._write_status()
+        try:
+            self.root.mkdir(parents=True, exist_ok=True)
+            if any(self.root.iterdir()):
+                raise DecisionEvidenceIncomplete("evidence episode directory already exists")
+            self._status_writable = True
+            self._write_status()
+        except Exception as error:
+            self._fail(error)
 
     def status(self):
         return {"schema": "qd-ed-decision-evidence-v1", "episode": self.episode,
@@ -97,10 +102,11 @@ class DecisionEvidence:
         self.failed = True
         self.error_type = type(error).__name__
         logging.getLogger(__name__).error("Decision evidence incomplete: %s", self.error_type)
-        try:
-            self._write_status()
-        except Exception:
-            pass  # Initial incomplete status remains; never claim completeness.
+        if self._status_writable:
+            try:
+                self._write_status()
+            except Exception:
+                pass  # Missing/initial incomplete status never establishes completeness.
 
     def record(self, event, **values):
         if self.failed or self.closed:
@@ -222,7 +228,9 @@ class DecisionEvidence:
                     contemporaneous_target_pose=None)
         self._outcome_observed = True
         if terminated:
-            self.record("automatic_reset_boundary", terminal_episode=self.episode)
+            self.record("automatic_reset_boundary", terminal_episode=self.episode,
+                        reset_will_follow=True, reset_completed=None)
+            self.flush()  # Persist the old episode before reset can fail natively.
             self.reset_sequence += 1
 
     def step_returned(self, *, terminated, truncated, success):
@@ -255,6 +263,11 @@ class DecisionEvidence:
                 stream.write(json.dumps(entry, allow_nan=False) + "\n")
                 stream.flush()
                 os.fsync(stream.fileno())
+            directory_fd = os.open(self.root, os.O_RDONLY | os.O_DIRECTORY)
+            try:
+                os.fsync(directory_fd)
+            finally:
+                os.close(directory_fd)
             self._bundle = number
             self.bytes_written += len(data)
             self._pending.clear()
@@ -268,6 +281,7 @@ class DecisionEvidence:
             self._fail(error)
 
     def finish(self):
+        """Return audit validity separately; never change the original task outcome."""
         self.flush()
         if self._dispatch_pending or self._decisions != self._committed:
             self._fail(DecisionEvidenceIncomplete("unfinished evidence"))
@@ -277,10 +291,10 @@ class DecisionEvidence:
                 self._write_status()
             except Exception as error:
                 self._fail(error)
-        if self.failed:
-            raise DecisionEvidenceIncomplete("episode decision evidence is incomplete")
+        return self.status()
 
     def close(self):
         """On an existing execution error, preserve it and leave complete=false."""
         self.flush()
         self.closed = True
+        return self.status()
