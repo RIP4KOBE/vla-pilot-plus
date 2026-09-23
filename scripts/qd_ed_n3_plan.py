@@ -38,6 +38,9 @@ TRANSPORT_GATE = 'Codex Stage call failure invalidates the frozen transport cond
 CHECKS = ('finite_action','source_compute','raw_stage_separation','substantive_qd_activation',
           'exact_native_past_feedback_timing_selection','native_feedback_bundle_alignment',
           'runtime_tracking_validity','substantive_feedback_search_activity')
+NATIVE_AUDIT_SCOPE = ('recognized N3 decisions; native canonical selected projection/origin/raw; '
+    'nonterminal acknowledged command/EEF; immediate complete predecessor/residual; '
+    'explicit inactive clears and terminal endpoints are excluded from usable feedback; no task-effect claim')
 REQUIRED = {MODULE, SUPERVISOR, REPORT, SUPPORT, DEPENDENCIES, PROFILE, OBSERVED, PROTOCOL, CLARIFICATION, 'core/qd_executed_quality.py','core/qd_executed_feedback.py',
             'main.py','core/keypoint_tracker.py','core/env_adapters/libero_adapter.py',
             'core/qd_ed.py','core/rdt_policy_steer.py','core/eds_eval_metrics.py','configs/config.yaml',
@@ -46,6 +49,32 @@ REQUIRED = {MODULE, SUPERVISOR, REPORT, SUPPORT, DEPENDENCIES, PROFILE, OBSERVED
 
 
 def api(value): return SimpleNamespace(**value) if isinstance(value, dict) else value
+
+
+def native_audit_alignment(audit, metrics, *, require):
+    """Match the frozen native auditor to public metrics; no tensor reread or activity release."""
+    require(audit.get('accepted') is True and audit.get('evidence_complete') is True,
+            'N3 native alignment requires accepted complete audit')
+    require(all(m.get('qd_quality_mode')=='executed_feedback_v1'
+        and type(m.get('qd_quality_applicable')) is bool and type(m.get('qd_feedback_active')) is bool
+        and (not m['qd_feedback_active'] or m['qd_quality_applicable']) for m in metrics),
+        'N3 native alignment metric applicability/active fields differ')
+    recognized=sum(m['qd_quality_applicable'] for m in metrics)
+    active=sum(m['qd_feedback_active'] for m in metrics)
+    gate=audit.get('n3_feedback_audit')
+    if not recognized:
+        require(gate is None,'N3 native audit unexpectedly claims unrecognized decisions')
+        return {'status':'not_applicable','recognized_decisions':0,'active_decisions':0,
+                'scope':NATIVE_AUDIT_SCOPE,'search_activity_or_checkpoint_release':False}
+    counters=('checked_decisions','active_previous_ack_verified','inactive_decisions','uncommitted_clears',
+              'inactive_ack_clears_unknown','complete_nonterminal_prefixes')
+    require(isinstance(gate,dict) and gate.get('schema')=='n3-native-feedback-audit-v1'
+        and gate.get('scope')==NATIVE_AUDIT_SCOPE,'N3 native feedback audit schema/scope missing or differs')
+    require(all(type(gate.get(k)) is int and 0<=gate[k]<=recognized for k in counters)
+        and gate['checked_decisions']==recognized and gate['active_previous_ack_verified']==active
+        and gate['inactive_decisions']==recognized-active,'N3 native feedback audit counts differ from metrics')
+    return {'status':'verified','recognized_decisions':recognized,'active_decisions':active,
+            'audit':copy.deepcopy(gate),'search_activity_or_checkpoint_release':False}
 
 
 def rows_from_dev(seeds):
@@ -257,6 +286,7 @@ def admission(plan, runtime, row, events, resources, root, runner):
               'N3 fixed-candidate mechanism prerequisite not met')
     originals=[x for x in plan['episodes'] if not x.get('retry_of')]
     cell_index=next(i for i,x in enumerate(originals) if r.episode_identity(x)==r.episode_identity(row))
+    first_n3_alignment=None
     for earlier in originals[:cell_index]:
         completed=[g[-1] for g in dispatched if g[0]['identity']==r.episode_identity(earlier)
                    and g[-1]['event']=='valid' and g[-1].get('outcome_valid') is True]
@@ -266,7 +296,14 @@ def admission(plan, runtime, row, events, resources, root, runner):
         audit=r.read_json(audit_path)
         r.require(audit.get('accepted') is True and audit.get('evidence_complete') is True,
                   'N3 prior complete decision evidence audit rejected')
+        if earlier['profile']=='N3':
+            metrics=r.read_events(audit_path.with_name('eds_metrics.jsonl'))
+            r.require(len(metrics)==completed[0].get('metric_chunks'),'N3 prior native audit metric count differs')
+            alignment=native_audit_alignment(audit,metrics,require=r.require)
+            if earlier['episode_key']==originals[2]['episode_key']: first_n3_alignment=alignment
     if cell_index>=3:
+        r.require(first_n3_alignment and first_n3_alignment['active_decisions']>0,
+                  'N3 checkpoint lacks actual native-audited active feedback')
         checkpoint=read_attestation(contract.get('checkpoint_release'),plan,root,r,'qd-ed-n3-checkpoint-v1')
         r.require(checkpoint.get('checks')=={key:True for key in CHECKS} and checkpoint.get('runtime_tracking_validity')=='known_valid','N3 first-three correctness/activation checkpoint not released')
         attempts=[g[-1]['attempt_id'] for first in originals[:3] for g in dispatched

@@ -265,8 +265,11 @@ def summarize_metrics(metrics, terminal, audit, compute):
     overhead=compute.get('execution_feedback_seconds_by_scope')
     require(isinstance(overhead,dict) and all(isinstance(k,str) and finite(v) and v>=0 for k,v in overhead.items()),
         'N3 episode feedback overhead record missing/invalid')
+    from qd_ed_n3_plan import native_audit_alignment
+    native_alignment=native_audit_alignment(audit,metrics,require=require)
     result['n3'] = {'episode_feedback_seconds_by_scope':overhead,
-        'native_alignment_evidence':'Separate N3 native bundle audit and reviewed checkpoint required; scalar JSON consistency is not tensor byte/actual execution proof.',
+        'native_feedback_bundle_alignment':native_alignment,
+        'native_alignment_evidence':'Frozen N3 native bundle audit counts matched to metrics; reviewed search-activity checkpoint remains separate.',
         'records': records, 'applicable_chunks': sum(r['qd_quality_applicable'] for r in records),
         'inapplicable_chunks': sum(not r['qd_quality_applicable'] for r in records),
         'reason_counts': dict(Counter(r['qd_quality_reason'] for r in records)),

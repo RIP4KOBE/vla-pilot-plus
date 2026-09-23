@@ -81,12 +81,23 @@ def fixture(tmp_path):
     return root,plan,manifest,runtime,seeds,resources,attest
 
 
+def native_audit(checked=2,active=1):
+    return {'accepted':True,'evidence_complete':True,'n3_feedback_audit':{
+        'schema':'n3-native-feedback-audit-v1','scope':n.NATIVE_AUDIT_SCOPE,
+        'checked_decisions':checked,'active_previous_ack_verified':active,'inactive_decisions':checked-active,
+        'uncommitted_clears':0,'inactive_ack_clears_unknown':0,'complete_nonterminal_prefixes':checked}}
+
+
 def events(plan,runtime,row,attempt='a',*,terminal='valid',valid=True,seconds=1.,retry_of=None):
     output=Path(plan['artifact_root'])/attempt
     (output/'eds_eval').mkdir(parents=True,exist_ok=True)
-    (output/'eds_eval/decision-evidence-audit.json').write_text(json.dumps({'accepted':True,'evidence_complete':True}))
+    audit=native_audit(1,1) if row['profile']=='N3' else {'accepted':True,'evidence_complete':True}
+    (output/'eds_eval/decision-evidence-audit.json').write_text(json.dumps(audit))
+    if row['profile']=='N3':
+        metric={'qd_quality_mode':'executed_feedback_v1','qd_quality_applicable':True,'qd_feedback_active':True}
+        (output/'eds_eval/eds_metrics.jsonl').write_text(json.dumps(metric)+'\n')
     base={'attempt_id':attempt,'output_dir':str(output),'identity':r.episode_identity(row),'budget_bucket':row['budget_bucket'],
-          'retry_of':retry_of,'n3_cohort_id':n.COHORT,'n3_frozen_identity':n.binding(plan,runtime)}
+          'retry_of':retry_of,'n3_cohort_id':n.COHORT,'n3_frozen_identity':n.binding(plan,runtime),'metric_chunks':1}
     return [{**base,'event':'reserved'},{**base,'event':'dispatched'},
             {**base,'event':terminal,'outcome_valid':valid,'success':False,'gpu_process_wall_seconds':seconds,
              'retryable_infrastructure':terminal=='aborted',
@@ -120,6 +131,24 @@ def test_fixed_order_and_checkpoint_ignore_success_but_require_valid_and_activat
     with pytest.raises(r.GateError,match='prior valid'):n.admission(plan,runtime,rows[3],changed,resources,root,r)
     plan['n3_cohort']['checkpoint_release']=attest('qd-ed-n3-checkpoint-v1',checks={k:k!='substantive_qd_activation' for k in n.CHECKS},attempt_ids=['0','1','2'])
     with pytest.raises(r.GateError,match='checkpoint'):n.admission(plan,runtime,rows[3],journal,resources,root,r)
+
+
+@pytest.mark.parametrize('kind',['missing','unrecognized','no_history'])
+def test_accepted_generic_audit_or_no_actual_feedback_cannot_release_checkpoint(fixture,kind):
+    root,plan,_,runtime,_,resources,attest=fixture;rows=plan['episodes'];journal=[]
+    for i in range(3):journal+=events(plan,runtime,rows[i],str(i))
+    plan['n3_cohort']['checkpoint_release']=attest('qd-ed-n3-checkpoint-v1',checks={k:True for k in n.CHECKS},attempt_ids=['0','1','2'])
+    output=Path(journal[-1]['output_dir'])/'eds_eval'
+    if kind=='missing':
+        audit={'accepted':True,'evidence_complete':True}
+    else:
+        recognized=kind=='no_history'
+        metric={'qd_quality_mode':'executed_feedback_v1','qd_quality_applicable':recognized,'qd_feedback_active':False}
+        (output/'eds_metrics.jsonl').write_text(json.dumps(metric)+'\n')
+        audit=native_audit(1,0) if recognized else {'accepted':True,'evidence_complete':True}
+    r.durable_json(output/'decision-evidence-audit.json',audit)
+    with pytest.raises(r.GateError,match='native feedback audit|lacks actual native-audited'):
+        n.admission(plan,runtime,rows[3],journal,resources,root,r)
 
 
 def test_bounded_recorded_choice_required_before_first_dispatch(fixture):

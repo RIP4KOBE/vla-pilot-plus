@@ -16,7 +16,7 @@
     },
     {
       "path": "experiments/iteration_003_executed_feedback/runner/README.md",
-      "sha256": "34820224197f81b7ba370b28f0226b0a63c10c82fcbd11cc0b5412a143f80ec0"
+      "sha256": "a1aa71e74c86362a2ca6f6f47719067601fee7668f800f4cba05b302dfac2b67"
     },
     {
       "path": "scripts/qd_ed_available_gpu_queue.py",
@@ -28,37 +28,45 @@
     },
     {
       "path": "scripts/qd_ed_n3_plan.py",
-      "sha256": "009034e754589aa06c99a4fc067888bfc89bb46cf96b534b3c1d2a08f2ac272e"
+      "sha256": "9a64eeda268b0eea70d355ec3bd3966014030437303684ce69cb6cb3e1aa5973"
     },
     {
       "path": "scripts/qd_ed_n3_report.py",
-      "sha256": "0bf346586d5c014369c34f9359a73ea0c5fb8e3b8f55490d7cfe2e8941a97656"
+      "sha256": "5e380a1ccd78314cbe5e61a9a78c36dcd812ec1a59e5fd3f804e835442237c30"
     },
     {
       "path": "scripts/qd_ed_n3_supervise.py",
-      "sha256": "23682b0b853c7c0f330f239f5a97d889e62c73bf8034493beeff6a0a81922a7a"
+      "sha256": "a485e355784d6f762c26a3bcec1d392c97f12d2f9ec2a5fa93d95db44162659e"
     },
     {
       "path": "tests/test_qd_ed_n3_plan.py",
-      "sha256": "9b3a181e945461db7efa586186a69600a4a26598b634b308a214a4d55a6fd726"
+      "sha256": "30a553c91fda80b3b17e90fbc2436137dd338fd22b8acb322ef01c8506606213"
     },
     {
       "path": "tests/test_qd_ed_n3_report.py",
-      "sha256": "f65e6c3df8cb8951962a2293719461cd4c75f4bd0b0ee89d5451a0dda5db54b7"
+      "sha256": "ef1ae0f05d8c67f4c6e80ce7913a01f1b48b4001dc49ad272e5a24df79e72afa"
     },
     {
       "path": "tests/test_qd_ed_n3_supervise.py",
-      "sha256": "469486ba8831f0267bac7e9fe51e5ec6d0b7041a141f93cc1ca9372840ab16ae"
+      "sha256": "9a1cf4b604f4af1f1055cfc2a17ee9b19bf23feba2b02588601e7bfdcd3d4872"
     }
   ],
   "gpu_provider_models_called": false,
   "integration_pending": [
-    "N3 production and specialized native feedback auditor from separate worktree",
+    "Root integrates N3 production/native auditor commit37ee19b plus this schema/count binding",
     "Root final source/runtime/model/config freeze",
     "Authorized conditional recorded activity evidence",
     "First3 native bundle correctness/activity review before remaining27 release"
   ],
   "n2_source_and_profiles_unchanged": true,
+  "native_audit_binding": {
+    "active_previous_ack_verified": "exactly metrics active count",
+    "auditor_sha256": "dcfffa225b16f40cc00ac4bd21eae1d080cc113668dbeabc240d2ccda50fddd6",
+    "checked_decisions": "exactly metrics applicable count",
+    "full_N_production_integration_pending_root": true,
+    "schema": "n3-native-feedback-audit-v1",
+    "source_commit": "37ee19b71a20a9ca7f94d0088039a3b334b6f195"
+  },
   "no_phase_promotion": true,
   "production_core_main_unchanged": true,
   "protocol_sha256": "05c83a8eb3801d4a4c4f41bee28c531505a7767aa56ba482399013068679b931",
@@ -73,6 +81,6 @@
     "tests/test_qd_ed_final_runner.py::test_legal_task_failure_is_not_a_retryable_infrastructure_failure",
     "tests/test_qd_ed_final_runner.py::test_dispatched_attempts_and_aborted_time_count_once"
   ],
-  "tests_passed": 56,
-  "wall_seconds": 0.6
+  "tests_passed": 69,
+  "wall_seconds": 0.53
 }
