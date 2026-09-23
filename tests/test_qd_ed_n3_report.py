@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 
 import pytest
-from test_qd_ed_n3_plan import r,n,load,ROOT,fixture,events
+from test_qd_ed_n3_plan import r,n,load,ROOT,fixture,events,native_audit
 
 sys.path.insert(0,str(ROOT/'scripts'))
 d=load('n3_report_tests',ROOT/'scripts/qd_ed_n3_report.py')
@@ -139,11 +139,30 @@ def metric_pair():
 
 def test_real_feedback_timing_is_separate_from_recognized_nohistory():
     metrics,terminal=metric_pair()
-    result=d.summarize_metrics(metrics,terminal,{'accepted':True},{'guided_chunks':2,'execution_feedback_seconds_by_scope':{}})
+    result=d.summarize_metrics(metrics,terminal,native_audit(),{'guided_chunks':2,'execution_feedback_seconds_by_scope':{}})
     assert result['n3']['applicable_chunks']==2 and result['n3']['feedback_active_chunks']==1
     assert result['n3']['quality_changed_candidates']==176
     assert result['n3']['feedback_overhead_seconds']['complete_total']==.02
     assert result['n3']['selection_change_count'] is None
+    alignment=result['n3']['native_feedback_bundle_alignment']
+    assert alignment['status']=='verified' and alignment['active_decisions']==1
+    assert alignment['search_activity_or_checkpoint_release'] is False
+
+
+@pytest.mark.parametrize('mutate',[
+    lambda a:a.pop('n3_feedback_audit'),
+    lambda a:a['n3_feedback_audit'].update(schema='old-generic-audit'),
+    lambda a:a['n3_feedback_audit'].update(scope='different claim'),
+    lambda a:a['n3_feedback_audit'].update(checked_decisions=1),
+    lambda a:a['n3_feedback_audit'].update(active_previous_ack_verified=2,inactive_decisions=0),
+    lambda a:a['n3_feedback_audit'].update(active_previous_ack_verified=0,inactive_decisions=2),
+    lambda a:a['n3_feedback_audit'].update(inactive_ack_clears_unknown=True),
+    lambda a:a['n3_feedback_audit'].update(uncommitted_clears=-1),
+])
+def test_native_audit_requires_exact_counts_and_schema_not_generic_acceptance(mutate):
+    metrics,terminal=metric_pair();audit=native_audit();mutate(audit)
+    with pytest.raises(ValueError,match='native feedback audit'):
+        d.summarize_metrics(metrics,terminal,audit,{'guided_chunks':2,'execution_feedback_seconds_by_scope':{}})
 
 
 @pytest.mark.parametrize('mutate,message',[
@@ -167,8 +186,10 @@ def test_unknown_provider_preserved_as_inactive_not_certified_feedback():
     m.update(qd_quality_applicable=False,qd_quality_reason='unsupported_provider',qd_quality_batches=[],
         qd_feedback_context={},qd_feedback_selected={},qd_feedback_reason='unsupported_provider')
     terminal.update(metric_chunks=1,score_batches=11,candidate_evaluations=176)
-    result=d.summarize_metrics([m],terminal,{}, {'guided_chunks':1,'execution_feedback_seconds_by_scope':{}})
+    result=d.summarize_metrics([m],terminal,{'accepted':True,'evidence_complete':True}, {'guided_chunks':1,'execution_feedback_seconds_by_scope':{}})
     assert result['n3']['feedback_active_chunks']==0 and result['n3']['inapplicable_chunks']==1
+    assert result['n3']['native_feedback_bundle_alignment']['status']=='not_applicable'
+    assert result['n3']['native_feedback_bundle_alignment']['search_activity_or_checkpoint_release'] is False
 
 
 def test_multiple_predispatch_records_original_and_recovery_keep_full_journal_costs(fixture):

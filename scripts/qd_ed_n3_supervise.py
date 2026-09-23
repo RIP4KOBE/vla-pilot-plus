@@ -94,7 +94,7 @@ def frozen_hardware(r,q):
 
 
 @contextmanager
-def audited_calls(r,audit):
+def audited_calls(r,audit,n):
     original=r.run_plan
     def run(*args,**kwargs):
         # Exactly one episode per queue call; audit before any later dispatch.
@@ -112,9 +112,20 @@ def audited_calls(r,audit):
                 'parent_ru_maxrss_before_kib':before,
                 'parent_ru_maxrss_after_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
                 'memory_scope':'Linux cumulative parent peak including imports/queue/prior audits; not audit-exclusive; peak difference is not memory usage'}
+            alignment_error=None
+            if report.get('accepted') is True and report.get('evidence_complete') is True and result['identity']['profile']=='N3':
+                try:
+                    metrics=r.read_events(output/'eds_eval/eds_metrics.jsonl')
+                    r.require(len(metrics)==result.get('metric_chunks'),'N3 native audit metric count differs')
+                    report['wrapper_observation']['native_feedback_bundle_alignment']=n.native_audit_alignment(report,metrics,require=r.require)
+                except Exception as exc:
+                    alignment_error=type(exc).__name__
+                    report['wrapper_observation']['native_feedback_bundle_alignment']={'status':'failed','error_type':alignment_error}
             r.durable_json(output/'eds_eval/decision-evidence-audit.json',report)
             r.require(report.get('accepted') is True and report.get('evidence_complete') is True,
                 'N3 decision evidence incomplete; later undispatched rows stopped; original terminal preserved')
+            r.require(alignment_error is None,
+                'N3 native feedback audit alignment failed; later undispatched rows stopped; original terminal preserved')
         return results
     r.run_plan=run
     try:yield
@@ -154,7 +165,7 @@ def main():
         with support.shared_runner_lease(r,q,ROOT,status,args.plan,monitor,check,episode_keys=keys):
             state=r.read_state(ROOT/'research-state.yaml')
             r.require(q.candidate_indices(state)==[3] and r.authorized_gpu(state)==3,'N3 GPU3-only state required')
-            with support.supervise_calls(r,q,monitor,check),frozen_hardware(r,q),audited_calls(r,audit_decision_evidence.audit_episode):
+            with support.supervise_calls(r,q,monitor,check),frozen_hardware(r,q),audited_calls(r,audit_decision_evidence.audit_episode,n):
                 with n.supervised_dispatch(plan,keys,ROOT,r,q,monitor,status):
                     entered=True
                     result=q.run_queue(args.plan,keys,poll_seconds=30,idle_seconds=120,status_path=status,root=ROOT)

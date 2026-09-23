@@ -6,20 +6,46 @@ from types import SimpleNamespace
 import pytest
 
 from test_qd_ed_n3_plan import r,n,load,fixture,ROOT,events
+from test_qd_ed_n3_plan import native_audit
 
 s=load('n3_test_supervisor',ROOT/n.SUPERVISOR)
 
 
+@pytest.mark.parametrize('aligned',[True,False])
+def test_native_count_gate_runs_after_accounting_and_stops_without_rewriting_terminal(tmp_path,aligned):
+    import json
+    output=tmp_path/'attempt';(output/'eds_eval').mkdir(parents=True)
+    metric={'qd_quality_mode':'executed_feedback_v1','qd_quality_applicable':True,'qd_feedback_active':False}
+    (output/'eds_eval/eds_metrics.jsonl').write_text(json.dumps(metric)+'\n')
+    terminal={'event':'valid','outcome_valid':True,'identity':{'profile':'N3'},'metric_chunks':1,'output_dir':str(output)}
+    saved=copy.deepcopy(terminal);calls=[]
+    def original(*args,**kwargs):calls.append('terminal_accounted');return [terminal]
+    fake=SimpleNamespace(run_plan=original,require=r.require,durable_json=r.durable_json,read_events=r.read_events)
+    report=native_audit(1,0)
+    if not aligned:report['n3_feedback_audit']['active_previous_ack_verified']=1
+    def audit(*args):
+        assert calls==['terminal_accounted'];calls.append('audit');return copy.deepcopy(report)
+    with s.audited_calls(fake,audit,n):
+        if aligned:assert fake.run_plan('plan',episode_keys=['one'])==[saved]
+        else:
+            with pytest.raises(r.GateError,match='original terminal preserved'):
+                fake.run_plan('plan',episode_keys=['one'])
+    assert terminal==saved and calls==['terminal_accounted','audit'] and fake.run_plan is original
+    record=r.read_json(output/'eds_eval/decision-evidence-audit.json')
+    assert record['accepted'] is True and record['n3_feedback_audit']==report['n3_feedback_audit']
+    assert record['wrapper_observation']['native_feedback_bundle_alignment']['status']==('verified' if aligned else 'failed')
+
+
 def test_audit_occurs_after_original_terminal_and_never_rewrites_it(tmp_path):
     output=tmp_path/'attempt';(output/'eds_eval').mkdir(parents=True)
-    outcome={'event':'valid','outcome_valid':True,'success':False,'output_dir':str(output)}
+    outcome={'event':'valid','outcome_valid':True,'success':False,'output_dir':str(output),'identity':{'profile':'C0'}}
     saved=copy.deepcopy(outcome);calls=[]
     def original(*args,**kwargs):calls.append('terminal_accounted');return [outcome]
     fake=SimpleNamespace(run_plan=original,require=r.require,durable_json=r.durable_json)
     def audit(*args):
         assert calls==['terminal_accounted'];calls.append('audit')
         return {'accepted':True,'evidence_complete':True}
-    with s.audited_calls(fake,audit):assert fake.run_plan('plan',episode_keys=['one'])==[saved]
+    with s.audited_calls(fake,audit,n):assert fake.run_plan('plan',episode_keys=['one'])==[saved]
     assert fake.run_plan is original and outcome==saved and calls==['terminal_accounted','audit']
     record=r.read_json(output/'eds_eval/decision-evidence-audit.json')
     assert record['wrapper_observation']['audit_wall_seconds']>=0
@@ -30,7 +56,7 @@ def test_audit_occurs_after_original_terminal_and_never_rewrites_it(tmp_path):
                                     {'accepted':True,'evidence_complete':False},None])
 def test_incomplete_or_broken_audit_stops_after_accounting_without_retry(tmp_path,report):
     output=tmp_path/'attempt';(output/'eds_eval').mkdir(parents=True)
-    terminal={'event':'valid','outcome_valid':True,'success':False,'output_dir':str(output)}
+    terminal={'event':'valid','outcome_valid':True,'success':False,'output_dir':str(output),'identity':{'profile':'C0'}}
     calls=[]
     def original(*args,**kwargs):calls.append('dispatch_once');return [terminal]
     fake=SimpleNamespace(run_plan=original,require=r.require,durable_json=r.durable_json)
@@ -38,7 +64,7 @@ def test_incomplete_or_broken_audit_stops_after_accounting_without_retry(tmp_pat
         if report is None:raise OSError('diagnostic failure')
         return dict(report)
     with pytest.raises(r.GateError,match='original terminal preserved'):
-        with s.audited_calls(fake,audit):fake.run_plan('plan',episode_keys=['one'])
+        with s.audited_calls(fake,audit,n):fake.run_plan('plan',episode_keys=['one'])
     assert calls==['dispatch_once'] and terminal['outcome_valid'] is True and fake.run_plan is original
     assert (output/'eds_eval/decision-evidence-audit.json').exists()
 
@@ -48,7 +74,7 @@ def test_invalid_original_terminal_does_not_run_audit_or_create_retry():
     def original(*args,**kwargs):calls.append('terminal_invalid_accounted');raise r.GateError('original invalid gate')
     fake=SimpleNamespace(run_plan=original,require=r.require,durable_json=r.durable_json)
     with pytest.raises(r.GateError,match='original invalid'):
-        with s.audited_calls(fake,lambda *_:calls.append('unexpected_audit')):
+        with s.audited_calls(fake,lambda *_:calls.append('unexpected_audit'),n):
             fake.run_plan('plan',episode_keys=['one'])
     assert calls==['terminal_invalid_accounted'] and fake.run_plan is original
 
