@@ -81,10 +81,14 @@ def cellkey(row):
 
 
 def plan_contract(plan):
-    from qd_ed_n3_plan import LIMITS
+    from qd_ed_n3_plan import LIMITS, ALLOCATION, BUDGET_ALLOCATION
     require(plan['n3_cohort']['cohort_id'] == COHORT and plan['n3_cohort']['limits'] == LIMITS
         and set(plan['candidate_profiles']) == {'N3'}
         and plan['n3_cohort']['protocol']['sha256'] == sha(PROTOCOL), 'wrong cohort/protocol/limits')
+    require(plan['n3_cohort'].get('budget_allocation')==BUDGET_ALLOCATION
+        and plan['n3_cohort'].get('budget_allocation_amendment')=={'path':ALLOCATION,'sha256':sha(ROOT/ALLOCATION)}
+        and any(x=={'path':ALLOCATION,'sha256':sha(ROOT/ALLOCATION)} for x in plan['code_files']),
+        'N3 prospective budget allocation/amendment differs')
     rows = [r for r in plan['episodes'] if not r.get('retry_of')]
     require([cellkey(r) for r in rows] == [(task, p) for task in range(10) for p in PROFILES], 'original 30-cell order differs')
     require(len({r['episode_key'] for r in plan['episodes']}) == len(plan['episodes']), 'duplicate planned episode key')
@@ -94,10 +98,12 @@ def plan_contract(plan):
                 'matched task seed/init differs')
     for row in rows:
         require(row['split'] == 'dev' and row['iteration'] == COHORT, 'non-Dev cell')
+        require(row['budget_bucket']==BUDGET_ALLOCATION['original_by_profile'][row['profile']], 'N3 original arm budget bucket differs')
     recoveries = [r for r in plan['episodes'] if r.get('retry_of')]
     require(len(recoveries) <= 4 and len({cellkey(r) for r in recoveries}) == len(recoveries), 'recovery allowance differs')
     by_cell = {cellkey(r): r for r in rows}
     for row in recoveries:
+        require(row['budget_bucket']==BUDGET_ALLOCATION['retry_bucket'],'N3 retry budget bucket differs')
         require(cellkey(row) in by_cell and all(row[k] == by_cell[cellkey(row)][k] for k in IDENTITY), 'recovery scientific identity differs')
     return rows
 
@@ -111,6 +117,7 @@ def validate_record_identity(terminal, plan, plan_sha):
         and terminal['runtime_manifest_sha256'] == plan['runtime_manifest_sha256']
         and terminal['runtime_inventory_sha256'] == plan['runtime_inventory_sha256']
         and terminal['init_row_sha256'] == row['init_row_sha256']
+        and terminal['budget_bucket'] == row['budget_bucket']
         and terminal.get('retry_of') == row.get('retry_of'), 'terminal frozen condition differs')
     binding = terminal.get('n3_frozen_identity', {})
     require(terminal.get('n3_cohort_id') == COHORT and binding.get('cohort_id') == COHORT
@@ -119,7 +126,7 @@ def validate_record_identity(terminal, plan, plan_sha):
         and binding.get('accounting_clarification_sha256') == plan['n3_cohort']['accounting_clarification']['sha256']
         and binding.get('source_files_sha256') == hashlib.sha256(json.dumps(plan['code_files'],sort_keys=True,separators=(',',':')).encode()).hexdigest()
         and binding.get('resource_contract_sha256') == hashlib.sha256(json.dumps({k:plan['n3_cohort'][k] for k in
-            ('limits','health_resources','runtime_prerequisites')},sort_keys=True,separators=(',',':')).encode()).hexdigest()
+            ('limits','health_resources','runtime_prerequisites','budget_allocation','budget_allocation_amendment')},sort_keys=True,separators=(',',':')).encode()).hexdigest()
         and binding.get('candidate_sha256') == plan['candidate_profiles']['N3']['sha256'], 'N3 binding differs')
     return row
 
@@ -394,7 +401,7 @@ def load_attempt(spec, plans):
     require(Path(spec['terminal']['path']).resolve() == output/'attempt-result.json', 'terminal location differs')
     # Preserve exact original public result without copying command/configuration objects.
     preserved = {k:terminal[k] for k in ('attempt_id','episode_key','identity','event','success','outcome_valid','task_failure',
-        'failure_class','reason','retryable_infrastructure','retry_of','time_unix','gpu_process_wall_seconds','output_dir',
+        'failure_class','reason','retryable_infrastructure','retry_of','time_unix','gpu_process_wall_seconds','output_dir','budget_bucket',
         'n3_frozen_identity','n3_recovery_eligibility','n3_episode_dispatched','failure_detail','gpu_monitor_timeout','required_cost_telemetry_complete','compute_outcome',
         'stage_backend','stage_model','stage_condition','stage_failed_queries','stage_successful_queries','stage_query_events',
         'provider_token_usage_complete',*COSTS) if k in terminal}

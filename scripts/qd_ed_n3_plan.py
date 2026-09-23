@@ -21,6 +21,9 @@ COHORT = 'N3_EXECUTED_FEEDBACK_DEV_20260923'
 PROTOCOL = 'experiments/iteration_003_executed_feedback/protocol.md'
 # Original study-wide interpretation: healthchecks count hours, not episode attempts.
 CLARIFICATION = 'experiments/iteration_002_executed_quality/accounting-clarification.md'
+ALLOCATION = 'experiments/iteration_003_executed_feedback/accounting-clarification.md'
+BUDGET_ALLOCATION = {'original_by_profile':{'C0':'baseline','Q0':'development','N3':'development'},
+                     'retry_bucket':'recovery'}
 PROFILE = 'configs/qd_ed_final/candidate_n3.json'
 OBSERVED = 'configs/qd_ed_final/n3_observed_baseline_profiles.json'
 MODULE = 'scripts/qd_ed_n3_plan.py'
@@ -41,7 +44,7 @@ CHECKS = ('finite_action','source_compute','raw_stage_separation','substantive_q
 NATIVE_AUDIT_SCOPE = ('recognized N3 decisions; native canonical selected projection/origin/raw; '
     'nonterminal acknowledged command/EEF; immediate complete predecessor/residual; '
     'explicit inactive clears and terminal endpoints are excluded from usable feedback; no task-effect claim')
-REQUIRED = {MODULE, SUPERVISOR, REPORT, SUPPORT, DEPENDENCIES, PROFILE, OBSERVED, PROTOCOL, CLARIFICATION, 'core/qd_executed_quality.py','core/qd_executed_feedback.py',
+REQUIRED = {MODULE, SUPERVISOR, REPORT, SUPPORT, DEPENDENCIES, PROFILE, OBSERVED, PROTOCOL, CLARIFICATION, ALLOCATION, 'core/qd_executed_quality.py','core/qd_executed_feedback.py',
             'main.py','core/keypoint_tracker.py','core/env_adapters/libero_adapter.py',
             'core/qd_ed.py','core/rdt_policy_steer.py','core/eds_eval_metrics.py','configs/config.yaml',
             'scripts/qd_ed_available_gpu_queue.py','scripts/qd_ed_gpu_probe.py','scripts/qd_ed_runtime_setup.py',
@@ -85,7 +88,7 @@ def rows_from_dev(seeds):
         for profile in ('C0','Q0','N3'):
             rows.append({**{key:matches[0][key] for key in FIELDS},'task_id':task,'profile':profile,
                 'episode_key':f'n3_dev_t{task:02d}_{profile.lower()}_20260923','iteration':COHORT,
-                'split':'dev','seed_block':'dev','budget_bucket':'development','timeout_seconds':1800})
+                'split':'dev','seed_block':'dev','budget_bucket':BUDGET_ALLOCATION['original_by_profile'][profile],'timeout_seconds':1800})
     return rows
 
 
@@ -114,7 +117,7 @@ def binding(plan, runtime):
         'stage_public_config_sha256':runtime['frozen_stage_provider']['public_config_sha256'],
         'source_files_sha256':source_identity(plan),
         'resource_contract_sha256':hashlib.sha256(json.dumps({key:contract[key] for key in
-            ('limits','health_resources','runtime_prerequisites')},sort_keys=True,separators=(',',':')).encode()).hexdigest()}
+            ('limits','health_resources','runtime_prerequisites','budget_allocation','budget_allocation_amendment')},sort_keys=True,separators=(',',':')).encode()).hexdigest()}
 
 
 def validate_contract(plan, manifest, runtime, seeds, root, runner):
@@ -124,11 +127,12 @@ def validate_contract(plan, manifest, runtime, seeds, root, runner):
     r.require(contract.get('schema')=='qd-ed-n3-cohort-v1' and contract.get('cohort_id')==COHORT,
               'N3 requires its explicit prospective cohort contract')
     r.require(contract.get('limits')==LIMITS, 'N3 local resource limits differ')
+    r.require(contract.get('budget_allocation')==BUDGET_ALLOCATION,'N3 original-arm budget allocation differs')
     r.require(plan.get('phase_authorization')=={'dev':True,'validation':False,'formal':False}, 'N3 Dev-only phase gate differs')
     paths={x['path']:x['sha256'] for x in plan['code_files']}
     r.require(REQUIRED<=set(paths), 'N3 runtime source fingerprints missing')
     r.require(len(paths)==len(plan['code_files']), 'N3 duplicate source fingerprints')
-    for key,relative in [('protocol',PROTOCOL),('accounting_clarification',CLARIFICATION)]:
+    for key,relative in [('protocol',PROTOCOL),('accounting_clarification',CLARIFICATION),('budget_allocation_amendment',ALLOCATION)]:
         r.require(contract.get(key)=={'path':relative,'sha256':paths[relative]} and
                   r.digest(root/relative)==paths[relative], 'N3 protocol/clarification differs')
     r.require(set(plan['candidate_profiles'])=={'N3'}, 'N3 matrix cannot include another candidate')
@@ -397,7 +401,7 @@ def main():
         observational_overrides={'main.decision_evidence.enabled':True},
         decision_evidence_gate='stop_remaining_on_incomplete_preserve_task_outcome',resource_amendment=PROTOCOL,
         candidate_profiles={'N3':{'path':str(ROOT/PROFILE),'sha256':r.digest(ROOT/PROFILE)}})
-    scientific={*base['scientific_config_files'],PROFILE,OBSERVED,PROTOCOL,CLARIFICATION}
+    scientific={*base['scientific_config_files'],PROFILE,OBSERVED,PROTOCOL,CLARIFICATION,ALLOCATION}
     paths={x['path'] for x in base['code_files']} | r.REQUIRED_CODE | REQUIRED | scientific
     for path in paths:
         actual=r.owned(ROOT/path,ROOT)
@@ -413,6 +417,8 @@ def main():
     plan['n3_cohort']={'schema':'qd-ed-n3-cohort-v1','cohort_id':COHORT,'limits':LIMITS,
         'protocol':{'path':PROTOCOL,'sha256':r.digest(ROOT/PROTOCOL)},
         'accounting_clarification':{'path':CLARIFICATION,'sha256':r.digest(ROOT/CLARIFICATION)},
+        'budget_allocation':copy.deepcopy(BUDGET_ALLOCATION),
+        'budget_allocation_amendment':{'path':ALLOCATION,'sha256':r.digest(ROOT/ALLOCATION)},
         'health_resources':[{'resource_id':identifier,'scope':'reused_prior'} for identifier in
             dict.fromkeys([runtime['cuda_egl_probe']['resource_id'],health['resource_id']])],
         'runtime_prerequisites':{'boot_id':BOOT,'references':prior,
