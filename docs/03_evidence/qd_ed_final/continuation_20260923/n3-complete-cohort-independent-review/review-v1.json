@@ -1,0 +1,149 @@
+{
+  "schema": "n3-complete-cohort-independent-review-v1",
+  "status": "PASS_NO_BLOCKER_FOR_PREPARATION",
+  "actual_read_authorized": false,
+  "scope": "Source and explicitly synthetic wrapper review only; no new actual cohort, episode, derived science, image or native bundle reads in this review task.",
+  "reviewed_artifacts": {
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-post-dev-diagnostic-preparation/read_full_dev.py": "54acac4ff3ca6414ff1b80f52de91fe3a43a3f326bc402e65514168f54c6f6b7",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-post-dev-diagnostic-preparation/protocol-v1.md": "8157d29e07df388ad8e5a28abce1a8ef825eb2ff1923ee13da55976f7937bca4",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-post-dev-diagnostic-preparation/dependencies-v1.json": "f37989596a2ab1060d11798f6c14d0df66055c34d212a9b39377917365d0b5de",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-post-dev-diagnostic-preparation/input-schema-v1.json": "274d5992f59ca61e16f7fc887f97a3e3ab51a03b3db922bf6ce0c37c2689a7f6",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-post-dev-diagnostic-preparation/test_read_full_dev.py": "e825eb4a918b003d319c889b53ac7d57ce528f0fee915707e2bbbb8674448a83",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/read_closed_loop.py": "1212c3c9675403dc0e8f3b97948ab8d6d9a5f873ccfa615564041da3fe5c309f",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/full-dev-closed-loop-preparation/read_full_dev.py": "b19331ff6861210056858d56da6dcbd2d6a24f06fc91e24dcc1beb0d4df18b3e",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/selected-tracking-preparation/read_selected_tracking.py": "a33714747a47415c8a8d64ba3297a016550e95b6f54a174a1654875603deec26",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-first3-review-preparation/review_first3.py": "a2ee7ae750805d84810badc08333c7944f8cd4b895e0ce0d23dfb1d5a90ab9b0",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_n3_report.py": "62b9afbbe6d8909d6414cdc9423237f2815a5274e3f076cfc1b3226d9998a79a",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/selected-tracking-preparation/test_selected_tracking.py": "17840cc96b4480ffce8075f1f227439db648f6a512b1ed06f9e67780acdbed25",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-first3-review-preparation/test_review_first3.py": "d78290399bbfa6b4b5e1efa56726a65082a69695926bc56e32f6ba2c8f937a4f"
+  },
+  "production_source_checks": [
+    {
+      "path": "main.py",
+      "sha256": "f9add8568d45ec799e4030b1108f069f4af88bf3b63c62d7f836d59539a427a7",
+      "git_commit": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+      "live_and_git_object_match": true
+    },
+    {
+      "path": "core/rdt_policy_steer.py",
+      "sha256": "05d9afca7cea50ea943fd8a32f4cd888c6d37df353ec4f896c51f0c5e2e4a144",
+      "git_commit": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+      "live_and_git_object_match": true
+    },
+    {
+      "path": "core/qd_ed.py",
+      "sha256": "5c86385a8271c3311aa715332d1307850b18ec37486f20ac53c19747fe4f207b",
+      "git_commit": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+      "live_and_git_object_match": true
+    },
+    {
+      "path": "core/qd_executed_quality.py",
+      "sha256": "d83dbd53e75708f3a6e71cab9c0814dc82a42c68898d53cb370df37d9a8c946b",
+      "git_commit": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+      "live_and_git_object_match": true
+    },
+    {
+      "path": "core/qd_executed_feedback.py",
+      "sha256": "33d1e38212741ccbf24e150c2b9739cc026ed553925ab7084d9e8b8d32e090ab",
+      "git_commit": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+      "live_and_git_object_match": true
+    },
+    {
+      "path": "core/decision_evidence.py",
+      "sha256": "3af145738e3b22a8bec7484d0c33ba9a81dffbf58335b61682eb0ddf43b3cb8c",
+      "git_commit": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+      "live_and_git_object_match": true
+    },
+    {
+      "path": "core/eds_eval_metrics.py",
+      "sha256": "574038725988ad258960af27d83a36ad81898e550888592d775c14b6df4754b2",
+      "git_commit": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+      "live_and_git_object_match": true
+    },
+    {
+      "path": "core/keypoint_tracker.py",
+      "sha256": "c60b6f8badb420bf98ae8908cb20b3f51b1c41ffa5df9d3e214f8247f0a2aa66",
+      "git_commit": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+      "live_and_git_object_match": true
+    },
+    {
+      "path": "core/env_adapters/libero_adapter.py",
+      "sha256": "f2130791c4c975603d8bab4fad4739374cbbba967df2fa2334ea881b6557d6bf",
+      "git_commit": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+      "live_and_git_object_match": true
+    },
+    {
+      "path": "scripts/audit_decision_evidence.py",
+      "sha256": "dcfffa225b16f40cc00ac4bd21eae1d080cc113668dbeabc240d2ccda50fddd6",
+      "git_commit": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+      "live_and_git_object_match": true
+    },
+    {
+      "path": "experiments/iteration_003_executed_feedback/protocol.md",
+      "sha256": "05c83a8eb3801d4a4c4f41bee28c531505a7767aa56ba482399013068679b931",
+      "git_commit": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+      "live_and_git_object_match": true
+    },
+    {
+      "path": "scripts/qd_ed_n3_report.py",
+      "sha256": "62b9afbbe6d8909d6414cdc9423237f2815a5274e3f076cfc1b3226d9998a79a",
+      "git_commit": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+      "live_and_git_object_match": true
+    },
+    {
+      "path": "scripts/qd_ed_n3_plan.py",
+      "sha256": "ca967ad486092f72b93cd169895b137efdba1411f6a62487a1d21b9e9c557bb1",
+      "git_commit": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+      "live_and_git_object_match": true
+    },
+    {
+      "path": "core/rdt_libero_action_converter.py",
+      "sha256": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d",
+      "git_commit": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+      "live_and_git_object_match": true
+    }
+  ],
+  "independent_tests": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-complete-cohort-independent-review/test_independent_adapter.py",
+    "sha256": "5a159a87a654c7eed6b28f9207fae7289534b35faafb48c687d2f63af70d367d",
+    "passed": 5,
+    "seconds": 0.04,
+    "exit_code": 0,
+    "stdout": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-complete-cohort-independent-review/pytest-v1.stdout.txt",
+    "stdout_sha256": "ad430bcd751b836a91fab4ff65c168e7e4f252c79243c40745308b866b554cb7",
+    "kind": "new wrapper-only tests; consumer stub used solely to verify branch/length/provenance plumbing, not to claim arithmetic or runtime evidence"
+  },
+  "author_validation": {
+    "reported_passed": 17,
+    "reported_seconds": 1.93,
+    "independently_rerun": false,
+    "coverage": "all30 source/member/recovery/snapshot rejection before decoding, legal recovery without invalid reads, real synthetic terminal m3/reset/absent-empty Stage, runtime inactive with eligible structural pair, Unknown aggregation, duplicate-native singleton final, missing-converter inventory rejection"
+  },
+  "counts_caution": "17 author plus5 independent checks have overlapping coverage; no old pure suite or actual reader rerun, no performance evidence.",
+  "resolved_findings": [
+    {
+      "issue": "New runtime output omitted existing previous/selected provenance promised by protocol",
+      "resolution": "added original metric/selection-event sequence and previous/selected/context metadata without arithmetic or new reads"
+    },
+    {
+      "issue": "Selected-tracking source closure omitted action converter",
+      "resolution": "expected core/rdt_libero_action_converter.py SHA added to dependency inventory gate; unchanged525506-to-bd618b9 source verified; no live queue/source change"
+    }
+  ],
+  "review_conclusions": {
+    "authority": "Exact ordered task0..9 x C0/Q0/N3 and30 unique accepted representatives; metadata/source/own-plan/recovery and every root audit-status-index snapshot bind before all bundle hashes and before first tensor decode. Original N3 report remains outcome/cost/promotion authority.",
+    "dependencies": "Fixed helper bytes checked; only pure chronology/actual-prefix/native selected-tracking/temporal transport/final-consumer functions reused. Reporter imports after separate root metadata-hash authorization equals its source inventory/script identity. No old CLI/admission or auditor is called.",
+    "timing": "Original actual m, pre-reset outcome, terminal reset sequence and interval conventions retained; runtime eligibility/provenance stays separate from retrospective structural pairs. Controls use not_applicable, not failure.",
+    "math": "Unchanged FP64 origin-centered/absolute selected errors and previous full8 residual*(i/8) versus zero for actual i<=m. No fitted gain/window, clipping, new scorer or nativeT7 correction.",
+    "activity": "Original first3-v2 helper remains exact; all active N3 decisions, canonical/parent associations and final native duplicates/ties preserved. Only actual-selected-relative final consumer preference/tie change or strict raw gap qualifies; canonical and nonselected-only comparison changes remain descriptive.",
+    "missingness": "Absent and present-empty Stage stay distinct; old typed optional-event Unknown logic unchanged. No zero filling of absent eligible pair means; all30 outputs required before interpretation."
+  },
+  "practical_limits": [
+    "Root must separately review final complete report and exact late-bound input/snapshot/authorization before any actual run; this PASS is preparation only.",
+    "Accepted-audit snapshot reuse relies on root exact immutable binding; this adapter deliberately does not rerun the native auditor.",
+    "Native join/shape/identity contradictions fail closed and preserve incomplete diagnostic without changing original episode validity.",
+    "EEF run origin, first post-action gripper state and within-run command changes retain different original interval conventions.",
+    "Float64 retrospective transport is not N3 native T7 quality and cannot prove deployed benefit; runtime tracker metadata does not establish physical keypoint attachment or contact.",
+    "Normalized Stage arguments, physical causes and counterfactual action/task outcomes remain Unknown."
+  ]
+}
