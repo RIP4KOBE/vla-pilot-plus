@@ -430,6 +430,17 @@ class EDSChunkMetrics:
     qd_degenerate_fallback_used: bool = False
     qd_degenerate_fallback_reason: str | None = None
     qd_degenerate_reward_value: float | None = None
+    qd_quality_mode: str = "provider"
+    qd_quality_applicable: bool = False
+    qd_quality_reason: str = "provider_mode"
+    qd_quality_target_index: int | None = None
+    qd_quality_identity: dict = field(default_factory=dict)
+    qd_quality_batches: list[dict] = field(default_factory=list)
+    qd_quality_changed_candidates: int = 0
+    qd_selected_raw_reward: float | None = None
+    qd_final_best_raw_reward: float | None = None
+    qd_selected_raw_gap: float | None = None
+    qd_best_observed_raw_reward: float | None = None
     qd_descriptor: str = "target_relative_endpoint_xy"
     qd_descriptor_axes: list[dict[str, str]] = field(default_factory=list)
     qd_descriptor_bounds: list[list[float]] = field(default_factory=list)
@@ -516,6 +527,12 @@ class EDSChunkMetrics:
 
     def to_jsonable(self) -> dict[str, Any]:
         payload = _to_json_safe(self)
+        if self.qd_quality_mode == "provider":
+            for key in list(payload):
+                if key.startswith("qd_quality_") or key in {
+                    "qd_selected_raw_reward", "qd_final_best_raw_reward",
+                    "qd_selected_raw_gap", "qd_best_observed_raw_reward"}:
+                    payload.pop(key)
         if self.qd_descriptor == "target_relative_endpoint_xy":
             # Keep legacy JSON shape exactly unchanged.
             for key in ("qd_descriptor_axes", "qd_descriptor_bounds", "qd_descriptor_bounds_by_iter",

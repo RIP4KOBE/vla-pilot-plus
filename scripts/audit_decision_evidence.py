@@ -128,9 +128,15 @@ def audit_episode(episode_dir, episode_compute_file):
             require(decoded["selected_canonical_fingerprint"] == fingerprints(decoded["selected_latent"])[0], "decoded_fingerprint_mismatch")
             guided = context["values"]["use_guidance"] and bool(context["values"]["providers"])
             candidate_rows = kinds["canonical_candidate_batch"]
+            n2_active = any(r["values"].get("quality_mode") == "executed_prefix_v1"
+                            for kind in ("canonical_candidate_batch", "effective_quality", "final_selection")
+                            for r in kinds[kind])
             known_candidates = defaultdict(list)
+            known_dual_quality = defaultdict(list)
             for item in candidate_rows:
                 value = item["values"]
+                if n2_active:
+                    require(value.get("quality_mode") == "executed_prefix_v1", "n2_canonical_mode_missing")
                 require(tensor(value["candidates"]), "candidate_tensor_invalid")
                 fps = fingerprints(value["candidates"])
                 require(fps == value["canonical_fingerprints"], "candidate_fingerprint_mismatch")
@@ -138,6 +144,12 @@ def audit_episode(episode_dir, episode_compute_file):
                 require(tensor(value["effective_quality"]) and value["effective_quality"].shape == (len(fps),), "candidate_quality_invalid")
                 for fp, quality in zip(fps, value["effective_quality"]):
                     known_candidates[fp].append(quality.item())
+                if value.get("quality_mode") == "executed_prefix_v1":
+                    raw = value.get("raw_provider_quality")
+                    require(tensor(raw) and raw.shape == value["effective_quality"].shape
+                            and raw.dtype == value["effective_quality"].dtype, "n2_candidate_raw_invalid")
+                    for fp, quality, original in zip(fps, value["effective_quality"], raw):
+                        known_dual_quality[fp].append((quality.item(), original.item()))
             if guided:
                 require(bool(candidate_rows), "guided_candidates_missing")
                 final = one("final_selection")["values"]
@@ -145,6 +157,15 @@ def audit_episode(episode_dir, episode_compute_file):
                 require(fp == final["selected_canonical_fingerprint"] == decoded["selected_canonical_fingerprint"], "selected_decode_mismatch")
                 require(fp == fingerprints(final["population"])[final["selected_index"]], "selected_pool_mismatch")
                 require(fp in known_candidates and final["selected_quality"] in known_candidates[fp], "selected_quality_not_observed")
+                if n2_active:
+                    require(final.get("quality_mode") == "executed_prefix_v1", "n2_final_mode_missing")
+                    raw = final.get("raw_provider_quality")
+                    expected_raw_dtype = torch.float32 if final["selection_rule"] == "archive_global_best" else final["population"].dtype
+                    require(tensor(raw) and raw.shape == (len(final["population"]),)
+                            and raw.dtype == expected_raw_dtype, "n2_final_raw_invalid")
+                    require(final.get("selected_raw_provider_quality") == raw[final["selected_index"]].item(), "n2_selected_raw_index_mismatch")
+                    require((final["selected_quality"], final["selected_raw_provider_quality"])
+                            in known_dual_quality[fp], "n2_selected_raw_not_observed")
             for item in kinds["parent_allocation"]:
                 value = item["values"]
                 fps = fingerprints(value["source_population"])
@@ -202,6 +223,15 @@ def audit_episode(episode_dir, episode_compute_file):
                     and torch.equal(effective[0]["quality"], -effective[0]["costs"]), "effective_quality_cost_mismatch")
                 require(tensor(aggregates[0]["aggregate_before_reward_mode"])
                     and aggregates[0]["aggregate_before_reward_mode"].shape == (samples.shape[0],), "aggregate_quality_invalid")
+                if n2_active and scope["role"] in ("canonical_initial", "canonical_offspring", "canonical_population"):
+                    require(effective[0].get("quality_mode") == "executed_prefix_v1", "n2_effective_mode_missing")
+                if effective[0].get("quality_mode") == "executed_prefix_v1":
+                    require(scope["role"] in ("canonical_initial", "canonical_offspring", "canonical_population"), "n2_auxiliary_quality_changed")
+                    raw = effective[0].get("raw_provider_quality")
+                    aggregate = aggregates[0]["aggregate_before_reward_mode"]
+                    require(tensor(raw) and raw.shape == aggregate.shape and raw.dtype == aggregate.dtype
+                            and torch.equal(raw, aggregate), "n2_raw_aggregate_mismatch")
+                    require(effective[0]["reward_mode"] == "normal", "n2_reward_mode_invalid")
             for kind in ("provider_return", "effective_quality", "scoring_aggregate"):
                 require(all(r["values"]["scoring_batch_id"] in score_ids for r in kinds[kind]), "orphan_score_result")
             if guided:

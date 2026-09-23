@@ -1,0 +1,47 @@
+{
+  "schema": "n2-cpu-validation-v1",
+  "scope": "CPU-only implementation validation; no N2 Dev score or recorded-candidate Q8 outcomes",
+  "base_commit": "f3f79951a608344024b72ea63e5f0e6bc317eee9",
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "python": "/home/hynx/miniconda3/envs/vla-pilot/bin/python"
+  },
+  "runs": [
+    {
+      "files": [
+        "tests/test_rdt_steer.py",
+        "tests/test_qd_executed_quality.py",
+        "tests/test_qd_ed_archive.py",
+        "tests/test_decision_evidence.py",
+        "tests/test_decision_evidence_audit.py"
+      ],
+      "passed": 483,
+      "seconds": 43.19,
+      "timing": "before final five audit guards"
+    },
+    {
+      "files": [
+        "tests/test_decision_evidence_audit.py"
+      ],
+      "passed": 22,
+      "seconds": 1.87,
+      "timing": "after strict raw dtype/shape and mixed-mode guards; 17 overlap, 5 new tests"
+    }
+  ],
+  "unique_tests_covered": 488,
+  "source_sha256": {
+    "core/qd_executed_quality.py": "d83dbd53e75708f3a6e71cab9c0814dc82a42c68898d53cb370df37d9a8c946b",
+    "core/qd_ed.py": "5c86385a8271c3311aa715332d1307850b18ec37486f20ac53c19747fe4f207b",
+    "core/rdt_policy_steer.py": "cf5d50870738f94c6c8cb211e8e0557e2db5e67639da7c2bf545d54e9ed17bdc",
+    "core/eds_eval_metrics.py": "9777a473e2297bc8c01fa62629640b5fe2ef540fd07bb6ce91cee7173e46f7b5",
+    "configs/config.yaml": "9f1f40b372984336455829b8544613a4a29d4f93ee7b786bdfa4d6b0d62e03f7",
+    "scripts/audit_decision_evidence.py": "c5936a251bc8145093392136fc8b06779c499cb456953d1079fc4e26c68e1b95",
+    "tests/test_qd_executed_quality.py": "3097934f5d2d15736ee28c39f5150c33b988240d834619fa3c545e7e34f4f7aa",
+    "tests/test_rdt_steer.py": "f3c8e5c84b29acd6c03b39e6df27be6a6e788939d31a5d06b130fbd44e99b4d6",
+    "tests/test_decision_evidence_audit.py": "43cadf0bd9206534e734def3ca9e3e23ca35b007304367e00639076657d55967"
+  },
+  "definition_only_report_sha256": "c8fa4783b2b9a0f3d257e13d744918ab4b9c95d660ae22de8d40e252be163319",
+  "online_evaluation": "NOT_RUN",
+  "arbor_node_complete": false
+}

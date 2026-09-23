@@ -306,6 +306,7 @@ class QDArchiveEntry:
     source_iter: int
     parent_cell_id: int | None
     insert_sequence: int
+    raw_reward: float | None = None
 
 
 @dataclass(frozen=True)
@@ -342,6 +343,7 @@ class QDParentAllocation:
     parent_lanes: tuple[str, ...] = ()
     secondary_parent_count: int = 0
     secondary_slot_counts: dict[int, int] = field(default_factory=dict)
+    parent_raw_rewards: Tensor | None = None
 
 
 class QDArchive:
@@ -370,6 +372,7 @@ class QDArchive:
         self.secondary_invariant_violation_count = 0
         self.secondary_rebin_discard_count = 0
         self._next_insert_sequence = 0
+        self._raw_channel_active: bool | None = None
 
     @staticmethod
     def _candidate_better(
@@ -392,6 +395,7 @@ class QDArchive:
         cell_ids: Tensor,
         source_iter: int,
         parent_cell_ids: Tensor | None = None,
+        raw_rewards: Tensor | None = None,
     ) -> QDUpdateSummary:
         actions = _finite_tensor(actions, name="QD candidate actions")
         if actions.ndim < 2 or actions.shape[0] <= 0:
@@ -423,6 +427,13 @@ class QDArchive:
                 raise ValueError("QD parent cell id is outside the configured grid")
             parent_values = [int(value) for value in parents.tolist()]
 
+        if raw_rewards is not None:
+            raw_rewards = _finite_tensor(raw_rewards, name="QD original provider rewards").reshape(-1)
+            if raw_rewards.numel() != candidate_count:
+                raise ValueError("QD original provider rewards must match candidate count")
+        if self._raw_channel_active is not None and self._raw_channel_active != (raw_rewards is not None):
+            raise RuntimeError("QD original reward channel changed within archive")
+        self._raw_channel_active = raw_rewards is not None
         visits = torch.bincount(cell_ids, minlength=self.cell_count)
         self.cumulative_visits += visits
         grouped: dict[int, list[dict[str, object]]] = {}
@@ -437,6 +448,7 @@ class QDArchive:
                 {
                     "action": action,
                     "reward": reward,
+                    "raw_reward": float(raw_rewards[index].detach().cpu().item()) if raw_rewards is not None else None,
                     "cost": cost,
                     "descriptor": descriptor,
                     "fingerprint": fingerprint,
@@ -462,6 +474,7 @@ class QDArchive:
                             source_iter=int(source_iter),
                             parent_cell_id=candidate["parent_cell_id"],
                             insert_sequence=-1,
+                            raw_reward=candidate["raw_reward"],
                         )
                     )
 
@@ -495,6 +508,7 @@ class QDArchive:
                     source_iter=int(source_iter),
                     parent_cell_id=winner["parent_cell_id"],
                     insert_sequence=self._next_insert_sequence,
+                    raw_reward=winner["raw_reward"],
                 )
                 self._next_insert_sequence += 1
                 rejections += len(candidates) - 1
@@ -681,6 +695,7 @@ class QDArchive:
                 "cell_id": cell,
                 "reward": entry.reward,
                 "cost": entry.cost,
+                **({"raw_reward": entry.raw_reward} if entry.raw_reward is not None else {}),
                 "descriptor_xy_m": entry.descriptor_xy_m.detach().cpu().tolist(),
                 "fingerprint": entry.fingerprint,
                 "source_iter": entry.source_iter,
@@ -705,12 +720,20 @@ class QDArchive:
             torch.tensor(cells, device=action_device, dtype=torch.long),
         )
 
+    def elite_raw_rewards(self) -> Tensor:
+        """Same sorted entries and native-value -> FP32 restoration as elite_tensors."""
+        entries = [self.entries[cell] for cell in sorted(self.entries)]
+        if not entries or any(entry.raw_reward is None for entry in entries):
+            raise RuntimeError("QD original reward association is missing")
+        return torch.tensor([entry.raw_reward for entry in entries], device=entries[0].action.device)
+
     def snapshot(self) -> list[dict[str, object]]:
         return [
             {
                 "cell_id": cell,
                 "reward": entry.reward,
                 "cost": entry.cost,
+                **({"raw_reward": entry.raw_reward} if entry.raw_reward is not None else {}),
                 ("descriptor_values" if self.descriptor_mode == EXECUTION_INTENT_DESCRIPTOR else "descriptor_xy_m"): entry.descriptor_xy_m.detach().cpu().tolist(),
                 "fingerprint": entry.fingerprint,
                 "source_iter": entry.source_iter,
@@ -891,6 +914,8 @@ def allocate_parent_slots(
         parent_costs=torch.tensor(
             [entry.cost for entry in parent_entries], device=action_device
         ),
+        parent_raw_rewards=(torch.tensor([entry.raw_reward for entry in parent_entries], device=action_device)
+                            if archive._raw_channel_active else None),
         parent_fingerprints=tuple(entry.fingerprint for entry in parent_entries),
         slot_counts={cell: int(slot_counts[cell]) for cell in occupied},
         weights={cell: float(raw_weights[cell]) for cell in occupied},
