@@ -1,0 +1,42 @@
+{
+  "scope": "Static declarations/assignments and runner/auditor contract only; no new cohort result/artifact read.",
+  "worktree": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z",
+  "files": [
+    {
+      "path": "experiments/iteration_002_executed_quality/protocol.md",
+      "sha256": "d5e560bb48cb705e13c931290adfccb3da905cf0a352e8d7bde8188dc5ca75b1"
+    },
+    {
+      "path": "experiments/iteration_002_executed_quality/accounting-clarification.md",
+      "sha256": "95449254ff20d25c404633181515d30fb7ca2114c9a174310aeff565794469f5"
+    },
+    {
+      "path": "scripts/qd_ed_final_runner.py",
+      "sha256": "7e360ebd243864a510500f5c9af4a6919c71a355e30c1bfd241439c4de26188d"
+    },
+    {
+      "path": "scripts/qd_ed_n2_plan.py",
+      "sha256": "cc39d7846a286f38de314dfa7a7b1a9f6d08e84792e20fee9ff2b84dac454ba1"
+    },
+    {
+      "path": "scripts/audit_decision_evidence.py",
+      "sha256": "c5936a251bc8145093392136fc8b06779c499cb456953d1079fc4e26c68e1b95"
+    },
+    {
+      "path": "core/eds_eval_metrics.py",
+      "sha256": "9777a473e2297bc8c01fa62629640b5fe2ef540fd07bb6ce91cee7173e46f7b5"
+    },
+    {
+      "path": "core/rdt_policy_steer.py",
+      "sha256": "cf5d50870738f94c6c8cb211e8e0557e2db5e67639da7c2bf545d54e9ed17bdc"
+    },
+    {
+      "path": "core/decision_evidence.py",
+      "sha256": "3af145738e3b22a8bec7484d0c33ba9a81dffbf58335b61682eb0ddf43b3cb8c"
+    },
+    {
+      "path": "main.py",
+      "sha256": "258d66b3040be8750beb9e0eab47a7b607db7cbe00d167726664526554fdec57"
+    }
+  ]
+}
