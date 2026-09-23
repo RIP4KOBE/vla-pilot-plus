@@ -13,7 +13,7 @@ project_target:
   required_formal_successes: 5
   achieved: false
 study:
-  status: PREPARING_FRESHBOOT_PRODUCTION_C0
+  status: WAITING_SHARED_RUNNER_FOR_GPU3_PRODUCTION_C0
   mode: real
   interaction: auto
   automatic_continuation: true
@@ -34,7 +34,7 @@ candidate:
     exceeding the frozen30attempt cap. No retry or rename can repair this cohort.
 budget:
   max_gpu_hours: 48.0
-  gpu_hours_consumed: 1.3767836063454173
+  gpu_hours_consumed: 1.551532294950973
   max_episode_attempts: 240
   reserved:
     baseline: 20
@@ -42,12 +42,12 @@ budget:
     validation: 60
     formal: 40
     recovery: 20
-  dispatched: 14
+  dispatched: 16
   aborted: 9
-  valid: 1
-  running: 0
+  valid: 2
+  running: 1
   invalid: 4
-  completed: 5
+  completed: 6
   gpu_hour_reservations:
     validation: 14.0
     formal: 10.0
@@ -90,7 +90,7 @@ derived_indexes:
 authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
   ledger is append-only event evidence, not a second mutable state.
 online_blockers: []
-updated_at: '2026-09-23T05:07:13.945462+00:00'
+updated_at: '2026-09-23T05:24:07.399383+00:00'
 seed_plan:
   path: data/frozen-seed-plan.json
   sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
@@ -144,21 +144,21 @@ stage_provider_ready: true
 runner:
   by_bucket:
     baseline: 1
-    development: 8
+    development: 10
     validation: 0
     formal: 0
     recovery: 5
-  reserved_attempts: 14
+  reserved_attempts: 16
   gpu_hours_by_bucket:
     baseline: 0.019651524036631195
-    development: 0.6201676624896288
+    development: 0.7949163510951843
     validation: 0.0
     formal: 0.0
     recovery: 0.7369644198191572
   gpu_healthcheck_hours: 0.2602564145160282
   gpu_healthcheck_inflight: 0
-  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu2_post_reboot_c0_t00__3b58560be246
-  last_event: valid
+  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_c0__fc39e13b4f1d
+  last_event: dispatched
 gpu_admission_last_observation:
   physical_gpu: 3
   physical_index: 3
@@ -944,8 +944,19 @@ continuation:
     owned_xids: 0
   user_confirmed_external_reboot: true
   freshboot_production_c0:
-    status: PREPARING_PROTOCOL_AND_SUPERVISOR
+    status: PREDISPATCH_DEFERRED_EXTERNAL_RUNNER
     arbor_node: '5.5'
     physical_gpu: 3
     episode_key: freshboot_c0_t00_20260923
     algorithm_score: null
+    source_commit: 8579ee301cc15283e78a94f7e0e9ddb306554c0a
+    plan_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-c0/plan.frozen.json
+    plan_sha256: 77869088e4232d5d712b3628ac87a36c991a567afa497d19daae16b6624e21f1
+    queue_status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-c0/queue-status.json
+    unified_exec_session_id: 40257
+    owned_episode_dispatches: 0
+    queue_failure_reason: unfinished attempt or healthcheck requires reconciliation
+    external_active_attempt: rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_c0__fc39e13b4f1d
+    next_step: Add safe shared-lock waiting and reentrant owned-lock handling; preserve
+      old frozen plan/status; same unconsumed prospective episode key, no scientific
+      retry.

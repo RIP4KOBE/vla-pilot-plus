@@ -7,6 +7,7 @@ the runner/queue are delayed until main so CPU tests need no GPU dependencies.
 """
 import argparse
 from contextlib import contextmanager
+import fcntl
 import json
 import os
 from pathlib import Path
@@ -14,6 +15,7 @@ import re
 import signal
 import subprocess
 import sys
+import threading
 import time
 
 ROOT = Path('/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z')
@@ -188,6 +190,99 @@ def supervise_calls(r, q, monitor, prerequisite):
         r.gpu_admission, r.wait_exclusively, q.pending_gate = admission, wait, pending
 
 
+@contextmanager
+def shared_runner_lease(r, q, root, status_path, plan_path, monitor, prerequisite,
+                        *, sleep=time.sleep, poll_seconds=30):
+    """Hold the real shared flock across the queue's idle window and one C0.
+
+    Only this process/thread's nested use of this exact inode is reentrant.
+    All other locks and callers retain the original runner implementation.
+    """
+    r.require(type(poll_seconds) is int and 1 <= poll_seconds <= 30,
+              'shared runner poll interval must be 1..30 seconds')
+    root, status_path = Path(root), Path(status_path)
+    lock_path = (root / 'data/qd-ed-runner.lock').resolve()
+    original_locked = r.locked
+    owner_pid, owner_thread = os.getpid(), threading.get_ident()
+    acquired = yielded = patched = False
+    status = {'schema': 'qd-ed-available-gpu-queue-v1', 'pid': owner_pid,
+              'base_plan_path': str(Path(plan_path).resolve()), 'episode_keys': [KEY],
+              'completed_keys': [], 'results': [], 'selected_physical_gpu': None,
+              'boot_id': BOOT, 'runner_lock_path': str(lock_path)}
+
+    def save(phase, **values):
+        status.update(status=phase, updated_unix=time.time(), **values)
+        r.durable_json(status_path, status)
+
+    try:
+        with lock_path.open('a+') as stream:
+            try:
+                while True:
+                    monitor.require_boot()
+                    prerequisite()
+                    try:
+                        fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    except BlockingIOError:
+                        save('waiting_shared_runner')
+                        sleep(poll_seconds)
+                        continue
+                    acquired = True
+                    break
+
+                def verify_lease():
+                    r.require(os.getpid() == owner_pid and threading.get_ident() == owner_thread,
+                              'shared runner lease owner differs')
+                    held, current = os.fstat(stream.fileno()), lock_path.stat()
+                    r.require((held.st_dev, held.st_ino) == (current.st_dev, current.st_ino),
+                              'shared runner lock inode changed')
+                    # Same open-file description: no unlock/relock gap. If an
+                    # unexpected unlock occurred, this still cannot bypass a
+                    # competing holder of the original lock.
+                    try:
+                        fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    except BlockingIOError:
+                        raise r.GateError('shared runner lease no longer held') from None
+
+                @contextmanager
+                def nested_locked(path, *, nonblocking=False):
+                    if (Path(path).resolve() == lock_path and os.getpid() == owner_pid
+                            and threading.get_ident() == owner_thread):
+                        verify_lease()
+                        yield
+                        verify_lease()
+                    else:
+                        with original_locked(path, nonblocking=nonblocking):
+                            yield
+
+                verify_lease()
+                monitor.require_boot()
+                prerequisite()
+                # Acquiring a released lock does not authorize reconciliation
+                # of an orphan reservation. Reject it before any state write.
+                with original_locked(root / 'data/qd-ed-state.lock'):
+                    events, _ = q.no_unfinished(root)
+                    r.sync_state_from_journal(root, events)
+                held = os.fstat(stream.fileno())
+                save('shared_runner_acquired', runner_lock_device=held.st_dev,
+                     runner_lock_inode=held.st_ino, owner_thread_id=owner_thread)
+                r.locked = nested_locked
+                patched = True
+                yielded = True
+                yield
+            finally:
+                if patched:
+                    r.locked = original_locked
+                if acquired:
+                    fcntl.flock(stream, fcntl.LOCK_UN)
+    except BaseException as exc:
+        # Once the queue is entered its existing error/finally owns status,
+        # termination and accounting. Here only pre-queue failures are saved.
+        if not yielded:
+            save('interrupted' if isinstance(exc, (KeyboardInterrupt, SystemExit)) else 'failed',
+                 reason=str(exc) if isinstance(exc, r.GateError) else type(exc).__name__)
+        raise
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--plan', type=Path, required=True)
@@ -235,9 +330,10 @@ def main(argv=None):
         raise KeyboardInterrupt()
     previous_sigterm = signal.signal(signal.SIGTERM, interrupted)
     try:
-        with supervise_calls(r, q, monitor, prerequisite):
-            return q.run_queue(args.plan, [KEY], poll_seconds=30, idle_seconds=120,
-                               status_path=status, root=ROOT)
+        with shared_runner_lease(r, q, ROOT, status, args.plan, monitor, prerequisite):
+            with supervise_calls(r, q, monitor, prerequisite):
+                return q.run_queue(args.plan, [KEY], poll_seconds=30, idle_seconds=120,
+                                   status_path=status, root=ROOT)
     finally:
         signal.signal(signal.SIGTERM, previous_sigterm)
 

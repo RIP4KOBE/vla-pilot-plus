@@ -24,6 +24,14 @@ The one original queue row has timeout1800s and uses the **development** bucket.
 
 The wrapper supplements the original queue/runner with boot/prerequisite and kernel-cursor supervision. Observe exact owned child PID/start identity and physical GPU3 PCI for new Xid31/109. It may stop only its owned work, allowing the original runner to terminate/reap and journal the original result. An owned fault invalidates the engineering gate even if generic outcome parsing says valid. Never rewrite the original outcome after seeing it. Unknown termination must remain unresolved/inflight until reconciled. Preserve original timeout, exclusivity, numerical/action/cost gates.
 
+### Scheduling-only predispatch amendment
+
+The initial frozen plan at source `8579ee301cc15283e78a94f7e0e9ddb306554c0a` was rejected before any reservation or dispatch because an independent session had started another shared-ledger episode. Preserve that plan and its failed queue-status file. The prospective C0 key remains unconsumed; no outcome exists to replace.
+
+The revised wrapper waits on the actual shared runner flock, checks boot/prerequisite while waiting, and retains that lock through the stable-idle window and this single episode. Nested runner-lock contexts reuse only the verified same-process/thread open file description and inode. Other locks and callers keep the original locking behavior. After acquiring it, reject unfinished journals before syncing the state budget; never reconcile another session's live work or terminate it. Original queue and runner retain all actual launch, timeout, cleanup and accounting behavior.
+
+A CPU-only source-binding revision of the unconsumed plan may be prepared while the external lock is busy. It changes only this protocol and the scheduling wrapper fingerprints/source commit, preserving the exact row, scientific configuration, inputs, model/provider identities and resolved command. Preserve both plan versions and verify the permitted source-diff allowlist. All quiescence, budget, exclusivity and source gates still execute after acquiring the real lock and before any reservation/dispatch. This is a scheduling correction with zero prior episode dispatches, not a scientific retry.
+
 ## Decision fixed before execution
 
 Report original task success or failure without an improvement claim. Engineering PASS requires a valid complete episode with finite action/numerical/cost evidence, actual guided C0 search at the frozen budget, original QD-off state, observed DINO/perception, actual actions, Stage activity/accounting, stable boot/exclusive GPU3 and no new owned Xid. If a valid trajectory legitimately omits a requested path, report coverage incomplete without inventing calls or changing its task result.

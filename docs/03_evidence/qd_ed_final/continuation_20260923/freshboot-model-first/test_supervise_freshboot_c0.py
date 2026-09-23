@@ -1,11 +1,13 @@
 """CPU mocks only: no child process, GPU, provider or simulator is launched."""
 import contextlib
+import fcntl
 import importlib.util
 import json
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import threading
 from types import SimpleNamespace
 import unittest
 from unittest.mock import Mock, patch
@@ -94,6 +96,87 @@ class Tests(unittest.TestCase):
                 raise ValueError('original error')
         self.assertEqual((api.gpu_admission, api.wait_exclusively, queue.pending_gate), before)
         self.assertEqual(prerequisite.call_count, 2)
+
+    def lease_fixture(self):
+        (self.folder / 'data').mkdir()
+        api = SimpleNamespace(locked=Mock(wraps=r.locked), require=r.require,
+            GateError=r.GateError, durable_json=r.durable_json,
+            sync_state_from_journal=Mock())
+        queue = SimpleNamespace(no_unfinished=Mock(return_value=([], [])))
+        monitor = SimpleNamespace(require_boot=Mock())
+        prerequisite = Mock()
+        status = self.folder / 'status.json'
+        return api, queue, monitor, prerequisite, status
+
+    def test_real_shared_lock_waits_isolates_and_reenters_only_owner(self):
+        api, queue, monitor, prerequisite, status = self.lease_fixture()
+        lock = self.folder / 'data/qd-ed-runner.lock'
+        original_locked = api.locked
+        calls = []
+        queue.no_unfinished.side_effect = lambda _: (calls.append('terminal') or [], [])
+        api.sync_state_from_journal.side_effect = lambda *_: calls.append('sync')
+        with lock.open('a+') as external:
+            fcntl.flock(external, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            def release_after_heartbeat(seconds):
+                self.assertEqual(seconds, 30)
+                self.assertEqual(json.loads(status.read_text())['status'], 'waiting_shared_runner')
+                self.assertIsNone(json.loads(status.read_text())['selected_physical_gpu'])
+                api.sync_state_from_journal.assert_not_called()
+                fcntl.flock(external, fcntl.LOCK_UN)
+            with s.shared_runner_lease(api, queue, self.folder, status, self.folder / 'plan',
+                    monitor, prerequisite, sleep=release_after_heartbeat):
+                self.assertEqual(calls, ['terminal', 'sync'])
+                self.assertEqual(json.loads(status.read_text())['status'], 'shared_runner_acquired')
+                with self.assertRaisesRegex(r.GateError, 'holds the lock'):
+                    with r.locked(lock, nonblocking=True): self.fail('external acquisition succeeded')
+                with api.locked(lock, nonblocking=True):
+                    with api.locked(lock): pass
+                other = self.folder / 'data/other.lock'
+                with api.locked(other, nonblocking=True): pass
+                self.assertTrue(any(call.args[0] == other for call in original_locked.call_args_list))
+                other_thread_errors = []
+                def competing_thread():
+                    try:
+                        with api.locked(lock, nonblocking=True):
+                            other_thread_errors.append('unexpected acquisition')
+                    except r.GateError as exc:
+                        other_thread_errors.append(str(exc))
+                thread = threading.Thread(target=competing_thread)
+                thread.start()
+                thread.join(timeout=2)
+                self.assertFalse(thread.is_alive())
+                self.assertEqual(other_thread_errors, ['another owned runner holds the lock'])
+        self.assertIs(api.locked, original_locked)
+        with r.locked(lock, nonblocking=True): pass
+        self.assertEqual(monitor.require_boot.call_count, 3)
+        self.assertEqual(prerequisite.call_count, 3)
+
+    def test_shared_lock_released_and_original_api_restored_on_body_error(self):
+        api, queue, monitor, prerequisite, status = self.lease_fixture()
+        original_locked = api.locked
+        lock = self.folder / 'data/qd-ed-runner.lock'
+        with self.assertRaisesRegex(ValueError, 'original queue error'):
+            with s.shared_runner_lease(api, queue, self.folder, status, self.folder / 'plan',
+                    monitor, prerequisite):
+                raise ValueError('original queue error')
+        self.assertIs(api.locked, original_locked)
+        with r.locked(lock, nonblocking=True): pass
+        api.sync_state_from_journal.assert_called_once_with(self.folder, [])
+
+    def test_unfinished_journal_rejected_before_sync_or_queue(self):
+        import qd_ed_available_gpu_queue as q
+        api, _, monitor, prerequisite, status = self.lease_fixture()
+        original_locked = api.locked
+        unfinished = [{'event': 'reserved', 'attempt_id': 'external-unfinished'}]
+        with patch.object(r, 'read_events', side_effect=[unfinished, []]):
+            with self.assertRaisesRegex(r.GateError, 'unfinished attempt or healthcheck requires reconciliation'):
+                with s.shared_runner_lease(api, q, self.folder, status, self.folder / 'plan',
+                        monitor, prerequisite):
+                    self.fail('unfinished journal entered queue')
+        api.sync_state_from_journal.assert_not_called()
+        self.assertEqual(json.loads(status.read_text())['status'], 'failed')
+        self.assertIs(api.locked, original_locked)
+        with r.locked(self.folder / 'data/qd-ed-runner.lock', nonblocking=True): pass
 
     def test_original_runner_finally_accounts_one_abort_and_stops(self):
         row = {'episode_key': s.KEY, 'iteration': s.ITERATION, 'profile': 'C0', 'split': 'dev',
