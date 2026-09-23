@@ -1,0 +1,28 @@
+# N2 recorded final-pool quality analysis v1
+
+Defined before N2 recomputation or online outcomes. Implements the CPU fixed-candidate check in frozen N2 protocol SHA `d5e560bb48cb705e13c931290adfccb3da905cf0a352e8d7bde8188dc5ca75b1`. Tool review, CPU tests, source commit and separate execution authorization must precede any runtime bundle read. The new tool/schema does not replace earlier analyses.
+
+Only the two previously complete and accepted task0 C0/Q0 episodes are allowed. Their direct-final-membership reports are fixed in the tool by SHA. All guided eligible decisions are included; A/non-A/Unknown are descriptive strata, never selection filters. No task5, fourth invalid observation, validation/formal data, new provider/model/projector/simulator calls or GPU initialization. No full archive replay.
+
+Recheck every JSON/source/input SHA and a fresh complete accepted frozen audit; only then use the frozen auditor's CPU `weights_only=True` event loader. Bind historical source bytes rather than current worktree HEAD, since later documentation-only commits do not change the observed implementation. Preserve the complete original audit, source, terminal and target-map provenance. Identity-v3 is an explicitly post-data engineering correction; original frozen map-v2 results remain unchanged.
+
+Use actual final_selection.population native tensors. Recompute membership with the frozen membership checker, requiring exact native shape/dtype/bytes identities and retaining all matching canonical occurrences. C0 input provenance is the actual last canonical batch row. Q0 insertion ancestry was not recorded: every native matching canonical occurrence must agree on full projection, original provider input, source EEF, scored keypoints and old native quality. Otherwise fail explicitly rather than choose a convenient occurrence or silently omit an eligible decision. Canonical score role/iteration, source ordering, full samples bytes, effective quality and saved geometry identities must agree.
+
+For each final slot call the implementation's SHA-frozen `core/qd_executed_quality.py::executed_prefix_quality` once on the saved native `(1,9,3)` projection and native scored keypoints. The target index comes only from the source/original-code/path-bound reviewed approach expression. No Q8 formula is duplicated here. Q8 uses original canonical samples.dtype (observed BF16), also required for projection, scored keypoints and canonical quality. The final archive's possible FP32 scalar carrier does not grant extra precision. Reject a helper dtype change, nonfinite result or mutation of recorded inputs. CPU arithmetic does not establish bitwise equivalence to GPU reduction kernels.
+
+Keep every exact native Q8 maximum without epsilon/tolerance. The activity gate is true only if at least one eligible decision has **all** maxima fingerprints different from actual selection. A deterministic representative is also described using the original pool rule: C0 lowest final slot; Q0 lowest fingerprint then final slot (the original sorted-cell final population). A mixed tie retaining the actual fingerprint is not an active quality change, even if this representative differs. Do not select ties using outcome, A/B status, geometry, raw quality or any future feedback.
+
+For every slot and all maxima report native action/source identities, all occurrence IDs, Q8 and native dtype, original recorded quality and its difference from actual selected quality, target provenance, stored t7/t8 coordinates and descriptive distances. Report both distances to the original context target (for continuity with frozen descriptions) and to the native scored target used by Q8; neither reconstructs lost BF16 precision. Geometry diagnostics use float64 arithmetic only on existing stored values. No physical success or contact/target state is inferred.
+
+All eligible decisions must process successfully for a report. A failure produces no accepted result artifact; the process exits nonzero with the failed assertion. No silent zero/Unknown aggregation for missing critical data. Output is a new directory outside attempts and old reports. Include CPU wall time, process memory peaks, source/helper/input hashes, excluded-decision provenance and descriptive counts. The recorded choice activity gate is not scientific promotion: new search populations and unexecuted physical success remain Unknown.
+
+## Execution manifest contract
+
+The input schema is `qd-ed-n2-fixed-pool-input-v1`. It contains `script_sha256`, `protocol_sha256`, and `{path,sha256}` references for `execution_authorization`, `quality_helper`, `n2_protocol`, `membership_report`, `membership_checker`. The separate root authorization must bind the exact script path/SHA, protocol SHA, helper reference, N2 protocol reference and `allowed_membership_reports` list. No actual execution is authorized merely by this document or by passing the CLI flag. Root will create final manifests after review; run with `CUDA_VISIBLE_DEVICES=''` and `--execute-reviewed`.
+
+The fixed reports are:
+
+- task0 C0: `continuation_20260923/final-population-membership/t00-c0-v1/final-population-membership.json`, SHA `fda61dee79c6df38e1772120b44fb24adf3ec0ff00bda791bc13e4a30cc107b8`.
+- task0 Q0: `continuation_20260923/final-population-membership/t00-q0-v1/final-population-membership.json`, SHA `40b319e2e41339cda84ba1f27cb61ff4dc71665dc4ee14ab6e46c64c0a6716b8`.
+
+Their immutable manifests link the prior complete audit, supplemental identity authorization/analysis and all source/bundle hashes. This preparation does not read their tensor bundles or recompute any real decision.
