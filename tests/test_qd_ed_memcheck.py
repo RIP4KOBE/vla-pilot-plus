@@ -89,3 +89,37 @@ def test_arbitrary_memcheck_flags_rejected(tmp_path, monkeypatch):
     plan['cuda_memcheck']['extra_args'] = ['--report-api-errors', 'no']
     with pytest.raises(runner.GateError, match='invalid CUDA memcheck contract'):
         runner.validate_memcheck(plan)
+
+
+def test_uncached_memcheck_has_separate_identity_and_keeps_blocking(tmp_path, monkeypatch):
+    plan, _ = contract(tmp_path, monkeypatch)
+    plan['cuda_memcheck'].update(force_blocking_launches=True, disable_caching_allocator=True)
+    with pytest.raises(runner.GateError, match='bounded development'):
+        runner.validate_memcheck(plan)
+    plan['episodes'][0]['iteration'] = 'GPU2_CUDA_MEMCHECK_NOCACHE_C0'
+    runner.validate_memcheck(plan)
+    runner.validate_memcheck_environment(plan, {'environment': {'PYTORCH_NO_CUDA_MEMORY_CACHING': '1'}})
+    with pytest.raises(runner.GateError, match='allocator environment'):
+        runner.validate_memcheck_environment(plan, {'environment': {}})
+    plan['cuda_memcheck']['force_blocking_launches'] = False
+    with pytest.raises(runner.GateError, match='retains blocking'):
+        runner.validate_memcheck(plan)
+
+
+def test_allocator_mode_cannot_leak_into_ordinary_runs(monkeypatch):
+    monkeypatch.setenv('PYTORCH_NO_CUDA_MEMORY_CACHING', '1')
+    runtime = {'environment': {}, 'gpu_mapping': {'physical_gpu': 2, 'egl_device_index': 1}}
+    assert 'PYTORCH_NO_CUDA_MEMORY_CACHING' not in runner.child_environment(runtime)
+    runner.validate_memcheck_environment({}, runtime)
+    runtime['environment']['PYTORCH_NO_CUDA_MEMORY_CACHING'] = '1'
+    assert runner.child_environment(runtime)['PYTORCH_NO_CUDA_MEMORY_CACHING'] == '1'
+    with pytest.raises(runner.GateError, match='allocator environment'):
+        runner.validate_memcheck_environment({}, runtime)
+
+
+@pytest.mark.parametrize('value', ['1', 1, None, ['extra']])
+def test_uncached_option_requires_boolean(tmp_path, monkeypatch, value):
+    plan, _ = contract(tmp_path, monkeypatch)
+    plan['cuda_memcheck']['disable_caching_allocator'] = value
+    with pytest.raises(runner.GateError, match='allocator flag must be boolean'):
+        runner.validate_memcheck(plan)

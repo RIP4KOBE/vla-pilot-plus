@@ -50,6 +50,7 @@ RUNTIME_ENV_ALLOW = {
     'PYTHONDONTWRITEBYTECODE',
     'QD_ED_CUDA_EGL_SERIALIZE',
     'QD_ED_RENDER_LIFETIME',
+    'PYTORCH_NO_CUDA_MEMORY_CACHING',
 }
 _HASH_CACHE = {}
 CODEX_CONFIG_KEYS = ('backend', 'model', 'reasoning_effort', 'timeout_seconds', 'cli_path', 'disabled_skill_paths')
@@ -308,6 +309,7 @@ def validate_plan(path, *, root=ROOT, require_frozen=True, allow_unverified_gpu=
         require(digest(task['bddl_path']) == row['bddl_sha256'] and digest(task['init_path']) == row['init_file_sha256'], 'runtime task inputs differ from frozen seed plan')
         owned(task['cache_dir'], artifact_root)
     validate_memcheck(plan)
+    validate_memcheck_environment(plan, runtime)
     return plan, manifest, runtime
 
 
@@ -328,9 +330,15 @@ def validate_memcheck(plan):
     if diagnostic is None:
         return
     require({'tool_path', 'files'} <= set(diagnostic)
-            <= {'tool_path', 'files', 'force_blocking_launches'}, 'invalid CUDA memcheck contract')
+            <= {'tool_path', 'files', 'force_blocking_launches', 'disable_caching_allocator'},
+            'invalid CUDA memcheck contract')
     blocking = diagnostic.get('force_blocking_launches', False)
     require(type(blocking) is bool, 'CUDA memcheck blocking launch flag must be boolean')
+    no_cache = diagnostic.get('disable_caching_allocator', False)
+    require(type(no_cache) is bool, 'CUDA memcheck allocator flag must be boolean')
+    require(not no_cache or blocking, 'uncached memcheck retains blocking launches')
+    iteration = ('GPU2_CUDA_MEMCHECK_NOCACHE_C0' if no_cache else
+                 'GPU2_CUDA_MEMCHECK_BLOCKING_C0' if blocking else 'GPU5_CUDA_MEMCHECK_C0')
     require(diagnostic['tool_path'] == str(MEMCHECK_TOOL), 'unexpected CUDA memcheck executable')
     require(plan.get('diagnostic_scope', {}).get('kind') == 'cuda_memcheck'
             and plan['diagnostic_scope'].get('online_algorithm_comparison') is False,
@@ -338,8 +346,7 @@ def validate_memcheck(plan):
     rows = plan.get('episodes', [])
     require(len(rows) == 1 and rows[0].get('split') == 'dev'
             and rows[0].get('budget_bucket') == 'development' and not rows[0].get('retry_of')
-            and rows[0].get('iteration') == ('GPU2_CUDA_MEMCHECK_BLOCKING_C0' if blocking
-                                           else 'GPU5_CUDA_MEMCHECK_C0')
+            and rows[0].get('iteration') == iteration
             and rows[0].get('profile') == 'C0'
             and type(rows[0].get('timeout_seconds')) is int
             and 0 < rows[0]['timeout_seconds'] <= 600,
@@ -349,6 +356,13 @@ def validate_memcheck(plan):
     require({r['path'] for r in records} == expected and str(MEMCHECK_TOOL) in expected,
             'CUDA memcheck package fingerprint set changed')
     verify_files(records, allowed_roots=(MEMCHECK_TOOL.parent,))
+
+
+def validate_memcheck_environment(plan, runtime):
+    no_cache = (plan.get('cuda_memcheck') or {}).get('disable_caching_allocator', False)
+    value = runtime.get('environment', {}).get('PYTORCH_NO_CUDA_MEMORY_CACHING')
+    require(value == '1' if no_cache else value is None,
+            'CUDA allocator environment differs from frozen diagnostic condition')
 
 
 def instrument_command(command, plan, output):
@@ -431,6 +445,7 @@ def runtime_gpu(runtime, state=None):
 
 def child_environment(runtime):
     env = dict(os.environ)  # Existing provider credentials are inherited, never serialized.
+    env.pop('PYTORCH_NO_CUDA_MEMORY_CACHING', None)
     if runtime.get('frozen_stage_provider', {}).get('backend') == 'codex_cli':
         for name in codex_removed_environment():
             env.pop(name, None)

@@ -28,7 +28,7 @@ candidate:
   ordering_amendment: experiments/iteration_001_execution_intent/startup-repair-amendment.md
 budget:
   max_gpu_hours: 48.0
-  gpu_hours_consumed: 1.0262591123256264
+  gpu_hours_consumed: 1.0692859363098008
   max_episode_attempts: 240
   reserved:
     baseline: 20
@@ -36,12 +36,12 @@ budget:
     validation: 60
     formal: 40
     recovery: 20
-  dispatched: 11
+  dispatched: 12
   aborted: 8
   valid: 0
   running: 0
-  invalid: 3
-  completed: 3
+  invalid: 4
+  completed: 4
   gpu_hour_reservations:
     validation: 14.0
     formal: 10.0
@@ -131,20 +131,20 @@ stage_provider_ready: true
 runner:
   by_bucket:
     baseline: 1
-    development: 5
+    development: 6
     validation: 0
     formal: 0
     recovery: 5
-  reserved_attempts: 11
+  reserved_attempts: 12
   gpu_hours_by_bucket:
     baseline: 0.019651524036631195
-    development: 0.2929994372140047
+    development: 0.33602626119817913
     validation: 0.0
     formal: 0.0
     recovery: 0.7136081510749904
   gpu_healthcheck_hours: 0.23690014577186147
   gpu_healthcheck_inflight: 0
-  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu5_cuda_memcheck_c0_t00__66eec8a1ab74
+  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu2_cuda_memcheck_blocking_c0_t00__3a0defb917b0
   last_event: valid
 gpu_admission_last_observation:
   physical_gpu: 7
@@ -191,9 +191,9 @@ closed_baseline:
   complete_success_rate: null
   report: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/iteration_000_intake/closed-incomplete-baseline-report.json
 active_plan:
-  path: /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-gpu2-blocking-memcheck-plan.json
-  source_commit: 90cbc3971461b9ed1a91818a5085f4489c3213e2
-  sha256: dccace904196bc218ed45b45ce5cd1447f0859639529ec776388c98b0d8995ba
+  path: /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-gpu2-blocking-memcheck-resume-plan.json
+  source_commit: ce2f198ac1c51ec13b324840579bb4e8b9e9219b
+  sha256: 8b503faf0076e20f943be3e139e6ee12f7e9de4b74213168e97ae05e739a9b45
   frozen: true
   iteration: GPU2_CUDA_MEMCHECK_BLOCKING_C0
   diagnostic_only: true
@@ -622,3 +622,36 @@ shared_parent_closure_snapshot:
   continuation_scope: Existing GPU2-only single engineering diagnostic under this
     branch authorized next-round plan; no automatic N1R/scientific dispatch, no reopening
     or rewriting closed parent cohorts.
+gpu2_blocking_memcheck_resume_queue:
+  pid: 1409572
+  proc_start_ticks: '380805610'
+  source_commit: ce2f198ac1c51ec13b324840579bb4e8b9e9219b
+  plan_path: /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-gpu2-blocking-memcheck-resume-plan.json
+  plan_sha256: 8b503faf0076e20f943be3e139e6ee12f7e9de4b74213168e97ae05e739a9b45
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/gpu2-blocking-memcheck-resume-queue-status.json
+  log_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/gpu2-blocking-memcheck-resume-queue.log
+  started_at: '2026-09-23T03:03:45.349235+00:00'
+  argv:
+  - /home/hynx/miniconda3/envs/vla-pilot/bin/python
+  - /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/scripts/qd_ed_available_gpu_queue.py
+  - --plan
+  - /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-gpu2-blocking-memcheck-resume-plan.json
+  - --episode-key
+  - gpu2_cuda_memcheck_blocking_c0_t00
+  - --poll-seconds
+  - '30'
+  - --idle-seconds
+  - '120'
+  - --status-path
+  - /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/gpu2-blocking-memcheck-resume-queue-status.json
+  physical_gpu: 2
+  status: failed_after_dispatch_oom
+  attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu2_cuda_memcheck_blocking_c0_t00__3a0defb917b0
+  production_python_pid: 1418921
+  actual_binding_evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__gpu2_cuda_memcheck_blocking_c0_t00__3a0defb917b0/actual-gpu2-process-binding.json
+  alive: false
+gpu2_blocking_memcheck_result:
+  attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu2_cuda_memcheck_blocking_c0_t00__3a0defb917b0
+  audit: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/analysis/gpu2-blocking-memcheck/audit.json
+  status: INVALID_BLOCKING_MEMCHECK_OOM
+  seconds: 154.8965663430281

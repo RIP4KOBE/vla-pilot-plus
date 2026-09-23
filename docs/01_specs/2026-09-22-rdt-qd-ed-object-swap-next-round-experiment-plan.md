@@ -4,6 +4,10 @@
 
 初稿的历史状态截点为 2026-09-22 05:03 UTC。用户随后明确授权更新方案、新建 worktree/branch、以 goal 模式测试迭代，并指定 GPU6。执行修订如下；历史快照保留其原时点口径。未调用 Arbor/Orchestra Research skill。
 
+## 2026-09-23 04:05 UTC 诊断进展
+
+GPU2同步memcheck于03:10 UTC因显存耗尽退出，154.90秒、0环境动作、0 Stage调用，第9次模型调用失败；未报告Xid或非法访问，首轮搜索未完成。同步启动没有消除OOM。下一项为单次600秒、GPU2专属的关闭缓存memcheck，按PyTorch官方诊断要求设置 `PYTORCH_NO_CUDA_MEMORY_CACHING=1`，保留同步启动及全部科学配置；新条件独立记录，不覆盖旧失败。157项CPU测试通过。协议见 `experiments/iteration_001_execution_intent/gpu2-uncached-memcheck-diagnostic.md`。本轮仍无有效算法结果。
+
 ## 2026-09-23 执行状态核查
 
 GPU2同步内存诊断队列于9月22日10:14 UTC因共享运行锁竞争退出，尚未派发对应episode；此后未持续执行。原Goal为paused。队列已修复为在自身尚无GPU派发时等待共享锁，相关151项CPU测试通过；保留旧失败日志与同一个未派发条件，重新冻结调度代码后接续单次600秒诊断，仍限定GPU2。另一分支于9月22日12:20 UTC保存TARGET_NOT_MET收尾报告，原关闭cohort和当时成本快照全部保留。本次接续不改写旧结果、不自动启动N1R/Validation/Formal；共享成本继续累计。

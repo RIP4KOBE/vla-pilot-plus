@@ -1,3 +1,15 @@
+# LATEST: GPU2 blocking memcheck also stopped on OOM
+
+Attempt`rdt-qd-ed-final-20260921T093925Z__gpu2_cuda_memcheck_blocking_c0_t00__3a0defb917b0` ended2026-09-23T03:10:15UTC after154.896566s. FourCUDAallocationerrors,9modelcalls,zeroactions/Stagequeries; noXidrecord. Synchronizinglaunches didnotresolveOOM; noillegalaccessprooforcleanpass. Queue/launcher/Pythonallgone. Audit`/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/analysis/gpu2-blocking-memcheck/audit.json`. Userprefersprogressdirectlyincurrentconversation. Nextdiagnosticproposal usesPyTorchdocumentedPYTORCH_NO_CUDA_MEMORY_CACHING=1 underboundedmemcheck; notyetlaunched.
+
+# CURRENT: GPU2 diagnostic production process verified running
+
+At2026-09-23T03:08:53.434959+00:00, productionPythonPID1418921, launcherPID1418914, queuePID1409572. Attempt`rdt-qd-ed-final-20260921T093925Z__gpu2_cuda_memcheck_blocking_c0_t00__3a0defb917b0` dispatched underfrozenHEADce2f198. ActualCUDA_VISIBLE_DEVICES=2, EGLindex1. Bindingevidence`/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__gpu2_cuda_memcheck_blocking_c0_t00__3a0defb917b0/actual-gpu2-process-binding.json`.600sdiagnosticcap; inspectterminalresult beforefurtheraction. Goalpaused; onlythisonebackgrounddiagnosticisqueued. PreservefrozenHEAD/source whilelive.
+
+# ACTIVE: GPU2 queue resumed after shared-lock wait fix
+
+QueuePID1409572, ticks380805610, frozenHEAD`ce2f198ac1c51ec13b324840579bb4e8b9e9219b`, plan`data/qd-ed-gpu2-blocking-memcheck-resume-plan.json`, SHA256`8b503faf0076e20f943be3e139e6ee12f7e9de4b74213168e97ae05e739a9b45`. ExistingundispatchedGPU2_CUDA_MEMCHECK_BLOCKING_C0 condition preserved.151CPUtests passed. Status/process/logprefix`runtime/gpu2-blocking-memcheck-resume-queue`. GPU2/EGL1only;120s idle gate;one600s diagnostic. Do not edit frozen source/HEAD while active. Parentfinalreport unchanged; noscientificcohort dispatch. Goalpaused.
+
 # 2026-09-23: queue had stopped before dispatch; repairing lock wait
 
 Priorqueue314500 failed2026-09-22T10:14:08UTC atsharedrunnerlock acquisition. gpu2_cuda_memcheck_blocking_c0_t00 haszero reserved/dispatched records andremains pending. GPU2currentlyidle; noownedworkers. Goalpaused. Parentbranch closedat2026-09-22T12:20:20UTC withTARGET_NOT_MET; report andallclosedcohorts preserved. Currentbranch continuation islimitedto thealready authorized, undispatched600sGPU2blockingmemcheck, noN1R/validation/formal dispatch. Sharedcosts synchronized; noreset. Audit`/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/analysis/gpu2-queue-resume-20260923/audit.json`. LockBusyError distinguishesexactlock; queuewaitsonsharedcontention onlybefore itsownGPUwork, refusespostdispatchretry.
