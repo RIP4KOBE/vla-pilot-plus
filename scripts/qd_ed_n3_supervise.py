@@ -30,7 +30,7 @@ def prerequisite(r,n,plan,runtime,root,*,boot=None,gpu_metadata=None):
     boot=Path('/proc/sys/kernel/random/boot_id').read_text().strip() if boot is None else boot
     r.require(boot==plan['boot_id']==n.BOOT,'N3 GPU3 boot changed')
     records={item['path']:item['sha256'] for item in plan['code_files']}
-    for relative in (n.SUPPORT,n.DEPENDENCIES,n.SUPERVISOR,n.MODULE,n.PROTOCOL,n.CLARIFICATION):
+    for relative in (n.SUPPORT,n.DEPENDENCIES,n.SUPERVISOR,n.MODULE,n.PROTOCOL,n.CLARIFICATION,n.ALLOCATION):
         r.require(records.get(relative)==r.digest(root/relative),'N3 supervisor/dependency source freeze differs')
     deps=r.read_json(root/n.DEPENDENCIES)
     r.verify_files(deps['files'])

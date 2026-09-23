@@ -62,6 +62,8 @@ def fixture(tmp_path):
           'n3_cohort':{'schema':'qd-ed-n3-cohort-v1','cohort_id':n.COHORT,'limits':copy.deepcopy(n.LIMITS),
               'protocol':{'path':n.PROTOCOL,'sha256':r.digest(root/n.PROTOCOL)},
               'accounting_clarification':{'path':n.CLARIFICATION,'sha256':r.digest(root/n.CLARIFICATION)},
+              'budget_allocation':copy.deepcopy(n.BUDGET_ALLOCATION),
+              'budget_allocation_amendment':{'path':n.ALLOCATION,'sha256':r.digest(root/n.ALLOCATION)},
               'health_resources':[{'resource_id':'prior-proof','scope':'reused_prior'}],
               'recorded_candidate_review':None,'checkpoint_release':None,
               'runtime_prerequisites':{'boot_id':n.BOOT,'reuse_scope':'prior_engineering_only_not_N3_algorithm_validation',
@@ -108,7 +110,7 @@ def test_exact_30_rows_common_observer_and_protocol_freeze(fixture):
     root,plan,manifest,runtime,seeds,_,_=fixture
     n.validate_contract(plan,manifest,runtime,seeds,root,r)
     assert [(x['task_id'],x['profile']) for x in plan['episodes']]==[(t,p) for t in range(10) for p in ('C0','Q0','N3')]
-    assert all(x['timeout_seconds']==1800 and x['budget_bucket']=='development' for x in plan['episodes'])
+    assert all(x['timeout_seconds']==1800 and x['budget_bucket']==n.BUDGET_ALLOCATION['original_by_profile'][x['profile']] for x in plan['episodes'])
     assert all(manifest['profiles'][p]['static_override_values']['main.decision_evidence.enabled'] is True for p in ('C0','Q0','N3'))
     for mutation,message in [(lambda p:p['episodes'].reverse(),'30 cells'),
         (lambda p:p['episodes'][0].update(env_seed=999),'30 cells'),
@@ -131,6 +133,51 @@ def test_fixed_order_and_checkpoint_ignore_success_but_require_valid_and_activat
     with pytest.raises(r.GateError,match='prior valid'):n.admission(plan,runtime,rows[3],changed,resources,root,r)
     plan['n3_cohort']['checkpoint_release']=attest('qd-ed-n3-checkpoint-v1',checks={k:k!='substantive_qd_activation' for k in n.CHECKS},attempt_ids=['0','1','2'])
     with pytest.raises(r.GateError,match='checkpoint'):n.admission(plan,runtime,rows[3],journal,resources,root,r)
+
+
+def test_prospective_arm_mapping_preserves_science_and_binds_amendment(fixture):
+    root,plan,manifest,runtime,seeds,*_=fixture
+    from collections import Counter
+    assert Counter(x['budget_bucket'] for x in plan['episodes'])=={'baseline':10,'development':20}
+    for row in plan['episodes']:
+        legacy={**row,'budget_bucket':'development'}
+        assert r.episode_identity(row)==r.episode_identity(legacy)
+    saved=n.binding(plan,runtime)
+    drift=copy.deepcopy(plan);drift['n3_cohort']['budget_allocation']['original_by_profile']['Q0']='baseline'
+    assert n.binding(drift,runtime)!=saved
+    with pytest.raises(r.GateError,match='budget allocation differs'):
+        n.validate_contract(drift,manifest,runtime,seeds,root,r)
+    drift=copy.deepcopy(plan);drift['episodes'][0]['budget_bucket']='development'
+    with pytest.raises(r.GateError,match='original 30 cells'):
+        n.validate_contract(drift,manifest,runtime,seeds,root,r)
+    drift=copy.deepcopy(plan);drift['n3_cohort']['budget_allocation_amendment']['sha256']='drift'
+    assert n.binding(drift,runtime)!=saved
+    with pytest.raises(r.GateError,match='clarification differs'):
+        n.validate_contract(drift,manifest,runtime,seeds,root,r)
+
+
+def test_actual_budget_checker_accepts_30_and_four_recoveries_without_changing_caps_or_history(fixture):
+    from test_qd_ed_final_runner import events_for, synced_state
+    _,plan,*_=fixture
+    journal=[]
+    for bucket,count in [('baseline',1),('development',72),('recovery',6)]:
+        for i in range(count):journal+=events_for(bucket+str(i),bucket=bucket)
+    original=copy.deepcopy(journal);caps=copy.deepcopy(r.BUCKETS)
+    rows=copy.deepcopy(plan['episodes'])+[{**plan['episodes'][i],'budget_bucket':'recovery'} for i in range(4)]
+    for i,row in enumerate(rows):
+        state=synced_state(journal);state['gpu_pool']=[3];before=copy.deepcopy(state)
+        timeout=r.check_budget(state,journal,row,physical_gpu=3)
+        n.protected_budget(state,journal,[],row,timeout,r)
+        assert timeout==1800 and state==before
+        journal+=events_for('new'+str(i),bucket=row['budget_bucket'],identity=r.episode_identity(row))
+    snap=r.budget_snapshot(journal)
+    assert snap['dispatched']==113 and snap['by_bucket']=={'baseline':11,'development':92,'recovery':10,'validation':0,'formal':0}
+    assert journal[:len(original)]==original and r.BUCKETS==caps
+    exhausted=journal+sum((events_for('more'+str(i),bucket='development') for i in range(8)),[])
+    state=synced_state(exhausted);state['gpu_pool']=[3]
+    with pytest.raises(r.GateError,match='development reserve exhausted'):
+        r.check_budget(state,exhausted,plan['episodes'][1],physical_gpu=3)
+
 
 
 @pytest.mark.parametrize('kind',['missing','unrecognized','no_history'])

@@ -13,6 +13,9 @@ d=load('n3_report_tests',ROOT/'scripts/qd_ed_n3_report.py')
 def report_plan(plan):
     plan=copy.deepcopy(plan)
     plan['n3_cohort']['protocol']['sha256']=d.sha(d.PROTOCOL)
+    amendment={'path':n.ALLOCATION,'sha256':d.sha(ROOT/n.ALLOCATION)}
+    plan['n3_cohort']['budget_allocation_amendment']=amendment
+    plan['code_files']=[amendment if x['path']==n.ALLOCATION else x for x in plan['code_files']]
     return plan
 
 
@@ -45,6 +48,19 @@ def test_matched_complete_numeric_threshold_paired_no_authorization(fixture):
     partial=d.summarize(plan,attempts[:-1])
     assert partial['matrix']=='incomplete' and partial['protocol_numeric_dev_criterion'] is None
     assert partial['profiles']['N3']['success_rate'] is None
+
+
+def test_report_preserves_budget_assignment_and_rejects_terminal_or_contract_relabel(fixture):
+    _,original,_,runtime,*_=fixture;plan=report_plan(original)
+    row=plan['episodes'][0];assert row['budget_bucket']=='baseline'
+    terminal=simple_attempt(plan,runtime,row,'c0')['terminal']
+    d.plan_contract(plan);d.validate_terminal(terminal,plan,'base-sha')
+    terminal['budget_bucket']='development'
+    with pytest.raises(ValueError,match='frozen condition differs'):
+        d.validate_terminal(terminal,plan,'base-sha')
+    changed=copy.deepcopy(plan);changed['n3_cohort']['budget_allocation']['original_by_profile']['C0']='development'
+    with pytest.raises(ValueError,match='budget allocation/amendment'):
+        d.plan_contract(changed)
 
 
 def test_immutable_base_plus_recovery_revision_preserves_both_terminals_and_costs(fixture):
