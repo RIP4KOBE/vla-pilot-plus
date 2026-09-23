@@ -8,7 +8,7 @@ import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 HERE = Path(__file__).resolve().parent
 spec = importlib.util.spec_from_file_location('observed_pairs', HERE/'observed-pairs.py')
@@ -102,6 +102,58 @@ class Tests(unittest.TestCase):
         api.check_budget.return_value = 1799
         with self.assertRaisesRegex(r.GateError, 'full episode timeout'):
             p.batch_budget(api, state, [], [], rows, [])
+
+    def journal_fixture(self, episode_seconds=3600):
+        rows = p.rows_from_dev(self.dev_seeds())
+        base = {'attempt_id': 'previous', 'budget_bucket': 'development',
+                'identity': r.episode_identity({**rows[0], 'iteration': 'PREVIOUS'})}
+        events = [{**base, 'event': 'reserved'}, {**base, 'event': 'dispatched'},
+                  {**base, 'event': 'aborted', 'gpu_process_wall_seconds': episode_seconds}]
+        resources = [{'resource_id': 'health', 'event': 'reserved'},
+                     {'resource_id': 'health', 'event': 'dispatched'},
+                     {'resource_id': 'health', 'event': 'completed', 'gpu_process_wall_seconds': 1800}]
+        state = {'gpu_pool': [3], 'max_concurrent_gpu_workers': 1,
+            'budget': {'max_episode_attempts': 240, 'max_gpu_hours': 48,
+                'reserved': dict(r.BUCKETS), 'gpu_hour_reservations': {'validation': 14., 'formal': 10.},
+                'dispatched': 239, 'aborted': 99, 'valid': 99, 'invalid': 99,
+                'completed': 198, 'running': 1, 'gpu_hours_consumed': 47.},
+            'runner': {'untouched_mutable_metadata': 'not used by budget checks'}}
+        return state, events, resources, rows
+
+    def test_actual_budget_uses_read_only_journal_view_including_resource_cost(self):
+        state, events, resources, rows = self.journal_fixture()
+        originals = copy.deepcopy((state, events, resources))
+        with tempfile.TemporaryDirectory() as folder:
+            paths = [Path(folder)/name for name in ('research-state.yaml', 'attempt-ledger.jsonl', 'gpu-healthcheck-ledger.jsonl')]
+            for path, value in zip(paths, originals): path.write_text(json.dumps(value))
+            before = [path.read_bytes() for path in paths]
+            with patch.object(r, 'sync_state_from_journal', side_effect=AssertionError('must not persist')) as sync:
+                view = p.journal_budget_view(r, state, events, resources)
+                p.batch_budget(r, view, events, resources, rows, [])
+                sync.assert_not_called()
+            self.assertEqual([path.read_bytes() for path in paths], before)
+        self.assertEqual((state, events, resources), originals)
+        self.assertEqual(view['budget']['dispatched'], 1)
+        self.assertEqual(view['budget']['gpu_hours_consumed'], 1.5)
+        self.assertEqual(view['budget']['running'], 0)
+        for name in ('max_episode_attempts', 'max_gpu_hours', 'reserved', 'gpu_hour_reservations'):
+            self.assertEqual(view['budget'][name], state['budget'][name])
+        self.assertEqual(view['runner'], state['runner'])
+        self.assertEqual(r.check_budget(view, events, rows[0], resources, [], physical_gpu=3), 1800)
+
+    def test_actual_journal_limits_still_reject_optimistic_stale_state(self):
+        state, events, resources, rows = self.journal_fixture(21.5*3600)
+        state['budget'].update(dispatched=0, gpu_hours_consumed=0.)
+        original = copy.deepcopy(state)
+        view = p.journal_budget_view(r, state, events, resources)
+        self.assertEqual(view['budget']['gpu_hours_consumed'], 22.)
+        with self.assertRaisesRegex(r.GateError, 'protected GPU-hour'):
+            p.batch_budget(r, view, events, resources, rows, [])
+        events[-1]['gpu_process_wall_seconds'] = 48*3600
+        exhausted = p.journal_budget_view(r, state, events, resources)
+        with self.assertRaisesRegex(r.GateError, 'GPU budget exhausted'):
+            p.batch_budget(r, exhausted, events, resources, rows, [])
+        self.assertEqual(state, original)
 
 
 if __name__ == '__main__': unittest.main()

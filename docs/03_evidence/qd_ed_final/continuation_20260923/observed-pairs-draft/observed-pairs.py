@@ -159,6 +159,19 @@ def prerequisite(r, plan, root):
         kernel['kind'] == 'episode' and kernel['faults'] == [], 'GPU3 common-condition process evidence differs')
 
 
+def journal_budget_view(r, state, events, resources):
+    """Read-only prepare view from the terminal journal held by the runner lock.
+
+    Refresh only sync_state_from_journal's dynamic budget fields. Authorization,
+    maxima, reserves and the caller's original state are never changed.
+    """
+    view = copy.deepcopy(state)
+    snapshot = r.budget_snapshot(events, resources)
+    for key in ('dispatched', 'aborted', 'valid', 'invalid', 'completed', 'running', 'gpu_hours_consumed'):
+        view['budget'][key] = snapshot[key]
+    return view
+
+
 def batch_budget(r, state, events, resources, rows, reservations):
     snap = r.budget_snapshot(events, resources)
     budget = state['budget']
@@ -236,7 +249,8 @@ def prepare(args, r, q, root):
         r.require(q.candidate_indices(state) == [3] and r.authorized_gpu(state) == 3,
                   'GPU3-only authorization required')
         r.require(not any(event.get('episode_key') in KEYS for event in events), 'new key already used')
-        batch_budget(r, state, events, resources, plan['episodes'],
+        budget_state = journal_budget_view(r, state, events, resources)
+        batch_budget(r, budget_state, events, resources, plan['episodes'],
                      r.read_events(root/'data/gpu-hour-reservation-ledger.jsonl'))
         output.parent.mkdir(parents=True, exist_ok=True)
         with output.open('x') as stream:
