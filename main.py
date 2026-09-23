@@ -1382,6 +1382,12 @@ class Main:
                 ) if key in query_result},
             })
 
+        # This explicitly frozen transport condition fails closed after preserving
+        # its event. The episode exception path still saves video and all usage.
+        if (query_status == "error" and
+                getattr(self.gemini_stage_recognizer, "output_format", None) == "json_schema_v1"):
+            raise RuntimeError("stage_json_query_failed: " + str(query_result.get("error")))
+
         # Update tracking state
         state['prev_norm_reward'] = curr_reward
         state['prev_gripper_open'] = curr_gripper_open

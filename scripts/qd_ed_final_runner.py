@@ -407,7 +407,7 @@ def build_command(plan, manifest, runtime, row, attempt_id):
         'main.eds_eval.report_dir': str(Path(plan['worktree']) / 'docs/03_evidence/qd_ed_final'),
         'main.eds_eval.job_id': attempt_id,
         'main.eds_eval.method_label': profile['historical_label'] + '__input_repaired' +
-            ('__' + CODEX_STAGE_CONDITION if provider_values else ''),
+            ('__' + codex_stage_condition(runtime) if provider_values else ''),
         'main.eds_mechanism_pretest.output_dir': str(output / 'mechanism'),
         'main.eds_mechanism_pretest.run_id': attempt_id,
     }
@@ -477,7 +477,14 @@ def codex_removed_environment():
 def codex_public_config(frozen):
     """Effective public invocation contract, never a hash of account files."""
     return codex_policy_module().public_invocation_policy(
-        **{key: frozen[key] for key in CODEX_CONFIG_KEYS if key != 'backend'})
+        **{key: frozen[key] for key in CODEX_CONFIG_KEYS if key != 'backend'},
+        output_format=frozen.get('output_format', 'legacy_text'))
+
+
+def codex_stage_condition(runtime):
+    mode = runtime.get('frozen_stage_provider', {}).get('output_format', 'legacy_text')
+    require(mode in {'legacy_text', 'json_schema_v1'}, 'unknown frozen Stage output format')
+    return 'codex_login_astra_low_json_v1' if mode == 'json_schema_v1' else CODEX_STAGE_CONDITION
 
 
 def codex_public_config_sha256(frozen):
@@ -488,6 +495,7 @@ def stage_overrides(runtime):
     frozen = runtime.get('frozen_stage_provider', {})
     if frozen.get('backend') != 'codex_cli':
         return {}
+    codex_stage_condition(runtime)
     require(frozen.get('model') == 'gpt-6-astra' and frozen.get('auth_mode') == 'chatgpt',
             'Codex Stage model/auth differs from authorized contract')
     require(frozen.get('reasoning_effort') == 'low' and type(frozen.get('timeout_seconds')) is int
@@ -505,7 +513,10 @@ def stage_overrides(runtime):
             'Codex public invocation fingerprint mismatch')
     require(not any(key in frozen for key in ('api_key', 'base_url', 'credential_env_name', 'access_token')),
             'Codex managed login contract must not contain API credentials/endpoints')
-    return {f'perception.gemini.{key}': frozen[key] for key in CODEX_CONFIG_KEYS}
+    overrides = {f'perception.gemini.{key}': frozen[key] for key in CODEX_CONFIG_KEYS}
+    if 'output_format' in frozen:
+        overrides['perception.gemini.output_format'] = frozen['output_format']
+    return overrides
 
 
 def verify_provider(runtime, env, *, root=ROOT, run=subprocess.run):
@@ -795,6 +806,12 @@ def episode_compute(output,row,runtime=None):
     require(transport.get('auth_mode') == 'chatgpt' and
             transport.get('public_config_sha256') == frozen['public_config_sha256'],
             'Codex observed public invocation policy differs from frozen binding')
+    mode = frozen.get('output_format', 'legacy_text')
+    require(transport.get('output_format', 'legacy_text') == mode,
+            'Codex observed Stage output format differs from frozen binding')
+    if mode == 'json_schema_v1':
+        require(transport.get('output_schema_sha256') == codex_public_config(frozen)['output_schema_sha256'],
+                'Codex observed Stage output schema differs from frozen binding')
     require(transport.get('application_max_attempts') == 1 and
             transport.get('internal_http_retry_observation_available') is False and
             transport.get('internal_retry_policy') == 'cli_managed_unknown', 'Codex retry observation contract missing')
@@ -825,7 +842,7 @@ def episode_compute(output,row,runtime=None):
     usage_complete = record['provider_usage_complete_calls'] == record['provider_logical_call_attempts']
     require(record.get('provider_token_usage_complete') is usage_complete, 'Codex token usage completeness label mismatch')
     result.update(stage_transport=transport, stage_backend='codex_cli', stage_model=frozen['model'],
-                  stage_condition=CODEX_STAGE_CONDITION,
+                  stage_condition=codex_stage_condition(runtime),
                   provider_http_counters_available=False, provider_logical_counters_available=True,
                   provider_http_observation='not_observable_through_codex_cli',
                   provider_token_usage_complete=usage_complete,
@@ -1035,7 +1052,7 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                   'retry_of':row.get('retry_of'),'output_dir':str(output),'physical_gpu':physical_gpu}
             if runtime.get('frozen_stage_provider', {}).get('backend') == 'codex_cli':
                 base.update(stage_backend='codex_cli', stage_model=runtime['frozen_stage_provider']['model'],
-                            stage_condition=CODEX_STAGE_CONDITION)
+                            stage_condition=codex_stage_condition(runtime))
             append_event(root,{**base,'event':'reserved','time_unix':time.time(),'admission':admission})
             durable_json(output/'command.json',{'argv':command,'environment_public':{**runtime['environment'],'CUDA_VISIBLE_DEVICES':str(physical_gpu),'CUDA_DEVICE_ORDER':'PCI_BUS_ID','MUJOCO_EGL_DEVICE_ID':str(runtime['gpu_mapping']['egl_device_index'])}})
             process=None; started=time.monotonic(); process_finished=None; dispatched=False

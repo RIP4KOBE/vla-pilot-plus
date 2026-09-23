@@ -536,6 +536,40 @@ def test_codex_child_removes_alternate_api_bindings_only_in_child(tmp_path, monk
     assert runner.os.environ['OPENAI_API_KEY'] == 'unit-test-placeholder'
 
 
+def test_structured_stage_condition_requires_fresh_policy_hash_and_explicit_override(tmp_path):
+    runtime = codex_runtime(tmp_path)
+    old = runtime['frozen_stage_provider']['public_config_sha256']
+    assert runner.codex_stage_condition(runtime) == 'codex_login_astra_low_v1'
+    runtime['frozen_stage_provider']['output_format'] = 'json_schema_v1'
+    with pytest.raises(runner.GateError, match='fingerprint'):
+        runner.stage_overrides(runtime)
+    runtime['frozen_stage_provider']['public_config_sha256'] = runner.codex_public_config_sha256(runtime['frozen_stage_provider'])
+    assert runtime['frozen_stage_provider']['public_config_sha256'] != old
+    assert runner.stage_overrides(runtime)['perception.gemini.output_format'] == 'json_schema_v1'
+    assert runner.codex_stage_condition(runtime) == 'codex_login_astra_low_json_v1'
+    runtime['frozen_stage_provider']['output_format'] = 'misspelled'
+    with pytest.raises(runner.GateError, match='output format'):
+        runner.stage_overrides(runtime)
+
+
+def test_structured_stage_costs_bind_observed_format_and_schema(tmp_path, monkeypatch):
+    episode, _, runtime, path, record = codex_compute_case(tmp_path, monkeypatch)
+    frozen = runtime['frozen_stage_provider']
+    frozen['output_format'] = 'json_schema_v1'
+    frozen['public_config_sha256'] = runner.codex_public_config_sha256(frozen)
+    record['stage_transport']['public_config_sha256'] = frozen['public_config_sha256']
+    path.write_text(json.dumps(record) + '\n')
+    with pytest.raises(runner.GateError, match='output format'):
+        runner.episode_compute(tmp_path, episode, runtime)
+    record['stage_transport']['output_format'] = 'json_schema_v1'
+    path.write_text(json.dumps(record) + '\n')
+    with pytest.raises(runner.GateError, match='output schema'):
+        runner.episode_compute(tmp_path, episode, runtime)
+    record['stage_transport']['output_schema_sha256'] = runner.codex_public_config(frozen)['output_schema_sha256']
+    path.write_text(json.dumps(record) + '\n')
+    assert runner.episode_compute(tmp_path, episode, runtime)['stage_condition'] == 'codex_login_astra_low_json_v1'
+
+
 def test_codex_provider_requires_managed_login_frozen_binary_and_installed_skill_set(tmp_path):
     runtime = codex_runtime(tmp_path)
     (tmp_path / 'configs').mkdir()

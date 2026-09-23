@@ -1273,6 +1273,39 @@ def test_guidance_toggle_without_stage_change_resets_eds_chunk_memory(tmp_path):
     assert calls == ["guidance_change"]
 
 
+@pytest.mark.parametrize("output_format", ["legacy_text", "json_schema_v1"])
+def test_failed_stage_query_preserves_evidence_before_json_condition_stops(output_format):
+    import main
+
+    result = {"ok": False, "error": "codex_invalid_structured_response",
+              "raw_response": "malformed", "codex_output_tokens": 51}
+    recognizer = SimpleNamespace(output_format=output_format, last_result=result,
+        identify_stage_and_guidance=lambda **kwargs: (1, True))
+    runner = main.Main.__new__(main.Main)
+    runner.policy = SimpleNamespace(get_normalized_reward=lambda: 0.0)
+    runner.config = {"vlm_query_limit": 10}
+    runner.gemini_stage_recognizer = recognizer
+    runner.adapter = SimpleNamespace(get_vlm_image=lambda: np.zeros((2, 2, 3)),
+                                    get_task_description=lambda: "swap objects")
+    runner.stage_descriptions = ["pick", "place"]
+    runner.init_img_with_keypoints = None
+    runner.keypoint_id_to_object = {}
+    runner.guidance_fns = {1: [], 2: []}
+    events = []
+    runner._append_stage_event = events.append
+    state = {"prev_norm_reward": 0.0, "prev_gripper_open": True,
+             "current_stage": 1, "use_guidance": True, "vlm_query_count": 0}
+    if output_format == "json_schema_v1":
+        with pytest.raises(RuntimeError, match="stage_json_query_failed"):
+            runner._update_stage(state, 1.0, 0.8, 0.6)
+    else:
+        assert runner._update_stage(state, 1.0, 0.8, 0.6)["current_stage"] == 1
+    assert len(events) == 1
+    assert events[0]["query_ok"] is False
+    assert events[0]["raw_response"] == "malformed"
+    assert events[0]["codex_output_tokens"] == 51
+
+
 def test_guidance_toggle_without_memory_hook_is_valid_for_vls_policy(tmp_path):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     import main

@@ -71,6 +71,7 @@ class CodexStageRecognizer(GeminiStageRecognizer):
     def _configure_transport(self, config):
         self.model = str(config.get("model", "gpt-6-astra"))
         self.reasoning_effort = str(config.get("reasoning_effort", "low"))
+        self.output_format = config.get("output_format", "legacy_text")
         self.timeout_seconds = float(config.get("timeout_seconds", 90))
         if not 0 < self.timeout_seconds <= 600:
             raise ValueError("Codex Stage timeout must be in (0, 600] seconds")
@@ -84,6 +85,7 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         self.public_policy = public_invocation_policy(
             model=self.model, reasoning_effort=self.reasoning_effort,
             timeout_seconds=self.timeout_seconds, cli_path=self.cli_path,
+            output_format=self.output_format,
             disabled_skill_paths=(config["disabled_skill_paths"] if config.get("disabled_skill_paths") is not None
                                   else discover_disabled_skill_paths()),
         )
@@ -99,6 +101,9 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         }
         self._call_transport = {}
         self._call_raw_response = None
+        if self.output_format == "json_schema_v1":
+            self.transport_metadata.update(output_format=self.output_format,
+                output_schema_sha256=self.public_policy["output_schema_sha256"])
 
     def _command(self, directory, image_paths):
         policy = self.public_policy
@@ -116,6 +121,10 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                 encoded = "{}" if value == {} else json.dumps(value)
             command.extend(["--config", f"{key}={encoded}"])
         command.extend(["--config", f"log_dir={json.dumps(str(directory / 'log'))}"])
+        if self.output_format == "json_schema_v1":
+            schema_path = directory / "stage-output.schema.json"
+            schema_path.write_text(json.dumps(policy["output_schema"], sort_keys=True))
+            command.extend(["--output-schema", str(schema_path)])
         for feature in policy["disabled_features"]:
             command.extend(["--disable", feature])
         for feature in policy["enabled_features"]:
@@ -202,6 +211,27 @@ class CodexStageRecognizer(GeminiStageRecognizer):
             raise CodexStageError(error_code)
         return messages[0]
 
+    def _normalize_structured_response(self, output):
+        """Validate the raw JSON, then use the unchanged legacy decision parser."""
+        def unique_pairs(pairs):
+            value = {}
+            for key, item in pairs:
+                if key in value:
+                    raise ValueError("duplicate field")
+                value[key] = item
+            return value
+        try:
+            value = json.loads(output, object_pairs_hook=unique_pairs)
+            if (not isinstance(value, dict) or set(value) != {"stage", "guidance", "evidence"}
+                    or type(value["stage"]) is not int or value["stage"] < 0
+                    or value["guidance"] not in ("yes", "no")
+                    or not isinstance(value["evidence"], str) or not value["evidence"].strip()):
+                raise ValueError("invalid response")
+        except (ValueError, TypeError):
+            raise CodexStageError("codex_invalid_structured_response") from None
+        evidence = " ".join(value["evidence"].splitlines())
+        return f"stage {value['stage']}\nguidance: {value['guidance']}\nevidence: {evidence}"
+
     def _request_stage_response(self, content):
         self.api_request_counter.values["logical_call_attempts"] += 1
         self._call_transport = dict(self.transport_metadata)
@@ -260,6 +290,8 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                     output = self._parse_events(raw_events)
                     if process.returncode != 0:
                         raise CodexStageError("codex_nonzero_exit")
+                    if self.output_format == "json_schema_v1":
+                        return self._normalize_structured_response(output)
                     return output
         except CodexStageError:
             raise
@@ -278,6 +310,9 @@ class CodexStageRecognizer(GeminiStageRecognizer):
             api_request_counter_available=False, transport=dict(self._call_transport),
         )
         if self._last_result["raw_response"] is None:
+            self._last_result["raw_response"] = self._call_raw_response
+        if self.output_format == "json_schema_v1":
+            self._last_result["normalized_response"] = self._last_result["raw_response"]
             self._last_result["raw_response"] = self._call_raw_response
         for key in _COUNTER_FIELDS:
             before_value = counter_before[key]

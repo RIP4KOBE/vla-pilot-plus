@@ -33,7 +33,8 @@ def events(answer=ANSWER, usage=None):
     ]
 
 
-def make(monkeypatch, tmp_path, event_list=None, returncode=0, timeout=False, raw=None):
+def make(monkeypatch, tmp_path, event_list=None, returncode=0, timeout=False, raw=None,
+         output_format="legacy_text"):
     calls = []
     cli = tmp_path / "codex"
     cli.touch()
@@ -50,6 +51,8 @@ def make(monkeypatch, tmp_path, event_list=None, returncode=0, timeout=False, ra
             self.kwargs = kwargs
             paths = [command[i + 1] for i, part in enumerate(command) if part == "--image"]
             self.images = [np.array(Image.open(path)) for path in paths]
+            self.schema = (json.loads(Path(command[command.index('--output-schema') + 1]).read_text())
+                           if '--output-schema' in command else None)
             calls.append(self)
             data = raw if raw is not None else "\n".join(json.dumps(event) for event in event_list).encode()
             kwargs["stdout"].write(data)
@@ -68,6 +71,7 @@ def make(monkeypatch, tmp_path, event_list=None, returncode=0, timeout=False, ra
         "backend": "codex_cli", "model": "gpt-6-astra", "cli_path": str(cli),
         "stage_template_path": str(template), "disabled_skill_paths": ["/active/one"],
         "timeout_seconds": 90,
+        "output_format": output_format,
     })
     return recognizer, calls
 
@@ -127,6 +131,61 @@ def test_child_environment_uses_existing_login_without_mutating_parent(monkeypat
     assert module.os.environ["OPENAI_API_KEY"] == "test-provider-value"
     assert "test-provider-value" not in json.dumps(calls[0].command)
     assert "auth.json" not in json.dumps(recognizer.public_policy)
+
+
+def test_structured_output_validates_schema_preserves_raw_json_and_usage(monkeypatch, tmp_path):
+    answer = json.dumps({'stage': 2, 'guidance': 'no', 'evidence': 'object grasped\nready to move'})
+    recognizer, calls = make(monkeypatch, tmp_path, event_list=events(answer=answer),
+                             output_format='json_schema_v1')
+    assert identify(recognizer) == (2, False)
+    assert calls[0].schema == recognizer.public_policy['output_schema']
+    assert calls[0].schema['additionalProperties'] is False
+    assert set(calls[0].schema['required']) == {'stage', 'guidance', 'evidence'}
+    assert recognizer.last_result['raw_response'] == answer
+    assert recognizer.last_result['evidence'] == 'object grasped ready to move'
+    assert recognizer.last_result['codex_input_tokens'] == USAGE['input_tokens']
+    assert recognizer.last_result['codex_failed_calls'] == 0
+    assert recognizer.last_result['transport']['output_format'] == 'json_schema_v1'
+    assert 'supersedes the three-line' in recognizer.public_policy['config_overrides']['developer_instructions']
+
+
+@pytest.mark.parametrize('answer', [
+    'Need soup lying outside Current outside basket left not visibly held. stage1 final N',
+    ANSWER, 'null', '[]', '{}',
+    '{"stage":1,"stage":2,"guidance":"no","evidence":"held"}',
+    *[json.dumps(value) for value in [
+        {'stage': 1, 'evidence': 'near'},
+        {'stage': True, 'guidance': 'yes', 'evidence': 'near'},
+        {'stage': 1.0, 'guidance': 'yes', 'evidence': 'near'},
+        {'stage': -1, 'guidance': 'yes', 'evidence': 'near'},
+        {'stage': 1, 'guidance': True, 'evidence': 'near'},
+        {'stage': 1, 'guidance': 'maybe', 'evidence': 'near'},
+        {'stage': 1, 'guidance': 'yes', 'evidence': ''},
+        {'stage': 1, 'guidance': 'yes', 'evidence': 3},
+        {'stage': 1, 'guidance': 'yes', 'evidence': 'near', 'extra': 'unapproved'},
+    ]],
+])
+def test_structured_malformed_response_fails_without_retry_and_keeps_raw_usage(monkeypatch, tmp_path, answer):
+    recognizer, calls = make(monkeypatch, tmp_path, event_list=events(answer=answer),
+                             output_format='json_schema_v1')
+    assert identify(recognizer) == (1, True)
+    assert len(calls) == 1
+    assert recognizer.last_result['error'] == 'codex_invalid_structured_response'
+    assert recognizer.last_result['raw_response'] == answer
+    assert recognizer.last_result['codex_failed_calls'] == 1
+    assert recognizer.last_result['codex_usage_complete_calls'] == 1
+
+
+def test_output_format_is_explicit_frozen_choice_and_legacy_stays_unconstrained(monkeypatch, tmp_path):
+    recognizer, calls = make(monkeypatch, tmp_path)
+    identify(recognizer)
+    assert '--output-schema' not in calls[0].command
+    assert 'output_schema' not in recognizer.public_policy
+    kwargs = dict(model='gpt-6-astra', reasoning_effort='low', timeout_seconds=90,
+                  cli_path=recognizer.cli_path, disabled_skill_paths=['/active/one'])
+    assert policy_sha256(public_invocation_policy(**kwargs, output_format='json_schema_v1')) != policy_sha256(recognizer.public_policy)
+    with pytest.raises(ValueError, match='output format'):
+        public_invocation_policy(**kwargs, output_format='json')
 
 
 def test_cli_policy_disables_tools_skills_and_preserves_builtin_system_prompt(monkeypatch, tmp_path):

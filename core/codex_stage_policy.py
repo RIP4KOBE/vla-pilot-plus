@@ -34,10 +34,24 @@ _COUNTER_FIELDS = (
     "output_tokens", "reasoning_output_tokens", "call_latency_s",
 )
 
+STAGE_OUTPUT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "stage": {"type": "integer", "minimum": 0},
+        "guidance": {"type": "string", "enum": ["yes", "no"]},
+        "evidence": {"type": "string"},
+    },
+    "required": ["stage", "guidance", "evidence"],
+    "additionalProperties": False,
+}
 
-def public_invocation_policy(*, model, reasoning_effort, timeout_seconds, cli_path, disabled_skill_paths=()):
+
+def public_invocation_policy(*, model, reasoning_effort, timeout_seconds, cli_path,
+                             disabled_skill_paths=(), output_format="legacy_text"):
     """Credential-free, deterministic full wrapper policy for freeze hashes."""
-    return {
+    if output_format not in {"legacy_text", "json_schema_v1"}:
+        raise ValueError("Unknown Codex Stage output format")
+    policy = {
         "backend": "codex_cli", "auth_mode": "chatgpt", "model": str(model),
         "reasoning_effort": str(reasoning_effort),
         "timeout_seconds": float(timeout_seconds), "cli_path": str(cli_path),
@@ -72,6 +86,18 @@ def public_invocation_policy(*, model, reasoning_effort, timeout_seconds, cli_pa
         "maximum_event_bytes": _MAX_EVENTS_BYTES,
         "process_group": "inherit_outer_runner_group",
     }
+    if output_format == "json_schema_v1":
+        policy["output_format"] = output_format
+        policy["output_schema"] = json.loads(json.dumps(STAGE_OUTPUT_SCHEMA))
+        policy["output_schema_sha256"] = policy_sha256(STAGE_OUTPUT_SCHEMA)
+        policy["output_policy"] = "one_turn_one_schema_json_message_required_usage_no_tools"
+        policy["config_overrides"]["developer_instructions"] = _DEVELOPER_INSTRUCTIONS.replace(
+            "Return only the three lines requested by the user prompt.",
+            "Apply the same Stage decision rules in the user prompt. Return only a JSON object "
+            "conforming to the supplied output schema: stage is the nonnegative stage number, "
+            "guidance is yes or no, and evidence is a brief nonempty observation. "
+            "This JSON format supersedes the three-line output format in the user prompt.")
+    return policy
 
 
 def policy_sha256(policy):
