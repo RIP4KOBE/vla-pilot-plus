@@ -1,0 +1,19 @@
+{
+  "schema": "n3-recorded-final-pool-input-interface-v1",
+  "input_schema": "n3-recorded-final-pool-input-v1",
+  "reference": {"path": "canonical absolute path under original A", "sha256": "64 lowercase hex characters"},
+  "required_references": ["matrix_report", "tracking_index", "tracking_provenance", "tracking_status", "fresh_audit_bindings"],
+  "provider_sources": "Complete list of exact path/text-SHA references from all accepted Q0 approved selected-tracking metadata, including unsupported semantics; no labels or default target index",
+  "scientific_scope": "All10 accepted Q0 representatives and all their decisions, only structurally eligible adjacent pairs' actual recorded final pools; invalid predecessors/C0/N2 payloads excluded",
+  "bundle_authority": "Exact Q0 status/index/bundle hashes inherited from completed approved selected-tracking provenance and fresh-audit binding; no re-audit",
+  "authorization_schema": "n3-recorded-final-pool-authorization-v1",
+  "authorization_fields": {
+    "schema": "n3-recorded-final-pool-authorization-v1",
+    "status": "AUTHORIZED_CPU_READ",
+    "conditional_math_only": true,
+    "freeze": "reference to reviewed freeze-v1.json",
+    "input_manifest": "reference to reviewed immutable input-manifest-v1.json copied under A"
+  },
+  "preparation_is_execution_authority": false,
+  "historical_runtime_eligibility": "Unknown_missing_tracker_validity_tokens"
+}

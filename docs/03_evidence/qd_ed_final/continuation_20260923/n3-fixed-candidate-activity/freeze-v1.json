@@ -1,0 +1,70 @@
+{
+  "actual_read_authorized": false,
+  "cpu_environment": {
+    "cuda_initialized": false,
+    "marshal_version": 4,
+    "python": "3.12.12 | packaged by conda-forge | (main, Oct 22 2025, 23:25:55) [GCC 14.3.0]",
+    "python_version": [
+      3,
+      12,
+      12
+    ],
+    "torch_version": "2.7.1+cu126"
+  },
+  "dependencies": {
+    "loader_identity_reproduction": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/provider-identity-correction/reproduce_identity.py",
+      "sha256": "e0547e51c6565f9554f859926540e99d0b86dfc19d234864c6b8fc66aadac9e0"
+    },
+    "loader_identity_review": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/provider-identity-correction/README.md",
+      "sha256": "7c2bb5024d05505394a6efe7df55eefe0a51696110acd9496355c683cb3e3f36"
+    },
+    "n3_protocol": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_003_executed_feedback/protocol.md",
+      "sha256": "05c83a8eb3801d4a4c4f41bee28c531505a7767aa56ba482399013068679b931"
+    },
+    "original_loader": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/utils/guidance_utils.py",
+      "sha256": "b0fe9d6d5fc014143f5877918de9bd0986b1688b4a6a90980847b7d15cab0c82"
+    },
+    "original_static_source_review": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/provider-target-review/static-output/review.json",
+      "sha256": "e3ab0144c64069d5ce5b6bea2ea8c208195442312e4a4893ee58a7369cc77ed6"
+    },
+    "quality_helper": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/core/qd_executed_feedback.py",
+      "sha256": "33d1e38212741ccbf24e150c2b9739cc026ed553925ab7084d9e8b8d32e090ab"
+    },
+    "semantic_helper": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/core/qd_executed_quality.py",
+      "sha256": "d83dbd53e75708f3a6e71cab9c0814dc82a42c68898d53cb370df37d9a8c946b"
+    },
+    "tracking_reader": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/selected-tracking-preparation-v1/source-v1/read_selected_tracking.py",
+      "sha256": "a33714747a47415c8a8d64ba3297a016550e95b6f54a174a1654875603deec26"
+    }
+  },
+  "local_files": {
+    "check_activity.py": "ea166d0e49339eff1d94f32a25ca7d3e525f44bd91a8c36841b81a05e7d0e51e",
+    "cpu-tests-v1.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "cpu-tests-v1.stdout.txt": "2a4cb4d32458e82bb1571577706f3dad9a6edd3b95920fa8e8d031472b94cac7",
+    "cpu-validation-v1.json": "37f39336962bf5e0bb7d9f3f90aa89e4a9448388f3fae63fa147b1ba57455f72",
+    "dependency-manifest-v1.json": "c29246b9e4fdf56fe29c83715871a554c54f556eb422996d969d3224b0b91c87",
+    "input-manifest-v1.json": "e8dfbb8d8c91355d008817ef15392eef7360a6c0018f792f04b43c4e44533f50",
+    "input-schema-v1.json": "620324d2b4b2f440d8fc21318de1e20655171210907752c99d6694d8a273e402",
+    "metadata-interface-check-v1.json": "53d24b9ebd5247c0006a3bcfe5cdcf495359a39e06d0a2c6ba70a8dac75dd91d",
+    "protocol-v1.md": "d0513f4ec0a3fc5d66ff8093e527d713f94ae60709c90f4b71dadc7c1ca974b0",
+    "test_check_activity.py": "ec19d86e66001956a01ed5d02e905c701be429b61a71bbcda3e884b851bc181d"
+  },
+  "schema": "n3-recorded-activity-freeze-v1",
+  "scope": "All10 accepted Q0; all guided and excluded decisions; every structurally eligible adjacent pair; actual final pools only; historical runtime eligibility Unknown",
+  "separate_actual_authorization_required": true,
+  "status": "CPU_TESTED_FROZEN_PENDING_ROOT_READ_AUTHORIZATION",
+  "tests": {
+    "driver_seconds": 1.8071518940050737,
+    "failed": 0,
+    "passed": 37,
+    "pytest_seconds": 1.16
+  }
+}

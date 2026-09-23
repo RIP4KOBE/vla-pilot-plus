@@ -1,0 +1,77 @@
+{
+  "actual_candidate_reads_authorized": false,
+  "compiler_contract": {
+    "dont_inherit": true,
+    "filename": "sys.intern(<string>)",
+    "flags": 0,
+    "marshal_version": 4,
+    "optimize": 0,
+    "provider_exec_or_call": false,
+    "python": [
+      3,
+      12,
+      12
+    ]
+  },
+  "cpu_environment": {
+    "cuda_initialized": false,
+    "marshal_version": 4,
+    "python": "3.12.12 | packaged by conda-forge | (main, Oct 22 2025, 23:25:55) [GCC 14.3.0]",
+    "python_version": [
+      3,
+      12,
+      12
+    ],
+    "torch_version": "2.7.1+cu126"
+  },
+  "executed_local_modules": [
+    "check_activity.py",
+    "quality_helper",
+    "semantic_helper",
+    "tracking_reader"
+  ],
+  "not_executed": [
+    "original_loader",
+    "loader_identity_reproduction",
+    "loader_identity_review",
+    "original_static_source_review",
+    "n3_protocol"
+  ],
+  "original_source": "525506ca3198f54d86dadf84bbb76eb64926d87a via approved immutable report/tracking/fresh-audit chain; no old W live-byte equality requirement",
+  "quality_helper_sole_local_import": "core.qd_executed_quality._validate_keypoints; module name prebound to the exact semantic_helper file; parent core package is not imported",
+  "references": {
+    "loader_identity_reproduction": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/provider-identity-correction/reproduce_identity.py",
+      "sha256": "e0547e51c6565f9554f859926540e99d0b86dfc19d234864c6b8fc66aadac9e0"
+    },
+    "loader_identity_review": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/provider-identity-correction/README.md",
+      "sha256": "7c2bb5024d05505394a6efe7df55eefe0a51696110acd9496355c683cb3e3f36"
+    },
+    "n3_protocol": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_003_executed_feedback/protocol.md",
+      "sha256": "05c83a8eb3801d4a4c4f41bee28c531505a7767aa56ba482399013068679b931"
+    },
+    "original_loader": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/utils/guidance_utils.py",
+      "sha256": "b0fe9d6d5fc014143f5877918de9bd0986b1688b4a6a90980847b7d15cab0c82"
+    },
+    "original_static_source_review": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/provider-target-review/static-output/review.json",
+      "sha256": "e3ab0144c64069d5ce5b6bea2ea8c208195442312e4a4893ee58a7369cc77ed6"
+    },
+    "quality_helper": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/core/qd_executed_feedback.py",
+      "sha256": "33d1e38212741ccbf24e150c2b9739cc026ed553925ab7084d9e8b8d32e090ab"
+    },
+    "semantic_helper": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/core/qd_executed_quality.py",
+      "sha256": "d83dbd53e75708f3a6e71cab9c0814dc82a42c68898d53cb370df37d9a8c946b"
+    },
+    "tracking_reader": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/selected-tracking-preparation-v1/source-v1/read_selected_tracking.py",
+      "sha256": "a33714747a47415c8a8d64ba3297a016550e95b6f54a174a1654875603deec26"
+    }
+  },
+  "schema": "n3-recorded-activity-dependencies-v1"
+}

@@ -1,0 +1,42 @@
+{
+  "actual_candidate_rows_read": 0,
+  "actual_rescores": 0,
+  "command": [
+    "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-fixed-candidate-activity/test_check_activity.py"
+  ],
+  "cpu_environment": {
+    "cuda_initialized": false,
+    "marshal_version": 4,
+    "python": "3.12.12 | packaged by conda-forge | (main, Oct 22 2025, 23:25:55) [GCC 14.3.0]",
+    "python_version": [
+      3,
+      12,
+      12
+    ],
+    "torch_version": "2.7.1+cu126"
+  },
+  "cwd": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923",
+  "exit_code": 0,
+  "failed": 0,
+  "passed": 37,
+  "provider_model_projector_simulator_calls": 0,
+  "schema": "n3-recorded-activity-cpu-validation-v1",
+  "scope": "37 focused synthetic checks only; metadata-interface-check separately reads approved JSON refs with .pt and provider .txt intercepted. No broad project tests.",
+  "stderr": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-fixed-candidate-activity/cpu-tests-v1.stderr.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-fixed-candidate-activity/cpu-tests-v1.stdout.txt",
+    "sha256": "2a4cb4d32458e82bb1571577706f3dad9a6edd3b95920fa8e8d031472b94cac7"
+  },
+  "tested_helper_sha256": {
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/core/qd_executed_feedback.py": "33d1e38212741ccbf24e150c2b9739cc026ed553925ab7084d9e8b8d32e090ab",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/core/qd_executed_quality.py": "d83dbd53e75708f3a6e71cab9c0814dc82a42c68898d53cb370df37d9a8c946b"
+  },
+  "wall_seconds": 1.8071518940050737
+}
