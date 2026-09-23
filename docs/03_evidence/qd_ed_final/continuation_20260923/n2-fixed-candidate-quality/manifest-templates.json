@@ -1,0 +1,62 @@
+{
+  "status": "PREPARATION_ONLY_NOT_AUTHORIZED",
+  "helper_sha_status": "snapshot; revalidate after implementation commit before root authorization",
+  "templates": [
+    {
+      "label": "t00-c0",
+      "manifest": {
+        "schema": "qd-ed-n2-fixed-pool-input-v1",
+        "script_sha256": "fd6c10e08a5bae81c8259b5390530e47b06cbe52cd0d0b383dbfeeedcb497e62",
+        "protocol_sha256": "7f5657a79be727f5feebda28e50a7b8fe63703576cb750a593b8846825a6a92b",
+        "execution_authorization": {
+          "path": "ROOT_MUST_WRITE_AFTER_REVIEW",
+          "sha256": null
+        },
+        "quality_helper": {
+          "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/core/qd_executed_quality.py",
+          "sha256": "d83dbd53e75708f3a6e71cab9c0814dc82a42c68898d53cb370df37d9a8c946b"
+        },
+        "n2_protocol": {
+          "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_002_executed_quality/protocol.md",
+          "sha256": "d5e560bb48cb705e13c931290adfccb3da905cf0a352e8d7bde8188dc5ca75b1"
+        },
+        "membership_checker": {
+          "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/final-population-membership/check_membership.py",
+          "sha256": "732763eef2b11909318500b4f95f8d403cf57db4da706dffb7afe53c74a0b160"
+        },
+        "membership_report": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/final-population-membership/t00-c0-v1/final-population-membership.json",
+          "sha256": "fda61dee79c6df38e1772120b44fb24adf3ec0ff00bda791bc13e4a30cc107b8"
+        }
+      }
+    },
+    {
+      "label": "t00-q0",
+      "manifest": {
+        "schema": "qd-ed-n2-fixed-pool-input-v1",
+        "script_sha256": "fd6c10e08a5bae81c8259b5390530e47b06cbe52cd0d0b383dbfeeedcb497e62",
+        "protocol_sha256": "7f5657a79be727f5feebda28e50a7b8fe63703576cb750a593b8846825a6a92b",
+        "execution_authorization": {
+          "path": "ROOT_MUST_WRITE_AFTER_REVIEW",
+          "sha256": null
+        },
+        "quality_helper": {
+          "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/core/qd_executed_quality.py",
+          "sha256": "d83dbd53e75708f3a6e71cab9c0814dc82a42c68898d53cb370df37d9a8c946b"
+        },
+        "n2_protocol": {
+          "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_002_executed_quality/protocol.md",
+          "sha256": "d5e560bb48cb705e13c931290adfccb3da905cf0a352e8d7bde8188dc5ca75b1"
+        },
+        "membership_checker": {
+          "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/final-population-membership/check_membership.py",
+          "sha256": "732763eef2b11909318500b4f95f8d403cf57db4da706dffb7afe53c74a0b160"
+        },
+        "membership_report": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/final-population-membership/t00-q0-v1/final-population-membership.json",
+          "sha256": "40b319e2e41339cda84ba1f27cb61ff4dc71665dc4ee14ab6e46c64c0a6716b8"
+        }
+      }
+    }
+  ]
+}
