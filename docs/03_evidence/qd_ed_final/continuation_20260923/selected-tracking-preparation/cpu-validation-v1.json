@@ -1,0 +1,15 @@
+{
+  "schema": "selected-tracking-cpu-validation-v1",
+  "count": 28,
+  "passed": 28,
+  "failed": 0,
+  "result": "28 passed in 1.43s",
+  "exit_code": 0,
+  "command": "CUDA_VISIBLE_DEVICES='' PYTHONDONTWRITEBYTECODE=1 /home/hynx/miniconda3/envs/vla-pilot/bin/python -m pytest -q docs/03_evidence/qd_ed_final/continuation_20260923/selected-tracking-preparation/test_selected_tracking.py -p no:cacheprovider",
+  "reader_sha256": "a33714747a47415c8a8d64ba3297a016550e95b6f54a174a1654875603deec26",
+  "test_sha256": "17840cc96b4480ffce8075f1f227439db648f6a512b1ed06f9e67780acdbed25",
+  "scope": "Handmade CPU fixtures including fake30 admission; no actual episode read or claimed performance evidence.",
+  "torch_cuda_initialized": false,
+  "actual_bundle_reads": 0,
+  "earlier_development_run": "26 tests passed before final source-inventory and explicit-authorization checks; not added to final count."
+}

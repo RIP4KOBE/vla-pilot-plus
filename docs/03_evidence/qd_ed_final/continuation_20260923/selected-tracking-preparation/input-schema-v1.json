@@ -1,0 +1,32 @@
+{
+  "schema": "selected-tracking-interface-description-v1",
+  "reference": {
+    "path": "absolute canonical artifact-root path",
+    "sha256": "64 lowercase hex characters"
+  },
+  "authorization": {
+    "schema": "selected-tracking-authorization-v1",
+    "status": "AUTHORIZED_CPU_SELECTED_TRACKING",
+    "source_commit": "525506ca3198f54d86dadf84bbb76eb64926d87a",
+    "retrospective_transport_approved": true,
+    "freeze": "reference",
+    "input_manifest": "reference"
+  },
+  "input_manifest": {
+    "schema": "selected-tracking-input-v1",
+    "matrix_report": "reference to root-reviewed d376f98a... matrix report",
+    "chronology_provenance": "reference to completed inputs-and-audit.json",
+    "chronology_index": "reference to completed index.json",
+    "chronology_status": "reference to complete status.json",
+    "chronology_authorization": "reference to original full-Dev chronology authorization",
+    "fresh_audit_bindings": "reference to root-reviewed 1fbe2501... immutable fresh-audit binding"
+  },
+  "binding_schema": "n2-dev-fresh-audit-provenance-bindings-v1",
+  "output_files": [
+    "t00-c0.json through t09-n2.json",
+    "index.json",
+    "inputs-and-source-hashes.json",
+    "status.json"
+  ],
+  "not_an_actual_authorization": true
+}

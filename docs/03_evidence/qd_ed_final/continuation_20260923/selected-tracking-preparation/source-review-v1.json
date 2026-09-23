@@ -1,0 +1,47 @@
+{
+  "schema": "selected-tracking-source-binding-v1",
+  "source_commit": "525506ca3198f54d86dadf84bbb76eb64926d87a",
+  "source_files": [
+    {
+      "relative_path": "main.py",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/main.py",
+      "sha256": "258d66b3040be8750beb9e0eab47a7b607db7cbe00d167726664526554fdec57",
+      "commit_bytes_verified": true
+    },
+    {
+      "relative_path": "core/rdt_policy_steer.py",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/rdt_policy_steer.py",
+      "sha256": "cf5d50870738f94c6c8cb211e8e0557e2db5e67639da7c2bf545d54e9ed17bdc",
+      "commit_bytes_verified": true
+    },
+    {
+      "relative_path": "core/env_adapters/libero_adapter.py",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/env_adapters/libero_adapter.py",
+      "sha256": "029657074f6fc783beebc3b4a1431faceee51f970e4d79f0ead3796b6dd2f508",
+      "commit_bytes_verified": true
+    },
+    {
+      "relative_path": "core/rdt_libero_action_converter.py",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/rdt_libero_action_converter.py",
+      "sha256": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d",
+      "commit_bytes_verified": true
+    },
+    {
+      "relative_path": "core/decision_evidence.py",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/decision_evidence.py",
+      "sha256": "3af145738e3b22a8bec7484d0c33ba9a81dffbf58335b61682eb0ddf43b3cb8c",
+      "commit_bytes_verified": true
+    },
+    {
+      "relative_path": "scripts/audit_decision_evidence.py",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/audit_decision_evidence.py",
+      "sha256": "c5936a251bc8145093392136fc8b06779c499cb456953d1079fc4e26c68e1b95",
+      "commit_bytes_verified": true
+    }
+  ],
+  "provider_projector_decoder_imported_or_called": false,
+  "audit_strategy": "Reuse only exact root-bound completed fullchronology certificates; auditor is hash-bound but not imported/called.",
+  "identity_note": "Canonical fingerprints cast FP32; native shape/dtype/bytes are separately required. Explicit selected-native to policy FP32 cast is checked.",
+  "origin_note": "Source controller ee_pos, cast t0 and raw robot0_eef_pos remain separate; no controller runtime bound inference.",
+  "actual_bundles_read": 0
+}

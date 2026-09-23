@@ -1,0 +1,22 @@
+{
+  "schema": "selected-tracking-freeze-v1",
+  "status": "CPU_TESTED_FROZEN_NO_ACTUAL_READ",
+  "actual_read_authorized": false,
+  "source_commit": "525506ca3198f54d86dadf84bbb76eb64926d87a",
+  "approved_draft_sha256": "abb6cf3d725a453397d49bc130d8889028bf59d86ca915abaff7ee48f2f9c539",
+  "local_files": {
+    "read_selected_tracking.py": "a33714747a47415c8a8d64ba3297a016550e95b6f54a174a1654875603deec26",
+    "test_selected_tracking.py": "17840cc96b4480ffce8075f1f227439db648f6a512b1ed06f9e67780acdbed25",
+    "approved-draft-v1.md": "abb6cf3d725a453397d49bc130d8889028bf59d86ca915abaff7ee48f2f9c539",
+    "protocol-v1.md": "62da94cd6917dc7f58e08bbc39fd56dc988743d13a8effde8e57c281fb26e23b",
+    "input-schema-v1.json": "f5eb918c8f3061f2152783dbd07855cc1f549ec2b715028797ff0f7c8c004f24",
+    "source-review-v1.json": "141dc155e4face42481a69beb482958b9590e051549dc7c34b7763cf81bc6a1d",
+    "cpu-validation-v1.json": "77fe926975920f28f5adf8f7473f3c8cc9f775f50282231fedb2d3ec7e8a7ea3"
+  },
+  "tests": {
+    "count": 28,
+    "passed": 28,
+    "failed": 0
+  },
+  "actual_run_requirement": "Independent review then separate exact30 root SHA-bound read authorization; do not invoke with implementation-only approval."
+}
