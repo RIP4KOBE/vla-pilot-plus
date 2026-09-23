@@ -405,3 +405,16 @@ Direct final membership passed all81 selected/native/quality bindings: distinct 
 Arbor strict ideation selected node6.1 / N2: exact recognized weighted approach objective over all8 executed projected actions, internal search quality separated from raw provider quality sent to Stage. Formula, recognition/fallback, CPU recorded-choice gate, matched30-cell Dev matrix plus at most4 narrow infrastructure recoveries,18h cap and unchanged Dev>=5/10 validation/formal gates frozen before implementation or Q8 results. Protocol experiments/iteration_002_executed_quality/protocol.md. Goal remains unmet; automatic continuation/GPU3-only remain in force.
 
 Accounting snapshot: 26/240 dispatched; 3.4783786469684728/48h; running entries may belong to the independent external session. No root GPU child at this checkpoint. Protected reserves unchanged.
+
+## 2026-09-23T08:17:00.315168+00:00 — N2 implementation and recorded-choice gate PASS
+
+Executor7e3acaa integrated as61bda3a. Relevant CPU suites483PASS plus5new strict audit cases (22audit rerun includes17overlap) give488 distinct checks; no GPU result. Real loader definitions-only: task0/5 stage1 recognized, constantstage2 fallback,0provider calls/CUDAfalse. Fixed-pool analysis tool11synthetic PASS, frozen helperd83dbd53e75708f3a6e71cab9c0814dc82a42c68898d53cb370df37d9a8c946b.
+
+Actual recorded C0/Q0 CPU reanalysis bothexit0/all native/identity/audit checksPASS. C0:1/29tie-robust choice changes;Q0:4/52plus1mixed tie excluded from activity. Five robust changes all trade off original quality for smaller projectedt8 distance; real counterfactual outcomes remainUnknown. Both arm activity gatesPASS, NOT promotion. C0 outputSHAbd0e1526d34bb0c4cc9826527eff64131fb561aae8f5e7538cc04f566fd3a6f1;Q0SHA195a77627fca592afd748602f864099d107ac91471c740c3a1a160071a8fe769;summarySHA51e04f816e9cadfe0e8c4812b8bddb931a882abff8e0be4fde2e173aa71d9fa9.
+
+All old bundles/sources were checked before integratingN2 inW. Future regeneration must use preserved observed source0d59b853 rather than newWcore bytes. Exact input/helper/source hashes retained in analysis reports. Next: freeze new matched Dev condition andfirst3cells; goalnotmet/GPU3only/automaticcontinuation unchanged.
+
+
+## 2026-09-23T08:27:40.905697+00:00 — N2 runner integration ready for prospective freeze
+
+Closed N2 runner contract8d48fdb and production61bda3a integrated;123 focused checks passed. No N2 dispatch yet. Freeze will bind final committed source,30 Hydra CPU compositions, original input/runtime/native dependencies and separately reviewed recorded-choice evidence. Only first3 C0/Q0/N2 cells are initially released; success does not control implementation release. Current accounting 30/240 attempts and3.820391461485417/48 GPUh includes independently appended external costs. Root GPU3 remains the sole authorized root worker.

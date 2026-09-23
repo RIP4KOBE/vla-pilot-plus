@@ -1,6 +1,6 @@
 # Active research continuation
 
-Updated 2026-09-23 07:38 UTC. The target is not met, and autonomous algorithm optimization remains active. Future root GPU experiments are restricted to physical GPU3. The four-row observation queue has ended and has no live root GPU worker; current work is CPU final-candidate membership diagnosis and preparation of the next evidence-supported mechanism. Independent external GPU2 work is not a root worker.
+Updated 2026-09-23T08:27:40.905697+00:00. The target is not met; autonomous N2 optimization remains active on physical GPU3 only. Production61bda3a and supervised runner8d48fdb are integrated. All123 focused integration checks passed; the recorded fixed-pool prerequisite passed with1/29 C0 and4/52 Q0 tie-robust selection changes. No N2 GPU episode or promotion exists yet. Next is the30-cell matched Dev source/configuration freeze and first3 correctness checkpoint. Existing partial/invalid results below remain historical evidence.
 
 Node5.4 original model-first B1/render and node5.5 full original production C0 passed their engineering checks after the external reboot; C0 was a valid 0/1 task failure. This establishes bounded execution recovery, not a root cause for the earlier rendering faults.
 
@@ -13,3 +13,11 @@ A reviewed CPU historical-pool check covered all81 eligible task0 decisions and1
 Shared accounting at the post-cohort update:3.3067037922379177/48 GPU-hours charged,24/240 dispatched,8valid/5invalid/10aborted/1external running. The external dispatch occurred after the root lease ended; root running GPU workers are0. Journal-derived counters continue to update as external costs settle. Validation/formal remain protected by14h/10h and60/40attempt reservations. Closed invalid N1 and historical negative reports are preserved; neither ends this active continuation.
 
 Authority: research-state.yaml and docs/03_evidence/qd_ed_final/iteration-ledger.md. Per-row terminal summaries and an identity-bound mechanism index are in docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-results. Next: finish final-membership evidence, retain the partial matrix disposition, freeze one new QD/ED hypothesis and protocol, then implement/test/compare within the remaining budget on GPU3.
+
+## Active continuation: N2 implementation
+
+Arbor node6.1 is RUNNING. Hypothesis/protocol frozen in a71fb07 before implementation or Q8 recomputation. N2 changes internal QD/ED quality to the recognized weighted approach objective over all8 executed projected points while Stage continues to use the original selected-action provider scalar. Original Q0 XY archive/16x11 search and all external modules remain fixed. Unknown semantics fall back before search.
+
+Default/unknown equivalence, source/code semantic binding, canonical raw/quality association, Stage normalization and unchanged call counts are under CPU implementation/testing in isolated worktrees. A separate frozen-formula recorded-choice check precedes GPU3 Dev. No N2 online result, promotion or target achievement exists.
+
+The observation matrix is closed with3valid/1transport-invalid and no pending rows; report-v4 summary SHA ccb131170b884a5ceb7ece80ba0775f6a226b41b88e5521d550af81d6187604e. Final membership confirms old-quality tradeoffs for all22 task0 A witnesses. This motivates a declared objective change, not a claim of physical benefit.

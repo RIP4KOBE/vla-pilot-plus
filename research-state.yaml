@@ -13,7 +13,7 @@ project_target:
   required_formal_successes: 5
   achieved: false
 study:
-  status: ACTIVE_N2_IMPLEMENTATION
+  status: ACTIVE_N2_PREPARING_MATCHED_DEV
   mode: real
   interaction: auto
   automatic_continuation: true
@@ -21,14 +21,33 @@ study:
 candidate:
   id: N2
   arbor_node: '6.1'
-  status: PROTOCOL_FROZEN_PREIMPLEMENTATION
+  status: CPU_GATES_PASSED_PREPARING_ONLINE_FREEZE
   protocol: experiments/iteration_002_executed_quality/protocol.md
   primary_change: executed_prefix_v1
   online_score: null
   scientific_decision: NOT_EVALUATED
+  protocol_commit: a71fb07
+  protocol_sha256: d5e560bb48cb705e13c931290adfccb3da905cf0a352e8d7bde8188dc5ca75b1
+  implementation_worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923
+  runner_worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n2-runner-20260923
+  implementation_commit: 61bda3a
+  executor_commit: 7e3acaaad6b0fdd89592d240c0c38066e04c7d30
+  recorded_choice_check:
+    status: PASS_IMPLEMENTATION_ACTIVITY_ONLY
+    artifact: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-fixed-candidate-quality/summary-v1.json
+    sha256: 51e04f816e9cadfe0e8c4812b8bddb931a882abff8e0be4fde2e173aa71d9fa9
+    C0:
+      eligible: 29
+      tie_robust_changed: 1
+    Q0:
+      eligible: 52
+      tie_robust_changed: 4
+      mixed_tie: 1
+    physical_effect: UNKNOWN
+  runner_commit: 8d48fdb
 budget:
   max_gpu_hours: 48.0
-  gpu_hours_consumed: 3.4783786469684728
+  gpu_hours_consumed: 3.820391461485417
   max_episode_attempts: 240
   reserved:
     baseline: 20
@@ -36,12 +55,12 @@ budget:
     validation: 60
     formal: 40
     recovery: 20
-  dispatched: 26
+  dispatched: 30
   aborted: 10
-  valid: 10
+  valid: 14
   running: 1
   invalid: 5
-  completed: 15
+  completed: 19
   gpu_hour_reservations:
     validation: 14.0
     formal: 10.0
@@ -74,16 +93,16 @@ historical:
   previous_gpu_hours: 6.946832055555556
   previous_formal_episodes: 0
 active_iteration: iteration_002_executed_quality
-next_action: Implement frozen dual-channel executed-prefix quality, CPU/default/Stage/accounting
-  checks, recorded-choice check, then new matched N2/C0/Q0 Dev matrix on exclusive
-  physical GPU3 only.
+next_action: Freeze reviewed N2 source, all30 CPU configurations and recorded-choice
+  attestation; launch first3 matched Dev cells on exclusive physical GPU3, then release27
+  only after correctness gates.
 source_spec_sha256: 3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef
 derived_indexes:
 - .arbor/sessions/rdt-qd-ed-final-20260921T093925Z
 authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
   ledger is append-only event evidence, not a second mutable state.
 online_blockers: []
-updated_at: '2026-09-23T07:49:08.072140+00:00'
+updated_at: '2026-09-23T08:27:40.905697+00:00'
 seed_plan:
   path: data/frozen-seed-plan.json
   sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
@@ -118,6 +137,9 @@ cpu_validation:
   context_lifetime_probe_passed: 6
   native_render_lifetime_helper_passed: 17
   native_render_lifetime_probe_passed: 3
+  n2_implementation_unique_passed: 488
+  n2_recorded_analysis_synthetic_passed: 11
+  n2_integrated_focused_passed: 123
 prepared_baseline_plan:
   path: data/qd-ed-final-plan.json
   episodes: 20
@@ -137,20 +159,20 @@ stage_provider_ready: true
 runner:
   by_bucket:
     baseline: 1
-    development: 20
+    development: 24
     validation: 0
     formal: 0
     recovery: 5
-  reserved_attempts: 26
+  reserved_attempts: 30
   gpu_hours_by_bucket:
     baseline: 0.019651524036631195
-    development: 2.7217627031126845
+    development: 3.0637755176296286
     validation: 0.0
     formal: 0.0
     recovery: 0.7369644198191572
   gpu_healthcheck_hours: 0.2602564145160282
   gpu_healthcheck_inflight: 0
-  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__n1s_dev_t02_q0__a7f5d086b104
+  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__n1s_dev_t04_q0__c19f2bba8e77
   last_event: dispatched
 gpu_admission_last_observation:
   physical_gpu: 3

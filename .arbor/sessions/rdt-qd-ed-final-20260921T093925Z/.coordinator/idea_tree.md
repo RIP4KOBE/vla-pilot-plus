@@ -140,9 +140,13 @@ Conflicts: Historical H1/H4/H5 and invalid N1 are preserved; this measures missi
 ### 6: Mechanism: Execution-aligned objectives for quality-diversity search.
 Hypothesis: Ranking committed actions with an objective supported on their complete executed prefix can address the observed omission of the final action without changing external providers.
 Observable: Recorded selection changes followed by same-round Dev gains, with raw Stage semantics and compute preserved.
-Conflicts: Prior N1 changed behavior representation and was cohort-invalid; old-quality retention failures do not evaluate a newly declared objective. [PENDING]
+Conflicts: Prior N1 changed behavior representation and was cohort-invalid; old-quality retention failures do not evaluate a newly declared objective. [RUNNING]
+
+**Insight**: Child6.1 prospectively freezes one full-executed-prefix objective; no new physical-outcome evidence yet. Stage receives original provider quality for the selected action.
 
 #### 6.1: Mechanism: Dual-channel full-executed-prefix QD quality before archive replacement and ED selection, with original provider quality retained for Stage.
 Hypothesis: The exact recognized approach objective over t1..t8 can retain and select actions missed by t1..t7 ranking, where observed final alternatives require an original-quality tradeoff.
 Observable: At least one recorded candidate choice changes under the frozen formula; prospective N2 reaches at least5/10 Dev and no fewer successes than matched P2/Q0 while passing action, Stage and compute gates.
-Conflicts: H4/H5 retained old quality; N2 explicitly changes its semantics, does not promise old maximum retention, and keeps N1 descriptor changes off. [PENDING]
+Conflicts: H4/H5 retained old quality; N2 explicitly changes its semantics, does not promise old maximum retention, and keeps N1 descriptor changes off. [RUNNING]
+
+**Result**: Protocol frozen a71fb07; executor implementation and CPU checks before any live N2.
