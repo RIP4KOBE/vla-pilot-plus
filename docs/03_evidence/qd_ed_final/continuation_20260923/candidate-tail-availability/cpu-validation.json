@@ -5,15 +5,16 @@
     "original quality-preserving alternative without new tolerance",
     "same fingerprint differing projection remains Unknown",
     "nonnormal, target and command mismatches excluded",
-    "all eligible decisions retained independently of actual A/B witnesses"
+    "all eligible decisions retained independently of actual A/B witnesses",
+    "native samples and quality dtype mismatch cannot join equal values; shape equality required"
   ],
-  "created_utc": "2026-09-23T07:13:18.300628+00:00",
+  "created_utc": "2026-09-23T07:15:46.381083+00:00",
   "files_sha256": {
-    "README.md": "4f46809794ce36c528090c2e0980624edfe46517df8c3cc151eab02b5498cfab",
-    "check_candidates.py": "4f43e92efecb30ef9f7c5a25913e9e0297b3d9d46e3cd3dc059404555b073b09",
+    "README.md": "0e57cae44200915c1c28cf1ee483bdedfff885ad1e13f8a8eb6401d39aabb924",
+    "check_candidates.py": "5ed4a49c0e9b62e43e5b98915e8bca252c6f598ce23a339d68b154e22906a839",
     "manifest-template.json": "c7b16984bf2c026fccd235a972c7ce5e133a36bd934000c9b492fce5f12e5788",
     "protocol.md": "981534d1e561dfe888b8cbeac92e4b14ba7fa3ecdaef04d498b7e1760d7f0ff5",
-    "test_candidates.py": "ff670df21a35d541c57db947021dbb1e390368bdbdf8c06ef27a659e96c1e843"
+    "test_candidates.py": "4aa61d525dd9d6d09ab11018ed7df11f6acfc0c5ddfa3a1ebd2a3483fdd602f4"
   },
   "gpu_model_provider_projector_simulator_network_calls": false,
   "input_kind": "synthetic disposable CPU fixture bundles only",
@@ -22,6 +23,6 @@
   "schema": "qd-ed-candidate-tail-cpu-validation-v1",
   "status": "PASS",
   "syntax_compile": "PASS without bytecode output",
-  "test_seconds": 0.083,
-  "tests": 5
+  "test_seconds": 0.095,
+  "tests": 6
 }
