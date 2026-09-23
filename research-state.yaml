@@ -9,16 +9,15 @@ gpu_pool:
 - 3
 max_concurrent_gpu_workers: 1
 project_target:
-  status: TARGET_NOT_MET
+  status: IN_PROGRESS_TARGET_NOT_YET_MET
   required_formal_successes: 5
   achieved: false
 study:
-  status: CONCLUDED_TARGET_NOT_MET
+  status: RUNNING_FRESHBOOT_ENGINEERING_CONTROL
   mode: real
   interaction: auto
-  concluded_at: '2026-09-22T12:20:20.701128+00:00'
-  decision: TARGET_NOT_MET / NO_ADOPTION
-  automatic_continuation: false
+  automatic_continuation: true
+  resumed_at: '2026-09-23T04:07:12.266326+00:00'
 candidate:
   id: N1
   arbor_node: '4.1'
@@ -35,7 +34,7 @@ candidate:
     exceeding the frozen30attempt cap. No retry or rename can repair this cohort.
 budget:
   max_gpu_hours: 48.0
-  gpu_hours_consumed: 1.0262591123256264
+  gpu_hours_consumed: 1.1122920094031952
   max_episode_attempts: 240
   reserved:
     baseline: 20
@@ -43,12 +42,12 @@ budget:
     validation: 60
     formal: 40
     recovery: 20
-  dispatched: 11
-  aborted: 8
+  dispatched: 14
+  aborted: 9
   valid: 0
-  running: 0
-  invalid: 3
-  completed: 3
+  running: 1
+  invalid: 4
+  completed: 4
   gpu_hour_reservations:
     validation: 14.0
     formal: 10.0
@@ -81,15 +80,17 @@ historical:
   previous_gpu_hours: 6.946832055555556
   previous_formal_episodes: 0
 active_iteration: iteration_001_execution_intent
-next_action: 'Study closed: TARGET_NOT_MET / NO_ADOPTION. No further automatic GPU
-  or scientific dispatch. Preserve all evidence and closed cohorts; see docs/03_evidence/qd_ed_final/final-report.md.'
+next_action: Run one exact original model-first/B1/render control on physical GPU3
+  under the new boot; preserve old failures, then continue full common-condition evaluation
+  if valid or minimal GL/CUDA isolation if not. In parallel implement zero-extra-call
+  decision evidence collector on isolated executor branch.
 source_spec_sha256: 3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef
 derived_indexes:
 - .arbor/sessions/rdt-qd-ed-final-20260921T093925Z
 authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
   ledger is append-only event evidence, not a second mutable state.
 online_blockers: []
-updated_at: '2026-09-22T12:20:20.701128+00:00'
+updated_at: '2026-09-23T04:48:59.327445+00:00'
 seed_plan:
   path: data/frozen-seed-plan.json
   sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
@@ -143,21 +144,21 @@ stage_provider_ready: true
 runner:
   by_bucket:
     baseline: 1
-    development: 5
+    development: 8
     validation: 0
     formal: 0
     recovery: 5
-  reserved_attempts: 11
+  reserved_attempts: 14
   gpu_hours_by_bucket:
     baseline: 0.019651524036631195
-    development: 0.2929994372140047
+    development: 0.3759784723721289
     validation: 0.0
     formal: 0.0
-    recovery: 0.7136081510749904
-  gpu_healthcheck_hours: 0.23690014577186147
+    recovery: 0.7166620129944349
+  gpu_healthcheck_hours: 0.23995400769130593
   gpu_healthcheck_inflight: 0
-  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu5_cuda_memcheck_c0_t00__66eec8a1ab74
-  last_event: valid
+  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu2_post_reboot_c0_t00__3b58560be246
+  last_event: dispatched
 gpu_admission_last_observation:
   physical_gpu: 3
   physical_index: 3
@@ -239,7 +240,7 @@ authorized_gpu_selection:
   authorized_at: '2026-09-22T08:25:04.726856+00:00'
   single_exclusive_worker: true
   rescan_if_unavailable: true
-  reconfirmed_at: '2026-09-22T10:31:01.328229+00:00'
+  reconfirmed_at: '2026-09-23T04:07:12.266326+00:00'
 resource_queue:
   pid: 3996172
   proc_start_ticks: '373125345'
@@ -472,7 +473,14 @@ native_resource_queue:
   last_verified_at: '2026-09-22T08:17:43.179597+00:00'
   heartbeat_unix: 1790062224.3071046
   archived_evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/queue-history/8771eaa-b1-evidence-reused
-user_persistence_instruction: 完成任务后再停止
+user_persistence_instruction:
+  text: 记住你的任务是在当前会话中自己持续迭代优化算法以完成我设定的任务目标，除非我说停止，否则自己优化无需停止直到达成任务目标
+  recorded_at: '2026-09-23T04:07:12.266326+00:00'
+  interpretation: Continue autonomous engineering recovery, targeted evidence collection
+    and QD-ED algorithm iteration; do not end the overall objective because a candidate/cohort
+    fails or a bounded review lacks ready evidence. Preserve all failure records and
+    current accounting. Numerical GPU/episode budgets and validation/formal reservations
+    are unchanged pending any explicit numeric amendment.
 prepared_render_diagnostics:
   status: CPU_REVIEWED_APPLIED
   patch: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/main-render-phase-timing-proposal.patch
@@ -885,3 +893,44 @@ final_delivery:
   automatic_dispatch_authorized: false
   stop_authority: 'User specification sections 6 and 10: bounded review found no supported
     successor mechanism. Budget remains available; target not achieved.'
+  historical_as_of: '2026-09-22T12:20:20.701128+00:00'
+study_history:
+- timestamp: '2026-09-23T04:07:12.266326+00:00'
+  event: USER_REOPENS_CONTINUOUS_OPTIMIZATION
+  prior_study:
+    status: CONCLUDED_TARGET_NOT_MET
+    mode: real
+    interaction: auto
+    concluded_at: '2026-09-22T12:20:20.701128+00:00'
+    decision: TARGET_NOT_MET / NO_ADOPTION
+    automatic_continuation: false
+  prior_report_commit: 1a0e1b52c3cab9acac1ee6092d58d5925b41163f
+continuation:
+  id: continuation_20260923
+  status: ACTIVE
+  artifacts: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923
+  previous_delivery_is_historical_checkpoint: true
+  automatic_gpu_dispatch_authorized: true
+  gpu_pool:
+  - 3
+  scientific_dispatch_gate: New prospective protocol after engineering validity; validation/formal
+    remain protected.
+  current_owned_workers: []
+  external_postclosure_attempt: rdt-qd-ed-final-20260921T093925Z__gpu2_cuda_memcheck_blocking_c0_t00__3a0defb917b0
+  external_attempt_accounting: Recorded as actual GPU2, invalid,154.8965663430281s;
+    no dispatch by this coordinator; included conservatively in shared study budget.
+  storage_observation: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/continuation_20260923/storage-observation.json
+  current_boot_id: 2a1fa95f-ab0d-488c-a298-fc488ddd2af7
+  temporary_local_evidence_root: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/continuation_20260923
+  storage_status: RESTORED_EXTERNALLY
+  storage_restored_observation: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/continuation_20260923/storage-restored-observation.json
+  freshboot_model_first:
+    status: READY_FOR_GPU3_ADMISSION
+    physical_gpu: 3
+    boot_id: 2a1fa95f-ab0d-488c-a298-fc488ddd2af7
+    protocol: experiments/iteration_001_execution_intent/gpu3-freshboot-model-first-control.md
+    supervisor: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/continuation_20260923/freshboot-model-first/supervise-freshboot-model-first.py
+    supervisor_sha256: ba1a631ed9abf0d7802126120b33176510d1248b8668c8572792474b844d3cf2
+    output_root: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-model-first
+    maximum_seconds: 600
+    automatic_retry: false

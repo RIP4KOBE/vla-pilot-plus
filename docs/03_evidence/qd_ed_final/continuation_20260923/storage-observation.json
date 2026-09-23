@@ -1,0 +1,281 @@
+{
+  "observed_at": "2026-09-23T04:38:03.033634+00:00",
+  "current_boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+  "previous_boot_id": "aa293923b32a4a98911cabd80cf10d6d",
+  "boot_time_utc": "2026-09-23 04:19:42",
+  "mounts": "/dev/disk/by-uuid/faef609f-0355-474b-bf4d-a34d04acb144 / ext4\n/dev/disk/by-uuid/d8048781-c05e-4dcc-a847-e3da3d47cf16 /boot ext4\n/dev/disk/by-uuid/26DC-4056 /boot/efi vfat\n/swap.img none swap\n/dev/sdb /mnt/data ext4\nUUID=7eef54ab-275f-429b-9a26-de570a1d05a2 /mnt/data/shared2 ext4\n",
+  "block_devices": {
+    "blockdevices": [
+      {
+        "name": "loop0",
+        "size": "4K",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/bare/5"
+        ]
+      },
+      {
+        "name": "loop1",
+        "size": "74M",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/core22/2437"
+        ]
+      },
+      {
+        "name": "loop2",
+        "size": "74M",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/core22/2955"
+        ]
+      },
+      {
+        "name": "loop3",
+        "size": "66.8M",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/core24/1643"
+        ]
+      },
+      {
+        "name": "loop4",
+        "size": "66.8M",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/core24/2124"
+        ]
+      },
+      {
+        "name": "loop5",
+        "size": "60.1M",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/core26/409"
+        ]
+      },
+      {
+        "name": "loop6",
+        "size": "60.1M",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/core26/462"
+        ]
+      },
+      {
+        "name": "loop7",
+        "size": "260.8M",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/firefox/8863"
+        ]
+      },
+      {
+        "name": "loop8",
+        "size": "261.3M",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/firefox/8929"
+        ]
+      },
+      {
+        "name": "loop9",
+        "size": "606.1M",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/gnome-46-2404/153"
+        ]
+      },
+      {
+        "name": "loop10",
+        "size": "39.8M",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/gh/751"
+        ]
+      },
+      {
+        "name": "loop11",
+        "size": "614.5M",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/gnome-46-2404/164"
+        ]
+      },
+      {
+        "name": "loop12",
+        "size": "91.7M",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/gtk-common-themes/1535"
+        ]
+      },
+      {
+        "name": "loop13",
+        "size": "122.1M",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/lxd/39858"
+        ]
+      },
+      {
+        "name": "loop14",
+        "size": "122.2M",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/lxd/40424"
+        ]
+      },
+      {
+        "name": "loop15",
+        "size": "402M",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/mesa-2404/1781"
+        ]
+      },
+      {
+        "name": "loop16",
+        "size": "402M",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/mesa-2404/1839"
+        ]
+      },
+      {
+        "name": "loop17",
+        "size": "1.3G",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/pycharm-community/672"
+        ]
+      },
+      {
+        "name": "loop18",
+        "size": "1.3G",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/pycharm-community/676"
+        ]
+      },
+      {
+        "name": "loop19",
+        "size": "50.1M",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/snapd/27710"
+        ]
+      },
+      {
+        "name": "loop20",
+        "size": "50.3M",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/snapd/27738"
+        ]
+      },
+      {
+        "name": "loop21",
+        "size": "940K",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          "/snap/speedtest/12"
+        ]
+      },
+      {
+        "name": "sda",
+        "size": "446.6G",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          null
+        ],
+        "children": [
+          {
+            "name": "sda1",
+            "size": "1G",
+            "fstype": "vfat",
+            "uuid": "26DC-4056",
+            "mountpoints": [
+              "/boot/efi"
+            ]
+          },
+          {
+            "name": "sda2",
+            "size": "1G",
+            "fstype": "ext4",
+            "uuid": "d8048781-c05e-4dcc-a847-e3da3d47cf16",
+            "mountpoints": [
+              "/boot"
+            ]
+          },
+          {
+            "name": "sda3",
+            "size": "444.6G",
+            "fstype": "ext4",
+            "uuid": "faef609f-0355-474b-bf4d-a34d04acb144",
+            "mountpoints": [
+              "/"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "sdb",
+        "size": "14T",
+        "fstype": null,
+        "uuid": null,
+        "mountpoints": [
+          null
+        ],
+        "children": [
+          {
+            "name": "sdb1",
+            "size": "14T",
+            "fstype": "ext4",
+            "uuid": "7eef54ab-275f-429b-9a26-de570a1d05a2",
+            "mountpoints": [
+              "/mnt/data/shared2"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "sdc",
+        "size": "7T",
+        "fstype": "ext4",
+        "uuid": "87195613-9a14-44c8-9ec6-1a7cb2b41017",
+        "mountpoints": [
+          "/mnt/data"
+        ]
+      }
+    ]
+  },
+  "mnt_data_has_mount": true,
+  "original_artifact_root_visible": true,
+  "frozen_rdt_weight_visible": true,
+  "system_mount_changes_performed": false,
+  "next_action": "Continue local CPU audits and minimal model-independent diagnostic preparation; user asked asynchronously about mount restoration or new paths. Do not overwrite missing artifact roots or redownload onto nearly-full root filesystem."
+}

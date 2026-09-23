@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-09-22T12:20:20.701128+00:00",
+  "timestamp": "2026-09-23T04:48:59.327445+00:00",
   "run_name": "rdt-qd-ed-final-20260921T093925Z",
-  "phase": "CONCLUDED_TARGET_NOT_MET",
+  "phase": "FRESHBOOT_CONTROL_ADMISSION",
   "source_commit": "2435f86f601fa97070f6697670b29063078e91ac",
   "active_plan": {
     "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/resource_queue/89d2dd719e0346bd9011931cc66731a0/plan.json",
@@ -48,10 +48,14 @@
     "selected_physical_gpu": 6,
     "archived_evidence": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/queue-history/8fb001b-native-abort"
   },
-  "in_flight_executors": [],
+  "in_flight_executors": [
+    "available_gpu_queue:5.4",
+    "codex_stage_adapter:5.2",
+    "gpu5_probe:5.3"
+  ],
   "owned_gpu_workers": [],
   "authoritative_state": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/research-state.yaml",
-  "next_action": "Study closed: TARGET_NOT_MET / NO_ADOPTION. No further automatic GPU or scientific dispatch. Preserve all evidence and closed cohorts; see docs/03_evidence/qd_ed_final/final-report.md.",
+  "next_action": "Run one exact original model-first/B1/render control on physical GPU3 under the new boot; preserve old failures, then continue full common-condition evaluation if valid or minimal GL/CUDA isolation if not. In parallel implement zero-extra-call decision evidence collector on isolated executor branch.",
   "target_achieved": false,
   "native_diagnostic": {
     "status": "MATCHING_COMPLETED_GPU6_B1_EVIDENCE_REUSED",
@@ -110,7 +114,7 @@
   },
   "budget": {
     "max_gpu_hours": 48.0,
-    "gpu_hours_consumed": 1.0262591123256264,
+    "gpu_hours_consumed": 1.1122920094031952,
     "max_episode_attempts": 240,
     "reserved": {
       "baseline": 20,
@@ -119,19 +123,19 @@
       "formal": 40,
       "recovery": 20
     },
-    "dispatched": 11,
-    "aborted": 8,
+    "dispatched": 14,
+    "aborted": 9,
     "valid": 0,
-    "running": 0,
-    "invalid": 3,
-    "completed": 3,
+    "running": 1,
+    "invalid": 4,
+    "completed": 4,
     "gpu_hour_reservations": {
       "validation": 14.0,
       "formal": 10.0
     }
   },
   "queue_pid": null,
-  "status": "CONCLUDED_TARGET_NOT_MET",
+  "status": "RUNNING_FRESHBOOT_ENGINEERING_CONTROL",
   "gpu3_render_queue": {
     "pid": 134110,
     "proc_start_ticks": "374175557",
@@ -486,5 +490,35 @@
     "active_queue": null,
     "automatic_dispatch_authorized": false,
     "stop_authority": "User specification sections 6 and 10: bounded review found no supported successor mechanism. Budget remains available; target not achieved."
+  },
+  "continuation": {
+    "id": "continuation_20260923",
+    "status": "ACTIVE",
+    "artifacts": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923",
+    "previous_delivery_is_historical_checkpoint": true,
+    "automatic_gpu_dispatch_authorized": true,
+    "gpu_pool": [
+      3
+    ],
+    "scientific_dispatch_gate": "New prospective protocol after engineering validity; validation/formal remain protected.",
+    "current_owned_workers": [],
+    "external_postclosure_attempt": "rdt-qd-ed-final-20260921T093925Z__gpu2_cuda_memcheck_blocking_c0_t00__3a0defb917b0",
+    "external_attempt_accounting": "Recorded as actual GPU2, invalid,154.8965663430281s; no dispatch by this coordinator; included conservatively in shared study budget.",
+    "storage_observation": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/continuation_20260923/storage-observation.json",
+    "current_boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+    "temporary_local_evidence_root": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/continuation_20260923",
+    "storage_status": "RESTORED_EXTERNALLY",
+    "storage_restored_observation": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/continuation_20260923/storage-restored-observation.json",
+    "freshboot_model_first": {
+      "status": "READY_FOR_GPU3_ADMISSION",
+      "physical_gpu": 3,
+      "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+      "protocol": "experiments/iteration_001_execution_intent/gpu3-freshboot-model-first-control.md",
+      "supervisor": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/continuation_20260923/freshboot-model-first/supervise-freshboot-model-first.py",
+      "supervisor_sha256": "ba1a631ed9abf0d7802126120b33176510d1248b8668c8572792474b844d3cf2",
+      "output_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-model-first",
+      "maximum_seconds": 600,
+      "automatic_retry": false
+    }
   }
 }

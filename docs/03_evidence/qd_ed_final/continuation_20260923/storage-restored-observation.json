@@ -1,0 +1,8 @@
+{
+  "timestamp": "2026-09-23T04:48:59.327445+00:00",
+  "mnt_data": "/dev/sdc /mnt/data ext4",
+  "shared2": "/dev/sdb1 /mnt/data/shared2 ext4",
+  "restored_by_this_coordinator": false,
+  "original_artifacts_visible": true,
+  "model_path_visible": true
+}

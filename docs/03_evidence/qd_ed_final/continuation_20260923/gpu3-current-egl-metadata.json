@@ -1,0 +1,221 @@
+{
+  "physical_gpu": 3,
+  "egl_device_index": 0,
+  "uuid": "GPU-62052fa1-37e0-79dc-21aa-5c0f25c0c315",
+  "pci_bus_id": "00000000:61:00.0",
+  "driver_version": "580.65.06",
+  "drm_pci_verified": false,
+  "metadata_mapping_verified": true,
+  "cuda_egl_verified": false,
+  "devices": [
+    {
+      "egl_device_index": 0,
+      "extensions": [
+        "EGL_NV_device_cuda",
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "cuda_attribute_ok": true,
+      "physical_cuda_ordinal": 3,
+      "drm_device_file": ""
+    },
+    {
+      "egl_device_index": 1,
+      "extensions": [
+        "EGL_NV_device_cuda",
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "cuda_attribute_ok": true,
+      "physical_cuda_ordinal": 2,
+      "drm_device_file": ""
+    },
+    {
+      "egl_device_index": 2,
+      "extensions": [
+        "EGL_NV_device_cuda",
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "cuda_attribute_ok": true,
+      "physical_cuda_ordinal": 0,
+      "drm_device_file": ""
+    },
+    {
+      "egl_device_index": 3,
+      "extensions": [
+        "EGL_NV_device_cuda",
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "cuda_attribute_ok": true,
+      "physical_cuda_ordinal": 1,
+      "drm_device_file": ""
+    },
+    {
+      "egl_device_index": 4,
+      "extensions": [
+        "EGL_NV_device_cuda",
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "cuda_attribute_ok": true,
+      "physical_cuda_ordinal": 7,
+      "drm_device_file": ""
+    },
+    {
+      "egl_device_index": 5,
+      "extensions": [
+        "EGL_NV_device_cuda",
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "cuda_attribute_ok": true,
+      "physical_cuda_ordinal": 6,
+      "drm_device_file": ""
+    },
+    {
+      "egl_device_index": 6,
+      "extensions": [
+        "EGL_NV_device_cuda",
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "cuda_attribute_ok": true,
+      "physical_cuda_ordinal": 4,
+      "drm_device_file": ""
+    },
+    {
+      "egl_device_index": 7,
+      "extensions": [
+        "EGL_NV_device_cuda",
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "cuda_attribute_ok": true,
+      "physical_cuda_ordinal": 5,
+      "drm_device_file": ""
+    },
+    {
+      "egl_device_index": 8,
+      "extensions": [
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "drm_device_file": "/dev/dri/card1",
+      "drm_pci_bus_id": "0000:61:00.0"
+    },
+    {
+      "egl_device_index": 9,
+      "extensions": [
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "drm_device_file": "/dev/dri/card2",
+      "drm_pci_bus_id": "0000:41:00.0"
+    },
+    {
+      "egl_device_index": 10,
+      "extensions": [
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "drm_device_file": "/dev/dri/card3",
+      "drm_pci_bus_id": "0000:01:00.0"
+    },
+    {
+      "egl_device_index": 11,
+      "extensions": [
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "drm_device_file": "/dev/dri/card4",
+      "drm_pci_bus_id": "0000:21:00.0"
+    },
+    {
+      "egl_device_index": 12,
+      "extensions": [
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "drm_device_file": "/dev/dri/card5",
+      "drm_pci_bus_id": "0000:e1:00.0"
+    },
+    {
+      "egl_device_index": 13,
+      "extensions": [
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "drm_device_file": "/dev/dri/card6",
+      "drm_pci_bus_id": "0000:c1:00.0"
+    },
+    {
+      "egl_device_index": 14,
+      "extensions": [
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "drm_device_file": "/dev/dri/card7",
+      "drm_pci_bus_id": "0000:81:00.0"
+    },
+    {
+      "egl_device_index": 15,
+      "extensions": [
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "drm_device_file": "/dev/dri/card8",
+      "drm_pci_bus_id": "0000:a1:00.0"
+    },
+    {
+      "egl_device_index": 16,
+      "extensions": [
+        "EGL_MESA_device_software",
+        "EGL_EXT_device_drm_render_node"
+      ]
+    }
+  ],
+  "created_utc": "2026-09-23T04:39:41Z",
+  "metadata_cuda_ordinal_namespace": "unmasked_pci_bus_id",
+  "enumeration_only": true,
+  "display_or_context_calls": false,
+  "allowed_egl_calls": [
+    "eglGetProcAddress",
+    "eglQueryDevicesEXT",
+    "eglQueryDeviceAttribEXT",
+    "eglQueryDeviceStringEXT"
+  ]
+}

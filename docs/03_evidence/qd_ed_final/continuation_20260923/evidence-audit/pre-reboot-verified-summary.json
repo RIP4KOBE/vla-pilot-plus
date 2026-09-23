@@ -1,0 +1,51 @@
+{
+  "schema": "qd-ed-node5.2-preserved-evidence-summary-v1",
+  "source_commit": "1a0e1b52c3cab9acac1ee6092d58d5925b41163f",
+  "provenance": "Copied from completed CPU tool output observed before the 2026-09-23 server-reboot mount outage; not a post-reboot reread of A.",
+  "gpu_executed": false,
+  "torch_load_weights_only": true,
+  "torch_cuda_initialized_at_scan_end": false,
+  "current_artifact_readback_status": "original_inventory_json_reread_and_summary_matches_after_mount_recovery",
+  "original_inventory_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/evidence-audit/existing-artifact-inventory.json",
+  "original_inventory_sha256": "4e0965194279ceb7fb0755aebe22831f737dad6d3bd93272c31f7eb59af04cc6",
+  "historical_fixed_pool": {
+    "traces": 20,
+    "shadow_stream_batches": 220,
+    "shadow_candidate_occurrences": 3520,
+    "fingerprint_matches": 3520,
+    "reward_value_matches": 3520,
+    "full_9_xyz_traces": 0,
+    "explicit_initial_eef_traces": 0,
+    "executed_observation_traces": 0,
+    "trajectory_shapes": [
+      "(16, 7, 3)"
+    ],
+    "trajectory_dtypes": [
+      "torch.bfloat16"
+    ]
+  },
+  "current_attempt_partial": {
+    "traces": 6,
+    "shadow_stream_batches": 66,
+    "shadow_candidate_occurrences": 1056,
+    "fingerprint_matches": 1056,
+    "reward_value_matches": 1056,
+    "full_9_xyz_traces": 0,
+    "explicit_initial_eef_traces": 0,
+    "executed_observation_traces": 0,
+    "trajectory_shapes": [
+      "(16, 7, 3)"
+    ],
+    "trajectory_dtypes": [
+      "torch.bfloat16"
+    ]
+  },
+  "limits": [
+    "Matched reward means the stored resolved quality for the same canonical fingerprint; it does not reconstruct unsaved raw per-provider return values.",
+    "Duplicate action fingerprints do not establish unique parent occurrence provenance.",
+    "No missing original t0/t8Z or real next-step observation was reconstructed.",
+    "Historical/current trace readability does not establish valid current-round scientific outcomes.",
+    "The report contains planned CPU tests; no new test-pass claim is made."
+  ],
+  "readback_scope": "Inventory JSON and its aggregate fields only; did not reload the 26 tensors or rerun 266 batches."
+}
