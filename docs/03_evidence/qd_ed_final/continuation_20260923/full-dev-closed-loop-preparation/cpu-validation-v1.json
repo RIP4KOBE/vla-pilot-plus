@@ -1,0 +1,12 @@
+{
+  "actual_read_authorized": false,
+  "command": "CUDA_VISIBLE_DEVICES='' PYTHONDONTWRITEBYTECODE=1 /home/hynx/miniconda3/envs/vla-pilot/bin/python -m pytest -q -p no:cacheprovider docs/03_evidence/qd_ed_final/continuation_20260923/full-dev-closed-loop-preparation/test_read_full_dev.py",
+  "exit_code": 0,
+  "python_version": "3.12.12",
+  "reader_sha256": "f949cf780699e812143c5d089f358d0f9c40dc1517465ac8ac7d6c2bf8306a95",
+  "result": "16 passed in 2.27s",
+  "schema": "n2-dev-chronology-cpu-validation-v1",
+  "scope": "synthetic temporary fixtures only, including full30 with unchanged frozen CPU auditor; no actual episode/bundle read or GPU/provider/model/projector/simulator call",
+  "test_sha256": "338d3b90a5269552d601c089d191e2cb4d441e5ccaea249d2c1d3470fb79a5da",
+  "tests": 16
+}

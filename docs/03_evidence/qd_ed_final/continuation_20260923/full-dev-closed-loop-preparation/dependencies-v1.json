@@ -1,0 +1,27 @@
+{
+  "actual_data_read": false,
+  "imports": [
+    "task0_helpers",
+    "auditor"
+  ],
+  "matrix_role": "Referenced outcome/cost/quality authority; not executed or reimplemented",
+  "schema": "n2-dev-chronology-dependencies-v1",
+  "sources": {
+    "auditor": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/audit_decision_evidence.py",
+      "sha256": "c5936a251bc8145093392136fc8b06779c499cb456953d1079fc4e26c68e1b95"
+    },
+    "matrix_protocol": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-matrix-report/source-v1/protocol.md",
+      "sha256": "5ff1478eec7a9d8e1e7fb0914d762bacd86195125ff863a7c918f533c225417c"
+    },
+    "matrix_reporter": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-matrix-report/source-v1/summarize_matrix.py",
+      "sha256": "8299647ed0ec904e230058a96a8d0b2d2714e2a3879341ea6917416093c3dfe2"
+    },
+    "task0_helpers": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/read_closed_loop.py",
+      "sha256": "1212c3c9675403dc0e8f3b97948ab8d6d9a5f873ccfa615564041da3fe5c309f"
+    }
+  }
+}

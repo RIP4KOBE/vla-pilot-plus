@@ -1,0 +1,23 @@
+{
+  "actual_read_authorized": false,
+  "actual_run_requirement": "separate root SHA-bound authorization after all30 accepted representatives and scope review",
+  "created_utc": "2026-09-23T12:12:41.853567+00:00",
+  "dependency_manifest": "dependencies-v1.json",
+  "local_files": {
+    "cpu-validation-v1.json": "c414011c4e2f20cbfe420e17c53405dc5e7ced87936179f730778c8e66862da9",
+    "dependencies-v1.json": "0d19db16e345922f392ee1df835d8757e2bf286754249d1c202e01c6faf754f8",
+    "implementation-plan-v1.md": "e7cac5d250436ce0c982e2d8cd08a1b61eee6a9518f7b2197dcb987f819b5e89",
+    "input-schema-v1.json": "a166a28fb9eecd4bebbf1e905c3a6af8465e5d4034ca37aecdcc06833c512774",
+    "protocol-draft-v1.md": "8cce9abf684b9ed5481aa15cec0ace9c654465b16a949760641d3d2adc9bfd67",
+    "protocol-v1.md": "4d7ca15fd0b0f8d72d6cc4310768ffc7bb19938e6dbfb00cea48275894bf4705",
+    "read_full_dev.py": "f949cf780699e812143c5d089f358d0f9c40dc1517465ac8ac7d6c2bf8306a95",
+    "test_read_full_dev.py": "338d3b90a5269552d601c089d191e2cb4d441e5ccaea249d2c1d3470fb79a5da"
+  },
+  "schema": "n2-dev-chronology-freeze-v1",
+  "status": "CPU_TESTED_FROZEN_BEFORE_FULL_DEV_READ",
+  "tests": {
+    "count": 16,
+    "exit_code": 0,
+    "result": "16 passed in 2.27s"
+  }
+}

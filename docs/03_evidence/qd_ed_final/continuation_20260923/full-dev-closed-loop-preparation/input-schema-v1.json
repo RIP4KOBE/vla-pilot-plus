@@ -1,0 +1,28 @@
+{
+  "schema": "n2-dev-chronology-schema-description-v1",
+  "reference": {"path": "absolute canonical owned path", "sha256": "64 lowercase hex characters"},
+  "authorization": {
+    "schema": "n2-dev-chronology-read-authorization-v1",
+    "status": "AUTHORIZED_CPU_READ",
+    "scope_reviewed": true,
+    "freeze": "reference to frozen definition",
+    "input_manifest": "reference to input manifest",
+    "matrix_report": "same reference as input manifest"
+  },
+  "input_manifest": {
+    "schema": "n2-dev-chronology-input-v1",
+    "matrix_report": "reference to root-reviewed complete_valid_30 frozen matrix report",
+    "cells": "exactly 30 entries below, one per matrix valid_attempt_id; input order immaterial"
+  },
+  "cell_entry": {
+    "attempt_id": "exact selected valid attempt ID",
+    "metadata": "reference to eds_eval/episode_metadata.jsonl",
+    "status": "reference to eds_eval/decision_evidence/episode_000/status.json",
+    "index": "reference to eds_eval/decision_evidence/episode_000/events.jsonl",
+    "stage_events": "one of stage_present or stage_absent"
+  },
+  "stage_present": {"status": "present", "reference": "reference to eds_eval/stage_events.jsonl; empty is allowed"},
+  "stage_absent": {"status": "not_recorded", "path": "exact eds_eval/stage_events.jsonl path, verified absent"},
+  "outputs": ["inputs-and-audit.json", "index.json", "overview.md", "status.json", "t00-c0.json through t09-n2.json", "one fresh audit per cell"],
+  "authority": "Existing matrix report remains outcome/cost/quality authority. This description is not a real authorization or manifest."
+}
