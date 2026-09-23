@@ -1,0 +1,43 @@
+{
+  "status": "CPU_TESTED_FROZEN_BEFORE_FIRST_DECODE",
+  "created_at": "2026-09-23T10:38:32.260321+00:00",
+  "source_sha256": "9362e502e32f0969e827b5f96f202ae88f42322f91bfdfda1e5dd174cc057c87",
+  "files": [
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/extract_fixed_grid.py",
+      "sha256": "9362e502e32f0969e827b5f96f202ae88f42322f91bfdfda1e5dd174cc057c87"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/test_extract_fixed_grid.py",
+      "sha256": "412754aeb9353ebe1e88ef5fd00a886cbdcb79ddb172d115007c7302a34c5d27"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/cpu-tests-v1.txt",
+      "sha256": "7a27f89ae217887513e408b4ef29d2c3fff03b933ad8ae3cf954f72215362655"
+    }
+  ],
+  "tools": {
+    "ffmpeg": "/home/hynx/miniconda3/envs/vla-pilot/bin/ffmpeg",
+    "ffmpeg_sha256": "b45c1ba8e48533a3e328b7ec98ba86393019cc18c32bc6e9689b27f68450ecd9",
+    "ffmpeg_version": "ffmpeg version 8.0 Copyright (c) 2000-2025 the FFmpeg developers",
+    "Pillow": "12.2.0",
+    "font": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    "font_sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
+    "python": "3.12.12 | packaged by conda-forge | (main, Oct 22 2025, 23:25:55) [GCC 14.3.0]"
+  },
+  "synthetic_tests": 6,
+  "test_returncode": 0,
+  "test_command": [
+    "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1",
+    "-p",
+    "test_extract_fixed_grid.py",
+    "-v"
+  ],
+  "torch_imported": false,
+  "pixel_decode_executions_before_freeze": 0
+}

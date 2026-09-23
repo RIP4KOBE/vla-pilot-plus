@@ -1,0 +1,51 @@
+{
+  "schema": "qd-ed-task0-recorded-video-read-authorization-v1",
+  "authorized_at": "2026-09-23T10:33:56.720507+00:00",
+  "authority": "root coordinator within user-authorized continuing Arbor study",
+  "bound_inputs": {
+    "video-read-protocol-v1.md": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-preparation-v1/video-read-protocol-v1.md",
+      "sha256": "d5a3cefd022ce286ff9f9415f3a022f2479e2c4831805cd5e8125a33f7d6141f"
+    },
+    "source-frame-mapping-v1.json": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-preparation-v1/source-frame-mapping-v1.json",
+      "sha256": "b55c07646d7ccd597975d826e7fef265d3ecfd1e57832ee56bd93775d02d76df"
+    },
+    "visual-inventory-v1.json": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-preparation-v1/visual-inventory-v1.json",
+      "sha256": "b9f96f865cc18f270c3fa0bb7e9631c0edf8f09f692c96e4c14cf75f38ae49dc"
+    }
+  },
+  "authorized": true,
+  "frame_ordinals_per_arm": [
+    0,
+    8,
+    16,
+    24,
+    32,
+    64,
+    96,
+    128,
+    160,
+    240,
+    320,
+    400,
+    480,
+    560,
+    640,
+    719
+  ],
+  "total_exported_frames": 48,
+  "contact_sheet_pages": 4,
+  "CPU_only": true,
+  "source_or_cohort_mutation_allowed": false,
+  "new_online_or_evaluation_release": false,
+  "interpretation_scope": "exact proposed protocol; direct visible chronology with source-before-action timing, no target identity/grasp/contact/causal inference; retain original overlays; no additional crops/frames/views",
+  "notes": [
+    "Freeze exact CPU extraction/caption source hash before first decode; no dependency installs/GPU/new render/model/provider",
+    "Source/decoded count/visible ordinal discrepancy is not repaired by post-hoc shift or alternate frames",
+    "Already accepted fresh numerical audits can be hash-verified; no unnecessary repeated tensor audit",
+    "Save all selected frames and sheets; root will inspect all4 sheets, report matching Unknown limits",
+    "Copy final source/protocol/references into isolated N for reproducible versioned delivery; W live source stays fixed"
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "schema": "task0-fixed-grid-direct-visual-review-v1",
+  "reviewer": "/root/gpu5_probe",
+  "review_method": "direct visual inspection of exactly4 approved contact sheets at original image detail; no OCR/model/API call, crop, extra frame or alternative view",
+  "decode_manifest_sha256": "492f5684e2644c04c82b4f899e43c1dcddb3fd405e6342df7594f7df6b5c8125",
+  "viewed_sheets": [
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/contact-sheet-01.png",
+      "sha256": "1739154eef9c5db5405e1e6aa8e4e202685e8be3001e12e97512f780fe0085f3",
+      "selected_cells": 12,
+      "visible_Step_Stage_Guide_vs_caption": "all12 visible labels consistent; no discrepancy observed"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/contact-sheet-02.png",
+      "sha256": "24bbfae5679f05bb126d14bdc04e2cfe04b347333c6abf26f412acd5a5b7bc57",
+      "selected_cells": 12,
+      "visible_Step_Stage_Guide_vs_caption": "all12 visible labels consistent; no discrepancy observed"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/contact-sheet-03.png",
+      "sha256": "4be18ad4f7dfbdd12500376f99fe06818930ff016bcb35a3a47187029f65b240",
+      "selected_cells": 12,
+      "visible_Step_Stage_Guide_vs_caption": "all12 visible labels consistent; no discrepancy observed"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/contact-sheet-04.png",
+      "sha256": "b4d54f5a236cf6511a83857b3c5ca58de8b8d5d51e4814c8edea8f6f47e0b300",
+      "selected_cells": 12,
+      "visible_Step_Stage_Guide_vs_caption": "all12 visible labels consistent; no discrepancy observed"
+    }
+  ],
+  "total_viewed_selected_cells": 48,
+  "separately_viewed_native_frames": 0,
+  "extra_frames_or_crops": 0,
+  "mapping_discrepancy_observed": false,
+  "mapping_scope": "observed label consistency supports approved source-before-action timing; no frame720/final-action response exists",
+  "unknown": [
+    "physical contact and secure grasp",
+    "unique object identity through occlusion",
+    "object whereabouts when not separately visible",
+    "task target/goal identity",
+    "exact3D pose and force",
+    "unsampled events between fixed frames",
+    "causal effect or whether different guidance would help",
+    "exact normalized Stage-query input"
+  ]
+}

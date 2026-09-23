@@ -1,0 +1,2258 @@
+{
+  "schema": "task0-fixed-grid-video-extraction-v1",
+  "source_commit": "525506ca3198f54d86dadf84bbb76eb64926d87a",
+  "authorization_sha256": "f488d1b66f624a27eea3bf887e20e9c5029e6ba50837e7bab94e9337b09c450f",
+  "freeze_sha256": "fea6615676b07138ebce626749fca055d7000e44da840f6151413f5edbb6adc0",
+  "source_sha256": "9362e502e32f0969e827b5f96f202ae88f42322f91bfdfda1e5dd174cc057c87",
+  "tools": {
+    "ffmpeg": "/home/hynx/miniconda3/envs/vla-pilot/bin/ffmpeg",
+    "ffmpeg_sha256": "b45c1ba8e48533a3e328b7ec98ba86393019cc18c32bc6e9689b27f68450ecd9",
+    "ffmpeg_version": "ffmpeg version 8.0 Copyright (c) 2000-2025 the FFmpeg developers",
+    "Pillow": "12.2.0",
+    "font": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    "font_sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
+    "python": "3.12.12 | packaged by conda-forge | (main, Oct 22 2025, 23:25:55) [GCC 14.3.0]"
+  },
+  "admissions": [
+    {
+      "arm": "C0",
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0",
+      "terminal_sha256": "4bb2e01c0fdf04bd653c913e0187c533d4f7d0440286bdab00ea5577968d7efa",
+      "original_audit_sha256": "b0729cc540f0d856d80ccc23bac69bde3a410152ec8a9dfb9bf40bda45e8bc06",
+      "fresh_audit_sha256": "aaec9b206c9b55d20399b69fa67812ab7b3041a518f6743f3132be87839f32f7",
+      "complete_current_audit_reused_by_hash": true,
+      "tensor_audit_rerun": false
+    },
+    {
+      "arm": "Q0",
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74",
+      "terminal_sha256": "42c840eee6319dc01f5a2f50e7ad406c067658b0640bc07095724bdef143e1a2",
+      "original_audit_sha256": "c8c6fb5d71295ed0d86da87e999ccb6e2ea9f18b508a745727455899831b8f7f",
+      "fresh_audit_sha256": "28bd13d7d722ba377e26e17dbbc826d623f34debf04a35577a19e582cee8bdc8",
+      "complete_current_audit_reused_by_hash": true,
+      "tensor_audit_rerun": false
+    },
+    {
+      "arm": "N2",
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85",
+      "terminal_sha256": "0492c1ba5047fa3d7da6e1c0fbc6ac49af3ed0f2a50479e13da60b7415fca36f",
+      "original_audit_sha256": "726d65ea4093562cf6cd724a38d8373b120759a54d2eba23d53d5b3b51bea9f5",
+      "fresh_audit_sha256": "c2d233cdb7fa1b9af1493f414f407ddecd73c21a007dc5e98a5c63b75da4feae",
+      "complete_current_audit_reused_by_hash": true,
+      "tensor_audit_rerun": false
+    }
+  ],
+  "input_sha256": {
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-preparation-v1/root-visual-authorization-v1.json": "f488d1b66f624a27eea3bf887e20e9c5029e6ba50837e7bab94e9337b09c450f",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/freeze-v1.json": "fea6615676b07138ebce626749fca055d7000e44da840f6151413f5edbb6adc0",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/extract_fixed_grid.py": "9362e502e32f0969e827b5f96f202ae88f42322f91bfdfda1e5dd174cc057c87",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/test_extract_fixed_grid.py": "412754aeb9353ebe1e88ef5fd00a886cbdcb79ddb172d115007c7302a34c5d27",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/cpu-tests-v1.txt": "7a27f89ae217887513e408b4ef29d2c3fff03b933ad8ae3cf954f72215362655",
+    "/home/hynx/miniconda3/envs/vla-pilot/bin/ffmpeg": "b45c1ba8e48533a3e328b7ec98ba86393019cc18c32bc6e9689b27f68450ecd9",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-preparation-v1/video-read-protocol-v1.md": "d5a3cefd022ce286ff9f9415f3a022f2479e2c4831805cd5e8125a33f7d6141f",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-preparation-v1/source-frame-mapping-v1.json": "b55c07646d7ccd597975d826e7fef265d3ecfd1e57832ee56bd93775d02d76df",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-preparation-v1/visual-inventory-v1.json": "b9f96f865cc18f270c3fa0bb7e9631c0edf8f09f692c96e4c14cf75f38ae49dc",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/main.py": "258d66b3040be8750beb9e0eab47a7b607db7cbe00d167726664526554fdec57",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/utils/vis_utils.py": "6e256ca29aabcb8ffeb852e56c732ec56885394bb8e4e8ca2fd0957e989289b8",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/env_adapters/libero_adapter.py": "029657074f6fc783beebc3b4a1431faceee51f970e4d79f0ead3796b6dd2f508",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/env_adapters/base_adapter.py": "a5bb4f9e06f458fc38e6cc7486e6c6d268fc67bfaf6fd9f84f90514236144de8",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/configs/backend/libero.yaml": "e1d1f41f178c7e5968e04b8337c13e8f37b691a7b3e93f9f8e9f7bb5796deb14",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_final_runner.py": "7e360ebd243864a510500f5c9af4a6919c71a355e30c1bfd241439c4de26188d",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/.hydra/config.yaml": "3c97368dbd194aa1bb7eb7cc4d29327dbf2101e0a37346088083c35ed516c8ee",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/.hydra/config.yaml": "ed00a132be335c4a4358d2a9a1d0a350d859b6edfb220242589c41894645d8ac",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/.hydra/config.yaml": "e7288fe15b73cf2cc55f43563b86417b9f7baa36d7f8e9b42e52a7c279af8202",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/output-v1/closed-loop-sequence.json": "b8a7c7bce23975ff1f421c7e7cd87eccc7d2517549301f4a81fb34189d1affa4",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/output-v1/inputs-and-audit.json": "dfddb2ff80734cabf7a819beef213ded8ab3410a02cc0a6b49ebced48fe70910",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/episode_1/episode_1_fail_agentview.mp4": "8477b50c6e7c47bc6ac9684966748247e0a0ed923dffe1d6e88bf69ae6ab3615",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/attempt-result.json": "4bb2e01c0fdf04bd653c913e0187c533d4f7d0440286bdab00ea5577968d7efa",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/eds_eval/decision-evidence-audit.json": "b0729cc540f0d856d80ccc23bac69bde3a410152ec8a9dfb9bf40bda45e8bc06",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/output-v1/c0-fresh-audit.json": "aaec9b206c9b55d20399b69fa67812ab7b3041a518f6743f3132be87839f32f7",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/episode_1/episode_1_fail_agentview.mp4": "b57484efdec6e1e9282f5da535a4b87666c1bc6d6cf7e83454f0f00159370ce6",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/attempt-result.json": "42c840eee6319dc01f5a2f50e7ad406c067658b0640bc07095724bdef143e1a2",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/eds_eval/decision-evidence-audit.json": "c8c6fb5d71295ed0d86da87e999ccb6e2ea9f18b508a745727455899831b8f7f",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/output-v1/q0-fresh-audit.json": "28bd13d7d722ba377e26e17dbbc826d623f34debf04a35577a19e582cee8bdc8",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/episode_1/episode_1_fail_agentview.mp4": "5819b83c4ca547db7a0849116f301cca4aa83cb3e40eecf48d490a7395c6be65",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/attempt-result.json": "0492c1ba5047fa3d7da6e1c0fbc6ac49af3ed0f2a50479e13da60b7415fca36f",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/eds_eval/decision-evidence-audit.json": "726d65ea4093562cf6cd724a38d8373b120759a54d2eba23d53d5b3b51bea9f5",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/output-v1/n2-fresh-audit.json": "c2d233cdb7fa1b9af1493f414f407ddecd73c21a007dc5e98a5c63b75da4feae"
+  },
+  "decoded": [
+    {
+      "arm": "C0",
+      "command": [
+        "/home/hynx/miniconda3/envs/vla-pilot/bin/ffmpeg",
+        "-hide_banner",
+        "-nostdin",
+        "-loglevel",
+        "verbose",
+        "-hwaccel",
+        "none",
+        "-threads",
+        "1",
+        "-i",
+        "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/episode_1/episode_1_fail_agentview.mp4",
+        "-map",
+        "0:v:0",
+        "-an",
+        "-sn",
+        "-dn",
+        "-filter_threads",
+        "1",
+        "-vf",
+        "select=eq(n\\,0)+eq(n\\,8)+eq(n\\,16)+eq(n\\,24)+eq(n\\,32)+eq(n\\,64)+eq(n\\,96)+eq(n\\,128)+eq(n\\,160)+eq(n\\,240)+eq(n\\,320)+eq(n\\,400)+eq(n\\,480)+eq(n\\,560)+eq(n\\,640)+eq(n\\,719)",
+        "-fps_mode",
+        "passthrough",
+        "-c:v",
+        "rawvideo",
+        "-pix_fmt",
+        "rgb24",
+        "-threads:v",
+        "1",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "returncode": 0,
+      "decoded_frame_count": 720,
+      "exported_frame_count": 16,
+      "raw_rgb_bytes": 19660800,
+      "decode_log_sha256": "a252bc3326df4e5244e9972dc531064224ff4446ce220d4ea9c5a309fc4ead3b",
+      "hardware_acceleration": "none",
+      "nonselected_frame_export_or_inspection": false
+    },
+    {
+      "arm": "Q0",
+      "command": [
+        "/home/hynx/miniconda3/envs/vla-pilot/bin/ffmpeg",
+        "-hide_banner",
+        "-nostdin",
+        "-loglevel",
+        "verbose",
+        "-hwaccel",
+        "none",
+        "-threads",
+        "1",
+        "-i",
+        "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/episode_1/episode_1_fail_agentview.mp4",
+        "-map",
+        "0:v:0",
+        "-an",
+        "-sn",
+        "-dn",
+        "-filter_threads",
+        "1",
+        "-vf",
+        "select=eq(n\\,0)+eq(n\\,8)+eq(n\\,16)+eq(n\\,24)+eq(n\\,32)+eq(n\\,64)+eq(n\\,96)+eq(n\\,128)+eq(n\\,160)+eq(n\\,240)+eq(n\\,320)+eq(n\\,400)+eq(n\\,480)+eq(n\\,560)+eq(n\\,640)+eq(n\\,719)",
+        "-fps_mode",
+        "passthrough",
+        "-c:v",
+        "rawvideo",
+        "-pix_fmt",
+        "rgb24",
+        "-threads:v",
+        "1",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "returncode": 0,
+      "decoded_frame_count": 720,
+      "exported_frame_count": 16,
+      "raw_rgb_bytes": 19660800,
+      "decode_log_sha256": "82edfe249bbe142c76a73a411d3e6472c94dbb5bedb744a499d1c1c24f85f300",
+      "hardware_acceleration": "none",
+      "nonselected_frame_export_or_inspection": false
+    },
+    {
+      "arm": "N2",
+      "command": [
+        "/home/hynx/miniconda3/envs/vla-pilot/bin/ffmpeg",
+        "-hide_banner",
+        "-nostdin",
+        "-loglevel",
+        "verbose",
+        "-hwaccel",
+        "none",
+        "-threads",
+        "1",
+        "-i",
+        "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/episode_1/episode_1_fail_agentview.mp4",
+        "-map",
+        "0:v:0",
+        "-an",
+        "-sn",
+        "-dn",
+        "-filter_threads",
+        "1",
+        "-vf",
+        "select=eq(n\\,0)+eq(n\\,8)+eq(n\\,16)+eq(n\\,24)+eq(n\\,32)+eq(n\\,64)+eq(n\\,96)+eq(n\\,128)+eq(n\\,160)+eq(n\\,240)+eq(n\\,320)+eq(n\\,400)+eq(n\\,480)+eq(n\\,560)+eq(n\\,640)+eq(n\\,719)",
+        "-fps_mode",
+        "passthrough",
+        "-c:v",
+        "rawvideo",
+        "-pix_fmt",
+        "rgb24",
+        "-threads:v",
+        "1",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "returncode": 0,
+      "decoded_frame_count": 720,
+      "exported_frame_count": 16,
+      "raw_rgb_bytes": 19660800,
+      "decode_log_sha256": "4d7f98c054f7f11a8f1849588fb2cc808a552e922e481906b39939291e7bea31",
+      "hardware_acceleration": "none",
+      "nonselected_frame_export_or_inspection": false
+    }
+  ],
+  "frames": [
+    {
+      "arm": "C0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "8477b50c6e7c47bc6ac9684966748247e0a0ed923dffe1d6e88bf69ae6ab3615",
+      "presentation_frame_index": 0,
+      "presentation_time_seconds": 0.0,
+      "action_relation": "before_action",
+      "action_global_step": 0,
+      "completed_episode_actions_before_frame": 0,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "93b52dbba1b357e04ebd0aa9f18984773949d853e89cf4fd92c42cac8cc7fadf",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/c0/frame_000000.png",
+      "png_sha256": "2a541e67646cddeb8a53cc4c48188a248d3de10d25194f401f47eb9f56eb793d",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d1:s0",
+        "stage": 1,
+        "use_guidance": true,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "C0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "8477b50c6e7c47bc6ac9684966748247e0a0ed923dffe1d6e88bf69ae6ab3615",
+      "presentation_frame_index": 8,
+      "presentation_time_seconds": 0.8,
+      "action_relation": "before_action",
+      "action_global_step": 8,
+      "completed_episode_actions_before_frame": 8,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "6a8763b85fa92b66acbce2ded412c4e17dba0ae87641c3c75cf559d31b373dca",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/c0/frame_000008.png",
+      "png_sha256": "27067d058c1d94b51eaa5dc9a04cf523806732b523a4303291f0f040e2e1d0d3",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d2:s8",
+        "stage": 1,
+        "use_guidance": true,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "C0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "8477b50c6e7c47bc6ac9684966748247e0a0ed923dffe1d6e88bf69ae6ab3615",
+      "presentation_frame_index": 16,
+      "presentation_time_seconds": 1.6,
+      "action_relation": "before_action",
+      "action_global_step": 16,
+      "completed_episode_actions_before_frame": 16,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "9062598efcc9518a656884e9b61c834bdd9bd5d2d4ef14f994962c1917fa6c5b",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/c0/frame_000016.png",
+      "png_sha256": "9a5684cfc0c2a8248ad78f20b73e0e57769b87bed3acf8f6f7feb513817fc0e4",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d3:s16",
+        "stage": 1,
+        "use_guidance": true,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "C0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "8477b50c6e7c47bc6ac9684966748247e0a0ed923dffe1d6e88bf69ae6ab3615",
+      "presentation_frame_index": 24,
+      "presentation_time_seconds": 2.4,
+      "action_relation": "before_action",
+      "action_global_step": 24,
+      "completed_episode_actions_before_frame": 24,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "cb2d0d94aca18a0db07087485546925b65b900b9d4d313dc037f8a933784c060",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/c0/frame_000024.png",
+      "png_sha256": "5a96854b7a92b71975fdaaf83fa0026afa190d16f180c521327c5ca6e82b06c8",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d4:s24",
+        "stage": 1,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "C0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "8477b50c6e7c47bc6ac9684966748247e0a0ed923dffe1d6e88bf69ae6ab3615",
+      "presentation_frame_index": 32,
+      "presentation_time_seconds": 3.2,
+      "action_relation": "before_action",
+      "action_global_step": 32,
+      "completed_episode_actions_before_frame": 32,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "3423042fc7a99bc485e1803ef629839beaac8e4eda048c9c0e3b9a4bab37529e",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/c0/frame_000032.png",
+      "png_sha256": "2412a690a0ed1bce9b8ac62ec875f6b08a06ea76d8d7ecc7a87673930e599b5c",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d5:s32",
+        "stage": 1,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "C0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "8477b50c6e7c47bc6ac9684966748247e0a0ed923dffe1d6e88bf69ae6ab3615",
+      "presentation_frame_index": 64,
+      "presentation_time_seconds": 6.4,
+      "action_relation": "before_action",
+      "action_global_step": 64,
+      "completed_episode_actions_before_frame": 64,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "78350b3d72d00c8bdb2e4789cf752d8949714ed9bcdea52a342379980f5a2415",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/c0/frame_000064.png",
+      "png_sha256": "12423d1d9d03e856f5540ba2b9c920189d47a967b15904373dc7ba2b23d9fa67",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d9:s64",
+        "stage": 1,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "C0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "8477b50c6e7c47bc6ac9684966748247e0a0ed923dffe1d6e88bf69ae6ab3615",
+      "presentation_frame_index": 96,
+      "presentation_time_seconds": 9.6,
+      "action_relation": "before_action",
+      "action_global_step": 96,
+      "completed_episode_actions_before_frame": 96,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "42d95a850e0861692304dd154054cfce67e083fcd77bea96b0841584cdaeb47b",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/c0/frame_000096.png",
+      "png_sha256": "d464fd5597fe503f4ba185639f590cd563c61fadbff4ff134bc89f5e8409d28c",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d13:s96",
+        "stage": 2,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "C0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "8477b50c6e7c47bc6ac9684966748247e0a0ed923dffe1d6e88bf69ae6ab3615",
+      "presentation_frame_index": 128,
+      "presentation_time_seconds": 12.8,
+      "action_relation": "before_action",
+      "action_global_step": 128,
+      "completed_episode_actions_before_frame": 128,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "05a636eb0a396ba0238a588e66f99632b6e4d4a46f0c2cb033f610b4a41bd9a0",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/c0/frame_000128.png",
+      "png_sha256": "04f53262eda27159bbbec83c23d827532ea73c483ea0e395610426249432da16",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d17:s128",
+        "stage": 1,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "C0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "8477b50c6e7c47bc6ac9684966748247e0a0ed923dffe1d6e88bf69ae6ab3615",
+      "presentation_frame_index": 160,
+      "presentation_time_seconds": 16.0,
+      "action_relation": "before_action",
+      "action_global_step": 160,
+      "completed_episode_actions_before_frame": 160,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "892474e0db73d5374077a5688e5db4a75c071e893deba9ec4bea174851cae327",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/c0/frame_000160.png",
+      "png_sha256": "d87411d7d676ed5614f7c877afa2200b304c269719586a3566f87d52cd62654f",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d21:s160",
+        "stage": 1,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "C0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "8477b50c6e7c47bc6ac9684966748247e0a0ed923dffe1d6e88bf69ae6ab3615",
+      "presentation_frame_index": 240,
+      "presentation_time_seconds": 24.0,
+      "action_relation": "before_action",
+      "action_global_step": 240,
+      "completed_episode_actions_before_frame": 240,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "2310e88203e088c0fe14b47d6d1297fe1a66042545618d0306241d1fb9d489fb",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/c0/frame_000240.png",
+      "png_sha256": "d8b4981d41201db4b35e29e5a26dd173abcf8e138fde364b7ca5ddfd4057d321",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d31:s240",
+        "stage": 2,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "C0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "8477b50c6e7c47bc6ac9684966748247e0a0ed923dffe1d6e88bf69ae6ab3615",
+      "presentation_frame_index": 320,
+      "presentation_time_seconds": 32.0,
+      "action_relation": "before_action",
+      "action_global_step": 320,
+      "completed_episode_actions_before_frame": 320,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "50d148f7c87dbedd96e8bbd1e0b40f1c5fd14ffbf20fd936c9c8911970c1409f",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/c0/frame_000320.png",
+      "png_sha256": "43e30a26b416657737a84b418b751264951275b60d55b8167895a08ac53b4b02",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d41:s320",
+        "stage": 1,
+        "use_guidance": true,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "C0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "8477b50c6e7c47bc6ac9684966748247e0a0ed923dffe1d6e88bf69ae6ab3615",
+      "presentation_frame_index": 400,
+      "presentation_time_seconds": 40.0,
+      "action_relation": "before_action",
+      "action_global_step": 400,
+      "completed_episode_actions_before_frame": 400,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "5269fd8b22e225f8fc97f73fbbdf5f51bff13ab8ce2986cdada38d6f513c03aa",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/c0/frame_000400.png",
+      "png_sha256": "4b97cf46464bc2b567f110dec7c27f32faee7868d5075783587d13fe7a5e415a",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d51:s400",
+        "stage": 1,
+        "use_guidance": true,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "C0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "8477b50c6e7c47bc6ac9684966748247e0a0ed923dffe1d6e88bf69ae6ab3615",
+      "presentation_frame_index": 480,
+      "presentation_time_seconds": 48.0,
+      "action_relation": "before_action",
+      "action_global_step": 480,
+      "completed_episode_actions_before_frame": 480,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "faf9b90ff02083da2db601df7b8f610a40fcd581c04af28501f400d1e83e6cfe",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/c0/frame_000480.png",
+      "png_sha256": "e57a5450e3cd7e9d953cb0f504267549903c1b491f8c21753dc0db52cca84626",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d61:s480",
+        "stage": 1,
+        "use_guidance": true,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "C0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "8477b50c6e7c47bc6ac9684966748247e0a0ed923dffe1d6e88bf69ae6ab3615",
+      "presentation_frame_index": 560,
+      "presentation_time_seconds": 56.0,
+      "action_relation": "before_action",
+      "action_global_step": 560,
+      "completed_episode_actions_before_frame": 560,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "de54dd0ed8046ab00054a6f7ce78d62bedb9a1e923b50492f10c49c98a6b1983",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/c0/frame_000560.png",
+      "png_sha256": "f4bcc67d26836697b513de039e667701680fc95cba07f8c7709e10dcd86996de",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d71:s560",
+        "stage": 1,
+        "use_guidance": true,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "C0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "8477b50c6e7c47bc6ac9684966748247e0a0ed923dffe1d6e88bf69ae6ab3615",
+      "presentation_frame_index": 640,
+      "presentation_time_seconds": 64.0,
+      "action_relation": "before_action",
+      "action_global_step": 640,
+      "completed_episode_actions_before_frame": 640,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "731ea729ffc91526a6c0b874fabcf6aabf5133dd44bba72d49ce3d5db3070245",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/c0/frame_000640.png",
+      "png_sha256": "9fc1da707c5b26524e30990a348e7af2ce89ec2a3a55aeb8fe912ac2b26c3a92",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d81:s640",
+        "stage": 2,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "C0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "8477b50c6e7c47bc6ac9684966748247e0a0ed923dffe1d6e88bf69ae6ab3615",
+      "presentation_frame_index": 719,
+      "presentation_time_seconds": 71.9,
+      "action_relation": "before_action",
+      "action_global_step": 719,
+      "completed_episode_actions_before_frame": 719,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "45311aaad9484a9d76da2b3599650ed91122e0d593a43b707a4c9b3561808c39",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/c0/frame_000719.png",
+      "png_sha256": "5f6b87b9f8c84a1aa191bc980866b2accf01918e6def9720899985e896298415",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d90:s712",
+        "stage": 2,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "Q0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "b57484efdec6e1e9282f5da535a4b87666c1bc6d6cf7e83454f0f00159370ce6",
+      "presentation_frame_index": 0,
+      "presentation_time_seconds": 0.0,
+      "action_relation": "before_action",
+      "action_global_step": 0,
+      "completed_episode_actions_before_frame": 0,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "528f4f3c68e197334d5efe8b60099bdd7ce3e3df0d13c5164d87645eb4a337a1",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/q0/frame_000000.png",
+      "png_sha256": "7296ce57ad92f70891f85e2c4ffc538a5ccecf6834019b8026bc8d27adf0d8d2",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d1:s0",
+        "stage": 1,
+        "use_guidance": true,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "Q0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "b57484efdec6e1e9282f5da535a4b87666c1bc6d6cf7e83454f0f00159370ce6",
+      "presentation_frame_index": 8,
+      "presentation_time_seconds": 0.8,
+      "action_relation": "before_action",
+      "action_global_step": 8,
+      "completed_episode_actions_before_frame": 8,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "cd5389dfda27fd412e40ae709366ea39954ba6efaa5c8e704135986334d028f1",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/q0/frame_000008.png",
+      "png_sha256": "e61598cb77bf01ce60f1e4f5c4fa3ded6ad21f8894547d532bd28599acb9e982",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d2:s8",
+        "stage": 1,
+        "use_guidance": true,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "Q0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "b57484efdec6e1e9282f5da535a4b87666c1bc6d6cf7e83454f0f00159370ce6",
+      "presentation_frame_index": 16,
+      "presentation_time_seconds": 1.6,
+      "action_relation": "before_action",
+      "action_global_step": 16,
+      "completed_episode_actions_before_frame": 16,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "7bad3e0aeb7bd730ef4d42716eda2d14e5c23402fda8734c21071461e3549170",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/q0/frame_000016.png",
+      "png_sha256": "c30a899ab9323a338d9e27a7c4aef9c7ebc8b1b6953df20fec2f168551d844af",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d3:s16",
+        "stage": 1,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "Q0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "b57484efdec6e1e9282f5da535a4b87666c1bc6d6cf7e83454f0f00159370ce6",
+      "presentation_frame_index": 24,
+      "presentation_time_seconds": 2.4,
+      "action_relation": "before_action",
+      "action_global_step": 24,
+      "completed_episode_actions_before_frame": 24,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "5d36c3795493a04a3b40841acefa24b5202f03d6f05cf00d45ebc3db67b75f2e",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/q0/frame_000024.png",
+      "png_sha256": "a8da3afe32af4002a17cbcb647d1ea4b9c328548f28e365d945c3fb4d2e94dca",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d4:s24",
+        "stage": 1,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "Q0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "b57484efdec6e1e9282f5da535a4b87666c1bc6d6cf7e83454f0f00159370ce6",
+      "presentation_frame_index": 32,
+      "presentation_time_seconds": 3.2,
+      "action_relation": "before_action",
+      "action_global_step": 32,
+      "completed_episode_actions_before_frame": 32,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "3f439656b13e095f2fbe66bf96378fe7b8625e48b50df9d0b153cd18225cd673",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/q0/frame_000032.png",
+      "png_sha256": "a0462256e21dd23bdc9531d9ce5688d0cf317e70b9f58fd5aadc341430ff815e",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d5:s32",
+        "stage": 2,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "Q0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "b57484efdec6e1e9282f5da535a4b87666c1bc6d6cf7e83454f0f00159370ce6",
+      "presentation_frame_index": 64,
+      "presentation_time_seconds": 6.4,
+      "action_relation": "before_action",
+      "action_global_step": 64,
+      "completed_episode_actions_before_frame": 64,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "f754633e5f1efecb30a92cd198e8e485020ed48d51c1162b4beee470c940e2e2",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/q0/frame_000064.png",
+      "png_sha256": "a259ca64a3e8bc5e534aa21360d8e3cd602baba10430bcd14e6addbc7f08447b",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d9:s64",
+        "stage": 2,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "Q0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "b57484efdec6e1e9282f5da535a4b87666c1bc6d6cf7e83454f0f00159370ce6",
+      "presentation_frame_index": 96,
+      "presentation_time_seconds": 9.6,
+      "action_relation": "before_action",
+      "action_global_step": 96,
+      "completed_episode_actions_before_frame": 96,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "4b9951fca348305e6322840e3308a6834052559cc343ef9f3c8033b96a93182b",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/q0/frame_000096.png",
+      "png_sha256": "63347fb64143c99cbf5364209b9f3e0ed53c82e019d0ba675eab22f1dad1218c",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d13:s96",
+        "stage": 2,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "Q0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "b57484efdec6e1e9282f5da535a4b87666c1bc6d6cf7e83454f0f00159370ce6",
+      "presentation_frame_index": 128,
+      "presentation_time_seconds": 12.8,
+      "action_relation": "before_action",
+      "action_global_step": 128,
+      "completed_episode_actions_before_frame": 128,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "ab2d3b6e8496975099eef35b286c38c0df4d8b0e48d3fcbdd7e4eeec4c4842ee",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/q0/frame_000128.png",
+      "png_sha256": "4d91b057fce4e8925c903046f31b60882b7b385c28ac05550e31921de63fb84e",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d17:s128",
+        "stage": 1,
+        "use_guidance": true,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "Q0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "b57484efdec6e1e9282f5da535a4b87666c1bc6d6cf7e83454f0f00159370ce6",
+      "presentation_frame_index": 160,
+      "presentation_time_seconds": 16.0,
+      "action_relation": "before_action",
+      "action_global_step": 160,
+      "completed_episode_actions_before_frame": 160,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "9fe572734c1bbff6050c240391b938dc330f8ac01d2e1e9953f3f34928dbdbcf",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/q0/frame_000160.png",
+      "png_sha256": "879c73fb0f7051c72f2fcf95b88ef38e825b71ab46c5cc435ea0af718043131c",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d21:s160",
+        "stage": 1,
+        "use_guidance": true,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "Q0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "b57484efdec6e1e9282f5da535a4b87666c1bc6d6cf7e83454f0f00159370ce6",
+      "presentation_frame_index": 240,
+      "presentation_time_seconds": 24.0,
+      "action_relation": "before_action",
+      "action_global_step": 240,
+      "completed_episode_actions_before_frame": 240,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "66707f53984e4603bb5d455fda3ca4987b7427d99bde31229d42266abd0cac73",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/q0/frame_000240.png",
+      "png_sha256": "8da5fea2239d527ae35d48602e636a208e906e7f0a740fd1a0dc93452d54fbf1",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d31:s240",
+        "stage": 1,
+        "use_guidance": true,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "Q0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "b57484efdec6e1e9282f5da535a4b87666c1bc6d6cf7e83454f0f00159370ce6",
+      "presentation_frame_index": 320,
+      "presentation_time_seconds": 32.0,
+      "action_relation": "before_action",
+      "action_global_step": 320,
+      "completed_episode_actions_before_frame": 320,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "be325f5e7e8b1815726e6673eb15c89b46ee8bd0bb1c38c94754e8f48d9abccf",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/q0/frame_000320.png",
+      "png_sha256": "1203e4eaf021591e56ba6db82dfdc20ce5dc66fc6211aa4c56d11f1163f8f1e0",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d41:s320",
+        "stage": 1,
+        "use_guidance": true,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "Q0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "b57484efdec6e1e9282f5da535a4b87666c1bc6d6cf7e83454f0f00159370ce6",
+      "presentation_frame_index": 400,
+      "presentation_time_seconds": 40.0,
+      "action_relation": "before_action",
+      "action_global_step": 400,
+      "completed_episode_actions_before_frame": 400,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "8331ffa1a81a0bc4520fdd59317e0452a0d0692204ba17aae8b4c22a0054fbc9",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/q0/frame_000400.png",
+      "png_sha256": "a88f0f52c5e1f1b197be719835b6c45ea86e8769cfbe45d4b62bbd08a24b47b5",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d51:s400",
+        "stage": 0,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "Q0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "b57484efdec6e1e9282f5da535a4b87666c1bc6d6cf7e83454f0f00159370ce6",
+      "presentation_frame_index": 480,
+      "presentation_time_seconds": 48.0,
+      "action_relation": "before_action",
+      "action_global_step": 480,
+      "completed_episode_actions_before_frame": 480,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "47d03e8613715c1caa0923354097cb6b81074e2c2161fae0eac0a1bbb946878b",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/q0/frame_000480.png",
+      "png_sha256": "f5a9d55fe7f7f036dac808a555417e04918ee67ae5f37283e5f0c93ce0c888ae",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d61:s480",
+        "stage": 2,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "Q0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "b57484efdec6e1e9282f5da535a4b87666c1bc6d6cf7e83454f0f00159370ce6",
+      "presentation_frame_index": 560,
+      "presentation_time_seconds": 56.0,
+      "action_relation": "before_action",
+      "action_global_step": 560,
+      "completed_episode_actions_before_frame": 560,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "5da608b716b1cc551ae3d4aeea471edbde924cc6b74e6080b7fb32342e06e786",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/q0/frame_000560.png",
+      "png_sha256": "5f1c05c8292702349c7be06d9415b8d7d6cc1f5125f4b6cf9cadb2c8290899bd",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d71:s560",
+        "stage": 1,
+        "use_guidance": true,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "Q0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "b57484efdec6e1e9282f5da535a4b87666c1bc6d6cf7e83454f0f00159370ce6",
+      "presentation_frame_index": 640,
+      "presentation_time_seconds": 64.0,
+      "action_relation": "before_action",
+      "action_global_step": 640,
+      "completed_episode_actions_before_frame": 640,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "2a1d9294b31a0fa365643d6f95a13092b7913928a87c04399c9af26c909ad33d",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/q0/frame_000640.png",
+      "png_sha256": "0ede2879ff2c8ff896c911a72edc04e415e99e19c19f04663392d2dcd390f2d6",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d81:s640",
+        "stage": 0,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "Q0",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "b57484efdec6e1e9282f5da535a4b87666c1bc6d6cf7e83454f0f00159370ce6",
+      "presentation_frame_index": 719,
+      "presentation_time_seconds": 71.9,
+      "action_relation": "before_action",
+      "action_global_step": 719,
+      "completed_episode_actions_before_frame": 719,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "fdeef217038e11c90ec02ab1ec4f5e8d65972ecd6bdee9ee5f41a08908b7d74b",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/q0/frame_000719.png",
+      "png_sha256": "b2207b5682c1699e4ced6d6009f951adc6534d3ad7c10ddac64592bcd84b9ea4",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d90:s712",
+        "stage": 2,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "N2",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "5819b83c4ca547db7a0849116f301cca4aa83cb3e40eecf48d490a7395c6be65",
+      "presentation_frame_index": 0,
+      "presentation_time_seconds": 0.0,
+      "action_relation": "before_action",
+      "action_global_step": 0,
+      "completed_episode_actions_before_frame": 0,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "237c541e5438cbd4e3ef5873010bb9442369edddbc6e1c310d22a028f9c3f8f5",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/n2/frame_000000.png",
+      "png_sha256": "41bb35af4a572d50c19c6e564b752e442d532ebb2c44aa5e33c7adbbc96991a7",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d1:s0",
+        "stage": 1,
+        "use_guidance": true,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "N2",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "5819b83c4ca547db7a0849116f301cca4aa83cb3e40eecf48d490a7395c6be65",
+      "presentation_frame_index": 8,
+      "presentation_time_seconds": 0.8,
+      "action_relation": "before_action",
+      "action_global_step": 8,
+      "completed_episode_actions_before_frame": 8,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "154d49bbe5a57f3fe94ab31eb90b1d8cfc1033e02a99b2e49a5883d64c19fc7a",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/n2/frame_000008.png",
+      "png_sha256": "5627c0bbb4a46895215cc1394ea730219199767a7b3dc5a633d72a2e79ce605b",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d2:s8",
+        "stage": 1,
+        "use_guidance": true,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "N2",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "5819b83c4ca547db7a0849116f301cca4aa83cb3e40eecf48d490a7395c6be65",
+      "presentation_frame_index": 16,
+      "presentation_time_seconds": 1.6,
+      "action_relation": "before_action",
+      "action_global_step": 16,
+      "completed_episode_actions_before_frame": 16,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "555e06db75e472a9480bb395c5cc8450aefb5b956fc62a98d2f5d238e96139ad",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/n2/frame_000016.png",
+      "png_sha256": "e8a6bc4bd294dcd44f5bcb38676e9e2410451740e5fc12e9a9b4d7948a342c9d",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d3:s16",
+        "stage": 1,
+        "use_guidance": true,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "N2",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "5819b83c4ca547db7a0849116f301cca4aa83cb3e40eecf48d490a7395c6be65",
+      "presentation_frame_index": 24,
+      "presentation_time_seconds": 2.4,
+      "action_relation": "before_action",
+      "action_global_step": 24,
+      "completed_episode_actions_before_frame": 24,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "b03065091abde428d522b6f504de26e6f0d2c670e976420a8d34f40351eda8d4",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/n2/frame_000024.png",
+      "png_sha256": "7760ab73505a090fb31abbda456e33766a38e3a5db7a6e063cd30a2ca64496bd",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d4:s24",
+        "stage": 1,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "N2",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "5819b83c4ca547db7a0849116f301cca4aa83cb3e40eecf48d490a7395c6be65",
+      "presentation_frame_index": 32,
+      "presentation_time_seconds": 3.2,
+      "action_relation": "before_action",
+      "action_global_step": 32,
+      "completed_episode_actions_before_frame": 32,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "cd221c6fb5655002400040b22fcaa33c04b2490e66bcbf8c9490ff92468db824",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/n2/frame_000032.png",
+      "png_sha256": "fbe8719414afe3520a2d0748e66f3801cfd92770fdfbe4eaa86717f076eb3cb6",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d5:s32",
+        "stage": 2,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "N2",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "5819b83c4ca547db7a0849116f301cca4aa83cb3e40eecf48d490a7395c6be65",
+      "presentation_frame_index": 64,
+      "presentation_time_seconds": 6.4,
+      "action_relation": "before_action",
+      "action_global_step": 64,
+      "completed_episode_actions_before_frame": 64,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "df976d4faf3abde3341aa196e48bf4080c057a4e0965d923e38a7c1410fc5695",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/n2/frame_000064.png",
+      "png_sha256": "920047e36dbea5bca382c8c55a72d18e0393c2c1d1bba16c598155318f386249",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d9:s64",
+        "stage": 2,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "N2",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "5819b83c4ca547db7a0849116f301cca4aa83cb3e40eecf48d490a7395c6be65",
+      "presentation_frame_index": 96,
+      "presentation_time_seconds": 9.6,
+      "action_relation": "before_action",
+      "action_global_step": 96,
+      "completed_episode_actions_before_frame": 96,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "ed744906745acfa9190395f17e9104d25eec22ea85f789e3b5885863bba6d60b",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/n2/frame_000096.png",
+      "png_sha256": "f988f28798f9c0479b608b9aa4223697ed8042aac285b367611b1ba91a242f1c",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d13:s96",
+        "stage": 2,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "N2",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "5819b83c4ca547db7a0849116f301cca4aa83cb3e40eecf48d490a7395c6be65",
+      "presentation_frame_index": 128,
+      "presentation_time_seconds": 12.8,
+      "action_relation": "before_action",
+      "action_global_step": 128,
+      "completed_episode_actions_before_frame": 128,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "47b3d77c9b9f2fa0633a212f2429e23140175d2285c3b2d298b01d52b25144da",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/n2/frame_000128.png",
+      "png_sha256": "73d4a6aabe5b7d2c503982f6e6d517ec4ff2e8037abc5216d1576b848499e7ab",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d17:s128",
+        "stage": 2,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "N2",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "5819b83c4ca547db7a0849116f301cca4aa83cb3e40eecf48d490a7395c6be65",
+      "presentation_frame_index": 160,
+      "presentation_time_seconds": 16.0,
+      "action_relation": "before_action",
+      "action_global_step": 160,
+      "completed_episode_actions_before_frame": 160,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "255f4634170949bea34037da040ff11ef1204b7979470af05cd9247d592479fe",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/n2/frame_000160.png",
+      "png_sha256": "f53ad0b9c8cee5db2fdc2ab9f88e596941643e749b286bc449c7b45c8bcd464b",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d21:s160",
+        "stage": 0,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "N2",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "5819b83c4ca547db7a0849116f301cca4aa83cb3e40eecf48d490a7395c6be65",
+      "presentation_frame_index": 240,
+      "presentation_time_seconds": 24.0,
+      "action_relation": "before_action",
+      "action_global_step": 240,
+      "completed_episode_actions_before_frame": 240,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "4a94610676686829023cf1e65271df66b639d88af8c16714b06a63cee4294f47",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/n2/frame_000240.png",
+      "png_sha256": "c5af73b175b92cee08059c0d868ddadb173190ed70e491a4b26c0f1815f6a26a",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d31:s240",
+        "stage": 0,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "N2",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "5819b83c4ca547db7a0849116f301cca4aa83cb3e40eecf48d490a7395c6be65",
+      "presentation_frame_index": 320,
+      "presentation_time_seconds": 32.0,
+      "action_relation": "before_action",
+      "action_global_step": 320,
+      "completed_episode_actions_before_frame": 320,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "0eb9c767a32bc7632187053c08e3e9b2deebd5942e20dde6ac8e7309acee78cc",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/n2/frame_000320.png",
+      "png_sha256": "eec4deea04da9c6e7a8aeebeb4ea9adfebdae3e49f8a5f5ee23d02235455ec03",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d41:s320",
+        "stage": 0,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "N2",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "5819b83c4ca547db7a0849116f301cca4aa83cb3e40eecf48d490a7395c6be65",
+      "presentation_frame_index": 400,
+      "presentation_time_seconds": 40.0,
+      "action_relation": "before_action",
+      "action_global_step": 400,
+      "completed_episode_actions_before_frame": 400,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "573f6809d3c4d1e3c92f5e20c2636bbc421f42ecdca966edb23ecc22e7352938",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/n2/frame_000400.png",
+      "png_sha256": "e743ce093c33701bce3c027c83a1bf5d6e2b957ad838ae87e5854d8861980202",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d51:s400",
+        "stage": 0,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "N2",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "5819b83c4ca547db7a0849116f301cca4aa83cb3e40eecf48d490a7395c6be65",
+      "presentation_frame_index": 480,
+      "presentation_time_seconds": 48.0,
+      "action_relation": "before_action",
+      "action_global_step": 480,
+      "completed_episode_actions_before_frame": 480,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "56fc960e2b9c021ae819c15676d7d135edf75511b32ddb5656866beb26c93a6a",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/n2/frame_000480.png",
+      "png_sha256": "2ea20b246eb6c1e17e0fbe257cee858c70006a5e9b4fed7034c9034ee3c112f6",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d61:s480",
+        "stage": 0,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "N2",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "5819b83c4ca547db7a0849116f301cca4aa83cb3e40eecf48d490a7395c6be65",
+      "presentation_frame_index": 560,
+      "presentation_time_seconds": 56.0,
+      "action_relation": "before_action",
+      "action_global_step": 560,
+      "completed_episode_actions_before_frame": 560,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "c8c09d661c910c475773782d17ddec02c8b624af1cbae801664a1eeb336e8028",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/n2/frame_000560.png",
+      "png_sha256": "a3d4e5dc1f7cd6ce298c2fc6f7a48c5d5c6bd56a06a9a27071e1a5c157025815",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d71:s560",
+        "stage": 0,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "N2",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "5819b83c4ca547db7a0849116f301cca4aa83cb3e40eecf48d490a7395c6be65",
+      "presentation_frame_index": 640,
+      "presentation_time_seconds": 64.0,
+      "action_relation": "before_action",
+      "action_global_step": 640,
+      "completed_episode_actions_before_frame": 640,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "c87e88e56288796b006e12415351ba7a019bd92d1569e33d354c1a7da28b3ccc",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/n2/frame_000640.png",
+      "png_sha256": "56f3da74062ba5f0f8027c8efd142c118e3fab00fd9aa623e6498755cd10a9e2",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d81:s640",
+        "stage": 0,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    },
+    {
+      "arm": "N2",
+      "parent_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/episode_1/episode_1_fail_agentview.mp4",
+      "parent_video_sha256": "5819b83c4ca547db7a0849116f301cca4aa83cb3e40eecf48d490a7395c6be65",
+      "presentation_frame_index": 719,
+      "presentation_time_seconds": 71.9,
+      "action_relation": "before_action",
+      "action_global_step": 719,
+      "completed_episode_actions_before_frame": 719,
+      "warmup_steps_excluded": 5,
+      "raw_decoded_rgb_sha256": "377cae8c88800e9def47ee5d6946270bfed7a09a263bd5f8eca34b75963999e6",
+      "png_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/n2/frame_000719.png",
+      "png_sha256": "94c37f1715fe5c987223615f5e6c30f4ffc0d166cfd254c7a97a83eb6a4d5ca1",
+      "shape": [
+        640,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "caption_context": {
+        "decision_id": "e0:d90:s712",
+        "stage": 0,
+        "use_guidance": false,
+        "meaning": "recorded decision state active before this action; not a new visual classification"
+      }
+    }
+  ],
+  "sheets": [
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/contact-sheet-01.png",
+      "sha256": "1739154eef9c5db5405e1e6aa8e4e202685e8be3001e12e97512f780fe0085f3",
+      "size": [
+        1980,
+        1656
+      ],
+      "cells": [
+        {
+          "row": 0,
+          "column": 0,
+          "arm": "C0",
+          "frame": 0,
+          "image_origin_xy": [
+            12,
+            12
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "2a541e67646cddeb8a53cc4c48188a248d3de10d25194f401f47eb9f56eb793d"
+        },
+        {
+          "row": 0,
+          "column": 1,
+          "arm": "C0",
+          "frame": 8,
+          "image_origin_xy": [
+            504,
+            12
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "27067d058c1d94b51eaa5dc9a04cf523806732b523a4303291f0f040e2e1d0d3"
+        },
+        {
+          "row": 0,
+          "column": 2,
+          "arm": "C0",
+          "frame": 16,
+          "image_origin_xy": [
+            996,
+            12
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "9a5684cfc0c2a8248ad78f20b73e0e57769b87bed3acf8f6f7feb513817fc0e4"
+        },
+        {
+          "row": 0,
+          "column": 3,
+          "arm": "C0",
+          "frame": 24,
+          "image_origin_xy": [
+            1488,
+            12
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "5a96854b7a92b71975fdaaf83fa0026afa190d16f180c521327c5ca6e82b06c8"
+        },
+        {
+          "row": 1,
+          "column": 0,
+          "arm": "Q0",
+          "frame": 0,
+          "image_origin_xy": [
+            12,
+            560
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "7296ce57ad92f70891f85e2c4ffc538a5ccecf6834019b8026bc8d27adf0d8d2"
+        },
+        {
+          "row": 1,
+          "column": 1,
+          "arm": "Q0",
+          "frame": 8,
+          "image_origin_xy": [
+            504,
+            560
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "e61598cb77bf01ce60f1e4f5c4fa3ded6ad21f8894547d532bd28599acb9e982"
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "arm": "Q0",
+          "frame": 16,
+          "image_origin_xy": [
+            996,
+            560
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "c30a899ab9323a338d9e27a7c4aef9c7ebc8b1b6953df20fec2f168551d844af"
+        },
+        {
+          "row": 1,
+          "column": 3,
+          "arm": "Q0",
+          "frame": 24,
+          "image_origin_xy": [
+            1488,
+            560
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "a8da3afe32af4002a17cbcb647d1ea4b9c328548f28e365d945c3fb4d2e94dca"
+        },
+        {
+          "row": 2,
+          "column": 0,
+          "arm": "N2",
+          "frame": 0,
+          "image_origin_xy": [
+            12,
+            1108
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "41bb35af4a572d50c19c6e564b752e442d532ebb2c44aa5e33c7adbbc96991a7"
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "arm": "N2",
+          "frame": 8,
+          "image_origin_xy": [
+            504,
+            1108
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "5627c0bbb4a46895215cc1394ea730219199767a7b3dc5a633d72a2e79ce605b"
+        },
+        {
+          "row": 2,
+          "column": 2,
+          "arm": "N2",
+          "frame": 16,
+          "image_origin_xy": [
+            996,
+            1108
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "e8a6bc4bd294dcd44f5bcb38676e9e2410451740e5fc12e9a9b4d7948a342c9d"
+        },
+        {
+          "row": 2,
+          "column": 3,
+          "arm": "N2",
+          "frame": 24,
+          "image_origin_xy": [
+            1488,
+            1108
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "7760ab73505a090fb31abbda456e33766a38e3a5db7a6e063cd30a2ca64496bd"
+        }
+      ],
+      "transform": "full uncropped frame, uniform0.75 scale, Pillow LANCZOS; external caption below image"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/contact-sheet-02.png",
+      "sha256": "24bbfae5679f05bb126d14bdc04e2cfe04b347333c6abf26f412acd5a5b7bc57",
+      "size": [
+        1980,
+        1656
+      ],
+      "cells": [
+        {
+          "row": 0,
+          "column": 0,
+          "arm": "C0",
+          "frame": 32,
+          "image_origin_xy": [
+            12,
+            12
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "2412a690a0ed1bce9b8ac62ec875f6b08a06ea76d8d7ecc7a87673930e599b5c"
+        },
+        {
+          "row": 0,
+          "column": 1,
+          "arm": "C0",
+          "frame": 64,
+          "image_origin_xy": [
+            504,
+            12
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "12423d1d9d03e856f5540ba2b9c920189d47a967b15904373dc7ba2b23d9fa67"
+        },
+        {
+          "row": 0,
+          "column": 2,
+          "arm": "C0",
+          "frame": 96,
+          "image_origin_xy": [
+            996,
+            12
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "d464fd5597fe503f4ba185639f590cd563c61fadbff4ff134bc89f5e8409d28c"
+        },
+        {
+          "row": 0,
+          "column": 3,
+          "arm": "C0",
+          "frame": 128,
+          "image_origin_xy": [
+            1488,
+            12
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "04f53262eda27159bbbec83c23d827532ea73c483ea0e395610426249432da16"
+        },
+        {
+          "row": 1,
+          "column": 0,
+          "arm": "Q0",
+          "frame": 32,
+          "image_origin_xy": [
+            12,
+            560
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "a0462256e21dd23bdc9531d9ce5688d0cf317e70b9f58fd5aadc341430ff815e"
+        },
+        {
+          "row": 1,
+          "column": 1,
+          "arm": "Q0",
+          "frame": 64,
+          "image_origin_xy": [
+            504,
+            560
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "a259ca64a3e8bc5e534aa21360d8e3cd602baba10430bcd14e6addbc7f08447b"
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "arm": "Q0",
+          "frame": 96,
+          "image_origin_xy": [
+            996,
+            560
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "63347fb64143c99cbf5364209b9f3e0ed53c82e019d0ba675eab22f1dad1218c"
+        },
+        {
+          "row": 1,
+          "column": 3,
+          "arm": "Q0",
+          "frame": 128,
+          "image_origin_xy": [
+            1488,
+            560
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "4d91b057fce4e8925c903046f31b60882b7b385c28ac05550e31921de63fb84e"
+        },
+        {
+          "row": 2,
+          "column": 0,
+          "arm": "N2",
+          "frame": 32,
+          "image_origin_xy": [
+            12,
+            1108
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "fbe8719414afe3520a2d0748e66f3801cfd92770fdfbe4eaa86717f076eb3cb6"
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "arm": "N2",
+          "frame": 64,
+          "image_origin_xy": [
+            504,
+            1108
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "920047e36dbea5bca382c8c55a72d18e0393c2c1d1bba16c598155318f386249"
+        },
+        {
+          "row": 2,
+          "column": 2,
+          "arm": "N2",
+          "frame": 96,
+          "image_origin_xy": [
+            996,
+            1108
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "f988f28798f9c0479b608b9aa4223697ed8042aac285b367611b1ba91a242f1c"
+        },
+        {
+          "row": 2,
+          "column": 3,
+          "arm": "N2",
+          "frame": 128,
+          "image_origin_xy": [
+            1488,
+            1108
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "73d4a6aabe5b7d2c503982f6e6d517ec4ff2e8037abc5216d1576b848499e7ab"
+        }
+      ],
+      "transform": "full uncropped frame, uniform0.75 scale, Pillow LANCZOS; external caption below image"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/contact-sheet-03.png",
+      "sha256": "4be18ad4f7dfbdd12500376f99fe06818930ff016bcb35a3a47187029f65b240",
+      "size": [
+        1980,
+        1656
+      ],
+      "cells": [
+        {
+          "row": 0,
+          "column": 0,
+          "arm": "C0",
+          "frame": 160,
+          "image_origin_xy": [
+            12,
+            12
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "d87411d7d676ed5614f7c877afa2200b304c269719586a3566f87d52cd62654f"
+        },
+        {
+          "row": 0,
+          "column": 1,
+          "arm": "C0",
+          "frame": 240,
+          "image_origin_xy": [
+            504,
+            12
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "d8b4981d41201db4b35e29e5a26dd173abcf8e138fde364b7ca5ddfd4057d321"
+        },
+        {
+          "row": 0,
+          "column": 2,
+          "arm": "C0",
+          "frame": 320,
+          "image_origin_xy": [
+            996,
+            12
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "43e30a26b416657737a84b418b751264951275b60d55b8167895a08ac53b4b02"
+        },
+        {
+          "row": 0,
+          "column": 3,
+          "arm": "C0",
+          "frame": 400,
+          "image_origin_xy": [
+            1488,
+            12
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "4b97cf46464bc2b567f110dec7c27f32faee7868d5075783587d13fe7a5e415a"
+        },
+        {
+          "row": 1,
+          "column": 0,
+          "arm": "Q0",
+          "frame": 160,
+          "image_origin_xy": [
+            12,
+            560
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "879c73fb0f7051c72f2fcf95b88ef38e825b71ab46c5cc435ea0af718043131c"
+        },
+        {
+          "row": 1,
+          "column": 1,
+          "arm": "Q0",
+          "frame": 240,
+          "image_origin_xy": [
+            504,
+            560
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "8da5fea2239d527ae35d48602e636a208e906e7f0a740fd1a0dc93452d54fbf1"
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "arm": "Q0",
+          "frame": 320,
+          "image_origin_xy": [
+            996,
+            560
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "1203e4eaf021591e56ba6db82dfdc20ce5dc66fc6211aa4c56d11f1163f8f1e0"
+        },
+        {
+          "row": 1,
+          "column": 3,
+          "arm": "Q0",
+          "frame": 400,
+          "image_origin_xy": [
+            1488,
+            560
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "a88f0f52c5e1f1b197be719835b6c45ea86e8769cfbe45d4b62bbd08a24b47b5"
+        },
+        {
+          "row": 2,
+          "column": 0,
+          "arm": "N2",
+          "frame": 160,
+          "image_origin_xy": [
+            12,
+            1108
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "f53ad0b9c8cee5db2fdc2ab9f88e596941643e749b286bc449c7b45c8bcd464b"
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "arm": "N2",
+          "frame": 240,
+          "image_origin_xy": [
+            504,
+            1108
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "c5af73b175b92cee08059c0d868ddadb173190ed70e491a4b26c0f1815f6a26a"
+        },
+        {
+          "row": 2,
+          "column": 2,
+          "arm": "N2",
+          "frame": 320,
+          "image_origin_xy": [
+            996,
+            1108
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "eec4deea04da9c6e7a8aeebeb4ea9adfebdae3e49f8a5f5ee23d02235455ec03"
+        },
+        {
+          "row": 2,
+          "column": 3,
+          "arm": "N2",
+          "frame": 400,
+          "image_origin_xy": [
+            1488,
+            1108
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "e743ce093c33701bce3c027c83a1bf5d6e2b957ad838ae87e5854d8861980202"
+        }
+      ],
+      "transform": "full uncropped frame, uniform0.75 scale, Pillow LANCZOS; external caption below image"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/contact-sheet-04.png",
+      "sha256": "b4d54f5a236cf6511a83857b3c5ca58de8b8d5d51e4814c8edea8f6f47e0b300",
+      "size": [
+        1980,
+        1656
+      ],
+      "cells": [
+        {
+          "row": 0,
+          "column": 0,
+          "arm": "C0",
+          "frame": 480,
+          "image_origin_xy": [
+            12,
+            12
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "e57a5450e3cd7e9d953cb0f504267549903c1b491f8c21753dc0db52cca84626"
+        },
+        {
+          "row": 0,
+          "column": 1,
+          "arm": "C0",
+          "frame": 560,
+          "image_origin_xy": [
+            504,
+            12
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "f4bcc67d26836697b513de039e667701680fc95cba07f8c7709e10dcd86996de"
+        },
+        {
+          "row": 0,
+          "column": 2,
+          "arm": "C0",
+          "frame": 640,
+          "image_origin_xy": [
+            996,
+            12
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "9fc1da707c5b26524e30990a348e7af2ce89ec2a3a55aeb8fe912ac2b26c3a92"
+        },
+        {
+          "row": 0,
+          "column": 3,
+          "arm": "C0",
+          "frame": 719,
+          "image_origin_xy": [
+            1488,
+            12
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "5f6b87b9f8c84a1aa191bc980866b2accf01918e6def9720899985e896298415"
+        },
+        {
+          "row": 1,
+          "column": 0,
+          "arm": "Q0",
+          "frame": 480,
+          "image_origin_xy": [
+            12,
+            560
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "f5a9d55fe7f7f036dac808a555417e04918ee67ae5f37283e5f0c93ce0c888ae"
+        },
+        {
+          "row": 1,
+          "column": 1,
+          "arm": "Q0",
+          "frame": 560,
+          "image_origin_xy": [
+            504,
+            560
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "5f1c05c8292702349c7be06d9415b8d7d6cc1f5125f4b6cf9cadb2c8290899bd"
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "arm": "Q0",
+          "frame": 640,
+          "image_origin_xy": [
+            996,
+            560
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "0ede2879ff2c8ff896c911a72edc04e415e99e19c19f04663392d2dcd390f2d6"
+        },
+        {
+          "row": 1,
+          "column": 3,
+          "arm": "Q0",
+          "frame": 719,
+          "image_origin_xy": [
+            1488,
+            560
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "b2207b5682c1699e4ced6d6009f951adc6534d3ad7c10ddac64592bcd84b9ea4"
+        },
+        {
+          "row": 2,
+          "column": 0,
+          "arm": "N2",
+          "frame": 480,
+          "image_origin_xy": [
+            12,
+            1108
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "2ea20b246eb6c1e17e0fbe257cee858c70006a5e9b4fed7034c9034ee3c112f6"
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "arm": "N2",
+          "frame": 560,
+          "image_origin_xy": [
+            504,
+            1108
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "a3d4e5dc1f7cd6ce298c2fc6f7a48c5d5c6bd56a06a9a27071e1a5c157025815"
+        },
+        {
+          "row": 2,
+          "column": 2,
+          "arm": "N2",
+          "frame": 640,
+          "image_origin_xy": [
+            996,
+            1108
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "56f3da74062ba5f0f8027c8efd142c118e3fab00fd9aa623e6498755cd10a9e2"
+        },
+        {
+          "row": 2,
+          "column": 3,
+          "arm": "N2",
+          "frame": 719,
+          "image_origin_xy": [
+            1488,
+            1108
+          ],
+          "image_size": [
+            480,
+            480
+          ],
+          "png_sha256": "94c37f1715fe5c987223615f5e6c30f4ffc0d166cfd254c7a97a83eb6a4d5ca1"
+        }
+      ],
+      "transform": "full uncropped frame, uniform0.75 scale, Pillow LANCZOS; external caption below image"
+    }
+  ],
+  "frame_grid": [
+    0,
+    8,
+    16,
+    24,
+    32,
+    64,
+    96,
+    128,
+    160,
+    240,
+    320,
+    400,
+    480,
+    560,
+    640,
+    719
+  ],
+  "total_exported_frames": 48,
+  "contact_sheet_pages": 4,
+  "visual_inspection_status": "NOT_YET_VIEWED_AT_EXTRACTION_COMPLETION",
+  "GPU_model_provider_projector_simulator_OCR_calls": 0,
+  "python_torch_imported": false,
+  "CUDA_VISIBLE_DEVICES": "",
+  "limitations": [
+    "source-before-action mapping; last action response absent",
+    "Step/Stage/Guide visual consistency pending authorized sheet review",
+    "prediction overlays are not executed motion",
+    "outcome labels retroactively stamped on every frame",
+    "no contact/grasp/target/causal inference"
+  ]
+}
