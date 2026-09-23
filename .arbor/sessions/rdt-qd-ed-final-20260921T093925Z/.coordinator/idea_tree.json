@@ -120,7 +120,8 @@
         "5.2",
         "5.3",
         "5.4",
-        "5.5"
+        "5.5",
+        "5.6"
       ],
       "depth": 1,
       "hypothesis": "Mechanism: Causal measurement and executable common conditions for QD-ED research.\nHypothesis: Reliable shared execution and exact decision-to-observation evidence resolve the invalid-measurement bottleneck before algorithm comparisons.\nObservable: Valid Dev controls and reproducible actual quality/selection/progress evidence; no inferred success scores from diagnostics.\nConflicts: Prior N1 cohort remains invalid and historical proxy gains remain insufficient; user requires continued recovery and targeted evidence collection.",
@@ -143,9 +144,10 @@
       "children_ids": [],
       "depth": 2,
       "hypothesis": "Mechanism: Full-precision decision-to-observation evidence contract.\nHypothesis: Actual provider quality, candidate identity and executed-horizon geometry linked to lawful next observations can distinguish real selection errors from XY-only proxy differences.\nObservable: Audit of available data and minimal observational instrumentation specification with exact ranking reconstruction and no online lookahead.\nConflicts: Historical17/220 XY argmin differences are not quality misranking; no N1 rename, privileged evaluator input or external reward change.",
-      "status": "running",
-      "insight": "Native-dtype passive collector and separate integrity audit implemented; actual Main/RDT/adapter CPU paths pass for C0 terminal success and Q0 step truncation. GPU integration waits for the currently frozen production control. Targeted observed C0/Q0 dev tasks0/5 planned, without counterfactual or task-success claims.",
-      "code_ref": "2c4a591add2f697e60fb6292a8fd8f1222134a4e"
+      "status": "done",
+      "insight": "Passive native-dtype collector and separate audit integrated at1be836b; integrated production/test bytes match the CPU-reviewed E source exactly. Actual Main/RDT/adapter CPU C0 terminal and Q0 truncation paths passed. No GPU equivalence claim; prospective Node5.6 evaluates completeness and operational overhead.",
+      "code_ref": "1be836b",
+      "result": "{\"implementation\":\"INTEGRATED\",\"CPU_integration_cases_passed\":2,\"GPU_observer_validation\":\"PENDING_NODE_5.6\",\"algorithm_improvement_claim\":false}"
     },
     "5.3": {
       "id": "5.3",
@@ -177,6 +179,15 @@
       "result": "{\"engineering_coverage\":\"PASS\",\"success_count\":0,\"episodes\":1,\"gpu_process_wall_seconds\":775.2034471839997,\"attempt_id\":\"rdt-qd-ed-final-20260921T093925Z__freshboot_c0_t00_20260923__47a4507eacbe\"}",
       "insight": "Full original production execution restored on GPU3:720 actual steps,29 guided/61 unguided chunks,28 successful Stage calls,1 DINO forward, no owned Xid and complete cost counters. Valid task outcome0/1; no performance improvement or root-cause claim. Continue observed mechanism diagnosis.",
       "code_ref": "ea0cd8b5b7b9fa2aa2a8d2475de766121c03a74b"
+    },
+    "5.6": {
+      "id": "5.6",
+      "parent_id": "5",
+      "children_ids": [],
+      "depth": 2,
+      "hypothesis": "Mechanism: Paired development measurement of actual candidate selection and executed action prefixes under a common passive observation condition.\nHypothesis: Linking native-dtype predictions to actual EEF and gripper feedback on exposed tasks0 and5 can separate score-proxy improvement from execution mismatch, where valid Q0 improved scores in38/52chunks yet failed and historical quality rescue did not improve success.\nObservable: Four fixed C0/Q0 episodes yield independently audited decision-to-execution chains, original task outcomes and predeclared trajectory-error and scored-versus-executed-horizon diagnostics; unknown counterfactuals remain unknown.\nConflicts: Historical H1/H4/H5 and invalid N1 are preserved; this measures missing feedback without repeating their mechanisms, changing reward/Stage, importing hidden state or repairing the closed N1 cohort.",
+      "status": "running",
+      "insight": "Four fixed observed C0/Q0 development rows on tasks0/5 accepted; preparing committed source and resolved configuration freeze. Original task outcomes and separate evidence validity retained; no dispatch yet."
     }
   }
 }

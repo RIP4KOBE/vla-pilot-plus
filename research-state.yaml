@@ -13,7 +13,7 @@ project_target:
   required_formal_successes: 5
   achieved: false
 study:
-  status: INTEGRATING_DECISION_EVIDENCE_FOR_GPU3_OBSERVED_DEVELOPMENT
+  status: PREPARING_GPU3_OBSERVED_C0_Q0_DEVELOPMENT
   mode: real
   interaction: auto
   automatic_continuation: true
@@ -89,7 +89,7 @@ derived_indexes:
 authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
   ledger is append-only event evidence, not a second mutable state.
 online_blockers: []
-updated_at: '2026-09-23T05:49:09.341230+00:00'
+updated_at: '2026-09-23T05:55:17.940993+00:00'
 seed_plan:
   path: data/frozen-seed-plan.json
   sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
@@ -972,7 +972,7 @@ continuation:
     summary_path: docs/03_evidence/qd_ed_final/continuation_20260923/freshboot-model-first/production-c0-result-summary.json
     summary_sha256: 90372e96bc360b44e71305e2f9bc884e55eaa411d90157d6945c45090151c32b
   decision_evidence_implementation:
-    status: CPU_REVIEWED_REAL_PATH_INTEGRATION_TESTS_PASSED_PENDING_GPU3_INTEGRATION
+    status: INTEGRATED_CPU_REVIEWED
     worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923
     commits:
     - 516cd92cddeb35e30ba568f92ae9ad5c86b2bb44
@@ -980,4 +980,21 @@ continuation:
     - 1ec9682290c2fe72f8ca7f50931015cd6119c522
     integrated_into_production: false
     gpu_validated: false
+    integrated_commit: 1be836b
+    online_equivalence_proven: false
+  observed_pairs:
+    arbor_node: '5.6'
+    status: PROTOCOL_ACCEPTED_PENDING_FREEZE
+    protocol: docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/prospective-protocol.md
+    tasks:
+    - 0
+    - 5
+    profiles:
+    - C0
+    - Q0
+    attempt_cap: 4
+    physical_gpu: 3
+    observation_condition: decision_observed_v1
+    budget_bucket: development
+    automatic_retry: false
 current_owned_workers: []

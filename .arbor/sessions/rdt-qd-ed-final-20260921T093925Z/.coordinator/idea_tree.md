@@ -89,11 +89,13 @@ Conflicts: Preserve all old Xid/image-parity failures; no retroactive threshold 
 #### 5.2: Mechanism: Full-precision decision-to-observation evidence contract.
 Hypothesis: Actual provider quality, candidate identity and executed-horizon geometry linked to lawful next observations can distinguish real selection errors from XY-only proxy differences.
 Observable: Audit of available data and minimal observational instrumentation specification with exact ranking reconstruction and no online lookahead.
-Conflicts: Historical17/220 XY argmin differences are not quality misranking; no N1 rename, privileged evaluator input or external reward change. [RUNNING]
+Conflicts: Historical17/220 XY argmin differences are not quality misranking; no N1 rename, privileged evaluator input or external reward change. [DONE]
 
-**Insight**: Native-dtype passive collector and separate integrity audit implemented; actual Main/RDT/adapter CPU paths pass for C0 terminal success and Q0 step truncation. GPU integration waits for the currently frozen production control. Targeted observed C0/Q0 dev tasks0/5 planned, without counterfactual or task-success claims.
+**Insight**: Passive native-dtype collector and separate audit integrated at1be836b; integrated production/test bytes match the CPU-reviewed E source exactly. Actual Main/RDT/adapter CPU C0 terminal and Q0 truncation paths passed. No GPU equivalence claim; prospective Node5.6 evaluates completeness and operational overhead.
 
-**Branch**: 2c4a591add2f697e60fb6292a8fd8f1222134a4e
+**Result**: {"implementation":"INTEGRATED","CPU_integration_cases_passed":2,"GPU_observer_validation":"PENDING_NODE_5.6","algorithm_improvement_claim":false}
+
+**Branch**: 1be836b
 
 #### 5.3: Mechanism: Minimal independent MuJoCo and staged CUDA differential control.
 Hypothesis: A tiny static scene with isolated CUDA initialization/allocation/compute distinguishes generic GL-CUDA interaction faults from LIBERO/RDT-specific resource state.
@@ -123,3 +125,10 @@ Conflicts: Pruned 4 and 4.1 remain invalid closed cohorts. This engineering dev 
 **Result**: {"engineering_coverage":"PASS","success_count":0,"episodes":1,"gpu_process_wall_seconds":775.2034471839997,"attempt_id":"rdt-qd-ed-final-20260921T093925Z__freshboot_c0_t00_20260923__47a4507eacbe"}
 
 **Branch**: ea0cd8b5b7b9fa2aa2a8d2475de766121c03a74b
+
+#### 5.6: Mechanism: Paired development measurement of actual candidate selection and executed action prefixes under a common passive observation condition.
+Hypothesis: Linking native-dtype predictions to actual EEF and gripper feedback on exposed tasks0 and5 can separate score-proxy improvement from execution mismatch, where valid Q0 improved scores in38/52chunks yet failed and historical quality rescue did not improve success.
+Observable: Four fixed C0/Q0 episodes yield independently audited decision-to-execution chains, original task outcomes and predeclared trajectory-error and scored-versus-executed-horizon diagnostics; unknown counterfactuals remain unknown.
+Conflicts: Historical H1/H4/H5 and invalid N1 are preserved; this measures missing feedback without repeating their mechanisms, changing reward/Stage, importing hidden state or repairing the closed N1 cohort. [RUNNING]
+
+**Insight**: Four fixed observed C0/Q0 development rows on tasks0/5 accepted; preparing committed source and resolved configuration freeze. Original task outcomes and separate evidence validity retained; no dispatch yet.
