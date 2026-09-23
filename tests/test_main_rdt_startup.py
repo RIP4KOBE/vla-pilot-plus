@@ -441,6 +441,10 @@ def _run_execution_horizon_episode(
                     self.current_chunk = np.array(action_chunk, copy=True)
                     row_ids = np.arange(self.current_chunk.shape[1])
                 self.current_chunk[0, :, 0] = self.plan_index * 100 + row_ids
+                evidence = getattr(self, "_decision_evidence", None)
+                if evidence is not None:
+                    evidence.record("policy_action_decode", selected_latent=self.current_chunk,
+                                    action_chunk=self.current_chunk)
             return self.current_chunk
 
         def get_last_eds_metrics(self):
@@ -494,6 +498,10 @@ def _run_execution_horizon_episode(
             episode_end = self.steps >= max_steps
             terminated = episode_end and termination_kind == "terminated"
             truncated = episode_end and termination_kind == "truncated"
+            evidence = getattr(self, "_decision_evidence", None)
+            if evidence is not None:
+                evidence.pre_reset_outcome({"robot0_eef_pos": np.array([self.steps, 0., 0.])},
+                    reward=0., terminated=terminated, success=False)
             return {}, 0.0, terminated, truncated, {
                 "success": False,
                 "behavior_name": "timeout",
@@ -558,6 +566,21 @@ def _run_execution_horizon_episode(
     runner._run_episode(episode=0, episode_dir=str(tmp_path), episode_seed=7)
     metrics_records = [record for record in appended if "execution_horizon_resolved" in record]
     return runner, policy, metrics_records
+
+
+def test_main_decision_evidence_enabled_uses_original_action_sequence(monkeypatch, tmp_path):
+    off, policy_off, _ = _run_execution_horizon_episode(
+        monkeypatch, tmp_path / "off", mode="fixed", target_distances=[.1],
+        use_guidance=False, max_steps=10)
+    on, policy_on, _ = _run_execution_horizon_episode(
+        monkeypatch, tmp_path / "on", mode="fixed", target_distances=[.1],
+        use_guidance=False, max_steps=10,
+        config_overrides={"decision_evidence": {"enabled": True}})
+    assert off.adapter.executed_rows == on.adapter.executed_rows
+    assert policy_off.select_flags == policy_on.select_flags
+    assert on.adapter.steps == off.adapter.steps == 10
+    assert on._decision_evidence.status()["complete"]
+    assert on._decision_evidence.status()["decisions"] == 2
 
 
 def test_main_sets_eds_episode_context_before_policy_sampling(monkeypatch, tmp_path):

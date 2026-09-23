@@ -1428,7 +1428,11 @@ class RDTSteer:
     def _counted_reward(self, fn, keypoints, trajectories):
         self._increment_compute("reward_calls")
         self._increment_compute("reward_evaluations", trajectories.shape[0])
-        return fn(keypoints, trajectories)
+        result = fn(keypoints, trajectories)
+        evidence = getattr(self, "_decision_evidence", None)
+        if evidence is not None:
+            evidence.provider_return(fn, result)
+        return result
 
     def _encoder_counter_hook(self, kind):
         def hook(module, args, kwargs):
@@ -1561,6 +1565,10 @@ class RDTSteer:
                 )
 
             self._cached_action_chunk = self._postprocess_actions(raw)
+            evidence = getattr(self, "_decision_evidence", None)
+            if evidence is not None:
+                evidence.record("policy_action_decode", selected_latent=raw,
+                                action_chunk=self._cached_action_chunk)
             self._cached_action_steps_remaining = self._cached_action_chunk.shape[1]
 
         self._cached_action_steps_remaining = max(0, self._cached_action_steps_remaining - 1)
@@ -1741,15 +1749,28 @@ class RDTSteer:
         if keypoints is None or not guidance_fns:
             return torch.zeros(samples.shape[0], device=samples.device, dtype=samples.dtype)
         self._increment_compute("reward_scoring_batches")
-        trajs = self._trajectory_reward_slice(self._rdt_sample_to_trajectory_3d(samples), slice_kind)
+        full_trajs = self._rdt_sample_to_trajectory_3d(samples)
+        trajs = self._trajectory_reward_slice(full_trajs, slice_kind)
+        evidence = getattr(self, "_decision_evidence", None)
+        if evidence is not None:
+            evidence.begin_scoring(samples=samples, keypoints=keypoints,
+                                   projected_xyz=full_trajs, provider_input_xyz=trajs,
+                                   slice_kind=slice_kind)
         rewards = []
         for b in range(trajs.shape[0]):
+            if evidence is not None:
+                evidence.scoring_candidate_index = b
+                evidence.scoring_provider_index = 0
             reward = sum(self._counted_reward(fn, keypoints, trajs[b : b + 1]) for fn in guidance_fns)
             if torch.is_tensor(reward):
                 rewards.append(reward.detach().to(device=samples.device, dtype=samples.dtype).reshape(()))
             else:
                 rewards.append(torch.tensor(float(reward), device=samples.device, dtype=samples.dtype))
-        return torch.stack(rewards)
+        result = torch.stack(rewards)
+        if evidence is not None:
+            evidence.record("scoring_aggregate", scoring_batch_id=evidence.scoring_batch_id,
+                            aggregate_before_reward_mode=result)
+        return result
 
     def _init_fkd(
         self,
@@ -1906,6 +1927,11 @@ class RDTSteer:
         action_mask = self._expand_action_mask_for_population(cond["action_mask"], actions)
         return actions * action_mask
 
+    def _observe_eds_score_call(self, *, role, iter_idx, site):
+        evidence = getattr(self, "_decision_evidence", None)
+        if evidence is not None:
+            evidence.set_scoring_scope(role=role, iter_idx=iter_idx, site=site)
+
     def _eds_score_population_as_cost(
         self,
         samples: Tensor,
@@ -1920,6 +1946,9 @@ class RDTSteer:
         if reward_mode not in valid_modes:
             raise ValueError(f"Unsupported EDS reward_mode={reward_mode!r}")
 
+        evidence = getattr(self, "_decision_evidence", None)
+        if evidence is not None:
+            evidence.begin_score_call()
         scoring_keypoints = keypoints
         if (
             reward_mode == "shuffled_keypoints"
@@ -1946,6 +1975,10 @@ class RDTSteer:
         elif reward_mode == "inverted":
             rewards = -rewards
         costs = -rewards
+        evidence = getattr(self, "_decision_evidence", None)
+        if evidence is not None:
+            evidence.record("effective_quality", scoring_batch_id=evidence.scoring_batch_id,
+                            reward_mode=reward_mode, quality=rewards, costs=costs)
         return costs.detach(), {"rewards": rewards.detach()}
 
     def _save_eds_population_cache(self, population: Tensor, cache_path: Optional[str], *, label: str) -> None:
@@ -3225,6 +3258,7 @@ class RDTSteer:
             if not torch.isfinite(adapted_memory).all():
                 raise ValueError("adapted_memory_nonfinite")
 
+            self._observe_eds_score_call(role="canonical_memory_fresh", iter_idx=-1, site="chunk_memory_fresh")
             fresh_costs, fresh_info = self._eds_score_population_as_cost(
                 fresh_population,
                 keypoints=keypoints,
@@ -3236,6 +3270,7 @@ class RDTSteer:
                 fresh_costs,
                 int(cfg.population_size),
             )
+            self._observe_eds_score_call(role="canonical_memory_adapted", iter_idx=-1, site="chunk_memory_adapted")
             memory_candidate_costs, memory_info = self._eds_score_population_as_cost(
                 adapted_memory,
                 keypoints=keypoints,
@@ -4821,6 +4856,7 @@ class RDTSteer:
         )
 
         if precomputed_population_scores is None:
+            self._observe_eds_score_call(role="canonical_initial", iter_idx=-1, site="initial_population")
             population_scores, population_info = self._eds_score_population_as_cost(
                 population,
                 keypoints=keypoints,
@@ -4846,6 +4882,10 @@ class RDTSteer:
             candidates: Tensor,
             rewards: Tensor,
         ) -> None:
+            evidence = getattr(self, "_decision_evidence", None)
+            if evidence is not None:
+                evidence.record("canonical_candidate_batch", iter_idx=int(iter_idx),
+                                candidates=candidates, effective_quality=rewards)
             if not cfg.qd_metrics_observer:
                 return
             descriptors = describe_qd(candidates)
@@ -4861,6 +4901,8 @@ class RDTSteer:
                 ],
             }
             metrics.shadow_qd_candidate_stream.append(record)
+            if evidence is not None:
+                evidence.record("canonical_candidate_identity", **record)
 
         record_shadow_qd_candidates(-1, population, population_rewards)
         if (
@@ -5045,6 +5087,7 @@ class RDTSteer:
                     stage_scores = population_scores
                     stage_info = population_info
                 else:
+                    self._observe_eds_score_call(role="auxiliary_pretest", iter_idx=0, site="initial_sampler_trace")
                     stage_scores, stage_info = self._eds_score_population_as_cost(
                         stage_population,
                         keypoints=keypoints,
@@ -5148,6 +5191,23 @@ class RDTSteer:
                 metrics.qd_parent_allocation_latency_s += float(
                     time.perf_counter() - allocation_start
                 )
+                evidence = getattr(self, "_decision_evidence", None)
+                if evidence is not None:
+                    evidence.record("archive_parent_allocation", iter_idx=i,
+                        parent_fingerprints=allocation.parent_fingerprints,
+                        parent_lanes=allocation.parent_lanes,
+                        parent_cell_ids=allocation.parent_cell_ids,
+                        parent_rewards=allocation.parent_rewards,
+                        parent_costs=allocation.parent_costs,
+                        slot_counts=allocation.slot_counts, weights=allocation.weights,
+                        sparse_slot_counts=allocation.sparse_slot_counts,
+                        secondary_slot_counts=allocation.secondary_slot_counts,
+                        secondary_parent_count=allocation.secondary_parent_count,
+                        global_quality_anchor_count=allocation.global_quality_anchor_count,
+                        global_quality_anchor_cell_id=allocation.global_quality_anchor_cell_id,
+                        global_quality_anchor_fingerprint=allocation.global_quality_anchor_fingerprint,
+                        original_archive_occurrences=None,
+                        identity_scope="actual allocation return; original insertion occurrences unavailable")
                 population = allocation.parent_actions.to(
                     device=x_t.device, dtype=x_t.dtype
                 )
@@ -5342,6 +5402,13 @@ class RDTSteer:
                 [plan.elite_indices, plan.offspring_parent_indices],
                 dim=0,
             )
+            evidence = getattr(self, "_decision_evidence", None)
+            if evidence is not None:
+                evidence.record("parent_allocation", iter_idx=i, source_population=population,
+                                source_quality=parent_source_rewards, source_costs=parent_source_scores,
+                                parent_indices=full_parent_indices, elite_count=elite_count,
+                                parent_cell_ids=qd_parent_cell_ids,
+                                offspring_sources=plan.offspring_sources)
             full_particle_sources = (
                 ("elite",) * elite_count + plan.offspring_sources
             )
@@ -5530,6 +5597,7 @@ class RDTSteer:
                 offspring - offspring_before_renoise
             ).reshape(offspring_count, -1).norm(dim=1)
             if trace_enabled and i == 0:
+                self._observe_eds_score_call(role="auxiliary_pretest", iter_idx=i, site="renoise_trace")
                 renoise_costs, renoise_info = self._eds_score_population_as_cost(
                     offspring,
                     keypoints=keypoints,
@@ -5592,6 +5660,7 @@ class RDTSteer:
             }
             if controller_decision is not None:
                 rollout_kwargs["diversity_scale_override"] = controller_decision.scale
+            self._observe_eds_score_call(role="canonical_offspring", iter_idx=i, site="rollout")
             offspring, rollout_scores, rollout_info = self._eds_rollout_reference(
                 **rollout_kwargs
             )
@@ -5743,6 +5812,7 @@ class RDTSteer:
                     f"{(cfg.population_size, 64, 128)}, got {tuple(population.shape)}"
                 )
             if elite_count > 0:
+                self._observe_eds_score_call(role="canonical_population", iter_idx=i, site="full_population_rescore")
                 population_scores, full_score_info = self._eds_score_population_as_cost(
                     population,
                     keypoints=keypoints,
@@ -6005,6 +6075,7 @@ class RDTSteer:
                             stage_scores = rollout_scores
                             stage_info = rollout_info
                         else:
+                            self._observe_eds_score_call(role="auxiliary_pretest", iter_idx=i, site="rollout_trace")
                             stage_scores, stage_info = self._eds_score_population_as_cost(
                                 stage_population,
                                 keypoints=keypoints,
@@ -6453,6 +6524,14 @@ class RDTSteer:
         metrics.selected_idx = best_idx
         metrics.selected_cost = float(population_scores[best_idx].detach().cpu().item())
         metrics.selected_reward = float(final_rewards[best_idx].detach().cpu().item())
+        evidence = getattr(self, "_decision_evidence", None)
+        if evidence is not None:
+            evidence.record("final_selection", population=population, selected_latent=selected,
+                            selected_index=best_idx, selected_quality=metrics.selected_reward,
+                            selected_cost=metrics.selected_cost,
+                            selected_fingerprint=metrics.qd_selected_action_fingerprint,
+                            selected_cell=metrics.qd_selected_cell,
+                            selection_rule="archive_global_best" if qd_archive is not None else "cost_argmin")
         if qd_archive is not None:
             selected_fingerprint = fingerprint_action(selected[0])
             if (

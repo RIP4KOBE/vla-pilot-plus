@@ -830,7 +830,14 @@ class LiberoEnv(gym.Env):
                 "done": bool(done),
                 "success": bool(is_success),
             }
+            evidence = getattr(self, "_decision_evidence", None)
+            if evidence is not None:
+                evidence.pre_reset_outcome(raw_obs, reward=reward, terminated=terminated, success=is_success)
             self.reset()
+        else:
+            evidence = getattr(self, "_decision_evidence", None)
+            if evidence is not None:
+                evidence.pre_reset_outcome(raw_obs, reward=reward, terminated=terminated, success=is_success)
         truncated = False
         return observation, reward, terminated, truncated, info
 
@@ -1643,8 +1650,9 @@ class LiberoAdapter(BaseEnvAdapter):
         dtype = action_sequence.dtype
 
         # Get starting position as tensor
+        start_position = self.get_ee_pose_world().position
         start_pos = torch.tensor(
-            self.get_ee_pose_world().position,
+            start_position,
             device=device,
             dtype=dtype
         )
@@ -1665,6 +1673,11 @@ class LiberoAdapter(BaseEnvAdapter):
             start_pos.unsqueeze(0),           # (1, 3)
             start_pos + cumsum_deltas         # (T, 3)
         ], dim=0)  # (T+1, 3)
+
+        evidence = getattr(self, "_decision_evidence", None)
+        if evidence is not None:
+            evidence.record("projection_origin", source_eef_position=start_position,
+                            cast_eef_start=start_pos)
 
         return trajectory
 
@@ -1693,6 +1706,11 @@ class LiberoAdapter(BaseEnvAdapter):
         action_numpy: np.ndarray = action.float().to("cpu").numpy()
 
         current_env = self._env[self.current_task_idx]
+        evidence = getattr(self, "_decision_evidence", None)
+        if evidence is not None:
+            current_env._decision_evidence = evidence
+            evidence.record("executed_action", action_numpy=action_numpy)
+            evidence.flush()
         observation, reward, terminated, truncated, info = current_env.step(action_numpy)
         self.episode_step += 1
 
