@@ -1,0 +1,24 @@
+{
+  "GPU_calls": 0,
+  "analysis_conditions": "Original frozen plan/analyzer/auditor/map-v2 only",
+  "cases": [
+    "partial matrix remains pending and accepted is not task success",
+    "full matrix retains provider strata and episode unit without promotion",
+    "tamper,wrong source/GPU,unaccepted audit,supplemental map rejected",
+    "unknown keys and partial references rejected"
+  ],
+  "compiled": true,
+  "imports": [
+    "argparse",
+    "collections",
+    "hashlib",
+    "json",
+    "math",
+    "pathlib"
+  ],
+  "model_provider_simulator_calls": 0,
+  "passed_tests": 4,
+  "pending_behavior": "No tensor/status/index/compute raw files were present in fixtures; successful summaries read only explicit JSON and their own source hash.",
+  "production_source_state_ledger_edits": 0,
+  "scope": "CPU synthetic JSON fixtures only; no actual runtime outcomes/bundles opened"
+}
