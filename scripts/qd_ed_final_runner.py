@@ -182,6 +182,44 @@ def episode_identity(row):
     return {key: row[key] for key in ('split', 'iteration', 'profile', 'task_id', 'env_seed', 'policy_seed', 'init_index')}
 
 
+def expand_candidate(candidate_id, candidate, baseline):
+    """Versioned, closed algorithm deltas; baseline dictionaries stay unchanged."""
+    require(candidate.get('baseline_reference') == 'Q0', 'candidate must reference Q0')
+    profile = candidate['profile']; original = baseline['restored_profile']
+    contract = candidate.get('algorithm_contract', 'n1_descriptor_only_v1' if candidate_id == 'N1' else None)
+    if contract == 'n1_descriptor_only_v1':
+        require(candidate_id == 'N1', 'N1 contract requires N1 identity')
+        require(set(profile) == set(original), 'N1 profile field set differs')
+        require({k for k in profile if profile[k] != original[k]} == {'qd_descriptor'}, 'N1 must change only qd_descriptor')
+        field = 'qd_descriptor'
+    elif contract == 'n2_executed_quality_only_v1':
+        require(candidate_id == 'N2', 'N2 contract requires N2 identity')
+        field = 'qd_quality_mode'
+        require(original.get(field, 'provider') == 'provider', 'N2 baseline quality is not provider')
+        require(set(profile) == set(original) | {field} and profile.get(field) == 'executed_prefix_v1'
+                and {k:v for k,v in profile.items() if k != field} == {k:v for k,v in original.items() if k != field},
+                'N2 must change only qd_quality_mode to executed_prefix_v1')
+        require(candidate.get('only_algorithm_change') == {field: {'before': 'provider', 'after': 'executed_prefix_v1'}},
+                'N2 declared algorithm delta differs')
+    else:
+        raise GateError('unknown candidate algorithm contract')
+    active = copy.deepcopy(baseline)
+    active['historical_label'] = str(candidate['label'])
+    active['restored_profile'] = copy.deepcopy(profile)
+    active['resolved_eds_config'][field] = profile[field]
+    active['static_override_values']['main.eds_config.' + field] = profile[field]
+    active['hydra_overrides'] = [f'{key}={hydra(value)}' for key,value in active['static_override_values'].items()]
+    return active
+
+
+def n2_support():
+    # Lazy stdlib-only loading avoids altering the legacy runner import path.
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('qd_ed_n2_plan_contract', Path(__file__).with_name('qd_ed_n2_plan.py'))
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module
+
+
 def validate_plan(path, *, root=ROOT, require_frozen=True):
     root = Path(root).resolve()
     plan = read_json(path)
@@ -210,17 +248,7 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
         require(relative in plan.get('scientific_config_files',[]) and relative in code_paths, 'candidate scientific fingerprint binding missing')
         require(digest(candidate_path)==reference['sha256'], 'candidate profile fingerprint mismatch')
         candidate=read_json(candidate_path)
-        require(candidate.get('baseline_reference')=='Q0', 'N1 must reference Q0')
-        baseline=manifest['profiles']['Q0']; candidate_profile=candidate['profile']
-        require(set(candidate_profile)==set(baseline['restored_profile']), 'N1 profile field set differs')
-        require({k for k in candidate_profile if candidate_profile[k]!=baseline['restored_profile'][k]}=={'qd_descriptor'}, 'N1 must change only qd_descriptor')
-        active=copy.deepcopy(baseline)
-        active['historical_label']=str(candidate['label'])
-        active['restored_profile']=candidate_profile
-        active['resolved_eds_config']['qd_descriptor']=candidate_profile['qd_descriptor']
-        active['static_override_values']['main.eds_config.qd_descriptor']=candidate_profile['qd_descriptor']
-        active['hydra_overrides']=[f'{key}={hydra(value)}' for key,value in active['static_override_values'].items()]
-        manifest['profiles'][candidate_id]=active
+        manifest['profiles'][candidate_id]=expand_candidate(candidate_id, candidate, manifest['profiles']['Q0'])
     runtime_path = owned(plan['runtime_manifest_path'], artifact_root)
     require(digest(runtime_path) == plan['runtime_manifest_sha256'], 'runtime manifest fingerprint mismatch')
     runtime = read_json(runtime_path)
@@ -292,6 +320,8 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
             require(row.get(field) == matching[0][field], f'episode differs from frozen seed plan: {field}')
         require(digest(task['bddl_path']) == row['bddl_sha256'] and digest(task['init_path']) == row['init_file_sha256'], 'runtime task inputs differ from frozen seed plan')
         owned(task['cache_dir'], artifact_root)
+    if 'N2' in plan.get('candidate_profiles', {}) or plan.get('n2_cohort') is not None:
+        n2_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
     return plan, manifest, runtime
 
 
@@ -613,11 +643,13 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
 def check_retry(events, row):
     groups = event_groups(events)
     prior = [g for g in groups.values() if g[0]['identity'] == episode_identity(row) and any(e['event']=='dispatched' for e in g)]
-    require(not any(g[-1]['event'] == 'valid' for g in prior), 'legal completed outcome cannot be retried')
+    n2_exception = bool(row.get('n2_recovery_contract')) and n2_support().retry_exception(events, row, globals())
+    require(not any(g[-1]['event'] == 'valid' for g in prior) or n2_exception, 'legal completed outcome cannot be retried')
     if prior:
         retry_of = row.get('retry_of')
         require(retry_of in groups and groups[retry_of] in prior, 'repeat requires explicit matching retry_of')
-        require(groups[retry_of][-1]['event'] == 'aborted' and groups[retry_of][-1].get('retryable_infrastructure') is True, 'only infrastructure abort is retryable')
+        require((groups[retry_of][-1]['event'] == 'aborted' and groups[retry_of][-1].get('retryable_infrastructure') is True)
+                or n2_exception, 'only infrastructure abort is retryable')
         require(not any(g[0].get('retry_of') == retry_of for g in groups.values()), 'retry_of already consumed')
     else:
         require(not row.get('retry_of'), 'retry_of has no matching dispatched identity')
@@ -809,11 +841,15 @@ def validate_result(output, row, profile, runtime=None):
             {'episode_id':0,'episode_seed':row['env_seed'],'task_id':row['task_id']}.items()), 'episode metadata identity mismatch')
     metrics=read_events(output/'eds_eval/eds_metrics.jsonl')
     seen=set(); eds=profile['resolved_eds_config']; expected=eds['population_size']*(eds['cem_iters']+1)
+    require(resolved['main'].get('eds_config',{}).get('qd_quality_mode','provider')==eds.get('qd_quality_mode','provider'),
+            'resolved configuration mismatch: main.eds_config.qd_quality_mode')
     for record in metrics:
         require(record.get('episode')==0 and record.get('task_id')==row['task_id'], 'metric task identity mismatch')
         step=record.get('global_step'); require(type(step) is int and 0<=step<=720 and step not in seen, 'duplicate/invalid metric step'); seen.add(step)
         require(record.get('score_call_count')==eds['cem_iters']+1 and record.get('search_evaluation_count')==expected, 'search compute budget mismatch')
         require(record.get('qd_archive_enabled') is (eds['qd_archive_mode']=='grid_archive'), 'QD enabled identity mismatch')
+        if eds.get('qd_quality_mode','provider')=='executed_prefix_v1':
+            require(record.get('qd_quality_mode')=='executed_prefix_v1', 'N2 requested quality mode identity mismatch')
         for key in ('nonfinite_count','gripper_qpos_violation_count','qd_accounting_violation_count','qd_elite_monotonicity_violation_count','qd_final_selection_mismatch_count','qd_secondary_invariant_violation_count'):
             require(type(record.get(key)) is int and record[key]==0, f'metric violation or missing field: {key}')
         require(type(record.get('action_mask_violation_max')) in (int,float) and math.isfinite(record['action_mask_violation_max']) and 0<=record['action_mask_violation_max']<=1e-6, 'action mask violation or missing field')
@@ -918,7 +954,12 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
             check_retry(events,row)
             state = read_state(root/'research-state.yaml')
             physical_gpu = runtime_gpu(runtime, state)
-            timeout=check_budget(state,events,row,read_events(root/'data/gpu-healthcheck-ledger.jsonl'),read_events(root/'data/gpu-hour-reservation-ledger.jsonl'),physical_gpu=physical_gpu)
+            resources=read_events(root/'data/gpu-healthcheck-ledger.jsonl')
+            timeout=check_budget(state,events,row,resources,read_events(root/'data/gpu-hour-reservation-ledger.jsonl'),physical_gpu=physical_gpu)
+            n2_base={}
+            if plan.get('n2_cohort') is not None:
+                require(timeout==1800, 'N2 requires its full frozen episode timeout')
+                n2_base=n2_support().admission(plan,runtime,row,events,resources,root,globals())
             admission=gpu_admission(physical_gpu=physical_gpu,expected_uuid=runtime['gpu_mapping']['uuid'])
             attempt_id=f"{plan['run_name']}__{row['episode_key']}__{uuid.uuid4().hex[:12]}"
             command,output=build_command(plan,manifest,runtime,row,attempt_id)
@@ -929,7 +970,7 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                   'runtime_manifest_sha256':plan['runtime_manifest_sha256'],'source_commit':plan['source_commit'],
                   'runtime_inventory_sha256':plan['runtime_inventory_sha256'],
                   'init_row_sha256':row['init_row_sha256'],
-                  'retry_of':row.get('retry_of'),'output_dir':str(output),'physical_gpu':physical_gpu}
+                  'retry_of':row.get('retry_of'),'output_dir':str(output),'physical_gpu':physical_gpu,**n2_base}
             if runtime.get('frozen_stage_provider', {}).get('backend') == 'codex_cli':
                 base.update(stage_backend='codex_cli', stage_model=runtime['frozen_stage_provider']['model'],
                             stage_condition=CODEX_STAGE_CONDITION)
@@ -961,6 +1002,10 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
             except BaseException as exc:
                 # Fail closed: parser/gate/scientific invalidity is never an automatic recovery retry.
                 final_event,outcome=failed_outcome(exc,output,row,launch_failed=dispatched and process is None,runtime=runtime)
+                if dispatched and plan.get('n2_cohort') is not None:
+                    eligibility=n2_support().transport_recovery_eligibility(exc,outcome,plan,row,runtime,globals())
+                    if eligibility is not None:
+                        outcome['n2_recovery_eligibility']=eligibility
                 if not dispatched:
                     final_event='aborted'; outcome['task_failure']=False; outcome['failure_class']='predispatch_gate'
                 if isinstance(exc,(KeyboardInterrupt,SystemExit)):
