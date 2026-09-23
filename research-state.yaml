@@ -13,28 +13,22 @@ project_target:
   required_formal_successes: 5
   achieved: false
 study:
-  status: PREPARING_FINAL_SOURCE_OBSERVED_PAIRS_GPU3
+  status: ACTIVE_N2_IMPLEMENTATION
   mode: real
   interaction: auto
   automatic_continuation: true
   resumed_at: '2026-09-23T04:07:12.266326+00:00'
 candidate:
-  id: N1
-  arbor_node: '4.1'
-  status: INVALID_NOT_PROMOTABLE_COHORT
-  protocol: experiments/iteration_001_execution_intent/protocol.md
-  protocol_commit: 56031d2
-  primary_change: target_distance_gripper_duty_v1
+  id: N2
+  arbor_node: '6.1'
+  status: PROTOCOL_FROZEN_PREIMPLEMENTATION
+  protocol: experiments/iteration_002_executed_quality/protocol.md
+  primary_change: executed_prefix_v1
   online_score: null
-  scientific_decision: INVALID
-  ordering_amendment: experiments/iteration_001_execution_intent/startup-repair-amendment.md
-  algorithm_effect: UNKNOWN_UNEVALUATED
-  closure_reason: One original N1 control cell is nonretryable invalid;4dispatches/1unique
-    cell already used means completing all30original cells would require33attempts,
-    exceeding the frozen30attempt cap. No retry or rename can repair this cohort.
+  scientific_decision: NOT_EVALUATED
 budget:
   max_gpu_hours: 48.0
-  gpu_hours_consumed: 2.0923382505737504
+  gpu_hours_consumed: 3.4783786469684728
   max_episode_attempts: 240
   reserved:
     baseline: 20
@@ -42,12 +36,12 @@ budget:
     validation: 60
     formal: 40
     recovery: 20
-  dispatched: 19
+  dispatched: 26
   aborted: 10
-  valid: 4
+  valid: 10
   running: 1
-  invalid: 4
-  completed: 8
+  invalid: 5
+  completed: 15
   gpu_hour_reservations:
     validation: 14.0
     formal: 10.0
@@ -79,17 +73,17 @@ historical:
   previous_reservations: 98
   previous_gpu_hours: 6.946832055555556
   previous_formal_episodes: 0
-active_iteration: iteration_001_execution_intent
-next_action: Integrate reviewed observer and freeze four observed C0/Q0 task0/task5
-  development episodes on GPU3, then use actual execution evidence to select one QD/ED
-  mechanism.
+active_iteration: iteration_002_executed_quality
+next_action: Implement frozen dual-channel executed-prefix quality, CPU/default/Stage/accounting
+  checks, recorded-choice check, then new matched N2/C0/Q0 Dev matrix on exclusive
+  physical GPU3 only.
 source_spec_sha256: 3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef
 derived_indexes:
 - .arbor/sessions/rdt-qd-ed-final-20260921T093925Z
 authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
   ledger is append-only event evidence, not a second mutable state.
 online_blockers: []
-updated_at: '2026-09-23T06:12:02.696837+00:00'
+updated_at: '2026-09-23T07:49:08.072140+00:00'
 seed_plan:
   path: data/frozen-seed-plan.json
   sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
@@ -143,20 +137,20 @@ stage_provider_ready: true
 runner:
   by_bucket:
     baseline: 1
-    development: 13
+    development: 20
     validation: 0
     formal: 0
     recovery: 5
-  reserved_attempts: 19
+  reserved_attempts: 26
   gpu_hours_by_bucket:
     baseline: 0.019651524036631195
-    development: 1.335722306717962
+    development: 2.7217627031126845
     validation: 0.0
     formal: 0.0
     recovery: 0.7369644198191572
   gpu_healthcheck_hours: 0.2602564145160282
   gpu_healthcheck_inflight: 0
-  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__n1s_dev_t00_c0__80e82d381eb9
+  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__n1s_dev_t02_q0__a7f5d086b104
   last_event: dispatched
 gpu_admission_last_observation:
   physical_gpu: 3
@@ -213,7 +207,7 @@ active_plan:
 hardware_migration:
   previous_physical_gpu: 7
   authorized_physical_gpu: 5
-  user_instruction: "\u6539\u75285"
+  user_instruction: 改用5
   authorized_at: '2026-09-22T04:31:51.394735+00:00'
   max_concurrent_gpu_workers: 1
   earlier_attempts_and_costs_preserved: true
@@ -235,8 +229,7 @@ authorized_gpu_selection:
   candidate_indices:
   - 3
   selected_physical_gpu: 3
-  user_instruction: "\u786E\u4FDD\u5F53\u524D\u4EFB\u52A1\u540E\u7EED\u90FD\u5728\
-    GPU3\u5B8C\u6210"
+  user_instruction: 确保当前任务后续都在GPU3完成
   authorized_at: '2026-09-22T08:25:04.726856+00:00'
   single_exclusive_worker: true
   rescan_if_unavailable: true
@@ -369,8 +362,7 @@ gpu_authorization_history:
   - 6
   - 7
   selected_physical_gpu: 6
-  user_instruction: "\u5E2E\u6211\u4F7F\u7528\u5F53\u524D\u670D\u52A1\u5668\u4E0A\u4EFB\
-    \u4F55\u80FD\u7528\u7684GPU\u6765\u8DD1\u8FD9\u4E2A\u4EFB\u52A1\u5373\u53EF"
+  user_instruction: 帮我使用当前服务器上任何能用的GPU来跑这个任务即可
   authorized_at: '2026-09-22T04:58:53.637965+00:00'
   single_exclusive_worker: true
   rescan_if_unavailable: true
@@ -378,8 +370,7 @@ gpu_authorization_history:
   candidate_indices:
   - 7
   selected_physical_gpu: 7
-  user_instruction: "\u540E\u7EED\u4EFB\u52A1\u90FD\u6536\u655B\u5230GPU7\u4E0A\u5B8C\
-    \u6210"
+  user_instruction: 后续任务都收敛到GPU7上完成
   authorized_at: '2026-09-22T06:36:54.904959+00:00'
   single_exclusive_worker: true
   rescan_if_unavailable: true
@@ -476,11 +467,7 @@ native_resource_queue:
   heartbeat_unix: 1790062224.3071046
   archived_evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/queue-history/8771eaa-b1-evidence-reused
 user_persistence_instruction:
-  text: "\u8BB0\u4F4F\u4F60\u7684\u4EFB\u52A1\u662F\u5728\u5F53\u524D\u4F1A\u8BDD\u4E2D\
-    \u81EA\u5DF1\u6301\u7EED\u8FED\u4EE3\u4F18\u5316\u7B97\u6CD5\u4EE5\u5B8C\u6210\
-    \u6211\u8BBE\u5B9A\u7684\u4EFB\u52A1\u76EE\u6807\uFF0C\u9664\u975E\u6211\u8BF4\
-    \u505C\u6B62\uFF0C\u5426\u5219\u81EA\u5DF1\u4F18\u5316\u65E0\u9700\u505C\u6B62\
-    \u76F4\u5230\u8FBE\u6210\u4EFB\u52A1\u76EE\u6807"
+  text: 记住你的任务是在当前会话中自己持续迭代优化算法以完成我设定的任务目标，除非我说停止，否则自己优化无需停止直到达成任务目标
   recorded_at: '2026-09-23T04:07:12.266326+00:00'
   interpretation: Continue autonomous engineering recovery, targeted evidence collection
     and QD-ED algorithm iteration; do not end the overall objective because a candidate/cohort
@@ -985,7 +972,7 @@ continuation:
     identity_fix_cpu_tests_passed: 36
   observed_pairs:
     arbor_node: '5.6'
-    status: READY_FOR_FINAL_SOURCE_CPU_FREEZE
+    status: CLOSED_THREE_VALID_ONE_TRANSPORT_INVALID
     protocol: docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/prospective-protocol.md
     tasks:
     - 0
@@ -1002,4 +989,41 @@ continuation:
     analysis_source_commit: 0ea423a
     provider_map_schema: qd-ed-provider-target-map-v2
     preparation_gpu_dispatches: 0
+    plan_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/plan.frozen.json
+    plan_sha256: ac123471db9fa9468661238982b3bdb5cb1a68010ec8261e0e5b12239c57e7e8
+    source_commit: 0d59b853a241cd88d984f5126428720a14abbfd5
+    queue_status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/queue-status.json
+    supervisor_pid: null
+    unified_exec_session: null
+    last_completed_episode_key: observed_pairs_t05_q0_20260923
+    completed_terminal_summaries:
+    - docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-results/t00-c0-terminal-summary.json
+    - docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-results/t00-q0-terminal-summary.json
+    - docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-results/t05-c0-terminal-summary.json
+    - docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-results/t05-q0-terminal-summary.json
+    last_completed_evidence_accepted: true
+    current_episode_key: null
+    original_frozen_summary: continuation_20260923/pair-summary/report-v3/summary.json
+    supplemental_identity_authorization: continuation_20260923/observed-pairs-v1/supplemental-identity-v3/authorization.json
+    gpu_queue_exit_code: 1
+    dispatched_rows: 4
+    valid_comparable_rows: 3
+    invalid_comparable_rows: 1
+    last_completed_outcome_valid: false
+    paired_inference: incomplete planned matrix; no complete two-pair comparison
 current_owned_workers: []
+closed_candidates:
+  N1:
+    id: N1
+    arbor_node: '4.1'
+    status: INVALID_NOT_PROMOTABLE_COHORT
+    protocol: experiments/iteration_001_execution_intent/protocol.md
+    protocol_commit: 56031d2
+    primary_change: target_distance_gripper_duty_v1
+    online_score: null
+    scientific_decision: INVALID
+    ordering_amendment: experiments/iteration_001_execution_intent/startup-repair-amendment.md
+    algorithm_effect: UNKNOWN_UNEVALUATED
+    closure_reason: One original N1 control cell is nonretryable invalid;4dispatches/1unique
+      cell already used means completing all30original cells would require33attempts,
+      exceeding the frozen30attempt cap. No retry or rename can repair this cohort.

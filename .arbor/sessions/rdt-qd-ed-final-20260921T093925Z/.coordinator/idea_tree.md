@@ -129,6 +129,20 @@ Conflicts: Pruned 4 and 4.1 remain invalid closed cohorts. This engineering dev 
 #### 5.6: Mechanism: Paired development measurement of actual candidate selection and executed action prefixes under a common passive observation condition.
 Hypothesis: Linking native-dtype predictions to actual EEF and gripper feedback on exposed tasks0 and5 can separate score-proxy improvement from execution mismatch, where valid Q0 improved scores in38/52chunks yet failed and historical quality rescue did not improve success.
 Observable: Four fixed C0/Q0 episodes yield independently audited decision-to-execution chains, original task outcomes and predeclared trajectory-error and scored-versus-executed-horizon diagnostics; unknown counterfactuals remain unknown.
-Conflicts: Historical H1/H4/H5 and invalid N1 are preserved; this measures missing feedback without repeating their mechanisms, changing reward/Stage, importing hidden state or repairing the closed N1 cohort. [RUNNING]
+Conflicts: Historical H1/H4/H5 and invalid N1 are preserved; this measures missing feedback without repeating their mechanisms, changing reward/Stage, importing hidden state or repairing the closed N1 cohort. [DONE]
 
-**Insight**: Four fixed observed C0/Q0 development rows on tasks0/5 accepted; preparing committed source and resolved configuration freeze. Original task outcomes and separate evidence validity retained; no dispatch yet.
+**Insight**: Four attempts closed: three comparable failures with accepted evidence; task5 Q0 transport invalid after one Stage error, no retry or A/B analysis. Original map results remain Unknown; separate identity-only correction shows A on both tasks, B on task0. Q0 historical nonregressing alternatives all lose old quality at A witnesses; final membership still being checked. Broader goal remains active; no algorithm promotion.
+
+**Result**: PARTIAL_EVIDENCE_COMPLETE_MATRIX_INVALID
+
+**Branch**: 0d59b853a241cd88d984f5126428720a14abbfd5
+
+### 6: Mechanism: Execution-aligned objectives for quality-diversity search.
+Hypothesis: Ranking committed actions with an objective supported on their complete executed prefix can address the observed omission of the final action without changing external providers.
+Observable: Recorded selection changes followed by same-round Dev gains, with raw Stage semantics and compute preserved.
+Conflicts: Prior N1 changed behavior representation and was cohort-invalid; old-quality retention failures do not evaluate a newly declared objective. [PENDING]
+
+#### 6.1: Mechanism: Dual-channel full-executed-prefix QD quality before archive replacement and ED selection, with original provider quality retained for Stage.
+Hypothesis: The exact recognized approach objective over t1..t8 can retain and select actions missed by t1..t7 ranking, where observed final alternatives require an original-quality tradeoff.
+Observable: At least one recorded candidate choice changes under the frozen formula; prospective N2 reaches at least5/10 Dev and no fewer successes than matched P2/Q0 while passing action, Stage and compute gates.
+Conflicts: H4/H5 retained old quality; N2 explicitly changes its semantics, does not promise old maximum retention, and keeps N1 descriptor changes off. [PENDING]

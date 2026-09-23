@@ -1,0 +1,81 @@
+{
+  "attempt_id": "rdt-qd-ed-final-20260921T093925Z__observed_pairs_t05_q0_20260923__e47f3979b453",
+  "episode_key": "observed_pairs_t05_q0_20260923",
+  "identity": {
+    "split": "dev",
+    "iteration": "OBSERVED_PAIRS_DEV_20260923",
+    "profile": "Q0",
+    "task_id": 5,
+    "env_seed": 970869399,
+    "policy_seed": 970869399,
+    "init_index": 0
+  },
+  "source_commit": "0d59b853a241cd88d984f5126428720a14abbfd5",
+  "physical_gpu": 3,
+  "outcome_valid": false,
+  "success": false,
+  "task_failure": true,
+  "guided_chunks": 4,
+  "unguided_chunks": 86,
+  "model_forward_calls": 514,
+  "model_batch_rows": 1774,
+  "reward_scoring_batches": 64,
+  "reward_evaluations": 1024,
+  "stage_successful_queries": 34,
+  "stage_failed_queries": 1,
+  "stage_codex_call_latency_s": 877.4430640910032,
+  "required_cost_telemetry_complete": true,
+  "gpu_process_wall_seconds": 1046.0592467280003,
+  "schema": "observed-pairs-terminal-summary-v1",
+  "scientific_comparability": "INVALID_FROZEN_STAGE_TRANSPORT",
+  "event_label_does_not_override_outcome_valid": "valid",
+  "reason": "Codex Stage call failure invalidates the frozen transport condition",
+  "execution_steps": 720,
+  "original_outcome_valid": false,
+  "evidence_accepted": true,
+  "evidence_complete": true,
+  "evidence_errors": [],
+  "evidence_status": {
+    "schema": "qd-ed-decision-evidence-v1",
+    "episode": 0,
+    "complete": true,
+    "failed": false,
+    "error_type": null,
+    "decisions": 90,
+    "committed_decisions": 90,
+    "pending_action": false,
+    "bundles": 2250,
+    "observer_wall_s": 7.80186184815102,
+    "bytes_written": 55939762,
+    "observer_wall_scope": "snapshot, payload fingerprint, bundle serialization and flush; excludes provider identity, status and scalar bookkeeping",
+    "precision": "source tensor dtype; no precision reconstructed",
+    "scope": "observed decisions and executed prefixes only"
+  },
+  "manual_integrity_audit": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/noncomparable-t05-q0/manual-integrity-audit.json",
+    "sha256": "593cd208d4ef601b2c66eb7be1f8095d6ba6fa26755e0fe2bf39fec093691bfe"
+  },
+  "automatic_wrapper_audit": "not reached because original runner rejected frozen transport condition",
+  "owned_xids": [],
+  "mechanistic_analysis": "NOT_RUN: invalid transport; excluded from frozen and supplemental A/B comparable set",
+  "retry": "No retry; attempt retained; four-row plan ended incomplete for paired inference",
+  "terminal": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__observed_pairs_t05_q0_20260923__e47f3979b453/attempt-result.json",
+    "sha256": "7687d27fd8fa79864b88b3599796753ba1bc7abc26edeb558fadc93061efa68d"
+  },
+  "stage_error_event_summary": {
+    "step": 16,
+    "code": "codex_unexpected_event",
+    "query_latency_s": 54.356164553999406,
+    "event_types": [
+      "thread.started",
+      "turn.started",
+      "error",
+      "item.completed",
+      "turn.completed"
+    ],
+    "subsequent_successful_calls": 34,
+    "underlying_error_payload": "not captured here; cause unknown",
+    "evidence_of_GPU_fault": false
+  }
+}

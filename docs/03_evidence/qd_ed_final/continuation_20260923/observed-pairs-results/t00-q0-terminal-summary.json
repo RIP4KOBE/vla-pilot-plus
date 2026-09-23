@@ -1,0 +1,75 @@
+{
+  "attempt_id": "rdt-qd-ed-final-20260921T093925Z__observed_pairs_t00_q0_20260923__6aac763a6c7a",
+  "episode_key": "observed_pairs_t00_q0_20260923",
+  "identity": {
+    "split": "dev",
+    "iteration": "OBSERVED_PAIRS_DEV_20260923",
+    "profile": "Q0",
+    "task_id": 0,
+    "env_seed": 1969522881,
+    "policy_seed": 1969522881,
+    "init_index": 0
+  },
+  "source_commit": "0d59b853a241cd88d984f5126428720a14abbfd5",
+  "physical_gpu": 3,
+  "outcome_valid": true,
+  "success": false,
+  "task_failure": true,
+  "guided_chunks": 52,
+  "unguided_chunks": 38,
+  "candidate_evaluations": 9152,
+  "score_batches": 572,
+  "model_forward_calls": 1282,
+  "model_batch_rows": 17662,
+  "reward_scoring_batches": 832,
+  "reward_evaluations": 13312,
+  "stage_successful_queries": 17,
+  "stage_failed_queries": 0,
+  "stage_codex_call_latency_s": 477.7014916549997,
+  "required_cost_telemetry_complete": true,
+  "gpu_process_wall_seconds": 786.957195125,
+  "schema": "observed-pairs-terminal-summary-v1",
+  "execution_steps": 720,
+  "evidence_accepted": true,
+  "evidence_complete": true,
+  "evidence_errors": [],
+  "evidence_status": {
+    "schema": "qd-ed-decision-evidence-v1",
+    "episode": 0,
+    "complete": true,
+    "failed": false,
+    "error_type": null,
+    "decisions": 90,
+    "committed_decisions": 90,
+    "pending_action": false,
+    "bundles": 2250,
+    "observer_wall_s": 24.49717373301246,
+    "bytes_written": 622120356,
+    "observer_wall_scope": "snapshot, payload fingerprint, bundle serialization and flush; excludes provider identity, status and scalar bookkeeping",
+    "precision": "source tensor dtype; no precision reconstructed",
+    "scope": "observed decisions and executed prefixes only"
+  },
+  "audit_wrapper_observation": {
+    "audit_wall_seconds": 21.41646075800054,
+    "parent_ru_maxrss_before_kib": 1041224,
+    "parent_ru_maxrss_after_kib": 1482220,
+    "memory_scope": "Linux parent-process cumulative peak including imports/queue and previous audits; not audit-exclusive memory; peak difference is not memory usage"
+  },
+  "owned_xids": [],
+  "inputs": {
+    "attempt-result.json": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__observed_pairs_t00_q0_20260923__6aac763a6c7a/attempt-result.json",
+      "sha256": "fc50cc7d52cc806a9cfdc6934e38a2ad6068129fe2fa3ef3081addcf67b2c827"
+    },
+    "eds_eval/decision-evidence-audit.json": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__observed_pairs_t00_q0_20260923__6aac763a6c7a/eds_eval/decision-evidence-audit.json",
+      "sha256": "91b8d3dd8eddf6f15d1e834969937d35f979f001d1bac3dfd82ec225d337d1cf"
+    },
+    "eds_eval/decision_evidence/episode_000/status.json": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__observed_pairs_t00_q0_20260923__6aac763a6c7a/eds_eval/decision_evidence/episode_000/status.json",
+      "sha256": "f145e6381a49209dcce878ff64630bddce770d03249471139db6b66389ded919"
+    }
+  },
+  "mechanistic_analysis": "pending original frozen and separately authorized identity-corrected supplemental CPU analyses; no promotion",
+  "interpretation": "valid unsuccessful development Q0; evidence acceptance is distinct from task outcome"
+}

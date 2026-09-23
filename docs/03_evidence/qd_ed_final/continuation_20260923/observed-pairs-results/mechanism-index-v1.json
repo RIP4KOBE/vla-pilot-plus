@@ -1,0 +1,361 @@
+{
+  "schema": "observed-pairs-mechanism-index-v1",
+  "complete_rows": 3,
+  "planned_rows": 4,
+  "matrix_status": "pending_last_row",
+  "promotion": "NOT_EVALUATED",
+  "authorization": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/supplemental-identity-v3/authorization.json",
+    "sha256": "6b6d42304f238ed2d88a1689a2ba6becf01761df67c57941b89dc1c26e0a47b6"
+  },
+  "summary_field_clarification": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/supplemental-identity-v3/summary-field-clarification.json",
+    "sha256": "2a75f8f34dbfce2a1108230f41aa3483dc38e49574071223f22efe097046c92f"
+  },
+  "rows": [
+    {
+      "guided_decisions": 29,
+      "eligible_decisions": 29,
+      "guided_target_triple_matches": 29,
+      "A_witness_ids": [
+        "e0:d3:s16",
+        "e0:d41:s320",
+        "e0:d46:s360",
+        "e0:d52:s408",
+        "e0:d54:s424"
+      ],
+      "B_witness_ids": [
+        "e0:d47:s368"
+      ],
+      "A_witnesses": 5,
+      "B_witnesses": 1,
+      "A_B_overlap_ids": [],
+      "B_full_chunk_but_not_through_step7_ids": [],
+      "continuous_eligible": {
+        "actual_frozen_target_progress_m": {
+          "max": 0.09454330213991745,
+          "mean": 0.039839978950786066,
+          "median": 0.03186883718954221,
+          "min": -0.042779459481605886,
+          "n": 29
+        },
+        "eef_projection_rmse_m": {
+          "max": 0.18233674468904593,
+          "mean": 0.05817176174048948,
+          "median": 0.03648341281754053,
+          "min": 0.00660731787697313,
+          "n": 29
+        },
+        "endpoint_precision_floor_m": {
+          "max": 0.002197266625,
+          "mean": 0.0013027404279513232,
+          "median": 0.0011960409134683485,
+          "min": 0.0005980209567341743,
+          "n": 29
+        },
+        "endpoint_projection_error_m": {
+          "max": 0.24642597817169226,
+          "mean": 0.07720520234829167,
+          "median": 0.0634094358694803,
+          "min": 0.010890481005185878,
+          "n": 29
+        },
+        "predicted_frozen_target_progress_m": {
+          "max": 0.15074984550296153,
+          "mean": 0.06172948967678546,
+          "median": 0.06703522888005078,
+          "min": -0.0269769574449088,
+          "n": 29
+        },
+        "progress_optimism_m": {
+          "max": 0.08069977759065751,
+          "mean": 0.021889510725999393,
+          "median": 0.015802502036697086,
+          "min": -0.031939311367245635,
+          "n": 29
+        },
+        "projected_motion_tracking_gain": {
+          "max": 1.092144273767274,
+          "mean": 0.5378905551562208,
+          "median": 0.4825073933360443,
+          "min": 0.0571961787351309,
+          "n": 29
+        },
+        "projected_t0_source_cast_error_m": {
+          "max": 0.0010560053472644874,
+          "mean": 0.00045988150355719365,
+          "median": 0.00044771984566938534,
+          "min": 8.089594077085155e-05,
+          "n": 29
+        }
+      },
+      "audit_accepted": true,
+      "evidence_complete": true,
+      "cuda_initialized_after": false,
+      "row": "t00-c0",
+      "original_frozen_target_matches": 0,
+      "original_frozen_A_B": "Unknown; no eligible exact-map match",
+      "supplement_is_post_data_identity_only": true,
+      "actual_progress_reversal_ids": [
+        "e0:d41:s320"
+      ],
+      "A_and_actual_progress_reversal_ids": [
+        "e0:d41:s320"
+      ],
+      "source_references": {
+        "original_frozen_analysis": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/analysis/t00-c0/run_20260923T063829Z/selected-decision-analysis.json",
+          "sha256": "42c14eda7fd3b89bd4c002c62d8508f0eab52d2d64c68dc2be1c68ed55bcd594"
+        },
+        "supplemental_analysis": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/supplemental-identity-v3/t00-c0/run_20260923T065650.364656Z/selected-decision-analysis.json",
+          "sha256": "659495acf39c835d55c5dbc444fa30bdce39fbcf6fbea56532bd2826971b1db1"
+        },
+        "supplemental_summary": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/supplemental-identity-v3/t00-c0/run_20260923T065650.364656Z/supplemental-summary.json",
+          "sha256": "8a7f3d5869846dd1f8010f24806ad15ddcc0c4577df378c13e43ae4f7be6607b"
+        }
+      }
+    },
+    {
+      "guided_decisions": 52,
+      "eligible_decisions": 52,
+      "guided_target_triple_matches": 52,
+      "A_witness_ids": [
+        "e0:d20:s152",
+        "e0:d24:s184",
+        "e0:d25:s192",
+        "e0:d26:s200",
+        "e0:d27:s208",
+        "e0:d28:s216",
+        "e0:d29:s224",
+        "e0:d30:s232",
+        "e0:d41:s320",
+        "e0:d42:s328",
+        "e0:d46:s360",
+        "e0:d47:s368",
+        "e0:d48:s376",
+        "e0:d49:s384",
+        "e0:d50:s392",
+        "e0:d71:s560",
+        "e0:d72:s568"
+      ],
+      "B_witness_ids": [
+        "e0:d21:s160",
+        "e0:d26:s200",
+        "e0:d27:s208",
+        "e0:d29:s224",
+        "e0:d31:s240",
+        "e0:d32:s248",
+        "e0:d39:s304",
+        "e0:d43:s336",
+        "e0:d45:s352",
+        "e0:d46:s360",
+        "e0:d49:s384",
+        "e0:d50:s392",
+        "e0:d71:s560",
+        "e0:d73:s576"
+      ],
+      "A_witnesses": 17,
+      "B_witnesses": 14,
+      "A_B_overlap_ids": [
+        "e0:d26:s200",
+        "e0:d27:s208",
+        "e0:d29:s224",
+        "e0:d46:s360",
+        "e0:d49:s384",
+        "e0:d50:s392",
+        "e0:d71:s560"
+      ],
+      "B_full_chunk_but_not_through_step7_ids": [
+        "e0:d29:s224",
+        "e0:d71:s560",
+        "e0:d73:s576"
+      ],
+      "continuous_eligible": {
+        "actual_frozen_target_progress_m": {
+          "max": 0.13573662780437734,
+          "mean": 0.024972693240743152,
+          "median": 0.01121532648083735,
+          "min": -0.012087492977522936,
+          "n": 52
+        },
+        "eef_projection_rmse_m": {
+          "max": 0.19592402666914738,
+          "mean": 0.05410012964786819,
+          "median": 0.04528999973193432,
+          "min": 0.009429752761836517,
+          "n": 52
+        },
+        "endpoint_precision_floor_m": {
+          "max": 0.0028049632297548967,
+          "mean": 0.0015899297810240546,
+          "median": 0.0012912470731648717,
+          "min": 0.0009846363640687058,
+          "n": 52
+        },
+        "endpoint_projection_error_m": {
+          "max": 0.24611155978654312,
+          "mean": 0.07094834056435279,
+          "median": 0.06315689577322492,
+          "min": 0.00828226431238422,
+          "n": 52
+        },
+        "predicted_frozen_target_progress_m": {
+          "max": 0.23064941944203254,
+          "mean": 0.052977671883987464,
+          "median": 0.03169324525162846,
+          "min": -0.0081245397474204,
+          "n": 52
+        },
+        "progress_optimism_m": {
+          "max": 0.17554901484460048,
+          "mean": 0.028004978643244315,
+          "median": 0.01987974530523044,
+          "min": -0.04580525545409117,
+          "n": 52
+        },
+        "projected_motion_tracking_gain": {
+          "max": 1.3005743768893416,
+          "mean": 0.34783129471022883,
+          "median": 0.28065806205635363,
+          "min": 0.0056119002790592605,
+          "n": 52
+        },
+        "projected_t0_source_cast_error_m": {
+          "max": 0.0009246259318548966,
+          "mean": 0.0003669956245644652,
+          "median": 0.0003284301731893955,
+          "min": 3.442445650879209e-05,
+          "n": 52
+        }
+      },
+      "audit_accepted": true,
+      "evidence_complete": true,
+      "cuda_initialized_after": false,
+      "row": "t00-q0",
+      "original_frozen_target_matches": 0,
+      "original_frozen_A_B": "Unknown; no eligible exact-map match",
+      "supplement_is_post_data_identity_only": true,
+      "actual_progress_reversal_ids": [
+        "e0:d29:s224",
+        "e0:d71:s560",
+        "e0:d73:s576"
+      ],
+      "A_and_actual_progress_reversal_ids": [
+        "e0:d29:s224",
+        "e0:d71:s560"
+      ],
+      "source_references": {
+        "original_frozen_analysis": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/analysis/t00-q0/run_20260923T065354Z/selected-decision-analysis.json",
+          "sha256": "7cc32f0718a644eaac479e88bdc9ae6405167a31b0148bf55735bd37fe1ea754"
+        },
+        "supplemental_analysis": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/supplemental-identity-v3/t00-q0/run_20260923T065714.056003Z/selected-decision-analysis.json",
+          "sha256": "f8117cc8c3ad79e8df8b0690d04a0a61fa86b3ef5cd497f81aad3988415caeaa"
+        },
+        "supplemental_summary": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/supplemental-identity-v3/t00-q0/run_20260923T065714.056003Z/supplemental-summary.json",
+          "sha256": "5caba7ea5c6ecb1d261fe5db9009543e261222e570d887dcb90b9ab6312b9c3e"
+        }
+      }
+    },
+    {
+      "guided_decisions": 12,
+      "eligible_decisions": 12,
+      "guided_target_triple_matches": 12,
+      "A_witness_ids": [
+        "e0:d31:s240",
+        "e0:d32:s248"
+      ],
+      "B_witness_ids": [],
+      "A_witnesses": 2,
+      "B_witnesses": 0,
+      "A_B_overlap_ids": [],
+      "B_full_chunk_but_not_through_step7_ids": [],
+      "continuous_eligible": {
+        "actual_frozen_target_progress_m": {
+          "max": 0.13137531256844248,
+          "mean": 0.059044120050050275,
+          "median": 0.05697658577459387,
+          "min": -0.0006777255629350637,
+          "n": 12
+        },
+        "eef_projection_rmse_m": {
+          "max": 0.0904248179628008,
+          "mean": 0.04949077933114268,
+          "median": 0.049744263740356884,
+          "min": 0.013646017085618986,
+          "n": 12
+        },
+        "endpoint_precision_floor_m": {
+          "max": 0.002027985341532733,
+          "mean": 0.001643580716066907,
+          "median": 0.0016914568667664815,
+          "min": 0.0010358019490037315,
+          "n": 12
+        },
+        "endpoint_projection_error_m": {
+          "max": 0.10076192642974965,
+          "mean": 0.06609179967247475,
+          "median": 0.06999746884241091,
+          "min": 0.022935202601980724,
+          "n": 12
+        },
+        "predicted_frozen_target_progress_m": {
+          "max": 0.1633935330299941,
+          "mean": 0.06054121018734018,
+          "median": 0.055680389498956345,
+          "min": -0.0388833716711144,
+          "n": 12
+        },
+        "progress_optimism_m": {
+          "max": 0.04408441565012139,
+          "mean": 0.0014970901372899099,
+          "median": 0.00857203774593249,
+          "min": -0.052433500245644825,
+          "n": 12
+        },
+        "projected_motion_tracking_gain": {
+          "max": 1.1366611166056628,
+          "mean": 0.51921057231867,
+          "median": 0.5600475505827089,
+          "min": 0.014966547080517995,
+          "n": 12
+        },
+        "projected_t0_source_cast_error_m": {
+          "max": 0.0007833392841037238,
+          "mean": 0.0003955829387877092,
+          "median": 0.0003802583099663407,
+          "min": 0.00011679949338312943,
+          "n": 12
+        }
+      },
+      "audit_accepted": true,
+      "evidence_complete": true,
+      "cuda_initialized_after": false,
+      "row": "t05-c0",
+      "original_frozen_target_matches": 0,
+      "original_frozen_A_B": "Unknown; no eligible exact-map match",
+      "supplement_is_post_data_identity_only": true,
+      "actual_progress_reversal_ids": [],
+      "A_and_actual_progress_reversal_ids": [],
+      "source_references": {
+        "original_frozen_analysis": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/analysis/t05-c0/run_20260923T070936Z/selected-decision-analysis.json",
+          "sha256": "bd9327cdc72ccf5baf96a3a47b18cd743740da8dd4eac81bd7eba28cf67d8d4e"
+        },
+        "supplemental_analysis": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/supplemental-identity-v3/t05-c0/run_20260923T070940.532300Z/selected-decision-analysis.json",
+          "sha256": "be702d34939b56508fdb18adcc8ebed0ceaaaaf4ec294129d74926db0897ca2a"
+        },
+        "supplemental_summary": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/supplemental-identity-v3/t05-c0/run_20260923T070940.532300Z/supplemental-summary.json",
+          "sha256": "04410ffee5b0ac69905f286609b544970025386449bdb7db5ffadc7d58af0656"
+        }
+      }
+    }
+  ],
+  "interpretation": "A observed across completed independent executions on both tasks; B observed on task0. Within-episode counts do not rank arms or establish task benefit; task5 Q0 pending. Historical candidate alternative availability and predecision selection change under deployment constraints remain to be checked. Original frozen results remain separate."
+}
