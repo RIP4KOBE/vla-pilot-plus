@@ -1,0 +1,20 @@
+{
+  "CUDA_initialized": false,
+  "actual_execution_authorization": "pending root review and new authorization",
+  "command": "CUDA_VISIBLE_DEVICES='' PYTHONDONTWRITEBYTECODE=1 /home/hynx/miniconda3/envs/vla-pilot/bin/python docs/03_evidence/qd_ed_final/continuation_20260923/final-population-membership/test_membership.py",
+  "created_utc": "2026-09-23T07:32:32.541979+00:00",
+  "files_sha256": {
+    "README.md": "ff1faef84632733936102b5e1f6abdeb2245783852212b6bdfc43d4439bd148d",
+    "check_membership.py": "732763eef2b11909318500b4f95f8d403cf57db4da706dffb7afe53c74a0b160",
+    "protocol.md": "9d57b9a061d9cd98c18bbc241e4e36c9f5841e9f550a43348b758c8531b18d9a",
+    "test_membership.py": "973293027363bc5c6c916fc4941849009a31b5870ed29ab1690869a1c33b0245"
+  },
+  "input_kind": "disposable synthetic native CPU tensors only",
+  "runtime_membership_computed": false,
+  "runtime_schema_only_inspection": "Separate prior authorized read-only feasibility inventory; no archive or membership computation",
+  "schema": "qd-ed-final-membership-cpu-validation-v1",
+  "status": "PASS",
+  "syntax_compile": "PASS without bytecode output",
+  "test_seconds": 0.015,
+  "tests": 4
+}
