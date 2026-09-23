@@ -105,7 +105,7 @@ def universe(tmp_path, monkeypatch):
 
 def auth_fixture(root, manifest):
     mr = put(root/'manifest.json', manifest)
-    files = ('read_full_dev.py', 'protocol-v1.md', 'input-schema-v1.json', 'dependencies-v1.json', 'test_read_full_dev.py')
+    files = ('read_full_dev.py', 'protocol-v1.md', 'protocol-v2.md', 'input-schema-v1.json', 'dependencies-v1.json', 'test_read_full_dev.py')
     freeze = {'status': 'CPU_TESTED_FROZEN_BEFORE_FULL_DEV_READ', 'actual_read_authorized': False,
               'local_files': {n: r.sha((HERE/n).read_bytes()) for n in files}}
     fr = put(root/'freeze.json', freeze)
@@ -117,6 +117,10 @@ def auth_fixture(root, manifest):
 def test_all30_real_frozen_auditor_and_reader_keep_optional_absence_and_early_success(universe):
     root, plan, report, manifest = universe
     before = {a['terminal']['attempt_id']: a['terminal']['success'] for c in report['cells'] for a in c['attempts']}
+    optional = manifest['cells'][2]
+    stage_path = Path(optional['stage_events']['path'])
+    identity = {'episode_id':0,'task_id':0,'episode_seed':100,'query_status':'ok'}
+    optional['stage_events'] = {'status':'present','reference':put(stage_path,[identity,{**identity,'global_step':0}],lines=True)}
     manifest['cells'].reverse()  # Stable output order must come from the fixed matrix.
     auth = auth_fixture(root, manifest); out = root/'continuation_20260923/full-dev-closed-loop-analysis/test'
     r.run(auth['path'], auth['sha256'], out)
@@ -126,6 +130,10 @@ def test_all30_real_frozen_auditor_and_reader_keep_optional_absence_and_early_su
     assert first['original_outcome']['success'] is True and first['summary']['observed_actions'] == 1
     assert first['summary']['stage']['events'] is None and first['summary']['stage']['query_status_counts'] is None
     assert second['summary']['stage']['events'] == [] and second['summary']['stage']['query_status_counts'] == {}
+    third = r.parse((out/'t00-n2.json').read_bytes())['summary']['stage']
+    assert len(third['events']) == 2 and [x['same_step_context_agrees'] for x in third['associations']] == [None,None]
+    assert third['associations'][0]['current_decision_id'] is None and third['associations'][1]['current_decision_id'] == 'd'
+    assert r.parse((out/'status.json').read_bytes())['complete'] is True
     assert first['actual_steps'][0]['eef']['dtype'] == 'torch.float64' and first['actual_steps'][0]['eef']['value'] == [.001, 0., 0.]
     assert first['actual_steps'][0]['returned_reset_sequence'] == 1 and first['automatic_reset_boundaries'][0]['reset_completed'] is None
     assert 'SENTINEL_NOT_EXPORTED' not in (out/'t00-c0.json').read_text() and '999.0' not in (out/'t00-c0.json').read_text()
@@ -261,3 +269,41 @@ def test_separate_authorization_is_required_before_admission(universe,monkeypatc
     with pytest.raises(ValueError,match='read_not_authorized'):
         r.run(ref['path'],ref['sha256'],root/'continuation_20260923/full-dev-closed-loop-analysis/denied')
     assert not (root/'continuation_20260923/full-dev-closed-loop-analysis/denied').exists()
+
+
+@pytest.mark.parametrize('location', ['missing', None, -1, True, 2.0, '2'])
+def test_unknown_stage_location_preserves_event_without_arithmetic(location):
+    ds=[decision(0,0,2,True),decision(1,2,1,False)]
+    ss=[step(0,0.),step(1,1.),step(2,2.)]
+    event={'query_status':'ok','stage_after':1,'guidance_after':False,'gripper_value_used':1}
+    if location!='missing':event['global_step']=location
+    out=r.joined_stage([event],ds,ss);item=out['associations'][0]
+    assert out['events']==[event] and out['query_status_counts']=={'ok':1}
+    assert item['location_status']=='Unknown_missing_or_invalid_step'
+    assert item['current_decision_id'] is None and item['preceding_decision_id'] is None
+    assert item['same_step_context_agrees'] is None and item['matches_first_sent'] is None
+    assert item['state_comparison_status'].startswith('Unknown')
+
+
+@pytest.mark.parametrize('after', [{}, {'stage_after':1}, {'guidance_after':False},
+    {'stage_after':None,'guidance_after':False}, {'stage_after':1,'guidance_after':None},
+    {'stage_after':True,'guidance_after':False}, {'stage_after':1,'guidance_after':0}])
+def test_unknown_after_state_is_not_proven_mismatch(after):
+    ds=[decision(0,0,2,True),decision(1,2,1,False)]
+    ss=[step(0,0.,command=1),step(1,1.,command=-1),step(2,2.)]
+    event={'global_step':2,'query_status':'ok','gripper_value_used':1,**after}
+    item=r.joined_stage([event],ds,ss)['associations'][0]
+    assert item['current_decision_id']=='1' and item['same_step_context_agrees'] is None
+    assert item['matches_first_sent'] is True and item['matches_last_sent'] is False
+    assert item['state_comparison_status'].startswith('Unknown')
+
+
+def test_known_state_match_and_mismatch_remain_distinct_from_unknown():
+    ds=[decision(0,0,1,False)];ss=[step(0,0.)]
+    events=[{'global_step':0,'stage_after':1,'guidance_after':False},
+            {'global_step':0,'stage_after':2,'guidance_after':False},
+            {'global_step':0,'stage_after':1,'guidance_after':True}]
+    items=r.joined_stage(events,ds,ss)['associations']
+    assert [x['same_step_context_agrees'] for x in items]==[True,False,False]
+    assert [x['state_comparison_status'] for x in items]==['known_match','known_mismatch','known_mismatch']
+    assert r.joined_stage(None,ds,ss)['events'] is None and r.joined_stage([],ds,ss)['events']==[]

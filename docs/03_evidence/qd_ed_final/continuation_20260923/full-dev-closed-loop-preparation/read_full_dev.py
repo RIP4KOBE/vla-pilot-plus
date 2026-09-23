@@ -196,19 +196,27 @@ def joined_stage(events, decisions, steps):
         return {'status': 'not_recorded', 'events': None, 'query_status_counts': None, 'trigger_counts': None, 'associations': None}
     by_step = {s['global_step']: s for s in steps}; associations = []
     for index, event in enumerate(events):
-        at = [d for d in decisions if d['global_step'] == event.get('global_step')]
+        location = event.get('global_step')
+        location_known = type(location) is int and location >= 0
+        at = [d for d in decisions if d['global_step'] == location] if location_known else []
         current = at[0] if len(at) == 1 else None
-        before = [d for d in decisions if d['executed_prefix_length'] and d['last_executed_step'] == event.get('global_step', -1)-1
-                  and current is not None and d['reset_sequence'] == current['reset_sequence']]
+        before = [d for d in decisions if d['executed_prefix_length'] and d['last_executed_step'] == location-1
+                  and d['reset_sequence'] == current['reset_sequence']] if current is not None else []
         prior = before[0] if len(before) == 1 else None
         first = by_step.get(prior['global_step']) if prior else None
         last = by_step.get(prior['last_executed_step']) if prior else None
         if last and (last['terminated'] or last['truncated']): first = last = None
         used = event.get('gripper_value_used')
         known = first is not None and last is not None and type(used) in (int, float) and math.isfinite(used)
+        state_known = (current is not None and type(current['stage']) is int and current['stage'] >= 0
+            and type(current['use_guidance']) is bool and type(event.get('stage_after')) is int
+            and event['stage_after'] >= 0 and type(event.get('guidance_after')) is bool)
+        agrees = ((current['stage'], current['use_guidance']) == (event['stage_after'], event['guidance_after'])) if state_known else None
         associations.append({'event_index': index, 'global_step': event.get('global_step'),
+            'location_status': 'recorded_nonnegative_integer' if location_known else 'Unknown_missing_or_invalid_step',
             'current_decision_id': current['decision_id'] if current else None,
-            'same_step_context_agrees': ((current['stage'], current['use_guidance']) == (event.get('stage_after'), event.get('guidance_after'))) if current else None,
+            'same_step_context_agrees': agrees,
+            'state_comparison_status': ('known_match' if agrees else 'known_mismatch') if state_known else 'Unknown_location_decision_or_state',
             'preceding_decision_id': prior['decision_id'] if first else None,
             'status': 'exact_recorded_value_comparison' if known else 'Unknown_no_unique_contiguous_prefix_or_logged_value',
             'logged_value_used': used, 'logged_first': event.get('first_gripper_value'), 'logged_last': event.get('last_gripper_value'),
@@ -313,7 +321,7 @@ def run(authorization, authorization_sha, output):
     require(freeze['status'] == 'CPU_TESTED_FROZEN_BEFORE_FULL_DEV_READ' and freeze['actual_read_authorized'] is False, 'freeze_invalid')
     for name, expected in freeze['local_files'].items():
         require(Path(name).name == name and sha((HERE/name).read_bytes()) == expected, 'reader_definition_changed')
-    require({'read_full_dev.py', 'protocol-v1.md', 'input-schema-v1.json', 'dependencies-v1.json', 'test_read_full_dev.py'} <= set(freeze['local_files']), 'freeze_inventory_missing')
+    require({'read_full_dev.py', 'protocol-v1.md', 'protocol-v2.md', 'input-schema-v1.json', 'dependencies-v1.json', 'test_read_full_dev.py'} <= set(freeze['local_files']), 'freeze_inventory_missing')
     helper, auditor, deps = dependencies()
     manifest = inputs.read(auth['input_manifest'])
     require(auth['matrix_report'] == manifest['matrix_report'], 'authorized_matrix_differs')

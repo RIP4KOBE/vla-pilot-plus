@@ -1,0 +1,22 @@
+{
+  "actual_read_authorized": false,
+  "command": "CUDA_VISIBLE_DEVICES='' PYTHONDONTWRITEBYTECODE=1 /home/hynx/miniconda3/envs/vla-pilot/bin/python -m pytest -q -p no:cacheprovider docs/03_evidence/qd_ed_final/continuation_20260923/full-dev-closed-loop-preparation/test_read_full_dev.py",
+  "exit_code": 0,
+  "independent_review": [
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/full-dev-chronology-review/review-v1.json",
+      "sha256": "6b55d92ec438ebb944b07365dcce268ae8b2dde0fe6f094e4fa3b4792c80d8f0"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/full-dev-chronology-review/review-v1.md",
+      "sha256": "04af15089fea4135485e4ee1c2556777f1daf0cc13816068db02b0b6a8c8218f"
+    }
+  ],
+  "python_version": "3.12.12",
+  "reader_sha256": "b19331ff6861210056858d56da6dcbd2d6a24f06fc91e24dcc1beb0d4df18b3e",
+  "result": "30 passed in 2.30s",
+  "schema": "n2-dev-chronology-cpu-validation-v2",
+  "scope": "Only the relevant synthetic reader suite; includes missing/invalid Stage location, missing/untyped after-state, known match/mismatch controls and full30 synthetic complete-Unknown path. No real episode/bundle read, GPU or provider/model/projector/simulator call.",
+  "test_sha256": "ac9d4c7af99b2034b0929cd92c8b1d42455ede81b24b544488b5bf903d226419",
+  "tests": 30
+}

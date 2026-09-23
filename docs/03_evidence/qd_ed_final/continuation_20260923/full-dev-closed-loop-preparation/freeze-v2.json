@@ -1,0 +1,39 @@
+{
+  "actual_read_authorized": false,
+  "actual_run_requirement": "separate root SHA-bound authorization after all30 accepted representatives and scope review",
+  "created_utc": "2026-09-23T12:22:45.516680+00:00",
+  "dependency_manifest": "dependencies-v1.json",
+  "immutable_prior_source": "A/continuation_20260923/n2-dev-v1/full-dev-closed-loop-preparation-v1/source-v1",
+  "independent_fix_review": [
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/full-dev-chronology-review/review-v1.json",
+      "sha256": "6b55d92ec438ebb944b07365dcce268ae8b2dde0fe6f094e4fa3b4792c80d8f0"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/full-dev-chronology-review/review-v1.md",
+      "sha256": "04af15089fea4135485e4ee1c2556777f1daf0cc13816068db02b0b6a8c8218f"
+    }
+  ],
+  "local_files": {
+    "cpu-validation-v1.json": "c414011c4e2f20cbfe420e17c53405dc5e7ced87936179f730778c8e66862da9",
+    "cpu-validation-v2.json": "3333b0bcf48232def5c1820952fa00c07fbac959373c202d999f2af77727560b",
+    "dependencies-v1.json": "0d19db16e345922f392ee1df835d8757e2bf286754249d1c202e01c6faf754f8",
+    "freeze-v1.json": "2f5644a565af0fec45c7611cd1c780b1232f9640320abe9455ac90a16fdac5a3",
+    "implementation-plan-v1.md": "e7cac5d250436ce0c982e2d8cd08a1b61eee6a9518f7b2197dcb987f819b5e89",
+    "input-schema-v1.json": "a166a28fb9eecd4bebbf1e905c3a6af8465e5d4034ca37aecdcc06833c512774",
+    "protocol-draft-v1.md": "8cce9abf684b9ed5481aa15cec0ace9c654465b16a949760641d3d2adc9bfd67",
+    "protocol-v1.md": "4d7ca15fd0b0f8d72d6cc4310768ffc7bb19938e6dbfb00cea48275894bf4705",
+    "protocol-v2.md": "b7f302057d9b3a6f0f73396348503782752ba1cd312f00730db0332580be0f54",
+    "read_full_dev.py": "b19331ff6861210056858d56da6dcbd2d6a24f06fc91e24dcc1beb0d4df18b3e",
+    "test_read_full_dev.py": "ac9d4c7af99b2034b0929cd92c8b1d42455ede81b24b544488b5bf903d226419"
+  },
+  "prior_freeze_sha256": "2f5644a565af0fec45c7611cd1c780b1232f9640320abe9455ac90a16fdac5a3",
+  "prior_source_commit": "292da8513e9b0a8feed325afd7374281d682640e",
+  "schema": "n2-dev-chronology-freeze-v2",
+  "status": "CPU_TESTED_FROZEN_BEFORE_FULL_DEV_READ",
+  "tests": {
+    "count": 30,
+    "exit_code": 0,
+    "result": "30 passed in 2.30s"
+  }
+}
