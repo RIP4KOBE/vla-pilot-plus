@@ -1,0 +1,14 @@
+{
+  "cuda_initialized": false,
+  "files_sha256": {
+    "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft.md": "0d831d1de4665dac8ff0e1fb954ab1f4b13bce6b20873267942ad74ccbcf032a",
+    "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/README.md": "6095b39690f4e282ca7559804c9bdf8097d3fae450dc09021b340a5e63b372d3",
+    "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/analyze_episode.py": "082610a1627259808f19a259639dde9c37b2626224bbd45f45886e92c5fb546c",
+    "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/test_analysis.py": "a57f3db130d00866722e45b6ab009bf210b008bb92f7dc9b7287d25ae42420f5"
+  },
+  "gpu_calls": 0,
+  "new_observer_episodes_read": 0,
+  "schema": "qd-ed-cpu-analysis-implementation-check-v1",
+  "test_result": "13 passed in 1.40s",
+  "test_scope": "explicit synthetic arithmetic fixtures plus existing collector CPU audit fixture; not runtime episodes"
+}
