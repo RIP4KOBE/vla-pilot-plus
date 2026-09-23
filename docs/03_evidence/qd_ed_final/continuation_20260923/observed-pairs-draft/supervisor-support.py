@@ -283,4 +283,3 @@ def shared_runner_lease(r, q, root, status_path, plan_path, monitor, prerequisit
             save('interrupted' if isinstance(exc, (KeyboardInterrupt, SystemExit)) else 'failed',
                  reason=str(exc) if isinstance(exc, r.GateError) else type(exc).__name__)
         raise
-
