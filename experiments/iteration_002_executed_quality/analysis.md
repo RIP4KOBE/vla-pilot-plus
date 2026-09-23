@@ -1,20 +1,44 @@
-# N2 status before online evaluation
+# N2 Dev decision: REJECT; study continues
 
-Status: implementation and recorded-choice prerequisite PASS; no N2 online result or scientific promotion. Target remains unmet. Protocol/formula were frozen in `a71fb07` before implementation or candidate recomputation.
+Recorded 2026-09-23 after all 30 matched Dev cells completed on physical GPU3. This closes N2's performance evaluation, not the user-authorized research task. No validation or formal candidate is released and the target remains unmet.
 
-Executor implementation `7e3acaa` was integrated as `61bda3a`. There are 488 distinct relevant CPU checks: the complete483-test run plus5 new strict audit cases (the22-test audit rerun overlaps17). Real loader definition-only checks recognized both authorized stage1 sources and rejected both constant stage2 sources; no provider call or CUDA initialization occurred. See `results/6.1-executed-prefix-quality/` for implementation choices, tests and limits.
+| Task | C0 | Q0 | N2 |
+|---|---|---|---|
+| 0 | failure | failure | failure |
+| 1 | failure | failure | failure |
+| 2 | failure | failure | failure |
+| 3 | failure | failure | failure |
+| 4 | failure | failure | failure |
+| 5 | success | failure | failure |
+| 6 | failure | failure | failure |
+| 7 | failure | failure | failure |
+| 8 | success | success | success |
+| 9 | failure | failure | failure |
+| Total | 2/10 | 1/10 | 1/10 |
 
-The prospectively frozen CPU check used all eligible decisions and actual final pools from the two complete task0 observation episodes. C0:29 decisions/464 slots,1 unambiguous Q8 choice change. Q0:52 decisions/818 slots,4 unambiguous changes and1 mixed tie retaining the original selection. The mixed tie is excluded from the activity gate. All native identity, dtype, input/source and original audit checks passed. Both recorded-choice activity gates are true; no GPU equivalence or actual alternative outcome is inferred.
+N2 gains no successful task against either matched control, loses task5 against C0, and ties Q0. It fails the preregistered threshold of at least 5/10 and no fewer successes than either control. These are observed small-sample comparisons, not a claim of statistical equivalence or proof that every QD/ED mechanism is ineffective.
 
-The five unambiguous changes each sacrifice original provider quality and have a smaller **projected** t8 distance to the decision-time target. Three of the five alternative projections still retreat from t7 to t8: full-prefix objective support does not guarantee monotonic approach. Their contact/grasp consequences remain Unknown. This is a bounded reason to test the unchanged N2 mechanism, not proof of task benefit or a reason to alter the formula after seeing results.
+All 30 selected representatives have accepted, complete decision-evidence audits. There were 31 dispatches: the original task0 Q0 transport-invalid attempt remains invalid, contributes cost, and is excluded from scientific trajectory analysis. Its prospectively permitted identical-identity recovery supplies the one valid Q0 representative. Valid task failures were not retried. Source remained `525506ca3198f54d86dadf84bbb76eb64926d87a`, with fixed seeds, runtime, transport and action contracts throughout.
 
-Evidence root: `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-fixed-candidate-quality/`.
+| Arm | GPU process seconds, all attempts | Valid guided chunks | Valid model forwards | Valid provider logical calls |
+|---|---:|---:|---:|---:|
+| C0 | 6067.048104607 | 200 | 7135 | 201 |
+| Q0 | 6292.725439663 | 185 | 7085 | 193 |
+| N2 | 4568.884975124 | 131 | 6221 | 149 |
 
-- C0 result SHA: `bd0e1526d34bb0c4cc9826527eff64131fb561aae8f5e7538cc04f566fd3a6f1`.
-- Q0 result SHA: `195a77627fca592afd748602f864099d107ac91471c740c3a1a160071a8fe769`.
-- Complete summary SHA: `51e04f816e9cadfe0e8c4812b8bddb931a882abff8e0be4fde2e173aa71d9fa9`.
-- Shared pure helper SHA: `d83dbd53e75708f3a6e71cab9c0814dc82a42c68898d53cb370df37d9a8c946b`.
+The cohort total is 16928.658519394 seconds, including 570.876267048 seconds for the invalid original Q0 attempt. It is not the entire study's charge. Complete guided chunks retain 176 canonical evaluations and 11 score batches. Full-episode computation differs because execution lengths and guidance trajectories differ; N2's lower total is not evidence of a more efficient successful algorithm. Internal HTTP requests/retries remain unobserved through the Codex CLI.
 
-The old observation implementation was audited before integrating N2 in W. Reproduction requires its frozen source revision `0d59b853a241cd88d984f5126428720a14abbfd5` and preserved manifest bindings. The new W core/auditor must not be substituted for those old source bytes. Original map-v2 and identity-corrected supplemental conditions remain separately labeled.
+N2's recognized Q8 objective was applicable on all 131 guided chunks and changed 22655 recorded candidate scalar values. The first-three checkpoint established actual quality-dependent search/selection activity, native raw-quality association, finite actions and unchanged canonical computation. Changed scalar counts alone do not establish changed actions or task benefit. The original raw channel remained the Stage input source; the exact normalized Stage argument was not recorded.
 
-Next: finish the frozen-source runtime/supervisor checks, then evaluate the first three matched C0/Q0/N2 Dev cells on physical GPU3, under the real shared runner lease. Their numerical, evidence, raw-Stage and compute checks determine release of the remaining27 cells; success itself is not a pilot stopping rule. All global caps and validation/formal reservations remain unchanged.
+The separately frozen CPU chronology completed all 30 representatives and 30 fresh audits without CUDA initialization or outcome changes. Guided actions were C0 1600/6285, Q0 1480/6594 and N2 1048/6594; OFF-to-ON reactivations were 48, 34 and 24. Successful task8 Q0/N2 runs each used only 16 guided actions out of 114. Thus a long OFF interval alone does not identify a failure cause or justify forcing guidance on. All 543 recorded Stage queries succeeded and their after-states agreed with the same-step decision context; this establishes recorded consistency, not semantic correctness.
+
+The outer loop selects bounded additional evidence collection: compare existing selected projections with their actual executed EEF responses, then examine a fixed past-residual prediction on eligible consecutive guided chunks. This diagnostic is separately specified before reading its numerical results. It does not modify Stage, the external provider/projector, the controller, the checkpoint, or the task. Grasp/contact, target progress, unexecuted candidate outcomes and causal failure explanations remain unknown. A subsequent algorithm needs evidence and a new prospective protocol; N2 is not retuned or promoted by changing its gate.
+
+Evidence under the study artifact root `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/`:
+
+- `continuation_20260923/n2-matrix-report/report-full-dev-v1.json`, SHA `d376f98a0d0d23d7b73b0a20ab768594c63ed6a6abce9473e0e67d2247bc88ab`.
+- `continuation_20260923/n2-matrix-report/root-candidate-decision-v1.json`, SHA `140d1429c3cc76854c3e230cfed5bc3b43be9f9fdebc550c20fda87968aa41f2`.
+- `continuation_20260923/full-dev-closed-loop-analysis/read-v1/index.json`, SHA `a0d26a8b61761a95c48d1c93dc80b8c5cc0c5f3779aa2bac7facb78f0583a7c0`.
+- `continuation_20260923/full-dev-closed-loop-analysis/read-v1/inputs-and-audit.json`, SHA `ccfc8cd622ab2c9c659a6ae89dc618c853a77dc4f80af3e590ba44589d74a3ce`.
+
+At this closure, journal-derived accounting was 11.72537440950208/48 GPU-hours and 79/240 dispatched attempts, with no running attempt. Validation/formal retain 24 GPU-hours and 100 attempts, leaving 12.27462559049792 hours and 61 unreserved attempts. Admission must recompute these values before any new dispatch. All future online work remains on GPU3 only.
