@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Stdlib-only descriptive summary of four explicitly named completed episodes.
+"""Stdlib-only descriptive summary of four explicitly named episode outcomes.
 
 Never opens a tensor bundle, ledger, process, model, provider, or simulator.
 Missing manifest rows stay pending; no directory scan or implicit latest input.
+An explicit terminal_invalid row closes a known invalid outcome without analysis.
 """
 import argparse
 from collections import Counter, defaultdict
@@ -126,13 +127,9 @@ def summarize_strata(analysis):
     return result
 
 
-def complete_row(reference, row, plan, plan_sha, sources):
-    require(set(reference) == {'status', 'terminal', 'audit', 'analysis'} and reference['status'] == 'complete',
-            'complete row requires terminal/audit/analysis references')
+def bound_terminal(reference, row, plan, plan_sha):
     root = Path(plan['artifact_root']).resolve()
-    terminal, terminal_path = load_reference(reference['terminal'], root)
-    audit, audit_path = load_reference(reference['audit'], root)
-    analysis, analysis_path = load_reference(reference['analysis'], root)
+    terminal, terminal_path = load_reference(reference, root)
     require(terminal_path.name == 'attempt-result.json', 'explicit terminal result required')
     output = terminal_path.parent
     require(Path(terminal['output_dir']).resolve() == output and output.parent == root/'attempts', 'attempt output binding differs')
@@ -143,6 +140,44 @@ def complete_row(reference, row, plan, plan_sha, sources):
         terminal['profile_manifest_sha256'] == plan['profiles_sha256'] and
         terminal['runtime_inventory_sha256'] == plan['runtime_inventory_sha256'] and
         terminal['runtime_manifest_sha256'] == plan['runtime_manifest_sha256'], 'terminal frozen condition differs')
+    return terminal, output
+
+
+def terminal_costs(terminal):
+    costs = {key: terminal.get(key) for key in COST_FIELDS}
+    require(type(costs['gpu_process_wall_seconds']) in (int, float) and
+        math.isfinite(costs['gpu_process_wall_seconds']) and costs['gpu_process_wall_seconds'] >= 0, 'terminal GPU cost invalid')
+    for value in costs.values():
+        require(value is None or (type(value) in (int, float) and math.isfinite(value) and value >= 0), 'invalid cost counter')
+    return costs
+
+
+def terminal_invalid_row(reference, row, plan, plan_sha):
+    require(set(reference) == {'status', 'terminal'} and reference['status'] == 'terminal_invalid',
+            'terminal_invalid row requires only terminal reference; no audit or analysis')
+    terminal, _ = bound_terminal(reference['terminal'], row, plan, plan_sha)
+    require(terminal.get('event') in {'valid', 'aborted'} and terminal.get('outcome_valid') is False,
+            'explicit invalid original terminal required; no outcome reclassification')
+    require(isinstance(terminal.get('reason'), str) and bool(terminal['reason'].strip()),
+            'invalid original terminal reason required')
+    return {'episode_key': row['episode_key'], 'status': 'terminal_invalid', 'identity': terminal['identity'],
+        'attempt_id': terminal['attempt_id'], 'physical_gpu': 3,
+        'original_outcome': {name: terminal.get(name) for name in
+            ('event', 'outcome_valid', 'success', 'task_failure', 'failure_class', 'reason', 'compute_outcome')},
+        'original_terminal': terminal, 'input_references': reference,
+        'audit': None, 'mechanism': None, 'strata': None, 'costs': terminal_costs(terminal),
+        'frozen_comparison_eligible': False,
+        'exclusion': 'Original terminal outcome_valid=false; raw task outcome and recorded costs retained, no A/B or paired inference.',
+        'provenance_limit': 'Only the explicit SHA-bound terminal JSON was consumed. No integrity audit or complete physical trajectory restores the frozen condition.'}
+
+
+def complete_row(reference, row, plan, plan_sha, sources):
+    require(set(reference) == {'status', 'terminal', 'audit', 'analysis'} and reference['status'] == 'complete',
+            'complete row requires terminal/audit/analysis references')
+    root = Path(plan['artifact_root']).resolve()
+    terminal, output = bound_terminal(reference['terminal'], row, plan, plan_sha)
+    audit, audit_path = load_reference(reference['audit'], root)
+    analysis, analysis_path = load_reference(reference['analysis'], root)
     require(terminal['event'] == 'valid' and terminal.get('outcome_valid') is True and
         type(terminal.get('success')) is bool, 'complete valid original terminal required; no relabeling')
     require(audit_path == output/'eds_eval/decision-evidence-audit.json', 'audit path binding differs')
@@ -167,11 +202,7 @@ def complete_row(reference, row, plan, plan_sha, sources):
         for path in (episode/'status.json', episode/'events.jsonl', compute)), 'analysis input provenance incomplete')
     require(analysis['input_sha256'].get(str(Path(plan['worktree']).resolve()/TARGET_MAP)) == sources[TARGET_MAP],
             'original frozen map-v2 condition differs; supplemental maps cannot be pooled')
-    costs = {key: terminal.get(key) for key in COST_FIELDS}
-    require(type(costs['gpu_process_wall_seconds']) in (int, float) and
-        math.isfinite(costs['gpu_process_wall_seconds']) and costs['gpu_process_wall_seconds'] >= 0, 'terminal GPU cost invalid')
-    for value in costs.values():
-        require(value is None or (type(value) in (int, float) and math.isfinite(value) and value >= 0), 'invalid cost counter')
+    costs = terminal_costs(terminal)
     return {'episode_key': row['episode_key'], 'status': 'complete', 'identity': terminal['identity'],
         'attempt_id': terminal['attempt_id'], 'physical_gpu': 3,
         'original_outcome': {name: terminal.get(name) for name in ('event', 'outcome_valid', 'success', 'task_failure', 'failure_class')},
@@ -184,11 +215,15 @@ def complete_row(reference, row, plan, plan_sha, sources):
         'costs': costs, 'mechanism': decision_summary(analysis['decisions']), 'strata': summarize_strata(analysis)}
 
 
-def pair_description(left, right, all_complete):
+def pair_description(left, right, all_complete, matrix_closed=False):
     result = {'task_id': left['identity']['task_id'], 'C0_P2_key': left['episode_key'], 'Q0_key': right['episode_key'],
-              'status': 'complete_descriptive_pair' if all_complete else 'pending_all_four',
+              'status': ('complete_descriptive_pair' if all_complete else
+                         'closed_incomplete_comparison' if matrix_closed else 'pending_all_four'),
               'inference': 'Not evaluated; no significance test, benefit claim, or automatic promotion.'}
     if not all_complete:
+        if matrix_closed:
+            result['row_statuses'] = {'C0_P2': left['status'], 'Q0': right['status']}
+            result['inference'] = 'Not established: all four valid analyzed rows are required; the closed matrix contains a terminal-invalid row.'
         return result
     result['original_success'] = {'C0_P2': left['original_outcome']['success'], 'Q0': right['original_outcome']['success']}
     result['episode_witness_presence'] = {hypothesis: {'C0_P2': left['mechanism'][hypothesis]['episode_presence'],
@@ -215,39 +250,58 @@ def summarize(manifest):
                 'identity': {key: row[key] for key in IDENTITY_FIELDS},
                 'reason': reference.get('reason', 'complete accepted analysis not supplied') if reference else 'complete accepted analysis not supplied',
                 'original_outcome': None, 'audit': None, 'mechanism': None, 'costs': None})
+        elif reference.get('status') == 'terminal_invalid':
+            rows.append(terminal_invalid_row(reference, row, plan, manifest['plan']['sha256']))
         else:
             rows.append(complete_row(reference, row, plan, manifest['plan']['sha256'], sources))
     complete = [row for row in rows if row['status'] == 'complete']
+    invalid = [row for row in rows if row['status'] == 'terminal_invalid']
+    pending = [row for row in rows if row['status'] == 'pending']
     all_complete = len(complete) == 4
+    matrix_closed = not pending
     return {'schema': 'qd-ed-observed-pair-summary-v1', 'plan_reference': manifest['plan'],
         'source_sha256': {'analysis': sources[ANALYZER], 'existing_auditor': sources[AUDITOR]},
         'target_map_condition': {'path': str(Path(plan['worktree']).resolve()/TARGET_MAP), 'sha256': sources[TARGET_MAP],
                                  'scope': 'Original frozen map-v2 only; no supplemental identity repair condition.'},
         'summary_script_sha256': digest(Path(__file__).read_bytes()),
-        'status': 'complete_descriptive_matrix' if all_complete else 'pending_matrix',
-        'completed_episodes': len(complete), 'pending_episodes': 4-len(complete), 'planned_episodes': 4,
+        'status': ('complete_descriptive_matrix' if all_complete else
+                   'closed_incomplete_comparison' if matrix_closed else 'pending_matrix'),
+        'completed_episodes': len(complete), 'complete_valid_episodes': len(complete),
+        'terminal_invalid_episodes': len(invalid), 'pending_episodes': len(pending), 'planned_episodes': 4,
         'unit_of_evidence': 'One complete episode; within-episode decisions are descriptive, correlated observations.',
-        'rows': rows, 'pairs': [pair_description(rows[0], rows[1], all_complete), pair_description(rows[2], rows[3], all_complete)],
+        'rows': rows, 'pairs': [pair_description(rows[0], rows[1], all_complete, matrix_closed),
+                              pair_description(rows[2], rows[3], all_complete, matrix_closed)],
         'completed_episode_gpu_wall_seconds': sum(row['costs']['gpu_process_wall_seconds'] for row in complete),
-        'cost_scope': 'Only the explicitly supplied completed episodes; excludes pending/aborted/other study resources and CPU audit time.',
+        'terminal_invalid_gpu_wall_seconds': sum(row['costs']['gpu_process_wall_seconds'] for row in invalid),
+        'recorded_terminal_gpu_wall_seconds': sum(row['costs']['gpu_process_wall_seconds'] for row in complete+invalid),
+        'cost_scope': 'Explicit complete-valid and terminal-invalid rows only, separately subtotaled; pending costs remain Unknown. Excludes other study resources and CPU audit time.',
         'promotion_status': 'NOT_EVALUATED', 'limitations': LIMIT}
 
 
 def render_markdown(report):
     lines = ['# Four observed Dev episodes — descriptive summary', '',
-        f"Status: {report['status']}; completed {report['completed_episodes']}/4, pending {report['pending_episodes']}/4.", '',
-        '| Task | Arm | Status | Original task success | Audit | Eligible decisions (descriptive) | A episode presence | B episode presence | GPU wall seconds |',
+        f"Status: {report['status']}; complete-valid {report['complete_valid_episodes']}/4, terminal-invalid {report['terminal_invalid_episodes']}/4, pending {report['pending_episodes']}/4.", '',
+        '| Task | Arm | Status | Original task success (raw) | Audit | Eligible decisions (descriptive) | A episode presence | B episode presence | GPU wall seconds |',
         '|---|---|---|---|---|---|---|---|---|']
     for row in report['rows']:
         identity = row['identity']
         if row['status'] == 'pending':
             values = ['pending', 'Unknown', 'pending', 'Unknown', 'Unknown', 'Unknown', 'Unknown']
+        elif row['status'] == 'terminal_invalid':
+            success = row['original_outcome']['success']
+            values = ['terminal-invalid', 'Unknown' if success is None else str(success).lower(),
+                'not admitted', 'Unknown', 'Unknown', 'Unknown', str(row['costs']['gpu_process_wall_seconds'])]
         else:
             values = ['complete', str(row['original_outcome']['success']).lower(), 'accepted (not success)',
                 str(row['mechanism']['hypothesis_eligible_decisions']), row['mechanism']['A_unscored_tail']['episode_presence'],
                 row['mechanism']['B_projection_response']['episode_presence'], str(row['costs']['gpu_process_wall_seconds'])]
         lines.append('| '+' | '.join([str(identity['task_id']), 'C0/P2' if identity['profile']=='C0' else 'Q0', *values])+' |')
     lines += ['', 'A = the frozen analyzer’s eligible full-prefix joint step7→8 regression witness. B = its eligible projection-response witness. No eligible prefix means Unknown, not a negative finding.', '']
+    for row in report['rows']:
+        if row['status'] == 'terminal_invalid':
+            lines += [f"{row['episode_key']}: original event={row['original_outcome']['event']}, outcome_valid=false, "
+                      f"task_failure={row['original_outcome']['task_failure']}; reason: {row['original_outcome']['reason']}. "
+                      'The raw task outcome remains recorded; this row is ineligible for the frozen comparison. No A/B analysis is supplied.', '']
     for pair in report['pairs']:
         lines.append(f"Task {pair['task_id']} pair: {pair['status']}.")
         if pair['status'] == 'complete_descriptive_pair':
@@ -255,8 +309,10 @@ def render_markdown(report):
             unmatched = sum(row['match'] == 'unmatched_retained' for row in pair['stage_provider_alignment'])
             lines.append(f"Stage/provider strata: {len(pair['stage_provider_alignment'])}; unmatched strata retained: {unmatched}. Full identities, counts, witness IDs and original descriptive medians are in summary.json.")
         lines.append('')
-    lines += [f"Completed-row GPU wall time only: {report['completed_episode_gpu_wall_seconds']} seconds. This is not the study's total budget/cost.", '', LIMIT,
-        '', 'Input JSON SHA bindings and frozen analyzer/auditor hashes are preserved in summary.json. The summary does not reopen tensor bundles or turn audit acceptance into task success. Missing inputs remain pending. No algorithm or promotion decision is made.', '']
+    lines += [f"Complete-valid GPU wall time: {report['completed_episode_gpu_wall_seconds']} seconds; "
+        f"terminal-invalid GPU wall time: {report['terminal_invalid_gpu_wall_seconds']} seconds; "
+        f"total explicitly recorded terminal cost: {report['recorded_terminal_gpu_wall_seconds']} seconds. This is not the study's total budget/cost.", '', LIMIT,
+        '', 'Input JSON SHA bindings and frozen analyzer/auditor hashes are preserved in summary.json. The summary does not reopen tensor bundles or turn audit acceptance into task success. Missing inputs remain pending; explicit invalid terminals close without restoring comparison eligibility. No algorithm or promotion decision is made.', '']
     return '\n'.join(lines)
 
 
@@ -278,6 +334,7 @@ def main():
     (output/'summary.json').write_text(json.dumps(report, indent=2, sort_keys=True, allow_nan=False)+'\n')
     (output/'report.md').write_text(render_markdown(report))
     print(json.dumps({'status':report['status'], 'completed_episodes':report['completed_episodes'],
+        'terminal_invalid_episodes':report['terminal_invalid_episodes'],
         'pending_episodes':report['pending_episodes'], 'output_dir':str(output), 'promotion_status':'NOT_EVALUATED'}))
 
 
