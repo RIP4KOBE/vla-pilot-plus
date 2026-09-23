@@ -117,14 +117,15 @@ def test_sha_failure_rejects_before_loading_tensor_payload(tmp_path, monkeypatch
     assert report["observed_counts"] is None
 
 
-@pytest.mark.parametrize("corruption", ["sequence", "role_link", "t8_missing", "selected", "dispatch_index", "eef_missing", "reset_claim", "stage_change", "reset_sequence"])
+@pytest.mark.parametrize("corruption", ["sequence", "role_link", "t8_missing", "selected", "dispatch_index", "eef_missing", "reset_claim", "stage_change", "reset_sequence", "wrapper_identity_only", "provider_link"])
 def test_semantic_corruption_fails_even_with_updated_valid_bundle_sha(tmp_path, corruption):
     rec, compute = episode(tmp_path)
     targets = {"sequence": "decision_context", "role_link": "provider_return",
                "t8_missing": "scoring_inputs", "selected": "final_selection",
                "dispatch_index": "action_dispatch", "eef_missing": "pre_reset_outcome",
                "reset_claim": "automatic_reset_boundary", "stage_change": "decision_context",
-               "reset_sequence": "step_returned"}
+               "reset_sequence": "step_returned", "wrapper_identity_only": "decision_context",
+               "provider_link": "provider_return"}
     def edit(row):
         if row["event"] != targets[corruption]:
             return False
@@ -138,6 +139,10 @@ def test_semantic_corruption_fails_even_with_updated_valid_bundle_sha(tmp_path, 
         elif corruption == "reset_claim": value["reset_completed"] = True
         elif corruption == "stage_change": value["stage_changed"] = True
         elif corruption == "reset_sequence": row["reset_sequence"] = 0
+        elif corruption == "wrapper_identity_only":
+            value["providers"][0]["original_code_sha256"] = None
+            value["providers"][0]["source_text_sha256"] = None
+        elif corruption == "provider_link": value["context_provider_ordinal"] = 1
         return True
     rewrite(rec.root, edit)
     report = audit.audit_episode(rec.root, compute)

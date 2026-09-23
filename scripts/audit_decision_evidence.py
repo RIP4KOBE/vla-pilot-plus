@@ -103,6 +103,13 @@ def audit_episode(episode_dir, episode_compute_file):
                     and context_value["previous_stage"] == previous_stage, "decision_context_link_mismatch")
             require(context_value["stage_changed"] == (previous_stage is not None and previous_stage != context_value["stage"]), "stage_change_mismatch")
             previous_decision, previous_stage = decision_id, context_value["stage"]
+            providers = context_value["providers"]
+            require([p["ordinal"] for p in providers] == list(range(len(providers))), "provider_identity_ordinals_invalid")
+            for provider in providers:
+                def valid_hash(value):
+                    return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value) is not None
+                require(valid_hash(provider.get("original_code_sha256")) or valid_hash(provider.get("source_text_sha256")), "provider_identity_missing")
+                require(provider.get("original_identity_origin") in ("direct_callable", "loader_attached_original"), "provider_identity_origin_unknown")
             rows = by_decision[decision_id]
             kinds = defaultdict(list)
             for row in rows:
@@ -182,6 +189,12 @@ def audit_episode(episode_dir, episode_compute_file):
                 require([(v["candidate_index"], v["provider_ordinal"]) for v in returned] == expected, "provider_return_coverage_invalid")
                 require(len(effective) == len(aggregates) == 1, "effective_quality_missing_or_duplicate")
                 require(all(v["scoring_scope"] == scope for v in returned + effective + aggregates), "scoring_role_link_mismatch")
+                identity_fields = ("code_sha256", "original_code_sha256", "source_text_sha256", "source_path")
+                for value in returned:
+                    linked = value["context_provider_ordinal"]
+                    require(type(linked) is int and 0 <= linked < len(providers), "provider_context_link_missing")
+                    require(all(providers[linked].get(k) == providers[value["provider_ordinal"]].get(k)
+                                for k in identity_fields), "provider_context_identity_mismatch")
                 require(all((tensor(v.get("result")) and v["result"].numel() == 1)
                     or (type(v.get("result")) in (int, float, bool) and math.isfinite(v["result"]))
                     for v in returned), "raw_provider_result_missing_or_invalid")
