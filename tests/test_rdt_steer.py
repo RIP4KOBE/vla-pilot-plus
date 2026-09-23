@@ -2351,6 +2351,184 @@ def _valid_qd_config(**updates):
     }
 
 
+def _n2_fixture_provider(index=1, *, recognized=True):
+    from core.qd_executed_quality import TEMPLATE
+    from utils.guidance_utils import wrap_guidance_function_with_device_fix
+    source = TEMPLATE.replace("[0], dtype", f"[{index}], dtype")
+    if not recognized:
+        source = source.replace("3.0", "4.0")
+    namespace = {"torch": torch}
+    exec(compile(source, "<synthetic-n2-fixture>", "exec", dont_inherit=True), namespace)
+    fn = wrap_guidance_function_with_device_fix(namespace["approach"])
+    fn._guidance_original_func = namespace["approach"]
+    fn._guidance_source_text = source
+    return fn
+
+
+@pytest.mark.parametrize("dtype", [torch.float32, torch.bfloat16])
+def test_n2_canonical_uses_existing_projection_and_preserves_auxiliary_provider(
+    stub_steer, stub_adapter, monkeypatch, dtype,
+):
+    from core.qd_executed_quality import recognize_executed_prefix_provider, executed_prefix_quality
+    stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
+                         sample_batch_size=16, policy_config={"action_chunk_horizon": 8})
+    fn = _n2_fixture_provider()
+    points = torch.tensor([[8., 8., 8.], [.13, -.21, .39]], dtype=dtype)
+    contract, _ = recognize_executed_prefix_provider([fn], points)
+    sample = torch.linspace(-.3, .4, 16 * 64 * 128).reshape(16, 64, 128).to(dtype)
+    projections = []
+    original = stub_steer._rdt_sample_to_trajectory_3d
+    def project(actions):
+        result = original(actions)
+        projections.append(result.detach().clone())
+        return result
+    monkeypatch.setattr(stub_steer, "_rdt_sample_to_trajectory_3d", project)
+    raw_cost, raw_info = stub_steer._eds_score_population_as_cost(sample, keypoints=points, guidance_fns=[fn])
+    first_counts = stub_steer.get_episode_compute_counters()
+    stub_steer.reset_episode_compute_counters()
+    cost, info = stub_steer._eds_score_population_as_cost(sample, keypoints=points, guidance_fns=[fn], qd_quality_contract=contract)
+    assert len(projections) == 2 and torch.equal(projections[0], projections[1])
+    assert torch.equal(info["raw_rewards"], raw_info["rewards"])
+    assert torch.equal(-cost, executed_prefix_quality(projections[-1], points, target_index=1))
+    assert first_counts == stub_steer.get_episode_compute_counters()
+    assert first_counts["reward_calls"] == first_counts["reward_evaluations"] == 16
+    # Subsequent auxiliary scoring cannot inherit a preceding canonical contract.
+    aux_cost, aux_info = stub_steer._eds_score_population_as_cost(sample, keypoints=points, guidance_fns=[fn])
+    assert torch.equal(aux_cost, raw_cost) and set(aux_info) == {"rewards"}
+    assert not torch.cuda.is_initialized()
+
+
+@pytest.mark.parametrize("archive", ["grid_archive", "none"])
+@pytest.mark.parametrize("dtype", [torch.float32, torch.bfloat16])
+def test_n2_full_loop_native_raw_stage_and_cpu_call_budget(stub_steer, stub_adapter, monkeypatch, archive, dtype):
+    stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
+                         sample_batch_size=16, policy_config={"action_chunk_horizon": 8})
+    fn = _n2_fixture_provider()
+    keypoints = torch.tensor([[9., 9., 9.], [.13, -.21, .39]], dtype=dtype)
+    initial = torch.linspace(-.12, .19, 16 * 64 * 128).reshape(16, 64, 128).to(dtype)
+    monkeypatch.setattr(stub_steer, "_eds_initial_population", lambda **kw: initial.clone())
+    cond = _rollout_cond(stub_steer)
+    projection_sizes = []
+    original_project = stub_steer._rdt_sample_to_trajectory_3d
+    def project(actions):
+        projection_sizes.append(len(actions))
+        return original_project(actions)
+    monkeypatch.setattr(stub_steer, "_rdt_sample_to_trajectory_3d", project)
+    metadata = []
+    original_metadata = stub_steer._eds_update_guidance_metadata_from_cost
+    def update(best, costs):
+        metadata.append((best.detach().clone(), costs.detach().clone()))
+        original_metadata(best, costs)
+    monkeypatch.setattr(stub_steer, "_eds_update_guidance_metadata_from_cost", update)
+    outputs = {}
+    for mode in ("provider", "executed_prefix_v1"):
+        stub_steer.reset_stage()
+        stub_steer.reset_episode_compute_counters()
+        projection_sizes.clear()
+        torch.manual_seed(9102)
+        cfg = stub_steer._resolve_eds_config_with_reference_defaults(_valid_qd_config(
+            qd_parent_sampling="sparse_priority", qd_archive_mode=archive, qd_quality_mode=mode))
+        selected = stub_steer._eds_guided_denoise_loop(x_t=torch.zeros_like(initial), cond=cond,
+            keypoints=keypoints, guidance_fns=[fn], eds_config=cfg, verbose=False, global_step=0, current_stage=1)
+        metrics = stub_steer.get_last_eds_metrics()
+        outputs[mode] = (selected, metrics, stub_steer.get_episode_compute_counters(), list(projection_sizes))
+    selected, metrics, counts, sizes = outputs["executed_prefix_v1"]
+    assert metrics["search_evaluation_count"] == 176 and metrics["score_call_count"] == 11
+    assert metrics["qd_evaluation_count"] == (176 if archive == "grid_archive" else 0)
+    assert metrics["qd_quality_applicable"] and metrics["qd_quality_target_index"] == 1
+    assert len(metrics["qd_quality_batches"]) == 11 and metrics["qd_quality_changed_candidates"] > 0
+    assert counts == outputs["provider"][2]  # Includes actual stub model/RBF/scheduler calls.
+    assert len(sizes) == len(outputs["provider"][3])  # Archive cardinality can differ after changed retention.
+    assert counts["model_forward_calls"] > 0 and counts["reward_calls"] == 176
+    assert counts["reward_scoring_batches"] == 11
+    expected_raw = fn(keypoints, original_project(selected)[:, 1:8]).to(selected.dtype).item()
+    assert stub_steer._last_raw_reward == metrics["qd_selected_raw_reward"] == expected_raw
+    assert metadata[-1][0].item() == -expected_raw
+    assert metadata[-1][1].dtype == (torch.float32 if archive == "grid_archive" else dtype)
+    assert metrics["qd_selected_raw_gap"] <= 0
+    assert "qd_quality_mode" not in outputs["provider"][1]
+    assert not torch.cuda.is_initialized()
+
+
+def test_n2_unknown_provider_is_exact_q0_and_fresh_after_reset(stub_steer, stub_adapter, monkeypatch):
+    stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
+                         sample_batch_size=16, policy_config={"action_chunk_horizon": 8})
+    fn = _n2_fixture_provider(recognized=False)
+    keypoints = torch.tensor([[9., 9., 9.], [.13, -.21, .39]])
+    initial = torch.linspace(-.12, .19, 16 * 64 * 128).reshape(16, 64, 128)
+    monkeypatch.setattr(stub_steer, "_eds_initial_population", lambda **kw: initial.clone())
+    cond = _rollout_cond(stub_steer)
+    results = []
+    for mode in ("provider", "executed_prefix_v1", "provider"):
+        stub_steer.reset()
+        torch.manual_seed(8391)
+        cfg = stub_steer._resolve_eds_config_with_reference_defaults(_valid_qd_config(
+            qd_parent_sampling="sparse_priority", qd_quality_mode=mode))
+        selected = stub_steer._eds_guided_denoise_loop(x_t=torch.zeros_like(initial), cond=cond,
+            keypoints=keypoints, guidance_fns=[fn], eds_config=cfg, verbose=False, global_step=0, current_stage=1)
+        results.append((selected, stub_steer.get_last_eds_artifacts(), stub_steer.get_last_eds_metrics(),
+                        torch.get_rng_state(), stub_steer.get_episode_compute_counters(), stub_steer._last_raw_reward))
+    for item in results[1:]:
+        assert torch.equal(item[0], results[0][0]) and torch.equal(item[3], results[0][3])
+        assert item[4:] == results[0][4:]
+        assert torch.equal(item[1]["final_scores"], results[0][1]["final_scores"])
+        assert item[1]["qd_initial_archive"]["archive"] == results[0][1]["qd_initial_archive"]["archive"]
+        assert item[2]["qd_selected_action_fingerprint"] == results[0][2]["qd_selected_action_fingerprint"]
+    assert results[1][2]["qd_quality_applicable"] is False
+    assert results[1][2]["qd_quality_reason"] == "not_weighted_distance_template"
+
+
+def test_n2_auxiliary_trace_sites_keep_original_quality(stub_steer, stub_adapter, monkeypatch):
+    stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
+                         sample_batch_size=16, policy_config={"action_chunk_horizon": 8})
+    initial = torch.linspace(-.12, .19, 16 * 64 * 128).reshape(16, 64, 128)
+    monkeypatch.setattr(stub_steer, "_eds_initial_population", lambda **kw: initial.clone())
+    stub_steer._last_eds_initial_sampler_trace_stages = [("initial_pretest", initial * 2)]
+    scope, calls = {}, []
+    observe = stub_steer._observe_eds_score_call
+    def mark(**kw):
+        scope.clear()
+        scope.update(kw)
+        observe(**kw)
+    original_score = stub_steer._eds_score_population_as_cost
+    def score(*args, **kw):
+        result = original_score(*args, **kw)
+        calls.append((dict(scope), kw.get("qd_quality_contract") is not None, "raw_rewards" in result[1]))
+        return result
+    monkeypatch.setattr(stub_steer, "_observe_eds_score_call", mark)
+    monkeypatch.setattr(stub_steer, "_eds_score_population_as_cost", score)
+    cfg = stub_steer._resolve_eds_config_with_reference_defaults(_valid_qd_config(
+        qd_parent_sampling="sparse_priority", qd_quality_mode="executed_prefix_v1",
+        mechanism_pretest={"enabled": True, "first_chunk_only": True}))
+    stub_steer._eds_guided_denoise_loop(x_t=torch.zeros_like(initial), cond=_rollout_cond(stub_steer),
+        keypoints=torch.tensor([[8., 8., 8.], [.1, -.2, .3]]), guidance_fns=[_n2_fixture_provider()],
+        eds_config=cfg, verbose=False, global_step=0, current_stage=1)
+    assert sum(active for _, active, _ in calls) == 11
+    auxiliary = [row for row in calls if row[0]["role"] == "auxiliary_pretest"]
+    assert len({row[0]["site"] for row in auxiliary}) == 3
+    assert all(not active and not raw for _, active, raw in auxiliary)
+    assert all(active == raw for _, active, raw in calls)
+
+
+def test_n2_wrong_canonical_action_identity_fails_before_archive(stub_steer, stub_adapter, monkeypatch):
+    stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
+                         sample_batch_size=16, policy_config={"action_chunk_horizon": 8})
+    initial = torch.linspace(-.12, .19, 16 * 64 * 128).reshape(16, 64, 128)
+    monkeypatch.setattr(stub_steer, "_eds_initial_population", lambda **kw: initial.clone())
+    original_score = stub_steer._eds_score_population_as_cost
+    def score(*args, **kw):
+        costs, info = original_score(*args, **kw)
+        info["qd_scored_actions"] = info["qd_scored_actions"].roll(1, dims=0)
+        return costs, info
+    monkeypatch.setattr(stub_steer, "_eds_score_population_as_cost", score)
+    cfg = stub_steer._resolve_eds_config_with_reference_defaults(_valid_qd_config(
+        qd_parent_sampling="sparse_priority", qd_quality_mode="executed_prefix_v1"))
+    with pytest.raises(RuntimeError, match="identity association"):
+        stub_steer._eds_guided_denoise_loop(x_t=torch.zeros_like(initial), cond=_rollout_cond(stub_steer),
+            keypoints=torch.zeros(2, 3), guidance_fns=[_n2_fixture_provider()], eds_config=cfg,
+            verbose=False, global_step=0, current_stage=1)
+
+
 def test_qd_config_accepts_primary_and_sparse_registered_profiles(stub_steer):
     uniform = stub_steer._resolve_eds_config_with_reference_defaults(
         _valid_qd_config()

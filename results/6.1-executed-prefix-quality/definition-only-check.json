@@ -1,0 +1,61 @@
+{
+  "schema": "n2-definition-only-recognition-v1",
+  "scope": "Existing real loader validate=False, definitions only; no provider/model/projection/simulation or recorded-candidate quality evaluation",
+  "provider_calls_observed": 0,
+  "cuda_initialized_before": false,
+  "cuda_initialized_after": false,
+  "inputs": [
+    {
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_0/stage1_guidance.txt",
+      "raw_source_sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+      "task_for_provenance_only": 0,
+      "stage_for_provenance_only": 1,
+      "applicable": true,
+      "reason": "recognized_weighted_distance_template",
+      "target_index": 0,
+      "identity": {
+        "source_text_sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+        "code_structure_sha256": "ac5d522090993bf2d72ffec2151d1daba0d54aefb17bf7068c077dc4300fa910",
+        "binding": "loader_wrapper_original_and_complete_template_ast"
+      }
+    },
+    {
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_0/stage2_guidance.txt",
+      "raw_source_sha256": "ca058cc1dcf87ce5910181800bb2f65b8cd4d92788b27f3b10b1e33dbc103f84",
+      "task_for_provenance_only": 0,
+      "stage_for_provenance_only": 2,
+      "applicable": false,
+      "reason": "not_weighted_distance_template",
+      "target_index": null,
+      "identity": null
+    },
+    {
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_5/stage1_guidance.txt",
+      "raw_source_sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+      "task_for_provenance_only": 5,
+      "stage_for_provenance_only": 1,
+      "applicable": true,
+      "reason": "recognized_weighted_distance_template",
+      "target_index": 0,
+      "identity": {
+        "source_text_sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+        "code_structure_sha256": "ac5d522090993bf2d72ffec2151d1daba0d54aefb17bf7068c077dc4300fa910",
+        "binding": "loader_wrapper_original_and_complete_template_ast"
+      }
+    },
+    {
+      "source_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_5/stage2_guidance.txt",
+      "raw_source_sha256": "ca058cc1dcf87ce5910181800bb2f65b8cd4d92788b27f3b10b1e33dbc103f84",
+      "task_for_provenance_only": 5,
+      "stage_for_provenance_only": 2,
+      "applicable": false,
+      "reason": "not_weighted_distance_template",
+      "target_index": null,
+      "identity": null
+    }
+  ],
+  "implementation_sha256": {
+    "core/qd_executed_quality.py": "d83dbd53e75708f3a6e71cab9c0814dc82a42c68898d53cb370df37d9a8c946b",
+    "utils/guidance_utils.py": "b0fe9d6d5fc014143f5877918de9bd0986b1688b4a6a90980847b7d15cab0c82"
+  }
+}

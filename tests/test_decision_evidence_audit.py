@@ -16,7 +16,7 @@ audit = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(audit)
 
 
-def episode(tmp_path, *, auxiliary=False, terminal_return=True):
+def episode(tmp_path, *, auxiliary=False, terminal_return=True, n2=False):
     rec = DecisionEvidence(tmp_path, episode=0)
     provider = lambda keypoints, trajectories: None
     rec.begin_decision(global_step=0, stage=1, use_guidance=True,
@@ -44,18 +44,23 @@ def episode(tmp_path, *, auxiliary=False, terminal_return=True):
             rec.provider_return(provider, quality[index].double())
         rec.record("scoring_aggregate", scoring_batch_id=rec.scoring_batch_id,
                    aggregate_before_reward_mode=quality)
+        active = n2 and role != "auxiliary_pretest"
+        internal = quality + 1 if active else quality
+        dual = {"quality_mode": "executed_prefix_v1", "raw_provider_quality": quality} if active else {}
         rec.record("effective_quality", scoring_batch_id=rec.scoring_batch_id,
-                   reward_mode="normal", quality=quality, costs=-quality)
+                   reward_mode="normal", quality=internal, costs=-internal, **dual)
         if role != "auxiliary_pretest":
             rec.record("canonical_candidate_batch", iter_idx=iteration,
-                       candidates=samples, effective_quality=quality)
+                       candidates=samples, effective_quality=internal, **dual)
     rec.record("parent_allocation", iter_idx=0, source_population=samples,
                source_quality=quality, source_costs=-quality,
                parent_indices=torch.tensor([0, 1]), elite_count=0,
                parent_cell_ids=None, offspring_sources=["softmax", "softmax"])
     selected = samples[1:2]
     rec.record("final_selection", population=samples, selected_latent=selected,
-               selected_index=1, selected_quality=1., selected_cost=-1.,
+               selected_index=1, selected_quality=2. if n2 else 1., selected_cost=-2. if n2 else -1.,
+               **({"quality_mode": "executed_prefix_v1", "raw_provider_quality": quality,
+                   "selected_raw_provider_quality": 1.} if n2 else {}),
                selected_fingerprint=None, selected_cell=None, selection_rule="cost_argmin")
     chunk = torch.zeros(1, 8, 7, dtype=torch.bfloat16)
     chunk[:, :, -1] = 1
@@ -166,3 +171,49 @@ def test_missing_status_keeps_original_outcome_and_unknown_evidence_completeness
     assert not report["accepted"] and report["evidence_complete"] is None
     assert report["original_execution_outcome"] == "completed"
     assert report["observed_counts"] is None
+
+
+def test_n2_audit_preserves_raw_aggregate_and_selected_association(tmp_path):
+    rec, compute = episode(tmp_path, auxiliary=True, n2=True)
+    assert audit.audit_episode(rec.root, compute)["accepted"]
+    def corrupt(row):
+        if row["event"] != "final_selection": return False
+        row["values"]["selected_raw_provider_quality"] = 2.0
+        return True
+    rewrite(rec.root, corrupt)
+    result = audit.audit_episode(rec.root, compute)
+    assert not result["accepted"] and result["errors"] == ["n2_selected_raw_index_mismatch"]
+
+
+def test_n2_audit_rejects_raw_relabelled_as_internal_quality(tmp_path):
+    rec, compute = episode(tmp_path, n2=True)
+    def corrupt(row):
+        if row["event"] != "effective_quality": return False
+        row["values"]["raw_provider_quality"] = row["values"]["quality"]
+        return True
+    rewrite(rec.root, corrupt)
+    result = audit.audit_episode(rec.root, compute)
+    assert not result["accepted"] and result["errors"] == ["n2_raw_aggregate_mismatch"]
+
+
+@pytest.mark.parametrize("corruption,expected", [
+    ("raw_dtype", "n2_raw_aggregate_mismatch"),
+    ("one_candidate_mode", "n2_canonical_mode_missing"),
+    ("one_effective_mode", "n2_effective_mode_missing"),
+    ("final_mode", "n2_final_mode_missing"),
+    ("final_only_n2", "n2_canonical_mode_missing"),
+])
+def test_n2_audit_fails_closed_on_mixed_modes_or_raw_dtype(tmp_path, corruption, expected):
+    rec, compute = episode(tmp_path, n2=corruption != "final_only_n2")
+    target = {"raw_dtype": "effective_quality", "one_candidate_mode": "canonical_candidate_batch",
+              "one_effective_mode": "effective_quality", "final_mode": "final_selection",
+              "final_only_n2": "final_selection"}[corruption]
+    def corrupt(row):
+        if row["event"] != target: return False
+        if corruption == "raw_dtype": row["values"]["raw_provider_quality"] = row["values"]["raw_provider_quality"].float()
+        elif corruption == "final_only_n2": row["values"]["quality_mode"] = "executed_prefix_v1"
+        else: row["values"].pop("quality_mode")
+        return True
+    rewrite(rec.root, corrupt)
+    result = audit.audit_episode(rec.root, compute)
+    assert not result["accepted"] and result["errors"] == [expected]

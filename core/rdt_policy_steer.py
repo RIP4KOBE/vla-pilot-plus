@@ -32,6 +32,9 @@ from core.eds_eval_metrics import (
 from core.eds_mechanism_trace import EDSMechanismTrace, EDSParticleStage
 from core.env_adapters import BaseEnvAdapter
 from core.fkd_class import FKD
+from core.qd_executed_quality import (
+    ExecutedPrefixContract, executed_prefix_quality, recognize_executed_prefix_provider,
+)
 from core.qd_ed import (
     EXECUTION_INTENT_AXES,
     EXECUTION_INTENT_DESCRIPTOR,
@@ -127,6 +130,7 @@ class _EDSConfig:
     adaptive_early_stop_patience: int = 2
     adaptive_reward_improvement_eps: float = 1e-3
     qd_archive_mode: str = "none"
+    qd_quality_mode: str = "provider"
     qd_degenerate_fallback_policy: str = "none"
     qd_descriptor: str = "target_relative_endpoint_xy"
     qd_grid_shape: tuple[int, int] = (4, 4)
@@ -1745,12 +1749,17 @@ class RDTSteer:
         guidance_fns: Optional[List[Callable]],
         *,
         slice_kind: str,
+        projection_out: dict | None = None,
     ) -> Tensor:
         if keypoints is None or not guidance_fns:
             return torch.zeros(samples.shape[0], device=samples.device, dtype=samples.dtype)
         self._increment_compute("reward_scoring_batches")
         full_trajs = self._rdt_sample_to_trajectory_3d(samples)
         trajs = self._trajectory_reward_slice(full_trajs, slice_kind)
+        if projection_out is not None:
+            if self._adapter is None:
+                raise RuntimeError("N2 cannot use the missing-adapter projection fallback")
+            projection_out["projected_xyz"] = full_trajs
         evidence = getattr(self, "_decision_evidence", None)
         if evidence is not None:
             evidence.begin_scoring(samples=samples, keypoints=keypoints,
@@ -1940,6 +1949,7 @@ class RDTSteer:
         guidance_fns: Optional[List[Callable]],
         reward_mode: str = "normal",
         shuffle_seed: int = 0,
+        qd_quality_contract: ExecutedPrefixContract | None = None,
     ) -> tuple[Tensor, dict]:
         reward_mode = str(reward_mode or "normal")
         valid_modes = {"normal", "zero", "shuffled_keypoints", "inverted"}
@@ -1964,22 +1974,44 @@ class RDTSteer:
             )
             scoring_keypoints = keypoints.index_select(0, perm)
 
+        projection_out = {} if qd_quality_contract is not None else None
+        if qd_quality_contract is not None:
+            if reward_mode != "normal":
+                raise RuntimeError("N2 canonical quality requires original normal reward mode")
+            qd_quality_contract.validate(guidance_fns)
         rewards = self._score_particles(
             samples,
             scoring_keypoints,
             guidance_fns,
             slice_kind="eds",
+            **({"projection_out": projection_out} if projection_out is not None else {}),
         )
         if reward_mode == "zero":
             rewards = torch.zeros_like(rewards)
         elif reward_mode == "inverted":
             rewards = -rewards
+        quality_info = {}
+        if qd_quality_contract is not None:
+            qd_quality_contract.validate(guidance_fns)
+            if not torch.isfinite(rewards).all():
+                raise FloatingPointError("N2 original provider reward is nonfinite")
+            quality_info["raw_rewards"] = rewards.detach().clone()
+            quality_info["qd_scored_actions"] = samples.detach().clone()
+            rewards = executed_prefix_quality(projection_out["projected_xyz"], scoring_keypoints,
+                                              target_index=qd_quality_contract.target_index)
+            if rewards.shape != quality_info["raw_rewards"].shape or rewards.dtype != samples.dtype:
+                raise RuntimeError("N2 canonical quality/raw association mismatch")
         costs = -rewards
         evidence = getattr(self, "_decision_evidence", None)
         if evidence is not None:
             evidence.record("effective_quality", scoring_batch_id=evidence.scoring_batch_id,
-                            reward_mode=reward_mode, quality=rewards, costs=costs)
-        return costs.detach(), {"rewards": rewards.detach()}
+                            reward_mode=reward_mode, quality=rewards, costs=costs,
+                            **({"quality_mode": "executed_prefix_v1",
+                                "raw_provider_quality": quality_info["raw_rewards"],
+                                "target_index": qd_quality_contract.target_index,
+                                "provider_identity": qd_quality_contract.identity}
+                               if qd_quality_contract is not None else {}))
+        return costs.detach(), {"rewards": rewards.detach(), **quality_info}
 
     def _save_eds_population_cache(self, population: Tensor, cache_path: Optional[str], *, label: str) -> None:
         if cache_path is None:
@@ -3401,6 +3433,7 @@ class RDTSteer:
         cfg: Optional[_EDSConfig] = None,
         iter_idx: int = 0,
         diversity_scale_override: float | None = None,
+        qd_quality_contract: ExecutedPrefixContract | None = None,
     ) -> tuple[Tensor, Tensor, dict]:
         if (
             cfg is not None
@@ -3426,6 +3459,7 @@ class RDTSteer:
                 n_trunc_steps=n_trunc_steps,
                 reward_mode=reward_mode,
                 shuffle_seed=shuffle_seed,
+                **({"qd_quality_contract": qd_quality_contract} if qd_quality_contract is not None else {}),
                 cfg=cfg,
                 iter_idx=iter_idx,
                 diversity_scale_override=diversity_scale_override,
@@ -3439,6 +3473,7 @@ class RDTSteer:
             n_trunc_steps=n_trunc_steps,
             reward_mode=reward_mode,
             shuffle_seed=shuffle_seed,
+            **({"qd_quality_contract": qd_quality_contract} if qd_quality_contract is not None else {}),
             cfg=cfg,
         )
 
@@ -3454,6 +3489,7 @@ class RDTSteer:
         reward_mode: str = "normal",
         shuffle_seed: int = 0,
         cfg: Optional[_EDSConfig] = None,
+        qd_quality_contract: ExecutedPrefixContract | None = None,
     ) -> tuple[Tensor, Tensor, dict]:
         x_t = self._eds_denoise_noisy_population(
             cond=cond,
@@ -3467,6 +3503,7 @@ class RDTSteer:
             guidance_fns=guidance_fns,
             reward_mode=reward_mode,
             shuffle_seed=shuffle_seed,
+            **({"qd_quality_contract": qd_quality_contract} if qd_quality_contract is not None else {}),
         )
         info = {**self._eds_empty_rollout_diversity_info(cfg), **info}
         return x_t, costs, info
@@ -3568,6 +3605,7 @@ class RDTSteer:
         reward_mode: str,
         shuffle_seed: int,
         attempted_diversity_scale: float | None = None,
+        qd_quality_contract: ExecutedPrefixContract | None = None,
     ) -> tuple[Tensor, Tensor, dict]:
         detail = []
         if step_idx is not None:
@@ -3589,6 +3627,7 @@ class RDTSteer:
             n_trunc_steps=n_trunc_steps,
             reward_mode=reward_mode,
             shuffle_seed=shuffle_seed,
+            **({"qd_quality_contract": qd_quality_contract} if qd_quality_contract is not None else {}),
             cfg=cfg,
         )
         info["rollout_diversity_mode"] = cfg.truncated_rollout_mode
@@ -3612,6 +3651,7 @@ class RDTSteer:
         cfg: _EDSConfig,
         iter_idx: int,
         diversity_scale_override: float | None = None,
+        qd_quality_contract: ExecutedPrefixContract | None = None,
     ) -> tuple[Tensor, Tensor, dict]:
         scheduler = self._noise_scheduler
         self._increment_compute("denoising_invocations")
@@ -3659,6 +3699,7 @@ class RDTSteer:
                 n_trunc_steps=n_trunc_steps,
                 reward_mode=reward_mode,
                 shuffle_seed=shuffle_seed,
+                **({"qd_quality_contract": qd_quality_contract} if qd_quality_contract is not None else {}),
                 attempted_diversity_scale=actual_scale,
             )
 
@@ -3695,6 +3736,7 @@ class RDTSteer:
                         n_trunc_steps=n_trunc_steps,
                         reward_mode=reward_mode,
                         shuffle_seed=shuffle_seed,
+                        **({"qd_quality_contract": qd_quality_contract} if qd_quality_contract is not None else {}),
                         attempted_diversity_scale=actual_scale,
                     )
                 if not torch.isfinite(div_grad).all():
@@ -3712,6 +3754,7 @@ class RDTSteer:
                         n_trunc_steps=n_trunc_steps,
                         reward_mode=reward_mode,
                         shuffle_seed=shuffle_seed,
+                        **({"qd_quality_contract": qd_quality_contract} if qd_quality_contract is not None else {}),
                         attempted_diversity_scale=actual_scale,
                     )
                 masked_div = self._mask_guidance_gradient(div_grad).to(
@@ -3744,6 +3787,7 @@ class RDTSteer:
                     n_trunc_steps=n_trunc_steps,
                     reward_mode=reward_mode,
                     shuffle_seed=shuffle_seed,
+                    **({"qd_quality_contract": qd_quality_contract} if qd_quality_contract is not None else {}),
                     attempted_diversity_scale=actual_scale,
                 )
             x_t = self._counted_scheduler_step(scheduler, model_output, t, x_t).prev_sample.to(dtype=noisy_action.dtype)
@@ -3764,6 +3808,7 @@ class RDTSteer:
                     n_trunc_steps=n_trunc_steps,
                     reward_mode=reward_mode,
                     shuffle_seed=shuffle_seed,
+                    **({"qd_quality_contract": qd_quality_contract} if qd_quality_contract is not None else {}),
                     attempted_diversity_scale=actual_scale,
                 )
 
@@ -3777,6 +3822,7 @@ class RDTSteer:
             guidance_fns=guidance_fns,
             reward_mode=reward_mode,
             shuffle_seed=shuffle_seed,
+            **({"qd_quality_contract": qd_quality_contract} if qd_quality_contract is not None else {}),
         )
         info.update(score_info)
         info["rollout_diversity_enabled"] = steps_applied > 0
@@ -4740,6 +4786,13 @@ class RDTSteer:
         current_stage: int,
     ) -> Tensor:
         cfg = eds_config
+        quality_contract = None
+        quality_reason = "provider_mode"
+        if cfg.qd_quality_mode == "executed_prefix_v1":
+            if self._action_chunk_horizon != 8:
+                raise ValueError("Executed-prefix quality requires action_chunk_horizon=8")
+            quality_contract, quality_reason = recognize_executed_prefix_provider(guidance_fns, keypoints)
+        quality_kwargs = ({"qd_quality_contract": quality_contract} if quality_contract is not None else {})
         execution_intent = cfg.qd_descriptor == EXECUTION_INTENT_DESCRIPTOR
         if execution_intent and self._action_chunk_horizon != 8:
             raise ValueError("Execution-intent QD requires action_chunk_horizon=8")
@@ -4767,6 +4820,12 @@ class RDTSteer:
             search_schedule_mode=cfg.search_schedule_mode,
             adaptive_rbf_enabled=adaptive_rbf_enabled,
         )
+        metrics.qd_quality_mode = cfg.qd_quality_mode
+        metrics.qd_quality_reason = quality_reason
+        metrics.qd_quality_applicable = quality_contract is not None
+        if quality_contract is not None:
+            metrics.qd_quality_target_index = quality_contract.target_index
+            metrics.qd_quality_identity = dict(quality_contract.identity)
         metrics.initial_diversity_descriptor_mode = cfg.initial_diversity_descriptor_mode
         metrics.rollout_diversity_descriptor_mode = cfg.rollout_diversity_descriptor_mode
         metrics.direction_rbf_weights = [
@@ -4863,6 +4922,7 @@ class RDTSteer:
                 guidance_fns=guidance_fns,
                 reward_mode=cfg.reward_mode,
                 shuffle_seed=cfg.shuffle_seed,
+                **quality_kwargs,
             )
         else:
             population_scores = precomputed_population_scores
@@ -4877,15 +4937,39 @@ class RDTSteer:
         qd_initial_bounds: QDBounds | None = None
         qd_initial_artifact: dict = {}
 
+        def original_rewards(info, rewards, candidates=None):
+            raw = info.get("raw_rewards")
+            if not torch.is_tensor(raw) or raw.shape != rewards.shape or raw.dtype != rewards.dtype or raw.device != rewards.device:
+                raise RuntimeError("N2 canonical original reward association missing or invalid")
+            if not torch.isfinite(raw).all():
+                raise FloatingPointError("N2 canonical original reward is nonfinite")
+            if candidates is not None:
+                scored = info.get("qd_scored_actions")
+                if not torch.is_tensor(scored) or scored.dtype != candidates.dtype or not torch.equal(scored, candidates):
+                    raise RuntimeError("N2 canonical action/raw identity association changed")
+            return raw
+
         def record_shadow_qd_candidates(
             iter_idx: int,
             candidates: Tensor,
             rewards: Tensor,
         ) -> None:
+            extra = {}
+            if quality_contract is not None:
+                raw = original_rewards(population_info, rewards, candidates)
+                extra = {"raw_provider_quality": raw, "quality_mode": cfg.qd_quality_mode}
+                metrics.qd_quality_changed_candidates += int((raw != rewards).sum().item())
+                best_raw = float(raw.max().item())
+                metrics.qd_best_observed_raw_reward = (best_raw if metrics.qd_best_observed_raw_reward is None
+                                                     else max(best_raw, metrics.qd_best_observed_raw_reward))
+                metrics.qd_quality_batches.append({"iter_idx": int(iter_idx),
+                    "raw_provider_quality": raw.detach().float().cpu().tolist(),
+                    "quality": rewards.detach().float().cpu().tolist(),
+                    "fingerprints": [fingerprint_action(action) for action in candidates]})
             evidence = getattr(self, "_decision_evidence", None)
             if evidence is not None:
                 evidence.record("canonical_candidate_batch", iter_idx=int(iter_idx),
-                                candidates=candidates, effective_quality=rewards)
+                                candidates=candidates, effective_quality=rewards, **extra)
             if not cfg.qd_metrics_observer:
                 return
             descriptors = describe_qd(candidates)
@@ -4939,6 +5023,7 @@ class RDTSteer:
                 descriptors=initial_descriptors,
                 cell_ids=initial_cell_ids,
                 source_iter=-1,
+                **({"raw_rewards": original_rewards(population_info, population_rewards, population)} if quality_contract is not None else {}),
             )
             metrics.qd_archive_update_latency_s += float(
                 time.perf_counter() - qd_update_start
@@ -5199,6 +5284,7 @@ class RDTSteer:
                         parent_cell_ids=allocation.parent_cell_ids,
                         parent_rewards=allocation.parent_rewards,
                         parent_costs=allocation.parent_costs,
+                        **({"parent_raw_rewards": allocation.parent_raw_rewards} if quality_contract is not None else {}),
                         slot_counts=allocation.slot_counts, weights=allocation.weights,
                         sparse_slot_counts=allocation.sparse_slot_counts,
                         secondary_slot_counts=allocation.secondary_slot_counts,
@@ -5657,6 +5743,7 @@ class RDTSteer:
                 "shuffle_seed": cfg.shuffle_seed,
                 "cfg": cfg,
                 "iter_idx": i,
+                **quality_kwargs,
             }
             if controller_decision is not None:
                 rollout_kwargs["diversity_scale_override"] = controller_decision.scale
@@ -5819,6 +5906,7 @@ class RDTSteer:
                     guidance_fns=guidance_fns,
                     reward_mode=cfg.reward_mode,
                     shuffle_seed=cfg.shuffle_seed,
+                    **quality_kwargs,
                 )
                 population_scores = self._eds_validate_population_scores(
                     population_scores,
@@ -5913,6 +6001,7 @@ class RDTSteer:
                     cell_ids=child_cell_ids,
                     source_iter=i,
                     parent_cell_ids=qd_parent_cell_ids,
+                    **({"raw_rewards": original_rewards(population_info, population_rewards, population)} if quality_contract is not None else {}),
                 )
                 metrics.qd_archive_update_latency_s += float(
                     time.perf_counter() - qd_update_start
@@ -6491,6 +6580,8 @@ class RDTSteer:
                 qd_final_cells,
             ) = qd_archive.elite_tensors()
             population_info = {"rewards": population_rewards}
+            if quality_contract is not None:
+                population_info["raw_rewards"] = qd_archive.elite_raw_rewards()
             chunk_population_sources = ("qd_archive",) * int(population.shape[0])
             selected_cell, selected_entry = qd_archive.select_global_best()
             matches = torch.nonzero(
@@ -6524,11 +6615,22 @@ class RDTSteer:
         metrics.selected_idx = best_idx
         metrics.selected_cost = float(population_scores[best_idx].detach().cpu().item())
         metrics.selected_reward = float(final_rewards[best_idx].detach().cpu().item())
+        stage_raw_rewards = None
+        if quality_contract is not None:
+            quality_contract.validate(guidance_fns)
+            stage_raw_rewards = original_rewards(population_info, final_rewards, None if qd_archive is not None else population)
+            metrics.qd_selected_raw_reward = float(stage_raw_rewards[best_idx].item())
+            metrics.qd_final_best_raw_reward = float(stage_raw_rewards.max().item())
+            metrics.qd_selected_raw_gap = metrics.qd_selected_raw_reward - metrics.qd_final_best_raw_reward
         evidence = getattr(self, "_decision_evidence", None)
         if evidence is not None:
             evidence.record("final_selection", population=population, selected_latent=selected,
                             selected_index=best_idx, selected_quality=metrics.selected_reward,
                             selected_cost=metrics.selected_cost,
+                            **({"quality_mode": cfg.qd_quality_mode,
+                                "raw_provider_quality": stage_raw_rewards,
+                                "selected_raw_provider_quality": metrics.qd_selected_raw_reward}
+                               if quality_contract is not None else {}),
                             selected_fingerprint=metrics.qd_selected_action_fingerprint,
                             selected_cell=metrics.qd_selected_cell,
                             selection_rule="archive_global_best" if qd_archive is not None else "cost_argmin")
@@ -6880,10 +6982,12 @@ class RDTSteer:
             )
         else:
             self._last_eds_mechanism_trace = None
-        self._eds_update_guidance_metadata_from_cost(
-            population_scores[best_idx],
-            population_scores,
-        )
+        if stage_raw_rewards is not None:
+            self._eds_update_guidance_metadata_from_cost(-stage_raw_rewards[best_idx], -stage_raw_rewards)
+        else:
+            self._eds_update_guidance_metadata_from_cost(
+                population_scores[best_idx], population_scores,
+            )
         ordered_candidates = self._eds_order_candidates_by_cost(population, population_scores)
         self._last_visualization_action_candidates = self._decode_visualization_action_candidates(
             ordered_candidates
@@ -7360,6 +7464,7 @@ class RDTSteer:
                 "adaptive_reward_improvement_eps",
             ),
             qd_archive_mode=str(cfg.get("qd_archive_mode", "none")),
+            qd_quality_mode=str(cfg.get("qd_quality_mode", "provider")),
             qd_degenerate_fallback_policy=str(
                 cfg.get("qd_degenerate_fallback_policy", "none")
             ),
@@ -7597,6 +7702,25 @@ class RDTSteer:
         _validate_direction_rbf_config(resolved.__dict__)
         if resolved.qd_archive_mode not in {"none", "grid_archive"}:
             raise ValueError("EDS qd_archive_mode must be one of none, grid_archive")
+        if resolved.qd_quality_mode not in {"provider", "executed_prefix_v1"}:
+            raise ValueError("EDS qd_quality_mode must be provider or executed_prefix_v1")
+        if resolved.qd_quality_mode == "executed_prefix_v1":
+            required_quality = {
+                "reward_mode": "normal", "qd_descriptor": "target_relative_endpoint_xy",
+                "qd_grid_shape": (4, 4), "qd_cell_capacity": 1,
+                "qd_bounds_update_policy": "fixed_initial", "qd_global_quality_anchor_count": 0,
+                "qd_secondary_lane_mode": "none", "qd_degenerate_fallback_policy": "none",
+                "population_size": 16, "cem_iters": 10, "use_cem": False,
+                "elite_carryover_count": 0, "chunk_population_mode": "fresh",
+                "chunk_memory_fraction": 0.0, "search_schedule_mode": "legacy_linear",
+            }
+            if resolved.qd_archive_mode == "grid_archive":
+                required_quality.update({"qd_parent_sampling": "sparse_priority",
+                    "qd_bounds_quantiles": (0.05, 0.95), "qd_bounds_expand_fraction": 0.1,
+                    "qd_min_axis_span_m": 0.08})
+            for name, expected in required_quality.items():
+                if getattr(resolved, name) != expected:
+                    raise ValueError(f"Executed-prefix quality requires {name}={expected!r}")
         if resolved.qd_degenerate_fallback_policy not in {"none", "control_v1"}:
             raise ValueError(
                 "EDS qd_degenerate_fallback_policy must be none or control_v1"

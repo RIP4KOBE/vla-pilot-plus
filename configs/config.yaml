@@ -121,6 +121,7 @@ main:
     qd_archive_mode: none
     qd_degenerate_fallback_policy: none
     qd_descriptor: target_relative_endpoint_xy
+    qd_quality_mode: provider
     qd_grid_shape: [4, 4]
     qd_cell_capacity: 1
     qd_secondary_lane_mode: none
