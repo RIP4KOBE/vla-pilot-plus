@@ -1,0 +1,15 @@
+{
+  "basis": "coordinator-provided public failure fields; source-only; no episode payload read",
+  "new_execution_authorized": false,
+  "original_cohort_retry_eligible": false,
+  "protected_promotion_possible_for_original_matrix": false,
+  "review_sha256": "3946300583fd8155b96ee8dc469786c9d72d1aeecae4a4764d50acec1694414a",
+  "schema": "n4-frozen-transport-cost-source-review-v1",
+  "source_head": "dd156490bf7a526b9af93f5db6c38e3667344a3c",
+  "sources": {
+    "docs/01_specs/2026-09-21-rdt-qd-ed-autoresearch-execution-prompt.md": "3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef",
+    "experiments/iteration_004_terminal_population/protocol.md": "b8562e3f9fffc77efc803c6b056441f7b426333a97eb176b52fdb0fe42088db2",
+    "scripts/qd_ed_final_runner.py": "eefdc47589ac69436562bac52ec774319ecf72c65007c596d25e61f8f42c4ee8",
+    "scripts/qd_ed_n4_plan.py": "e5a6fd6e084a0748d786a0baec4472507d5ba61384696023b76a0099c05c59e9"
+  }
+}
