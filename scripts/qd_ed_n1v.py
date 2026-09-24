@@ -27,12 +27,21 @@ N1Y_AUTH_SHA = '495bd36ebece8d659d134544020409bc57c3d8fd42993abc7dee5e3518e49edf
 N1Y_CONTRACT = {**N1X_CONTRACT, 'schema': 'qd-ed-n1y-timeout-recovery-v1',
                 'iteration': 'N1Y', 'authorization_sha256': N1Y_AUTH_SHA,
                 'failure_detail': 'n1y_stage_timeout'}
+N1Z_AUTH_SHA = '3a0849094437d9aaa6cac68bdb2e5c27cb2a0aa824de45cb58dc1542b6dc942f'
+N1Z_CONTRACT = {**N1Y_CONTRACT, 'schema': 'qd-ed-n1z-timeout-recovery-v1',
+                'iteration': 'N1Z', 'authorization_sha256': N1Z_AUTH_SHA,
+                'failure_detail': 'n1z_stage_timeout'}
 
 
 def settings(iteration):
     """Separate immutable authorities; never infer one cohort's policy from another."""
-    if iteration not in {'N1V', 'N1W', 'N1X', 'N1Y'}:
+    if iteration not in {'N1V', 'N1W', 'N1X', 'N1Y', 'N1Z'}:
         return None
+    if iteration == 'N1Z':
+        return {'iteration': 'N1Z', 'key': 'n1z', 'sha': N1Z_AUTH_SHA,
+                'caps': N1W_CAPS, 'contract': N1Z_CONTRACT, 'limit': 5,
+                'limit_word': 'five',
+                'condition': 'codex_login_luna_low_json_transport_fallback_preturn_multiline_90s_v3'}
     if iteration == 'N1Y':
         return {'iteration': 'N1Y', 'key': 'n1y', 'sha': N1Y_AUTH_SHA,
                 'caps': N1W_CAPS, 'contract': N1Y_CONTRACT, 'limit': 5,
@@ -55,7 +64,7 @@ def settings(iteration):
 
 
 def budget_authority(budget, read_json, digest, require, *, legacy_caps):
-    present = [name for name in ('N1V', 'N1W', 'N1X', 'N1Y') if budget.get(name.lower() + '_authorization') is not None]
+    present = [name for name in ('N1V', 'N1W', 'N1X', 'N1Y', 'N1Z') if budget.get(name.lower() + '_authorization') is not None]
     require(len(present) <= 1, 'multiple active bounded-cohort budget authorities')
     if not present:
         return 240, legacy_caps
@@ -74,15 +83,15 @@ def budget_authority(budget, read_json, digest, require, *, legacy_caps):
 
 def validate_contract(r, plan, state):
     iterations = {row.get('iteration') for row in plan.get('episodes', [])}
-    registered = iterations & {'N1V', 'N1W', 'N1X', 'N1Y'}
-    present = [name for name in ('N1V', 'N1W', 'N1X', 'N1Y') if plan.get(name.lower() + '_recovery') is not None]
+    registered = iterations & {'N1V', 'N1W', 'N1X', 'N1Y', 'N1Z'}
+    present = [name for name in ('N1V', 'N1W', 'N1X', 'N1Y', 'N1Z') if plan.get(name.lower() + '_recovery') is not None]
     if not registered and not present:
         return
     r.require(len(iterations) == len(registered) == len(present) == 1
               and present[0] in registered, 'bounded cohort requires one explicit matching iteration')
     cfg = settings(present[0]); label = cfg['iteration']; key = cfg['key']
     r.require(plan.get(key + '_recovery') == cfg['contract'], f'{label} requires its exact prospective recovery contract')
-    if label in {'N1X', 'N1Y'}:
+    if label in {'N1X', 'N1Y', 'N1Z'}:
         r.require(plan.get('stage_schedule') == {'min_query_gap_steps': 32, 'max_queries': 14},
                   'N1X Stage schedule changed')
     ceiling, _ = budget_authority(state['budget'], r.read_json, r.digest, r.require, legacy_caps=r.BUCKETS)
@@ -111,6 +120,9 @@ def validate_transport_binding(r, plan, runtime):
     if runtime.get('frozen_stage_provider', {}).get('event_policy') == 'completed_transport_fallback_preturn_v2':
         r.require(all(row.get('iteration') == 'N1Y' for row in plan['episodes']),
                   'pre-turn transport fallback acceptance requires N1Y')
+    if runtime.get('frozen_stage_provider', {}).get('event_policy') == 'completed_transport_fallback_preturn_multiline_v3':
+        r.require(all(row.get('iteration') == 'N1Z' for row in plan['episodes']),
+                  'multiline pre-turn transport fallback acceptance requires N1Z')
 
 
 def check_retry(groups, row, identity, require):

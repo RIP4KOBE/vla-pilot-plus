@@ -78,6 +78,9 @@ def _safe_error_diagnostic(message):
         "http_status_codes": sorted({int(match) for match in re.findall(
             r"(?:\bHTTP(?:/\d(?:\.\d)?)?\s+(?:error\s+)?|\bstatus(?:\s+code)?\s*[=:]?\s+)([45]\d{2})\b",
             sample, re.IGNORECASE)}),
+        "known_transport_prefix": message.startswith(TRANSPORT_FALLBACK_PREFIX),
+        "contains_line_break": any(char in message for char in ("\r", "\n")),
+        "contains_nul": "\x00" in message,
     }
 
 
@@ -214,7 +217,8 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         transport_fallbacks = []
         completed = False
         fallback_policy = self.event_policy in {
-            "completed_transport_fallback_v1", "completed_transport_fallback_preturn_v2"}
+            "completed_transport_fallback_v1", "completed_transport_fallback_preturn_v2",
+            "completed_transport_fallback_preturn_multiline_v3"}
         for event_index, event in enumerate(events):
             kind = event.get("type")
             event_types.append(kind if isinstance(kind, str) else "invalid")
@@ -254,8 +258,12 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                     and kind == "item.completed" and item_kind == "error"
                     and isinstance(message, str) and message.startswith(TRANSPORT_FALLBACK_PREFIX)
                     and len(TRANSPORT_FALLBACK_PREFIX) < len(message) <= 2048
-                    and not any(char in message for char in ("\x00", "\r", "\n"))
-                    and (starts == 1 or (self.event_policy == "completed_transport_fallback_preturn_v2"
+                    and (not any(char in message for char in ("\x00", "\r", "\n"))
+                         if self.event_policy != "completed_transport_fallback_preturn_multiline_v3"
+                         else not any(ord(char) < 32 and char not in "\t\r\n" for char in message))
+                    and (starts == 1 or (self.event_policy in {
+                         "completed_transport_fallback_preturn_v2",
+                         "completed_transport_fallback_preturn_multiline_v3"}
                          and starts == 0 and thread_starts == 1 and event_index == 1))
                     and not completed and not messages and not transport_fallbacks)
                 if fallback:
@@ -294,7 +302,8 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                     "maximum": int(match[2]) if reconnect else None,
                 })
                 if not (self.event_policy in {"completed_reconnect_v1", "completed_transport_fallback_v1",
-                                              "completed_transport_fallback_preturn_v2"} and reconnect
+                                              "completed_transport_fallback_preturn_v2",
+                                              "completed_transport_fallback_preturn_multiline_v3"} and reconnect
                         and starts == 1 and not completed and not messages):
                     error_code = "codex_unexpected_event"
             else:
@@ -315,7 +324,8 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         )
         if fallback_policy:
             self._call_transport['transport_fallback_notices'] = transport_fallbacks
-        if self.event_policy == "completed_transport_fallback_preturn_v2" and thread_starts != 1:
+        if self.event_policy in {"completed_transport_fallback_preturn_v2",
+                                 "completed_transport_fallback_preturn_multiline_v3"} and thread_starts != 1:
             error_code = "codex_expected_one_thread"
         if starts == complete_turns == len(usages) == 1 and stream_error is None:
             self.api_request_counter.values["usage_complete_calls"] += 1

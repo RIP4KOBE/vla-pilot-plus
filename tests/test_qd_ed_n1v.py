@@ -326,6 +326,16 @@ def test_n1y_preturn_binding_is_new_and_cannot_be_used_for_n1x():
         p.validate_transport_binding(r, {'episodes': [{'iteration': 'N1X'}]}, runtime)
 
 
+def test_n1z_multiline_binding_is_new_and_cannot_be_used_for_n1y():
+    runtime = {'frozen_stage_provider': {'backend': 'codex_cli', 'model': 'gpt-6-luna',
+        'timeout_seconds': 90, 'output_format': 'json_schema_v1',
+        'event_policy': 'completed_transport_fallback_preturn_multiline_v3'}}
+    assert r.codex_stage_condition(runtime) == p.settings('N1Z')['condition']
+    p.validate_transport_binding(r, {'episodes': [{'iteration': 'N1Z'}]}, runtime)
+    with pytest.raises(r.GateError, match='acceptance condition'):
+        p.validate_transport_binding(r, {'episodes': [{'iteration': 'N1Y'}]}, runtime)
+
+
 def test_n1w_new_acceptance_requires_correct_cohort_and_180_seconds():
     runtime = {'frozen_stage_provider':{'output_format':'json_schema_v1',
         'event_policy':'completed_transport_fallback_v1','timeout_seconds':180}}

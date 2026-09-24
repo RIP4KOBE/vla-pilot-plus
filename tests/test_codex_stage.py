@@ -291,6 +291,42 @@ def test_preturn_fallback_accepts_one_complete_reply_without_relaxing_v1(monkeyp
     assert 'private detail' not in json.dumps(new.last_result)
 
 
+def test_preturn_multiline_fallback_requires_new_policy_and_complete_reply(monkeypatch, tmp_path):
+    stream = events(answer=json.dumps({'stage': 2, 'guidance': 'no', 'evidence': 'held'}))
+    notice = fallback_notice()
+    notice['item']['message'] += '\n  server response detail'
+    stream.insert(1, notice)
+    old, _ = make(monkeypatch, tmp_path, event_list=stream,
+                  output_format='json_schema_v1', event_policy='completed_transport_fallback_preturn_v2')
+    assert identify(old) == (1, True)
+    assert old.last_result['error'] == 'codex_unexpected_item'
+    new, calls = make(monkeypatch, tmp_path, event_list=stream,
+                      output_format='json_schema_v1',
+                      event_policy='completed_transport_fallback_preturn_multiline_v3')
+    assert identify(new) == (2, False)
+    assert len(calls) == new.last_result['codex_usage_complete_calls'] == 1
+    assert new.last_result['transport']['error_diagnostics'][0]['contains_line_break'] is True
+    assert new.last_result['transport']['error_diagnostics'][0]['known_transport_prefix'] is True
+    assert 'server response detail' not in json.dumps(new.last_result)
+
+
+@pytest.mark.parametrize('message', [
+    'unrelated provider error',
+    module.TRANSPORT_FALLBACK_PREFIX,
+    module.TRANSPORT_FALLBACK_PREFIX + 'error\x00secret',
+    module.TRANSPORT_FALLBACK_PREFIX + 'error\x01secret',
+])
+def test_preturn_multiline_rejects_unrelated_or_control_items(monkeypatch, tmp_path, message):
+    stream = events(answer=json.dumps({'stage': 2, 'guidance': 'no', 'evidence': 'held'}))
+    notice = fallback_notice()
+    notice['item']['message'] = message
+    stream.insert(1, notice)
+    recognizer, _ = make(monkeypatch, tmp_path, event_list=stream,
+        output_format='json_schema_v1', event_policy='completed_transport_fallback_preturn_multiline_v3')
+    assert identify(recognizer) == (1, True)
+    assert recognizer.last_result['error'] == 'codex_unexpected_item'
+
+
 @pytest.mark.parametrize('change', ['before_thread', 'duplicate', 'unknown', 'missing_usage',
                                      'missing_completion', 'nonzero', 'second_turn', 'tool_item'])
 def test_preturn_fallback_still_rejects_other_error_or_incomplete_turn(monkeypatch, tmp_path, change):

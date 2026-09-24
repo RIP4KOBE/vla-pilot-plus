@@ -57,7 +57,8 @@ def public_invocation_policy(*, model, reasoning_effort, timeout_seconds, cli_pa
     if output_format not in {"legacy_text", "json_schema_v1"}:
         raise ValueError("Unknown Codex Stage output format")
     if event_policy not in {"strict_v1", "completed_reconnect_v1", "completed_transport_fallback_v1",
-                            "completed_transport_fallback_preturn_v2"}:
+                            "completed_transport_fallback_preturn_v2",
+                            "completed_transport_fallback_preturn_multiline_v3"}:
         raise ValueError("Unknown Codex Stage event policy")
     if event_policy != "strict_v1" and output_format != "json_schema_v1":
         raise ValueError("Reconnect policy requires structured output")
@@ -113,7 +114,8 @@ def public_invocation_policy(*, model, reasoning_effort, timeout_seconds, cli_pa
             "explicit_numbered_reconnecting_notice_inside_single_turn_then_"
             "one_complete_usage_one_schema_message_exit_zero_no_other_error"
         )
-    if event_policy in {"completed_transport_fallback_v1", "completed_transport_fallback_preturn_v2"}:
+    if event_policy in {"completed_transport_fallback_v1", "completed_transport_fallback_preturn_v2",
+                        "completed_transport_fallback_preturn_multiline_v3"}:
         policy["transport_fallback_acceptance"] = {
             "exact_notice_prefix": TRANSPORT_FALLBACK_PREFIX,
             "maximum_notice_characters": 2048,
@@ -121,8 +123,12 @@ def public_invocation_policy(*, model, reasoning_effort, timeout_seconds, cli_pa
             "event_type": "item.completed",
             "item_type": "error",
             "position": ("after_single_thread_start_before_turn_start_or_inside_single_turn_before_reply"
-                         if event_policy == "completed_transport_fallback_preturn_v2" else
+                         if event_policy in {"completed_transport_fallback_preturn_v2",
+                                             "completed_transport_fallback_preturn_multiline_v3"} else
                          "inside_single_turn_before_agent_message_and_completion"),
+            "line_break_policy": ("bounded_suffix_may_contain_cr_lf_no_other_controls"
+                                  if event_policy == "completed_transport_fallback_preturn_multiline_v3" else
+                                  "no_line_breaks"),
             "required_completion": "one_schema_message_then_one_usage_exit_zero_no_other_error",
             "new_application_invocations": 0,
         }
