@@ -44,6 +44,54 @@ class CodexStageError(RuntimeError):
     """Fixed public error codes: never include CLI stderr or environment data."""
 
 
+_MAX_DIAGNOSTIC_BYTES = 64 * 1024
+_DIAGNOSTIC_PATTERNS = {
+    "stream_disconnected": r"stream disconnected",
+    "connection_reset": r"connection reset|broken pipe",
+    "connection_refused": r"connection refused",
+    "timeout": r"timed out|timeout",
+    "dns_resolution": r"dns error|failed to resolve|name resolution",
+    "tls_error": r"tls error|certificate verify failed|invalid peer certificate",
+    "rate_limited": r"rate.limit|too many requests",
+    "quota_exhausted": r"quota exceeded|quota exhausted|insufficient_quota|usage limit",
+    "authentication_failed": r"unauthorized|authentication failed|invalid.api.key",
+    "permission_denied": r"permission denied|forbidden",
+    "service_unavailable": r"service unavailable|internal server error|bad gateway",
+    "websocket": r"websocket",
+    "transport_fallback": r"falling back|fallback",
+}
+
+
+def _safe_error_diagnostic(message):
+    """Report text markers and hashes, never raw messages or inferred root causes."""
+    if not isinstance(message, str):
+        return {"message_present": False, "signals": [], "http_status_codes": []}
+    encoded = message.encode(errors="replace")
+    sample = encoded[:_MAX_DIAGNOSTIC_BYTES].decode(errors="replace")
+    return {
+        "message_present": True,
+        "message_sha256": hashlib.sha256(encoded).hexdigest(),
+        "message_length": len(message),
+        "classification_truncated": len(encoded) > _MAX_DIAGNOSTIC_BYTES,
+        "signals": [name for name, pattern in _DIAGNOSTIC_PATTERNS.items()
+                    if re.search(pattern, sample, re.IGNORECASE)],
+        "http_status_codes": sorted({int(match) for match in re.findall(
+            r"(?:\bHTTP(?:/\d(?:\.\d)?)?\s+(?:error\s+)?|\bstatus(?:\s+code)?\s*[=:]?\s+)([45]\d{2})\b",
+            sample, re.IGNORECASE)}),
+    }
+
+
+def _stderr_diagnostic(stream):
+    stream.seek(0)
+    raw = stream.read(_MAX_DIAGNOSTIC_BYTES + 1)
+    sample = raw[:_MAX_DIAGNOSTIC_BYTES]
+    result = _safe_error_diagnostic(sample.decode(errors="replace"))
+    # The diagnostic is explicitly a bounded prefix, not the whole stderr.
+    result.update(bytes_examined=len(sample), truncated=len(raw) > len(sample),
+                  sample_sha256=hashlib.sha256(sample).hexdigest())
+    return result
+
+
 def _stop_owned_process(process):
     """Terminate only this child and its descendants, staying in runner's group."""
     try:
@@ -94,6 +142,7 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                                   else discover_disabled_skill_paths()),
         )
         self.transport_metadata = {
+            "diagnostics_version": "redacted_cli_v1",
             "backend": "codex_cli", "auth_mode": "chatgpt", "model": self.model,
             "reasoning_effort": self.reasoning_effort,
             "timeout_seconds": self.timeout_seconds, "cli_path": self.cli_path,
@@ -160,6 +209,7 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         item_types = []
         usages = []
         errors = []
+        diagnostics = []
         completed = False
         for event_index, event in enumerate(events):
             kind = event.get("type")
@@ -193,6 +243,9 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                 item_types.append(item_kind if isinstance(item_kind, str) else "invalid")
                 if item_kind not in ("agent_message", "reasoning"):
                     error_code = "codex_unexpected_item"
+                if item_kind == "error":
+                    diagnostics.append({"event_index": event_index, "source": "error_item",
+                                        **_safe_error_diagnostic(item.get("message"))})
                 if item_kind == "agent_message" and kind == "item.completed":
                     text = item.get("text")
                     if not isinstance(text, str) or not text.strip():
@@ -201,6 +254,8 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                         messages.append(text.strip())
             elif kind == "error":
                 message = event.get("message")
+                diagnostics.append({"event_index": event_index, "source": "error_event",
+                                    **_safe_error_diagnostic(message)})
                 match = re.fullmatch(
                     r"Reconnecting\.\.\. ([1-9][0-9]{0,2})/([1-9][0-9]{0,2})(?:[ \n][^\x00]*)?",
                     message,
@@ -219,6 +274,11 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                     error_code = "codex_unexpected_event"
             elif kind not in ("thread.started",):
                 error_code = "codex_unexpected_event"
+                if kind == "turn.failed":
+                    detail = event.get("error")
+                    diagnostics.append({"event_index": event_index, "source": "turn_failed",
+                                        **_safe_error_diagnostic(detail.get("message")
+                                            if isinstance(detail, dict) else None)})
         complete_turns = sum(kind == "turn.completed" for kind in event_types)
         if len(messages) == 1:
             self._call_raw_response = messages[0]
@@ -226,6 +286,7 @@ class CodexStageRecognizer(GeminiStageRecognizer):
             event_types=event_types, item_types=item_types, observed_usage=usages,
             completed_turns=complete_turns,
             error_events=errors,
+            error_diagnostics=diagnostics,
         )
         if starts == complete_turns == len(usages) == 1 and stream_error is None:
             self.api_request_counter.values["usage_complete_calls"] += 1
@@ -287,6 +348,10 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                         raise CodexStageError("codex_unexpected_content")
                 if not 1 <= len(images) <= 2:
                     raise CodexStageError("codex_expected_one_or_two_images")
+                self._call_transport["request_fingerprint"] = {
+                    "prompt_sha256": hashlib.sha256("\n\n".join(texts).encode()).hexdigest(),
+                    "image_png_sha256": [hashlib.sha256(path.read_bytes()).hexdigest() for path in images],
+                }
                 command = self._command(directory, images)
                 with (directory / "events.jsonl").open("w+b") as events_file, (
                     directory / "stderr.txt"
@@ -307,12 +372,17 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                         if len(partial) <= _MAX_EVENTS_BYTES:
                             try:
                                 self._parse_events(partial)
-                            except CodexStageError:
-                                pass
+                            except CodexStageError as exc:
+                                self._call_transport["partial_event_validation_error"] = str(exc)
                         raise CodexStageError("codex_timeout") from None
                     except BaseException:
                         _stop_owned_process(process)
                         raise
+                    finally:
+                        try:
+                            self._call_transport["stderr_diagnostic"] = _stderr_diagnostic(error_file)
+                        except OSError:
+                            self._call_transport["stderr_diagnostic"] = {"read_failed": True}
                     events_file.seek(0)
                     self._call_transport.update(process_returncode=process.returncode,
                                                 process_timed_out=False)

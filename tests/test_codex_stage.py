@@ -1,5 +1,7 @@
 """CPU-only boundary tests for managed-login Stage calls; no live API/GPU."""
 import json
+import hashlib
+import io
 from pathlib import Path
 import subprocess
 import sys
@@ -34,7 +36,7 @@ def events(answer=ANSWER, usage=None):
 
 
 def make(monkeypatch, tmp_path, event_list=None, returncode=0, timeout=False, raw=None,
-         output_format="legacy_text", event_policy="strict_v1", timeout_seconds=90):
+         output_format="legacy_text", event_policy="strict_v1", timeout_seconds=90, stderr=b""):
     calls = []
     cli = tmp_path / "codex"
     cli.touch()
@@ -57,6 +59,8 @@ def make(monkeypatch, tmp_path, event_list=None, returncode=0, timeout=False, ra
             data = raw if raw is not None else "\n".join(json.dumps(event) for event in event_list).encode()
             kwargs["stdout"].write(data)
             kwargs["stdout"].flush()
+            kwargs["stderr"].write(stderr)
+            kwargs["stderr"].flush()
 
         def communicate(self, input=None, timeout=None):
             self.prompt = input
@@ -327,6 +331,82 @@ def test_180_second_call_uses_one_invocation_and_complete_usage(monkeypatch, tmp
     assert recognizer.last_result['codex_usage_complete_calls'] == 1
     assert recognizer.last_result['transport']['timeout_seconds'] == 180
     assert recognizer.last_result['transport']['process_timed_out'] is False
+
+
+@pytest.mark.parametrize('source', ['error_event', 'error_item', 'turn_failed'])
+def test_error_diagnostics_keep_categories_without_private_payload(monkeypatch, tmp_path, source):
+    secret = 'https://private.example/request?access_token=do-not-retain'
+    message = f'stream disconnected: unexpected status 429 Too Many Requests {secret}'
+    detail = {
+        'error_event': {'type': 'error', 'message': message},
+        'error_item': {'type': 'item.completed', 'item': {'type': 'error', 'message': message}},
+        'turn_failed': {'type': 'turn.failed', 'error': {'message': message}},
+    }[source]
+    stream = events()
+    stream.insert(2, detail)
+    recognizer, calls = make(monkeypatch, tmp_path, event_list=stream)
+    assert identify(recognizer) == (1, True)
+    result = recognizer.last_result
+    assert result['ok'] is False and result['codex_failed_calls'] == 1
+    assert result['codex_usage_complete_calls'] == 1  # valid observed usage is retained
+    diagnostic = result['transport']['error_diagnostics'][0]
+    assert diagnostic['source'] == source
+    assert diagnostic['http_status_codes'] == [429]
+    assert diagnostic['signals'] == ['stream_disconnected', 'rate_limited']
+    assert diagnostic['message_sha256'] == hashlib.sha256(message.encode()).hexdigest()
+    assert secret not in json.dumps(result) and 'private.example' not in json.dumps(result)
+    assert len(calls) == 1
+
+
+def test_timeout_retains_bounded_stderr_and_error_item_diagnostics(monkeypatch, tmp_path):
+    monkeypatch.setattr(module, '_stop_owned_process', lambda process: None)
+    stream = events()[:2] + [
+        {'type': 'error', 'message': 'Reconnecting... 2/5 stream disconnected'},
+        {'type': 'item.completed', 'item': {'type': 'error', 'message': 'HTTP/1.1 503 Service Unavailable private-value'}},
+    ]
+    recognizer, calls = make(monkeypatch, tmp_path, event_list=stream, timeout=True,
+        stderr=b'websocket connection reset; falling back; token=private-value',
+        output_format='json_schema_v1', event_policy='completed_reconnect_v1', timeout_seconds=180)
+    identify(recognizer)
+    result = recognizer.last_result
+    assert result['error'] == 'codex_timeout'
+    assert result['codex_usage_complete_calls'] == 0
+    transport = result['transport']
+    assert transport['partial_event_validation_error'] == 'codex_expected_one_completed_turn'
+    assert transport['error_diagnostics'][1]['http_status_codes'] == [503]
+    assert transport['stderr_diagnostic']['signals'] == ['connection_reset', 'websocket', 'transport_fallback']
+    assert 'private-value' not in json.dumps(result)
+    assert len(calls) == 1 and not Path(calls[0].kwargs['cwd']).exists()
+
+
+def test_stderr_is_diagnostic_only_and_request_fingerprints_preserve_inputs(monkeypatch, tmp_path):
+    recognizer, calls = make(monkeypatch, tmp_path, stderr=b'HTTP 503 transient warning private-value')
+    assert identify(recognizer) == (2, False)
+    result = recognizer.last_result
+    assert result['ok'] is True
+    fingerprint = result['transport']['request_fingerprint']
+    assert fingerprint['prompt_sha256'] == hashlib.sha256(calls[0].prompt.encode()).hexdigest()
+    expected = []
+    for pixels in calls[0].images:
+        stream = io.BytesIO(); Image.fromarray(pixels).save(stream, format='PNG')
+        expected.append(hashlib.sha256(stream.getvalue()).hexdigest())
+    assert fingerprint['image_png_sha256'] == expected
+    assert result['transport']['stderr_diagnostic']['http_status_codes'] == [503]
+    assert 'private-value' not in json.dumps(result)
+
+
+def test_stderr_capture_is_bounded_and_does_not_mask_call_on_io_error(monkeypatch, tmp_path):
+    prefix = b'x' * module._MAX_DIAGNOSTIC_BYTES
+    diagnostic = module._stderr_diagnostic(io.BytesIO(prefix + b' HTTP 401 private-value'))
+    assert diagnostic['truncated'] is True
+    assert diagnostic['bytes_examined'] == module._MAX_DIAGNOSTIC_BYTES
+    assert diagnostic['sample_sha256'] == hashlib.sha256(prefix).hexdigest()
+    assert diagnostic['http_status_codes'] == []
+    assert 'private-value' not in json.dumps(diagnostic)
+    monkeypatch.setattr(module, '_stderr_diagnostic', lambda stream: (_ for _ in ()).throw(OSError('private-value')))
+    recognizer, _ = make(monkeypatch, tmp_path)
+    assert identify(recognizer) == (2, False)
+    assert recognizer.last_result['transport']['stderr_diagnostic'] == {'read_failed': True}
 
 
 def test_malformed_stream_does_not_drop_observed_prior_usage(monkeypatch, tmp_path):
