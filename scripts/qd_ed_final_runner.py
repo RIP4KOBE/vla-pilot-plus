@@ -399,6 +399,11 @@ def build_command(plan, manifest, runtime, row, attempt_id):
         require(all(key not in values or values[key] == value for key, value in provider_values.items()),
                 'static/runtime Codex provider binding differs')
     values.update(provider_values)
+    if row.get('iteration') == 'N1X':
+        require(plan.get('stage_schedule') == {'min_query_gap_steps': 32, 'max_queries': 14},
+                'N1X Stage scheduler contract changed')
+        values['main.vlm_query_limit'] = 14
+        values['+main.stage_min_query_gap_steps'] = 32
     # Explicit per-episode policy RNG replaces historical run seed 0. All arms
     # use this new contract; this is not replay of the sequential historic RNG.
     values['seed'] = row['policy_seed']
@@ -497,6 +502,10 @@ def codex_stage_condition(runtime):
     require(event_policy in {'strict_v1', 'completed_reconnect_v1', 'completed_transport_fallback_v1'}, 'unknown frozen Stage event policy')
     timeout = frozen.get('timeout_seconds', 90)
     require(type(timeout) is int and timeout in {90, 180}, 'unknown frozen Stage timeout')
+    if frozen.get('model') == 'gpt-6-luna':
+        require(mode == 'json_schema_v1' and timeout == 90 and event_policy == 'completed_transport_fallback_v1',
+                'Luna Stage requires structured 90-second transport fallback contract')
+        return 'codex_login_luna_low_json_transport_fallback_90s_v1'
     if event_policy == 'completed_transport_fallback_v1':
         require(mode == 'json_schema_v1' and timeout == 180, 'transport fallback policy requires structured 180-second contract')
         return 'codex_login_astra_low_json_transport_fallback_180s_v1'
@@ -519,7 +528,7 @@ def stage_overrides(runtime):
     if frozen.get('backend') != 'codex_cli':
         return {}
     codex_stage_condition(runtime)
-    require(frozen.get('model') == 'gpt-6-astra' and frozen.get('auth_mode') == 'chatgpt',
+    require(frozen.get('model') in {'gpt-6-astra', 'gpt-6-luna'} and frozen.get('auth_mode') == 'chatgpt',
             'Codex Stage model/auth differs from authorized contract')
     require(frozen.get('reasoning_effort') == 'low' and type(frozen.get('timeout_seconds')) is int
             and frozen['timeout_seconds'] in {90, 180}, 'Codex Stage reasoning/timeout differs from frozen contract')
@@ -931,7 +940,9 @@ def validate_codex_stage_events(output, costs):
 def validate_resolved_identity(output, row, profile, runtime):
     output = Path(output)
     resolved=read_state(output/'.hydra/config.yaml')
-    for key,value in {**profile['static_override_values'], **stage_overrides(runtime or {}), 'seed':row['policy_seed'],
+    schedule = ({'main.vlm_query_limit': 14, 'main.stage_min_query_gap_steps': 32}
+                if row.get('iteration') == 'N1X' else {})
+    for key,value in {**profile['static_override_values'], **stage_overrides(runtime or {}), **schedule, 'seed':row['policy_seed'],
                        'main.episode_num':1,'main.episode_seed_schedule':[row['env_seed']],
                        'backend.libero.task_ids_filter':[row['task_id']],
                        'main.require_task_cache_identity':True}.items():
@@ -982,6 +993,13 @@ def validate_result(output, row, profile, runtime=None):
     validate_video(videos[0])
     metrics = validate_metric_identity(output, row, profile)
     stage_summary=stage_query_summary(output,row)
+    if row.get('iteration') == 'N1X':
+        stages = read_events(output/'eds_eval/stage_events.jsonl')
+        require(all(e.get('vlm_query_limit') == 14 and e.get('stage_min_query_gap_steps') == 32
+                    for e in stages), 'N1X Stage schedule trace mismatch')
+        actual_steps = [e['global_step'] for e in stages if e.get('query_status') != 'skipped']
+        require(len(actual_steps) <= 14 and all(b-a >= 32 for a,b in zip(actual_steps,actual_steps[1:])),
+                'N1X Stage query budget/gap violation')
     require(not stage_summary['stage_all_queries_failed'], 'all actual Stage queries failed')
     safety=read_events(output/'eds_eval/safety_events.jsonl')
     require(not any(e.get('event')=='gripper_qpos_violation' and e.get('count',0)>0 for e in safety), 'gripper qpos safety violation')

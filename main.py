@@ -1291,15 +1291,23 @@ class Main:
 
         # Query VLM if triggered (with limit check)
         vlm_query_limit = self.config.get("vlm_query_limit", 10)
+        stage_min_query_gap_steps = int(self.config.get("stage_min_query_gap_steps", 0))
+        if stage_min_query_gap_steps < 0:
+            raise ValueError("stage_min_query_gap_steps must be nonnegative")
         vlm_query_count = state.get('vlm_query_count', 0)
+        last_vlm_query_step = state.get('last_vlm_query_step')
+        stage_query_gap_active = (last_vlm_query_step is not None and
+            int(state.get('global_step', 0)) - last_vlm_query_step < stage_min_query_gap_steps)
         stage_before = state['current_stage']
         guidance_before = state['use_guidance']
         query_status = None
         skipped_reason = None
         query_result = {}
 
-        if trigger_reason and self.gemini_stage_recognizer is not None and vlm_query_count < vlm_query_limit:
+        if (trigger_reason and self.gemini_stage_recognizer is not None and
+                vlm_query_count < vlm_query_limit and not stage_query_gap_active):
             log.info(f"[Trigger] {trigger_reason} (query {vlm_query_count + 1}/{vlm_query_limit})")
+            state['last_vlm_query_step'] = int(state.get('global_step', 0))
 
             new_stage, need_guidance = self.gemini_stage_recognizer.identify_stage_and_guidance(
                 current_rgb=np.array(self.adapter.get_vlm_image()),
@@ -1342,6 +1350,9 @@ class Main:
             log.debug(f"[Trigger] {trigger_reason} (skipped, limit {vlm_query_limit} reached)")
             query_status = "skipped"
             skipped_reason = "query_limit_reached"
+        elif trigger_reason and stage_query_gap_active:
+            query_status = "skipped"
+            skipped_reason = "minimum_query_gap"
         elif trigger_reason:
             log.debug(f"[Trigger] {trigger_reason} (skipped, recognizer unavailable)")
             query_status = "skipped"
@@ -1361,6 +1372,8 @@ class Main:
                 "guidance_after": state['use_guidance'],
                 "vlm_query_count": state.get('vlm_query_count', vlm_query_count),
                 "vlm_query_limit": int(vlm_query_limit),
+                "stage_min_query_gap_steps": stage_min_query_gap_steps,
+                "last_vlm_query_step": state.get('last_vlm_query_step'),
                 "gripper_value_used": gripper_val,
                 "previous_gripper_value": state.get("previous_gripper_value"),
                 "first_gripper_value": state.get("first_gripper_value"),

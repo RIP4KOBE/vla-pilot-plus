@@ -284,6 +284,38 @@ def test_n1w_timeout_uses_new_binding_and_cannot_reclassify_old_result(tmp_path,
         p.validate_transport_binding(r,{'episodes':[episode]},runtime)
 
 
+def test_n1x_luna_timeout_is_prospective_and_usage_stays_unknown(tmp_path, timeout_case):
+    episode, profile, runtime, path, record, stage, event = timeout_case
+    episode['iteration'] = 'N1X'
+    frozen = runtime['frozen_stage_provider']
+    frozen.update(model='gpt-6-luna', timeout_seconds=90,
+                  event_policy='completed_transport_fallback_v1')
+    frozen['public_config_sha256'] = r.codex_public_config_sha256(frozen)
+    config_path = tmp_path / '.hydra/config.yaml'
+    config = yaml.safe_load(config_path.read_text())
+    for key, value in r.stage_overrides(runtime).items():
+        current = config
+        parts = key.lstrip('+').split('.')
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        current[parts[-1]] = value
+    config['main'] = {**config.get('main', {}), 'vlm_query_limit': 14,
+                      'stage_min_query_gap_steps': 32}
+    config_path.write_text(yaml.safe_dump(config))
+    for transport in (record['stage_transport'], event['transport']):
+        transport.update({k: frozen[k] for k in r.CODEX_CONFIG_KEYS})
+        transport.update(event_policy=frozen['event_policy'],
+                         public_config_sha256=frozen['public_config_sha256'])
+    path.write_text(json.dumps(record) + '\n')
+    stage.write_text(json.dumps(event) + '\n')
+    assert r.codex_stage_condition(runtime) == p.settings('N1X')['condition']
+    result = p.timeout_outcome(r, {'n1x_recovery': p.N1X_CONTRACT},
+                               tmp_path, episode, profile, runtime)
+    assert result['failure_detail'] == 'n1x_stage_timeout'
+    assert result['n1x_authorization_sha256'] == p.N1X_AUTH_SHA
+    assert result['failed_call_token_usage'] is None
+
+
 def test_n1w_new_acceptance_requires_correct_cohort_and_180_seconds():
     runtime = {'frozen_stage_provider':{'output_format':'json_schema_v1',
         'event_policy':'completed_transport_fallback_v1','timeout_seconds':180}}

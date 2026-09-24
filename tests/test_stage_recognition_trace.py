@@ -266,6 +266,8 @@ def test_stage_trigger_appends_auditable_redacted_event(tmp_path):
         "guidance_after": False,
         "vlm_query_count": 1,
         "vlm_query_limit": 10,
+        "stage_min_query_gap_steps": 0,
+        "last_vlm_query_step": 64,
         "gripper_value_used": 1.0,
         "previous_gripper_value": -1.0,
         "first_gripper_value": 0.5,
@@ -307,6 +309,22 @@ def test_stage_trigger_records_skipped_query(
     assert event["vlm_query_count"] == query_count
     assert event["stage_before"] == event["stage_after"] == 1
     assert event["guidance_before"] is event["guidance_after"] is True
+
+
+def test_stage_minimum_query_gap_skips_chatter_without_spending_call(tmp_path):
+    recognizer = _SuccessfulRecognizer("redacted")
+    runner = _runner(tmp_path, recognizer, query_limit=14)
+    runner.config["stage_min_query_gap_steps"] = 32
+    state = _trigger_state()
+    state["last_vlm_query_step"] = 48
+    state = runner._update_stage(state, 1.0, 0.8, 0.6)
+    assert recognizer.calls == 0 and state["vlm_query_count"] == 0
+    assert _read_events(tmp_path)[0]["skipped_reason"] == "minimum_query_gap"
+    state["global_step"] = 80
+    state["prev_gripper_open"] = True
+    state = runner._update_stage(state, 1.0, 0.8, 0.6)
+    assert recognizer.calls == 1 and state["vlm_query_count"] == 1
+    assert state["last_vlm_query_step"] == 80
 
 
 def test_stage_trace_write_failure_warns_without_interrupting_control_loop(
