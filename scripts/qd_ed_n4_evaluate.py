@@ -55,6 +55,7 @@ def prepare(plan,promotion_reference,events,root,runner=r):
     api=e.api(runner);plan=copy.deepcopy(plan)
     plan['n4_evaluation']['promotion_certificate']=promotion_reference
     e.reviewed_promotion(plan,events,root,api)
+    e.require_settled(events,api.read_events(Path(root)/'data/gpu-healthcheck-ledger.jsonl'),api)
     seed_path=api.owned(plan['seed_plan_path'],root)
     api.require(api.digest(seed_path)==plan['seed_plan_sha256'],'frozen seed metadata changed')
     plan['episodes']=e.rows(api.read_json(seed_path),plan['n4_evaluation']['phase'])
