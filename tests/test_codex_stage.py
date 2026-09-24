@@ -348,6 +348,56 @@ def test_exact_luna_metadata_warning_matches_live_hash_and_requires_v4(monkeypat
     assert new.last_result['transport']['error_diagnostics'][0]['signals'] == ['model_metadata_fallback']
 
 
+def combined_warning_stream():
+    stream = events(answer=json.dumps({'stage': 2, 'guidance': 'no', 'evidence': 'held'}))
+    warning = module.MODEL_METADATA_FALLBACK_TEMPLATE.format(model='gpt-6-luna')
+    stream.insert(1, {'type': 'item.completed', 'item': {'type': 'error', 'message': warning}})
+    for attempt in (2, 3, 4, 5):
+        stream.insert(len(stream) - 2, {'type': 'error',
+            'message': f'Reconnecting... {attempt}/5 (stream disconnected)'})
+    stream.insert(len(stream) - 2, fallback_notice())
+    return stream
+
+
+def test_combined_live_startup_warnings_require_v5(monkeypatch, tmp_path):
+    stream = combined_warning_stream()
+    old, _ = make(monkeypatch, tmp_path, event_list=stream, model='gpt-6-luna',
+                  output_format='json_schema_v1', event_policy='completed_known_startup_warnings_v4')
+    assert identify(old) == (1, True)
+    new, calls = make(monkeypatch, tmp_path, event_list=stream, model='gpt-6-luna',
+                      output_format='json_schema_v1', event_policy='completed_known_startup_warnings_combo_v5')
+    assert identify(new) == (2, False)
+    assert len(calls) == new.last_result['codex_usage_complete_calls'] == 1
+    transport = new.last_result['transport']
+    assert len(transport['model_metadata_warning_notices']) == 1
+    assert len(transport['transport_fallback_notices']) == 1
+    assert [e['attempt'] for e in transport['error_events']] == [2, 3, 4, 5]
+
+
+@pytest.mark.parametrize('change', ['wrong_model', 'duplicate_metadata', 'duplicate_fallback',
+    'unknown_error', 'reconnect_order', 'reconnect_maximum', 'too_many_reconnects',
+    'missing_usage', 'missing_reply', 'nonzero', 'extra_turn', 'tool_item'])
+def test_combined_warning_v5_rejects_unapproved_streams(monkeypatch, tmp_path, change):
+    stream = combined_warning_stream()
+    if change == 'wrong_model': stream[1]['item']['message'] = stream[1]['item']['message'].replace('luna', 'astra')
+    if change == 'duplicate_metadata': stream.insert(2, dict(stream[1]))
+    if change == 'duplicate_fallback': stream.insert(-2, fallback_notice())
+    if change == 'unknown_error': stream[3]['message'] = 'unknown provider failure'
+    if change == 'reconnect_order': stream[4]['message'] = stream[3]['message']
+    if change == 'reconnect_maximum': stream[4]['message'] = 'Reconnecting... 3/6 (stream disconnected)'
+    if change == 'too_many_reconnects':
+        stream.insert(-2, {'type': 'error', 'message': 'Reconnecting... 6/6 (stream disconnected)'})
+    if change == 'missing_usage': stream[-1]['usage'] = {}
+    if change == 'missing_reply': stream.pop(-2)
+    if change == 'extra_turn': stream += events()
+    if change == 'tool_item': stream.insert(-2, {'type': 'item.completed', 'item': {'type': 'command_execution'}})
+    recognizer, _ = make(monkeypatch, tmp_path, event_list=stream, model='gpt-6-luna',
+        returncode=1 if change == 'nonzero' else 0,
+        output_format='json_schema_v1', event_policy='completed_known_startup_warnings_combo_v5')
+    assert identify(recognizer) == (1, True)
+    assert recognizer.last_result['codex_failed_calls'] == 1
+
+
 @pytest.mark.parametrize('change', ['wrong_model', 'modified_text', 'duplicate', 'after_turn',
                                      'missing_usage', 'nonzero', 'extra_thread'])
 def test_metadata_warning_v4_rejects_other_conditions(monkeypatch, tmp_path, change):

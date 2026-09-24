@@ -63,7 +63,8 @@ def public_invocation_policy(*, model, reasoning_effort, timeout_seconds, cli_pa
     if event_policy not in {"strict_v1", "completed_reconnect_v1", "completed_transport_fallback_v1",
                             "completed_transport_fallback_preturn_v2",
                             "completed_transport_fallback_preturn_multiline_v3",
-                            "completed_known_startup_warnings_v4"}:
+                            "completed_known_startup_warnings_v4",
+                            "completed_known_startup_warnings_combo_v5"}:
         raise ValueError("Unknown Codex Stage event policy")
     if event_policy != "strict_v1" and output_format != "json_schema_v1":
         raise ValueError("Reconnect policy requires structured output")
@@ -121,7 +122,8 @@ def public_invocation_policy(*, model, reasoning_effort, timeout_seconds, cli_pa
         )
     if event_policy in {"completed_transport_fallback_v1", "completed_transport_fallback_preturn_v2",
                         "completed_transport_fallback_preturn_multiline_v3",
-                        "completed_known_startup_warnings_v4"}:
+                        "completed_known_startup_warnings_v4",
+                        "completed_known_startup_warnings_combo_v5"}:
         policy["transport_fallback_acceptance"] = {
             "exact_notice_prefix": TRANSPORT_FALLBACK_PREFIX,
             "maximum_notice_characters": 2048,
@@ -131,20 +133,32 @@ def public_invocation_policy(*, model, reasoning_effort, timeout_seconds, cli_pa
             "position": ("after_single_thread_start_before_turn_start_or_inside_single_turn_before_reply"
                          if event_policy in {"completed_transport_fallback_preturn_v2",
                                              "completed_transport_fallback_preturn_multiline_v3",
-                                             "completed_known_startup_warnings_v4"} else
+                                             "completed_known_startup_warnings_v4",
+                                             "completed_known_startup_warnings_combo_v5"} else
                          "inside_single_turn_before_agent_message_and_completion"),
             "line_break_policy": ("bounded_suffix_may_contain_cr_lf_no_other_controls"
                                   if event_policy in {"completed_transport_fallback_preturn_multiline_v3",
-                                                      "completed_known_startup_warnings_v4"} else
+                                                      "completed_known_startup_warnings_v4",
+                                                      "completed_known_startup_warnings_combo_v5"} else
                                   "no_line_breaks"),
             "required_completion": "one_schema_message_then_one_usage_exit_zero_no_other_error",
             "new_application_invocations": 0,
         }
-    if event_policy == "completed_known_startup_warnings_v4":
+    if event_policy in {"completed_known_startup_warnings_v4",
+                        "completed_known_startup_warnings_combo_v5"}:
         policy["model_metadata_warning_acceptance"] = {
             "exact_notice": MODEL_METADATA_FALLBACK_TEMPLATE.format(model=model),
             "position": "after_single_thread_start_before_turn_start_only",
-            "maximum_total_known_warnings": 1,
+            "maximum_total_known_warnings": (
+                2 if event_policy == "completed_known_startup_warnings_combo_v5" else 1),
+            "required_completion": "one_schema_message_one_usage_exit_zero_no_other_error",
+        }
+    if event_policy == "completed_known_startup_warnings_combo_v5":
+        policy["combined_warning_acceptance"] = {
+            "model_metadata_notices_max": 1,
+            "transport_fallback_notices_max": 1,
+            "numbered_reconnect_notices_max": 5,
+            "reconnect_order": "strictly_increasing_same_maximum",
             "required_completion": "one_schema_message_one_usage_exit_zero_no_other_error",
         }
     return policy

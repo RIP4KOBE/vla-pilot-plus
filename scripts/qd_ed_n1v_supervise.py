@@ -86,12 +86,15 @@ def mechanism_audit(terminal):
         'profile': terminal['identity']['profile'], 'success': terminal['success'],
         'guided_chunks': len(metrics), 'active_qd_chunks': len(active),
         'metrics_sha256': r.digest(output / 'eds_eval/eds_metrics.jsonl') if metrics else None}
-    if terminal['identity']['iteration'] == 'N1AA':
+    if terminal['identity']['iteration'] in {'N1AA', 'N1AB'}:
         stage_events = r.read_events(output / 'eds_eval/stage_events.jsonl')
         actual = [event for event in stage_events if event.get('query_status') != 'skipped']
         result['stage_model_metadata_warning_calls'] = sum(len(event.get('transport', {}).get(
             'model_metadata_warning_notices', [])) for event in actual)
         result['stage_actual_calls'] = len(actual)
+        if terminal['identity']['iteration'] == 'N1AB':
+            result['stage_transport_fallback_calls'] = sum(len(event.get('transport', {}).get(
+                'transport_fallback_notices', [])) for event in actual)
     if terminal['identity']['profile'] == 'N1':
         for m in active:
             r.require(m['qd_descriptor'] == 'target_distance_gripper_duty_v1'

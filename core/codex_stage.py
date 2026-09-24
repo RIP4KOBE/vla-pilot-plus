@@ -222,7 +222,8 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         fallback_policy = self.event_policy in {
             "completed_transport_fallback_v1", "completed_transport_fallback_preturn_v2",
             "completed_transport_fallback_preturn_multiline_v3",
-            "completed_known_startup_warnings_v4"}
+            "completed_known_startup_warnings_v4",
+            "completed_known_startup_warnings_combo_v5"}
         for event_index, event in enumerate(events):
             kind = event.get("type")
             event_types.append(kind if isinstance(kind, str) else "invalid")
@@ -264,17 +265,21 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                     and len(TRANSPORT_FALLBACK_PREFIX) < len(message) <= 2048
                     and (not any(char in message for char in ("\x00", "\r", "\n"))
                          if self.event_policy not in {"completed_transport_fallback_preturn_multiline_v3",
-                                                   "completed_known_startup_warnings_v4"}
+                                                   "completed_known_startup_warnings_v4",
+                                                   "completed_known_startup_warnings_combo_v5"}
                          else not any(ord(char) < 32 and char not in "\t\r\n" for char in message))
                     and (starts == 1 or (self.event_policy in {
                          "completed_transport_fallback_preturn_v2",
                          "completed_transport_fallback_preturn_multiline_v3",
-                         "completed_known_startup_warnings_v4"}
+                         "completed_known_startup_warnings_v4",
+                         "completed_known_startup_warnings_combo_v5"}
                          and starts == 0 and thread_starts == 1 and event_index == 1))
                     and not completed and not messages and not transport_fallbacks
-                    and not model_metadata_warnings)
+                    and (not model_metadata_warnings or
+                         self.event_policy == "completed_known_startup_warnings_combo_v5"))
                 metadata_warning = (
-                    self.event_policy == "completed_known_startup_warnings_v4"
+                    self.event_policy in {"completed_known_startup_warnings_v4",
+                                          "completed_known_startup_warnings_combo_v5"}
                     and kind == "item.completed" and item_kind == "error"
                     and message == MODEL_METADATA_FALLBACK_TEMPLATE.format(model=self.model)
                     and starts == 0 and thread_starts == 1 and event_index == 1
@@ -323,7 +328,8 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                 if not (self.event_policy in {"completed_reconnect_v1", "completed_transport_fallback_v1",
                                               "completed_transport_fallback_preturn_v2",
                                               "completed_transport_fallback_preturn_multiline_v3",
-                                              "completed_known_startup_warnings_v4"} and reconnect
+                                              "completed_known_startup_warnings_v4",
+                                              "completed_known_startup_warnings_combo_v5"} and reconnect
                         and starts == 1 and not completed and not messages):
                     error_code = "codex_unexpected_event"
             else:
@@ -344,11 +350,21 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         )
         if fallback_policy:
             self._call_transport['transport_fallback_notices'] = transport_fallbacks
-        if self.event_policy == "completed_known_startup_warnings_v4":
+        if self.event_policy in {"completed_known_startup_warnings_v4",
+                                 "completed_known_startup_warnings_combo_v5"}:
             self._call_transport['model_metadata_warning_notices'] = model_metadata_warnings
+        if self.event_policy == "completed_known_startup_warnings_combo_v5":
+            reconnects = [notice for notice in errors
+                          if notice['classification'] == 'numbered_reconnecting_notice']
+            pairs = [(notice['attempt'], notice['maximum']) for notice in reconnects]
+            if (len(reconnects) > 5 or len(reconnects) != len(errors)
+                    or any(a >= b or max_a != max_b for (a, max_a), (b, max_b)
+                           in zip(pairs, pairs[1:]))):
+                error_code = "codex_invalid_reconnect_sequence"
         if self.event_policy in {"completed_transport_fallback_preturn_v2",
                                  "completed_transport_fallback_preturn_multiline_v3",
-                                 "completed_known_startup_warnings_v4"} and thread_starts != 1:
+                                 "completed_known_startup_warnings_v4",
+                                 "completed_known_startup_warnings_combo_v5"} and thread_starts != 1:
             error_code = "codex_expected_one_thread"
         if starts == complete_turns == len(usages) == 1 and stream_error is None:
             self.api_request_counter.values["usage_complete_calls"] += 1

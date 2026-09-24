@@ -35,12 +35,21 @@ N1AA_AUTH_SHA = '31117d98810344880d89499a22df98dc44c36ac001ae0c8d9b7be3d2208c1cc
 N1AA_CONTRACT = {**N1Z_CONTRACT, 'schema': 'qd-ed-n1aa-timeout-recovery-v1',
                  'iteration': 'N1AA', 'authorization_sha256': N1AA_AUTH_SHA,
                  'failure_detail': 'n1aa_stage_timeout'}
+N1AB_AUTH_SHA = 'af44838ef325a2eea09cf2aab62669605c4111662fb3103217d89ac2615b6026'
+N1AB_CONTRACT = {**N1AA_CONTRACT, 'schema': 'qd-ed-n1ab-timeout-recovery-v1',
+                 'iteration': 'N1AB', 'authorization_sha256': N1AB_AUTH_SHA,
+                 'failure_detail': 'n1ab_stage_timeout'}
 
 
 def settings(iteration):
     """Separate immutable authorities; never infer one cohort's policy from another."""
-    if iteration not in {'N1V', 'N1W', 'N1X', 'N1Y', 'N1Z', 'N1AA'}:
+    if iteration not in {'N1V', 'N1W', 'N1X', 'N1Y', 'N1Z', 'N1AA', 'N1AB'}:
         return None
+    if iteration == 'N1AB':
+        return {'iteration': 'N1AB', 'key': 'n1ab', 'sha': N1AB_AUTH_SHA,
+                'caps': N1W_CAPS, 'contract': N1AB_CONTRACT, 'limit': 5,
+                'limit_word': 'five',
+                'condition': 'codex_login_luna_low_json_known_startup_warnings_combo_90s_v5'}
     if iteration == 'N1AA':
         return {'iteration': 'N1AA', 'key': 'n1aa', 'sha': N1AA_AUTH_SHA,
                 'caps': N1W_CAPS, 'contract': N1AA_CONTRACT, 'limit': 5,
@@ -73,7 +82,7 @@ def settings(iteration):
 
 
 def budget_authority(budget, read_json, digest, require, *, legacy_caps):
-    present = [name for name in ('N1V', 'N1W', 'N1X', 'N1Y', 'N1Z', 'N1AA') if budget.get(name.lower() + '_authorization') is not None]
+    present = [name for name in ('N1V', 'N1W', 'N1X', 'N1Y', 'N1Z', 'N1AA', 'N1AB') if budget.get(name.lower() + '_authorization') is not None]
     require(len(present) <= 1, 'multiple active bounded-cohort budget authorities')
     if not present:
         return 240, legacy_caps
@@ -92,15 +101,15 @@ def budget_authority(budget, read_json, digest, require, *, legacy_caps):
 
 def validate_contract(r, plan, state):
     iterations = {row.get('iteration') for row in plan.get('episodes', [])}
-    registered = iterations & {'N1V', 'N1W', 'N1X', 'N1Y', 'N1Z', 'N1AA'}
-    present = [name for name in ('N1V', 'N1W', 'N1X', 'N1Y', 'N1Z', 'N1AA') if plan.get(name.lower() + '_recovery') is not None]
+    registered = iterations & {'N1V', 'N1W', 'N1X', 'N1Y', 'N1Z', 'N1AA', 'N1AB'}
+    present = [name for name in ('N1V', 'N1W', 'N1X', 'N1Y', 'N1Z', 'N1AA', 'N1AB') if plan.get(name.lower() + '_recovery') is not None]
     if not registered and not present:
         return
     r.require(len(iterations) == len(registered) == len(present) == 1
               and present[0] in registered, 'bounded cohort requires one explicit matching iteration')
     cfg = settings(present[0]); label = cfg['iteration']; key = cfg['key']
     r.require(plan.get(key + '_recovery') == cfg['contract'], f'{label} requires its exact prospective recovery contract')
-    if label in {'N1X', 'N1Y', 'N1Z', 'N1AA'}:
+    if label in {'N1X', 'N1Y', 'N1Z', 'N1AA', 'N1AB'}:
         r.require(plan.get('stage_schedule') == {'min_query_gap_steps': 32, 'max_queries': 14},
                   'N1X Stage schedule changed')
     ceiling, _ = budget_authority(state['budget'], r.read_json, r.digest, r.require, legacy_caps=r.BUCKETS)
@@ -135,6 +144,9 @@ def validate_transport_binding(r, plan, runtime):
     if runtime.get('frozen_stage_provider', {}).get('event_policy') == 'completed_known_startup_warnings_v4':
         r.require(all(row.get('iteration') == 'N1AA' for row in plan['episodes']),
                   'known startup warning acceptance requires N1AA')
+    if runtime.get('frozen_stage_provider', {}).get('event_policy') == 'completed_known_startup_warnings_combo_v5':
+        r.require(all(row.get('iteration') == 'N1AB' for row in plan['episodes']),
+                  'combined known startup warning acceptance requires N1AB')
 
 
 def check_retry(groups, row, identity, require):

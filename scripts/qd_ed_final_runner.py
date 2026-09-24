@@ -399,7 +399,7 @@ def build_command(plan, manifest, runtime, row, attempt_id):
         require(all(key not in values or values[key] == value for key, value in provider_values.items()),
                 'static/runtime Codex provider binding differs')
     values.update(provider_values)
-    if row.get('iteration') in {'N1X', 'N1Y', 'N1Z', 'N1AA'}:
+    if row.get('iteration') in {'N1X', 'N1Y', 'N1Z', 'N1AA', 'N1AB'}:
         require(plan.get('stage_schedule') == {'min_query_gap_steps': 32, 'max_queries': 14},
                 'N1X Stage scheduler contract changed')
         values['main.vlm_query_limit'] = 14
@@ -502,16 +502,19 @@ def codex_stage_condition(runtime):
     require(event_policy in {'strict_v1', 'completed_reconnect_v1', 'completed_transport_fallback_v1',
                              'completed_transport_fallback_preturn_v2',
                              'completed_transport_fallback_preturn_multiline_v3',
-                             'completed_known_startup_warnings_v4'}, 'unknown frozen Stage event policy')
+                             'completed_known_startup_warnings_v4',
+                             'completed_known_startup_warnings_combo_v5'}, 'unknown frozen Stage event policy')
     timeout = frozen.get('timeout_seconds', 90)
     require(type(timeout) is int and timeout in {90, 180}, 'unknown frozen Stage timeout')
     if frozen.get('model') == 'gpt-6-luna':
         require(mode == 'json_schema_v1' and timeout == 90 and event_policy in {
                 'completed_transport_fallback_v1', 'completed_transport_fallback_preturn_v2',
                 'completed_transport_fallback_preturn_multiline_v3',
-                'completed_known_startup_warnings_v4'},
+                'completed_known_startup_warnings_v4', 'completed_known_startup_warnings_combo_v5'},
                 'Luna Stage requires structured 90-second transport fallback contract')
-        return ('codex_login_luna_low_json_known_startup_warnings_90s_v4'
+        return ('codex_login_luna_low_json_known_startup_warnings_combo_90s_v5'
+                if event_policy == 'completed_known_startup_warnings_combo_v5' else
+                'codex_login_luna_low_json_known_startup_warnings_90s_v4'
                 if event_policy == 'completed_known_startup_warnings_v4' else
                 'codex_login_luna_low_json_transport_fallback_preturn_multiline_90s_v3'
                 if event_policy == 'completed_transport_fallback_preturn_multiline_v3' else
@@ -953,7 +956,7 @@ def validate_resolved_identity(output, row, profile, runtime):
     output = Path(output)
     resolved=read_state(output/'.hydra/config.yaml')
     schedule = ({'main.vlm_query_limit': 14, 'main.stage_min_query_gap_steps': 32}
-                if row.get('iteration') in {'N1X', 'N1Y', 'N1Z', 'N1AA'} else {})
+                if row.get('iteration') in {'N1X', 'N1Y', 'N1Z', 'N1AA', 'N1AB'} else {})
     for key,value in {**profile['static_override_values'], **stage_overrides(runtime or {}), **schedule, 'seed':row['policy_seed'],
                        'main.episode_num':1,'main.episode_seed_schedule':[row['env_seed']],
                        'backend.libero.task_ids_filter':[row['task_id']],
@@ -1005,7 +1008,7 @@ def validate_result(output, row, profile, runtime=None):
     validate_video(videos[0])
     metrics = validate_metric_identity(output, row, profile)
     stage_summary=stage_query_summary(output,row)
-    if row.get('iteration') in {'N1X', 'N1Y', 'N1Z', 'N1AA'}:
+    if row.get('iteration') in {'N1X', 'N1Y', 'N1Z', 'N1AA', 'N1AB'}:
         stages = read_events(output/'eds_eval/stage_events.jsonl')
         require(all(e.get('vlm_query_limit') == 14 and e.get('stage_min_query_gap_steps') == 32
                     for e in stages), 'N1X Stage schedule trace mismatch')

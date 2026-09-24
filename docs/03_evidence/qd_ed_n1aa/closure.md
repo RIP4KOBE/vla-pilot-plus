@@ -1,0 +1,5 @@
+# N1AA closed, scientifically incomplete
+
+GPU2 N1AA produced 22 valid cells out of its frozen 30-cell development matrix: N1 0/7, Q0 1/7 (task 4), C0 0/8. There were no Stage-timeout recoveries. The next primary, task 7/Q0, is invalid because v4 rejected a combined known-warning event sequence; seven primaries were not dispatched. The candidate already cannot reach 5/10 within N1AA because its first seven N1 tasks all failed, but this partial cohort is **not** a completed development comparison.
+
+The task 7/Q0 Stage call completed in 79.78 seconds with CLI exit 0, one schema reply and complete usage. It emitted the exact Luna model-metadata warning, numbered reconnects 2/5–5/5, then a bounded WebSocket-to-HTTPS fallback notice. N1AA allowed at most one known warning class and correctly marked this as `codex_unexpected_item`. No old journal or outcome is changed. A separately frozen N1AB parser policy and cohort will test this specific combination prospectively; N1AA results are never pooled with it.
