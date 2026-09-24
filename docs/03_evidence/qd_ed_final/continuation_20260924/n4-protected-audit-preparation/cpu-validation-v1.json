@@ -1,0 +1,48 @@
+{
+  "schema": "n4-conditional-protected-audit-cpu-preparation-v1",
+  "base_commit": "f6a9ab04c0f184bbe2f8c837b33492835bc8fec9",
+  "source_files": [
+    {
+      "path": "scripts/audit_n4_qd_off_evidence.py",
+      "sha256": "f37cefb5b62c03210941e62ad2f2d92953bf4217a31ebdc8e0747db295b21ab9"
+    },
+    {
+      "path": "scripts/qd_ed_n4_evaluation_report.py",
+      "sha256": "0c2516e22a56f680465134fec38987d74273be5c25259b0f9aca52d8763b8887"
+    },
+    {
+      "path": "tests/test_n4_qd_off_audit.py",
+      "sha256": "ffe3c05f26b4f18c8072b9c9389ea48c793143b365a859072cbea033db21a9d9"
+    },
+    {
+      "path": "tests/test_qd_ed_n4_evaluation_report.py",
+      "sha256": "3e69fe95479283807a856d190608d1116947f67a822acd2bf6a86ffb2e249b0e"
+    },
+    {
+      "path": "docs/03_evidence/qd_ed_final/continuation_20260924/n4-protected-audit-preparation/README.md",
+      "sha256": "960c5ed488faaa33f905ccd7e955776607cdca6fad7a93e9654dc4626e2edd49"
+    }
+  ],
+  "protocol": {
+    "path": "experiments/iteration_004_terminal_population/protected-evaluation-protocol-v1.md",
+    "sha256": "09881ae7ae24e363ee710c6a2dc8455c01fa74b25b6dec279dafc9a1946564f8"
+  },
+  "phase_contract_sha256": "4e5ee7e5991870458744ccfa475ed14d5fc326b2719ade6be5c532032885d55e",
+  "command": "CUDA_VISIBLE_DEVICES='' PYTHONDONTWRITEBYTECODE=1 /home/hynx/miniconda3/envs/vla-pilot/bin/python -m pytest tests/test_n4_qd_off_audit.py tests/test_qd_ed_n4_evaluation_report.py -q",
+  "passed": 21,
+  "failed": 0,
+  "wall_seconds": 9.82,
+  "warnings": [
+    "2 existing core/fkd_class.py invalid escape SyntaxWarnings"
+  ],
+  "native_stub_dtypes": [
+    "torch.float32",
+    "torch.bfloat16"
+  ],
+  "execution_authorized": false,
+  "actual_protected_or_ongoing_dev_data_read": false,
+  "gpu_calls": 0,
+  "model_checkpoint_loads": 0,
+  "real_provider_calls": 0,
+  "scientific_source_modified": false
+}
