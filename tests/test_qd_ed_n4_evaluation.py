@@ -447,3 +447,11 @@ def test_audit_failure_retains_valid_terminal_without_retry_or_next_dispatch(eva
     assert t==original and t['event']=='valid' and t['outcome_valid'] is True
     saved=r.read_json(output/'eds_eval/decision-evidence-audit.json')
     assert saved['accepted'] is False and saved['wrapper_observation']['phase_native_alignment']['status']=='failed'
+
+
+def test_unsettled_reservations_rejected_even_without_dispatch(evaluation):
+    *_,make,_=evaluation;p=make('validation');row=p['episodes'][0];t=terminal(p,row)
+    with pytest.raises(r.GateError,match='unsettled private episode'):
+        e.require_settled([{**t,'event':'reserved'}],[],r)
+    with pytest.raises(r.GateError,match='unsettled private health'):
+        e.require_settled([], [{'resource_id':'h','event':'reserved'}],r)

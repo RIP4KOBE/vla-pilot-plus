@@ -1,15 +1,21 @@
 {
   "GPU_or_provider_or_model_calls": false,
   "actual_protected_payloads_read": false,
+  "additional_checks": {
+    "added_case": "unsettled reserved-only private episode/health blocks preparation/admission",
+    "elapsed_seconds": 0.99,
+    "result": "PASS",
+    "tests": 34
+  },
   "cuda_visible_devices": "",
   "files": [
     {
       "path": "scripts/qd_ed_n4_evaluation.py",
-      "sha256": "9a680b30ac80730513c13838af2a3c7cb6ac863c02718d5c5d62d65d47b87ae2"
+      "sha256": "524d318360e68340267b22e64191dc11de50f660edf7e8f8dc19c68a2c6e6335"
     },
     {
       "path": "scripts/qd_ed_n4_evaluate.py",
-      "sha256": "1242b4608f8cf9659e0b3c86dd15f91db91af2b69b0b1f2018ce3bd7576b9b27"
+      "sha256": "7b8d470649c0f77eec57f39d4bcb745fd9e73dad385e6b2ff6322fe6abf55ff3"
     },
     {
       "path": "scripts/qd_ed_final_runner.py",
@@ -25,7 +31,7 @@
     },
     {
       "path": "tests/test_qd_ed_n4_evaluation.py",
-      "sha256": "d4d8ce1948a3392a0490e91e63f4000e171699e9d2e9a7ad841c196bcc29950d"
+      "sha256": "439236a51048f11534b224b453c0262541ea01e1f27b33869ad656a7afa0e3ed"
     },
     {
       "path": "experiments/iteration_004_terminal_population/protected-evaluation-protocol-v1.md",

@@ -330,6 +330,7 @@ def admission(plan,runtime,row,events,resources,root,runner,*,allocate_now=True,
     r=api(runner);c=plan['n4_evaluation'];phase=c['phase'];b=binding(plan)
     resource_authority(plan,runtime,root,r)
     require_scope(plan,root,r,row)
+    require_settled(events,resources,r)
     r.require(plan['phase_authorization'].get(phase) is True and plan.get('frozen') is True,'evaluation phase not released')
     reviewed_promotion(plan,events,root,r)
     r.require(any(x==row for x in plan['episodes']),'evaluation row outside exact frozen plan')
@@ -662,3 +663,13 @@ def check_seed_exposure(plan,events,root,runner):
         expected={'schema':'qd-ed-n4-evaluation-allocation-v1','binding':binding(plan)}
         r.require(allocation.exists() and r.read_json(allocation)==expected,
             'validation reservation exists without this exact seed allocation')
+
+
+def require_settled(events,resources,runner):
+    r=api(runner)
+    r.require(all(g[-1]['event'] in r.TERMINAL for g in r.event_groups(events).values()),
+        'protected phase has unsettled private episode reservation/cost')
+    health=[{**x,'attempt_id':x['resource_id'],'event':'valid' if x['event']=='completed' else x['event']} for x in resources]
+    r.require(all(g[-1]['event'] in r.TERMINAL for g in r.event_groups(health).values()),
+        'protected phase has unsettled private health reservation/cost')
+    return r.budget_snapshot(events,resources)
