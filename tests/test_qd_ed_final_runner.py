@@ -162,6 +162,50 @@ def test_budget_uses_remaining_gpu_time_and_refuses_unclosed_attempt():
         runner.check_budget(synced_state(events),events,row())
 
 
+def test_authorized_n1u_reallocation_admits_exactly_full_cohort():
+    events = []
+    for bucket, count in [('baseline', 11), ('development', 92), ('recovery', 7)]:
+        for index in range(count):
+            events += events_for(f'{bucket}{index}', bucket=bucket)
+    episode = row()
+    episode.update(budget_bucket='development', iteration='N1U')
+    for index in range(30):
+        assert runner.check_budget(synced_state(events), events, episode) == 100
+        events += events_for(f'n1u{index}', bucket='development')
+    current = synced_state(events)
+    assert current['budget']['dispatched'] == 140
+    with pytest.raises(runner.GateError, match='development reserve exhausted'):
+        runner.check_budget(current, events, episode)
+    # Mutable state alone cannot raise the approved source limit.
+    current['budget']['reserved']['development'] = 123
+    with pytest.raises(runner.GateError, match='development reserve exhausted'):
+        runner.check_budget(current, events, episode)
+    for bucket in ('validation', 'formal'):
+        episode.update(split=bucket, budget_bucket=bucket)
+        assert runner.check_budget(synced_state(events), events, episode) == 100
+
+
+@pytest.mark.parametrize('bucket,count', [('baseline', 11), ('recovery', 7)])
+def test_n1u_transfer_removes_donor_capacity_even_with_old_state(bucket, count):
+    events = sum((events_for(f'{bucket}{i}', bucket=bucket) for i in range(count)), [])
+    current = synced_state(events)
+    current['budget']['reserved'][bucket] = 20
+    episode = row()
+    episode['budget_bucket'] = bucket
+    with pytest.raises(runner.GateError, match=f'{bucket} reserve exhausted'):
+        runner.check_budget(current, events, episode)
+
+
+def test_old_state_does_not_implicitly_activate_higher_development_limit():
+    events = sum((events_for(f'dev{i}', bucket='development') for i in range(100)), [])
+    current = synced_state(events)
+    current['budget']['reserved']['development'] = 100
+    episode = row()
+    episode['budget_bucket'] = 'development'
+    with pytest.raises(runner.GateError, match='development reserve exhausted'):
+        runner.check_budget(current, events, episode)
+
+
 def test_append_only_event_commit_updates_authoritative_state(tmp_path):
     (tmp_path/'data').mkdir(); p=tmp_path/'research-state.yaml'; p.write_text(yaml.safe_dump(state()))
     for event in events_for(terminal='aborted',retryable=True):

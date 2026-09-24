@@ -28,7 +28,10 @@ from qd_ed_gpu_faults import KernelXidMonitor, MonitorError
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON = Path('/home/hynx/miniconda3/envs/vla-pilot/bin/python')
 SCHEMA = 'qd-ed-final-plan-v1'
-BUCKETS = {'baseline': 20, 'development': 100, 'validation': 60, 'formal': 40, 'recovery': 20}
+# User-approved 2026-09-24 N1U reallocation: unused baseline9 + recovery13
+# fund development22; total240 and validation/formal reserves are unchanged.
+# See experiments/iteration_001_execution_intent/n1u-budget-reallocation-approved.md.
+BUCKETS = {'baseline': 11, 'development': 122, 'validation': 60, 'formal': 40, 'recovery': 7}
 TERMINAL = {'valid', 'aborted'}
 REQUIRED_CODE = {
     'main.py', 'core/rdt_policy_steer.py', 'core/qd_ed.py', 'core/eds_eval_metrics.py',
