@@ -8,6 +8,7 @@
     "tests": 34
   },
   "cuda_visible_devices": "",
+  "execution_status": "ARCHIVED_CONDITIONAL_ONLY; original N4 missing-usage invalid cell prevents complete-valid Dev promotion; no W integration/release",
   "files": [
     {
       "path": "scripts/qd_ed_n4_evaluation.py",
@@ -36,15 +37,45 @@
     {
       "path": "experiments/iteration_004_terminal_population/protected-evaluation-protocol-v1.md",
       "sha256": "09881ae7ae24e363ee710c6a2dc8455c01fa74b25b6dec279dafc9a1946564f8"
+    },
+    {
+      "path": "scripts/qd_ed_n4_evaluation_report.py",
+      "sha256": "0c2516e22a56f680465134fec38987d74273be5c25259b0f9aca52d8763b8887"
+    },
+    {
+      "path": "scripts/audit_n4_qd_off_evidence.py",
+      "sha256": "f37cefb5b62c03210941e62ad2f2d92953bf4217a31ebdc8e0747db295b21ab9"
+    },
+    {
+      "path": "tests/test_qd_ed_n4_evaluation_report.py",
+      "sha256": "3e69fe95479283807a856d190608d1116947f67a822acd2bf6a86ffb2e249b0e"
+    },
+    {
+      "path": "tests/test_n4_qd_off_audit.py",
+      "sha256": "ffe3c05f26b4f18c8072b9c9389ea48c793143b365a859072cbea033db21a9d9"
     }
   ],
+  "independent_checks": {
+    "result": "PASS",
+    "review_sha256": "f1dbbd57b602512f8546e30b0f3329750d698c1f37a22ce60f78665f2d92245d",
+    "scope": "runner boundary source dd15649; E own 21 focused tests plus integrated suite above",
+    "unique_tests": 13
+  },
   "initial_checks": {
     "combined_affected_tests": 146,
     "elapsed_seconds": 3.12,
     "new_contract_tests": 33,
     "result": "PASS"
   },
-  "pending": "E report/native ablation adapter integration and independent source review; not execution-ready authorization",
+  "integrated_checks": {
+    "cuda_visible_devices": "",
+    "elapsed_seconds": 11.81,
+    "includes": "contract/entry, phase report, real FP32+BF16 CPU stub producer-to-QD-off-auditor, unchanged generic runner/queue and N4 Dev gates",
+    "result": "PASS",
+    "tests": 168,
+    "warning": "Existing core/fkd_class.py SyntaxWarning invalid escape sequence; no source change"
+  },
+  "integration_commit": "1c67355",
   "phase_authorized": false,
   "production_source_unchanged": true,
   "schema": "n4-protected-runner-cpu-validation-v1",
