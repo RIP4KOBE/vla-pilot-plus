@@ -34,10 +34,30 @@
     {
       "path": "experiments/iteration_004_terminal_population/transport180-engineering-protocol-v1.md",
       "sha256": "a960f4075cca5962e3e9cd35956f96b49f7433f797529134896803f7b5473e2d"
+    },
+    {
+      "path": "core/codex_stage.py",
+      "sha256": "beaf6386e5edd449ddf8df610bf25d08e34d42b3bc7e9e5d2c1418a244206960"
+    },
+    {
+      "path": "core/codex_stage_lifecycle.py",
+      "sha256": "de10576f89368b81c03b7b8d1d7c04e757a394d8b0b4974515c0b08e606d00e6"
+    },
+    {
+      "path": "tests/test_codex_stage_lifecycle.py",
+      "sha256": "e636560c45f2a73985b4772ee427e06cdf283157e75fd2b1e91f54dee0b29d2f"
     }
   ],
+  "integrated_checks": {
+    "elapsed_seconds": 7.98,
+    "isolated_integration_commit": "86b0ca1",
+    "result": "PASS",
+    "scope": "new E1, passive lifecycle/default90, original generic runner/queue and N4 gates; only synthetic/local child fixtures",
+    "stage_passive_commit": "d59d99aacdf616cf09a761349fff35586252e62c",
+    "tests": 221
+  },
   "new_tests": 22,
-  "pending": "final passive lifecycle commit, independent review and isolated integration checks; no execution release",
+  "pending": "independent final review and root source/protocol/runtime/release review; no real plan or execution release",
   "result": "PASS",
   "schema": "n4-e1-runner-cpu-validation-v1",
   "science_or_original_N4_module_changes": false,
