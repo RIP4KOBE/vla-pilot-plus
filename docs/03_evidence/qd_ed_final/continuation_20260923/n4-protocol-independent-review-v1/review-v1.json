@@ -1,0 +1,74 @@
+{
+  "schema": "n4-prospective-protocol-independent-review-v1",
+  "verdict": "PASS",
+  "blocking_findings": [],
+  "reviewed_documents": [
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_004_terminal_population/protocol.md",
+      "sha256": "b8562e3f9fffc77efc803c6b056441f7b426333a97eb176b52fdb0fe42088db2"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_004_terminal_population/q0-transfer-check-protocol.md",
+      "sha256": "3ff18d22eb934a24f790bef5b411089f9a4c9116b098cfb7baa2b36cbbc277ca"
+    }
+  ],
+  "checks": [
+    {
+      "name": "single_mechanism",
+      "result": "PASS",
+      "evidence": "Q0 original quality, N2/N3 off; archive behavior/quality/replacement/parents unchanged. Last real canonical population first-index native stored-cost argmin is the execution-consumer change; its different tie semantics are explicit."
+    },
+    {
+      "name": "complete_transfer_identity",
+      "result": "PASS",
+      "evidence": "Exact full-report/input and ten accepted Q0 representatives including task9 recovery; all825 decisions/155guided/6594actual retained. Invalid predecessor excluded. Source/runtime/profile/seed/init/audit/status/index and every bundle hash required before decode."
+    },
+    {
+      "name": "decoded_actual_prefix_activity",
+      "result": "PASS",
+      "evidence": "Actual selected\u2192recorded decode\u2192actual dispatch verified before alternative comparison. Pinned pure decoder; first8 and actualm separate; finite exact FP32 numerical equality including signed-zero equality. Nonmember AND changed withinm required. Member/tie/Unknown and suffix-only changes retained."
+    },
+    {
+      "name": "cost_raw_stage_separation",
+      "result": "PASS",
+      "evidence": "Known provider costs=-rewards and same-call canonical native association required. Selected original raw reward remains bound to existing normalization/Stage; archive-cost reference remains _last_scale source. No new scoring, provider, projection or alternative observations."
+    },
+    {
+      "name": "default_archive_audits",
+      "result": "PASS",
+      "evidence": "Archive global best remains a truthful separate diagnostic, default final-globalbest checks unchanged. New-mode audit must verify last-native16/firstargmin and dispatch; no disabled genuine violation or historical reinterpretation."
+    },
+    {
+      "name": "prospective_statistics",
+      "result": "PASS",
+      "evidence": "Backend-order equally spaced0,3,6,9 fixed before transfer read and labeled exposed exploratory Dev.12 accepted cells required, N4>=2/4 and>=both controls plus correctness/QD/decoded-prefix activity. Firsttriplet is correctness-only. N3 gate and protected gates unchanged."
+    },
+    {
+      "name": "budget_recovery",
+      "result": "PASS",
+      "evidence": "12originals charge4baseline+8Dev;<=4 exact infrastructure replacements,<=1/cell, recovery-bucket only.16*1840s=8.1777777778h before health, while8.5h includes health and every dispatch must fit all caps/reserves. Completion is not guaranteed; native audit failure is not automatically recoverable."
+    },
+    {
+      "name": "stop_rule_clarification",
+      "result": "PASS",
+      "evidence": "Final edit only clarifies completed-matrix aggregate failure. Ordinary valid episode failures remain denominator members, are not retried and cause no early success-based stop. Reversing this exact text edit reproduces the previously reviewed b5f97461 document SHA."
+    },
+    {
+      "name": "authorization",
+      "result": "PASS",
+      "evidence": "Docs do not authorize actual read/implementation/dispatch. Exact source/helper/environment/input freeze and review precede separately authorized read; implementation conditional on complete prerequisite, then reviewed plan/runner/source freeze beforeDev."
+    }
+  ],
+  "limits": [
+    "Docs-only review, not implementation/native-audit validation or evidence of task benefit. Future tests must demonstrate these contracts.",
+    "Four exposed Dev cells are an exploratory screen, not an independent estimate or proof of superiority; retained validation/formal gates are essential.",
+    "Alternative decoded commands are not observations of executed alternatives, task outcomes, contact or feasibility.",
+    "Health/new costs or invalids can prevent completion under fixed caps; no recovery or reserve borrowing for new hypotheses."
+  ],
+  "final_clarification_only_verified_against_old_sha256": "b5f974617293ed35934a3968b36ac014ee4a4f6eacc4106d5946f7eda298c700",
+  "executable_tests_run": 0,
+  "native_reads": 0,
+  "model_provider_simulator_GPU_calls": 0,
+  "W_mutations": 0,
+  "added_thresholds_or_quotas": 0
+}
