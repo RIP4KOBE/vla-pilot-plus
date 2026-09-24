@@ -268,6 +268,17 @@ def n4_support():
     return _N4_SUPPORT
 
 
+def is_n4_evaluation(plan):
+    return (plan.get('n4_evaluation') is not None or any(
+        str(x.get('iteration','')).startswith(('N4_VALIDATION_','N4_FORMAL_')) or
+        x.get('profile')=='N4_QD_OFF' for x in plan.get('episodes',[])))
+
+
+def n4_evaluation_support():
+    import importlib
+    return importlib.import_module('qd_ed_n4_evaluation')
+
+
 def validate_plan(path, *, root=ROOT, require_frozen=True):
     root = Path(root).resolve()
     plan = read_json(path)
@@ -372,7 +383,9 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
         n2_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
     if 'N3' in plan.get('candidate_profiles', {}) or plan.get('n3_cohort') is not None:
         n3_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
-    if is_n4_plan(plan):
+    if is_n4_evaluation(plan):
+        n4_evaluation_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+    elif is_n4_plan(plan):
         n4_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
     return plan, manifest, runtime
 
@@ -660,7 +673,7 @@ def budget_snapshot(events, resource_events=()):
     return result
 
 
-def check_budget(state, events, row, resource_events=(), reservation_events=(), *, physical_gpu=None):
+def check_budget(state, events, row, resource_events=(), reservation_events=(), *, physical_gpu=None, evaluation_context=None):
     budget = state['budget']; snap = budget_snapshot(events,resource_events)
     selected_gpu = authorized_gpu(state)
     require(physical_gpu is None or (type(physical_gpu) is int and physical_gpu == selected_gpu),
@@ -686,13 +699,19 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
         require(bool(reservation_events) and reservation_events[-1].get('event')=='gpu_hour_reservations_changed' and
                 reservation_events[-1].get('gpu_hour_reservations')==reservations and
                 bool(reservation_events[-1].get('rationale')) and 'time_unix' in reservation_events[-1], 'GPU-hour reallocation requires matching reservation ledger event')
-    protected_hours=sum(max(0.,hours-snap['gpu_hours_by_bucket'][name]) for name,hours in reservations.items() if name!=bucket)
+    excluded=bucket
+    if evaluation_context is not None:
+        excluded=n4_evaluation_support().hour_reservation_exclusion(
+            evaluation_context,state,events,row,resource_events,reservation_events,globals())
+    protected_hours=sum(max(0.,hours-snap['gpu_hours_by_bucket'][name]) for name,hours in reservations.items() if name!=excluded)
     available=int((budget['max_gpu_hours']-snap['gpu_hours_consumed']-protected_hours)*3600)-TERMINATION_GRACE_SECONDS
     require(available>0, 'GPU budget cannot cover process termination grace')
     return min(row['timeout_seconds'],available)
 
 
 def check_retry(events, row):
+    if str(row.get('iteration','')).startswith(('N4_VALIDATION_','N4_FORMAL_')) or row.get('n4_evaluation_recovery_contract') is not None:
+        return n4_evaluation_support().check_retry(events,row,globals())
     if str(row.get('iteration')) == 'N4_TERMINAL_POPULATION_DEV_20260924' or row.get('n4_recovery_contract') is not None:
         return n4_support().check_retry(events, row, globals())
     if str(row.get('iteration')) == 'N3_EXECUTED_FEEDBACK_DEV_20260923' or row.get('n3_recovery_contract') is not None:
@@ -1005,7 +1024,9 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
         plan,manifest,runtime=validate_plan(plan_path,root=root)
         if plan.get('n3_cohort') is not None:
             n3_support().require_scope(plan, root, globals())
-        if is_n4_plan(plan):
+        if is_n4_evaluation(plan):
+            n4_evaluation_support().require_scope(plan,root,globals())
+        elif is_n4_plan(plan):
             n4_support().require_scope(plan, root, globals())
         require(plan.get('phase_authorization', {}).get(split) is True, f'{split} has not passed its preregistered phase gate')
         rows=selected_rows(plan,split,iteration)
@@ -1021,7 +1042,12 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
             state = read_state(root/'research-state.yaml')
             physical_gpu = runtime_gpu(runtime, state)
             resources=read_events(root/'data/gpu-healthcheck-ledger.jsonl')
-            timeout=check_budget(state,events,row,resources,read_events(root/'data/gpu-hour-reservation-ledger.jsonl'),physical_gpu=physical_gpu)
+            evaluation_permission=None
+            if is_n4_evaluation(plan):
+                evaluation_permission=n4_evaluation_support().validated_budget_context(
+                    plan,runtime,row,events,resources,root,globals())
+            timeout=check_budget(state,events,row,resources,read_events(root/'data/gpu-hour-reservation-ledger.jsonl'),
+                physical_gpu=physical_gpu,evaluation_context=evaluation_permission)
             n2_base={}
             if plan.get('n2_cohort') is not None:
                 require(timeout==1800, 'N2 requires its full frozen episode timeout')
@@ -1030,7 +1056,10 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                 n3_support().require_scope(plan, root, globals(), row)
                 n3_support().protected_budget(state, events, resources, row, timeout, globals())
                 n2_base=n3_support().admission(plan,runtime,row,events,resources,root,globals())
-            if is_n4_plan(plan):
+            if is_n4_evaluation(plan):
+                n4_evaluation_support().whole_phase_budget(plan,state,events,resources,row,timeout,globals())
+                n2_base=n4_evaluation_support().admission(plan,runtime,row,events,resources,root,globals())
+            elif is_n4_plan(plan):
                 n4_support().require_scope(plan, root, globals(), row)
                 n4_support().protected_budget(state, events, resources, row, timeout, globals(), plan=plan)
                 n2_base=n4_support().admission(plan,runtime,row,events,resources,root,globals())
@@ -1084,7 +1113,11 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                     eligibility=n3_support().transport_recovery_eligibility(exc,outcome,plan,row,runtime,globals())
                     if eligibility is not None:
                         outcome['n3_recovery_eligibility']=eligibility
-                if dispatched and is_n4_plan(plan):
+                if dispatched and is_n4_evaluation(plan):
+                    eligibility=n4_evaluation_support().transport_eligibility(exc,outcome,plan,globals())
+                    if eligibility is not None:
+                        outcome['n4_evaluation_recovery_eligibility']=eligibility
+                elif dispatched and is_n4_plan(plan):
                     eligibility=n4_support().transport_recovery_eligibility(exc,outcome,plan,row,runtime,globals())
                     if eligibility is not None:
                         outcome['n4_recovery_eligibility']=eligibility
@@ -1099,7 +1132,7 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                           'gpu_process_wall_seconds':elapsed,'gpu_time_measurement':f'exclusive GPU{physical_gpu} process wall-time upper bound, includes startup/abort'}
                 if plan.get('n3_cohort') is not None:
                     terminal['n3_episode_dispatched']=dispatched
-                if is_n4_plan(plan):
+                if is_n4_plan(plan) or is_n4_evaluation(plan):
                     terminal['n4_episode_dispatched']=dispatched
                 append_event(root,terminal)
                 durable_json(output/'attempt-result.json',terminal)

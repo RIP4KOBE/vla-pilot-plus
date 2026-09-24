@@ -1,0 +1,46 @@
+{
+  "GPU_or_provider_or_model_calls": false,
+  "actual_protected_payloads_read": false,
+  "cuda_visible_devices": "",
+  "files": [
+    {
+      "path": "scripts/qd_ed_n4_evaluation.py",
+      "sha256": "9a680b30ac80730513c13838af2a3c7cb6ac863c02718d5c5d62d65d47b87ae2"
+    },
+    {
+      "path": "scripts/qd_ed_n4_evaluate.py",
+      "sha256": "1242b4608f8cf9659e0b3c86dd15f91db91af2b69b0b1f2018ce3bd7576b9b27"
+    },
+    {
+      "path": "scripts/qd_ed_final_runner.py",
+      "sha256": "eefdc47589ac69436562bac52ec774319ecf72c65007c596d25e61f8f42c4ee8"
+    },
+    {
+      "path": "scripts/qd_ed_available_gpu_queue.py",
+      "sha256": "3e8c67e56664b703246e2f8a8e0e08b904f40b223105b4617372374b2b0d0f14"
+    },
+    {
+      "path": "configs/qd_ed_final/n4_evaluation_profiles.json",
+      "sha256": "838a21b5ddbb5fe4c0648483a75bdd01db0e2a09c5cbe669aa09ff69410d22c5"
+    },
+    {
+      "path": "tests/test_qd_ed_n4_evaluation.py",
+      "sha256": "d4d8ce1948a3392a0490e91e63f4000e171699e9d2e9a7ad841c196bcc29950d"
+    },
+    {
+      "path": "experiments/iteration_004_terminal_population/protected-evaluation-protocol-v1.md",
+      "sha256": "09881ae7ae24e363ee710c6a2dc8455c01fa74b25b6dec279dafc9a1946564f8"
+    }
+  ],
+  "initial_checks": {
+    "combined_affected_tests": 146,
+    "elapsed_seconds": 3.12,
+    "new_contract_tests": 33,
+    "result": "PASS"
+  },
+  "pending": "E report/native ablation adapter integration and independent source review; not execution-ready authorization",
+  "phase_authorized": false,
+  "production_source_unchanged": true,
+  "schema": "n4-protected-runner-cpu-validation-v1",
+  "source_base": "f6a9ab04c0f184bbe2f8c837b33492835bc8fec9"
+}
