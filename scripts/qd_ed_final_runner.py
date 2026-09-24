@@ -21,8 +21,10 @@ import subprocess
 import sys
 import time
 import uuid
+from types import SimpleNamespace
 
 import yaml
+import qd_ed_n1v as n1v
 from qd_ed_gpu_faults import KernelXidMonitor, MonitorError
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -42,7 +44,7 @@ REQUIRED_CODE = {
     'vlm_query/vlm_agent.py', 'scripts/qd_ed_final_report.py',
     'scripts/qd_ed_codex_launch.py',
     'scripts/qd_ed_gpu_faults.py',
-    'core/codex_stage.py', 'core/codex_stage_policy.py',
+    'core/codex_stage.py', 'core/codex_stage_policy.py', 'scripts/qd_ed_n1v.py',
 }
 REQUIRED_CODE.update(str(p.relative_to(ROOT)) for folder in ('core','utils','vlm_query')
                      for p in (ROOT/folder).rglob('*') if p.is_file() and p.suffix in {'.py','.txt'})
@@ -204,6 +206,7 @@ def validate_plan(path, *, root=ROOT, require_frozen=True, allow_unverified_gpu=
     require(plan.get('frozen') is True or not require_frozen, 'plan is not frozen')
     require(Path(plan['worktree']).resolve() == root, 'plan worktree mismatch')
     state = read_state(root / 'research-state.yaml')
+    n1v.validate_contract(SimpleNamespace(**globals()), plan, state)
     require(plan['run_name'] == state['run_name'], 'run identity mismatch')
     artifact_root = Path(plan['artifact_root']).resolve()
     require(artifact_root == Path(state['artifacts']).resolve(), 'artifact root mismatch')
@@ -715,7 +718,8 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
     selected_gpu = authorized_gpu(state)
     require(physical_gpu is None or (type(physical_gpu) is int and physical_gpu == selected_gpu),
             'GPU policy/runtime physical device mismatch')
-    require(budget['max_episode_attempts'] <= 240 and budget['max_gpu_hours'] <= 48, 'budget exceeds authorization')
+    ceiling, caps = n1v.budget_authority(budget, read_json, digest, require, legacy_caps=BUCKETS)
+    require(budget['max_episode_attempts'] <= ceiling and budget['max_gpu_hours'] <= 48, 'budget exceeds authorization')
     require(snap['running'] == 0, 'unfinished dispatched attempt must be reconciled first')
     require(snap['gpu_healthcheck_inflight']==0, 'unfinished GPU healthcheck reservation must be reconciled first')
     require(budget['dispatched'] == snap['dispatched'], 'state/ledger dispatched mismatch')
@@ -724,7 +728,7 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
     require(snap['gpu_hours_consumed'] < budget['max_gpu_hours'], 'GPU budget exhausted')
     require(budget['reserved']['validation'] >= 60 and budget['reserved']['formal'] >= 40, 'validation/formal reserve was reduced')
     bucket = row['budget_bucket']
-    require(snap['by_bucket'][bucket] < min(BUCKETS[bucket], budget['reserved'][bucket]), f'{bucket} reserve exhausted')
+    require(snap['by_bucket'][bucket] < min(caps[bucket], budget['reserved'][bucket]), f'{bucket} reserve exhausted')
     if bucket not in {'validation', 'formal'}:
         protected = max(0,60-snap['by_bucket']['validation']) + max(0,40-snap['by_bucket']['formal'])
         require(snap['dispatched'] + 1 + protected <= budget['max_episode_attempts'], 'would consume protected validation/formal reserve')
@@ -744,6 +748,7 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
 
 def check_retry(events, row):
     groups = event_groups(events)
+    n1v.check_retry(groups, row, episode_identity, require)
     prior = [g for g in groups.values() if g[0]['identity'] == episode_identity(row) and any(e['event']=='dispatched' for e in g)]
     require(not any(g[-1]['event'] == 'valid' for g in prior), 'legal completed outcome cannot be retried')
     if prior:
@@ -919,10 +924,8 @@ def validate_codex_stage_events(output, costs):
             'Codex Stage event/episode latency accounting mismatch')
 
 
-def validate_result(output, row, profile, runtime=None):
-    output=Path(output)
-    require(not list(output.glob('episode_*/error.txt')), 'episode error artifact')
-    require(not list(output.glob('episode_*/*fail_error.txt')), 'episode preparation/execution failure')
+def validate_resolved_identity(output, row, profile, runtime):
+    output = Path(output)
     resolved=read_state(output/'.hydra/config.yaml')
     for key,value in {**profile['static_override_values'], **stage_overrides(runtime or {}), 'seed':row['policy_seed'],
                        'main.episode_num':1,'main.episode_seed_schedule':[row['env_seed']],
@@ -935,15 +938,10 @@ def validate_result(output, row, profile, runtime=None):
         for part in key.lstrip('+').split('.'):
             actual=actual[part]
         require(actual==value, f'resolved configuration mismatch: {key}')
-    result=(output/'results.txt').read_text()
-    counts=re.findall(r'^Success count: ([01])/1$',result,re.M)
-    rates=re.findall(r'^Success rate: ([0-9.]+)%$',result,re.M)
-    require(len(counts)==len(rates)==1, 'results must describe exactly one episode')
-    success=int(counts[0]); require(float(rates[0])==success*100., 'result count/rate mismatch')
-    status='success' if success else 'fail'
-    videos=[p for p in (output/'episode_1').glob(f'episode_1_{status}*.mp4') if p.is_file() and not p.is_symlink() and p.stat().st_size>0]
-    require(videos, 'matching nonempty episode outcome video missing')
-    validate_video(videos[0])
+
+
+def validate_metric_identity(output, row, profile):
+    output = Path(output)
     metadata=read_events(output/'eds_eval/episode_metadata.jsonl')
     require(len(metadata)==1 and all(type(metadata[0].get(key)) is int and metadata[0][key]==value for key,value in
             {'episode_id':0,'episode_seed':row['env_seed'],'task_id':row['task_id']}.items()), 'episode metadata identity mismatch')
@@ -961,6 +959,24 @@ def validate_result(output, row, profile, runtime=None):
             require(not (key.endswith('_fallback_used') and value is True), f'unapproved fallback: {key}')
         if eds['qd_archive_mode']=='grid_archive':
             require(record.get('qd_evaluation_count')==expected, 'archive accounting mismatch')
+    return metrics
+
+
+def validate_result(output, row, profile, runtime=None):
+    output=Path(output)
+    require(not list(output.glob('episode_*/error.txt')), 'episode error artifact')
+    require(not list(output.glob('episode_*/*fail_error.txt')), 'episode preparation/execution failure')
+    validate_resolved_identity(output, row, profile, runtime)
+    result=(output/'results.txt').read_text()
+    counts=re.findall(r'^Success count: ([01])/1$',result,re.M)
+    rates=re.findall(r'^Success rate: ([0-9.]+)%$',result,re.M)
+    require(len(counts)==len(rates)==1, 'results must describe exactly one episode')
+    success=int(counts[0]); require(float(rates[0])==success*100., 'result count/rate mismatch')
+    status='success' if success else 'fail'
+    videos=[p for p in (output/'episode_1').glob(f'episode_1_{status}*.mp4') if p.is_file() and not p.is_symlink() and p.stat().st_size>0]
+    require(videos, 'matching nonempty episode outcome video missing')
+    validate_video(videos[0])
+    metrics = validate_metric_identity(output, row, profile)
     stage_summary=stage_query_summary(output,row)
     require(not stage_summary['stage_all_queries_failed'], 'all actual Stage queries failed')
     safety=read_events(output/'eds_eval/safety_events.jsonl')
@@ -1073,10 +1089,12 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
             if runtime.get('frozen_stage_provider', {}).get('backend') == 'codex_cli':
                 base.update(stage_backend='codex_cli', stage_model=runtime['frozen_stage_provider']['model'],
                             stage_condition=codex_stage_condition(runtime))
+            if row.get('iteration') == 'N1V':
+                base['n1v_authorization_sha256'] = n1v.AUTH_SHA
             append_event(root,{**base,'event':'reserved','time_unix':time.time(),'admission':admission})
             durable_json(output/'command.json',{'argv':command,'environment_public':{**runtime['environment'],'CUDA_VISIBLE_DEVICES':str(physical_gpu),'CUDA_DEVICE_ORDER':'PCI_BUS_ID','MUJOCO_EGL_DEVICE_ID':str(runtime['gpu_mapping']['egl_device_index'])}})
             process=None; started=time.monotonic(); process_finished=None; dispatched=False
-            outcome={'retryable_infrastructure':False}; final_event='aborted'
+            outcome={'retryable_infrastructure':False}; final_event='aborted'; code=None
             try:
                 # Recheck immediately before dispatch; the global runner lock prevents owned concurrency.
                 runtime_gpu(runtime, read_state(root/'research-state.yaml'))
@@ -1101,8 +1119,15 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                 require(code==0, f'child exit code {code}')
                 outcome=validate_result(output,row,manifest['profiles'][row['profile']],runtime); final_event='valid'
             except BaseException as exc:
-                # Fail closed: parser/gate/scientific invalidity is never an automatic recovery retry.
+                # Default fail-closed behavior is retained; only the approved N1V
+                # typed Stage-timeout evidence path below can opt into recovery.
                 final_event,outcome=failed_outcome(exc,output,row,launch_failed=dispatched and process is None,runtime=runtime)
+                if dispatched and code == 0 and isinstance(exc, GateError) and str(exc) in {
+                        'episode error artifact', 'episode preparation/execution failure'}:
+                    prospective = n1v.timeout_outcome(SimpleNamespace(**globals()),
+                        plan, output, row, manifest['profiles'][row['profile']], runtime)
+                    if prospective is not None:
+                        final_event, outcome = 'aborted', prospective
                 if not dispatched:
                     final_event='aborted'; outcome['task_failure']=False; outcome['failure_class']='predispatch_gate'
                 if isinstance(exc,(KeyboardInterrupt,SystemExit)):
