@@ -203,6 +203,7 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         except (ValueError, UnicodeDecodeError):
             stream_error = "codex_invalid_event_stream"
         starts = 0
+        thread_starts = 0
         messages = []
         error_code = stream_error
         event_types = []
@@ -212,13 +213,17 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         diagnostics = []
         transport_fallbacks = []
         completed = False
+        fallback_policy = self.event_policy in {
+            "completed_transport_fallback_v1", "completed_transport_fallback_preturn_v2"}
         for event_index, event in enumerate(events):
             kind = event.get("type")
             event_types.append(kind if isinstance(kind, str) else "invalid")
-            if kind == "turn.started":
+            if kind == "thread.started":
+                thread_starts += 1
+            elif kind == "turn.started":
                 starts += 1
             elif kind == "turn.completed":
-                if self.event_policy == "completed_transport_fallback_v1" and len(messages) != 1:
+                if fallback_policy and len(messages) != 1:
                     error_code = "codex_unexpected_event"
                 completed = True
                 self.api_request_counter.values["completed_turns"] += 1
@@ -245,12 +250,14 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                 item_kind = item.get("type") if isinstance(item, dict) else None
                 item_types.append(item_kind if isinstance(item_kind, str) else "invalid")
                 message = item.get("message") if isinstance(item, dict) else None
-                fallback = (self.event_policy == "completed_transport_fallback_v1"
+                fallback = (fallback_policy
                     and kind == "item.completed" and item_kind == "error"
                     and isinstance(message, str) and message.startswith(TRANSPORT_FALLBACK_PREFIX)
                     and len(TRANSPORT_FALLBACK_PREFIX) < len(message) <= 2048
                     and not any(char in message for char in ("\x00", "\r", "\n"))
-                    and starts == 1 and not completed and not messages and not transport_fallbacks)
+                    and (starts == 1 or (self.event_policy == "completed_transport_fallback_preturn_v2"
+                         and starts == 0 and thread_starts == 1 and event_index == 1))
+                    and not completed and not messages and not transport_fallbacks)
                 if fallback:
                     transport_fallbacks.append({"event_index": event_index,
                         "classification": "websocket_to_https_fallback_notice",
@@ -262,7 +269,7 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                     diagnostics.append({"event_index": event_index, "source": "error_item",
                                         **_safe_error_diagnostic(item.get("message"))})
                 if item_kind == "agent_message" and kind == "item.completed":
-                    if self.event_policy == "completed_transport_fallback_v1" and completed:
+                    if fallback_policy and completed:
                         error_code = "codex_unexpected_event"
                     text = item.get("text")
                     if not isinstance(text, str) or not text.strip():
@@ -286,10 +293,11 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                     "attempt": int(match[1]) if reconnect else None,
                     "maximum": int(match[2]) if reconnect else None,
                 })
-                if not (self.event_policy in {"completed_reconnect_v1", "completed_transport_fallback_v1"} and reconnect
+                if not (self.event_policy in {"completed_reconnect_v1", "completed_transport_fallback_v1",
+                                              "completed_transport_fallback_preturn_v2"} and reconnect
                         and starts == 1 and not completed and not messages):
                     error_code = "codex_unexpected_event"
-            elif kind not in ("thread.started",):
+            else:
                 error_code = "codex_unexpected_event"
                 if kind == "turn.failed":
                     detail = event.get("error")
@@ -305,8 +313,10 @@ class CodexStageRecognizer(GeminiStageRecognizer):
             error_events=errors,
             error_diagnostics=diagnostics,
         )
-        if self.event_policy == "completed_transport_fallback_v1":
+        if fallback_policy:
             self._call_transport['transport_fallback_notices'] = transport_fallbacks
+        if self.event_policy == "completed_transport_fallback_preturn_v2" and thread_starts != 1:
+            error_code = "codex_expected_one_thread"
         if starts == complete_turns == len(usages) == 1 and stream_error is None:
             self.api_request_counter.values["usage_complete_calls"] += 1
         if starts != 1 or complete_turns != 1:

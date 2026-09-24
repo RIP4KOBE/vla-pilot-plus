@@ -274,6 +274,41 @@ def test_proposed_transport_fallback_accepts_only_completed_single_call_and_pres
     assert 'private detail' not in json.dumps(result)
 
 
+def test_preturn_fallback_accepts_one_complete_reply_without_relaxing_v1(monkeypatch, tmp_path):
+    stream = events(answer=json.dumps({'stage': 2, 'guidance': 'no', 'evidence': 'held'}))
+    stream.insert(1, fallback_notice())
+    old, _ = make(monkeypatch, tmp_path, event_list=stream,
+                  output_format='json_schema_v1', event_policy='completed_transport_fallback_v1')
+    assert identify(old) == (1, True)
+    assert old.last_result['error'] == 'codex_unexpected_item'
+    new, calls = make(monkeypatch, tmp_path, event_list=stream,
+                      output_format='json_schema_v1', event_policy='completed_transport_fallback_preturn_v2')
+    assert identify(new) == (2, False)
+    assert len(calls) == new.last_result['codex_usage_complete_calls'] == 1
+    assert new.last_result['codex_failed_calls'] == 0
+    notices = new.last_result['transport']['transport_fallback_notices']
+    assert len(notices) == 1 and notices[0]['event_index'] == 1
+    assert 'private detail' not in json.dumps(new.last_result)
+
+
+@pytest.mark.parametrize('change', ['before_thread', 'duplicate', 'unknown', 'missing_usage',
+                                     'missing_completion', 'nonzero', 'second_turn', 'tool_item'])
+def test_preturn_fallback_still_rejects_other_error_or_incomplete_turn(monkeypatch, tmp_path, change):
+    stream = events(answer=json.dumps({'stage': 2, 'guidance': 'no', 'evidence': 'held'}))
+    stream.insert(0 if change == 'before_thread' else 1, fallback_notice())
+    if change == 'duplicate': stream.insert(2, fallback_notice())
+    if change == 'unknown': stream[1]['item']['message'] = 'unrelated provider error'
+    if change == 'missing_usage': stream[-1]['usage'] = {}
+    if change == 'missing_completion': stream.pop()
+    if change == 'second_turn': stream += events()
+    if change == 'tool_item': stream.insert(3, {'type':'item.completed', 'item':{'type':'command_execution'}})
+    recognizer, calls = make(monkeypatch, tmp_path, event_list=stream,
+        returncode=1 if change == 'nonzero' else 0,
+        output_format='json_schema_v1', event_policy='completed_transport_fallback_preturn_v2')
+    assert identify(recognizer) == (1, True)
+    assert len(calls) == 1 and recognizer.last_result['codex_failed_calls'] == 1
+
+
 @pytest.mark.parametrize('change', ['legacy','duplicate','unknown','empty_suffix','newline','nul','oversized',
     'item_updated','before_start','after_message','after_completion','nonzero','timeout','missing_usage',
     'missing_completion','turn_failed','tool_item','two_responses','two_turns','bad_json','other_error',

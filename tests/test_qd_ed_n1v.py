@@ -316,6 +316,16 @@ def test_n1x_luna_timeout_is_prospective_and_usage_stays_unknown(tmp_path, timeo
     assert result['failed_call_token_usage'] is None
 
 
+def test_n1y_preturn_binding_is_new_and_cannot_be_used_for_n1x():
+    runtime = {'frozen_stage_provider': {'backend': 'codex_cli', 'model': 'gpt-6-luna',
+        'timeout_seconds': 90, 'output_format': 'json_schema_v1',
+        'event_policy': 'completed_transport_fallback_preturn_v2'}}
+    assert r.codex_stage_condition(runtime) == p.settings('N1Y')['condition']
+    p.validate_transport_binding(r, {'episodes': [{'iteration': 'N1Y'}]}, runtime)
+    with pytest.raises(r.GateError, match='acceptance condition'):
+        p.validate_transport_binding(r, {'episodes': [{'iteration': 'N1X'}]}, runtime)
+
+
 def test_n1w_new_acceptance_requires_correct_cohort_and_180_seconds():
     runtime = {'frozen_stage_provider':{'output_format':'json_schema_v1',
         'event_policy':'completed_transport_fallback_v1','timeout_seconds':180}}
