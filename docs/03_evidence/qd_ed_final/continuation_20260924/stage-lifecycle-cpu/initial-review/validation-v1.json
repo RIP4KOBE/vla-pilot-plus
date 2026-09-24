@@ -1,0 +1,53 @@
+{
+  "schema": "codex-stage-lifecycle-cpu-validation-v1",
+  "base_commit": "f6a9ab04c0f184bbe2f8c837b33492835bc8fec9",
+  "historical_codex_stage_sha256": "27adf43302afc455a1b3122f267c7493c212bc83982bdaeba09d89873913da25",
+  "actual_provider_calls": 0,
+  "gpu_calls": 0,
+  "online_validation_authorized": false,
+  "changed_production_files": [
+    "core/codex_stage.py",
+    "core/codex_stage_lifecycle.py"
+  ],
+  "source_sha256": {
+    "core/codex_stage.py": "dd5a9389934a09f638e6ba159b2d74a958849844a34fd26cb62e07d36ca16805",
+    "core/codex_stage_lifecycle.py": "be02ab0ca6e84c7045f6730e8ca46d1ed8db10bb8c9a9ed417a8e6f81117f21f",
+    "tests/test_codex_stage_lifecycle.py": "64f30eb76ebf078f093489e1d069c952f3b954ef68082050d510308f6c317dfa",
+    "tests/test_codex_stage.py": "793fdfc15610d4ab2eb3ca8b742a3dbf4daf43f82d776839099bbd12caf1661d",
+    "core/codex_stage_policy.py": "92f78a80651e97390a296e42850aae0b70217afb1c362e9b5d0b8a07b8cbe432",
+    "core/gemini_grounder.py": "0d1a51c8dbd077f274235ae00c1b3ab538e0f9745d85fd12417e21f57980b1f6",
+    "main.py": "f9add8568d45ec799e4030b1108f069f4af88bf3b63c62d7f836d59539a427a7",
+    "configs/perception.yaml": "428b7ef08eaca1c284145502938637bfab99967b5519909110f5d83a2d04feb7"
+  },
+  "unchanged_functions": {
+    "_stop_owned_process": {
+      "identical": true,
+      "sha256": "715d2a65a1e7776329caf85d8487a41b279fa6c0b9c46341b08adf581cf983b8"
+    },
+    "_configure_transport": {
+      "identical": true,
+      "sha256": "84ff7084b568d822ae22817200f9b71829829cce54577a62ac87ba1e2cbe7098"
+    },
+    "_command": {
+      "identical": true,
+      "sha256": "becd54ac36b8fb5115c3d2b7ea8f67ba75425e0baa972477a85d3248f7681e38"
+    },
+    "_parse_events": {
+      "identical": true,
+      "sha256": "8dbfaed3220856550b9fe8d778cb71fecdd03b17943c7f3d14352e5f0b4ab99f"
+    },
+    "_record_transport_result": {
+      "identical": true,
+      "sha256": "ed3844defa4d69e63a62a707d100a6f56eaf26e31b50fc28659327124acd40ff"
+    }
+  },
+  "test_command": "CUDA_VISIBLE_DEVICES='' PYTHONDONTWRITEBYTECODE=1 /home/hynx/miniconda3/envs/vla-pilot/bin/python -m pytest tests/test_codex_stage.py tests/test_codex_stage_lifecycle.py -q",
+  "test_result": {
+    "passed": 50,
+    "elapsed_seconds": 6.2,
+    "new_tests": 25,
+    "existing_tests": 25
+  },
+  "result": "CPU_PASS_not_remote_timing_proof",
+  "scope": "passive local observation; unchanged acceptance, CLI wait, timeout defaults, retry and counter policy"
+}
