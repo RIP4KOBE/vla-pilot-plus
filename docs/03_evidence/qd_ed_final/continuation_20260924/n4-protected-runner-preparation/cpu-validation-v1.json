@@ -11,7 +11,7 @@
   "files": [
     {
       "path": "scripts/qd_ed_n4_evaluation.py",
-      "sha256": "524d318360e68340267b22e64191dc11de50f660edf7e8f8dc19c68a2c6e6335"
+      "sha256": "4e5ee7e5991870458744ccfa475ed14d5fc326b2719ade6be5c532032885d55e"
     },
     {
       "path": "scripts/qd_ed_n4_evaluate.py",
@@ -31,7 +31,7 @@
     },
     {
       "path": "tests/test_qd_ed_n4_evaluation.py",
-      "sha256": "439236a51048f11534b224b453c0262541ea01e1f27b33869ad656a7afa0e3ed"
+      "sha256": "bb0e56681e220de106a6f95cd402b19257710951c8b54064106c490fc3fe11ae"
     },
     {
       "path": "experiments/iteration_004_terminal_population/protected-evaluation-protocol-v1.md",
@@ -48,5 +48,11 @@
   "phase_authorized": false,
   "production_source_unchanged": true,
   "schema": "n4-protected-runner-cpu-validation-v1",
+  "schema_shape_recheck": {
+    "change": "Use frozen Dev profiles.N4.valid_cell_observation_summary.qd_active_chunks nesting",
+    "elapsed_seconds": 0.96,
+    "result": "PASS",
+    "tests": 34
+  },
   "source_base": "f6a9ab04c0f184bbe2f8c837b33492835bc8fec9"
 }

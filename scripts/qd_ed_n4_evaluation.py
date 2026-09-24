@@ -246,7 +246,7 @@ def reviewed_promotion(plan,events,root,runner):
             and computed.get('input_scope_complete') is True,'Dev promotion incomplete/numeric/activity failure')
         predecessor=dev.COHORT
         candidate=computed['profiles']['N4']
-        r.require(candidate.get('qd_active_chunks',0)>0 and
+        r.require(candidate.get('valid_cell_observation_summary',{}).get('qd_active_chunks',0)>0 and
             candidate.get('n4_consumer_summary',{}).get('actual_prefix_different_decisions',0)>=1,
             'Dev promotion lacks substantive native QD/actual-prefix activity')
         reported_dev=base
