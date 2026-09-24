@@ -1,0 +1,18 @@
+{
+  "command": [
+    "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-complete-cohort-independent-review/v2-checkpoint-admission/test_independent_checkpoint.py",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-post-dev-diagnostic-preparation-v2/test_checkpoint_admission.py::test_real_all30_admission_accepts_metadata_recovery_without_decode",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-post-dev-diagnostic-preparation-v2/test_checkpoint_admission.py::test_checkpoint_first3_identity_mismatch_stops_before_native_hash"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 2.037124146008864,
+  "independent_metadata_cases": 13,
+  "author_focused_integration_cases_rerun": 2,
+  "scope": "synthetic only; no actual entrypoint or episode inputs; overlap not new performance evidence"
+}

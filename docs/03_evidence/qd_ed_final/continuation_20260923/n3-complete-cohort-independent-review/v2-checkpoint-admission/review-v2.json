@@ -1,0 +1,73 @@
+{
+  "schema": "n3-post-dev-checkpoint-admission-independent-review-v2",
+  "verdict": "PASS",
+  "blocking_findings": [],
+  "reviewed_source_directory": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-post-dev-diagnostic-preparation-v2",
+  "reviewed_source_hashes": {
+    "read_full_dev.py": "731e8dde617d89cf538caf13c11f23b267b03225c32f93660fe9a1d731e8ae40",
+    "protocol-v2.md": "7827f9adbfe030b21708efdc7a46f39224268fc79041e8c80371bab8bfeff807",
+    "dependencies-v2.json": "f8a8f5bea616fdaeca46760f29f8ecb930088029d1c23a5a500236f4a621b256",
+    "test_checkpoint_admission.py": "e90c4bcb295eea2a7f93e068f55d77f1732d93b24d379a71dbf7c4642bca26fe",
+    "inherited-protocol-v1.md": "8157d29e07df388ad8e5a28abce1a8ef825eb2ff1923ee13da55976f7937bca4",
+    "input-schema-v2.json": "617bd8cdaa09bdf91b96dd5d22b511abaf620ab4bd6dc6a2a9a4838531aae1d9"
+  },
+  "prior_review_preserved": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-complete-cohort-independent-review/review-v1.json",
+    "sha256": "f17a52a48fd9d7590e2579909ae12b7d3c47e2485ca74ff817defb4dca1fb1a4"
+  },
+  "failure_scope": "V1 was authorized and read matrix/plan metadata, then failed admission. Root reports 0 cells completed and 0 native decodes; the correction does not reuse its execution authorization.",
+  "findings": [
+    "Exact base and ordered post-checkpoint/recovery plan references are pinned. The base checkpoint_release key must exist with JSON null.",
+    "Both revisions must name the same exact pinned checkpoint path/SHA. Only after that check is the comparison copy normalized to null. All other cohort fields, source/runtime/profile/seed bindings, code inventory, candidate profiles and original episode rows retain exact comparisons.",
+    "Checkpoint bytes are SHA-verified, including fields outside the metadata subset. Schema, cohort/source/code/protocol, known_valid tracking, three unique first-triplet IDs and all eight strict boolean-true checks are pinned and source-bound.",
+    "The first three complete accepted representatives must match the certificate IDs before entering the cell loop. Existing all30 own-plan/recovery/accepted snapshot and bundle-hash gates remain unchanged.",
+    "Checkpoint evidence references are not followed. No source attestation helper, fresh auditor or scientific entrypoint is called by the new gate.",
+    "Only admit/run changed and admit_plans was added. Fourteen preexisting function/class blocks are source-byte-identical; five pure/helper module references, called-function contract, environment version requirements and fourteen production source hashes are unchanged.",
+    "Inherited protocol bytes are preserved. This fix changes neither chronology/Stage conventions nor fixed residual arithmetic, native selected joins, final-consumer activity witnesses, aggregation, outcome or cost interpretation."
+  ],
+  "validation": {
+    "independent_synthetic_cases": 13,
+    "author_focused_full_admission_cases_rerun": 2,
+    "total_checks_in_this_run": 15,
+    "pytest_result": "15 passed in 1.33s",
+    "overlap_notice": "Two tests are selected from the author 29-case metadata suite; no old mathematical/chronology suites rerun and no counts are performance evidence.",
+    "boundaries": [
+      "exact-null/post/recovery success without evidence recursion",
+      "missing/non-null base rejection before reads",
+      "missing/null/wrong revision certificate rejection",
+      "rehashed scientific/resource/new-field/runtime-inventory drift rejection",
+      "integer one is not accepted as a true certificate check",
+      "extra named revision rejected before reads",
+      "changed certificate bytes outside compared subset rejected",
+      "all30 invented accepted recovery metadata admitted with zero torch.load calls",
+      "wrong first3 identities rejected before native hashing"
+    ],
+    "public_metadata_read_count": 4,
+    "source_metadata_verification": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-complete-cohort-independent-review/v2-checkpoint-admission/source-metadata-verification-v2.json",
+      "sha256": "f2957db28555fc90748b9dbd6a97af7e13b261c3600a623837b4f8fb3ba9b2c6"
+    },
+    "execution": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-complete-cohort-independent-review/v2-checkpoint-admission/test-execution-v2.json",
+      "sha256": "c2cecc8976ef56c302f56274fe0444cfb0f5ce34becc4474aa5a730ba5fe1667"
+    },
+    "test_source": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-complete-cohort-independent-review/v2-checkpoint-admission/test_independent_checkpoint.py",
+      "sha256": "2758931343f33e1c40a22ac08843605e6a839ef70234c224ef097e1db1ac05ca"
+    },
+    "stdout": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-complete-cohort-independent-review/v2-checkpoint-admission/pytest-v2.stdout.txt",
+      "sha256": "887f694a5ef0e4731fd2b027dbfbf1b9d330ced5535489d2699edce7923a45ce"
+    },
+    "stderr": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-complete-cohort-independent-review/v2-checkpoint-admission/pytest-v2.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "limits": [
+    "This source/metadata/synthetic review does not re-audit actual episode tensors or independently verify the scientific checkpoint evidence named in the certificate.",
+    "Accepted status/index snapshot provenance and all30 input authority remain requirements of a separately frozen future root authorization.",
+    "No actual reader invocation, new episode payload/metric/scientific analysis, GPU/model/provider/projector/simulator call, W edit, or state/ledger/plan change was performed.",
+    "Source hashes, not a moving worktree label, define this review. Later source changes require review of the changed bytes."
+  ]
+}
