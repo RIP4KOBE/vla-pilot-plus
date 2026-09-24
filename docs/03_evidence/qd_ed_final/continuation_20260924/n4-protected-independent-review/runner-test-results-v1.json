@@ -1,0 +1,36 @@
+{
+  "unique_cases": 13,
+  "runs": [
+    {
+      "source_commit_bytes": "04504d18e7e6f7350bdbe28b8ec8b597a4b23c92",
+      "cases": 11,
+      "passed": 11,
+      "seconds": 0.38,
+      "scope": "actual temporary CPU lease, admitted recovery capability, row/journal/resource/thread drift, complete-numeric-fail, unrecognized health, both historical registries despite self-consistent misleading summary, predispatch episode/health reservations before seed read"
+    },
+    {
+      "source_commit_bytes": "dd156490bf7a526b9af93f5db6c38e3667344a3c",
+      "cases": 2,
+      "passed": 2,
+      "deselected": 11,
+      "seconds": 0.13,
+      "scope": "actual frozen Dev report summarize pure function creates twelve synthetic cells; nested active count positive/zero tests against reviewed_promotion"
+    }
+  ],
+  "overlap_notice": "The first nine passed once before two reserved-only cases were added (9 PASS/0.34s). They are included in the eleven and not counted twice. The final one-line promotion accessor change is checked by the two new real-schema cases; unaffected eleven were not rerun. No tests imply scientific performance.",
+  "fixture_correction": {
+    "initial_result": "5 failed,4 passed/0.57s",
+    "cause": "Independent fixture accidentally reused a validation seed for its synthetic prior Dev cost; real exposure guard correctly rejected it before capability creation.",
+    "change": "Only independent fake prior Dev env/policy seed and split changed to distinct Dev values; no production change.",
+    "classification": "review-fixture error, not product defect"
+  },
+  "test_source": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260924/n4-protected-independent-review/test_phase_boundaries.py",
+    "sha256": "2d1d2bcedcbe08f3363b3c1a20b7494b24974ea03cc72beb07c97f0abf16d381"
+  },
+  "archived_first_nine_source": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260924/n4-protected-independent-review/source-tests-first-nine.py",
+    "sha256": "343cfab793022e221948d76b6ee9e1ca8431a0146c84f92413ef2fe88633a744",
+    "note": "Comment originally named initial review commit20b0fa7; actual pinned module SHA in this file is the later04504d1 code. Commit identity here is derived from git-object byte equality, not its historical comment."
+  }
+}

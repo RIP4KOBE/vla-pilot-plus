@@ -1,0 +1,149 @@
+{
+  "schema": "n4-protected-independent-runner-review-v1",
+  "date_utc": "2026-09-24",
+  "verdict": "PASS_REVIEWED_RUNNER_BOUNDARIES_INTEGRATED_REPORT_AND_ABLATION_PENDING",
+  "reviewed_commit": "dd156490bf7a526b9af93f5db6c38e3667344a3c",
+  "base_commit": "f6a9ab04c0f184bbe2f8c837b33492835bc8fec9",
+  "reviewed_commit_chain": [
+    "20b0fa74efb59a0c79e3b3fceb2092a6db2ad008",
+    "04504d18e7e6f7350bdbe28b8ec8b597a4b23c92",
+    "dd156490bf7a526b9af93f5db6c38e3667344a3c"
+  ],
+  "source_refs": [
+    {
+      "relative_path": "scripts/qd_ed_n4_evaluation.py",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-evaluation-runner-20260924/scripts/qd_ed_n4_evaluation.py",
+      "sha256": "4e5ee7e5991870458744ccfa475ed14d5fc326b2719ade6be5c532032885d55e"
+    },
+    {
+      "relative_path": "scripts/qd_ed_n4_evaluate.py",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-evaluation-runner-20260924/scripts/qd_ed_n4_evaluate.py",
+      "sha256": "7b8d470649c0f77eec57f39d4bcb745fd9e73dad385e6b2ff6322fe6abf55ff3"
+    },
+    {
+      "relative_path": "scripts/qd_ed_final_runner.py",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-evaluation-runner-20260924/scripts/qd_ed_final_runner.py",
+      "sha256": "eefdc47589ac69436562bac52ec774319ecf72c65007c596d25e61f8f42c4ee8"
+    },
+    {
+      "relative_path": "scripts/qd_ed_available_gpu_queue.py",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-evaluation-runner-20260924/scripts/qd_ed_available_gpu_queue.py",
+      "sha256": "3e8c67e56664b703246e2f8a8e0e08b904f40b223105b4617372374b2b0d0f14"
+    },
+    {
+      "relative_path": "scripts/qd_ed_n4_report.py",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-evaluation-runner-20260924/scripts/qd_ed_n4_report.py",
+      "sha256": "d26769d73e43e6b10b8171f6930604bc510d15b26174ca3a767bcdf84a72c2fb"
+    },
+    {
+      "relative_path": "scripts/qd_ed_n4_plan.py",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-evaluation-runner-20260924/scripts/qd_ed_n4_plan.py",
+      "sha256": "e5a6fd6e084a0748d786a0baec4472507d5ba61384696023b76a0099c05c59e9"
+    },
+    {
+      "relative_path": "scripts/qd_ed_n4_supervise.py",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-evaluation-runner-20260924/scripts/qd_ed_n4_supervise.py",
+      "sha256": "b6dd9224cfaf3066ccd40dd9abe51c93fe8fafe1018329a85c3a247ba74dd877"
+    },
+    {
+      "relative_path": "configs/qd_ed_final/n4_evaluation_profiles.json",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-evaluation-runner-20260924/configs/qd_ed_final/n4_evaluation_profiles.json",
+      "sha256": "838a21b5ddbb5fe4c0648483a75bdd01db0e2a09c5cbe669aa09ff69410d22c5"
+    },
+    {
+      "relative_path": "tests/test_qd_ed_n4_evaluation.py",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-evaluation-runner-20260924/tests/test_qd_ed_n4_evaluation.py",
+      "sha256": "bb0e56681e220de106a6f95cd402b19257710951c8b54064106c490fc3fe11ae"
+    },
+    {
+      "relative_path": "tests/test_qd_ed_n4_plan.py",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-evaluation-runner-20260924/tests/test_qd_ed_n4_plan.py",
+      "sha256": "001120fb7b90d064639b9a218c00f00758a309706eaa2b3314fe74ffac9a4054"
+    },
+    {
+      "relative_path": "tests/test_qd_ed_n4_report.py",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-evaluation-runner-20260924/tests/test_qd_ed_n4_report.py",
+      "sha256": "370fbd9bcadce171f3c8e4cc13487c50b38bdd6f3e59701abbc47907d671867e"
+    }
+  ],
+  "blocking_findings": [],
+  "independent_checks": {
+    "unique_cases": 13,
+    "runs": [
+      {
+        "source_commit_bytes": "04504d18e7e6f7350bdbe28b8ec8b597a4b23c92",
+        "cases": 11,
+        "passed": 11,
+        "seconds": 0.38,
+        "scope": "actual temporary CPU lease, admitted recovery capability, row/journal/resource/thread drift, complete-numeric-fail, unrecognized health, both historical registries despite self-consistent misleading summary, predispatch episode/health reservations before seed read"
+      },
+      {
+        "source_commit_bytes": "dd156490bf7a526b9af93f5db6c38e3667344a3c",
+        "cases": 2,
+        "passed": 2,
+        "deselected": 11,
+        "seconds": 0.13,
+        "scope": "actual frozen Dev report summarize pure function creates twelve synthetic cells; nested active count positive/zero tests against reviewed_promotion"
+      }
+    ],
+    "overlap_notice": "The first nine passed once before two reserved-only cases were added (9 PASS/0.34s). They are included in the eleven and not counted twice. The final one-line promotion accessor change is checked by the two new real-schema cases; unaffected eleven were not rerun. No tests imply scientific performance.",
+    "fixture_correction": {
+      "initial_result": "5 failed,4 passed/0.57s",
+      "cause": "Independent fixture accidentally reused a validation seed for its synthetic prior Dev cost; real exposure guard correctly rejected it before capability creation.",
+      "change": "Only independent fake prior Dev env/policy seed and split changed to distinct Dev values; no production change.",
+      "classification": "review-fixture error, not product defect"
+    },
+    "test_source": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260924/n4-protected-independent-review/test_phase_boundaries.py",
+      "sha256": "2d1d2bcedcbe08f3363b3c1a20b7494b24974ea03cc72beb07c97f0abf16d381"
+    },
+    "archived_first_nine_source": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260924/n4-protected-independent-review/source-tests-first-nine.py",
+      "sha256": "343cfab793022e221948d76b6ee9e1ca8431a0146c84f92413ef2fe88633a744",
+      "note": "Comment originally named initial review commit20b0fa7; actual pinned module SHA in this file is the later04504d1 code. Commit identity here is derived from git-object byte equality, not its historical comment."
+    }
+  },
+  "closed_boundary_results": [
+    {
+      "id": "phase_bound_recovery_budget",
+      "result": "PASS",
+      "source": "qd_ed_n4_evaluation.py:330,427-458 and generic check_budget",
+      "evidence": "Real temporary flock plus supervisor wrappers; permission created through admission with exact recovery terminal/certificate; generic raw-recovery budget cannot consume reservations, verified validation capability permits only validation exclusion, preserves formal10h/rawcosts. Mutated journal/resources/phase or ownerthread rejected."
+    },
+    {
+      "id": "passing_validation_and_settled_costs",
+      "result": "PASS_WITH_REPORT_DEPENDENCY_PENDING",
+      "source": "reviewed_promotion/prepare_reservation_release/require_settled",
+      "evidence": "Complete60 numeric-failed synthetic adapter result rejected; passing result cannot omit settled but unrecognized health resource; reserved-only episode/health rejected before protected seed read. Dev nativeactivity now matches unchanged frozen reporter nested schema."
+    },
+    {
+      "id": "historical_exposure",
+      "result": "PASS",
+      "source": "verify_seed_metadata/check_seed_exposure/allocate",
+      "evidence": "Both historical/rolling registry files are SHA-bound. Even a hash-consistent summary claiming no known intersections is rejected when a registry contains the candidate seed; empty private ledger cannot erase it."
+    }
+  ],
+  "source_review_notes": [
+    "Exact original60/40 matrix and seed-block identity are regenerated from bound seeds; recovery max4/2, exact original cell and single parent; source-profile identity comparisons retain production bytes and enumerate tooling changes.",
+    "Formal allocation persists candidate fingerprint under own state lock before reservation; distinct fingerprint fails. Reports/releases cannot be substituted by phase boolean.",
+    "Direct generic runner/queue uses protected owned scope before dispatch; hardware hook and PID/thread/boot/lease/monitor identity remain pinned. These are accidental-entry guards under frozen-source trust, not protection against arbitrary Python mutation.",
+    "Full1800+40 window and remaining originals/recovery slots checked without relabelling raw recovery charges. Private authority checks local regular ledgers/locks and original caps; no peer state or ledger read is added.",
+    "Reused Dev prerequisite helper still verifies old immutable resource pointer as historical provenance after new private authority validation. This is not new historical independent-budget authority; new budgets/ownership derive from explicit isolation authority.",
+    "QD_OFF configuration removes archive and selects compatibility consumer; active noarchive path/population Stage spread is disclosed, formal ten fourth-arm rows retained. Native noarchive audit and complete60/40 report remain an external implementation dependency."
+  ],
+  "not_validated": [
+    "New E report recomputation of actual accepted evidence and transitive source closure.",
+    "New E QD_OFF native audit and reporter integration with deployed metric types.",
+    "Actual protected seed availability, report results, resource capacity, phase release or GPU dispatch."
+  ],
+  "scope": {
+    "actual_episode_or_protected_result_reads": 0,
+    "native_bundle_reads": 0,
+    "actual_seed_or_registry_reads": 0,
+    "gpu_model_provider_calls": 0,
+    "W_X_V_source_edits": 0,
+    "runtime_state_ledger_mutations": 0,
+    "synthetic_tmp_files_and_cpu_flock_only": true,
+    "phase_authorized": false
+  }
+}

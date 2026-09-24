@@ -1,0 +1,64 @@
+{
+  "schema": "n4-protected-independent-design-review-v1",
+  "date_utc": "2026-09-24",
+  "verdict": "CONDITIONAL_DESIGN_ACCEPT_IMPLEMENTATION_PENDING",
+  "source_refs": [
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-evaluation-runner-20260924/docs/03_evidence/qd_ed_final/continuation_20260924/n4-protected-runner-preparation/interface-design-v1.md",
+      "sha256": "ac743abe426d67d1a887fe0c7d7ebdc09691bf15d0fc4b36a0086d4d59eb6d87"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-protected-evaluation-preparation-v1/memo-v1.md",
+      "sha256": "632c8dd210aaa950d54d8f5ab7caff41563596ea66034a35e9cc911afb802ee0"
+    }
+  ],
+  "scope": {
+    "read": "two design documents only; previously reviewed frozen N4 interfaces",
+    "actual_scientific_results_read": false,
+    "protected_seed_registry_read": false,
+    "native_bundles_read": false,
+    "gpu_model_provider_calls": 0,
+    "implementation_tests_run": 0,
+    "production_mutation": false,
+    "execution_or_promotion_authority": false
+  },
+  "blocking_design_contradictions": [],
+  "required_implementation_counterexamples": [
+    {
+      "id": "phase_bound_recovery_budget",
+      "counterexample": "A validation retry remains raw budget_bucket=recovery. A budget exemption based only on that bucket either withholds its own phase reservation incorrectly or permits the wrong protected reservation.",
+      "requirement": "Derive the excluded protected-hour reservation only from the verified exact original-cell/phase capability, bound frozen recovery identity and parent; preserve raw recovery counters and costs. Validation must retain formal 10h protection."
+    },
+    {
+      "id": "passing_not_only_complete_validation",
+      "counterexample": "All 60 validation cells are valid and accepted but N4 is below 10/20 or below a same-round control. Completion alone cannot release unused validation hours or admit formal.",
+      "requirement": "Recompute the complete numeric/control/correctness/native/source/accounting gates; require settled costs and a separate completion-bound explicit release event. Keep original 60/40 slots and all charges."
+    },
+    {
+      "id": "historical_exposure_after_private_split",
+      "counterexample": "A seed disappears from the private owner ledger after historical shared records are partitioned; an own-ledger-only check falsely declares it unexposed.",
+      "requirement": "Bind the approved historical exposure metadata and original registries with their stated scope, then recheck own reserved identities at admission. Shared row0 remains declared layout reuse. No automatic seed replacement."
+    }
+  ],
+  "reviewed_design_properties": [
+    "First-three correctness is not full Dev promotion; complete12 N4>=2/4 and >= both controls plus native/source/substantive-QD and actual-prefix-difference gates precede validation.",
+    "Validation remains 60 originals (20 per C0/Q0/N4); formal remains 40 originals (10 per C0/Q0/N4/QD_OFF), with complete identity including seed block.",
+    "Protected numeric gates stay 10/20 and 5/10 with same-round controls; no new protected action-difference quota or ablation-superiority threshold.",
+    "QD_OFF means total archive removal with compatibility consumer and population Stage spread; active C0 equivalence is disclosed and the formal fourth arm is retained.",
+    "Private 240 attempts/48h, GPU3 single worker, original bucket caps, 14h/10h reservations, full 1840s window and eligible recovery maxima 4/2 are retained.",
+    "Formal candidate latch occurs before any formal reservation; report booleans alone do not provide release authority.",
+    "Production source remains mapped to selected Dev bytes; phase tooling/audit adapters require explicit reviewed allowlist and separate source freeze."
+  ],
+  "parent_metadata_notice_not_independently_reopened": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-protected-evaluation-preparation-v1/prospective-seed-metadata-review-v1.json",
+    "sha256": "10cf6516514f8616014e8f3bf34f02ccc1ea591e8f3855d5d6eb4c394a672e6c",
+    "reported_scope": "own study historical-exposure-inventory plus exposure-registry plus private reserved identities; provisional, admission must recheck",
+    "reported_result": "20 c1 seeds have no known intersection; all row0 layouts shared with formal",
+    "independent_availability_claim": false
+  },
+  "limitations": [
+    "Design review is not a code audit, phase promotion, resource availability finding, or execution release.",
+    "No protected outcomes or running Dev results were used.",
+    "Implementation source, exact dependencies and focused synthetic counterexamples will be independently checked after stable submission."
+  ]
+}
