@@ -17,6 +17,7 @@ import tempfile
 import psutil
 
 from core.gemini_grounder import GeminiStageRecognizer
+from core.codex_stage_lifecycle import LifecycleTelemetry, StageLifecycle
 
 
 from core.codex_stage_policy import (
@@ -206,6 +207,8 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         self.api_request_counter.values["logical_call_attempts"] += 1
         self._call_transport = dict(self.transport_metadata)
         self._call_raw_response = None
+        lifecycle = LifecycleTelemetry(StageLifecycle, _MAX_EVENTS_BYTES)
+        self._call_transport["lifecycle"] = lifecycle.data
         child_env = os.environ.copy()
         for name in _REMOVED_ENVIRONMENT:
             child_env.pop(name, None)
@@ -233,34 +236,49 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                 with (directory / "events.jsonl").open("w+b") as events_file, (
                     directory / "stderr.txt"
                 ).open("w+b") as error_file:
-                    process = subprocess.Popen(
-                        command, stdin=subprocess.PIPE, stdout=events_file,
-                        stderr=error_file, cwd=directory, env=child_env,
-                        text=True, start_new_session=False,
-                    )
+                    process = None
                     try:
-                        process.communicate(input="\n\n".join(texts), timeout=self.timeout_seconds)
-                    except subprocess.TimeoutExpired:
-                        _stop_owned_process(process)
+                        lifecycle.mark("spawn_started_at")
+                        process = subprocess.Popen(
+                            command, stdin=subprocess.PIPE, stdout=events_file,
+                            stderr=error_file, cwd=directory, env=child_env,
+                            text=True, start_new_session=False,
+                        )
+                        lifecycle.mark("spawn_returned_at")
+                        lifecycle.start(events_file)
+                        try:
+                            lifecycle.mark("communicate_started_at")
+                            process.communicate(input="\n\n".join(texts), timeout=self.timeout_seconds)
+                            lifecycle.mark("communicate_returned_at")
+                        except subprocess.TimeoutExpired:
+                            lifecycle.mark("timeout_observed_at")
+                            lifecycle.mark("cleanup_started_at")
+                            _stop_owned_process(process)
+                            lifecycle.mark("cleanup_returned_at")
+                            events_file.seek(0)
+                            partial = events_file.read(_MAX_EVENTS_BYTES + 1)
+                            if len(partial) <= _MAX_EVENTS_BYTES:
+                                try:
+                                    self._parse_events(partial)
+                                except CodexStageError:
+                                    pass
+                            raise CodexStageError("codex_timeout") from None
+                        except BaseException:
+                            lifecycle.mark("cleanup_started_at")
+                            _stop_owned_process(process)
+                            lifecycle.mark("cleanup_returned_at")
+                            raise
                         events_file.seek(0)
-                        partial = events_file.read(_MAX_EVENTS_BYTES + 1)
-                        if len(partial) <= _MAX_EVENTS_BYTES:
-                            try:
-                                self._parse_events(partial)
-                            except CodexStageError:
-                                pass
-                        raise CodexStageError("codex_timeout") from None
-                    except BaseException:
-                        _stop_owned_process(process)
-                        raise
-                    events_file.seek(0)
-                    raw_events = events_file.read(_MAX_EVENTS_BYTES + 1)
-                    if len(raw_events) > _MAX_EVENTS_BYTES:
-                        raise CodexStageError("codex_event_stream_too_large")
-                    output = self._parse_events(raw_events)
-                    if process.returncode != 0:
-                        raise CodexStageError("codex_nonzero_exit")
-                    return output
+                        raw_events = events_file.read(_MAX_EVENTS_BYTES + 1)
+                        if len(raw_events) > _MAX_EVENTS_BYTES:
+                            raise CodexStageError("codex_event_stream_too_large")
+                        output = self._parse_events(raw_events)
+                        if process.returncode != 0:
+                            raise CodexStageError("codex_nonzero_exit")
+                        return output
+                    finally:
+                        lifecycle.finish(process)
+                        self._call_transport["lifecycle"] = lifecycle.data
         except CodexStageError:
             raise
         except Exception:
