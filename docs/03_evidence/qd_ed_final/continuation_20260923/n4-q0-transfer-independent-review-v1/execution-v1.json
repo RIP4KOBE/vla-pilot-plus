@@ -1,0 +1,21 @@
+{
+  "command": [
+    "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n4-q0-transfer-check-preparation/test_q0_transfer.py",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n4-q0-transfer-independent-review-v1/test_independent_q0_transfer.py"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 5.254072534007719,
+  "source_hashes": {
+    "check_q0_transfer.py": "363973170cd89aee0a19c63ffc433cf1ffb71d636c3bd56985dff230e92d4e04",
+    "test_q0_transfer.py": "51bbe2d62fe342dd31cbe1f953242f46d70be233eb435e399cf7307737f3768a",
+    "dependencies-v1.json": "c34e772141bda569fbdfa7f0c723abd47d292b7cbe219e44ea2d187f3242e2f0",
+    "input-schema-v1.json": "c8ffaf902b96265c87634778d61f0a19bc9452cf99db6f4f5cba4515381d442e"
+  },
+  "scope": "Synthetic fixtures and source imports only. No actual reader entrypoint or scientific input paths."
+}

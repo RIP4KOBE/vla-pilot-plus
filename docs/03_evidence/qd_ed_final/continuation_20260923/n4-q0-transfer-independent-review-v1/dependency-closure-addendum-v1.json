@@ -1,0 +1,29 @@
+{
+  "schema": "n4-q0-transfer-independent-test-closure-addendum-v1",
+  "verdict": "PASS_METADATA_ONLY_CLOSURE_ADDITION",
+  "original_review": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n4-q0-transfer-independent-review-v1/review-v1.json",
+    "sha256": "6814138e888e40a157bbcd512a4b0f853dd95f9ffcd8be09d61f6c59e46d9227"
+  },
+  "final_dependencies": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n4-q0-transfer-check-preparation/dependencies-v1.json",
+    "sha256": "5f947b2823a1e55edf6b4fa0cffb37686c29fc019db60823ed23763f4c8f6da2"
+  },
+  "added_test_only_references": {
+    "v1_fixture_imported_reader": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-post-dev-diagnostic-preparation/read_full_dev.py",
+      "sha256": "54acac4ff3ca6414ff1b80f52de91fe3a43a3f326bc402e65514168f54c6f6b7"
+    },
+    "v1_fixture_imported_definition": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-post-dev-diagnostic-preparation/dependencies-v1.json",
+      "sha256": "f37989596a2ab1060d11798f6c14d0df66055c34d212a9b39377917365d0b5de"
+    }
+  },
+  "new_test_closure_text": "The synthetic fixture imports only its old stdlib reader and reads its old dependency JSON at module load; its dependencies(), actual reader and old tests are not called. All three test-only files are listed.",
+  "exact_previous_bytes_reconstructed_sha256": "c34e772141bda569fbdfa7f0c723abd47d292b7cbe219e44ea2d187f3242e2f0",
+  "check": "Removing precisely these two test-only refs and the test_closure explanation reconstructs the original dependency JSON bytes and SHA. Reader, test and schema hashes remain unchanged; added files match declared hashes.",
+  "test_evidence_reused": "44 source/synthetic checks from review-v1; no rerun required because no implementation or test byte changed.",
+  "actual_data_read": false,
+  "actual_reader_invoked": false,
+  "limits": "This addendum closes the test fixture import inventory only. It does not authorize actual data reading or N4 GPU execution."
+}

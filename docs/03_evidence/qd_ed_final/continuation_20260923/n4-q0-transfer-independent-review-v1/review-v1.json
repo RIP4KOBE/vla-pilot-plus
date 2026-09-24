@@ -1,0 +1,92 @@
+{
+  "schema": "n4-q0-transfer-independent-source-review-v1",
+  "verdict": "PASS_NO_BLOCKING_DEFECT_FOUND",
+  "actual_read_authorized": false,
+  "production_source_commit": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+  "scientific_prerequisite_protocol_sha256": "3ff18d22eb934a24f790bef5b411089f9a4c9116b098cfb7baa2b36cbbc277ca",
+  "reviewed_sources": {
+    "check_q0_transfer.py": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n4-q0-transfer-check-preparation/check_q0_transfer.py",
+      "sha256": "363973170cd89aee0a19c63ffc433cf1ffb71d636c3bd56985dff230e92d4e04"
+    },
+    "test_q0_transfer.py": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n4-q0-transfer-check-preparation/test_q0_transfer.py",
+      "sha256": "51bbe2d62fe342dd31cbe1f953242f46d70be233eb435e399cf7307737f3768a"
+    },
+    "dependencies-v1.json": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n4-q0-transfer-check-preparation/dependencies-v1.json",
+      "sha256": "c34e772141bda569fbdfa7f0c723abd47d292b7cbe219e44ea2d187f3242e2f0"
+    },
+    "input-schema-v1.json": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n4-q0-transfer-check-preparation/input-schema-v1.json",
+      "sha256": "c8ffaf902b96265c87634778d61f0a19bc9452cf99db6f4f5cba4515381d442e"
+    }
+  },
+  "test_evidence": {
+    "author_checks": 36,
+    "independent_checks": 8,
+    "combined_passed": 44,
+    "pytest_reported_seconds": 4.46,
+    "process_wall_seconds": 5.254072534007719,
+    "exit_code": 0,
+    "artifacts": {
+      "test_independent_q0_transfer.py": {
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n4-q0-transfer-independent-review-v1/test_independent_q0_transfer.py",
+        "sha256": "a01fb25d292b92702ab30b010a2701e34e6f9df4b5d9b208d067fc9c8e94c7c6"
+      },
+      "pytest-v1.stdout.txt": {
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n4-q0-transfer-independent-review-v1/pytest-v1.stdout.txt",
+        "sha256": "046a33abdbb4d3be18c14975bb2152d0f6b7a19675a345849ba8b4593f906b2f"
+      },
+      "pytest-v1.stderr.txt": {
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n4-q0-transfer-independent-review-v1/pytest-v1.stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "execution-v1.json": {
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n4-q0-transfer-independent-review-v1/execution-v1.json",
+        "sha256": "aaab5b27876d29cd211b288b5d6a9e63b663ec66a7c6ebaa2def7a8476f5b136"
+      }
+    },
+    "scope": "Overlapping source/synthetic correctness evidence, not task-performance evidence."
+  },
+  "source_findings": [
+    {
+      "area": "admission",
+      "finding": "Exact full-matrix/report/source authority is checked, then only the ten ordered Q0 representatives and their approved completed audit/status/index snapshots are admitted. The exact task9 recovery relation is retained. Bound metadata and complete native inventories are hash-checked before first native decoding; the prior metadata-only admit_plans contract is reused without invoking a historical reader CLI or a new whole-audit pass."
+    },
+    {
+      "area": "native costs and causal occurrence",
+      "finding": "Eleven canonical batches of sixteen and ten unique parent allocations are checked before dictionary construction. Canonical scoring/aggregate/effective/canonical causal order and per-round parent-source order are explicit. Same-call native quality/cost association uses strict dtype, shape and bytes; duplicate native matches must agree and all ties/matching indices survive."
+    },
+    {
+      "area": "deployed decoding",
+      "finding": "Actual selected native latent must match recorded FP32 policy input; the pinned deployed 128-to-7 decoder must reproduce the recorded action chunk and all actually dispatched commands. The alternative is the first-index argmin of the last canonical native stored costs, not a new score or float32 reranking. Full eight commands and actual m are compared separately using finite FP32 numeric equality, including +0/-0 equivalence."
+    },
+    {
+      "area": "activity gate",
+      "finding": "All 155 guided comparisons must be known within the fixed ten-Q0/825-decision/6594-action universe. At least one decision must have both actual-selected nonmembership in the last population and different decoded commands within actual m. Member tie changes and native-only/inactive-dimension/after-m changes are retained descriptively but cannot satisfy this conjunction."
+    },
+    {
+      "area": "execution lifecycle",
+      "finding": "The new reader associates sent actions with their pre-reset outcomes and permits the existing terminal returned reset_sequence increment. General global-step/reset/terminal lifecycle invariants remain supplied by the exact unchanged original accepted audit and its root snapshot binding; the new reader does not manufacture a fresh certificate."
+    }
+  ],
+  "independent_cases": [
+    "Terminal m=3 prefix retains its pre-reset response when returned reset_sequence increments.",
+    "BF16 stored-cost ties preserve indices [0,1,2] and first index 0.",
+    "Selected member tie with different decoded commands is not a nonmember conjunction.",
+    "Nonmember differing only in an inactive latent dimension does not satisfy actual-command activity.",
+    "Nonmember differing only after actual m is labeled suffix-only and does not satisfy activity.",
+    "Native signed-zero difference does not become a FP32 numeric command difference.",
+    "Numerically equal parent values with a different dtype fail native association.",
+    "Numerically equal stored costs with shape (1,16) fail native shape association."
+  ],
+  "limits": [
+    "Only source and invented synthetic fixtures were reviewed or executed; no actual native bundles, current metrics, images or scientific results were opened.",
+    "No actual reader entrypoint, GPU, model, provider, projector or simulator was invoked. CUDA initialization remained false in the focused synthetic checks.",
+    "This review applies to the four exact source/schema/dependency bytes above. A later freeze and root authorization must bind the exact ten accepted snapshots and all inputs before one actual read.",
+    "Original audit correctness and root immutable snapshot certification are inherited prerequisites, not newly proved by these wrapper tests.",
+    "No task benefit, counterfactual outcome, grasp/contact state, or permission to launch N4 follows from this review. The independent online resource issue and GPU HOLD remain separate."
+  ],
+  "mutations": "Only this independent N review directory; no W or E files, plans, ledgers, or states changed."
+}
