@@ -1,0 +1,23 @@
+{
+  "schema": "n3-v1-admission-failure-provenance",
+  "v1_source_commit": "40beea793467e301b831e35e8c79c659d6c59416",
+  "reader_sha256": "54acac4ff3ca6414ff1b80f52de91fe3a43a3f326bc402e65514168f54c6f6b7",
+  "freeze_sha256": "3430de2a696bf5f1ce1fb33b822f8810839c09d7450dbbb8bb878c60a563cf5d",
+  "status": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n3-post-dev-analysis/read-v1/status.json",
+    "sha256": "35f1bfa438966aefb41c0c0c552fedc751cc2f75029e54bf542cbd0e62d77465"
+  },
+  "process_result": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n3-post-dev-analysis/launch-v1/process-result.json",
+    "sha256": "43132ebdc09895c08476b42f57f87175b8e4cbd7f9078ac6751ccc075121cd5b"
+  },
+  "exit_code": 1,
+  "phase": "admission",
+  "error": "revision_changes_frozen_condition",
+  "cell": null,
+  "decoded_native_bundles": 0,
+  "extracted_cells": 0,
+  "read_scope_before_failure": "Authorized matrix and public plan metadata; do not describe the attempt as zero file reads.",
+  "preserved": true,
+  "v2_actual_execution_authorized": false
+}

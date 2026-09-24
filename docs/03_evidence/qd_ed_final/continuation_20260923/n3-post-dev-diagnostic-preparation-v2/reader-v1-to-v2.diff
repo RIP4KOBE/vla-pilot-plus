@@ -1,0 +1,78 @@
+--- v1/read_full_dev.py
++++ v2/read_full_dev.py
+@@ -104,6 +104,42 @@
+     rows = inputs.read(extra['reference'], lines=True)
+     require(all(all(r.get(k) == v for k, v in identity.items()) for r in rows), 'Stage_identity_differs')
+     return rows
++
++
++def admit_plans(authority, base, originals, definition, inputs):
++    """Only the pinned null-to-certificate transition; no evidence recursion."""
++    contract = definition['checkpoint_admission']
++    require(authority['base_plan'] == contract['base_plan']
++            and authority.get('plan_revisions') == contract['plan_revisions'], 'named_plan_references_differ')
++    cohort = base['n3_cohort']
++    require('checkpoint_release' in cohort and cohort['checkpoint_release'] is None
++            and contract['base_checkpoint_value'] is None, 'base_checkpoint_must_be_explicit_null')
++    release = inputs.read(contract['checkpoint_release'])
++    expected = contract['release_metadata']
++    require({k: release.get(k) for k in expected} == expected, 'checkpoint_metadata_differs')
++    code_sha = sha(json.dumps(base['code_files'], sort_keys=True, separators=(',', ':')).encode())
++    require(release['schema'] == 'qd-ed-n3-checkpoint-v1'
++            and release['cohort_id'] == cohort['cohort_id'] == COHORT
++            and release['source_commit'] == base['source_commit'] == SOURCE
++            and release['source_files_sha256'] == code_sha
++            and release['protocol_sha256'] == cohort['protocol']['sha256']
++            and release['runtime_tracking_validity'] == 'known_valid'
++            and len(release['attempt_ids']) == len(set(release['attempt_ids'])) == 3
++            and release['checks'] and all(v is True for v in release['checks'].values()), 'checkpoint_source_binding_differs')
++    plans = {authority['base_plan']['sha256']: base}
++    for ref in contract['plan_revisions']:
++        plan = inputs.read(ref)
++        revision_cohort = plan['n3_cohort']
++        require('checkpoint_release' in revision_cohort
++                and revision_cohort['checkpoint_release'] == contract['checkpoint_release'], 'revision_checkpoint_reference_differs')
++        normalized = dict(revision_cohort)
++        normalized['checkpoint_release'] = None
++        require(all(plan[k] == base[k] for k in BINDING)
++                and plan['code_files'] == base['code_files'] and plan['candidate_profiles'] == base['candidate_profiles']
++                and normalized == cohort
++                and [r for r in plan['episodes'] if not r.get('retry_of')] == originals, 'revision_changes_frozen_condition')
++        plans[ref['sha256']] = plan
++    return plans
+ 
+ 
+ def admit(manifest, auth, definition, modules, inputs):
+@@ -133,14 +169,7 @@
+     modules['report'] = dependency_module('report', definition['modules']['report'])
+     for task in range(10):
+         require(len({tuple(r[k] for k in ('env_seed', 'policy_seed', 'init_index', 'init_row_sha256')) for r in originals[task*3:task*3+3]}) == 1, 'unmatched_task_seed_init')
+-    plans = {authority['base_plan']['sha256']: base}
+-    for ref in authority.get('plan_revisions', []):
+-        plan = inputs.read(ref)
+-        require(all(plan[k] == base[k] for k in BINDING)
+-                and plan['code_files'] == base['code_files'] and plan['candidate_profiles'] == base['candidate_profiles']
+-                and plan['n3_cohort'] == base['n3_cohort']
+-                and [r for r in plan['episodes'] if not r.get('retry_of')] == originals, 'revision_changes_frozen_condition')
+-        plans[ref['sha256']] = plan
++    plans = admit_plans(authority, base, originals, definition, inputs)
+     require(all(len({r['episode_key'] for r in p['episodes']}) == len(p['episodes']) for p in plans.values()), 'ambiguous_own_plan_rows')
+     cells = report['cells']; extras = manifest['cells']; snapshots = auth['completed_audit_snapshots']
+     require(len(cells) == len(extras) == len(snapshots) == 30
+@@ -148,6 +177,7 @@
+             and len({c['valid_attempt_id'] for c in cells}) == 30
+             and {r['attempt_id'] for r in extras} == {c['valid_attempt_id'] for c in cells}
+             and {r['attempt_id'] for r in snapshots} == {c['valid_attempt_id'] for c in cells}, 'complete_representative_universe_differs')
++    require([c['valid_attempt_id'] for c in cells[:3]] == definition['checkpoint_admission']['release_metadata']['attempt_ids'], 'checkpoint_first3_representatives_differ')
+     extra_by_id = {r['attempt_id']: r for r in extras}; snapshot_by_id = {r['attempt_id']: r for r in snapshots}
+     admitted = []
+     for original, cell in zip(originals, cells):
+@@ -326,7 +356,7 @@
+     for name, expected in freeze['files'].items():
+         require(Path(name).name == name and sha((HERE/name).read_bytes()) == expected, 'frozen_local_source_differs')
+     require(freeze['files']['read_full_dev.py'] == sha(Path(__file__).read_bytes()) and freeze['actual_read_authorized'] is False, 'reader_freeze_differs')
+-    definition = parse((HERE/'dependencies-v1.json').read_bytes()); modules = dependencies(definition)
++    definition = parse((HERE/'dependencies-v2.json').read_bytes()); modules = dependencies(definition)
+     manifest = inputs.read(auth['manifest'])
+     out = inputs.path(output)
+     require(str(out) == auth['output'] and out.is_relative_to(inputs.root/'continuation_20260923/n3-post-dev-analysis') and not out.exists(), 'new_authorized_output_required')

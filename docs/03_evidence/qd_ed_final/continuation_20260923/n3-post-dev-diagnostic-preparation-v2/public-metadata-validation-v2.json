@@ -1,0 +1,22 @@
+{
+  "accepted": true,
+  "actual_read_authorized": false,
+  "base_checkpoint_key_present": true,
+  "base_checkpoint_value": null,
+  "input_hashes": {
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n3-dev-v1/accounted-v2/plan.frozen.json": "476808c028b4cde067dddcd9f3bea535e1bd634d990aad49dcdc3f0ec2853c99",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n3-dev-v1/accounted-v2/post-checkpoint-v1/checkpoint-release-v1.json": "53d3c62ed1de81e1260b6ecce36f511a921a74e6b0527bae0950b9e65b4cdae4",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n3-dev-v1/accounted-v2/post-checkpoint-v1/plan.frozen.json": "252d895631c8452739924d0509747aa7aa91b63da439b49dc5b54777568d210a",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n3-dev-v1/accounted-v2/recovery-task9-q0-v1/plan.frozen.json": "fc0c762eab862c3d983c4530f777aa808149045277d61e25edd55663b56f5604"
+  },
+  "native_bundle_reads": 0,
+  "original_rows": 30,
+  "plan_count": 3,
+  "revision_episode_counts": [
+    30,
+    31
+  ],
+  "schema": "n3-checkpoint-public-metadata-validation-v2",
+  "scope": "Only exact four authorized public metadata files. No report/metrics/compute/bundle decode, no evidence reference traversal, no actual diagnostic entrypoint.",
+  "tensor_decodes": 0
+}

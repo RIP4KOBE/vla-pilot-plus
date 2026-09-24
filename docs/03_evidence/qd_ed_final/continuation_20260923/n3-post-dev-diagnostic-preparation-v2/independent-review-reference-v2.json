@@ -1,0 +1,21 @@
+{
+  "schema": "n3-checkpoint-independent-review-reference-v2",
+  "status": "PASS",
+  "references": {
+    "json": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-complete-cohort-independent-review/v2-checkpoint-admission/review-v2.json",
+      "sha256": "c4a2fbb4ed032300c56dd7ba46c7e02753e6fc8157d2eb83350e02a51c91dc40"
+    },
+    "markdown": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-complete-cohort-independent-review/v2-checkpoint-admission/review-v2.md",
+      "sha256": "fb91d150c8328f46dadaa8763657a1328fae0e15c2b4f450651dc124311b8162"
+    }
+  },
+  "reviewer": "gpu5_probe",
+  "independent_metadata_checks": 13,
+  "author_targeted_controls_repeated": 2,
+  "passed": 15,
+  "elapsed_seconds": 1.33,
+  "actual_reader_calls": 0,
+  "actual_bundle_or_metric_reads": 0
+}

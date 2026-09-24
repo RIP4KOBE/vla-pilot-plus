@@ -1,0 +1,14 @@
+{
+  "schema": "n3-checkpoint-admission-cpu-validation-v2",
+  "status": "PASS",
+  "command": "CUDA_VISIBLE_DEVICES='' PYTHONDONTWRITEBYTECODE=1 /home/hynx/miniconda3/envs/vla-pilot/bin/python -m pytest -q -p no:cacheprovider /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-post-dev-diagnostic-preparation-v2/test_checkpoint_admission.py",
+  "passed": 29,
+  "elapsed_seconds": 1.35,
+  "exit_code": 0,
+  "stdout_summary": "29 passed in 1.35s",
+  "runtime_science_suite_reruns": 0,
+  "actual_reader_calls": 0,
+  "actual_scientific_payload_reads": 0,
+  "synthetic_native_decodes": 0,
+  "scope": "Targeted checkpoint/ref/source/scientific/resource negatives, complete synthetic30/recovery admission, first3 identity gate, exact old scientific-function/dependency equality. Real metadata check recorded separately."
+}

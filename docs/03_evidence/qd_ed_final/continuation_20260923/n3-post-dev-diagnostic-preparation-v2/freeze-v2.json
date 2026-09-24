@@ -1,0 +1,117 @@
+{
+  "schema": "n3-post-dev-preparation-freeze-v2",
+  "status": "CPU_TESTED_INDEPENDENTLY_REVIEWED_ADMISSION_CORRECTION",
+  "source_commit": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+  "files": {
+    "README.md": "8f2e4701cfe605448e7269e295584002dc1114eb6a202a696accfd6e3da7cc11",
+    "cpu-validation-v2.json": "8e1c791f4355ab1ff54463eb198f6df2300b6f61291f32fecfdbf43fb85a3001",
+    "dependencies-v2.json": "f8a8f5bea616fdaeca46760f29f8ecb930088029d1c23a5a500236f4a621b256",
+    "diff-inventory-v2.json": "c47eb4465a7d62869286e62233d27909958f50a996a133103ff68ebcea1c2a73",
+    "independent-review-reference-v2.json": "ee279bf78951a72295a1f039ef29d7fe5be5a5b3c44c505bcd3101801e0866d4",
+    "inherited-protocol-v1.md": "8157d29e07df388ad8e5a28abce1a8ef825eb2ff1923ee13da55976f7937bca4",
+    "input-schema-v2.json": "617bd8cdaa09bdf91b96dd5d22b511abaf620ab4bd6dc6a2a9a4838531aae1d9",
+    "protocol-v2.md": "7827f9adbfe030b21708efdc7a46f39224268fc79041e8c80371bab8bfeff807",
+    "public-metadata-validation-v2.json": "0265a7a6c8a747717f71bd8d507c89b9c113c915906f81042b392158f59d88fb",
+    "read_full_dev.py": "731e8dde617d89cf538caf13c11f23b267b03225c32f93660fe9a1d731e8ae40",
+    "reader-v1-to-v2.diff": "fb13284ac9768b81260bd3cd3d627d64828bee4ec9d07c3406d0804c5634e9ed",
+    "test_checkpoint_admission.py": "e90c4bcb295eea2a7f93e068f55d77f1732d93b24d379a71dbf7c4642bca26fe",
+    "v1-failure-provenance.json": "31e5a42f6ec25c8a60dab452b0d8fc6636f5305e63b9c7cbaf102447b8dd92d7"
+  },
+  "runtime_modules": {
+    "task0": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/read_closed_loop.py",
+      "sha256": "1212c3c9675403dc0e8f3b97948ab8d6d9a5f873ccfa615564041da3fe5c309f"
+    },
+    "chronology": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/full-dev-closed-loop-preparation/read_full_dev.py",
+      "sha256": "b19331ff6861210056858d56da6dcbd2d6a24f06fc91e24dcc1beb0d4df18b3e"
+    },
+    "tracking": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/selected-tracking-preparation/read_selected_tracking.py",
+      "sha256": "a33714747a47415c8a8d64ba3297a016550e95b6f54a174a1654875603deec26"
+    },
+    "first3": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-first3-review-preparation/review_first3.py",
+      "sha256": "a2ee7ae750805d84810badc08333c7944f8cd4b895e0ce0d23dfb1d5a90ab9b0"
+    },
+    "report": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_n3_report.py",
+      "sha256": "62b9afbbe6d8909d6414cdc9423237f2815a5274e3f076cfc1b3226d9998a79a"
+    }
+  },
+  "reviewed_source_sha256": {
+    "main.py": "f9add8568d45ec799e4030b1108f069f4af88bf3b63c62d7f836d59539a427a7",
+    "core/rdt_policy_steer.py": "05d9afca7cea50ea943fd8a32f4cd888c6d37df353ec4f896c51f0c5e2e4a144",
+    "core/qd_ed.py": "5c86385a8271c3311aa715332d1307850b18ec37486f20ac53c19747fe4f207b",
+    "core/qd_executed_quality.py": "d83dbd53e75708f3a6e71cab9c0814dc82a42c68898d53cb370df37d9a8c946b",
+    "core/qd_executed_feedback.py": "33d1e38212741ccbf24e150c2b9739cc026ed553925ab7084d9e8b8d32e090ab",
+    "core/decision_evidence.py": "3af145738e3b22a8bec7484d0c33ba9a81dffbf58335b61682eb0ddf43b3cb8c",
+    "core/eds_eval_metrics.py": "574038725988ad258960af27d83a36ad81898e550888592d775c14b6df4754b2",
+    "core/keypoint_tracker.py": "c60b6f8badb420bf98ae8908cb20b3f51b1c41ffa5df9d3e214f8247f0a2aa66",
+    "core/env_adapters/libero_adapter.py": "f2130791c4c975603d8bab4fad4739374cbbba967df2fa2334ea881b6557d6bf",
+    "scripts/audit_decision_evidence.py": "dcfffa225b16f40cc00ac4bd21eae1d080cc113668dbeabc240d2ccda50fddd6",
+    "experiments/iteration_003_executed_feedback/protocol.md": "05c83a8eb3801d4a4c4f41bee28c531505a7767aa56ba482399013068679b931",
+    "scripts/qd_ed_n3_report.py": "62b9afbbe6d8909d6414cdc9423237f2815a5274e3f076cfc1b3226d9998a79a",
+    "scripts/qd_ed_n3_plan.py": "ca967ad486092f72b93cd169895b137efdba1411f6a62487a1d21b9e9c557bb1",
+    "core/rdt_libero_action_converter.py": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d"
+  },
+  "checkpoint_admission": {
+    "base_plan": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n3-dev-v1/accounted-v2/plan.frozen.json",
+      "sha256": "476808c028b4cde067dddcd9f3bea535e1bd634d990aad49dcdc3f0ec2853c99"
+    },
+    "plan_revisions": [
+      {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n3-dev-v1/accounted-v2/post-checkpoint-v1/plan.frozen.json",
+        "sha256": "252d895631c8452739924d0509747aa7aa91b63da439b49dc5b54777568d210a"
+      },
+      {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n3-dev-v1/accounted-v2/recovery-task9-q0-v1/plan.frozen.json",
+        "sha256": "fc0c762eab862c3d983c4530f777aa808149045277d61e25edd55663b56f5604"
+      }
+    ],
+    "checkpoint_release": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n3-dev-v1/accounted-v2/post-checkpoint-v1/checkpoint-release-v1.json",
+      "sha256": "53d3c62ed1de81e1260b6ecce36f511a921a74e6b0527bae0950b9e65b4cdae4"
+    },
+    "release_metadata": {
+      "schema": "qd-ed-n3-checkpoint-v1",
+      "cohort_id": "N3_EXECUTED_FEEDBACK_DEV_20260923",
+      "source_commit": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+      "source_files_sha256": "b77e80094770b5b366a219d6309ac41de4fa42321808948d97f034163dd86ae3",
+      "protocol_sha256": "05c83a8eb3801d4a4c4f41bee28c531505a7767aa56ba482399013068679b931",
+      "runtime_tracking_validity": "known_valid",
+      "attempt_ids": [
+        "rdt-qd-ed-final-20260921T093925Z__n3_dev_t00_c0_20260923__e795f6015528",
+        "rdt-qd-ed-final-20260921T093925Z__n3_dev_t00_q0_20260923__68529dcfb882",
+        "rdt-qd-ed-final-20260921T093925Z__n3_dev_t00_n3_20260923__e4899b02aeff"
+      ],
+      "checks": {
+        "exact_native_past_feedback_timing_selection": true,
+        "finite_action": true,
+        "native_feedback_bundle_alignment": true,
+        "raw_stage_separation": true,
+        "runtime_tracking_validity": true,
+        "source_compute": true,
+        "substantive_feedback_search_activity": true,
+        "substantive_qd_activation": true
+      }
+    },
+    "base_checkpoint_value": null
+  },
+  "author_targeted_tests": 29,
+  "independent_metadata_checks": 13,
+  "author_controls_independently_repeated": 2,
+  "independent_test_count": 15,
+  "source_dependency_ref_hashes_verified": 22,
+  "scientific_functions_and_old_helper_refs_unchanged": true,
+  "public_plan_checkpoint_metadata_reads": 4,
+  "actual_read_authorized": false,
+  "actual_input_manifest_created": false,
+  "actual_episode_payload_reads": 0,
+  "actual_diagnostic_calls": 0,
+  "fresh_audit_calls": 0,
+  "required_later_authority": "Separate new root authorization bound to this freeze and new output; unchanged complete30 accepted report and completed-audit snapshots. V1 failed output/source/auth remain unchanged.",
+  "v1_freeze_sha256": "3430de2a696bf5f1ce1fb33b822f8810839c09d7450dbbb8bb878c60a563cf5d",
+  "scope": "Only exact-null base and named revisions/checkpoint metadata admission; no scientific functions, formulas, thresholds, outcomes, resource rules, W/source/plan/ledger changes."
+}
