@@ -45,6 +45,10 @@ STAGE_OUTPUT_SCHEMA = {
     "additionalProperties": False,
 }
 
+# Literal present in the pinned 0.155.1 CLI binary. This is an opt-in proposal;
+# the frozen N1V runner does not authorize this new acceptance policy.
+TRANSPORT_FALLBACK_PREFIX = 'Falling back from WebSockets to HTTPS transport. '
+
 
 def public_invocation_policy(*, model, reasoning_effort, timeout_seconds, cli_path,
                              disabled_skill_paths=(), output_format="legacy_text",
@@ -52,7 +56,7 @@ def public_invocation_policy(*, model, reasoning_effort, timeout_seconds, cli_pa
     """Credential-free, deterministic full wrapper policy for freeze hashes."""
     if output_format not in {"legacy_text", "json_schema_v1"}:
         raise ValueError("Unknown Codex Stage output format")
-    if event_policy not in {"strict_v1", "completed_reconnect_v1"}:
+    if event_policy not in {"strict_v1", "completed_reconnect_v1", "completed_transport_fallback_v1"}:
         raise ValueError("Unknown Codex Stage event policy")
     if event_policy != "strict_v1" and output_format != "json_schema_v1":
         raise ValueError("Reconnect policy requires structured output")
@@ -108,6 +112,17 @@ def public_invocation_policy(*, model, reasoning_effort, timeout_seconds, cli_pa
             "explicit_numbered_reconnecting_notice_inside_single_turn_then_"
             "one_complete_usage_one_schema_message_exit_zero_no_other_error"
         )
+    if event_policy == "completed_transport_fallback_v1":
+        policy["transport_fallback_acceptance"] = {
+            "exact_notice_prefix": TRANSPORT_FALLBACK_PREFIX,
+            "maximum_notice_characters": 2048,
+            "maximum_notice_count": 1,
+            "event_type": "item.completed",
+            "item_type": "error",
+            "position": "inside_single_turn_before_agent_message_and_completion",
+            "required_completion": "one_schema_message_then_one_usage_exit_zero_no_other_error",
+            "new_application_invocations": 0,
+        }
     return policy
 
 

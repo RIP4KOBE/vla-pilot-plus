@@ -23,7 +23,7 @@ from core.gemini_grounder import GeminiStageRecognizer
 
 from core.codex_stage_policy import (
     _COUNTER_FIELDS, _MAX_EVENTS_BYTES, _REMOVED_ENVIRONMENT,
-    discover_disabled_skill_paths, policy_sha256, public_invocation_policy,
+    TRANSPORT_FALLBACK_PREFIX, discover_disabled_skill_paths, policy_sha256, public_invocation_policy,
 )
 
 
@@ -210,6 +210,7 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         usages = []
         errors = []
         diagnostics = []
+        transport_fallbacks = []
         completed = False
         for event_index, event in enumerate(events):
             kind = event.get("type")
@@ -217,6 +218,8 @@ class CodexStageRecognizer(GeminiStageRecognizer):
             if kind == "turn.started":
                 starts += 1
             elif kind == "turn.completed":
+                if self.event_policy == "completed_transport_fallback_v1" and len(messages) != 1:
+                    error_code = "codex_unexpected_event"
                 completed = True
                 self.api_request_counter.values["completed_turns"] += 1
                 usage = event.get("usage")
@@ -241,12 +244,26 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                 item = event.get("item")
                 item_kind = item.get("type") if isinstance(item, dict) else None
                 item_types.append(item_kind if isinstance(item_kind, str) else "invalid")
-                if item_kind not in ("agent_message", "reasoning"):
+                message = item.get("message") if isinstance(item, dict) else None
+                fallback = (self.event_policy == "completed_transport_fallback_v1"
+                    and kind == "item.completed" and item_kind == "error"
+                    and isinstance(message, str) and message.startswith(TRANSPORT_FALLBACK_PREFIX)
+                    and len(TRANSPORT_FALLBACK_PREFIX) < len(message) <= 2048
+                    and not any(char in message for char in ("\x00", "\r", "\n"))
+                    and starts == 1 and not completed and not messages and not transport_fallbacks)
+                if fallback:
+                    transport_fallbacks.append({"event_index": event_index,
+                        "classification": "websocket_to_https_fallback_notice",
+                        "message_sha256": hashlib.sha256(message.encode()).hexdigest(),
+                        "message_length": len(message)})
+                if item_kind not in ("agent_message", "reasoning") and not fallback:
                     error_code = "codex_unexpected_item"
                 if item_kind == "error":
                     diagnostics.append({"event_index": event_index, "source": "error_item",
                                         **_safe_error_diagnostic(item.get("message"))})
                 if item_kind == "agent_message" and kind == "item.completed":
+                    if self.event_policy == "completed_transport_fallback_v1" and completed:
+                        error_code = "codex_unexpected_event"
                     text = item.get("text")
                     if not isinstance(text, str) or not text.strip():
                         error_code = "codex_empty_response"
@@ -269,7 +286,7 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                     "attempt": int(match[1]) if reconnect else None,
                     "maximum": int(match[2]) if reconnect else None,
                 })
-                if not (self.event_policy == "completed_reconnect_v1" and reconnect
+                if not (self.event_policy in {"completed_reconnect_v1", "completed_transport_fallback_v1"} and reconnect
                         and starts == 1 and not completed and not messages):
                     error_code = "codex_unexpected_event"
             elif kind not in ("thread.started",):
@@ -288,6 +305,8 @@ class CodexStageRecognizer(GeminiStageRecognizer):
             error_events=errors,
             error_diagnostics=diagnostics,
         )
+        if self.event_policy == "completed_transport_fallback_v1":
+            self._call_transport['transport_fallback_notices'] = transport_fallbacks
         if starts == complete_turns == len(usages) == 1 and stream_error is None:
             self.api_request_counter.values["usage_complete_calls"] += 1
         if starts != 1 or complete_turns != 1:

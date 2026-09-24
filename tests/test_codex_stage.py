@@ -254,6 +254,67 @@ def test_reconnect_policy_changes_only_local_acceptance_contract(monkeypatch, tm
         public_invocation_policy(**kwargs, event_policy='completed_reconnect_v1')
 
 
+def fallback_notice():
+    return {'type':'item.completed', 'item':{'type':'error',
+        'message':'Falling back from WebSockets to HTTPS transport. stream disconnected before completion: private detail'}}
+
+
+def test_proposed_transport_fallback_accepts_only_completed_single_call_and_preserves_evidence(monkeypatch, tmp_path):
+    stream = events(answer=json.dumps({'stage':2,'guidance':'no','evidence':'held'}))
+    stream[2:2] = [{'type':'error','message':'Reconnecting... 5/5'}, fallback_notice()]
+    recognizer, calls = make(monkeypatch,tmp_path,event_list=stream,timeout_seconds=180,
+        output_format='json_schema_v1',event_policy='completed_transport_fallback_v1')
+    assert identify(recognizer) == (2,False)
+    result = recognizer.last_result
+    assert len(calls) == result['codex_logical_call_attempts'] == result['codex_usage_complete_calls'] == 1
+    assert result['codex_failed_calls'] == 0
+    assert result['transport']['item_types'] == ['error','agent_message']
+    assert len(result['transport']['transport_fallback_notices']) == 1
+    assert result['transport']['transport_fallback_notices'][0]['classification'] == 'websocket_to_https_fallback_notice'
+    assert 'private detail' not in json.dumps(result)
+
+
+@pytest.mark.parametrize('change', ['legacy','duplicate','unknown','empty_suffix','newline','nul','oversized',
+    'item_updated','before_start','after_message','after_completion','nonzero','timeout','missing_usage',
+    'missing_completion','turn_failed','tool_item','two_responses','two_turns','bad_json','other_error',
+    'completion_before_response'])
+def test_proposed_fallback_never_bypasses_nonfallback_gates(monkeypatch,tmp_path,change):
+    stream = events(answer=json.dumps({'stage':2,'guidance':'no','evidence':'held'}) if change!='bad_json' else ANSWER)
+    notice = fallback_notice()
+    if change == 'unknown': notice['item']['message'] = 'unknown server error'
+    if change == 'empty_suffix': notice['item']['message'] = module.TRANSPORT_FALLBACK_PREFIX
+    if change == 'newline': notice['item']['message'] += '\n'
+    if change == 'nul': notice['item']['message'] += '\x00'
+    if change == 'oversized': notice['item']['message'] += 'x'*2048
+    if change == 'item_updated': notice['type'] = 'item.updated'
+    stream.insert({'before_start':0,'after_message':3,'after_completion':4}.get(change,2),notice)
+    if change == 'duplicate': stream.insert(3,fallback_notice())
+    if change == 'missing_usage': stream[-1]['usage'] = {}
+    if change == 'missing_completion': stream.pop()
+    if change == 'turn_failed': stream.insert(3,{'type':'turn.failed','error':{'message':'failed'}})
+    if change == 'tool_item': stream.insert(3,{'type':'item.completed','item':{'type':'command_execution'}})
+    if change == 'two_responses': stream.insert(3,events()[2])
+    if change == 'two_turns': stream += events()
+    if change == 'other_error': stream.insert(3,{'type':'error','message':'unknown error'})
+    if change == 'completion_before_response': stream[3],stream[4] = stream[4],stream[3]
+    if change == 'timeout': monkeypatch.setattr(module,'_stop_owned_process',lambda process:None)
+    recognizer,calls = make(monkeypatch,tmp_path,event_list=stream,timeout_seconds=180,
+        returncode=1 if change=='nonzero' else 0,timeout=change=='timeout',output_format='json_schema_v1',
+        event_policy='completed_reconnect_v1' if change=='legacy' else 'completed_transport_fallback_v1')
+    assert identify(recognizer) == (1,True)
+    assert len(calls) == 1 and recognizer.last_result['codex_failed_calls'] == 1
+
+
+def test_proposed_fallback_policy_changes_acceptance_hash_without_altering_cli_arguments():
+    kwargs = dict(model='gpt-6-astra',reasoning_effort='low',timeout_seconds=180,
+                  cli_path='/pinned/codex',output_format='json_schema_v1')
+    old = public_invocation_policy(**kwargs,event_policy='completed_reconnect_v1')
+    new = public_invocation_policy(**kwargs,event_policy='completed_transport_fallback_v1')
+    assert policy_sha256(old) != policy_sha256(new)
+    assert {k:v for k,v in old.items() if k!='event_policy'} == {
+        k:v for k,v in new.items() if k not in {'event_policy','transport_fallback_acceptance'}}
+
+
 def test_cli_policy_disables_tools_skills_and_preserves_builtin_system_prompt(monkeypatch, tmp_path):
     recognizer, calls = make(monkeypatch, tmp_path)
     identify(recognizer)
