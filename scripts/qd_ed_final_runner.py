@@ -255,7 +255,7 @@ _N4_SUPPORT = None
 
 
 def is_n4_plan(plan):
-    return ('N4' in plan.get('candidate_profiles', {}) or plan.get('n4_cohort') is not None
+    return (is_n4e1_plan(plan) or 'N4' in plan.get('candidate_profiles', {}) or plan.get('n4_cohort') is not None
             or any(str(row.get('iteration')) == 'N4_TERMINAL_POPULATION_DEV_20260924' for row in plan.get('episodes', [])))
 
 
@@ -266,6 +266,32 @@ def n4_support():
         spec = importlib.util.spec_from_file_location('qd_ed_n4_plan_contract', Path(__file__).with_name('qd_ed_n4_plan.py'))
         _N4_SUPPORT = importlib.util.module_from_spec(spec); spec.loader.exec_module(_N4_SUPPORT)
     return _N4_SUPPORT
+
+
+_N4E1_SUPPORT = None
+
+
+def is_n4e1_plan(plan):
+    return (plan.get('n4e1_cohort') is not None or any(str(row.get('iteration'))=='N4_E1_TRANSPORT180_DEV_20260924'
+        for row in plan.get('episodes', [])))
+
+
+def n4e1_support():
+    global _N4E1_SUPPORT
+    if _N4E1_SUPPORT is None:
+        import importlib.util
+        spec=importlib.util.spec_from_file_location('qd_ed_n4e1_plan_contract',Path(__file__).with_name('qd_ed_n4e1_plan.py'))
+        _N4E1_SUPPORT=importlib.util.module_from_spec(spec);spec.loader.exec_module(_N4E1_SUPPORT)
+    return _N4E1_SUPPORT
+
+
+def n4_dispatch_support(plan):
+    return n4e1_support() if is_n4e1_plan(plan) else n4_support()
+
+
+def stage_condition(runtime):
+    stage_overrides(runtime)
+    return n4e1_support().STAGE_CONDITION if runtime.get('stage_engineering_condition') is not None else CODEX_STAGE_CONDITION
 
 
 def validate_plan(path, *, root=ROOT, require_frozen=True):
@@ -304,6 +330,8 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
     require(Path(runtime['worktree']).resolve() == root, 'runtime worktree mismatch')
     require(Path(runtime['artifact_root']).resolve() == artifact_root, 'runtime artifact root mismatch')
     stage_overrides(runtime)
+    require((runtime.get('stage_engineering_condition') is not None)==is_n4e1_plan(plan),
+        'E1 transport requires its dedicated cohort; old transport remains unchanged')
     physical_gpu = runtime_gpu(runtime, state)
     if require_frozen:
         require(plan.get('egl_mapping_verified') is True and runtime.get('cuda_egl_verified') is True, f'GPU{physical_gpu}/EGL mapping not verified')
@@ -373,7 +401,7 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
     if 'N3' in plan.get('candidate_profiles', {}) or plan.get('n3_cohort') is not None:
         n3_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
     if is_n4_plan(plan):
-        n4_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+        n4_dispatch_support(plan).validate_contract(plan, manifest, runtime, seeds, root, globals())
     return plan, manifest, runtime
 
 
@@ -410,7 +438,7 @@ def build_command(plan, manifest, runtime, row, attempt_id):
         'main.eds_eval.report_dir': str(Path(plan['worktree']) / 'docs/03_evidence/qd_ed_final'),
         'main.eds_eval.job_id': attempt_id,
         'main.eds_eval.method_label': profile['historical_label'] + '__input_repaired' +
-            ('__' + CODEX_STAGE_CONDITION if provider_values else ''),
+            ('__' + stage_condition(runtime) if provider_values else ''),
         'main.eds_mechanism_pretest.output_dir': str(output / 'mechanism'),
         'main.eds_mechanism_pretest.run_id': attempt_id,
     }
@@ -489,8 +517,11 @@ def stage_overrides(runtime):
         return {}
     require(frozen.get('model') == 'gpt-6-astra' and frozen.get('auth_mode') == 'chatgpt',
             'Codex Stage model/auth differs from authorized contract')
+    engineering=runtime.get('stage_engineering_condition')
+    if engineering is not None:
+        require(engineering==n4e1_support().engineering_condition(),'unrecognized public Stage engineering condition')
     require(frozen.get('reasoning_effort') == 'low' and type(frozen.get('timeout_seconds')) is int
-            and frozen['timeout_seconds'] == 90, 'Codex Stage reasoning/timeout differs from frozen contract')
+            and frozen['timeout_seconds'] == (180 if engineering is not None else 90), 'Codex Stage reasoning/timeout differs from frozen contract')
     require(isinstance(frozen.get('cli_path'), str) and Path(frozen['cli_path']).is_absolute(),
             'Codex CLI path must be absolute')
     require(str(Path(frozen['cli_path']).resolve()) == frozen['cli_path'], 'Codex CLI path must identify the resolved executable')
@@ -693,6 +724,8 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
 
 
 def check_retry(events, row):
+    if str(row.get('iteration'))=='N4_E1_TRANSPORT180_DEV_20260924' or row.get('n4e1_recovery_contract') is not None:
+        return n4e1_support().check_retry(events,row,globals())
     if str(row.get('iteration')) == 'N4_TERMINAL_POPULATION_DEV_20260924' or row.get('n4_recovery_contract') is not None:
         return n4_support().check_retry(events, row, globals())
     if str(row.get('iteration')) == 'N3_EXECUTED_FEEDBACK_DEV_20260923' or row.get('n3_recovery_contract') is not None:
@@ -810,7 +843,7 @@ def episode_compute(output,row,runtime=None):
     usage_complete = record['provider_usage_complete_calls'] == record['provider_logical_call_attempts']
     require(record.get('provider_token_usage_complete') is usage_complete, 'Codex token usage completeness label mismatch')
     result.update(stage_transport=transport, stage_backend='codex_cli', stage_model=frozen['model'],
-                  stage_condition=CODEX_STAGE_CONDITION,
+                  stage_condition=stage_condition(runtime),
                   provider_http_counters_available=False, provider_logical_counters_available=True,
                   provider_http_observation='not_observable_through_codex_cli',
                   provider_token_usage_complete=usage_complete,
@@ -1006,7 +1039,7 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
         if plan.get('n3_cohort') is not None:
             n3_support().require_scope(plan, root, globals())
         if is_n4_plan(plan):
-            n4_support().require_scope(plan, root, globals())
+            n4_dispatch_support(plan).require_scope(plan, root, globals())
         require(plan.get('phase_authorization', {}).get(split) is True, f'{split} has not passed its preregistered phase gate')
         rows=selected_rows(plan,split,iteration)
         if episode_keys:
@@ -1031,9 +1064,9 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                 n3_support().protected_budget(state, events, resources, row, timeout, globals())
                 n2_base=n3_support().admission(plan,runtime,row,events,resources,root,globals())
             if is_n4_plan(plan):
-                n4_support().require_scope(plan, root, globals(), row)
-                n4_support().protected_budget(state, events, resources, row, timeout, globals(), plan=plan)
-                n2_base=n4_support().admission(plan,runtime,row,events,resources,root,globals())
+                n4_dispatch_support(plan).require_scope(plan, root, globals(), row)
+                n4_dispatch_support(plan).protected_budget(state, events, resources, row, timeout, globals(), plan=plan)
+                n2_base=n4_dispatch_support(plan).admission(plan,runtime,row,events,resources,root,globals())
             admission=gpu_admission(physical_gpu=physical_gpu,expected_uuid=runtime['gpu_mapping']['uuid'])
             attempt_id=f"{plan['run_name']}__{row['episode_key']}__{uuid.uuid4().hex[:12]}"
             command,output=build_command(plan,manifest,runtime,row,attempt_id)
@@ -1047,7 +1080,7 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                   'retry_of':row.get('retry_of'),'output_dir':str(output),'physical_gpu':physical_gpu,**n2_base}
             if runtime.get('frozen_stage_provider', {}).get('backend') == 'codex_cli':
                 base.update(stage_backend='codex_cli', stage_model=runtime['frozen_stage_provider']['model'],
-                            stage_condition=CODEX_STAGE_CONDITION)
+                            stage_condition=stage_condition(runtime))
             append_event(root,{**base,'event':'reserved','time_unix':time.time(),'admission':admission})
             durable_json(output/'command.json',{'argv':command,'environment_public':{**runtime['environment'],'CUDA_VISIBLE_DEVICES':str(physical_gpu),'CUDA_DEVICE_ORDER':'PCI_BUS_ID','MUJOCO_EGL_DEVICE_ID':str(runtime['gpu_mapping']['egl_device_index'])}})
             process=None; started=time.monotonic(); process_finished=None; dispatched=False
@@ -1085,9 +1118,9 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                     if eligibility is not None:
                         outcome['n3_recovery_eligibility']=eligibility
                 if dispatched and is_n4_plan(plan):
-                    eligibility=n4_support().transport_recovery_eligibility(exc,outcome,plan,row,runtime,globals())
+                    eligibility=n4_dispatch_support(plan).transport_recovery_eligibility(exc,outcome,plan,row,runtime,globals())
                     if eligibility is not None:
-                        outcome['n4_recovery_eligibility']=eligibility
+                        outcome['n4e1_recovery_eligibility' if is_n4e1_plan(plan) else 'n4_recovery_eligibility']=eligibility
                 if not dispatched:
                     final_event='aborted'; outcome['task_failure']=False; outcome['failure_class']='predispatch_gate'
                 if isinstance(exc,(KeyboardInterrupt,SystemExit)):
@@ -1100,7 +1133,7 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                 if plan.get('n3_cohort') is not None:
                     terminal['n3_episode_dispatched']=dispatched
                 if is_n4_plan(plan):
-                    terminal['n4_episode_dispatched']=dispatched
+                    terminal['n4e1_episode_dispatched' if is_n4e1_plan(plan) else 'n4_episode_dispatched']=dispatched
                 append_event(root,terminal)
                 durable_json(output/'attempt-result.json',terminal)
                 summaries.append(terminal)
@@ -1152,6 +1185,7 @@ def reconcile_ledger(plan_path, attempt_id, *, root=ROOT):
         terminal={**group[0],**outcome,'event':event,'time_unix':time.time(),
                   'gpu_process_wall_seconds':max(0.,time.time()-dispatched['time_unix']) if dispatched else 0.,
                   'gpu_time_measurement':'conservative upper bound through explicit dead-process reconciliation'}
+        if is_n4e1_plan(plan):terminal['n4e1_episode_dispatched']=dispatched is not None
         append_event(root,terminal); durable_json(output/'attempt-result.json',terminal)
         return terminal
 

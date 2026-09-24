@@ -462,7 +462,7 @@ def run_queue(plan_path, episode_keys, *, poll_seconds=30, idle_seconds=120, sta
             if plan.get('n3_cohort') is not None:
                 runner.n3_support().require_scope(plan, root, runner)
             if runner.is_n4_plan(plan):
-                runner.n4_support().require_scope(plan, root, runner)
+                runner.n4_dispatch_support(plan).require_scope(plan, root, runner)
             code_paths = {record['path'] for record in plan['code_files']}
             runner.require({'scripts/qd_ed_available_gpu_queue.py', 'scripts/qd_ed_gpu_probe.py',
                             'scripts/qd_ed_runtime_setup.py'} <= code_paths,

@@ -1,0 +1,45 @@
+{
+  "CUDA_VISIBLE_DEVICES": "",
+  "GPU_or_provider_calls": false,
+  "W_changed": false,
+  "actual_episode_or_protected_or_peer_payload_reads": false,
+  "affected_suite_tests": 166,
+  "elapsed_seconds": 2.97,
+  "execution_authorized": false,
+  "files": [
+    {
+      "path": "scripts/qd_ed_n4e1_plan.py",
+      "sha256": "649449da2be43661080ce39f04f37fb5fd06e12360020937aca02da6d782f1cb"
+    },
+    {
+      "path": "scripts/qd_ed_n4e1_supervise.py",
+      "sha256": "6db2641a51e093d9c6b07afbbfed847256be8d22d55d8a2d5d5aa30f942ad41a"
+    },
+    {
+      "path": "scripts/qd_ed_n4e1_report.py",
+      "sha256": "69899bc1869d48c186a906a60d6d2d3d65269016d72c6914d60e4c3f19cc98ac"
+    },
+    {
+      "path": "scripts/qd_ed_final_runner.py",
+      "sha256": "fc1a7cdda18af2d013ea90cab581ddf89c7088fc1c22fe5e5139995ffce0c6ed"
+    },
+    {
+      "path": "scripts/qd_ed_available_gpu_queue.py",
+      "sha256": "0523d0a9020c27ca5e0f0c7e8209711d9edd349b458da3012c589c18d7f64cc2"
+    },
+    {
+      "path": "tests/test_qd_ed_n4e1.py",
+      "sha256": "9ff2ccecede9d2e61aa07456385ec5c19add7b7c631960c1841469426168c6c8"
+    },
+    {
+      "path": "experiments/iteration_004_terminal_population/transport180-engineering-protocol-v1.md",
+      "sha256": "a960f4075cca5962e3e9cd35956f96b49f7433f797529134896803f7b5473e2d"
+    }
+  ],
+  "new_tests": 22,
+  "pending": "final passive lifecycle commit, independent review and isolated integration checks; no execution release",
+  "result": "PASS",
+  "schema": "n4-e1-runner-cpu-validation-v1",
+  "science_or_original_N4_module_changes": false,
+  "source_base": "f6a9ab04c0f184bbe2f8c837b33492835bc8fec9"
+}
