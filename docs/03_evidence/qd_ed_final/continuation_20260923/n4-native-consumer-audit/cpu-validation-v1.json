@@ -1,0 +1,50 @@
+{
+  "schema": "n4-native-consumer-audit-cpu-validation-v1",
+  "status": "PASS",
+  "auditor_sha256": "e4b81cc549488a1bf37183905fbddf1073acac4ce5ef29bc266e0b80d63fe9c4",
+  "tests_sha256": "22bea496d7dead03b129c82cc3d03800bb60d42c2faa44c6581b4ec84ed82733",
+  "command": "CUDA_VISIBLE_DEVICES='' PYTHONDONTWRITEBYTECODE=1 /home/hynx/miniconda3/envs/vla-pilot/bin/python -m pytest -q -p no:cacheprovider tests/test_n4_terminal_population_audit.py tests/test_decision_evidence_audit.py tests/test_n3_feedback_audit.py",
+  "test_result": {
+    "passed": 66,
+    "elapsed_seconds": 9.97,
+    "new_N4": 30,
+    "existing_generic_and_N3": 36,
+    "exit_code": 0
+  },
+  "producer_integration": {
+    "source_commit": "00f03001a50a8c3f9ca7efec11a1424922921daa",
+    "scope": "Two previously emitted synthetic CPU stub-policy to real collector lifecycle traces, one per tested dtype, re-audited with this exact auditor; no original experiment data.",
+    "audit_references": [
+      {
+        "path": "/tmp/n4-consumer-native-audit-integration-20260924a/test_n4_select_action_uses_act0/independent-native-audit-v2.json",
+        "sha256": "14ea611b0fcd245f3f085619d459978a277cc47a27bb906c98a907b650fec53a",
+        "accepted": true,
+        "counts": {
+          "checked_decisions": 1,
+          "canonical_batches_verified": 11,
+          "canonical_candidates_verified": 176,
+          "parent_rounds_verified": 10,
+          "actual_actions_verified": 8,
+          "decoded_reference_actual_prefix_different_decisions": 1
+        }
+      },
+      {
+        "path": "/tmp/n4-consumer-native-audit-integration-20260924a/test_n4_select_action_uses_act1/independent-native-audit-v2.json",
+        "sha256": "c966a327890963f606b1e3af05a5acebdba65de934d382a2a99fade55b97500b",
+        "accepted": true,
+        "counts": {
+          "checked_decisions": 1,
+          "canonical_batches_verified": 11,
+          "canonical_candidates_verified": 176,
+          "parent_rounds_verified": 10,
+          "actual_actions_verified": 8,
+          "decoded_reference_actual_prefix_different_decisions": 1
+        }
+      }
+    ]
+  },
+  "actual_native_experiment_reads": 0,
+  "GPU_model_provider_projector_simulator_calls": 0,
+  "actual_launch_authorized": false,
+  "counterfactual_task_outcome": "Unknown"
+}
