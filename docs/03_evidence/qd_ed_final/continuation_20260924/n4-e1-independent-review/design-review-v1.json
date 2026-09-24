@@ -1,0 +1,63 @@
+{
+  "schema": "n4-e1-independent-design-review-v1",
+  "verdict": "DESIGN_PASS_IMPLEMENTATION_PENDING_NO_EXECUTION_AUTHORITY",
+  "source_refs": [
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-engineering-design-v1/card.md",
+      "sha256": "a28d1b15d3f7a46cc24a44c966abc02e30163b24b051f0308842e6a975699a2a"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-evaluation-runner-20260924/docs/03_evidence/qd_ed_final/continuation_20260924/n4-transport180-condition-design/proposal-v1.md",
+      "sha256": "44d682c784f94d0def3e3328f11089606a4c77dc81d192a2c1587998740cdcde"
+    }
+  ],
+  "blocking_design_contradictions": [],
+  "required_focused_implementation_cases": [
+    {
+      "id": "passive_functional_transparency",
+      "counterexample": "Observer thread start/read/JSON/stop failure propagates into original Stage success or calls the original parser twice, changing failed/completed/token counts.",
+      "required_check": "CPU differential original-vs-observed success, incomplete timeout, completed-and-failed timeout, parse error and cleanup failure; preserve original Popen/communicate/cleanup calls, return/exception and counters. Helper reads via bounded pread, never consumes shared offset or calls accounting parser. Observer failures remain diagnostic Unknown."
+    },
+    {
+      "id": "bounded_sanitized_lifecycle",
+      "counterexample": "Background observer outlives file teardown, leaks unbounded event content, or labels local poll time as remote completion time.",
+      "required_check": "Bound thread/bytes/records/teardown; preserve only fixed event kinds, monotonic observation timing and known lifecycle/exit fields. No raw prompt/response/stderr/argv. Do not claim zero overhead or exact remote event times."
+    },
+    {
+      "id": "closed_180_authority",
+      "counterexample": "A caller edits timeout/condition in an old runtime to180 and generic validate/build/result paths silently accept it without E1 plan/release/owned scope.",
+      "required_check": "Old90 remains exact. Only exact new condition/public-policy/source/profile/runtime/plan/release identity can admit180; direct/generic dispatch stays closed. All call sites and recorded condition labels agree. No arbitrary90..600 allowance, second application attempt or timeout ladder."
+    },
+    {
+      "id": "fresh_complete_matched_identity",
+      "counterexample": "Old valid controls or first3 success are pooled into the new12, or a missing-usage cell is replaced via old retry naming.",
+      "required_check": "All12 new task-major identities with fixed exposed seeds/init and C0/Q0/N4; first3 part of denominator and correctness-only checkpoint. Full12 numeric/safety/native/compute/activity gates unchanged. Missing usage stays Unknown+invalid+nonretryable and stops pending cells; ordinary valid task failure remains denominator."
+    },
+    {
+      "id": "exact_source_and_cost_boundary",
+      "counterexample": "Tooling/source-map directory wildcard allows Stage prompt/algorithm changes, or longer provider wait silently extends episode deadline or borrows protected funds.",
+      "required_check": "Enumerate exact passive helper/hook and new tooling deltas; all algorithm/input/normalization/model/environment bytes unchanged. Fixed4baseline+8development originals, <=4 eligible recoveries/1cell,16dispatch/8.5h including attributable health; every admission full1800+40, private240/48 and original60/40+14/10 reserves, GPU3 UUID/boot/ownlocks. No automaticprobe or protected release."
+    }
+  ],
+  "interpretation": [
+    "This is a one-time engineering condition for unchanged N4, not a new QD algorithm or a repair of the old incomplete/invalid matrix.",
+    "Same tasks/seeds/init are exposed Dev re-evaluation; neither independent validation nor causal proof of the timeout change.",
+    "Observed deadline truncation warrants testing the bounded condition but proves neither necessity nor sufficiency of180 seconds.",
+    "Functional transparency is the passive observer contract; local timestamp precision/latency overhead must be described honestly and cannot be proven zero by synthetic tests.",
+    "Existing protected-phase preparation hardbinds old condition; no automatic promotion or reuse of that certificate is granted by E1."
+  ],
+  "pending": [
+    "E lifecycle helper narrow-hook source and failure-isolation tests.",
+    "R3 dedicatedE1 contract/runner/plan/supervisor/report and exact transitive source mapping.",
+    "Root real plan/resource/source/device review and any later explicit release."
+  ],
+  "scope": {
+    "new_reads": "two named source-only design documents only",
+    "actual_episode_or_protected_or_peer_reads": 0,
+    "new_native_payload_reads": 0,
+    "GPU_model_provider_calls": 0,
+    "production_state_ledger_mutations": 0,
+    "implementation_tests_run": 0,
+    "phase_authorized": false
+  }
+}

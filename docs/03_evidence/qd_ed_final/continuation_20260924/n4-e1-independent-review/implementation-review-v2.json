@@ -1,0 +1,106 @@
+{
+  "blocking_findings": [],
+  "cpu_validation": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260924/n4-e1-independent-review/cpu-validation-v2.json",
+    "sha256": "c840d8225d13e20bfb440c04398a191443a43b575e2a93ee3d548976dd3f399c"
+  },
+  "design_review": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260924/n4-e1-independent-review/design-review-v1.json",
+    "sha256": "94ed222f63a93e2b8b46e1311eb873ca84e58b802fe8277af5b17643f0581970"
+  },
+  "initial_blockers_preserved": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260924/n4-e1-independent-review/lifecycle-initial-blockers-v1.json",
+    "sha256": "37803d80b330596340675349ada8ef0966bd3026dbb497469c0c0fe601df3b3d"
+  },
+  "practical_limits": [
+    "A permanently blocked OS pread may retain at most one daemon and its dedicated dupFD until process exit; subsequent observers are disabled with Unknown prior_observer_timeout. This is documented, not claimed eliminated.",
+    "Synthetic failure isolation and source review do not prove zero overhead or real filesystem/network timing. Monotonic metadata records local observation; no remote service diagnosis or guaranteed180s sufficiency.",
+    "No actual runtime draft, real plan preparation, Hydra preview, source inventory/model validation, physical GPU check or scientific payload read was executed by this reviewer. Root must separately freeze and review actual inputs and release.",
+    "No new task benefit, cohort completion or protected-phase promotion is inferred. Existing old incomplete/invalid outcomes and cost remain unchanged."
+  ],
+  "resolved_initial_blockers": [
+    {
+      "id": "hook_failure_changes_original_execution",
+      "resolution": "LifecycleTelemetry guards constructor/mark/start/finish/snapshot. Independent constructor/after-spawn/finish/snapshot fault x original success/timeout preserves original90 deadline, response, onecall/completion/usage/failed counters and cleanup."
+    },
+    {
+      "id": "unbounded_observer_join",
+      "resolution": "50ms boundedjoin; observer owns dup descriptor, workerfinallyclose; timeout freezes incomplete public snapshot and process-local disables all future observers. Independent close/reuse test confirms no subsequent read or worker; released blockedread closes dup. Original child operations unaffected."
+    }
+  ],
+  "reviewed_boundaries": [
+    "Exact180 new engineering marker/runtime and dedicated cohort/plan/release; old90 exact. No timeout ladder or generic direct dispatch. Generic validate_plan enforces marker iff E1 and supervised scope precedes GPU admission/ledger reservation.",
+    "Source mapping preserves every old source outside explicit 8-path delta, model inventory, seed plan, profile/candidate, prompt policy and all runtime fields except marker/timeout/public-policy hash; parent frozen plan SHA is bound. Live integrated code equals git bytes.",
+    "Four baseline plus eight development original12; first3 correctness only and still in denominator. Remaining9 requires source/protocol/attempt-bound checkpoint and exact release. All12 new cohort identity, old outcomes rejected, valid failures retained; partial3/11 numeric/activity Unknown.",
+    "Missing token usage remains observed subtotal with complete total Unknown; nonretryable invalid, stops later cells. Only enumerated eligible infrastructure causes under exact same frozen condition may use at most4recoveries/1percell; no old timeout retry.",
+    "Private240/48 authority owner/GPU3/UUID local files; no symlink/hardlink locks. Full1800+40 each admission, original protected60/40 slots and14/10h, all pending4/8 plusrecovery capacity,16dispatch and8.5h includesnewhealth. Old reusedhealth not doublecharged.",
+    "N4 native audit/metrics association reused unchanged for every guided chunk; finalscope has no protected-phase authority. Frozen hardware requires existing sameboot/device proof, no automaticprobe.",
+    "Observer metadata whitelist drops raw event payload/text/argv/stderr and token values; timestamps are local observation times, not server times; provider calls, parse acceptance and counters remain owned by original code."
+  ],
+  "reviewed_integrated_commit": "3306b78aad525a614bc7db9a11888056d25925cd",
+  "reviewed_passive_commit": "d59d99aacdf616cf09a761349fff35586252e62c",
+  "reviewed_runner_commit": "22330c78361f143489017ba8dd49e039578f97be",
+  "schema": "n4-e1-independent-implementation-review-v2",
+  "scope": {
+    "GPU_model_provider_simulator_calls": 0,
+    "W_X_mutations": 0,
+    "actual_episode_or_protected_or_peer_reads": 0,
+    "native_payload_reads": 0,
+    "phase_authorized": false,
+    "read_inputs": "named source/protocol and synthetic metadata only"
+  },
+  "source_base": "f6a9ab04c0f184bbe2f8c837b33492835bc8fec9",
+  "source_diff_evidence": {
+    "algorithm_config_environment_changes_since_base": [
+      "core/codex_stage.py",
+      "core/codex_stage_lifecycle.py"
+    ],
+    "public_policy_bytes_unchanged": true,
+    "script_changes_since_base": [
+      "scripts/qd_ed_available_gpu_queue.py",
+      "scripts/qd_ed_final_runner.py",
+      "scripts/qd_ed_n4e1_plan.py",
+      "scripts/qd_ed_n4e1_report.py",
+      "scripts/qd_ed_n4e1_supervise.py"
+    ]
+  },
+  "source_refs": [
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-e1-runner-20260924/scripts/qd_ed_n4e1_plan.py",
+      "sha256": "649449da2be43661080ce39f04f37fb5fd06e12360020937aca02da6d782f1cb"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-e1-runner-20260924/scripts/qd_ed_n4e1_supervise.py",
+      "sha256": "6db2641a51e093d9c6b07afbbfed847256be8d22d55d8a2d5d5aa30f942ad41a"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-e1-runner-20260924/scripts/qd_ed_n4e1_report.py",
+      "sha256": "69899bc1869d48c186a906a60d6d2d3d65269016d72c6914d60e4c3f19cc98ac"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-e1-runner-20260924/scripts/qd_ed_final_runner.py",
+      "sha256": "fc1a7cdda18af2d013ea90cab581ddf89c7088fc1c22fe5e5139995ffce0c6ed"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-e1-runner-20260924/scripts/qd_ed_available_gpu_queue.py",
+      "sha256": "0523d0a9020c27ca5e0f0c7e8209711d9edd349b458da3012c589c18d7f64cc2"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-e1-runner-20260924/core/codex_stage.py",
+      "sha256": "beaf6386e5edd449ddf8df610bf25d08e34d42b3bc7e9e5d2c1418a244206960"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-e1-runner-20260924/core/codex_stage_lifecycle.py",
+      "sha256": "de10576f89368b81c03b7b8d1d7c04e757a394d8b0b4974515c0b08e606d00e6"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-e1-runner-20260924/core/codex_stage_policy.py",
+      "sha256": "92f78a80651e97390a296e42850aae0b70217afb1c362e9b5d0b8a07b8cbe432"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-e1-runner-20260924/experiments/iteration_004_terminal_population/transport180-engineering-protocol-v1.md",
+      "sha256": "a960f4075cca5962e3e9cd35956f96b49f7433f797529134896803f7b5473e2d"
+    }
+  ],
+  "verdict": "PASS_CPU_SOURCE_REVIEW_ONLY_NO_EXECUTION_AUTHORITY"
+}

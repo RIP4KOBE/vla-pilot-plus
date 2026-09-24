@@ -1,0 +1,48 @@
+{
+  "schema": "n4-e1-passive-lifecycle-initial-blocking-review-v1",
+  "verdict": "TWO_CONCRETE_BOUNDARY_BLOCKERS",
+  "source_refs": [
+    {
+      "source_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-stage-lifecycle-20260924/core/codex_stage.py",
+      "sha256": "dd5a9389934a09f638e6ba159b2d74a958849844a34fd26cb62e07d36ca16805",
+      "same_when_archiving": true,
+      "archived_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260924/n4-e1-independent-review/initial-lifecycle-source/codex_stage.py"
+    },
+    {
+      "source_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-stage-lifecycle-20260924/core/codex_stage_lifecycle.py",
+      "sha256": "be02ab0ca6e84c7045f6730e8ca46d1ed8db10bb8c9a9ed417a8e6f81117f21f",
+      "same_when_archiving": true,
+      "archived_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260924/n4-e1-independent-review/initial-lifecycle-source/codex_stage_lifecycle.py"
+    }
+  ],
+  "reproduction_source": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260924/n4-e1-independent-review/reproduce_lifecycle_initial.py",
+    "sha256": "796a95182aa06692ce4a4d57a97cc58bb518aa50a669ba5f6a74809716bd1d29"
+  },
+  "reproduction_result": {
+    "cases": 4,
+    "passed_proving_bad_behavior": 4,
+    "seconds": 2.11,
+    "real_process_provider_GPU_calls": 0
+  },
+  "findings": [
+    {
+      "id": "diagnostic_exception_changes_original_execution",
+      "site": "core/codex_stage.py new StageLifecycle construction and directmark/finish calls",
+      "reproductions": [
+        "Constructor diagnostic RuntimeError changes otherwise successful fake to failure.",
+        "mark(spawn_returned_at) diagnostic RuntimeError leaves created fake without communicate or original cleanup and returnsfailure.",
+        "finish diagnostic RuntimeError overwrites parsed success, retaining completed count but incrementing failed."
+      ],
+      "required_fix": "Narrow no-throw facade for all diagnostic calls including construction; failed observer records fixed sanitized Unknown, never bypass original communicate/cleanup/result/counters."
+    },
+    {
+      "id": "unbounded_observer_join",
+      "site": "core/codex_stage_lifecycle.py StageLifecycle.finish",
+      "reproduction": "Fake thread records join() without timeout; a stalled pread/parse can hold original caller indefinitely. Byte cap is not time bound.",
+      "required_fix": "Bound caller join and freeze detached snapshot; isolate original FD lifetime from surviving observer via ownedFD; stop furtherreads after stop. Explicitly disclose permanently OS-blocked daemon/FD cannot be forcibly reaped by Python thread and preserve original call behavior."
+    }
+  ],
+  "proposed_fix_not_yet_reviewed": "No-throw facade + observer-owneddupFD + boundedjoin + frozenincomplete snapshot, with root decision on subsequentobserver starts afterstall.",
+  "scope": "No actual payload, secrets, GPU/provider or W/S source edits. This report preserves initial failures; not final acceptance."
+}
