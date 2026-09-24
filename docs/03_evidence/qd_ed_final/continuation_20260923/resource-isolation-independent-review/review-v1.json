@@ -1,0 +1,66 @@
+{
+  "schema": "resource-isolation-independent-review-v1",
+  "decision": "PASS",
+  "reviewer": "gpu5_probe",
+  "blockers": [],
+  "source": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/resource-isolation-20260924-v1/migrate-private-resources.py",
+    "sha256": "296e9ec22313c031d1f838cb5d6f4e081a5cc419974cbcb307beb5753b5d4ff9"
+  },
+  "author_tests": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/resource-isolation-20260924-v1/test_migrate_private_resources.py",
+    "sha256": "eff5abe1fcdfd3d1cd87e8c503a0532458c36a8982b8d93b691001b5ead1c1da"
+  },
+  "independent_tests": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260923/resource-isolation-independent-review/test_independent_partition.py",
+    "sha256": "4df16bf5ab55cc8b514cc0247bc862d11589c0bcefe5493e1cae2dfc1d944085"
+  },
+  "authorization": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/resource-isolation-20260924-v1/authorization.json",
+    "sha256": "4026c141ff9bd06f31734c0a43122327b359c35bd847670f641961df9ce81f47"
+  },
+  "drain_source_reviewed": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/resource-isolation-20260924-v1/drain-and-hold-v2.py",
+    "sha256": "efbe293e944ee9694ff218155bc0137daa3455ca90b9f3d53bf5e229f8420f50"
+  },
+  "checks": {
+    "real_old_lease_holder_not_only_json": true,
+    "old_state_lock_held": true,
+    "all_episode_health_groups_terminal": true,
+    "per_line_bytes_and_complete_groups_exact_once": true,
+    "decimal_cost_and_event_conservation": true,
+    "cross_owner_retry_lineage_not_second_charge": true,
+    "private_caps_protected_reserves_and_actual_worker_field": true,
+    "old_external_hold_and_shared_state_enforcement_superseded": true,
+    "W_lock_inodes_unchanged_X_five_links_per_file_atomic": true,
+    "archive_and_write_ahead_progress_manual_recovery": true,
+    "frozen_source_plan_runtime_authority_identity_unchanged": true,
+    "no_automatic_activation_release_dispatch": true
+  },
+  "cpu": {
+    "python": "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+    "environment": {
+      "CUDA_VISIBLE_DEVICES": "",
+      "PYTHONDONTWRITEBYTECODE": "1"
+    },
+    "command": "CUDA_VISIBLE_DEVICES='' PYTHONDONTWRITEBYTECODE=1 /home/hynx/miniconda3/envs/vla-pilot/bin/python -m pytest -q -p no:cacheprovider docs/03_evidence/qd_ed_final/continuation_20260923/resource-isolation-independent-review/test_independent_partition.py /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/resource-isolation-20260924-v1/test_migrate_private_resources.py",
+    "cwd": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924",
+    "exit_code": 0,
+    "stdout": "........................                                                 [100%]\n24 passed in 0.16s\n",
+    "author_checks": 18,
+    "independent_checks": 6,
+    "no_real_migration": true,
+    "fault_injection_scope": "migrate function on invented tmp roots only; external lease and immutable-inventory functions stubbed to isolate filesystem failure; real holder checked by separate tmp helper test"
+  },
+  "limitations": [
+    "Per-file replacement is atomic, not the entire multi-file operation. No new supervisor may start while MIGRATED_PENDING_VALIDATION.",
+    "Uncatchable interruption may precede the latest progress record; prepared hashes and archive permit manual reconciliation, not blind rerun.",
+    "Nonempty reservation history or unowned/ambiguous/inflight events reject and require separate review.",
+    "Historical retry references do not authorize future cross-study writes/retries.",
+    "Real resource validation/ACTIVE transition/lease release and launch remain root actions."
+  ],
+  "narrative": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260923/resource-isolation-independent-review/review-v1.md",
+    "sha256": "dbba1df68efecc06a810e61d005dcc5a522611009b2b788f29c80c1526b1410e"
+  }
+}
