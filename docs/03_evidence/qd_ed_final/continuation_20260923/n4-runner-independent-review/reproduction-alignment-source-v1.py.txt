@@ -1,0 +1,52 @@
+def native_audit_alignment(audit, metrics, *, require):
+    """Match all guided native consumer checks; difference is not a first-three gate."""
+    require(audit.get('accepted') is True and audit.get('evidence_complete') is True,
+            'N4 native alignment requires accepted complete audit')
+    require(all(m.get('qd_final_selection_mode')=='terminal_population_v1'
+        and m.get('qd_quality_mode','provider')=='provider' for m in metrics),
+        'N4 native alignment consumer/provider fields differ')
+    steps=[m.get('global_step') for m in metrics]
+    require(all(type(x) is int and 0<=x<=720 for x in steps) and steps==sorted(steps) and len(set(steps))==len(steps), 'N4 metric step identity differs')
+    count=len(metrics); gate=audit.get('n4_terminal_population_audit')
+    if not count:
+        require(gate is None, 'N4 empty guided metrics unexpectedly claim native checks')
+        return {'status':'not_applicable','checked_decisions':0,'actual_prefix_different_decisions':0,
+                'correctness_checkpoint_or_promotion_release':False}
+    require(isinstance(gate,dict) and gate.get('schema')==NATIVE_AUDIT_SCHEMA,
+            'N4 native terminal-population audit missing or schema differs')
+    for key,expected in [('checked_decisions',count),('canonical_batches_verified',count*11),
+                         ('canonical_candidates_verified',count*176),('parent_rounds_verified',count*10)]:
+        require(type(gate.get(key)) is int and gate[key]==expected, 'N4 native audit count differs: '+key)
+    for key in ('decoded_reference_first8_different_decisions','decoded_reference_actual_prefix_different_decisions'):
+        require(type(gate.get(key)) is int and 0<=gate[key]<=count, 'N4 native difference count invalid: '+key)
+    require(gate['decoded_reference_actual_prefix_different_decisions']<=gate['decoded_reference_first8_different_decisions'],
+            'N4 actual-prefix difference exceeds first8 difference')
+    require(type(gate.get('actual_actions_verified')) is int and 0<=gate['actual_actions_verified']<=count*8,
+            'N4 native actual action count invalid')
+    decisions=gate.get('decisions')
+    require(isinstance(decisions,list) and [d.get('global_step') for d in decisions]==steps,
+            'N4 native audit decision sequence differs')
+    first8=actual=actions=0
+    for decision in decisions:
+        require(all(type(decision.get(k)) is int and decision[k]==v for k,v in
+            [('canonical_batches_verified',11),('canonical_candidates_verified',176),('parent_rounds_verified',10)]),
+            'N4 native per-decision accounting differs')
+        m=decision.get('actual_prefix_length')
+        require(type(m) is int and 0<=m<=8,'N4 native actual prefix length differs')
+        sets=[]
+        for key,limit in [('decoded_reference_first8_diff_positions',8),('decoded_reference_actual_prefix_diff_positions',m)]:
+            positions=decision.get(key)
+            require(isinstance(positions,list) and all(isinstance(p,list) and len(p)==2
+                and all(type(v) is int for v in p) and 0<=p[0]<limit and 0<=p[1]<7 for p in positions),
+                'N4 decoded difference positions invalid')
+            mapped={tuple(p) for p in positions}
+            require(len(mapped)==len(positions),'N4 decoded difference positions repeated')
+            sets.append(mapped)
+        require(sets[1]=={p for p in sets[0] if p[0]<m},'N4 actual-prefix differences not exact prefix restriction')
+        first8+=bool(sets[0]);actual+=bool(sets[1]);actions+=m
+    require(first8==gate['decoded_reference_first8_different_decisions']
+        and actual==gate['decoded_reference_actual_prefix_different_decisions']
+        and actions==gate['actual_actions_verified'],'N4 native difference/action aggregate differs')
+    return {'status':'verified','checked_decisions':count,
+            'actual_prefix_different_decisions':gate['decoded_reference_actual_prefix_different_decisions'],
+            'audit':copy.deepcopy(gate),'correctness_checkpoint_or_promotion_release':False}

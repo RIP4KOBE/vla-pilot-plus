@@ -1,0 +1,30 @@
+{
+  "schema": "n4-runner-independent-cpu-checks-v1",
+  "scope": "invented dictionaries and temporary fixture files only; no actual study ledger, model/provider/simulator/GPU or episode payload reads",
+  "independent_test_source": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260923/n4-runner-independent-review/test_independent_n4_runner.py",
+    "sha256": "a89e9d11098f5dba6490e54ce83c8d3908a16d3fec2e7fcb1470ce3ba2b402fe"
+  },
+  "execution": {
+    "python": "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+    "environment": {
+      "CUDA_VISIBLE_DEVICES": "",
+      "PYTHONDONTWRITEBYTECODE": "1"
+    },
+    "runner": "pytest -q -p no:cacheprovider",
+    "cwd": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924",
+    "exit_code": 0,
+    "stdout": ".............                                                            [100%]\n13 passed in 0.17s\n",
+    "independent_checks": 8,
+    "existing_focused_checks": 5,
+    "total": 13,
+    "count_scope": "CPU correctness checks; overlaps author tests, no performance or scientific evidence"
+  },
+  "existing_focused_node_ids": [
+    "tests/test_qd_ed_n4_supervise.py::test_direct_runner_and_generic_queue_cannot_dispatch_or_rebind",
+    "tests/test_qd_ed_n4_supervise.py::test_real_lease_scope_ownership_hooks_and_exception_release",
+    "tests/test_qd_ed_n4_plan.py::test_budget_original_caps_112_plus12_plus4_and_full_timeout",
+    "tests/test_qd_ed_n4_plan.py::test_current_whole_matrix_capacity_checked_before_any_row",
+    "tests/test_qd_ed_n4_report.py::test_multiple_predispatch_records_original_and_recovery_keep_full_journal_costs"
+  ]
+}

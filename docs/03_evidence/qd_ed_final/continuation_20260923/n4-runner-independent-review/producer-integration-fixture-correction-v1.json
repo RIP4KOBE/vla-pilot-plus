@@ -1,0 +1,12 @@
+{
+  "schema": "n4-producer-integration-fixture-correction-v1",
+  "initial_test_sha256": "1f9d7f53c93d7fddd4c5b47bdf911d3286e6af06b1aa90dcb44c7d39c4fb293d",
+  "exit_code": 1,
+  "checks": 2,
+  "result": "both final native audits passed, then runner rejected missing global_step",
+  "failure": "N4 metric step identity differs",
+  "cause": "policy fixture omits Main.run envelope fields appended at main.py:1902-1910, not a native consumer mismatch",
+  "correction": "add only synthetic episode=0/global_step=0/task_id=0 envelope matching this lifecycle, preserve all emitted policy fields",
+  "initial_synthetic_output_root": "/tmp/n4-runner-native-producer-review-20260924-v1",
+  "no_production_change": true
+}

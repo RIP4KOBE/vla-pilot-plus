@@ -1,0 +1,181 @@
+{
+  "schema": "n4-runner-independent-review-v2",
+  "decision": "PASS_AFTER_NARROW_FIX",
+  "reviewer": "gpu5_probe",
+  "blockers": [],
+  "review_scope": "source and invented CPU fixtures only; no actual scientific native reads, real checkpoint/model, online provider, simulator/GPU execution or release",
+  "reviewed_runner_commit": "748123965735152a4cbc930a5834a5f2ae0b9819",
+  "reviewed_runner_sources": [
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-runner-20260924/scripts/qd_ed_n4_plan.py",
+      "sha256": "e5a6fd6e084a0748d786a0baec4472507d5ba61384696023b76a0099c05c59e9"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-runner-20260924/scripts/qd_ed_n4_supervise.py",
+      "sha256": "b6dd9224cfaf3066ccd40dd9abe51c93fe8fafe1018329a85c3a247ba74dd877"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-runner-20260924/scripts/qd_ed_n4_report.py",
+      "sha256": "d26769d73e43e6b10b8171f6930604bc510d15b26174ca3a767bcdf84a72c2fb"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-runner-20260924/scripts/qd_ed_final_runner.py",
+      "sha256": "c3ccced7b0535a824a96724f787dfc5cd3636f1de023149082593d35dc975d5b"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-runner-20260924/scripts/qd_ed_available_gpu_queue.py",
+      "sha256": "4882bf38a14de334b76f000bc23e492cce4be5e9da9e802472f8025d7baba394"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-runner-20260924/configs/qd_ed_final/candidate_n4.json",
+      "sha256": "8d421a3c6ec860dee778453225339d776911647480bc2f0394e098a00ded84b2"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-runner-20260924/configs/qd_ed_final/n4_observed_baseline_profiles.json",
+      "sha256": "9ad91066bc0cf91bc8c79d9b02acbd4b83e5e5a45ae31072b0e92d2221baa54f"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-runner-20260924/tests/test_qd_ed_n4_plan.py",
+      "sha256": "001120fb7b90d064639b9a218c00f00758a309706eaa2b3314fe74ffac9a4054"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-runner-20260924/tests/test_qd_ed_n4_supervise.py",
+      "sha256": "006217b73b2979291997a350a304e3f1aa3b78cd589168e806b6e8d5bc015499"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-runner-20260924/tests/test_qd_ed_n4_report.py",
+      "sha256": "370fbd9bcadce171f3c8e4cc13487c50b38bdd6f3e59701abbc47907d671867e"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-runner-20260924/experiments/iteration_004_terminal_population/protocol.md",
+      "sha256": "b8562e3f9fffc77efc803c6b056441f7b426333a97eb176b52fdb0fe42088db2"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-runner-20260924/experiments/iteration_004_terminal_population/q0-transfer-check-protocol.md",
+      "sha256": "3ff18d22eb934a24f790bef5b411089f9a4c9116b098cfb7baa2b36cbbc277ca"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-runner-20260924/experiments/iteration_004_terminal_population/resource-resumption-amendment-v1.md",
+      "sha256": "a08b37836b5a9283118821bb5b6b2b2f2ccf3683bc145a6023f199484e4557dd"
+    }
+  ],
+  "algorithm_commit_unchanged": "00f03001a50a8c3f9ca7efec11a1424922921daa",
+  "producer_sources": [
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/core/rdt_policy_steer.py",
+      "sha256": "edebea0873ca1d3868741c0602d1d7a2d0b92f5b0d0eef848288a10f4e0956ac"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/core/qd_terminal_population.py",
+      "sha256": "6b927f824ce17dd8ea939709c9f92539767291189426818136b8238030534dcf"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/core/eds_eval_metrics.py",
+      "sha256": "b10d47290494d494f60aa96b5583ca1102866ff4ccde2a465c6174a0f4b5e000"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/core/decision_evidence.py",
+      "sha256": "3af145738e3b22a8bec7484d0c33ba9a81dffbf58335b61682eb0ddf43b3cb8c"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/core/rdt_libero_action_converter.py",
+      "sha256": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/core/qd_ed.py",
+      "sha256": "5c86385a8271c3311aa715332d1307850b18ec37486f20ac53c19747fe4f207b"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/tests/test_rdt_steer.py",
+      "sha256": "68f13bc0137256ae63eb63582e1bafb0b7a485902095952931ac57d38e9b2fc6"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/main.py",
+      "sha256": "f9add8568d45ec799e4030b1108f069f4af88bf3b63c62d7f836d59539a427a7"
+    }
+  ],
+  "final_auditor_commit": "847ebdfa23b6747b627f832a90a7c37e743c77a5",
+  "final_auditor": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-audit-20260924/scripts/audit_decision_evidence.py",
+    "sha256": "4fdc8793d2a4cc4935e571c5db58e38e4ed48aae388f2ef598928a2b322491df"
+  },
+  "initial_reproduction": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260923/n4-runner-independent-review/reproductions-v1.json",
+    "sha256": "5fa1bd64aa93893e10a16f504d07d71376df179f726b18122f259e5454fd02fc"
+  },
+  "initial_function_source": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260923/n4-runner-independent-review/reproduction-alignment-source-v1.py.txt",
+    "sha256": "f926c9cf361f21ed296c23ad83495fd8e54a0e001cea8c5328b16dc5c649b4a9"
+  },
+  "fixed_findings": [
+    "wrong/missing terminal/archive metrics now rejected against exact accepted native decision",
+    "zero actual prefix now rejected; m must be 1..8",
+    "actual difference positions must exactly restrict first8 positions to actually executed m"
+  ],
+  "checks": {
+    "exact_twelve_originals_six_baseline_six_development": true,
+    "protected_caps_and_remaining_whole_cohort_attempt_allocation": true,
+    "full_1800_plus_40_global_and_local_headroom": true,
+    "new_health_and_invalid_recovery_costs_preserved": true,
+    "separate_exact_execution_release_first3_remaining9": true,
+    "checkpoint_exact_attempt_order_and_correctness_only": true,
+    "real_lease_owned_monitor_and_generic_entry_blocked": true,
+    "each_guided_metric_bound_to_native_audit": true,
+    "partial_numeric_and_activity_unknown": true,
+    "report_never_authorizes_protected_phase": true
+  },
+  "cpu_checks": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260923/n4-runner-independent-review/cpu-checks-v1.json",
+    "sha256": "ad773386b548a7bb7008f80ecc22f1f2e3e83ef400bc84723bfafee0bc682b7c"
+  },
+  "independent_test_source": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260923/n4-runner-independent-review/test_independent_n4_runner.py",
+    "sha256": "a89e9d11098f5dba6490e54ce83c8d3908a16d3fec2e7fcb1470ce3ba2b402fe"
+  },
+  "producer_integration": {
+    "test_source": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260923/n4-runner-independent-review/test_producer_native_alignment.py",
+      "sha256": "c7612c019d19f2f9343f7fbcc1204dcc47d87d9a190240ed3e0b55d082c5775b"
+    },
+    "exit_code": 0,
+    "checks": 2,
+    "pytest_seconds": 5.34,
+    "counts_per_dtype": {
+      "canonical_batches": 11,
+      "canonical_candidates": 176,
+      "parent_rounds": 10,
+      "actual_actions": 8
+    },
+    "cuda_initialized": false,
+    "results": [
+      {
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260923/n4-runner-independent-review/producer-fp32-result-v1.json",
+        "sha256": "977684e2339200cfa6110051ad072caa85d67945da4b0d531880c2cbf992b12f"
+      },
+      {
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260923/n4-runner-independent-review/producer-bf16-result-v1.json",
+        "sha256": "97e5ea38318299ed4a3129f61ed6cb3492f34241ce56d4afe4b421d1c1780b70"
+      }
+    ],
+    "fixture_correction": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260923/n4-runner-independent-review/producer-integration-fixture-correction-v1.json",
+      "sha256": "2372a4553493b4cd6258c19d1ced3c3c5c5500924431b2eb51c0c4e20f67f270"
+    },
+    "initial_fixture_source": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260923/n4-runner-independent-review/producer-integration-initial-test.py.txt",
+      "sha256": "1f9d7f53c93d7fddd4c5b47bdf911d3286e6af06b1aa90dcb44c7d39c4fb293d"
+    },
+    "command": "CUDA_VISIBLE_DEVICES='' PYTHONDONTWRITEBYTECODE=1 /home/hynx/miniconda3/envs/vla-pilot/bin/python -m pytest -q -p no:cacheprovider docs/03_evidence/qd_ed_final/continuation_20260923/n4-runner-independent-review/test_producer_native_alignment.py --basetemp=/tmp/n4-runner-native-producer-review-20260924-v2"
+  },
+  "check_count_scope": "13 bounded source/metadata checks plus 2 producer integration cases; author suite overlap, no scientific/performance evidence",
+  "limitations": [
+    "Metadata-only reporter relies on frozen accepted native auditor rather than independently decoding tensors.",
+    "In-process scope is an accidental-entry guard under frozen source, not an arbitrary-code security boundary.",
+    "Live GPU health, shared resource/lease availability and exact root execution release remain required.",
+    "No scientific benefit, cohort completion, checkpoint or protected-phase release is inferred."
+  ],
+  "narrative": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924/docs/03_evidence/qd_ed_final/continuation_20260923/n4-runner-independent-review/review-v2.md",
+    "sha256": "77b107ad3bba582c4db1f9157009e7960bc4f03ac8b68e8c85e6edee1041ab89"
+  }
+}

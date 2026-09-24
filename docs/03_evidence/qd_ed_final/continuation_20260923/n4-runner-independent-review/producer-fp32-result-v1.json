@@ -1,0 +1,1734 @@
+{
+  "schema": "n4-independent-stub-producer-native-alignment-v1",
+  "dtype": "torch.float32",
+  "scope": "invented CPU stub network/provider and collector actions; no real episode/model/GPU",
+  "accepted": true,
+  "evidence_complete": true,
+  "errors": [],
+  "native_alignment": {
+    "status": "verified",
+    "checked_decisions": 1,
+    "actual_prefix_different_decisions": 1,
+    "audit": {
+      "schema": "n4-native-terminal-population-audit-v1",
+      "checked_decisions": 1,
+      "canonical_batches_verified": 11,
+      "canonical_candidates_verified": 176,
+      "parent_rounds_verified": 10,
+      "actual_actions_verified": 8,
+      "decoded_reference_first8_different_decisions": 1,
+      "decoded_reference_actual_prefix_different_decisions": 1,
+      "decisions": [
+        {
+          "decision_id": "e0:d1:s0",
+          "global_step": 0,
+          "canonical_batches_verified": 11,
+          "canonical_candidates_verified": 176,
+          "parent_rounds_verified": 10,
+          "actual_prefix_length": 8,
+          "selected_index": 0,
+          "minimum_cost_tie_indices": [
+            0
+          ],
+          "selected_occurrence_id": "e0:d1:s0:q2139:r0",
+          "selected_native_sha256": "fd636b3fe48b31182be725d9ae94bd7183704c4a4de14eeecb69daa786ee1c54",
+          "selected_fingerprint": "d656679e0e83e7457125e3227a46bbce2cd44c9004ece8b0c2fd49c14d31f849",
+          "selected_cell": 0,
+          "selected_parent_cell": 0,
+          "selected_cost": 4.576075553894043,
+          "selected_raw_reward": -4.576075553894043,
+          "terminal_native_ids": [
+            "fd636b3fe48b31182be725d9ae94bd7183704c4a4de14eeecb69daa786ee1c54",
+            "e959782618df3ffde8fa54ad04136f18535d0b7a3ae9580c6fd35cec2f7f7651",
+            "e959782618df3ffde8fa54ad04136f18535d0b7a3ae9580c6fd35cec2f7f7651",
+            "90b2aa72a5eeb04c4dd222bef03bc46db703f66963f8b826d4a3a2fbd3e1466d",
+            "e1f6e325bd9b85cf479ffe7851d34c08c6500d58d8a9e90f4cf9ee269322fe5c",
+            "e1f6e325bd9b85cf479ffe7851d34c08c6500d58d8a9e90f4cf9ee269322fe5c",
+            "e1f6e325bd9b85cf479ffe7851d34c08c6500d58d8a9e90f4cf9ee269322fe5c",
+            "e1f6e325bd9b85cf479ffe7851d34c08c6500d58d8a9e90f4cf9ee269322fe5c",
+            "e1f6e325bd9b85cf479ffe7851d34c08c6500d58d8a9e90f4cf9ee269322fe5c",
+            "77a3011d35f26655ecdac68d1df4c97a4f15bc7019181bf3703bc03bd445c930",
+            "77a3011d35f26655ecdac68d1df4c97a4f15bc7019181bf3703bc03bd445c930",
+            "77a3011d35f26655ecdac68d1df4c97a4f15bc7019181bf3703bc03bd445c930",
+            "77a3011d35f26655ecdac68d1df4c97a4f15bc7019181bf3703bc03bd445c930",
+            "77a3011d35f26655ecdac68d1df4c97a4f15bc7019181bf3703bc03bd445c930",
+            "a6a7cb510cbd56d906c5c895e0ec1768d69a6a689fea0d390df72dfacb2a5c26",
+            "a00e4872d4184b0a50b0b5baab9304775c417de13923fa0a30a9481fc5d4a02e"
+          ],
+          "terminal_native_costs": {
+            "dtype": "torch.float32",
+            "shape": [
+              16
+            ],
+            "sha256": "d7afbf7f76123c405a66ccd4801009744f49f08b11b2295d19aa903d61f7ce02",
+            "values": [
+              4.576075553894043,
+              489.9029541015625,
+              489.9029541015625,
+              238.64871215820312,
+              169.61155700683594,
+              169.61155700683594,
+              169.61155700683594,
+              169.61155700683594,
+              169.61155700683594,
+              173.13677978515625,
+              173.13677978515625,
+              173.13677978515625,
+              173.13677978515625,
+              173.13677978515625,
+              60.91543960571289,
+              5.170125484466553
+            ]
+          },
+          "terminal_raw_provider_quality": {
+            "dtype": "torch.float32",
+            "shape": [
+              16
+            ],
+            "sha256": "d81f22208adc17d25697aa97b6e53113240deb4a648a2734d87e1d423fa26f9d",
+            "values": [
+              -4.576075553894043,
+              -489.9029541015625,
+              -489.9029541015625,
+              -238.64871215820312,
+              -169.61155700683594,
+              -169.61155700683594,
+              -169.61155700683594,
+              -169.61155700683594,
+              -169.61155700683594,
+              -173.13677978515625,
+              -173.13677978515625,
+              -173.13677978515625,
+              -173.13677978515625,
+              -173.13677978515625,
+              -60.91543960571289,
+              -5.170125484466553
+            ]
+          },
+          "archive_reference_native_sha256": "e58cb16b20c5c1c9bdaa3bcba31eb1bc324588cdbf6161d5d54c685f7cf88ea6",
+          "archive_reference_index": 3,
+          "archive_reference_cell": 5,
+          "archive_reference_fingerprint": "72ce350de58f4734a24a4e5842b1a46df01fedf4d9718de9c65b286c0038ecb2",
+          "archive_reference_raw_reward": -0.18552204966545105,
+          "archive_reference_cost": 0.18552204966545105,
+          "archive_reference_costs": {
+            "dtype": "torch.float32",
+            "shape": [
+              7
+            ],
+            "sha256": "5859fa26c9947478375444135e964c44bf4705b0d2eb1d60de21a72d32e85f36",
+            "values": [
+              0.7089284658432007,
+              489.8035583496094,
+              238.5131378173828,
+              0.18552204966545105,
+              0.21060429513454437,
+              60.644805908203125,
+              0.9346688389778137
+            ]
+          },
+          "canonical_sources": [
+            {
+              "iter_idx": -1,
+              "canonical_sequence": 69,
+              "scoring_batch_id": 50
+            },
+            {
+              "iter_idx": 0,
+              "canonical_sequence": 284,
+              "scoring_batch_id": 169
+            },
+            {
+              "iter_idx": 1,
+              "canonical_sequence": 499,
+              "scoring_batch_id": 384
+            },
+            {
+              "iter_idx": 2,
+              "canonical_sequence": 714,
+              "scoring_batch_id": 599
+            },
+            {
+              "iter_idx": 3,
+              "canonical_sequence": 929,
+              "scoring_batch_id": 814
+            },
+            {
+              "iter_idx": 4,
+              "canonical_sequence": 1144,
+              "scoring_batch_id": 1029
+            },
+            {
+              "iter_idx": 5,
+              "canonical_sequence": 1343,
+              "scoring_batch_id": 1228
+            },
+            {
+              "iter_idx": 6,
+              "canonical_sequence": 1542,
+              "scoring_batch_id": 1427
+            },
+            {
+              "iter_idx": 7,
+              "canonical_sequence": 1741,
+              "scoring_batch_id": 1626
+            },
+            {
+              "iter_idx": 8,
+              "canonical_sequence": 1940,
+              "scoring_batch_id": 1825
+            },
+            {
+              "iter_idx": 9,
+              "canonical_sequence": 2139,
+              "scoring_batch_id": 2024
+            }
+          ],
+          "parent_associations": [
+            {
+              "iter_idx": 0,
+              "allocation_sequence": 119,
+              "parent_sequence": 120,
+              "slots": [
+                {
+                  "slot": 0,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r3"
+                  ]
+                },
+                {
+                  "slot": 1,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r3"
+                  ]
+                },
+                {
+                  "slot": 2,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r3"
+                  ]
+                },
+                {
+                  "slot": 3,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r3"
+                  ]
+                },
+                {
+                  "slot": 4,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 5,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 6,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 7,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 8,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 9,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 10,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 11,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 12,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r12"
+                  ]
+                },
+                {
+                  "slot": 13,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r12"
+                  ]
+                },
+                {
+                  "slot": 14,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r12"
+                  ]
+                },
+                {
+                  "slot": 15,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r12"
+                  ]
+                }
+              ]
+            },
+            {
+              "iter_idx": 1,
+              "allocation_sequence": 334,
+              "parent_sequence": 335,
+              "slots": [
+                {
+                  "slot": 0,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r3"
+                  ]
+                },
+                {
+                  "slot": 1,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r3"
+                  ]
+                },
+                {
+                  "slot": 2,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q284:r4"
+                  ]
+                },
+                {
+                  "slot": 3,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q284:r4"
+                  ]
+                },
+                {
+                  "slot": 4,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q284:r4"
+                  ]
+                },
+                {
+                  "slot": 5,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q284:r4"
+                  ]
+                },
+                {
+                  "slot": 6,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 7,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 8,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 9,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 10,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 11,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 12,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q284:r12"
+                  ]
+                },
+                {
+                  "slot": 13,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q284:r12"
+                  ]
+                },
+                {
+                  "slot": 14,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r12"
+                  ]
+                },
+                {
+                  "slot": 15,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r12"
+                  ]
+                }
+              ]
+            },
+            {
+              "iter_idx": 2,
+              "allocation_sequence": 549,
+              "parent_sequence": 550,
+              "slots": [
+                {
+                  "slot": 0,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r3"
+                  ]
+                },
+                {
+                  "slot": 1,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r3"
+                  ]
+                },
+                {
+                  "slot": 2,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q499:r5"
+                  ]
+                },
+                {
+                  "slot": 3,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q499:r5"
+                  ]
+                },
+                {
+                  "slot": 4,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 5,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 6,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 7,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 8,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 9,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 10,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 11,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 12,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q284:r12"
+                  ]
+                },
+                {
+                  "slot": 13,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q284:r12"
+                  ]
+                },
+                {
+                  "slot": 14,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r12"
+                  ]
+                },
+                {
+                  "slot": 15,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r12"
+                  ]
+                }
+              ]
+            },
+            {
+              "iter_idx": 3,
+              "allocation_sequence": 764,
+              "parent_sequence": 765,
+              "slots": [
+                {
+                  "slot": 0,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r3"
+                  ]
+                },
+                {
+                  "slot": 1,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r3"
+                  ]
+                },
+                {
+                  "slot": 2,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q499:r5"
+                  ]
+                },
+                {
+                  "slot": 3,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q499:r5"
+                  ]
+                },
+                {
+                  "slot": 4,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 5,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 6,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 7,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 8,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 9,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 10,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 11,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 12,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 13,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 14,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q284:r12"
+                  ]
+                },
+                {
+                  "slot": 15,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r12"
+                  ]
+                }
+              ]
+            },
+            {
+              "iter_idx": 4,
+              "allocation_sequence": 979,
+              "parent_sequence": 980,
+              "slots": [
+                {
+                  "slot": 0,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r3"
+                  ]
+                },
+                {
+                  "slot": 1,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 2,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 3,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 4,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 5,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 6,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 7,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 8,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r3"
+                  ]
+                },
+                {
+                  "slot": 9,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 10,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 11,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 12,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 13,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 14,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 15,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r12"
+                  ]
+                }
+              ]
+            },
+            {
+              "iter_idx": 5,
+              "allocation_sequence": 1194,
+              "parent_sequence": 1195,
+              "slots": [
+                {
+                  "slot": 0,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 1,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 2,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 3,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 4,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 5,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 6,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 7,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r3"
+                  ]
+                },
+                {
+                  "slot": 8,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 9,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 10,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 11,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 12,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 13,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 14,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q284:r12"
+                  ]
+                },
+                {
+                  "slot": 15,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r12"
+                  ]
+                }
+              ]
+            },
+            {
+              "iter_idx": 6,
+              "allocation_sequence": 1393,
+              "parent_sequence": 1394,
+              "slots": [
+                {
+                  "slot": 0,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r3"
+                  ]
+                },
+                {
+                  "slot": 1,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 2,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 3,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r3"
+                  ]
+                },
+                {
+                  "slot": 4,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 5,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 6,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 7,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 8,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 9,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 10,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 11,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 12,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 13,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 14,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q284:r12"
+                  ]
+                },
+                {
+                  "slot": 15,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r12"
+                  ]
+                }
+              ]
+            },
+            {
+              "iter_idx": 7,
+              "allocation_sequence": 1592,
+              "parent_sequence": 1593,
+              "slots": [
+                {
+                  "slot": 0,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r3"
+                  ]
+                },
+                {
+                  "slot": 1,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 2,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 3,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r3"
+                  ]
+                },
+                {
+                  "slot": 4,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 5,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 6,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 7,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 8,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 9,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 10,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 11,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 12,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 13,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 14,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q284:r12"
+                  ]
+                },
+                {
+                  "slot": 15,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r12"
+                  ]
+                }
+              ]
+            },
+            {
+              "iter_idx": 8,
+              "allocation_sequence": 1791,
+              "parent_sequence": 1792,
+              "slots": [
+                {
+                  "slot": 0,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r3"
+                  ]
+                },
+                {
+                  "slot": 1,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 2,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 3,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r3"
+                  ]
+                },
+                {
+                  "slot": 4,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 5,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 6,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 7,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 8,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 9,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 10,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 11,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 12,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 13,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 14,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q284:r12"
+                  ]
+                },
+                {
+                  "slot": 15,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r12"
+                  ]
+                }
+              ]
+            },
+            {
+              "iter_idx": 9,
+              "allocation_sequence": 1990,
+              "parent_sequence": 1991,
+              "slots": [
+                {
+                  "slot": 0,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r3"
+                  ]
+                },
+                {
+                  "slot": 1,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 2,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r5"
+                  ]
+                },
+                {
+                  "slot": 3,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q929:r3"
+                  ]
+                },
+                {
+                  "slot": 4,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 5,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 6,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 7,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 8,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r7"
+                  ]
+                },
+                {
+                  "slot": 9,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 10,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 11,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 12,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 13,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r8"
+                  ]
+                },
+                {
+                  "slot": 14,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q284:r12"
+                  ]
+                },
+                {
+                  "slot": 15,
+                  "matching_occurrence_ids": [
+                    "e0:d1:s0:q69:r12"
+                  ]
+                }
+              ]
+            }
+          ],
+          "archive_associations": [
+            {
+              "slot": 0,
+              "matching_occurrence_ids": [
+                "e0:d1:s0:q69:r3"
+              ]
+            },
+            {
+              "slot": 1,
+              "matching_occurrence_ids": [
+                "e0:d1:s0:q929:r5"
+              ]
+            },
+            {
+              "slot": 2,
+              "matching_occurrence_ids": [
+                "e0:d1:s0:q929:r3"
+              ]
+            },
+            {
+              "slot": 3,
+              "matching_occurrence_ids": [
+                "e0:d1:s0:q69:r7"
+              ]
+            },
+            {
+              "slot": 4,
+              "matching_occurrence_ids": [
+                "e0:d1:s0:q69:r8"
+              ]
+            },
+            {
+              "slot": 5,
+              "matching_occurrence_ids": [
+                "e0:d1:s0:q284:r12"
+              ]
+            },
+            {
+              "slot": 6,
+              "matching_occurrence_ids": [
+                "e0:d1:s0:q69:r12"
+              ]
+            }
+          ],
+          "decoded_reference_first8_diff_positions": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              0,
+              3
+            ],
+            [
+              0,
+              4
+            ],
+            [
+              0,
+              5
+            ],
+            [
+              0,
+              6
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              1,
+              4
+            ],
+            [
+              1,
+              5
+            ],
+            [
+              1,
+              6
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              4,
+              0
+            ],
+            [
+              4,
+              1
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              4,
+              6
+            ],
+            [
+              5,
+              0
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              6,
+              0
+            ],
+            [
+              6,
+              1
+            ],
+            [
+              6,
+              2
+            ],
+            [
+              6,
+              3
+            ],
+            [
+              6,
+              4
+            ],
+            [
+              6,
+              5
+            ],
+            [
+              6,
+              6
+            ],
+            [
+              7,
+              0
+            ],
+            [
+              7,
+              1
+            ],
+            [
+              7,
+              2
+            ],
+            [
+              7,
+              3
+            ],
+            [
+              7,
+              4
+            ],
+            [
+              7,
+              5
+            ],
+            [
+              7,
+              6
+            ]
+          ],
+          "decoded_reference_actual_prefix_diff_positions": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              0,
+              3
+            ],
+            [
+              0,
+              4
+            ],
+            [
+              0,
+              5
+            ],
+            [
+              0,
+              6
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              1,
+              4
+            ],
+            [
+              1,
+              5
+            ],
+            [
+              1,
+              6
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              4,
+              0
+            ],
+            [
+              4,
+              1
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              4,
+              6
+            ],
+            [
+              5,
+              0
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              6,
+              0
+            ],
+            [
+              6,
+              1
+            ],
+            [
+              6,
+              2
+            ],
+            [
+              6,
+              3
+            ],
+            [
+              6,
+              4
+            ],
+            [
+              6,
+              5
+            ],
+            [
+              6,
+              6
+            ],
+            [
+              7,
+              0
+            ],
+            [
+              7,
+              1
+            ],
+            [
+              7,
+              2
+            ],
+            [
+              7,
+              3
+            ],
+            [
+              7,
+              4
+            ],
+            [
+              7,
+              5
+            ],
+            [
+              7,
+              6
+            ]
+          ],
+          "stage_binding_sequence": 2197,
+          "stage_raw_reward": -4.576075553894043,
+          "stage_init_reward": -4.576075553894043,
+          "normalized_reward_written": 0.0,
+          "archive_cost_spread_scale": 112.81465148925781,
+          "archive_cost_reference_sha256": "5859fa26c9947478375444135e964c44bf4705b0d2eb1d60de21a72d32e85f36",
+          "reference_scope": "stored archive action decoded only; counterfactual outcome Unknown",
+          "limits": "unique archive insertion ancestry and actual normalized Stage input Unknown; GPU scale reduction bound by original source/call tests, not recreated by CPU"
+        }
+      ],
+      "scope": "N4 last canonical16 native-cost first-index consumer, all canonical/parent associations, original raw/Stage metadata and deployed actual command linkage; stored archive-reference decoding is not a counterfactual rollout"
+    },
+    "correctness_checkpoint_or_promotion_release": false
+  },
+  "cuda_initialized": false,
+  "metric_path": "/tmp/n4-runner-native-producer-review-20260924-v2/test_real_stub_producer_to_nat0/eds_metrics.jsonl",
+  "metric_sha256": "27e3ac55f5a32a79fc45bb636f7cce175c82b0786bd717d47c50e7b73075ca59",
+  "auditor_sha256": "4fdc8793d2a4cc4935e571c5db58e38e4ed48aae388f2ef598928a2b322491df",
+  "plan_sha256": "e5a6fd6e084a0748d786a0baec4472507d5ba61384696023b76a0099c05c59e9"
+}

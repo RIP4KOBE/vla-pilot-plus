@@ -1,0 +1,22 @@
+{
+  "schema": "n4-runner-source-review-reproduction-v1",
+  "scope": "pure invented dictionaries; no actual scientific reads or GPU",
+  "module": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-runner-20260924/scripts/qd_ed_n4_plan.py",
+    "sha256": "437d236c3dc73b5cc2093343a5eb17909dc07a7f353ed782836d4d7e86d7879f"
+  },
+  "function_source_sha256": "f926c9cf361f21ed296c23ad83495fd8e54a0e001cea8c5328b16dc5c649b4a9",
+  "results": [
+    {
+      "case": "wrong_or_missing_consumer_identity",
+      "returned_status": "verified",
+      "expected": "reject"
+    },
+    {
+      "case": "zero_actual_prefix",
+      "returned_status": "verified",
+      "expected": "reject"
+    }
+  ],
+  "disposition": "Blocking metadata alignment gap reported to author; author accepted narrow fix. Budget and phase gates not implicated by these reproductions."
+}

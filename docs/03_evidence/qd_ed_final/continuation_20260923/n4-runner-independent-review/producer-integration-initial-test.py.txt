@@ -1,0 +1,65 @@
+"""Two CPU dtypes: actual stub-policy metrics through deployed audit/report interface."""
+import hashlib
+import importlib.util
+import json
+import sys
+from pathlib import Path
+
+import pytest
+import torch
+
+N4 = Path('/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924')
+R4 = Path('/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-runner-20260924')
+T = Path('/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-audit-20260924')
+
+
+def load(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+producer = load('n4_independent_producer_fixtures', N4 / 'tests/test_rdt_steer.py')
+_patch_core_imports = producer._patch_core_imports
+stub_steer = producer.stub_steer
+stub_adapter = producer.stub_adapter
+mock_batch = producer.mock_batch
+
+
+@pytest.mark.parametrize('dtype', [torch.float32, torch.bfloat16])
+def test_real_stub_producer_to_native_alignment(stub_steer, stub_adapter, mock_batch, monkeypatch, tmp_path, dtype):
+    assert not torch.cuda.is_initialized()
+    producer.test_n4_select_action_uses_actual_deployed_fp32_decode(
+        stub_steer, stub_adapter, mock_batch, monkeypatch, tmp_path, dtype)
+    from core.eds_eval_metrics import append_jsonl, read_jsonl
+    metric_path = tmp_path / 'eds_metrics.jsonl'
+    append_jsonl(metric_path, stub_steer.get_last_eds_metrics())
+    audit_path = T / 'scripts/audit_decision_evidence.py'
+    assert hashlib.sha256(audit_path.read_bytes()).hexdigest() == '4fdc8793d2a4cc4935e571c5db58e38e4ed48aae388f2ef598928a2b322491df'
+    auditor = load('n4_independent_final_auditor', audit_path)
+    audit = auditor.audit_episode(tmp_path / 'episode_000', tmp_path / 'episode_compute.jsonl')
+    assert audit['accepted'] and audit['evidence_complete'], audit['errors']
+    plan_path = R4 / 'scripts/qd_ed_n4_plan.py'
+    assert hashlib.sha256(plan_path.read_bytes()).hexdigest() == 'e5a6fd6e084a0748d786a0baec4472507d5ba61384696023b76a0099c05c59e9'
+    n = load('n4_independent_final_plan', plan_path)
+    def require(condition, message):
+        if not condition:
+            raise ValueError(message)
+    metrics = read_jsonl(metric_path)
+    alignment = n.native_audit_alignment(audit, metrics, require=require)
+    assert alignment['status'] == 'verified' and alignment['checked_decisions'] == 1
+    gate = audit['n4_terminal_population_audit']
+    assert (gate['canonical_batches_verified'], gate['canonical_candidates_verified'],
+            gate['parent_rounds_verified'], gate['actual_actions_verified']) == (11, 176, 10, 8)
+    assert metrics[0]['qd_terminal_population']['cost_dtype'] == str(dtype)
+    assert not torch.cuda.is_initialized()
+    output = {'schema': 'n4-independent-stub-producer-native-alignment-v1', 'dtype': str(dtype),
+        'scope': 'invented CPU stub network/provider and collector actions; no real episode/model/GPU',
+        'accepted': audit['accepted'], 'evidence_complete': audit['evidence_complete'], 'errors': audit['errors'],
+        'native_alignment': alignment, 'cuda_initialized': torch.cuda.is_initialized(),
+        'metric_path': str(metric_path), 'metric_sha256': hashlib.sha256(metric_path.read_bytes()).hexdigest(),
+        'auditor_sha256': hashlib.sha256(audit_path.read_bytes()).hexdigest(),
+        'plan_sha256': hashlib.sha256(plan_path.read_bytes()).hexdigest()}
+    (tmp_path / 'producer-alignment-result.json').write_text(json.dumps(output, indent=2) + '\n')

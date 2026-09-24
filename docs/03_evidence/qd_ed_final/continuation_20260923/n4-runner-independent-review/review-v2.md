@@ -1,0 +1,27 @@
+# N4 runner independent source and CPU review
+
+Decision: **PASS after the narrow metric/native association fix**. The exact reviewed source hashes are in `review-v2.json`; the initial blocking reproductions remain unchanged in `reproductions-v1.json` and `reproduction-alignment-source-v1.py.txt`.
+
+This review covers only source and invented CPU fixtures. It does not release an execution, checkpoint, protected phase, or scientific promotion. It read no real study episode or its native tensors/images, loaded no real checkpoint, and made no online provider, GPU or simulator call. The producer integration uses only the existing test stub network/provider and invented CPU collector actions. The N4 algorithm remains commit `00f03001a50a8c3f9ca7efec11a1424922921daa`.
+
+## Finding and correction
+
+The initial `native_audit_alignment` accepted wrong/missing terminal-consumer metadata and a zero-length actual prefix. The corrected version associates every guided metric with the corresponding native-audited decision: final canonical source/batch, selected occurrence/index/ties/native dtype, raw reward/cost/cell/parent cell/fingerprint, archive reference and original Stage cost vector, and top-level selected/global-best identities. It requires `1 <= m <= 8`. Actual-prefix difference positions must equal the first-eight positions restricted to `i < m`; a nonexecuted tail difference cannot become an activity witness. N4 selected target distance remains Unknown, separate from the archive diagnostic.
+
+The auditor's two supplemental outputs (`selected_fingerprint` and the native archive cost record) are copied from its already verified in-memory values. The reviewed auditor diff changes no selection, gate, provider/projector call, or formula.
+
+## Other gates reviewed
+
+- The original matrix is exactly four fixed tasks in task-major C0/Q0/N4 order, twelve rows allocated six baseline plus six development. Up to four eligible one-per-cell infrastructure replacements preserve the original terminal and charge recovery. Neither valid task failure nor arbitrary Xid/numerical failure authorizes replacement.
+- Each dispatch must fit the complete 1,800-second timeout plus 40-second cleanup, the local 8.5-hour allowance (including new health work), unchanged bucket caps, and protected 100 attempts/24 GPU hours. Remaining original cells and unused allowed recovery capacity must fit the bucket/attempt allocation. A passed admission is not a guarantee that every future row will remain affordable; shared capacity is rechecked.
+- Resource authority is separate from execution release. The active resource pointer stays `online_dispatch_authorized=false`. A separate exact plan/source/runtime/allocation/key release, the real shared lease, owned monitor, frozen hardware mapping and supervisor capability are required. Generic runner/queue/rebind entry cannot substitute for this path.
+- The first-three release requires exact accepted C0/Q0/N4 attempt identities and native correctness. Ordinary valid failures and zero decoded differences do not become early outcome gates. The remaining-nine release is bound to the corresponding checkpoint and explicit ordered keys.
+- Reporting preserves every original, invalid, recovery and predispatch record and all cost. An incomplete matrix has Unknown numeric/activity criteria and pair differences; it cannot use partial success counts as a smaller denominator. The full twelve-row report computes the frozen aggregate gate and actual-prefix difference criterion separately. Every report has `phase_authorized=false`; validation/formal remain closed.
+
+## Focused CPU evidence and limits
+
+Eight independent checks plus five existing targeted entry/lease/accounting checks passed: **13 passed in 0.17 s**. The exact invocation and node IDs are in `cpu-checks-v1.json`. These overlap the author's suite and are correctness evidence, not new scientific or performance observations. No broad repository suite or historical reader was run.
+
+A further **two dtype integration checks passed in 5.34 s**. They reuse the actual FP32/BF16 stub-policy `select_action` test, finish its invented collector lifecycle, serialize the emitted metrics through `core.eds_eval_metrics.append_jsonl`, call final auditor `847ebdfa`, then call final runner `7481239` native alignment. Both give accepted/complete audit with no errors, verified association, 11 canonical batches, 176 candidates, 10 parent rounds and 8 actual synthetic actions, with CUDA uninitialized. No production field was replaced by a handwritten value. The first test version omitted Main's three episode-envelope labels and correctly failed the step gate; the corrected fixture adds only `episode`, `global_step` and `task_id` exactly as `main.py:1902-1910` does. That initial failure and fixture correction are retained, rather than reported as a production defect. The two final result JSON files preserve all returned native alignment metadata; temporary synthetic bundles remain outside the repository.
+
+The metadata report relies on the accepted source-frozen native auditor for native association and finite execution; it does not independently decode tensors. The supervisor capability prevents accidental alternate entry under frozen code, not hostile arbitrary Python mutation. Runtime GPU health, current lease/budget availability, real plan/source freezing and root release remain necessary before dispatch. No success or task-benefit claim follows from this review.
