@@ -60,3 +60,5 @@ Stage诊断。最新202项CPU检查通过6.57秒，包括明确旧策略仍拒�
 其改变有效响应的接受规则和分组额度，需要新协议授权；尚未生效。
 
 完整机器审计：`/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/analysis/n1v/final-audit.json`。
+
+关闭后核验：`analysis/n1v/closure-verification.json`的10项检查全部通过；N1V之前的整个账本字节与授权时SHA一致，原计划和全部终态证据未变，87个执行源码文件可从原提交逐字恢复。关闭后的修复提交为`5386efc1bff9b7a8d2c5aa9a12ec1e0499e2adc3`，没有用于任何N1V回合。
