@@ -1,0 +1,561 @@
+{
+  "schema": "n4-single-dev-stage-timeout-engineering-diagnosis-v1",
+  "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n4_dev_t06_c0_20260924__72e9581d4cb0",
+  "source_head_at_review": "f6a9ab04c0f184bbe2f8c837b33492835bc8fec9",
+  "scope": "one explicitly authorized public Dev Stage/compute/kernel metadata plus <=20 sanitized log lines; no native payload, image, peer, protected outcome or credentials",
+  "inputs": [
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n4_dev_t06_c0_20260924__72e9581d4cb0/eds_eval/stage_events.jsonl",
+      "sha256": "0ccabf25e8c47a8b7cdd72d88ed7ba0ccbe2b7a1385d6412b19440818d2b6336",
+      "bytes": 81626
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n4_dev_t06_c0_20260924__72e9581d4cb0/eds_eval/episode_compute.jsonl",
+      "sha256": "b614ab02e5b924bf8a02db84109bed35fd82e87e3286a9945ca33cb844729a17",
+      "bytes": 12321
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n4_dev_t06_c0_20260924__72e9581d4cb0/freshboot-kernel-monitor.json",
+      "sha256": "94b2b054cc296fe89efdc2be9b1d5f6350a25a7c18c3a41d684afe713fe167d2",
+      "bytes": 711
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n4_dev_t06_c0_20260924__72e9581d4cb0/main.log",
+      "sha256": "9668e79f3ec7053ebaca82cbb010dcd481b6c3dba7a669eea18a8278fb332470",
+      "bytes": 553,
+      "scope": "at most20 total emitted lines, fixed machine error tokens only"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n4_dev_t06_c0_20260924__72e9581d4cb0/runner.log",
+      "sha256": "ff908623d2d9715a1795ac544aa38d9acb88faf64e661b70cd33803c5b95dfd7",
+      "bytes": 39674,
+      "scope": "at most20 total emitted lines, fixed machine error tokens only"
+    }
+  ],
+  "source_refs": [
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/codex_stage.py",
+      "sha256": "27adf43302afc455a1b3122f267c7493c212bc83982bdaeba09d89873913da25"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/codex_stage_policy.py",
+      "sha256": "92f78a80651e97390a296e42850aae0b70217afb1c362e9b5d0b8a07b8cbe432"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/gemini_grounder.py",
+      "sha256": "0d1a51c8dbd077f274235ae00c1b3ab538e0f9745d85fd12417e21f57980b1f6"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/main.py",
+      "sha256": "f9add8568d45ec799e4030b1108f069f4af88bf3b63c62d7f836d59539a427a7"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_final_runner.py",
+      "sha256": "c3ccced7b0535a824a96724f787dfc5cd3636f1de023149082593d35dc975d5b"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_n4_plan.py",
+      "sha256": "e5a6fd6e084a0748d786a0baec4472507d5ba61384696023b76a0099c05c59e9"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/supervisor-support.py",
+      "sha256": "1f007fbebd1f33c583876084aefb99b02b41d8b3b602afda23bcf28ae8d8fd60"
+    }
+  ],
+  "stage_rows": [
+    {
+      "global_step": 40,
+      "chunk_id": 5,
+      "query_ok": true,
+      "query_status": "ok",
+      "error": null,
+      "query_latency_s": 87.42847654099751,
+      "logical_call_attempts": 1,
+      "completed_turns": 1,
+      "failed_calls": 0,
+      "usage_complete_calls": 1,
+      "input_tokens": 10806,
+      "cached_input_tokens": 6784,
+      "output_tokens": 86,
+      "reasoning_output_tokens": 33,
+      "call_latency_s": 87.42847654099751,
+      "raw_response_present": true,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "item_types": [
+        "agent_message"
+      ],
+      "timeout_seconds": 90.0,
+      "application_max_attempts": 1,
+      "public_config_sha256": "92755b006b497972f9f5563b7ceb1580bc36b2e4b4923804257f223eda9e5221"
+    },
+    {
+      "global_step": 48,
+      "chunk_id": 6,
+      "query_ok": true,
+      "query_status": "ok",
+      "error": null,
+      "query_latency_s": 38.634685565994005,
+      "logical_call_attempts": 1,
+      "completed_turns": 1,
+      "failed_calls": 0,
+      "usage_complete_calls": 1,
+      "input_tokens": 10809,
+      "cached_input_tokens": 6784,
+      "output_tokens": 73,
+      "reasoning_output_tokens": 22,
+      "call_latency_s": 38.634685565994005,
+      "raw_response_present": true,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "item_types": [
+        "agent_message"
+      ],
+      "timeout_seconds": 90.0,
+      "application_max_attempts": 1,
+      "public_config_sha256": "92755b006b497972f9f5563b7ceb1580bc36b2e4b4923804257f223eda9e5221"
+    },
+    {
+      "global_step": 64,
+      "chunk_id": 8,
+      "query_ok": true,
+      "query_status": "ok",
+      "error": null,
+      "query_latency_s": 89.3438846749923,
+      "logical_call_attempts": 1,
+      "completed_turns": 1,
+      "failed_calls": 0,
+      "usage_complete_calls": 1,
+      "input_tokens": 10801,
+      "cached_input_tokens": 6784,
+      "output_tokens": 75,
+      "reasoning_output_tokens": 27,
+      "call_latency_s": 89.3438846749923,
+      "raw_response_present": true,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "item_types": [
+        "agent_message"
+      ],
+      "timeout_seconds": 90.0,
+      "application_max_attempts": 1,
+      "public_config_sha256": "92755b006b497972f9f5563b7ceb1580bc36b2e4b4923804257f223eda9e5221"
+    },
+    {
+      "global_step": 72,
+      "chunk_id": 9,
+      "query_ok": false,
+      "query_status": "error",
+      "error": "codex_timeout",
+      "query_latency_s": 90.19384925100894,
+      "logical_call_attempts": 1,
+      "completed_turns": 0,
+      "failed_calls": 1,
+      "usage_complete_calls": 0,
+      "input_tokens": 0,
+      "cached_input_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_output_tokens": 0,
+      "call_latency_s": 90.19384925100894,
+      "raw_response_present": false,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "error"
+      ],
+      "item_types": [],
+      "timeout_seconds": 90.0,
+      "application_max_attempts": 1,
+      "public_config_sha256": "92755b006b497972f9f5563b7ceb1580bc36b2e4b4923804257f223eda9e5221"
+    },
+    {
+      "global_step": 80,
+      "chunk_id": 10,
+      "query_ok": false,
+      "query_status": "error",
+      "error": "codex_timeout",
+      "query_latency_s": 90.18625238000823,
+      "logical_call_attempts": 1,
+      "completed_turns": 1,
+      "failed_calls": 1,
+      "usage_complete_calls": 1,
+      "input_tokens": 10814,
+      "cached_input_tokens": 6784,
+      "output_tokens": 77,
+      "reasoning_output_tokens": 26,
+      "call_latency_s": 90.18625238000823,
+      "raw_response_present": true,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "item_types": [
+        "agent_message"
+      ],
+      "timeout_seconds": 90.0,
+      "application_max_attempts": 1,
+      "public_config_sha256": "92755b006b497972f9f5563b7ceb1580bc36b2e4b4923804257f223eda9e5221"
+    },
+    {
+      "global_step": 200,
+      "chunk_id": 25,
+      "query_ok": true,
+      "query_status": "ok",
+      "error": null,
+      "query_latency_s": 38.13546793400019,
+      "logical_call_attempts": 1,
+      "completed_turns": 1,
+      "failed_calls": 0,
+      "usage_complete_calls": 1,
+      "input_tokens": 10853,
+      "cached_input_tokens": 6784,
+      "output_tokens": 86,
+      "reasoning_output_tokens": 40,
+      "call_latency_s": 38.13546793400019,
+      "raw_response_present": true,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "item_types": [
+        "agent_message"
+      ],
+      "timeout_seconds": 90.0,
+      "application_max_attempts": 1,
+      "public_config_sha256": "92755b006b497972f9f5563b7ceb1580bc36b2e4b4923804257f223eda9e5221"
+    },
+    {
+      "global_step": 224,
+      "chunk_id": 28,
+      "query_ok": true,
+      "query_status": "ok",
+      "error": null,
+      "query_latency_s": 56.32915403600782,
+      "logical_call_attempts": 1,
+      "completed_turns": 1,
+      "failed_calls": 0,
+      "usage_complete_calls": 1,
+      "input_tokens": 10805,
+      "cached_input_tokens": 6784,
+      "output_tokens": 81,
+      "reasoning_output_tokens": 33,
+      "call_latency_s": 56.32915403600782,
+      "raw_response_present": true,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "item_types": [
+        "agent_message"
+      ],
+      "timeout_seconds": 90.0,
+      "application_max_attempts": 1,
+      "public_config_sha256": "92755b006b497972f9f5563b7ceb1580bc36b2e4b4923804257f223eda9e5221"
+    },
+    {
+      "global_step": 240,
+      "chunk_id": 30,
+      "query_ok": false,
+      "query_status": "error",
+      "error": "codex_timeout",
+      "query_latency_s": 90.2089627749956,
+      "logical_call_attempts": 1,
+      "completed_turns": 0,
+      "failed_calls": 1,
+      "usage_complete_calls": 0,
+      "input_tokens": 0,
+      "cached_input_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_output_tokens": 0,
+      "call_latency_s": 90.2089627749956,
+      "raw_response_present": false,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "error"
+      ],
+      "item_types": [],
+      "timeout_seconds": 90.0,
+      "application_max_attempts": 1,
+      "public_config_sha256": "92755b006b497972f9f5563b7ceb1580bc36b2e4b4923804257f223eda9e5221"
+    },
+    {
+      "global_step": 272,
+      "chunk_id": 34,
+      "query_ok": true,
+      "query_status": "ok",
+      "error": null,
+      "query_latency_s": 39.493984842993086,
+      "logical_call_attempts": 1,
+      "completed_turns": 1,
+      "failed_calls": 0,
+      "usage_complete_calls": 1,
+      "input_tokens": 10810,
+      "cached_input_tokens": 6784,
+      "output_tokens": 99,
+      "reasoning_output_tokens": 52,
+      "call_latency_s": 39.493984842993086,
+      "raw_response_present": true,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "item_types": [
+        "agent_message"
+      ],
+      "timeout_seconds": 90.0,
+      "application_max_attempts": 1,
+      "public_config_sha256": "92755b006b497972f9f5563b7ceb1580bc36b2e4b4923804257f223eda9e5221"
+    },
+    {
+      "global_step": 280,
+      "chunk_id": 35,
+      "query_ok": true,
+      "query_status": "ok",
+      "error": null,
+      "query_latency_s": 78.11478922900278,
+      "logical_call_attempts": 1,
+      "completed_turns": 1,
+      "failed_calls": 0,
+      "usage_complete_calls": 1,
+      "input_tokens": 10801,
+      "cached_input_tokens": 6784,
+      "output_tokens": 74,
+      "reasoning_output_tokens": 26,
+      "call_latency_s": 78.11478922900278,
+      "raw_response_present": true,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "item_types": [
+        "agent_message"
+      ],
+      "timeout_seconds": 90.0,
+      "application_max_attempts": 1,
+      "public_config_sha256": "92755b006b497972f9f5563b7ceb1580bc36b2e4b4923804257f223eda9e5221"
+    },
+    {
+      "global_step": 320,
+      "chunk_id": 40,
+      "query_ok": true,
+      "query_status": "ok",
+      "error": null,
+      "query_latency_s": 58.4805711650115,
+      "logical_call_attempts": 1,
+      "completed_turns": 1,
+      "failed_calls": 0,
+      "usage_complete_calls": 1,
+      "input_tokens": 10805,
+      "cached_input_tokens": 6784,
+      "output_tokens": 53,
+      "reasoning_output_tokens": 0,
+      "call_latency_s": 58.4805711650115,
+      "raw_response_present": true,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "item_types": [
+        "agent_message"
+      ],
+      "timeout_seconds": 90.0,
+      "application_max_attempts": 1,
+      "public_config_sha256": "92755b006b497972f9f5563b7ceb1580bc36b2e4b4923804257f223eda9e5221"
+    },
+    {
+      "global_step": 328,
+      "chunk_id": 41,
+      "query_ok": true,
+      "query_status": "ok",
+      "error": null,
+      "query_latency_s": 24.213888806989416,
+      "logical_call_attempts": 1,
+      "completed_turns": 1,
+      "failed_calls": 0,
+      "usage_complete_calls": 1,
+      "input_tokens": 10801,
+      "cached_input_tokens": 6784,
+      "output_tokens": 46,
+      "reasoning_output_tokens": 0,
+      "call_latency_s": 24.213888806989416,
+      "raw_response_present": true,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "item_types": [
+        "agent_message"
+      ],
+      "timeout_seconds": 90.0,
+      "application_max_attempts": 1,
+      "public_config_sha256": "92755b006b497972f9f5563b7ceb1580bc36b2e4b4923804257f223eda9e5221"
+    }
+  ],
+  "counter_reconciliation": {
+    "logical_call_attempts": {
+      "stage_event_sum": 12,
+      "episode_stage": 12,
+      "episode_provider": 12,
+      "exact_match": true
+    },
+    "completed_turns": {
+      "stage_event_sum": 10,
+      "episode_stage": 10,
+      "episode_provider": 10,
+      "exact_match": true
+    },
+    "failed_calls": {
+      "stage_event_sum": 3,
+      "episode_stage": 3,
+      "episode_provider": 3,
+      "exact_match": true
+    },
+    "usage_complete_calls": {
+      "stage_event_sum": 10,
+      "episode_stage": 10,
+      "episode_provider": 10,
+      "exact_match": true
+    },
+    "input_tokens": {
+      "stage_event_sum": 108105,
+      "episode_stage": 108105,
+      "episode_provider": 108105,
+      "exact_match": true
+    },
+    "cached_input_tokens": {
+      "stage_event_sum": 67840,
+      "episode_stage": 67840,
+      "episode_provider": 67840,
+      "exact_match": true
+    },
+    "output_tokens": {
+      "stage_event_sum": 750,
+      "episode_stage": 750,
+      "episode_provider": 750,
+      "exact_match": true
+    },
+    "reasoning_output_tokens": {
+      "stage_event_sum": 259,
+      "episode_stage": 259,
+      "episode_provider": 259,
+      "exact_match": true
+    },
+    "call_latency_s": {
+      "stage_event_sum": 780.7639672020014,
+      "episode_stage": 780.7639672020014,
+      "episode_provider": 780.7639672020014,
+      "exact_match": true
+    }
+  },
+  "counts": {
+    "logical": 12,
+    "stage_query_ok": 9,
+    "stage_query_failed": 3,
+    "completed_turns": 10,
+    "usage_complete_calls": 10,
+    "completed_and_failed_overlap": 1,
+    "overlap_steps": [
+      80
+    ],
+    "usage_missing_steps": [
+      72,
+      240
+    ]
+  },
+  "compute_labels": {
+    "outcome": "completed",
+    "provider_token_usage_complete": false,
+    "provider_counter_semantics": "Codex logical CLI call attempts include failures; completed_turns are transport completions; failed_calls include parse failures and may overlap completed_turns. HTTP attempts and retries are unavailable (null). Tokens are observed usage subtotals, with completeness recorded separately.",
+    "provider_request_attempts": null,
+    "provider_sdk_retry_attempts": null,
+    "provider_http_counters_available": false,
+    "provider_logical_counters_available": true
+  },
+  "kernel_evidence": {
+    "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n4_dev_t06_c0_20260924__72e9581d4cb0",
+    "pid": 3437491,
+    "proc_start_ticks": 10212564,
+    "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+    "physical_gpu": 3,
+    "pci": "0000:61:00",
+    "faults": [],
+    "updated_unix": 1790240310.4229114
+  },
+  "sanitized_log_matches": [
+    {
+      "file": "runner.log",
+      "line": 329,
+      "tokens": [
+        "codex_timeout"
+      ]
+    },
+    {
+      "file": "runner.log",
+      "line": 332,
+      "tokens": [
+        "codex_timeout"
+      ]
+    },
+    {
+      "file": "runner.log",
+      "line": 355,
+      "tokens": [
+        "codex_timeout"
+      ]
+    }
+  ],
+  "findings": {
+    "counter_bug_supported": false,
+    "reason": "completed_turns counts parsed transport completion, failed_calls counts unsuccessful request result, including timeout with completion parsed during cleanup. All nine counter sums exactly match event→Stage→provider.",
+    "timeout_after_completion_observed": "step80 cleanup-parsed stream includes one agent_message and turn.completed+usage, while communicate hit90s and adapter unconditionally raised codex_timeout; completion timestamp relative to deadline is unobserved.",
+    "two_incomplete_timeouts": "steps72/240 saved event types thread.started/turn.started/error and no completion/usage. Zero token increments are observed subtotals, not zero actual service cost. Sanitized error kind is retained but error content/cause is unavailable.",
+    "gpu_fault_supported": false,
+    "gpu_fault_limit": "No monitor-recorded exact owned GPU3 PCI/PID/lifetime Xid; not a proof of all possible GPU/driver or service faults.",
+    "timeout_only_sufficiency": "Unknown. Observed successful latency max89.3438846749923s is close to90s, so a longer prospective bound could avoid some deadline expirations, but two error-bearing incomplete streams and completion-vs-exit ambiguity do not establish eventual success or complete usage.",
+    "old_terminal": "Immutable invalid/no-recovery under frozen protocol; no data backfill, retry, label or90s change."
+  },
+  "minimal_prospective_engineering_evidence": [
+    "Preserve sanitized process lifecycle metadata: monotonic subprocess start, deadline detection, before/after cleanup, exit status, and when first/complete event is observed; retain event kind sequence and usage completeness separately from query success.",
+    "If a future condition changes timeout or process completion handling, freeze it prospectively for all matched arms, retain one application attempt unless separately authorized, charge full child lifetime and preserve unknown service usage on missing terminal usage.",
+    "Do not accept a post-cleanup response retroactively as an on-time successful old Stage call. Do not infer HTTP retries/network/server error cause from logical CLI counters. No new timeout value or future retry is selected in this review."
+  ],
+  "unknowns": [
+    "Whether step80 completion preceded90s, arrived during cleanup, or CLI exit was delayed; event stream has no local receipt timestamps.",
+    "The details/root cause of the error events at72/240, network/remote service queue/load and CLI internal retries.",
+    "Actual input/output usage of the two incomplete calls and whether a longer deadline would produce complete usage.",
+    "Any unrecorded GPU/driver issue outside exact monitored Xid attribution."
+  ],
+  "mutations": {
+    "W_X_source": false,
+    "terminal_state_ledger": false,
+    "GPU_model_provider": false,
+    "own_review_artifacts_only": true
+  }
+}
