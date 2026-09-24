@@ -1,0 +1,50 @@
+{
+  "role": "PREPARATION ONLY; no actual manifest/auth created",
+  "reference": {
+    "path": "canonical absolute path inside owned artifact root",
+    "sha256": "64 lowercase hex"
+  },
+  "manifest": {
+    "schema": "n4-q0-transfer-input-v1",
+    "matrix_report": "ref SHA209ccdefaa092ba72e4e940849034721eec199029b4c1dba18f5a5ec94d0334b",
+    "matrix_report_input": "ref SHA4d183d7f2b82a774e49dbab6709fa43170519c21ab86694e18d5b659b2a6a897",
+    "completed_diagnostic_provenance": "ref to completed n3-post-dev-analysis/read-v2/provenance.json SHA5581ed63d89c8de170c1750ba18fe1d131dd83eacc384305ab6eb90de684658c",
+    "cells": "exact10 accepted Q0 representatives in task0..9 order; each entry below"
+  },
+  "cell": {
+    "attempt_id": "accepted matrix representative ID (task9 recovery only)",
+    "metadata": "ref eds_eval/episode_metadata.jsonl",
+    "status": "ref eds_eval/decision_evidence/episode_000/status.json",
+    "index": "ref eds_eval/decision_evidence/episode_000/events.jsonl"
+  },
+  "authorization": {
+    "schema": "n4-q0-transfer-read-authorization-v1",
+    "status": "authorized",
+    "freeze": "ref to final separately reviewed freeze-v1.json",
+    "manifest": "ref to final input manifest",
+    "reviewed_manifest": "identical reference to manifest",
+    "completed_Q0_scope_reviewed": true,
+    "reviewed_metadata_sources": {
+      "scripts/qd_ed_n3_report.py": "62b9afbbe6d8909d6414cdc9423237f2815a5274e3f076cfc1b3226d9998a79a",
+      "scripts/qd_ed_n3_plan.py": "ca967ad486092f72b93cd169895b137efdba1411f6a62487a1d21b9e9c557bb1"
+    },
+    "completed_audit_snapshots": "exact10 original root-verified snapshots, each entry below",
+    "output": "new canonical directory under A/continuation_20260923/n4-q0-transfer-check-analysis"
+  },
+  "snapshot": {
+    "attempt_id": "accepted ID",
+    "audit": "original accepted audit ref from matrix",
+    "status": "same ref as manifest cell.status",
+    "index": "same ref as manifest cell.index",
+    "auditor_sha256": "dcfffa225b16f40cc00ac4bd21eae1d080cc113668dbeabc240d2ccda50fddd6",
+    "binding": "root_verified_unchanged_after_complete_frozen_audit"
+  },
+  "scope_notes": [
+    "No Stage, metrics or invalid-predecessor input reference supplied in cells. Accepted metrics reference is provenance-bound from the original report but file payload is not opened.",
+    "Report and provenance are metadata only. Full original30 report membership is checked; only10 Q0 status/index/native inventories are read.",
+    "All Q0 refs/native bundles must match completed read-v2 provenance.input_hashes, then be rehashed before any native decode.",
+    "Named base/postcheckpoint/recovery and exact-null/release53d3 transition use unchanged frozen v2 admit_plans.",
+    "Live W HEAD need not equal historical source; source inventory and pinned helper/decoder bytes remain exact."
+  ],
+  "actual_read_authorized": false
+}

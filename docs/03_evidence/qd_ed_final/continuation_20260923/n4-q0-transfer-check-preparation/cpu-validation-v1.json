@@ -1,0 +1,20 @@
+{
+  "schema": "n4-q0-transfer-cpu-validation-v1",
+  "status": "PASS",
+  "command": "CUDA_VISIBLE_DEVICES='' PYTHONDONTWRITEBYTECODE=1 /home/hynx/miniconda3/envs/vla-pilot/bin/python -m pytest -q -p no:cacheprovider /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n4-q0-transfer-check-preparation/test_q0_transfer.py",
+  "exit_code": 0,
+  "passed": 36,
+  "elapsed_seconds": 3.48,
+  "stdout_summary": "36 passed in 3.48s",
+  "reader_sha256": "363973170cd89aee0a19c63ffc433cf1ffb71d636c3bd56985dff230e92d4e04",
+  "tests_sha256": "51bbe2d62fe342dd31cbe1f953242f46d70be233eb435e399cf7307737f3768a",
+  "test_scopes": {
+    "native_cost_parent_decode_and_gate": 25,
+    "metadata_Q0_recovery_source_universe_and_before_decode": 11
+  },
+  "prior_pure_suite_reruns": 0,
+  "actual_native_reads": 0,
+  "actual_metrics_reads": 0,
+  "provider_model_projector_simulator_calls": 0,
+  "actual_read_authorized": false
+}

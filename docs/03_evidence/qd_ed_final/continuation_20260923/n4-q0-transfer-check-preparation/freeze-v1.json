@@ -1,0 +1,53 @@
+{
+  "CUDA_VISIBLE_DEVICES": "",
+  "PYTHONDONTWRITEBYTECODE": "1",
+  "actual_input_binding": "Late-bound exact manifest and unchanged completed-audit snapshots require a separate root SHA-bound authorization. No actual native read is authorized by this package.",
+  "actual_read_authorized": false,
+  "algorithm_implementation_authorized": false,
+  "files": {
+    "README.md": "b04404d4d31087a4cb3a49b053fee25d9fd5bf8c9a1b15d875d4f52b75bfb534",
+    "check_q0_transfer.py": "363973170cd89aee0a19c63ffc433cf1ffb71d636c3bd56985dff230e92d4e04",
+    "cpu-validation-v1.json": "16d5f3aa31c3e12e0fe958daf0a5306ae7508fd28c5a19be5c28a68bc73e7e15",
+    "dependencies-v1.json": "5f947b2823a1e55edf6b4fa0cffb37686c29fc019db60823ed23763f4c8f6da2",
+    "frozen-protocol.md": "b8562e3f9fffc77efc803c6b056441f7b426333a97eb176b52fdb0fe42088db2",
+    "frozen-q0-transfer-check-protocol.md": "3ff18d22eb934a24f790bef5b411089f9a4c9116b098cfb7baa2b36cbbc277ca",
+    "independent-review-v1.json": "3648edad9dfbf35d59b046a6f77cac7a1fa498a044ae821007ae581528c8294a",
+    "input-schema-v1.json": "c8ffaf902b96265c87634778d61f0a19bc9452cf99db6f4f5cba4515381d442e",
+    "operational-protocol-v1.md": "743b063209b8d97582b36543e19c3a4e2c9b1043cf7ad11f30d0f703016d8f84",
+    "source-closure-validation-v1.json": "ea8c584fd9427831a4ea882fc2cfc18a9878d6813026611c21194a0a48ca2b3c",
+    "test_q0_transfer.py": "51bbe2d62fe342dd31cbe1f953242f46d70be233eb435e399cf7307737f3768a"
+  },
+  "future_execution_command_template": [
+    "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+    "check_q0_transfer.py",
+    "--authorization",
+    "<root-authorized-json>",
+    "--authorization-sha256",
+    "<exact-auth-sha256>",
+    "--output",
+    "<new-authorized-output-directory>",
+    "--execute-reviewed"
+  ],
+  "input_inventory": {
+    "actions": 6594,
+    "cells": 10,
+    "decisions": 825,
+    "guided": 155
+  },
+  "online_dispatch_authorized": false,
+  "preparation_parent_commit": "70a59f4d164bbe73b0c240c89cb7250e6fe7dfe4",
+  "python_version": "3.12.12",
+  "resource_status": "Online HOLD is separate from the unchanged historical scientific protocols and CPU prerequisite. No allocation is created or transferred here.",
+  "schema": "n4-q0-transfer-preparation-freeze-v1",
+  "scientific_prerequisite_sha256": "3ff18d22eb934a24f790bef5b411089f9a4c9116b098cfb7baa2b36cbbc277ca",
+  "scientific_protocol_sha256": "b8562e3f9fffc77efc803c6b056441f7b426333a97eb176b52fdb0fe42088db2",
+  "source_commit": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+  "status": "frozen_preparation_only",
+  "synthetic_test_evidence": {
+    "author": 36,
+    "combined": 44,
+    "independent": 8,
+    "scope": "Source and invented CPU records only; no actual data run or task-performance evidence."
+  },
+  "torch_version": "2.7.1+cu126"
+}

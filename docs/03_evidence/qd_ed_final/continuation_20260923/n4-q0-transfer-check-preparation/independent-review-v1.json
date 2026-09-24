@@ -1,0 +1,24 @@
+{
+  "actual_read_authorized": false,
+  "author_synthetic_checks": 36,
+  "combined_synthetic_checks": 44,
+  "independent_synthetic_checks": 8,
+  "online_resource_release": false,
+  "references": {
+    "dependency-closure-addendum-v1.json": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n4-q0-transfer-independent-review-v1/dependency-closure-addendum-v1.json",
+      "sha256": "b0fd7b19501a79e02046f9642a76ff55b4f07e7fa4bd1b1816c05512ce10bf20"
+    },
+    "review-v1.json": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n4-q0-transfer-independent-review-v1/review-v1.json",
+      "sha256": "6814138e888e40a157bbcd512a4b0f853dd95f9ffcd8be09d61f6c59e46d9227"
+    },
+    "review-v1.md": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n4-q0-transfer-independent-review-v1/review-v1.md",
+      "sha256": "ced2310c8a076d748391b4ce727b1aa54534b140dfc8b002c59c8bd104418c07"
+    }
+  },
+  "review_commit": "4e89c129087304263e2c8afd832d680d5e49461f",
+  "schema": "n4-q0-transfer-independent-review-binding-v1",
+  "verdict": "PASS_NO_BLOCKING_DEFECT_FOUND"
+}
