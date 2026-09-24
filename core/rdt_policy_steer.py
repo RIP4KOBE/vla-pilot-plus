@@ -38,6 +38,9 @@ from core.qd_executed_feedback import (
 from core.qd_executed_quality import (
     ExecutedPrefixContract, executed_prefix_quality, recognize_executed_prefix_provider,
 )
+from core.qd_terminal_population import (
+    MODE as TERMINAL_POPULATION_MODE, DEFAULT_MODE as DEFAULT_FINAL_SELECTION_MODE, TerminalPopulation,
+)
 from core.qd_ed import (
     EXECUTION_INTENT_AXES,
     EXECUTION_INTENT_DESCRIPTOR,
@@ -134,6 +137,7 @@ class _EDSConfig:
     adaptive_reward_improvement_eps: float = 1e-3
     qd_archive_mode: str = "none"
     qd_quality_mode: str = "provider"
+    qd_final_selection_mode: str = DEFAULT_FINAL_SELECTION_MODE
     qd_degenerate_fallback_policy: str = "none"
     qd_descriptor: str = "target_relative_endpoint_xy"
     qd_grid_shape: tuple[int, int] = (4, 4)
@@ -4857,6 +4861,12 @@ class RDTSteer:
         current_stage: int,
     ) -> Tensor:
         cfg = eds_config
+        terminal_mode = cfg.qd_final_selection_mode == TERMINAL_POPULATION_MODE
+        if terminal_mode and self._action_chunk_horizon != 8:
+            raise ValueError("N4 terminal population requires action_chunk_horizon=8")
+        terminal_population = None
+        terminal_canonical_sequence = None
+        terminal_scoring_batch_id = None
         feedback_setup_started = time.perf_counter() if cfg.qd_quality_mode == FEEDBACK_MODE else None
         quality_contract = None
         quality_reason = "provider_mode"
@@ -4905,6 +4915,7 @@ class RDTSteer:
             search_schedule_mode=cfg.search_schedule_mode,
             adaptive_rbf_enabled=adaptive_rbf_enabled,
         )
+        metrics.qd_final_selection_mode = cfg.qd_final_selection_mode
         metrics.qd_quality_mode = cfg.qd_quality_mode
         metrics.qd_quality_reason = quality_reason
         metrics.qd_quality_applicable = quality_contract is not None
@@ -5046,6 +5057,7 @@ class RDTSteer:
             candidates: Tensor,
             rewards: Tensor,
         ) -> None:
+            nonlocal terminal_canonical_sequence, terminal_scoring_batch_id
             extra = {}
             if quality_contract is not None:
                 raw = original_rewards(population_info, rewards, candidates)
@@ -5060,8 +5072,11 @@ class RDTSteer:
                     "fingerprints": [fingerprint_action(action) for action in candidates]})
             evidence = getattr(self, "_decision_evidence", None)
             if evidence is not None:
-                evidence.record("canonical_candidate_batch", iter_idx=int(iter_idx),
+                sequence = evidence.record("canonical_candidate_batch", iter_idx=int(iter_idx),
                                 candidates=candidates, effective_quality=rewards, **extra)
+                if terminal_mode and iter_idx == 9:
+                    terminal_canonical_sequence = sequence
+                    terminal_scoring_batch_id = evidence.scoring_batch_id
             if not cfg.qd_metrics_observer:
                 return
             descriptors = describe_qd(candidates)
@@ -6073,6 +6088,15 @@ class RDTSteer:
                 child_cell_ids, child_overflow = self._eds_qd_cell_ids(
                     child_descriptors, qd_bounds, cfg
                 )
+                if terminal_mode and i == 9:
+                    # Freeze the actual masked canonical batch before archive consumers can replace it.
+                    terminal_population = TerminalPopulation.capture(
+                        population, population_scores, population_info.get("rewards"), child_cell_ids,
+                        torch.as_tensor(qd_parent_cell_ids, dtype=torch.long, device=population.device),
+                        canonical_event_sequence=terminal_canonical_sequence,
+                        scoring_batch_id=terminal_scoring_batch_id,
+                        decision_id=getattr(getattr(self, "_decision_evidence", None), "decision_id", None),
+                    )
                 fixed_initial_sse = (0.0 if execution_intent else qd_within_cell_endpoint_sse(
                     child_descriptors, fixed_initial_cell_ids
                 ))
@@ -6663,6 +6687,8 @@ class RDTSteer:
                 )
 
         qd_best_idx: int | None = None
+        archive_reference = None
+        stage_reference_costs = None
         if qd_archive is not None:
             (
                 population,
@@ -6686,6 +6712,53 @@ class RDTSteer:
             metrics.qd_selected_reward = selected_entry.reward
             metrics.qd_selected_action_fingerprint = selected_entry.fingerprint
             metrics.qd_global_best_action_fingerprint = selected_entry.fingerprint
+            if terminal_mode:
+                if terminal_population is None:
+                    raise RuntimeError("N4 missing final canonical population")
+                # Check the original archive-global-best contract before changing execution domain.
+                archive_selected = population[qd_best_idx:qd_best_idx + 1]
+                if (fingerprint_action(archive_selected[0]) != selected_entry.fingerprint
+                        or float(population_rewards[qd_best_idx].item()) != selected_entry.reward):
+                    metrics.qd_final_selection_mismatch_count += 1
+                archive_reference = {
+                    "population": population, "rewards": population_rewards, "costs": population_scores,
+                    "cell_ids": qd_final_cells, "global_best_index": qd_best_idx,
+                    "selected_latent": archive_selected, "selected_fingerprint": selected_entry.fingerprint,
+                    "selected_cell": selected_cell, "selected_quality": selected_entry.reward,
+                    "selected_cost": float(population_scores[qd_best_idx].item()),
+                }
+                stage_reference_costs = population_scores
+                metrics.qd_archive_reference = {
+                    "global_best_index": qd_best_idx, "selected_fingerprint": selected_entry.fingerprint,
+                    "selected_cell": selected_cell, "selected_quality": selected_entry.reward,
+                    "selected_cost": float(population_scores[qd_best_idx].item()),
+                    "costs": population_scores.detach().cpu().tolist(),
+                    "cost_dtype": str(population_scores.dtype),
+                    "final_selection_mismatch_count": metrics.qd_final_selection_mismatch_count,
+                    "stage_reference_scope": "qd_archive_cost_spread",
+                }
+                population, population_scores = terminal_population.actions, terminal_population.costs
+                population_rewards = terminal_population.rewards
+                population_info = {"rewards": population_rewards}
+                qd_best_idx = terminal_population.select_index()
+                chunk_population_sources = ("terminal_canonical_population",) * 16
+                metrics.qd_selected_cell = int(terminal_population.cell_ids[qd_best_idx].item())
+                metrics.qd_selected_reward = float(population_rewards[qd_best_idx].item())
+                metrics.qd_selected_action_fingerprint = fingerprint_action(population[qd_best_idx])
+                metrics.qd_terminal_population = {
+                    "iter_idx": 9, "population_size": 16, "selected_index": qd_best_idx,
+                    "canonical_event_sequence": terminal_population.canonical_event_sequence,
+                    "scoring_batch_id": terminal_population.scoring_batch_id,
+                    "selected_occurrence_id": terminal_population.occurrence_id(qd_best_idx),
+                    "minimum_cost_tie_indices": terminal_population.tie_indices(),
+                    "selected_cell": metrics.qd_selected_cell,
+                    "selected_parent_cell": int(terminal_population.parent_cell_ids[qd_best_idx].item()),
+                    "selected_fingerprint": metrics.qd_selected_action_fingerprint,
+                    "selected_cost": float(population_scores[qd_best_idx].item()),
+                    "selected_raw_reward": metrics.qd_selected_reward,
+                    "cost_dtype": str(population_scores.dtype),
+                    "source_scope": "last canonical row and allocated parent cell; not unique archive ancestry",
+                }
 
         metrics.nonfinite_count = int(
             (~torch.isfinite(population)).sum().detach().cpu().item()
@@ -6736,8 +6809,19 @@ class RDTSteer:
                                if quality_contract is not None else {}),
                             selected_fingerprint=metrics.qd_selected_action_fingerprint,
                             selected_cell=metrics.qd_selected_cell,
-                            selection_rule="archive_global_best" if qd_archive is not None else "cost_argmin")
-        if qd_archive is not None:
+                            selection_rule=("terminal_population_first_argmin" if terminal_mode else
+                                            "archive_global_best" if qd_archive is not None else "cost_argmin"),
+                            **({"qd_final_selection_mode": cfg.qd_final_selection_mode,
+                                "terminal_population": {**metrics.qd_terminal_population,
+                                    "native_costs": population_scores, "raw_provider_quality": population_rewards,
+                                    "cell_ids": terminal_population.cell_ids,
+                                    "parent_cell_ids": terminal_population.parent_cell_ids},
+                                "archive_reference": archive_reference,
+                                "stage_reward_reference": {"selected_raw_reward": population_rewards[best_idx],
+                                    "reference_costs": stage_reference_costs,
+                                    "reference_scope": "qd_archive_cost_spread"}}
+                               if terminal_mode else {}))
+        if qd_archive is not None and not terminal_mode:
             selected_fingerprint = fingerprint_action(selected[0])
             if (
                 selected_fingerprint != metrics.qd_global_best_action_fingerprint
@@ -6752,7 +6836,13 @@ class RDTSteer:
             )
         )
         metrics.population_diversity_final = self._eds_population_diversity(population)
-        metrics.target_distance_after = self._eds_target_distance(population, keypoints, best_idx)
+        if terminal_mode:
+            # Preserve the old diagnostic projection count/domain; do not add projections for N4.
+            metrics.qd_archive_reference["target_distance_after"] = self._eds_target_distance(
+                archive_reference["population"], keypoints, archive_reference["global_best_index"])
+            metrics.target_distance_after = None  # Selected-action target distance was not recomputed.
+        else:
+            metrics.target_distance_after = self._eds_target_distance(population, keypoints, best_idx)
         metrics.action_mask_violation_max = max_action_mask_violation
         if parent_mode_coverages:
             metrics.parent_mode_coverage = float(
@@ -7085,7 +7175,15 @@ class RDTSteer:
             )
         else:
             self._last_eds_mechanism_trace = None
-        if stage_raw_rewards is not None:
+        if terminal_mode:
+            self._eds_update_guidance_metadata_from_cost(population_scores[best_idx], stage_reference_costs)
+            if evidence is not None:
+                evidence.record("terminal_population_stage_binding",
+                    selected_raw_reward=self._last_raw_reward,
+                    archive_cost_spread_scale=self._last_scale,
+                    stage_init_reward=self._stage_init_reward,
+                    normalized_reward=self._last_normalized_reward)
+        elif stage_raw_rewards is not None:
             self._eds_update_guidance_metadata_from_cost(-stage_raw_rewards[best_idx], -stage_raw_rewards)
         else:
             self._eds_update_guidance_metadata_from_cost(
@@ -7574,6 +7672,7 @@ class RDTSteer:
             ),
             qd_archive_mode=str(cfg.get("qd_archive_mode", "none")),
             qd_quality_mode=str(cfg.get("qd_quality_mode", "provider")),
+            qd_final_selection_mode=str(cfg.get("qd_final_selection_mode", DEFAULT_FINAL_SELECTION_MODE)),
             qd_degenerate_fallback_policy=str(
                 cfg.get("qd_degenerate_fallback_policy", "none")
             ),
@@ -7811,6 +7910,22 @@ class RDTSteer:
         _validate_direction_rbf_config(resolved.__dict__)
         if resolved.qd_archive_mode not in {"none", "grid_archive"}:
             raise ValueError("EDS qd_archive_mode must be one of none, grid_archive")
+        if resolved.qd_final_selection_mode not in {DEFAULT_FINAL_SELECTION_MODE, TERMINAL_POPULATION_MODE}:
+            raise ValueError("EDS qd_final_selection_mode must be archive_global_best or terminal_population_v1")
+        if resolved.qd_final_selection_mode == TERMINAL_POPULATION_MODE:
+            required_terminal = {
+                "qd_quality_mode": "provider", "reward_mode": "normal",
+                "qd_archive_mode": "grid_archive", "qd_descriptor": "target_relative_endpoint_xy",
+                "qd_grid_shape": (4, 4), "qd_cell_capacity": 1, "qd_parent_sampling": "sparse_priority",
+                "qd_bounds_update_policy": "fixed_initial", "qd_bounds_quantiles": (0.05, 0.95),
+                "qd_bounds_expand_fraction": 0.1, "qd_min_axis_span_m": 0.08,
+                "qd_global_quality_anchor_count": 0, "qd_secondary_lane_mode": "none",
+                "qd_degenerate_fallback_policy": "none",
+                "save_ed_cache": False, "use_initial_cache": False,
+            }
+            for name, expected in required_terminal.items():
+                if getattr(resolved, name) != expected:
+                    raise ValueError(f"N4 terminal population requires {name}={expected!r}")
         if resolved.qd_quality_mode not in {"provider", "executed_prefix_v1", FEEDBACK_MODE}:
             raise ValueError("EDS qd_quality_mode must be provider, executed_prefix_v1 or executed_feedback_v1")
         if resolved.qd_quality_mode in {"executed_prefix_v1", FEEDBACK_MODE}:

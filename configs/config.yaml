@@ -123,6 +123,8 @@ main:
     qd_descriptor: target_relative_endpoint_xy
     # Optional executed_prefix_v1 (N2) / executed_feedback_v1 (N3); default unchanged.
     qd_quality_mode: provider
+    # N4 changes only the final QD consumer; default archive selection is unchanged.
+    qd_final_selection_mode: archive_global_best
     qd_grid_shape: [4, 4]
     qd_cell_capacity: 1
     qd_secondary_lane_mode: none

@@ -1,0 +1,89 @@
+{
+  "schema": "n4-terminal-population-implementation-cpu-v1",
+  "status": "IMPLEMENTED_CPU_TESTED_NOT_ONLINE_EVALUATED",
+  "base_commit": "9e5c63632fbd9169e88b6437b50f365eac819d6b",
+  "protocol_sha256": "b8562e3f9fffc77efc803c6b056441f7b426333a97eb176b52fdb0fe42088db2",
+  "prerequisite_definition_sha256": "3ff18d22eb934a24f790bef5b411089f9a4c9116b098cfb7baa2b36cbbc277ca",
+  "root_prerequisite_review_sha256": "711cef1fdcec7b3c28d3c202fefb1294e02ec2672dfe53e4043fcdecbca1a0db",
+  "files": {
+    "core/qd_terminal_population.py": "6b927f824ce17dd8ea939709c9f92539767291189426818136b8238030534dcf",
+    "core/rdt_policy_steer.py": "edebea0873ca1d3868741c0602d1d7a2d0b92f5b0d0eef848288a10f4e0956ac",
+    "core/eds_eval_metrics.py": "b10d47290494d494f60aa96b5583ca1102866ff4ccde2a465c6174a0f4b5e000",
+    "configs/config.yaml": "da6803047a36ab0d70c6d256783003949fcc45979adce67e78d418a64ff121ab",
+    "tests/test_qd_terminal_population.py": "7fca066d891ca70e42743bff0d8cd44ddfe0217dcf860b65b55f96440d6e6d18",
+    "tests/test_rdt_steer.py": "68f13bc0137256ae63eb63582e1bafb0b7a485902095952931ac57d38e9b2fc6"
+  },
+  "mechanism": {
+    "field": "qd_final_selection_mode",
+    "default": "archive_global_best",
+    "candidate": "terminal_population_v1",
+    "selection": "First native stored-cost argmin over the actual last canonical masked sixteen, with all ties retained. No quality/decoder/model/provider/projector call is added.",
+    "archive": "All updates, parents, incumbent/fingerprint/cell ordering and hard-gate counters are retained. Archive reference and execution domain are distinct.",
+    "stage": "Selected original raw reward and original normalization; _last_scale uses the original archive FP32 cost vector. A passive event records the already-written metadata.",
+    "unknown": "New selected target_distance_after is None; old diagnostic projection/domain remains available as qd_archive_reference.target_distance_after. Unique insertion ancestry and actual normalized Stage API input remain unobserved."
+  },
+  "cpu_validation": {
+    "environment": {
+      "CUDA_VISIBLE_DEVICES": "",
+      "PYTHONDONTWRITEBYTECODE": "1"
+    },
+    "command": "/home/hynx/miniconda3/envs/vla-pilot/bin/python -m pytest -q -p no:cacheprovider tests/test_qd_terminal_population.py tests/test_rdt_steer.py -k 'n4 or native_first_argmin or corrupt_native_batch or n2_full_loop or n3_full_loop or qd_loop_bypasses_legacy_selector or decision_evidence_is_passive_for_real_stub_select_action'",
+    "passed": 40,
+    "deselected": 386,
+    "seconds": 17.35,
+    "final_lifecycle_test_update": {
+      "command": "/home/hynx/miniconda3/envs/vla-pilot/bin/python -m pytest -q -p no:cacheprovider tests/test_rdt_steer.py -k 'n4_select_action_uses_actual_deployed_fp32_decode' --basetemp=/tmp/n4-consumer-native-audit-integration-20260924a",
+      "passed": 2,
+      "seconds": 5.99,
+      "overlaps_the_40": true
+    },
+    "evidence": "Synthetic stub networks/providers only, never real weights/providers/environment. Full 176/11/10-round producer path, native cost/shape/dtype/sign/ties, exact absent-vs-explicit default, baseline/N2/N3, RNG and counted calls; different last-pool/archive spread confirms Stage reference remains archive.",
+    "auditor_source": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-audit-20260924/scripts/audit_decision_evidence.py",
+      "sha256": "e4b81cc549488a1bf37183905fbddf1073acac4ce5ef29bc266e0b80d63fe9c4",
+      "note": "Final strengthened auditor rerun on the same two unchanged synthetic producer bundles; no new fixture generation or scientific read."
+    },
+    "independent_auditor_integration": [
+      {
+        "dtype": "torch.float32",
+        "artifact_path": "/tmp/n4-consumer-native-audit-integration-20260924a/test_n4_select_action_uses_act0/independent-native-audit-v2.json",
+        "artifact_sha256": "14ea611b0fcd245f3f085619d459978a277cc47a27bb906c98a907b650fec53a",
+        "accepted": true,
+        "errors": [],
+        "gate": {
+          "schema": "n4-native-terminal-population-audit-v1",
+          "checked_decisions": 1,
+          "canonical_batches_verified": 11,
+          "canonical_candidates_verified": 176,
+          "parent_rounds_verified": 10,
+          "actual_actions_verified": 8,
+          "decoded_reference_first8_different_decisions": 1,
+          "decoded_reference_actual_prefix_different_decisions": 1,
+          "scope": "N4 last canonical16 native-cost first-index consumer, all canonical/parent associations, original raw/Stage metadata and deployed actual command linkage; stored archive-reference decoding is not a counterfactual rollout"
+        }
+      },
+      {
+        "dtype": "torch.bfloat16",
+        "artifact_path": "/tmp/n4-consumer-native-audit-integration-20260924a/test_n4_select_action_uses_act1/independent-native-audit-v2.json",
+        "artifact_sha256": "c966a327890963f606b1e3af05a5acebdba65de934d382a2a99fade55b97500b",
+        "accepted": true,
+        "errors": [],
+        "gate": {
+          "schema": "n4-native-terminal-population-audit-v1",
+          "checked_decisions": 1,
+          "canonical_batches_verified": 11,
+          "canonical_candidates_verified": 176,
+          "parent_rounds_verified": 10,
+          "actual_actions_verified": 8,
+          "decoded_reference_first8_different_decisions": 1,
+          "decoded_reference_actual_prefix_different_decisions": 1,
+          "scope": "N4 last canonical16 native-cost first-index consumer, all canonical/parent associations, original raw/Stage metadata and deployed actual command linkage; stored archive-reference decoding is not a counterfactual rollout"
+        }
+      }
+    ],
+    "cuda_initialized": false
+  },
+  "scope": "No real native episode reread, images, GPU, model weights, online providers, simulator, runner/auditor source changes, W/state/ledger changes or protected file reads.",
+  "scientific_score": null,
+  "scientific_conclusion": "Implementation/activity plumbing only. No N4 task-benefit claim or GPU authorization."
+}
