@@ -214,7 +214,7 @@ def promotion(evaluation,monkeypatch):
         events+=group(t);attempts.append({'terminal':t,'status':'complete_valid'})
     computed={'matrix':'complete_valid_12','protocol_numeric_dev_criterion':True,
         'protocol_execution_activity_criterion':True,'input_scope_complete':True,
-        'profiles':{'N4':{'qd_active_chunks':1,'n4_consumer_summary':{'actual_prefix_different_decisions':1}}}}
+        'profiles':{'N4':{'valid_cell_observation_summary':{'qd_active_chunks':1},'n4_consumer_summary':{'actual_prefix_different_decisions':1}}}}
     er=SimpleNamespace(recompute_dev=lambda *a:(computed,attempts,base));monkeypatch.setitem(sys.modules,'qd_ed_n4_evaluation_report',er)
     report=save(artifact/'report.json',{**computed,'input_manifest':{'synthetic':True}})
     proof=save(artifact/'proof.json',{'synthetic':True})
