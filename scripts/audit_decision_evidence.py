@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 from collections import Counter, defaultdict
 import hashlib
+import importlib.util
 import json
 import io
 import math
@@ -69,6 +70,187 @@ def _native_sha(value):
 def _native_record(value):
     return {"dtype": str(value.dtype), "shape": list(value.shape),
             "sha256": _native_sha(value), "values": value.tolist()}
+
+
+def _audit_n4_terminal_population(kinds, context, final_event):
+    """Audit the actual N4 consumer; reference decoding is not a rollout.
+
+    Called after the generic audit has checked providers, event sequence and
+    executed pre-reset lifecycle. No scores, projections or archive are rerun.
+    """
+    def one(kind):
+        require(len(kinds[kind]) == 1, "n4_missing_or_duplicate_" + kind)
+        return kinds[kind][0]
+
+    def native(value, shape, dtype=None):
+        require(tensor(value) and value.is_floating_point() and tuple(value.shape) == tuple(shape)
+                and (dtype is None or value.dtype == dtype), "n4_native_shape_dtype_or_finite")
+        return value
+
+    def same(left, right):
+        return tensor(left) and tensor(right) and _native_sha(left) == _native_sha(right)
+
+    def numeric_same(left, right):
+        return (tensor(left) and tensor(right) and left.dtype == right.dtype == torch.float32
+                and left.shape == right.shape and torch.equal(left, right))
+
+    canonical = kinds["canonical_candidate_batch"]
+    require([r["values"]["iter_idx"] for r in canonical] == list(range(-1, 10)), "n4_canonical_11_coverage")
+    sources = [r for r in kinds["scoring_inputs"] if r["values"]["scoring_scope"]["role"] != "auxiliary_pretest"]
+    scoring = {r["values"]["scoring_scope"]["iter_idx"]: r for r in sources}
+    allocations = {r["values"]["iter_idx"]: r for r in kinds["archive_parent_allocation"]}
+    parents = {r["values"]["iter_idx"]: r for r in kinds["parent_allocation"]}
+    require(len(sources) == len(scoring) == 11 and set(scoring) == set(range(-1, 10)), "n4_scoring_11_coverage")
+    require(len(kinds["archive_parent_allocation"]) == len(kinds["parent_allocation"])
+            == len(allocations) == len(parents) == 10 and set(allocations) == set(parents) == set(range(10)),
+            "n4_parent_10_coverage")
+    known, batches, parent_links = defaultdict(list), [], []
+    final_costs = None
+    for row in canonical:
+        value = row["values"]; iteration = value["iter_idx"]; source = scoring[iteration]
+        scope = source["values"]["scoring_scope"]
+        require(scope["role"] == ("canonical_initial" if iteration == -1 else "canonical_offspring"), "n4_scoring_role")
+        actions = native(value["candidates"], (16, 64, 128))
+        quality = native(value["effective_quality"], (16,), actions.dtype)
+        require(same(actions, source["values"]["samples"]), "n4_same_call_population_mismatch")
+        linked = lambda kind: [r for r in kinds[kind] if r["values"]["scoring_batch_id"] == source["sequence"]]
+        aggregates, effectives = linked("scoring_aggregate"), linked("effective_quality")
+        require(len(aggregates) == len(effectives) == 1, "n4_same_call_score_missing_or_duplicate")
+        aggregate, effective = aggregates[0], effectives[0]; ev = effective["values"]
+        require(ev.get("quality_mode", "provider") == value.get("quality_mode", "provider") == "provider"
+                and ev["reward_mode"] == "normal" and ev["scoring_scope"] == aggregate["values"]["scoring_scope"] == scope,
+                "n4_original_provider_mode_mismatch")
+        costs = native(ev["costs"], (16,), actions.dtype)
+        require(same(quality, ev["quality"]) and same(quality, aggregate["values"]["aggregate_before_reward_mode"])
+                and same(costs, -quality), "n4_same_call_raw_cost_mismatch")
+        require(source["sequence"] < aggregate["sequence"] < effective["sequence"] < row["sequence"], "n4_same_call_order")
+        if iteration >= 0:
+            allocation, parent = allocations[iteration], parents[iteration]
+            av, pv = allocation["values"], parent["values"]
+            require(all(prior["sequence"] < allocation["sequence"] < parent["sequence"] < source["sequence"]
+                        for prior in canonical if prior["values"]["iter_idx"] < iteration), "n4_parent_prior_only_order")
+            pa = native(pv["source_population"], (16, 64, 128), actions.dtype)
+            indices = pv["parent_indices"]
+            require(pv["elite_count"] == 0 and torch.is_tensor(indices) and indices.dtype == torch.int64
+                    and indices.device.type == "cpu" and torch.equal(indices, torch.arange(16)), "n4_sparse_parent_contract")
+            pr, pc = native(av["parent_rewards"], (16,), torch.float32), native(av["parent_costs"], (16,), torch.float32)
+            require(same(pr, pv["source_quality"]) and same(pc, pv["source_costs"])
+                    and av["parent_lanes"] == ["quality"] * 16, "n4_parent_values_or_lanes")
+            allocated_cells = av["parent_cell_ids"]
+            require(tensor(allocated_cells) and allocated_cells.dtype == torch.int64 and allocated_cells.shape == (16,)
+                    and bool(((allocated_cells >= 0) & (allocated_cells < 16)).all())
+                    and same(allocated_cells, pv["parent_cell_ids"]), "n4_parent_cell_source_mismatch")
+            slots = []
+            for index, action in enumerate(pa):
+                matches = known[_native_sha(action)]
+                require(matches and all(m["quality"] == pr[index].item() and m["cost"] == pc[index].item()
+                                        for m in matches), "n4_parent_native_prior_association")
+                slots.append({"slot": index, "matching_occurrence_ids": [m["occurrence_id"] for m in matches]})
+            parent_links.append({"iter_idx": iteration, "allocation_sequence": allocation["sequence"],
+                                 "parent_sequence": parent["sequence"], "slots": slots})
+        for index, action in enumerate(actions):
+            known[_native_sha(action)].append({"occurrence_id": value["occurrence_ids"][index],
+                "iter_idx": iteration, "row": index, "quality": quality[index].item(), "cost": costs[index].item()})
+        batches.append({"iter_idx": iteration, "canonical_sequence": row["sequence"], "scoring_batch_id": source["sequence"]})
+        final_costs = costs
+
+    final = final_event["values"]; terminal = final["terminal_population"]; archive = final["archive_reference"]
+    last = canonical[-1]; last_values = last["values"]
+    require(final["selection_rule"] == "terminal_population_first_argmin"
+            and final.get("qd_final_selection_mode") == "terminal_population_v1"
+            and final.get("quality_mode", "provider") == "provider", "n4_final_mode_mismatch")
+    require(last["sequence"] < final_event["sequence"] < one("policy_action_decode")["sequence"], "n4_final_order")
+    require(terminal["iter_idx"] == 9 and terminal["canonical_event_sequence"] == last["sequence"]
+            and terminal["scoring_batch_id"] == scoring[9]["sequence"], "n4_last_canonical_source_mismatch")
+    population = native(final["population"], (16, 64, 128), last_values["candidates"].dtype)
+    require(same(population, last_values["candidates"]) and same(terminal["native_costs"], final_costs)
+            and same(terminal["raw_provider_quality"], last_values["effective_quality"]), "n4_last_population_cost_raw_mismatch")
+    minimum = int(torch.argmin(final_costs).item())
+    ties = torch.nonzero(final_costs == final_costs.min(), as_tuple=False).reshape(-1).tolist()
+    require(type(final["selected_index"]) is int and final["selected_index"] == minimum
+            and isinstance(terminal["minimum_cost_tie_indices"], list)
+            and all(type(i) is int for i in terminal["minimum_cost_tie_indices"])
+            and terminal["minimum_cost_tie_indices"] == ties, "n4_first_native_cost_argmin_or_ties")
+    require(terminal["selected_occurrence_id"] == last_values["occurrence_ids"][minimum], "n4_selected_occurrence_mismatch")
+    selected = native(final["selected_latent"], (1, 64, 128), population.dtype)
+    require(same(selected, population[minimum:minimum + 1]) and final["selected_cost"] == final_costs[minimum].item()
+            and final["selected_quality"] == last_values["effective_quality"][minimum].item(), "n4_selected_native_cost_raw_mismatch")
+    cells = terminal["cell_ids"]
+    require(tensor(cells) and cells.dtype == torch.int64 and cells.shape == (16,)
+            and bool(((cells >= 0) & (cells < 16)).all()) and final["selected_cell"] == cells[minimum].item(), "n4_selected_recorded_cell_mismatch")
+    parent_cells = terminal["parent_cell_ids"]
+    require(tensor(parent_cells) and parent_cells.dtype == torch.int64 and parent_cells.shape == (16,)
+            and same(parent_cells, allocations[9]["values"]["parent_cell_ids"])
+            and terminal["selected_parent_cell"] == parent_cells[minimum].item(), "n4_selected_parent_cell_mismatch")
+    require(final["selected_fingerprint"] == fingerprints(selected)[0], "n4_selected_fingerprint_mismatch")
+
+    ap = archive["population"]
+    require(tensor(ap) and ap.ndim == 3 and 1 <= len(ap) <= 16, "n4_archive_shape")
+    native(ap, (len(ap), 64, 128), population.dtype)
+    ar, ac = native(archive["rewards"], (len(ap),), torch.float32), native(archive["costs"], (len(ap),), torch.float32)
+    cell_ids = archive["cell_ids"]
+    require(tensor(cell_ids) and cell_ids.dtype == torch.int64 and cell_ids.shape == (len(ap),)
+            and cell_ids.tolist() == sorted(set(cell_ids.tolist())) and bool(((cell_ids >= 0) & (cell_ids < 16)).all()), "n4_archive_cells")
+    archive_links = []
+    for index, action in enumerate(ap):
+        matches = known[_native_sha(action)]
+        require(matches and all(m["quality"] == ar[index].item() and m["cost"] == ac[index].item() for m in matches), "n4_archive_native_cost_association")
+        archive_links.append({"slot": index, "matching_occurrence_ids": [m["occurrence_id"] for m in matches]})
+    afp = fingerprints(ap)
+    best = min(range(len(ap)), key=lambda i: (-ar[i].item(), afp[i], cell_ids[i].item()))
+    require(type(archive["global_best_index"]) is int and archive["global_best_index"] == best
+            and same(archive["selected_latent"], ap[best:best + 1])
+            and archive["selected_fingerprint"] == afp[best] and archive["selected_cell"] == cell_ids[best].item()
+            and archive["selected_quality"] == ar[best].item() and archive["selected_cost"] == ac[best].item(), "n4_archive_global_best_reference_mismatch")
+
+    reference = final["stage_reward_reference"]
+    require(reference["reference_scope"] == "qd_archive_cost_spread" and same(reference["reference_costs"], ac)
+            and same(reference["selected_raw_reward"], last_values["effective_quality"][minimum]), "n4_stage_raw_or_archive_scale_reference")
+    binding = one("terminal_population_stage_binding"); bv = binding["values"]
+    require(final_event["sequence"] < binding["sequence"] < one("policy_action_decode")["sequence"], "n4_stage_binding_order")
+    require(all(type(bv[k]) in (int, float) and math.isfinite(bv[k]) for k in
+                ("selected_raw_reward", "archive_cost_spread_scale", "stage_init_reward", "normalized_reward")), "n4_stage_binding_invalid")
+    require(bv["selected_raw_reward"] == final["selected_quality"] and bv["archive_cost_spread_scale"] >= 0, "n4_stage_written_raw_or_scale_invalid")
+    normalized = max(0.0, min(1.2, 1.0 - bv["selected_raw_reward"] / bv["stage_init_reward"])) if bv["stage_init_reward"] < -1e-6 else 0.0
+    require(bv["normalized_reward"] == normalized, "n4_stage_written_normalized_mismatch")
+    # Source + real-call CPU tests bind scale to the captured original archive
+    # vector. Do not pretend CPU reduction recreates bit-exact GPU FP32 mean.
+    decoder_path = Path(__file__).resolve().parents[1] / "core" / "rdt_libero_action_converter.py"
+    spec = importlib.util.spec_from_file_location("n4_audit_deployed_decoder", decoder_path)
+    decoder = importlib.util.module_from_spec(spec); spec.loader.exec_module(decoder)
+    decoded_event = one("policy_action_decode"); decoded = decoded_event["values"]
+    require(same(decoded["selected_latent"], selected.float()), "n4_selected_policy_cast_mismatch")
+    actual = decoder.decode_rdt_libero_action_chunk(decoded["selected_latent"], 8)
+    require(numeric_same(actual, decoded["action_chunk"]) and numeric_same(actual, one("decision_committed")["values"]["action_chunk"])
+            and one("decision_committed")["values"]["execution_horizon"] == 8, "n4_actual_deployed_decode_mismatch")
+    dispatches, sent = kinds["action_dispatch"], kinds["executed_action"]
+    m = len(dispatches)
+    require(1 <= m <= 8 and len(sent) == m, "n4_actual_prefix_invalid")
+    for index, row in enumerate(sent):
+        require(numeric_same(row["values"]["action_numpy"], actual[0, index]), "n4_actual_dispatch_mismatch")
+    hypothetical = decoder.decode_rdt_libero_action_chunk(archive["selected_latent"].float(), 8)
+    differences = torch.nonzero(actual[0] != hypothetical[0], as_tuple=False).tolist()
+    return {"decision_id": context["decision_id"], "global_step": context["global_step"],
+        "canonical_batches_verified": 11, "canonical_candidates_verified": 176, "parent_rounds_verified": 10,
+        "actual_prefix_length": m, "selected_index": minimum, "minimum_cost_tie_indices": ties,
+        "selected_occurrence_id": terminal["selected_occurrence_id"], "selected_native_sha256": _native_sha(selected[0]),
+        "selected_cell": final["selected_cell"], "selected_parent_cell": terminal["selected_parent_cell"],
+        "selected_cost": final["selected_cost"], "selected_raw_reward": final["selected_quality"],
+        "terminal_native_ids": [_native_sha(action) for action in population],
+        "terminal_native_costs": _native_record(final_costs),
+        "terminal_raw_provider_quality": _native_record(last_values["effective_quality"]),
+        "archive_reference_native_sha256": _native_sha(archive["selected_latent"][0]),
+        "archive_reference_index": best, "archive_reference_cell": archive["selected_cell"],
+        "archive_reference_fingerprint": archive["selected_fingerprint"],
+        "archive_reference_raw_reward": archive["selected_quality"], "archive_reference_cost": archive["selected_cost"],
+        "canonical_sources": batches, "parent_associations": parent_links, "archive_associations": archive_links,
+        "decoded_reference_first8_diff_positions": differences,
+        "decoded_reference_actual_prefix_diff_positions": [p for p in differences if p[0] < m],
+        "stage_binding_sequence": binding["sequence"], "stage_raw_reward": bv["selected_raw_reward"],
+        "stage_init_reward": bv["stage_init_reward"], "normalized_reward_written": bv["normalized_reward"],
+        "archive_cost_spread_scale": bv["archive_cost_spread_scale"],
+        "archive_cost_reference_sha256": _native_sha(ac), "reference_scope": "stored archive action decoded only; counterfactual outcome Unknown",
+        "limits": "unique archive insertion ancestry and actual normalized Stage input Unknown; GPU scale reduction bound by original source/call tests, not recreated by CPU"}
 
 
 def _audit_n3_feedback(kinds, context, final, events, previous):
@@ -413,6 +595,26 @@ def audit_episode(episode_dir, episode_compute_file):
                         episode_ended = bool(value["terminated"] or value["truncated"])
                         pending = None
             require(pending is None and prefixes > 0, "unfinished_or_unexecuted_decision")
+            n4_markers = any(r["values"].get("selection_rule") == "terminal_population_first_argmin"
+                             or r["values"].get("qd_final_selection_mode") == "terminal_population_v1"
+                             or "terminal_population" in r["values"] for r in kinds["final_selection"])
+            if n4_markers or kinds["terminal_population_stage_binding"]:
+                require(guided and not dual_active, "n4_unguided_or_dual_quality")
+                n4 = _audit_n4_terminal_population(kinds, context, one("final_selection"))
+                gate = report.setdefault("n4_terminal_population_audit", {
+                    "schema": "n4-native-terminal-population-audit-v1", "checked_decisions": 0,
+                    "canonical_batches_verified": 0, "canonical_candidates_verified": 0,
+                    "parent_rounds_verified": 0, "actual_actions_verified": 0,
+                    "decoded_reference_first8_different_decisions": 0,
+                    "decoded_reference_actual_prefix_different_decisions": 0,
+                    "decisions": [], "scope": "N4 last canonical16 native-cost first-index consumer, all canonical/parent associations, original raw/Stage metadata and deployed actual command linkage; stored archive-reference decoding is not a counterfactual rollout"})
+                gate["checked_decisions"] += 1
+                for field in ("canonical_batches_verified", "canonical_candidates_verified", "parent_rounds_verified"):
+                    gate[field] += n4[field]
+                gate["actual_actions_verified"] += n4["actual_prefix_length"]
+                gate["decoded_reference_first8_different_decisions"] += int(bool(n4["decoded_reference_first8_diff_positions"]))
+                gate["decoded_reference_actual_prefix_different_decisions"] += int(bool(n4["decoded_reference_actual_prefix_diff_positions"]))
+                gate["decisions"].append(n4)
             if dual_mode == "executed_feedback_v1":
                 previous_feedback_certificate = _audit_n3_feedback(
                     kinds, context, final, events, previous_feedback_certificate)
