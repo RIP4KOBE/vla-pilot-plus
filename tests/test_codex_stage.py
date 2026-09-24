@@ -36,7 +36,8 @@ def events(answer=ANSWER, usage=None):
 
 
 def make(monkeypatch, tmp_path, event_list=None, returncode=0, timeout=False, raw=None,
-         output_format="legacy_text", event_policy="strict_v1", timeout_seconds=90, stderr=b""):
+         output_format="legacy_text", event_policy="strict_v1", timeout_seconds=90, stderr=b"",
+         model="gpt-6-astra"):
     calls = []
     cli = tmp_path / "codex"
     cli.touch()
@@ -72,7 +73,7 @@ def make(monkeypatch, tmp_path, event_list=None, returncode=0, timeout=False, ra
     make_timeout = [timeout]
     monkeypatch.setattr(module.subprocess, "Popen", Process)
     recognizer = CodexStageRecognizer({
-        "backend": "codex_cli", "model": "gpt-6-astra", "cli_path": str(cli),
+        "backend": "codex_cli", "model": model, "cli_path": str(cli),
         "stage_template_path": str(template), "disabled_skill_paths": ["/active/one"],
         "timeout_seconds": timeout_seconds,
         "output_format": output_format,
@@ -327,6 +328,45 @@ def test_preturn_multiline_rejects_unrelated_or_control_items(monkeypatch, tmp_p
     assert recognizer.last_result['error'] == 'codex_unexpected_item'
 
 
+def test_exact_luna_metadata_warning_matches_live_hash_and_requires_v4(monkeypatch, tmp_path):
+    warning = module.MODEL_METADATA_FALLBACK_TEMPLATE.format(model='gpt-6-luna')
+    assert len(warning) == 122
+    assert hashlib.sha256(warning.encode()).hexdigest() == (
+        'c9873998fae7b5e32f26f003cc85a9dc11480871e124b8592818df89a672001b')
+    stream = events(answer=json.dumps({'stage': 2, 'guidance': 'no', 'evidence': 'held'}))
+    stream.insert(1, {'type': 'item.completed', 'item': {'type': 'error', 'message': warning}})
+    old, _ = make(monkeypatch, tmp_path, event_list=stream,
+        output_format='json_schema_v1', event_policy='completed_transport_fallback_preturn_multiline_v3')
+    assert identify(old) == (1, True)
+    assert old.last_result['error'] == 'codex_unexpected_item'
+    new, calls = make(monkeypatch, tmp_path, event_list=stream, model='gpt-6-luna',
+        output_format='json_schema_v1', event_policy='completed_known_startup_warnings_v4')
+    assert identify(new) == (2, False)
+    assert len(calls) == new.last_result['codex_usage_complete_calls'] == 1
+    assert len(new.last_result['transport']['model_metadata_warning_notices']) == 1
+    assert new.last_result['transport']['transport_fallback_notices'] == []
+    assert new.last_result['transport']['error_diagnostics'][0]['signals'] == ['model_metadata_fallback']
+
+
+@pytest.mark.parametrize('change', ['wrong_model', 'modified_text', 'duplicate', 'after_turn',
+                                     'missing_usage', 'nonzero', 'extra_thread'])
+def test_metadata_warning_v4_rejects_other_conditions(monkeypatch, tmp_path, change):
+    warning = module.MODEL_METADATA_FALLBACK_TEMPLATE.format(model='gpt-6-luna')
+    stream = events(answer=json.dumps({'stage': 2, 'guidance': 'no', 'evidence': 'held'}))
+    notice = {'type': 'item.completed', 'item': {'type': 'error', 'message': warning}}
+    stream.insert(2 if change == 'after_turn' else 1, notice)
+    if change == 'wrong_model': notice['item']['message'] = warning.replace('gpt-6-luna', 'gpt-6-astra')
+    if change == 'modified_text': notice['item']['message'] += ' '
+    if change == 'duplicate': stream.insert(2, {'type': 'item.completed', 'item': {'type': 'error', 'message': warning}})
+    if change == 'missing_usage': stream[-1]['usage'] = {}
+    if change == 'extra_thread': stream.insert(1, {'type': 'thread.started', 'thread_id': 'extra'})
+    recognizer, _ = make(monkeypatch, tmp_path, event_list=stream,
+        returncode=1 if change == 'nonzero' else 0, model='gpt-6-luna',
+        output_format='json_schema_v1', event_policy='completed_known_startup_warnings_v4')
+    assert identify(recognizer) == (1, True)
+    assert recognizer.last_result['codex_failed_calls'] == 1
+
+
 @pytest.mark.parametrize('change', ['before_thread', 'duplicate', 'unknown', 'missing_usage',
                                      'missing_completion', 'nonzero', 'second_turn', 'tool_item'])
 def test_preturn_fallback_still_rejects_other_error_or_incomplete_turn(monkeypatch, tmp_path, change):
@@ -506,7 +546,7 @@ def test_timeout_retains_bounded_stderr_and_error_item_diagnostics(monkeypatch, 
     transport = result['transport']
     assert transport['partial_event_validation_error'] == 'codex_expected_one_completed_turn'
     assert transport['error_diagnostics'][1]['http_status_codes'] == [503]
-    assert transport['stderr_diagnostic']['signals'] == ['connection_reset', 'websocket', 'transport_fallback']
+    assert transport['stderr_diagnostic']['signals'] == ['connection_reset', 'websocket']
     assert 'private-value' not in json.dumps(result)
     assert len(calls) == 1 and not Path(calls[0].kwargs['cwd']).exists()
 

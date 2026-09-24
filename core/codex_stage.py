@@ -23,7 +23,8 @@ from core.gemini_grounder import GeminiStageRecognizer
 
 from core.codex_stage_policy import (
     _COUNTER_FIELDS, _MAX_EVENTS_BYTES, _REMOVED_ENVIRONMENT,
-    TRANSPORT_FALLBACK_PREFIX, discover_disabled_skill_paths, policy_sha256, public_invocation_policy,
+    TRANSPORT_FALLBACK_PREFIX, MODEL_METADATA_FALLBACK_TEMPLATE,
+    discover_disabled_skill_paths, policy_sha256, public_invocation_policy,
 )
 
 
@@ -58,7 +59,8 @@ _DIAGNOSTIC_PATTERNS = {
     "permission_denied": r"permission denied|forbidden",
     "service_unavailable": r"service unavailable|internal server error|bad gateway",
     "websocket": r"websocket",
-    "transport_fallback": r"falling back|fallback",
+    "transport_fallback": r"falling back from WebSockets to HTTPS transport\.",
+    "model_metadata_fallback": r"Model metadata for `[^`]+` not found\. Defaulting to fallback metadata",
 }
 
 
@@ -215,10 +217,12 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         errors = []
         diagnostics = []
         transport_fallbacks = []
+        model_metadata_warnings = []
         completed = False
         fallback_policy = self.event_policy in {
             "completed_transport_fallback_v1", "completed_transport_fallback_preturn_v2",
-            "completed_transport_fallback_preturn_multiline_v3"}
+            "completed_transport_fallback_preturn_multiline_v3",
+            "completed_known_startup_warnings_v4"}
         for event_index, event in enumerate(events):
             kind = event.get("type")
             event_types.append(kind if isinstance(kind, str) else "invalid")
@@ -259,19 +263,34 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                     and isinstance(message, str) and message.startswith(TRANSPORT_FALLBACK_PREFIX)
                     and len(TRANSPORT_FALLBACK_PREFIX) < len(message) <= 2048
                     and (not any(char in message for char in ("\x00", "\r", "\n"))
-                         if self.event_policy != "completed_transport_fallback_preturn_multiline_v3"
+                         if self.event_policy not in {"completed_transport_fallback_preturn_multiline_v3",
+                                                   "completed_known_startup_warnings_v4"}
                          else not any(ord(char) < 32 and char not in "\t\r\n" for char in message))
                     and (starts == 1 or (self.event_policy in {
                          "completed_transport_fallback_preturn_v2",
-                         "completed_transport_fallback_preturn_multiline_v3"}
+                         "completed_transport_fallback_preturn_multiline_v3",
+                         "completed_known_startup_warnings_v4"}
                          and starts == 0 and thread_starts == 1 and event_index == 1))
-                    and not completed and not messages and not transport_fallbacks)
+                    and not completed and not messages and not transport_fallbacks
+                    and not model_metadata_warnings)
+                metadata_warning = (
+                    self.event_policy == "completed_known_startup_warnings_v4"
+                    and kind == "item.completed" and item_kind == "error"
+                    and message == MODEL_METADATA_FALLBACK_TEMPLATE.format(model=self.model)
+                    and starts == 0 and thread_starts == 1 and event_index == 1
+                    and not completed and not messages and not transport_fallbacks
+                    and not model_metadata_warnings)
                 if fallback:
                     transport_fallbacks.append({"event_index": event_index,
                         "classification": "websocket_to_https_fallback_notice",
                         "message_sha256": hashlib.sha256(message.encode()).hexdigest(),
                         "message_length": len(message)})
-                if item_kind not in ("agent_message", "reasoning") and not fallback:
+                if metadata_warning:
+                    model_metadata_warnings.append({"event_index": event_index,
+                        "classification": "exact_model_metadata_fallback_warning",
+                        "message_sha256": hashlib.sha256(message.encode()).hexdigest(),
+                        "message_length": len(message)})
+                if item_kind not in ("agent_message", "reasoning") and not fallback and not metadata_warning:
                     error_code = "codex_unexpected_item"
                 if item_kind == "error":
                     diagnostics.append({"event_index": event_index, "source": "error_item",
@@ -303,7 +322,8 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                 })
                 if not (self.event_policy in {"completed_reconnect_v1", "completed_transport_fallback_v1",
                                               "completed_transport_fallback_preturn_v2",
-                                              "completed_transport_fallback_preturn_multiline_v3"} and reconnect
+                                              "completed_transport_fallback_preturn_multiline_v3",
+                                              "completed_known_startup_warnings_v4"} and reconnect
                         and starts == 1 and not completed and not messages):
                     error_code = "codex_unexpected_event"
             else:
@@ -324,8 +344,11 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         )
         if fallback_policy:
             self._call_transport['transport_fallback_notices'] = transport_fallbacks
+        if self.event_policy == "completed_known_startup_warnings_v4":
+            self._call_transport['model_metadata_warning_notices'] = model_metadata_warnings
         if self.event_policy in {"completed_transport_fallback_preturn_v2",
-                                 "completed_transport_fallback_preturn_multiline_v3"} and thread_starts != 1:
+                                 "completed_transport_fallback_preturn_multiline_v3",
+                                 "completed_known_startup_warnings_v4"} and thread_starts != 1:
             error_code = "codex_expected_one_thread"
         if starts == complete_turns == len(usages) == 1 and stream_error is None:
             self.api_request_counter.values["usage_complete_calls"] += 1
