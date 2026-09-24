@@ -1,0 +1,82 @@
+{
+  "base_commit": "9e5c63632fbd9169e88b6437b50f365eac819d6b",
+  "commands": [
+    {
+      "command": "CUDA_VISIBLE_DEVICES='' python3 -m pytest -q tests/test_qd_ed_n4_plan.py tests/test_qd_ed_n4_supervise.py tests/test_qd_ed_n4_report.py tests/test_qd_ed_n3_plan.py tests/test_qd_ed_n3_supervise.py tests/test_qd_ed_n3_report.py tests/test_qd_ed_final_runner.py tests/test_qd_ed_available_gpu_queue.py",
+      "failed": 0,
+      "passed": 212,
+      "pytest_seconds": 2.92
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "cpu_environment": {
+    "CUDA_VISIBLE_DEVICES": "",
+    "python": "Python 3.12.12"
+  },
+  "external_interface": {
+    "check": "source/interface review only; producer/auditor integration is separate root work",
+    "native_auditor_commit": "847ebdfa23b6747b627f832a90a7c37e743c77a5",
+    "native_auditor_sha256": "4fdc8793d2a4cc4935e571c5db58e38e4ed48aae388f2ef598928a2b322491df",
+    "required_additional_fields": [
+      "selected_fingerprint",
+      "archive_reference_costs"
+    ],
+    "schema": "n4-native-terminal-population-audit-v1"
+  },
+  "limitations": [
+    "No plan was frozen or episode dispatched.",
+    "Actual fully integrated core/native auditor/supervisor validation and exact root release are required before launch.",
+    "Independent N4 review uses separate source-only and synthetic evidence, not episode data."
+  ],
+  "schema": "qd-ed-n4-runner-cpu-validation-v1",
+  "scope": "isolated CPU synthetic implementation validation; no GPU/model/provider/simulator, no live ledger/state write, no scientific payload reads",
+  "source_files": [
+    {
+      "path": "scripts/qd_ed_final_runner.py",
+      "sha256": "c3ccced7b0535a824a96724f787dfc5cd3636f1de023149082593d35dc975d5b"
+    },
+    {
+      "path": "scripts/qd_ed_available_gpu_queue.py",
+      "sha256": "4882bf38a14de334b76f000bc23e492cce4be5e9da9e802472f8025d7baba394"
+    },
+    {
+      "path": "scripts/qd_ed_n4_plan.py",
+      "sha256": "e5a6fd6e084a0748d786a0baec4472507d5ba61384696023b76a0099c05c59e9"
+    },
+    {
+      "path": "scripts/qd_ed_n4_supervise.py",
+      "sha256": "b6dd9224cfaf3066ccd40dd9abe51c93fe8fafe1018329a85c3a247ba74dd877"
+    },
+    {
+      "path": "scripts/qd_ed_n4_report.py",
+      "sha256": "d26769d73e43e6b10b8171f6930604bc510d15b26174ca3a767bcdf84a72c2fb"
+    },
+    {
+      "path": "configs/qd_ed_final/candidate_n4.json",
+      "sha256": "8d421a3c6ec860dee778453225339d776911647480bc2f0394e098a00ded84b2"
+    },
+    {
+      "path": "configs/qd_ed_final/n4_observed_baseline_profiles.json",
+      "sha256": "9ad91066bc0cf91bc8c79d9b02acbd4b83e5e5a45ae31072b0e92d2221baa54f"
+    },
+    {
+      "path": "tests/test_qd_ed_n4_plan.py",
+      "sha256": "001120fb7b90d064639b9a218c00f00758a309706eaa2b3314fe74ffac9a4054"
+    },
+    {
+      "path": "tests/test_qd_ed_n4_supervise.py",
+      "sha256": "006217b73b2979291997a350a304e3f1aa3b78cd589168e806b6e8d5bc015499"
+    },
+    {
+      "path": "tests/test_qd_ed_n4_report.py",
+      "sha256": "370fbd9bcadce171f3c8e4cc13487c50b38bdd6f3e59701abbc47907d671867e"
+    },
+    {
+      "path": "docs/03_evidence/qd_ed_final/continuation_20260924/n4-runner-preparation/README.md",
+      "sha256": "0c334fd1c0a88e3e41b26bf03894b059002d843473fc4c0299d245337be9a0aa"
+    }
+  ]
+}
