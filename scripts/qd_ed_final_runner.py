@@ -246,6 +246,7 @@ def validate_plan(path, *, root=ROOT, require_frozen=True, allow_unverified_gpu=
     require(Path(runtime['worktree']).resolve() == root, 'runtime worktree mismatch')
     require(Path(runtime['artifact_root']).resolve() == artifact_root, 'runtime artifact root mismatch')
     stage_overrides(runtime)
+    n1v.validate_transport_binding(SimpleNamespace(**globals()), plan, runtime)
     physical_gpu = runtime_gpu(runtime, state)
     if require_frozen:
         validate_gpu_readiness(plan, runtime, allow_unverified_gpu=allow_unverified_gpu)
@@ -493,9 +494,12 @@ def codex_stage_condition(runtime):
     mode = frozen.get('output_format', 'legacy_text')
     require(mode in {'legacy_text', 'json_schema_v1'}, 'unknown frozen Stage output format')
     event_policy = frozen.get('event_policy', 'strict_v1')
-    require(event_policy in {'strict_v1', 'completed_reconnect_v1'}, 'unknown frozen Stage event policy')
+    require(event_policy in {'strict_v1', 'completed_reconnect_v1', 'completed_transport_fallback_v1'}, 'unknown frozen Stage event policy')
     timeout = frozen.get('timeout_seconds', 90)
     require(type(timeout) is int and timeout in {90, 180}, 'unknown frozen Stage timeout')
+    if event_policy == 'completed_transport_fallback_v1':
+        require(mode == 'json_schema_v1' and timeout == 180, 'transport fallback policy requires structured 180-second contract')
+        return 'codex_login_astra_low_json_transport_fallback_180s_v1'
     if timeout == 180:
         require(mode == 'json_schema_v1' and event_policy == 'completed_reconnect_v1',
                 '180-second Stage timeout requires structured reconnect contract')
@@ -1089,8 +1093,9 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
             if runtime.get('frozen_stage_provider', {}).get('backend') == 'codex_cli':
                 base.update(stage_backend='codex_cli', stage_model=runtime['frozen_stage_provider']['model'],
                             stage_condition=codex_stage_condition(runtime))
-            if row.get('iteration') == 'N1V':
-                base['n1v_authorization_sha256'] = n1v.AUTH_SHA
+            recovery_cfg = n1v.settings(row.get('iteration'))
+            if recovery_cfg:
+                base[recovery_cfg['key'] + '_authorization_sha256'] = recovery_cfg['sha']
             append_event(root,{**base,'event':'reserved','time_unix':time.time(),'admission':admission})
             durable_json(output/'command.json',{'argv':command,'environment_public':{**runtime['environment'],'CUDA_VISIBLE_DEVICES':str(physical_gpu),'CUDA_DEVICE_ORDER':'PCI_BUS_ID','MUJOCO_EGL_DEVICE_ID':str(runtime['gpu_mapping']['egl_device_index'])}})
             process=None; started=time.monotonic(); process_finished=None; dispatched=False

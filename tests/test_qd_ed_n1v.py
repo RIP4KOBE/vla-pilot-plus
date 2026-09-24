@@ -187,17 +187,19 @@ def test_primary_order_is_task_interleaved_and_cannot_be_success_selected():
     with pytest.raises(r.GateError, match='order changed'): s.validate_cohort(plan)
 
 
+@pytest.mark.parametrize('iteration', ['N1V', 'N1W'])
 @pytest.mark.parametrize('recovery_also_times_out', [False, True])
-def test_supervisor_end_to_end_bounded_recovery_and_resume(tmp_path, monkeypatch, recovery_also_times_out):
+def test_supervisor_end_to_end_bounded_recovery_and_resume(tmp_path, monkeypatch, recovery_also_times_out, iteration):
+    cfg = p.settings(iteration)
     root = tmp_path / 'worktree'; (root / 'data').mkdir(parents=True)
     artifact = tmp_path / 'artifact'; artifact.mkdir()
     rows = []
     for task in range(10):
         for profile in (('Q0','C0','N1') if task % 2 == 0 else ('C0','Q0','N1')):
-            item = row(); item.update(task_id=task,profile=profile,iteration='N1V',
-                episode_key=f'n1v_dev_t{task:02d}_{profile.lower()}',init_row_sha256='init-row',budget_bucket='development')
+            item = row(); item.update(task_id=task,profile=profile,iteration=iteration,
+                episode_key=f'{iteration.lower()}_dev_t{task:02d}_{profile.lower()}',init_row_sha256='init-row',budget_bucket='development')
             rows.append(item)
-    plan = {'episodes':rows,'n1v_recovery':p.CONTRACT,'artifact_root':str(artifact),
+    plan = {'episodes':rows,cfg['key'] + '_recovery':cfg['contract'],'artifact_root':str(artifact),
             'source_commit':'source','runtime_manifest_sha256':'runtime'}
     path = root / 'plan.json'; r.durable_json(path, plan)
     runtime = {'gpu_mapping':{'physical_gpu':2,'egl_device_index':1},'cuda_egl_probe':{'resource_id':'proven'}}
@@ -219,8 +221,9 @@ def test_supervisor_end_to_end_bounded_recovery_and_resume(tmp_path, monkeypatch
             retryable=timeout,bucket=item['budget_bucket'],identity=r.episode_identity(item))
         for e in fresh:
             e.update(source_commit='source',runtime_manifest_sha256='runtime',init_row_sha256='init-row',
-                n1v_authorization_sha256=p.AUTH_SHA,retry_of=item.get('retry_of'))
-        if timeout: fresh[-1]['failure_detail'] = 'n1v_stage_timeout'
+                retry_of=item.get('retry_of'))
+            e.update({cfg['key'] + '_authorization_sha256':cfg['sha']})
+        if timeout: fresh[-1]['failure_detail'] = cfg['key'] + '_stage_timeout'
         with ledger.open('a') as stream:
             for e in fresh: stream.write(json.dumps(e) + '\n')
         if timeout: raise r.GateError('attempt stopped after failure; no automatic retry: ' + attempt)
@@ -236,3 +239,72 @@ def test_supervisor_end_to_end_bounded_recovery_and_resume(tmp_path, monkeypatch
         assert all(not item.get('retry_of') for item in calls[2:])  # every valid failure is retained
         s.run(path,status,root=root)
         assert len(calls) == 31  # administrative resume cannot replay completed cells
+
+
+def test_n1w_recoveries_are_separate_and_fifth_is_last():
+    def newer(events):
+        for event in events:
+            event['identity']['iteration'] = 'N1W'
+            event['n1w_authorization_sha256'] = p.N1W_AUTH_SHA
+            event.pop('n1v_authorization_sha256',None)
+            if event.get('failure_detail'): event['failure_detail'] = 'n1w_stage_timeout'
+        return events
+    original = newer(n1v_events())
+    episode = row(); episode.update(iteration='N1W',budget_bucket='recovery',retry_of='primary')
+    # All six hypothetical old N1V recoveries must not consume a new N1W slot.
+    history = []
+    for t in range(6): history += n1v_events(f'old{t}',task=t,retry_of=f'older{t}')
+    used = []
+    for t in range(4):
+        used += newer(n1v_events(f'p{t}',task=t))
+        used += newer(n1v_events(f'r{t}',task=t,retry_of=f'p{t}'))
+    r.check_retry(history + used + original,episode)
+    used += newer(n1v_events('p4',task=4)) + newer(n1v_events('r4',task=4,retry_of='p4'))
+    with pytest.raises(r.GateError,match='five-recovery'): r.check_retry(history + used + original,episode)
+    wrong = copy.deepcopy(original); wrong[-1]['n1w_authorization_sha256'] = p.AUTH_SHA
+    with pytest.raises(r.GateError,match='prospectively'): r.check_retry(wrong,episode)
+
+
+def test_n1w_timeout_uses_new_binding_and_cannot_reclassify_old_result(tmp_path, timeout_case):
+    episode,profile,runtime,path,record,stage,event = timeout_case
+    episode['iteration'] = 'N1W'
+    frozen = runtime['frozen_stage_provider']; frozen['event_policy'] = 'completed_transport_fallback_v1'
+    frozen['public_config_sha256'] = r.codex_public_config_sha256(frozen)
+    config_path = tmp_path / '.hydra/config.yaml'; config = yaml.safe_load(config_path.read_text())
+    config['perception']['gemini']['event_policy'] = frozen['event_policy']; config_path.write_text(yaml.safe_dump(config))
+    for transport in (record['stage_transport'],event['transport']):
+        transport.update(event_policy=frozen['event_policy'],public_config_sha256=frozen['public_config_sha256'])
+    path.write_text(json.dumps(record)+'\n');stage.write_text(json.dumps(event)+'\n')
+    result = p.timeout_outcome(r,{'n1w_recovery':p.N1W_CONTRACT},tmp_path,episode,profile,runtime)
+    assert result['failure_detail'] == 'n1w_stage_timeout' and result['n1w_authorization_sha256'] == p.N1W_AUTH_SHA
+    assert result['failed_call_token_usage'] is None
+    episode['iteration'] = 'N1V'
+    assert p.timeout_outcome(r,{'n1w_recovery':p.N1W_CONTRACT},tmp_path,episode,profile,runtime) is None
+    with pytest.raises(r.GateError,match='acceptance condition'):
+        p.validate_transport_binding(r,{'episodes':[episode]},runtime)
+
+
+def test_n1w_new_acceptance_requires_correct_cohort_and_180_seconds():
+    runtime = {'frozen_stage_provider':{'output_format':'json_schema_v1',
+        'event_policy':'completed_transport_fallback_v1','timeout_seconds':180}}
+    p.validate_transport_binding(r,{'episodes':[{'iteration':'N1W'}]},runtime)
+    assert r.codex_stage_condition(runtime) == p.settings('N1W')['condition']
+    with pytest.raises(r.GateError,match='approved N1W'):
+        p.validate_transport_binding(r,{'episodes':[{'iteration':'N1U'}]},runtime)
+    runtime['frozen_stage_provider']['timeout_seconds'] = 90
+    with pytest.raises(r.GateError,match='180-second'): r.codex_stage_condition(runtime)
+
+
+def test_n1w_budget_has_one_authority_and_does_not_reuse_n1v_caps(tmp_path,monkeypatch):
+    current = state(); auth = tmp_path/'n1w-auth.json'
+    auth.write_text(json.dumps({'approved':True,'caps':p.N1W_CAPS,'max_episode_attempts':250,'max_gpu_hours':48}))
+    monkeypatch.setattr(p,'N1W_AUTH_SHA',r.digest(auth))
+    current['budget'].update(max_episode_attempts=250,reserved=p.N1W_CAPS,
+        gpu_hour_reservations={'validation':14.,'formal':10.},
+        n1w_authorization={'path':str(auth),'sha256':r.digest(auth)})
+    assert r.check_budget(current,[],row()) == 100
+    current['budget']['reserved'] = p.CAPS
+    with pytest.raises(r.GateError,match='allocations'): r.check_budget(current,[],row())
+    current['budget']['reserved'] = p.N1W_CAPS
+    current['budget']['n1v_authorization'] = {'path':str(auth),'sha256':p.AUTH_SHA}
+    with pytest.raises(r.GateError,match='multiple active'): r.check_budget(current,[],row())

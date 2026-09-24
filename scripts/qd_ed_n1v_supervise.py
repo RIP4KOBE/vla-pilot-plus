@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run/resume the approved N1V30 cohort with at most six explicit recoveries."""
+"""Run/resume the approved N1V/N1W30 cohort with its separately authorized recovery cap."""
 import argparse
 from contextlib import contextmanager
 import copy
@@ -25,7 +25,7 @@ def held_runner_lease(path):
             if Path(requested).resolve() == path:
                 current = path.stat()
                 r.require(os.getpid() == owner and (current.st_dev, current.st_ino) == identity,
-                          'N1V shared lease PID/inode changed')
+                          'bounded-cohort shared lease PID/inode changed')
                 yield
             else:
                 with original(requested, nonblocking=nonblocking):
@@ -38,30 +38,35 @@ def held_runner_lease(path):
 
 
 def validate_cohort(plan):
+    cfg = protocol.settings(plan['episodes'][0]['iteration'])
+    r.require(cfg is not None, 'unregistered bounded cohort')
     expected = [(task, profile) for task in range(10)
                 for profile in (('Q0', 'C0', 'N1') if task % 2 == 0 else ('C0', 'Q0', 'N1'))]
     r.require([(row['task_id'], row['profile']) for row in plan['episodes']] == expected
-              and all(row['iteration'] == 'N1V' and not row.get('retry_of') for row in plan['episodes']),
-              'N1V30 original task-interleaved primary order changed')
-    r.require(plan.get('n1v_recovery') == protocol.CONTRACT, 'N1V recovery contract changed')
+              and all(row['iteration'] == cfg['iteration'] and not row.get('retry_of') for row in plan['episodes']),
+              'bounded-cohort30 original task-interleaved primary order changed')
+    r.require(plan.get(cfg['key'] + '_recovery') == cfg['contract'], 'bounded cohort recovery contract changed')
+    return cfg
 
 
 def cell_action(events, row, plan):
     """Return one valid representative, an undispatched primary, or one recovery."""
+    cfg = protocol.settings(row['iteration'])
+    r.require(cfg is not None, 'unregistered bounded cohort')
     groups = r.event_groups(events)
     prior = [g for g in groups.values() if g[0]['identity'] == r.episode_identity(row)]
     for group in prior:
         last = group[-1]
-        r.require(last['event'] in r.TERMINAL, 'N1V unfinished attempt requires explicit reconciliation')
+        r.require(last['event'] in r.TERMINAL, 'bounded-cohort unfinished attempt requires explicit reconciliation')
         r.require(last.get('source_commit') == plan['source_commit']
-                  and last.get('n1v_authorization_sha256') == protocol.AUTH_SHA
+                  and last.get(cfg['key'] + '_authorization_sha256') == cfg['sha']
                   and last.get('runtime_manifest_sha256') == plan['runtime_manifest_sha256']
                   and last.get('init_row_sha256') == row['init_row_sha256'],
-                  'N1V existing attempt differs from frozen source/runtime/input authority')
+                  'bounded-cohort existing attempt differs from frozen source/runtime/input authority')
     dispatched = [g for g in prior if any(e['event'] == 'dispatched' for e in g)]
     valid = [g[-1] for g in dispatched if g[-1].get('outcome_valid') is True]
     if valid:
-        r.require(len(valid) == 1 and dispatched[-1][-1] == valid[0], 'N1V duplicate or reordered valid cell')
+        r.require(len(valid) == 1 and dispatched[-1][-1] == valid[0], 'bounded-cohort duplicate or reordered valid cell')
         return 'completed', valid[0]
     if not dispatched:
         return 'primary', row
@@ -86,10 +91,10 @@ def mechanism_audit(terminal):
             r.require(m['qd_descriptor'] == 'target_distance_gripper_duty_v1'
                       and m['qd_descriptor_axes'] == [{'name': 'target_distance', 'unit': 'm'},
                           {'name': 'positive_gripper_command_duty', 'unit': 'fraction'}],
-                      'N1V N1 descriptor/axis implementation mismatch')
+                      'bounded-cohort N1 descriptor/axis implementation mismatch')
             parents = m['qd_parent_descriptor_values_by_iter']
             r.require(isinstance(parents, list) and all(isinstance(batch, list) for batch in parents),
-                      'N1V parent sampling telemetry missing')
+                      'bounded-cohort parent sampling telemetry missing')
         result['sampled_parent_count'] = sum(len(batch) for m in active for batch in m['qd_parent_descriptor_values_by_iter'])
         result['parent_batches_with_multiple_duties'] = sum(len({d[1] for d in batch}) > 1
             for m in active for batch in m['qd_parent_descriptor_values_by_iter'])
@@ -98,13 +103,13 @@ def mechanism_audit(terminal):
 
 def run(plan_path, status_path, *, root=r.ROOT):
     root = Path(root); plan_path = Path(plan_path).resolve()
-    plan = r.read_json(plan_path); validate_cohort(plan)
+    plan = r.read_json(plan_path); cfg = validate_cohort(plan)
     status_path = r.owned(status_path, plan['artifact_root']); status_path.parent.mkdir(parents=True, exist_ok=True)
-    status = {'schema': 'qd-ed-n1v-supervisor-v1', 'pid': os.getpid(),
+    status = {'schema': 'qd-ed-' + cfg['key'] + '-supervisor-v1', 'pid': os.getpid(),
               'boot_id': Path('/proc/sys/kernel/random/boot_id').read_text().strip(),
               'plan_path': str(plan_path), 'plan_sha256': r.digest(plan_path),
               'source_commit': plan['source_commit'], 'physical_gpu': 2,
-              'primary_planned': 30, 'recovery_limit': 6, 'completed_keys': [], 'mechanism_audits': []}
+              'primary_planned': 30, 'recovery_limit': cfg['limit'], 'completed_keys': [], 'mechanism_audits': []}
     def save(phase, **values):
         status.update(status=phase, updated_unix=time.time(), **values)
         r.durable_json(status_path, status)
@@ -112,23 +117,23 @@ def run(plan_path, status_path, *, root=r.ROOT):
     try:
         with held_runner_lease(root / 'data/qd-ed-runner.lock'):
             plan, _, runtime = r.validate_plan(plan_path, root=root)
-            r.require(r.runtime_gpu(runtime) == 2, 'N1V requires physical GPU2')
+            r.require(r.runtime_gpu(runtime) == 2, 'bounded-cohort requires physical GPU2')
             # A same-boot proven device is mandatory; do not add unplanned probes.
             mapping = q.current_metadata(2, root=root)
             proof = q.find_probe(runtime, mapping, r.read_events(root / 'data/gpu-healthcheck-ledger.jsonl'), root=root)
             r.require(q.same_mapping(runtime['gpu_mapping'], mapping) and proof == runtime.get('cuda_egl_probe')
-                      and proof is not None, 'N1V approved GPU2 readiness proof changed; review required')
+                      and proof is not None, 'bounded-cohort approved GPU2 readiness proof changed; review required')
             events = r.read_events(root / 'data/attempt-ledger.jsonl')
             snap = r.budget_snapshot(events, r.read_events(root / 'data/gpu-healthcheck-ledger.jsonl'))
-            cohort = [g for g in r.event_groups(events).values() if g[0]['identity']['iteration'] == 'N1V'
+            cohort = [g for g in r.event_groups(events).values() if g[0]['identity']['iteration'] == cfg['iteration']
                       and any(e['event'] == 'dispatched' for e in g)]
             primary_used = sum(not g[0].get('retry_of') for g in cohort)
             recovery_used = sum(bool(g[0].get('retry_of')) for g in cohort)
-            r.require(snap['by_bucket']['development'] + 30 - primary_used <= protocol.CAPS['development']
-                      and snap['by_bucket']['recovery'] + 6 - recovery_used <= protocol.CAPS['recovery']
-                      and snap['dispatched'] + 36 - len(cohort) + max(0,60-snap['by_bucket']['validation'])
+            r.require(snap['by_bucket']['development'] + 30 - primary_used <= cfg['caps']['development']
+                      and snap['by_bucket']['recovery'] + cfg['limit'] - recovery_used <= cfg['caps']['recovery']
+                      and snap['dispatched'] + 30 + cfg['limit'] - len(cohort) + max(0,60-snap['by_bucket']['validation'])
                           + max(0,40-snap['by_bucket']['formal']) <= 250,
-                      'N1V full remaining cohort/recovery capacity no longer fits approved budget')
+                      'bounded-cohort full remaining cohort/recovery capacity no longer fits approved budget')
             for row in plan['episodes']:
                 while True:
                     events = r.read_events(root / 'data/attempt-ledger.jsonl')
@@ -141,11 +146,11 @@ def run(plan_path, status_path, *, root=r.ROOT):
                     active_path = plan_path
                     if action == 'recovery':
                         recovery = copy.deepcopy(plan); recovery['episodes'] = [item]
-                        recovery['n1v_recovery_parent'] = {'path': str(plan_path), 'sha256': r.digest(plan_path),
+                        recovery[cfg['key'] + '_recovery_parent'] = {'path': str(plan_path), 'sha256': r.digest(plan_path),
                                                           'retry_of': item['retry_of']}
                         active_path = status_path.parent / (item['episode_key'] + '-plan.json')
                         if active_path.exists():
-                            r.require(r.read_json(active_path) == recovery, 'N1V frozen recovery plan changed')
+                            r.require(r.read_json(active_path) == recovery, 'bounded-cohort frozen recovery plan changed')
                         else:
                             r.durable_json(active_path, recovery)
                     queue_status = status_path.parent / (item['episode_key'] + '-queue.json')
@@ -158,10 +163,10 @@ def run(plan_path, status_path, *, root=r.ROOT):
                     except r.GateError:
                         fresh = [g for key, g in r.event_groups(r.read_events(root / 'data/attempt-ledger.jsonl')).items()
                                  if key not in before and any(e['event'] == 'dispatched' for e in g)]
-                        if len(fresh) != 1 or fresh[0][-1].get('failure_detail') != 'n1v_stage_timeout':
+                        if len(fresh) != 1 or fresh[0][-1].get('failure_detail') != cfg['key'] + '_stage_timeout':
                             raise
                         # The next cell_action enforces identity, one per cell,
-                        # six total, and refuses a failed recovery or valid failure.
+                        # the cohort total, and refuses a failed recovery or valid failure.
                         save('stage_timeout_recorded', infrastructure_attempt_id=fresh[0][-1]['attempt_id'])
             save('development_completed', current_episode_key=None)
             return status
