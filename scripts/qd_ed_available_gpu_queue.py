@@ -332,7 +332,7 @@ def clone_runtime(runtime, mapping, metadata_path, proof):
 def bind_plan(plan_path, plan, runtime, device, row, events_path, *, root=ROOT):
     """Freeze a hardware-only child plan, keeping the original immutable."""
     runner.require(plan.get('n3_cohort') is None, 'N3 generic bind/probe forbidden; use frozen supervised runtime')
-    runner.require(not runner.is_n4_plan(plan), 'N4 generic bind/probe forbidden; use frozen supervised runtime')
+    runner.require(not (runner.is_n4_plan(plan) or runner.is_n4_evaluation(plan)), 'N4 generic bind/probe forbidden; use frozen supervised runtime')
     physical_gpu = device['physical_gpu']
     with runner.locked(root / 'data/qd-ed-runner.lock', nonblocking=True):
         pending_gate(root, row)
@@ -461,7 +461,9 @@ def run_queue(plan_path, episode_keys, *, poll_seconds=30, idle_seconds=120, sta
             plan, _, runtime = runner.validate_plan(plan_path, root=root)
             if plan.get('n3_cohort') is not None:
                 runner.n3_support().require_scope(plan, root, runner)
-            if runner.is_n4_plan(plan):
+            if runner.is_n4_evaluation(plan):
+                runner.n4_evaluation_support().require_scope(plan,root,runner)
+            elif runner.is_n4_plan(plan):
                 runner.n4_support().require_scope(plan, root, runner)
             code_paths = {record['path'] for record in plan['code_files']}
             runner.require({'scripts/qd_ed_available_gpu_queue.py', 'scripts/qd_ed_gpu_probe.py',
