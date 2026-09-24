@@ -430,6 +430,9 @@ class EDSChunkMetrics:
     qd_degenerate_fallback_used: bool = False
     qd_degenerate_fallback_reason: str | None = None
     qd_degenerate_reward_value: float | None = None
+    qd_final_selection_mode: str = "archive_global_best"
+    qd_terminal_population: dict = field(default_factory=dict)
+    qd_archive_reference: dict = field(default_factory=dict)
     qd_quality_mode: str = "provider"
     qd_quality_applicable: bool = False
     qd_quality_reason: str = "provider_mode"
@@ -534,6 +537,9 @@ class EDSChunkMetrics:
 
     def to_jsonable(self) -> dict[str, Any]:
         payload = _to_json_safe(self)
+        if self.qd_final_selection_mode == "archive_global_best":
+            for key in ("qd_final_selection_mode", "qd_terminal_population", "qd_archive_reference"):
+                payload.pop(key)
         if self.qd_quality_mode != "executed_feedback_v1":
             for key in list(payload):
                 if key.startswith("qd_feedback_"):

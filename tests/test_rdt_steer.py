@@ -10160,3 +10160,224 @@ def test_n3_real_search_and_ack_bundles_pass_specialized_audit(stub_steer, stub_
     assert result["n3_feedback_audit"]["active_previous_ack_verified"] == 1
     assert result["n3_feedback_audit"]["complete_nonterminal_prefixes"] == 1
     assert not torch.cuda.is_initialized()
+
+
+@pytest.mark.parametrize('change', [
+    {'qd_quality_mode': 'executed_prefix_v1'}, {'qd_quality_mode': 'executed_feedback_v1'},
+    {'qd_archive_mode': 'none'}, {'qd_parent_sampling': 'uniform_cells'},
+    {'qd_bounds_update_policy': 'causal_envelope_v1'}, {'reward_mode': 'zero'},
+    {'qd_descriptor': 'target_distance_gripper_duty_v1'}, {'elite_carryover_count': 1},
+    {'qd_final_selection_mode': 'unknown'}, {'save_ed_cache': True}, {'use_initial_cache': True},
+])
+def test_n4_unsupported_combination_rejected(stub_steer, change):
+    cfg = _valid_qd_config(qd_parent_sampling='sparse_priority', qd_final_selection_mode='terminal_population_v1')
+    cfg.update(change)
+    with pytest.raises(ValueError):
+        stub_steer._resolve_eds_config_with_reference_defaults(cfg)
+
+
+@pytest.mark.parametrize('dtype', [torch.float32, torch.bfloat16])
+@pytest.mark.parametrize('observer', [False, True])
+def test_n4_terminal_consumer_native_loop_preserves_search_and_stage_reference(
+    stub_steer, stub_adapter, monkeypatch, tmp_path, dtype, observer,
+):
+    from core.decision_evidence import DecisionEvidence
+    from core.rdt_libero_action_converter import decode_rdt_libero_action_chunk
+    stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
+                         sample_batch_size=16, policy_config={'action_chunk_horizon': 8})
+    initial = torch.zeros(16, 64, 128, dtype=dtype)
+    # All initial cells have better quality than any offspring; archive excludes the terminal pool.
+    initial[:, :, 39] = torch.linspace(-.5, .5, 16).to(dtype)[:, None]
+    initial[:, :, 42] = -torch.arange(16).to(dtype)[:, None] - 40
+    monkeypatch.setattr(stub_steer, '_eds_initial_population', lambda **kw: initial.clone())
+    calls = {'scores': 0, 'rollouts': 0, 'project': 0}
+    original_project = stub_adapter.delta_actions_to_ee_trajectory
+    def project(actions):
+        calls['project'] += 1
+        return original_project(actions)
+    monkeypatch.setattr(stub_adapter, 'delta_actions_to_ee_trajectory', project)
+    batches = []
+    def score(samples, **kw):
+        calls['scores'] += 1
+        costs = samples[:, 0, 42].clone()
+        return costs, {'rewards': -costs}
+    def rollout(**kw):
+        calls['rollouts'] += 1
+        actions = initial.clone()
+        actions[:, :, 39] += .01 * calls['rollouts']
+        costs = torch.arange(1000, 1016).to(dtype)
+        actions[:, :, 42] = costs[:, None]
+        batches.append(actions.clone())
+        scores, info = score(actions)
+        return actions, scores, info
+    monkeypatch.setattr(stub_steer, '_eds_score_population_as_cost', score)
+    monkeypatch.setattr(stub_steer, '_eds_rollout_reference', rollout)
+    monkeypatch.setattr(stub_steer, '_eds_renoise_reference', lambda samples, steps: samples)
+    monkeypatch.setattr(stub_steer, '_eds_select_parent_plan', lambda *a, **kw: pytest.fail('legacy parent selector'))
+    history = []
+    for mode in ('archive_global_best', 'terminal_population_v1'):
+        stub_steer.reset(); calls.update(scores=0, rollouts=0, project=0); batches.clear()
+        stub_steer._stage_init_reward = -2000.0
+        rec = DecisionEvidence(tmp_path/mode, episode=0) if observer else None
+        stub_steer._decision_evidence = rec
+        if rec: rec.begin_decision(global_step=0, stage=0, use_guidance=True, keypoints=torch.zeros(1,3), providers=[])
+        torch.manual_seed(134)
+        cfg = stub_steer._resolve_eds_config_with_reference_defaults(_valid_qd_config(
+            qd_parent_sampling='sparse_priority', qd_final_selection_mode=mode))
+        selected = stub_steer._eds_guided_denoise_loop(x_t=torch.zeros_like(initial), cond=_rollout_cond(stub_steer),
+            keypoints=torch.zeros(1,3), guidance_fns=None, eds_config=cfg, verbose=False, global_step=0, current_stage=0)
+        metrics = stub_steer.get_last_eds_metrics()
+        events = []
+        if rec:
+            rec.flush()
+            for p in sorted(rec.root.glob('bundle_*.pt')):
+                events.extend(torch.load(p, map_location='cpu', weights_only=True)['events'])
+        history.append((selected.clone(), metrics, dict(calls), torch.get_rng_state().clone(),
+                        batches[-1].clone(), events, stub_steer._last_raw_reward, stub_steer._last_scale))
+    old, new = history
+    assert old[2] == new[2] == {'scores':11, 'rollouts':10, 'project':old[2]['project']}
+    assert torch.equal(old[3], new[3]) and torch.equal(old[4], new[4])
+    assert not torch.equal(old[0], new[0]) and torch.equal(new[0], new[4][0:1])
+    assert new[1]['score_call_count'] == 11 and new[1]['search_evaluation_count'] == 176
+    assert new[1]['qd_evaluation_count'] == 176
+    assert len(new[1]['qd_parent_slots_by_cell_by_iter']) == 10
+    assert all(sum(r.values())==16 for r in new[1]['qd_parent_slots_by_cell_by_iter'])
+    assert new[1]['qd_parent_slots_by_cell_by_iter'] == old[1]['qd_parent_slots_by_cell_by_iter']
+    assert new[1]['qd_global_best_action_fingerprint'] == old[1]['qd_global_best_action_fingerprint']
+    assert new[1]['qd_selected_action_fingerprint'] != new[1]['qd_global_best_action_fingerprint']
+    for key in ('qd_accounting_violation_count','qd_elite_monotonicity_violation_count','qd_final_selection_mismatch_count'):
+        assert old[1][key] == new[1][key] == 0
+    assert new[6] == -1000 and new[7] == old[7]
+    assert new[1]['qd_terminal_population']['minimum_cost_tie_indices'] == ([0,1,2] if dtype==torch.bfloat16 else [0])
+    assert 'qd_final_selection_mode' not in old[1]
+    assert new[1]['target_distance_after'] is None
+    if observer:
+        final = next(r for r in new[5] if r['event']=='final_selection')
+        fv = final['values']; terminal = fv['terminal_population']
+        canonical = next(r for r in new[5] if r['sequence']==terminal['canonical_event_sequence'])
+        assert canonical['event']=='canonical_candidate_batch' and canonical['values']['iter_idx']==9
+        assert terminal['selected_occurrence_id'] == canonical['values']['occurrence_ids'][0]
+        assert fv['population'].dtype == terminal['native_costs'].dtype == dtype
+        assert torch.equal(fv['population'], canonical['values']['candidates'])
+        assert fv['archive_reference']['costs'].dtype==torch.float32
+        assert torch.equal(fv['stage_reward_reference']['reference_costs'], fv['archive_reference']['costs'])
+        binding = next(r for r in new[5] if r['event']=='terminal_population_stage_binding')
+        assert binding['sequence'] > final['sequence']
+        assert binding['values']['selected_raw_reward'] == new[6]
+        assert binding['values']['archive_cost_spread_scale'] == new[7]
+        assert binding['values']['stage_init_reward'] == -2000.0
+        assert binding['values']['normalized_reward'] == 0.5
+        actual = decode_rdt_libero_action_chunk(fv['selected_latent'].float(), 8)
+        reference = decode_rdt_libero_action_chunk(fv['archive_reference']['selected_latent'].float(), 8)
+        assert not torch.equal(actual, reference)
+    assert not torch.cuda.is_initialized()
+
+
+@pytest.mark.parametrize('dtype', [torch.float32, torch.bfloat16])
+def test_n4_real_cpu_scoring_path_canonical_binding_and_exact_default(stub_steer, stub_adapter, monkeypatch, tmp_path, dtype):
+    """Real search/scoring plumbing with the test-only stub network/provider, no model weights."""
+    from core.decision_evidence import DecisionEvidence
+    stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
+                         sample_batch_size=16, policy_config={'action_chunk_horizon': 8})
+    synthetic_fn = _n2_fixture_provider()
+    keypoints = torch.tensor([[9.,9.,9.],[.13,-.21,.39]], dtype=dtype)
+    initial = torch.linspace(-.12,.19,16*64*128).reshape(16,64,128).to(dtype)
+    monkeypatch.setattr(stub_steer, '_eds_initial_population', lambda **kw: initial.clone())
+    project_rows = []
+    project = stub_steer._rdt_sample_to_trajectory_3d
+    def tracked_project(actions):
+        project_rows.append(len(actions))
+        return project(actions)
+    monkeypatch.setattr(stub_steer, '_rdt_sample_to_trajectory_3d', tracked_project)
+    runs=[]
+    for mode in (None, 'archive_global_best', 'terminal_population_v1'):
+        stub_steer.reset(); project_rows.clear()
+        rec=DecisionEvidence(tmp_path/str(mode), episode=0)
+        stub_steer._decision_evidence=rec
+        rec.begin_decision(global_step=0, stage=0, use_guidance=True, keypoints=keypoints, providers=[synthetic_fn])
+        cfgdict=_valid_qd_config(qd_parent_sampling='sparse_priority')
+        if mode is not None: cfgdict['qd_final_selection_mode']=mode
+        cfg=stub_steer._resolve_eds_config_with_reference_defaults(cfgdict)
+        torch.manual_seed(25191)
+        selected=stub_steer._eds_guided_denoise_loop(x_t=torch.zeros_like(initial), cond=_rollout_cond(stub_steer),
+            keypoints=keypoints, guidance_fns=[synthetic_fn], eds_config=cfg, verbose=False, global_step=0, current_stage=0)
+        metrics=stub_steer.get_last_eds_metrics()
+        rec.flush();events=[]
+        for path in sorted(rec.root.glob('bundle_*.pt')):
+            events.extend(torch.load(path,map_location='cpu',weights_only=True)['events'])
+        runs.append((selected.clone(),torch.get_rng_state().clone(),stub_steer.get_episode_compute_counters(),
+                     list(project_rows),events,metrics))
+    assert torch.equal(runs[0][0],runs[1][0]) and torch.equal(runs[0][1],runs[1][1])
+    assert runs[0][2:4]==runs[1][2:4]
+    assert all('qd_final_selection_mode' not in r[5] for r in runs[:2])
+    assert torch.equal(runs[0][1],runs[2][1])
+    assert runs[0][2:4]==runs[2][2:4]  # No extra provider, projection or stub-network call.
+    events=runs[2][4]; byseq={r['sequence']:r for r in events}
+    final=next(r['values'] for r in events if r['event']=='final_selection')
+    terminal=final['terminal_population']
+    score=byseq[terminal['scoring_batch_id']]
+    batch=byseq[terminal['canonical_event_sequence']]
+    effective=next(r['values'] for r in events if r['event']=='effective_quality'
+                   and r['values']['scoring_batch_id']==score['sequence'])
+    assert score['event']=='scoring_inputs' and score['values']['scoring_scope']=={'role':'canonical_offspring','iter_idx':9,'site':'rollout'}
+    assert batch['values']['iter_idx']==9
+    assert torch.equal(score['values']['samples'], final['population'])
+    assert torch.equal(effective['costs'], terminal['native_costs'])
+    assert effective['costs'].dtype==final['population'].dtype==dtype
+    index=int(torch.argmin(effective['costs']))
+    assert final['selected_index']==index and torch.equal(final['selected_latent'], score['values']['samples'][index:index+1])
+    assert final['stage_reward_reference']['selected_raw_reward'].item()==effective['quality'][index].item()
+    assert len([r for r in events if r['event']=='canonical_candidate_batch'])==11
+    assert len([r for r in events if r['event']=='archive_parent_allocation'])==10
+    assert runs[2][5]['search_evaluation_count']==176 and runs[2][5]['score_call_count']==11
+    assert not torch.cuda.is_initialized()
+
+
+@pytest.mark.parametrize('dtype', [torch.float32, torch.bfloat16])
+def test_n4_select_action_uses_actual_deployed_fp32_decode(stub_steer, stub_adapter, mock_batch, monkeypatch, tmp_path, dtype):
+    # The ordinary stub has no parameters; give its dtype-selection path a CPU scalar.
+    stub_steer._dit.register_parameter('_dtype_anchor', nn.Parameter(torch.zeros((), dtype=dtype), requires_grad=False))
+    from core.decision_evidence import DecisionEvidence
+    from core.rdt_libero_action_converter import decode_rdt_libero_action_chunk
+    stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x:x, sample_batch_size=16,
+                         policy_config={'action_chunk_horizon':8})
+    initial=torch.linspace(-.12,.19,16*64*128).reshape(16,64,128).to(dtype)
+    monkeypatch.setattr(stub_steer,'_eds_initial_population',lambda **kw:initial.clone())
+    rec=DecisionEvidence(tmp_path,episode=0);stub_steer._decision_evidence=rec
+    original_project = stub_adapter.delta_actions_to_ee_trajectory
+    def observed_project(actions):
+        result = original_project(actions)
+        rec.record('projection_origin', source_eef_position=torch.zeros(3), cast_eef_start=result[0])
+        return result
+    monkeypatch.setattr(stub_adapter, 'delta_actions_to_ee_trajectory', observed_project)
+    synthetic_fn=_n2_fixture_provider()
+    points=np.array([[9.,9.,9.],[.13,-.21,.39]],dtype=np.float32)
+    rec.begin_decision(global_step=0,stage=0,use_guidance=True,keypoints=torch.tensor(points),providers=[synthetic_fn])
+    torch.manual_seed(6654)
+    action=stub_steer.select_action(mock_batch,generate_new_chunk=True,use_guidance=True,guidance_type='eds',
+        eds_config=_valid_qd_config(qd_parent_sampling='sparse_priority',qd_final_selection_mode='terminal_population_v1'),
+        guidance_fns=[synthetic_fn],keypoints=points)
+    rec.flush();events=[]
+    for path in sorted(rec.root.glob('bundle_*.pt')):
+        events.extend(torch.load(path,map_location='cpu',weights_only=True)['events'])
+    final=next(r['values'] for r in events if r['event']=='final_selection')
+    decoded=next(r['values'] for r in events if r['event']=='policy_action_decode')
+    assert final['selected_latent'].dtype==dtype and decoded['selected_latent'].dtype==torch.float32
+    assert torch.equal(final['selected_latent'].float(),decoded['selected_latent'])
+    assert torch.equal(action,decoded['action_chunk'])
+    assert torch.equal(action,decode_rdt_libero_action_chunk(final['selected_latent'].float(),8))
+    assert tuple(action.shape)==(1,8,7) and torch.isfinite(action).all()
+    assert stub_steer.get_last_eds_metrics()['qd_final_selection_mode']=='terminal_population_v1'
+    # Complete an invented collector lifecycle so the independently implemented
+    # audit can consume the real stub-search/decode trace without an environment.
+    rec.commit_decision(action_chunk=action, execution_horizon=8)
+    for i in range(8):
+        rec.dispatch(global_step=i, execution_index=i+1)
+        rec.record('executed_action', action_numpy=action[0,i].numpy())
+        rec.pre_reset_outcome({'robot0_eef_pos': np.zeros(3)}, reward=0., terminated=(i==7), success=False)
+        rec.step_returned(terminated=(i==7), truncated=False, success=False)
+    rec.finish()
+    assert rec.status()['complete'] and not rec.status()['failed']
+    (tmp_path/'episode_compute.jsonl').write_text(json.dumps({'episode_id':0, 'outcome':'completed',
+        'decision_evidence':rec.status()})+'\n')
+    assert not torch.cuda.is_initialized()
