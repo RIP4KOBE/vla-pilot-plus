@@ -170,3 +170,18 @@ def test_internally_consistent_recorded_chunk_still_must_match_deployed_decode(t
         rewrite(rec, event, lambda row: row["values"]["action_chunk"].add_(.125))
     result = audit.audit_episode(rec.root, compute)
     assert not result["accepted"] and result["errors"] == ["n4_actual_deployed_decode_mismatch"]
+
+
+def test_metric_join_exports_validated_selected_fingerprint_and_native_archive_costs(tmp_path):
+    rec, compute = episode(tmp_path)
+    result = audit.audit_episode(rec.root, compute)
+    assert result["accepted"], result["errors"]
+    decision = result["n4_terminal_population_audit"]["decisions"][0]
+    selected = torch.zeros(1, 64, 128, dtype=torch.bfloat16)
+    selected[:, :, 10] = -1
+    selected[:, :, 39] = 160 / 256
+    costs = torch.arange(4, dtype=torch.float32) / 16 + 1
+    assert decision["selected_fingerprint"] == audit.fingerprints(selected)[0]
+    assert decision["archive_reference_costs"] == audit._native_record(costs)
+    assert decision["archive_reference_costs"]["sha256"] == decision["archive_cost_reference_sha256"]
+    assert decision["archive_reference_costs"]["values"][decision["archive_reference_index"]] == decision["archive_reference_cost"]
