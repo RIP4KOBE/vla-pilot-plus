@@ -1,0 +1,48 @@
+{
+  "GPU_or_provider_calls": false,
+  "actual_episode_or_protected_or_peer_payloads_read": false,
+  "execution_authorized": false,
+  "old_cohort_recovery_authorized": false,
+  "proposal_sha256": "44d682c784f94d0def3e3328f11089606a4c77dc81d192a2c1587998740cdcde",
+  "schema": "n4-transport180-prospective-source-design-v1",
+  "snapshot": {
+    "attempts": 80,
+    "baseline": 16,
+    "development": 58,
+    "gpu_hours": 11.403172863324977,
+    "recovery": 6
+  },
+  "snapshot_authority": "parent-provided private resource metadata, not a live admission check",
+  "source_base": "e4ab106",
+  "source_or_plan_implemented": false,
+  "sources": [
+    {
+      "path": "docs/01_specs/2026-09-21-rdt-qd-ed-autoresearch-execution-prompt.md",
+      "sha256": "3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef"
+    },
+    {
+      "path": "experiments/iteration_004_terminal_population/protocol.md",
+      "sha256": "b8562e3f9fffc77efc803c6b056441f7b426333a97eb176b52fdb0fe42088db2"
+    },
+    {
+      "path": "scripts/qd_ed_final_runner.py",
+      "sha256": "eefdc47589ac69436562bac52ec774319ecf72c65007c596d25e61f8f42c4ee8"
+    },
+    {
+      "path": "scripts/qd_ed_n4_plan.py",
+      "sha256": "e5a6fd6e084a0748d786a0baec4472507d5ba61384696023b76a0099c05c59e9"
+    },
+    {
+      "path": "scripts/qd_ed_n4_report.py",
+      "sha256": "d26769d73e43e6b10b8171f6930604bc510d15b26174ca3a767bcdf84a72c2fb"
+    },
+    {
+      "path": "core/codex_stage.py",
+      "sha256": "27adf43302afc455a1b3122f267c7493c212bc83982bdaeba09d89873913da25"
+    },
+    {
+      "path": "core/codex_stage_policy.py",
+      "sha256": "92f78a80651e97390a296e42850aae0b70217afb1c362e9b5d0b8a07b8cbe432"
+    }
+  ]
+}
