@@ -34,7 +34,7 @@ CODE_ADDITIONS = {PROTOCOL, CONTINUATION, PROFILE, 'core/qd_grasp_timing.py',
                   'tests/test_qd_grasp_timing.py', 'tests/test_qd_ed_n5_plan.py'}
 _SCOPE = None
 AUDIT_PLUMBING = {'scripts/qd_ed_n5_plan.py', 'scripts/qd_ed_n5_supervise.py',
-                  'scripts/qd_ed_n5_report.py'}
+                  'scripts/qd_ed_n5_report.py', 'tests/test_qd_ed_n5_plan.py'}
 
 
 def api(value):
