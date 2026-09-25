@@ -1,0 +1,5 @@
+# Conditional outer-loop observation from exposed Dev only
+
+This note uses only the already exposed, same-task/seed Dev task-0 attempts. N6 succeeded; N7 failed. N6 recorded 13 successful Stage queries and 5 guided chunks, while N7 recorded 24 successful Stage queries and 17 guided chunks. N6's Stage outputs were stage 1 seven times and stage 2 six times; N7's were stage 1 fifteen times and stage 2 nine times. Neither episode had a Stage query failure. These are post-treatment trajectory measurements: the larger N7 search activity could be a consequence of not finishing, not the reason for failure.
+
+Combined with the read-only 4×2×2 replay's excess newly conflated N7 candidate pairs, this does not justify a quick descriptor sweep. If N7 validation fails, first inspect the task-0 executed-prefix and grasp/transport sequence in the native evidence, then choose one prospective QD selection or closed-loop hypothesis with a falsifiable action-level prediction. Keep Stage and its prompt frozen. Do not use interim validation task/seed outcomes to choose that hypothesis.
