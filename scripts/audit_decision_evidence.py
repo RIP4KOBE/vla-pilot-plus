@@ -220,8 +220,9 @@ def _audit_n4_terminal_population(kinds, context, final_event):
             recorded_distances = grasp.get("projected_distances_m")
             require(tensor(recorded_distances) and recorded_distances.dtype == torch.float32
                     and recorded_distances.shape == (16, 8)
-                    and torch.equal(recorded_distances, distances)
-                    and grasp.get("best_reach_m") == float(distances.min().item()),
+                    and bool(((recorded_distances - distances).abs() <= 1e-7).all())
+                    and isinstance(grasp.get("best_reach_m"), float)
+                    and abs(grasp["best_reach_m"] - float(distances.min().item())) <= 1e-7,
                     "n5_distance_or_projection_mismatch")
             decoder_path = Path(__file__).resolve().parents[1] / "core" / "rdt_libero_action_converter.py"
             spec = importlib.util.spec_from_file_location("n5_audit_deployed_decoder", decoder_path)
@@ -237,6 +238,9 @@ def _audit_n4_terminal_population(kinds, context, final_event):
                     "n5_command_sign_mismatch")
             eligibility = (positive & (distances <= 0.06)
                            & (distances <= distances.min() + 0.03)).any(dim=1)
+            recorded_eligibility = (positive & (recorded_distances <= 0.06)
+                                    & (recorded_distances <= recorded_distances.min() + 0.03)).any(dim=1)
+            require(torch.equal(recorded_eligibility, eligibility), "n5_numeric_threshold_crossing")
             eligible_indices = torch.nonzero(eligibility, as_tuple=False).reshape(-1).tolist()
             require(grasp.get("eligible_indices") == eligible_indices, "n5_eligibility_mismatch")
             if eligible_indices:

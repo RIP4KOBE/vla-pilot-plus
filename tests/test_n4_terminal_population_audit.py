@@ -213,3 +213,15 @@ def test_n5_audit_accepts_non_argmin_grasp_choice_and_rejects_false_eligibility(
     rewrite(rec, "final_selection", lambda row: row["values"]["terminal_population"]["grasp_selection"].update(eligible_indices=[0, 1]))
     result = audit.audit_episode(rec.root, compute)
     assert not result["accepted"] and result["errors"] == ["n5_eligibility_mismatch"]
+
+
+def test_n5_audit_allows_float32_device_roundoff_but_rejects_material_distance_change(tmp_path):
+    rec, compute = episode(tmp_path, n5=True)
+    rewrite(rec, "final_selection", lambda row: row["values"]["terminal_population"]["grasp_selection"]
+            ["projected_distances_m"][0, 0].fill_(2.9802322387695312e-8))
+    accepted = audit.audit_episode(rec.root, compute)
+    assert accepted["accepted"], accepted["errors"]
+    rewrite(rec, "final_selection", lambda row: row["values"]["terminal_population"]["grasp_selection"]
+            ["projected_distances_m"][0, 0].fill_(1e-4))
+    rejected = audit.audit_episode(rec.root, compute)
+    assert not rejected["accepted"] and rejected["errors"] == ["n5_distance_or_projection_mismatch"]
