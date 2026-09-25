@@ -29,13 +29,14 @@ def test_sixty_cells_match_frozen_task_seed_init_and_arm_order():
 def test_validation_scope_is_one_cell_only():
     plan = {'source_commit': 'frozen', 'n7_validation': {}}
     root = Path('/tmp/n7-validation-test-root')
+    support = runner.n7_dispatch_support(plan)
     with pytest.raises(runner.GateError):
-        validation.require_scope(plan, root, runner.__dict__, {'episode_key': 'a'})
-    with validation.supervised_scope(plan, root, 'a'):
-        validation.require_scope(plan, root, runner.__dict__, {'episode_key': 'a'})
+        support.require_scope(plan, root, runner.__dict__, {'episode_key': 'a'})
+    with support.supervised_scope(plan, root, 'a'):
+        support.require_scope(plan, root, runner.__dict__, {'episode_key': 'a'})
         with pytest.raises(runner.GateError):
-            validation.require_scope(plan, root, runner.__dict__, {'episode_key': 'b'})
-    assert runner.n7_dispatch_support(plan) is runner.n7_validation_support()
+            support.require_scope(plan, root, runner.__dict__, {'episode_key': 'b'})
+    assert support is runner.n7_validation_support()
 
 
 def test_validation_cap_preserves_formal_reserve():
