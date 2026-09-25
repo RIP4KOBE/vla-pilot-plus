@@ -49,6 +49,8 @@ from core.qd_ed import (
     EXECUTION_INTENT_DESCRIPTOR,
     HEIGHT_AWARE_AXES,
     HEIGHT_AWARE_DESCRIPTOR,
+    DIRECTION_HEIGHT_AXES,
+    DIRECTION_HEIGHT_DESCRIPTOR,
     QDArchive,
     QDBounds,
     QDParentAllocation,
@@ -60,7 +62,9 @@ from core.qd_ed import (
     qd_descriptor,
     execution_intent_descriptor,
     height_aware_descriptor,
+    direction_height_descriptor,
     freeze_execution_intent_bounds,
+    freeze_direction_height_bounds,
     within_cell_endpoint_sse as qd_within_cell_endpoint_sse,
 )
 from core.rdt_libero_action_converter import (
@@ -4819,6 +4823,10 @@ class RDTSteer:
             if self._action_chunk_horizon != 8:
                 raise ValueError("Height-aware QD requires action_chunk_horizon=8")
             return height_aware_descriptor(trajectories, keypoints)
+        if descriptor_mode == DIRECTION_HEIGHT_DESCRIPTOR:
+            if self._action_chunk_horizon != 8:
+                raise ValueError("Direction-height QD requires action_chunk_horizon=8")
+            return direction_height_descriptor(trajectories, keypoints)
         return qd_descriptor(trajectories, keypoints)
 
     @staticmethod
@@ -4826,7 +4834,9 @@ class RDTSteer:
         descriptors: Tensor, cfg: _EDSConfig
     ) -> QDBounds:
         freeze = (freeze_execution_intent_bounds
-                  if cfg.qd_descriptor == EXECUTION_INTENT_DESCRIPTOR else qd_freeze_bounds)
+                  if cfg.qd_descriptor == EXECUTION_INTENT_DESCRIPTOR else
+                  freeze_direction_height_bounds
+                  if cfg.qd_descriptor == DIRECTION_HEIGHT_DESCRIPTOR else qd_freeze_bounds)
         return freeze(
             descriptors,
             quantiles=cfg.qd_bounds_quantiles,
@@ -4910,11 +4920,14 @@ class RDTSteer:
         quality_kwargs = ({"qd_quality_contract": quality_contract} if quality_contract is not None else {})
         execution_intent = cfg.qd_descriptor == EXECUTION_INTENT_DESCRIPTOR
         height_aware = cfg.qd_descriptor == HEIGHT_AWARE_DESCRIPTOR
-        non_xy_descriptor = execution_intent or height_aware
+        direction_height = cfg.qd_descriptor == DIRECTION_HEIGHT_DESCRIPTOR
+        non_xy_descriptor = execution_intent or height_aware or direction_height
         if execution_intent and self._action_chunk_horizon != 8:
             raise ValueError("Execution-intent QD requires action_chunk_horizon=8")
         if height_aware and self._action_chunk_horizon != 8:
             raise ValueError("Height-aware QD requires action_chunk_horizon=8")
+        if direction_height and self._action_chunk_horizon != 8:
+            raise ValueError("Direction-height QD requires action_chunk_horizon=8")
         def describe_qd(candidates, *, projection_out=None):
             if projection_out is None:
                 if non_xy_descriptor:
@@ -4971,7 +4984,8 @@ class RDTSteer:
         metrics.qd_degenerate_fallback_policy = cfg.qd_degenerate_fallback_policy
         metrics.qd_descriptor = cfg.qd_descriptor
         if non_xy_descriptor:
-            axes = EXECUTION_INTENT_AXES if execution_intent else HEIGHT_AWARE_AXES
+            axes = (EXECUTION_INTENT_AXES if execution_intent else
+                    DIRECTION_HEIGHT_AXES if direction_height else HEIGHT_AWARE_AXES)
             metrics.qd_descriptor_axes = [dict(axis) for axis in axes]
         metrics.qd_grid_shape = list(cfg.qd_grid_shape)
         metrics.qd_cell_capacity = cfg.qd_cell_capacity
@@ -5147,7 +5161,7 @@ class RDTSteer:
             initial_cell_ids, initial_overflow = self._eds_qd_cell_ids(
                 initial_descriptors, qd_bounds, cfg
             )
-            if height_aware and getattr(self, "_decision_evidence", None) is not None:
+            if (height_aware or direction_height) and getattr(self, "_decision_evidence", None) is not None:
                 self._decision_evidence.record(
                     "qd_descriptor_assignment", iter_idx=-1,
                     descriptor_mode=cfg.qd_descriptor,
@@ -6131,7 +6145,7 @@ class RDTSteer:
                 child_cell_ids, child_overflow = self._eds_qd_cell_ids(
                     child_descriptors, qd_bounds, cfg
                 )
-                if height_aware and getattr(self, "_decision_evidence", None) is not None:
+                if (height_aware or direction_height) and getattr(self, "_decision_evidence", None) is not None:
                     self._decision_evidence.record(
                         "qd_descriptor_assignment", iter_idx=i,
                         descriptor_mode=cfg.qd_descriptor,
@@ -7998,9 +8012,9 @@ class RDTSteer:
             required_terminal = {
                 "qd_quality_mode": "provider", "reward_mode": "normal",
                 "qd_archive_mode": "grid_archive",
-                "qd_descriptor": (HEIGHT_AWARE_DESCRIPTOR
+                "qd_descriptor": (resolved.qd_descriptor
                                   if resolved.qd_final_selection_mode == GRASP_TIMING_MODE
-                                  and resolved.qd_descriptor == HEIGHT_AWARE_DESCRIPTOR
+                                  and resolved.qd_descriptor in {HEIGHT_AWARE_DESCRIPTOR, DIRECTION_HEIGHT_DESCRIPTOR}
                                   else "target_relative_endpoint_xy"),
                 "qd_grid_shape": (4, 4), "qd_cell_capacity": 1, "qd_parent_sampling": "sparse_priority",
                 "qd_bounds_update_policy": "fixed_initial", "qd_bounds_quantiles": (0.05, 0.95),
@@ -8012,9 +8026,9 @@ class RDTSteer:
             for name, expected in required_terminal.items():
                 if getattr(resolved, name) != expected:
                     raise ValueError(f"N4 terminal population requires {name}={expected!r}")
-        if (resolved.qd_descriptor == HEIGHT_AWARE_DESCRIPTOR
+        if (resolved.qd_descriptor in {HEIGHT_AWARE_DESCRIPTOR, DIRECTION_HEIGHT_DESCRIPTOR}
                 and resolved.qd_final_selection_mode != GRASP_TIMING_MODE):
-            raise ValueError("Height-aware QD requires terminal_grasp_proximity_v1")
+            raise ValueError("Height or direction-height QD requires terminal_grasp_proximity_v1")
         if resolved.qd_quality_mode not in {"provider", "executed_prefix_v1", FEEDBACK_MODE}:
             raise ValueError("EDS qd_quality_mode must be provider, executed_prefix_v1 or executed_feedback_v1")
         if resolved.qd_quality_mode in {"executed_prefix_v1", FEEDBACK_MODE}:
@@ -8039,9 +8053,9 @@ class RDTSteer:
                 "EDS qd_degenerate_fallback_policy must be none or control_v1"
             )
         if resolved.qd_descriptor not in {"target_relative_endpoint_xy", EXECUTION_INTENT_DESCRIPTOR,
-                                          HEIGHT_AWARE_DESCRIPTOR}:
+                                          HEIGHT_AWARE_DESCRIPTOR, DIRECTION_HEIGHT_DESCRIPTOR}:
             raise ValueError(
-                "EDS qd_descriptor must be target_relative_endpoint_xy, target_distance_gripper_duty_v1 or target_horizontal_radius_signed_height_v1"
+                "EDS qd_descriptor must be a supported frozen XY, execution-intent, height-aware or direction-height mode"
             )
         if resolved.qd_descriptor == EXECUTION_INTENT_DESCRIPTOR:
             required_intent = {

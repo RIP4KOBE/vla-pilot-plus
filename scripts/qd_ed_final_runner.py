@@ -249,12 +249,27 @@ def expand_candidate(candidate_id, candidate, baseline):
                     'before': 'target_relative_endpoint_xy',
                     'after': 'target_horizontal_radius_signed_height_v1'}},
                 'N6 must change only the N5 descriptor')
+    elif contract == 'n7_direction_height_descriptor_only_v1':
+        require(candidate_id == 'N7', 'N7 contract requires N7 identity')
+        parent = candidate.get('parent_candidate')
+        require(isinstance(parent, dict) and parent.get('path') == 'configs/qd_ed_final/candidate_n6.json'
+                and parent.get('sha256') == digest(ROOT / parent['path']),
+                'N7 parent N6 profile identity differs')
+        inherited = read_json(ROOT / parent['path'])['profile']
+        field = 'qd_descriptor'
+        require(set(profile) == set(inherited) and profile.get(field) == 'target_xy_quadrant_signed_height_v1'
+                and {k: v for k, v in profile.items() if k != field}
+                    == {k: v for k, v in inherited.items() if k != field}
+                and candidate.get('only_algorithm_change') == {field: {
+                    'before': 'target_horizontal_radius_signed_height_v1',
+                    'after': 'target_xy_quadrant_signed_height_v1'}},
+                'N7 must change only the N6 descriptor')
     else:
         raise GateError('unknown candidate algorithm contract')
     active = copy.deepcopy(baseline)
     active['historical_label'] = str(candidate['label'])
     active['restored_profile'] = copy.deepcopy(profile)
-    fields = ('qd_descriptor', 'qd_final_selection_mode') if candidate_id == 'N6' else (field,)
+    fields = ('qd_descriptor', 'qd_final_selection_mode') if candidate_id in {'N6', 'N7'} else (field,)
     for changed_field in fields:
         active['resolved_eds_config'][changed_field] = profile[changed_field]
         active['static_override_values']['main.eds_config.' + changed_field] = profile[changed_field]
@@ -329,6 +344,10 @@ def is_n6_plan(plan):
     return plan.get('n6_cohort') is not None or 'N6' in plan.get('candidate_profiles', {})
 
 
+def is_n7_plan(plan):
+    return plan.get('n7_cohort') is not None or 'N7' in plan.get('candidate_profiles', {})
+
+
 _N5_SUPPORT = None
 
 
@@ -351,6 +370,18 @@ def n6_support():
         spec = importlib.util.spec_from_file_location('qd_ed_n6_plan_contract', Path(__file__).with_name('qd_ed_n6_plan.py'))
         _N6_SUPPORT = importlib.util.module_from_spec(spec); spec.loader.exec_module(_N6_SUPPORT)
     return _N6_SUPPORT
+
+
+_N7_SUPPORT = None
+
+
+def n7_support():
+    global _N7_SUPPORT
+    if _N7_SUPPORT is None:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('qd_ed_n7_plan_contract', Path(__file__).with_name('qd_ed_n7_plan.py'))
+        _N7_SUPPORT = importlib.util.module_from_spec(spec); spec.loader.exec_module(_N7_SUPPORT)
+    return _N7_SUPPORT
 
 
 def stage_condition(runtime):
@@ -394,8 +425,8 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
     require(Path(runtime['worktree']).resolve() == root, 'runtime worktree mismatch')
     require(Path(runtime['artifact_root']).resolve() == artifact_root, 'runtime artifact root mismatch')
     stage_overrides(runtime)
-    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan)),
-        '180s transport requires its dedicated N4-E1, N5 or N6 cohort')
+    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan) or is_n7_plan(plan)),
+        '180s transport requires its dedicated N4-E1, N5, N6 or N7 cohort')
     physical_gpu = runtime_gpu(runtime, state)
     if require_frozen:
         require(plan.get('egl_mapping_verified') is True and runtime.get('cuda_egl_verified') is True, f'GPU{physical_gpu}/EGL mapping not verified')
@@ -470,6 +501,8 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
         n5_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
     if is_n6_plan(plan):
         n6_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if is_n7_plan(plan):
+        n7_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
     return plan, manifest, runtime
 
 
@@ -1114,6 +1147,8 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
             n5_support().require_scope(plan, root, globals())
         if is_n6_plan(plan):
             n6_support().require_scope(plan, root, globals())
+        if is_n7_plan(plan):
+            n7_support().require_scope(plan, root, globals())
         require(plan.get('phase_authorization', {}).get(split) is True, f'{split} has not passed its preregistered phase gate')
         rows=selected_rows(plan,split,iteration)
         if episode_keys:
@@ -1148,6 +1183,11 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                 n2_base=support.admission(plan,runtime,row,events,resources,root,globals())
             if is_n6_plan(plan):
                 support=n6_support()
+                support.require_scope(plan,root,globals(),row)
+                support.protected_budget(state,events,resources,row,timeout,globals(),plan=plan)
+                n2_base=support.admission(plan,runtime,row,events,resources,root,globals())
+            if is_n7_plan(plan):
+                support=n7_support()
                 support.require_scope(plan,root,globals(),row)
                 support.protected_budget(state,events,resources,row,timeout,globals(),plan=plan)
                 n2_base=support.admission(plan,runtime,row,events,resources,root,globals())
@@ -1222,6 +1262,8 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                     terminal['n5_episode_dispatched']=dispatched
                 if is_n6_plan(plan):
                     terminal['n6_episode_dispatched']=dispatched
+                if is_n7_plan(plan):
+                    terminal['n7_episode_dispatched']=dispatched
                 append_event(root,terminal)
                 durable_json(output/'attempt-result.json',terminal)
                 summaries.append(terminal)
@@ -1276,6 +1318,7 @@ def reconcile_ledger(plan_path, attempt_id, *, root=ROOT):
         if is_n4e1_plan(plan):terminal['n4e1_episode_dispatched']=dispatched is not None
         if is_n5_plan(plan):terminal['n5_episode_dispatched']=dispatched is not None
         if is_n6_plan(plan):terminal['n6_episode_dispatched']=dispatched is not None
+        if is_n7_plan(plan):terminal['n7_episode_dispatched']=dispatched is not None
         append_event(root,terminal); durable_json(output/'attempt-result.json',terminal)
         return terminal
 
