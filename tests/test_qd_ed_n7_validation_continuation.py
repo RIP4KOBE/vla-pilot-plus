@@ -1,5 +1,6 @@
 """A Stage-stream-invalid C1 cell gets one typed recovery, never a legal retry."""
 import copy
+from pathlib import Path
 
 import pytest
 
@@ -19,8 +20,12 @@ def test_exact_pending_matrix_and_one_typed_recovery():
 
 
 def test_real_stream_failure_is_only_retry_exception():
-    events=runner.read_events(runner.ROOT/'data/attempt-ledger.jsonl')
     original=runner.read_json(recovery.ORIGINAL)
+    # Reconstruct the immutable pre-recovery ledger view; this also works in
+    # a separate source worktree whose private journal is intentionally empty.
+    owner=Path(original['worktree'])
+    events=[e for e in runner.read_events(owner/'data/attempt-ledger.jsonl')
+            if e.get('retry_of')!=recovery.OLD_ATTEMPT]
     row=recovery.expected_rows(original)[0]
     runner.check_retry(events,row)
     ordinary=copy.deepcopy(row)

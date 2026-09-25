@@ -341,7 +341,7 @@ def is_n5_plan(plan):
 
 
 def is_n6_plan(plan):
-    return plan.get('n6_cohort') is not None or 'N6' in plan.get('candidate_profiles', {})
+    return plan.get('n7_formal') is None and (plan.get('n6_cohort') is not None or 'N6' in plan.get('candidate_profiles', {}))
 
 
 def is_n7_plan(plan):
@@ -410,7 +410,23 @@ def n7_validation_continuation_support():
     return _N7_VALIDATION_CONTINUATION_SUPPORT
 
 
+_N7_FORMAL_SUPPORT = None
+
+
+def n7_formal_support():
+    global _N7_FORMAL_SUPPORT
+    if _N7_FORMAL_SUPPORT is None:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('qd_ed_n7_formal_contract',
+            Path(__file__).with_name('qd_ed_n7_formal_plan.py'))
+        _N7_FORMAL_SUPPORT = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_N7_FORMAL_SUPPORT)
+    return _N7_FORMAL_SUPPORT
+
+
 def n7_dispatch_support(plan):
+    if plan.get('n7_formal') is not None:
+        return n7_formal_support()
     if plan.get('n7_validation_continuation') is not None:
         return n7_validation_continuation_support()
     return n7_validation_support() if plan.get('n7_validation') is not None else n7_support()
