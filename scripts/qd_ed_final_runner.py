@@ -384,6 +384,22 @@ def n7_support():
     return _N7_SUPPORT
 
 
+_N7_VALIDATION_SUPPORT = None
+
+
+def n7_validation_support():
+    global _N7_VALIDATION_SUPPORT
+    if _N7_VALIDATION_SUPPORT is None:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('qd_ed_n7_validation_contract', Path(__file__).with_name('qd_ed_n7_validation_plan.py'))
+        _N7_VALIDATION_SUPPORT = importlib.util.module_from_spec(spec); spec.loader.exec_module(_N7_VALIDATION_SUPPORT)
+    return _N7_VALIDATION_SUPPORT
+
+
+def n7_dispatch_support(plan):
+    return n7_validation_support() if plan.get('n7_validation') is not None else n7_support()
+
+
 def stage_condition(runtime):
     stage_overrides(runtime)
     return n4e1_support().STAGE_CONDITION if runtime.get('stage_engineering_condition') is not None else CODEX_STAGE_CONDITION
@@ -502,7 +518,7 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
     if is_n6_plan(plan):
         n6_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
     if is_n7_plan(plan):
-        n7_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+        n7_dispatch_support(plan).validate_contract(plan, manifest, runtime, seeds, root, globals())
     return plan, manifest, runtime
 
 
@@ -1148,7 +1164,7 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
         if is_n6_plan(plan):
             n6_support().require_scope(plan, root, globals())
         if is_n7_plan(plan):
-            n7_support().require_scope(plan, root, globals())
+            n7_dispatch_support(plan).require_scope(plan, root, globals())
         require(plan.get('phase_authorization', {}).get(split) is True, f'{split} has not passed its preregistered phase gate')
         rows=selected_rows(plan,split,iteration)
         if episode_keys:
@@ -1187,7 +1203,7 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                 support.protected_budget(state,events,resources,row,timeout,globals(),plan=plan)
                 n2_base=support.admission(plan,runtime,row,events,resources,root,globals())
             if is_n7_plan(plan):
-                support=n7_support()
+                support=n7_dispatch_support(plan)
                 support.require_scope(plan,root,globals(),row)
                 support.protected_budget(state,events,resources,row,timeout,globals(),plan=plan)
                 n2_base=support.admission(plan,runtime,row,events,resources,root,globals())
