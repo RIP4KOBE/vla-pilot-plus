@@ -41,6 +41,9 @@ from core.qd_executed_quality import (
 from core.qd_terminal_population import (
     MODE as TERMINAL_POPULATION_MODE, DEFAULT_MODE as DEFAULT_FINAL_SELECTION_MODE, TerminalPopulation,
 )
+from core.qd_grasp_timing import (
+    MODE as GRASP_TIMING_MODE, ABSOLUTE_REACH_M, RELATIVE_REACH_M, select_grasp_timing,
+)
 from core.qd_ed import (
     EXECUTION_INTENT_AXES,
     EXECUTION_INTENT_DESCRIPTOR,
@@ -4797,8 +4800,11 @@ class RDTSteer:
     def _eds_qd_descriptor(
         self, population: Tensor, keypoints: Optional[Tensor],
         descriptor_mode: str = "target_relative_endpoint_xy",
+        projection_out: dict | None = None,
     ) -> Tensor:
         trajectories = self._rdt_sample_to_trajectory_3d(population)
+        if projection_out is not None:
+            projection_out["projected_xyz"] = trajectories.detach().clone()
         if descriptor_mode == EXECUTION_INTENT_DESCRIPTOR:
             if self._action_chunk_horizon != 8:
                 raise ValueError("Execution-intent QD requires action_chunk_horizon=8")
@@ -4861,10 +4867,17 @@ class RDTSteer:
         current_stage: int,
     ) -> Tensor:
         cfg = eds_config
-        terminal_mode = cfg.qd_final_selection_mode == TERMINAL_POPULATION_MODE
+        grasp_timing_mode = cfg.qd_final_selection_mode == GRASP_TIMING_MODE
+        terminal_mode = cfg.qd_final_selection_mode in {TERMINAL_POPULATION_MODE, GRASP_TIMING_MODE}
         if terminal_mode and self._action_chunk_horizon != 8:
-            raise ValueError("N4 terminal population requires action_chunk_horizon=8")
+            raise ValueError("Terminal population selection requires action_chunk_horizon=8")
         terminal_population = None
+        terminal_projected_xyz = None
+        grasp_contract = None
+        grasp_reason = None
+        grasp_selection = None
+        if grasp_timing_mode:
+            grasp_contract, grasp_reason = recognize_executed_prefix_provider(guidance_fns, keypoints)
         terminal_canonical_sequence = None
         terminal_scoring_batch_id = None
         feedback_setup_started = time.perf_counter() if cfg.qd_quality_mode == FEEDBACK_MODE else None
@@ -4891,10 +4904,15 @@ class RDTSteer:
         execution_intent = cfg.qd_descriptor == EXECUTION_INTENT_DESCRIPTOR
         if execution_intent and self._action_chunk_horizon != 8:
             raise ValueError("Execution-intent QD requires action_chunk_horizon=8")
-        def describe_qd(candidates):
+        def describe_qd(candidates, *, projection_out=None):
+            if projection_out is None:
+                if execution_intent:
+                    return self._eds_qd_descriptor(candidates, keypoints, cfg.qd_descriptor)
+                return self._eds_qd_descriptor(candidates, keypoints)
             if execution_intent:
-                return self._eds_qd_descriptor(candidates, keypoints, cfg.qd_descriptor)
-            return self._eds_qd_descriptor(candidates, keypoints)
+                return self._eds_qd_descriptor(candidates, keypoints, cfg.qd_descriptor,
+                                               projection_out=projection_out)
+            return self._eds_qd_descriptor(candidates, keypoints, projection_out=projection_out)
         loop_start = time.perf_counter()
         adaptive_rbf_enabled = (
             cfg.truncated_rollout_mode == "rbf_diverse"
@@ -6042,7 +6060,10 @@ class RDTSteer:
                     or qd_parent_cell_ids is None
                 ):
                     raise RuntimeError("QD archive loop state is incomplete")
-                child_descriptors = describe_qd(population)
+                terminal_projection_out = {} if grasp_timing_mode and i == 9 else None
+                child_descriptors = describe_qd(population, projection_out=terminal_projection_out)
+                if terminal_projection_out is not None:
+                    terminal_projected_xyz = terminal_projection_out["projected_xyz"]
                 fixed_initial_cell_ids, raw_initial_overflow = self._eds_qd_cell_ids(
                     child_descriptors, qd_initial_bounds, cfg
                 )
@@ -6740,7 +6761,20 @@ class RDTSteer:
                 population, population_scores = terminal_population.actions, terminal_population.costs
                 population_rewards = terminal_population.rewards
                 population_info = {"rewards": population_rewards}
-                qd_best_idx = terminal_population.select_index()
+                if grasp_timing_mode:
+                    if terminal_projected_xyz is None:
+                        raise RuntimeError("N5 missing final canonical projection")
+                    if grasp_contract is not None:
+                        grasp_contract.validate(guidance_fns)
+                    grasp_selection = select_grasp_timing(
+                        terminal_population, terminal_projected_xyz,
+                        self._decode_visualization_action_candidates(population), keypoints,
+                        target_index=(grasp_contract.target_index if grasp_contract is not None else None),
+                        recognition_reason=grasp_reason,
+                    )
+                    qd_best_idx = grasp_selection.index
+                else:
+                    qd_best_idx = terminal_population.select_index()
                 chunk_population_sources = ("terminal_canonical_population",) * 16
                 metrics.qd_selected_cell = int(terminal_population.cell_ids[qd_best_idx].item())
                 metrics.qd_selected_reward = float(population_rewards[qd_best_idx].item())
@@ -6759,6 +6793,16 @@ class RDTSteer:
                     "cost_dtype": str(population_scores.dtype),
                     "source_scope": "last canonical row and allocated parent cell; not unique archive ancestry",
                 }
+                if grasp_selection is not None:
+                    metrics.qd_terminal_population["grasp_selection"] = {
+                        "target_index": grasp_selection.target_index,
+                        "recognition_reason": grasp_selection.recognition_reason,
+                        "best_reach_m": grasp_selection.best_reach_m,
+                        "eligible_indices": list(grasp_selection.eligible_indices),
+                        "native_argmin_index": grasp_selection.native_argmin_index,
+                        "absolute_reach_m": ABSOLUTE_REACH_M,
+                        "relative_reach_m": RELATIVE_REACH_M,
+                    }
 
         metrics.nonfinite_count = int(
             (~torch.isfinite(population)).sum().detach().cpu().item()
@@ -6809,13 +6853,19 @@ class RDTSteer:
                                if quality_contract is not None else {}),
                             selected_fingerprint=metrics.qd_selected_action_fingerprint,
                             selected_cell=metrics.qd_selected_cell,
-                            selection_rule=("terminal_population_first_argmin" if terminal_mode else
+                            selection_rule=("terminal_grasp_proximity" if grasp_timing_mode else
+                                            "terminal_population_first_argmin" if terminal_mode else
                                             "archive_global_best" if qd_archive is not None else "cost_argmin"),
                             **({"qd_final_selection_mode": cfg.qd_final_selection_mode,
                                 "terminal_population": {**metrics.qd_terminal_population,
                                     "native_costs": population_scores, "raw_provider_quality": population_rewards,
                                     "cell_ids": terminal_population.cell_ids,
-                                    "parent_cell_ids": terminal_population.parent_cell_ids},
+                                    "parent_cell_ids": terminal_population.parent_cell_ids,
+                                    **({"grasp_selection": {
+                                        **metrics.qd_terminal_population["grasp_selection"],
+                                        "projected_distances_m": grasp_selection.projected_distances_m,
+                                        "positive_commands": grasp_selection.positive_commands,
+                                    }} if grasp_selection is not None else {})},
                                 "archive_reference": archive_reference,
                                 "stage_reward_reference": {"selected_raw_reward": population_rewards[best_idx],
                                     "reference_costs": stage_reference_costs,
@@ -7910,9 +7960,9 @@ class RDTSteer:
         _validate_direction_rbf_config(resolved.__dict__)
         if resolved.qd_archive_mode not in {"none", "grid_archive"}:
             raise ValueError("EDS qd_archive_mode must be one of none, grid_archive")
-        if resolved.qd_final_selection_mode not in {DEFAULT_FINAL_SELECTION_MODE, TERMINAL_POPULATION_MODE}:
-            raise ValueError("EDS qd_final_selection_mode must be archive_global_best or terminal_population_v1")
-        if resolved.qd_final_selection_mode == TERMINAL_POPULATION_MODE:
+        if resolved.qd_final_selection_mode not in {DEFAULT_FINAL_SELECTION_MODE, TERMINAL_POPULATION_MODE, GRASP_TIMING_MODE}:
+            raise ValueError("EDS qd_final_selection_mode must be archive_global_best, terminal_population_v1 or terminal_grasp_proximity_v1")
+        if resolved.qd_final_selection_mode in {TERMINAL_POPULATION_MODE, GRASP_TIMING_MODE}:
             required_terminal = {
                 "qd_quality_mode": "provider", "reward_mode": "normal",
                 "qd_archive_mode": "grid_archive", "qd_descriptor": "target_relative_endpoint_xy",

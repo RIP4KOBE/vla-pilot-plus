@@ -10290,7 +10290,7 @@ def test_n4_real_cpu_scoring_path_canonical_binding_and_exact_default(stub_steer
         return project(actions)
     monkeypatch.setattr(stub_steer, '_rdt_sample_to_trajectory_3d', tracked_project)
     runs=[]
-    for mode in (None, 'archive_global_best', 'terminal_population_v1'):
+    for mode in (None, 'archive_global_best', 'terminal_population_v1', 'terminal_grasp_proximity_v1'):
         stub_steer.reset(); project_rows.clear()
         rec=DecisionEvidence(tmp_path/str(mode), episode=0)
         stub_steer._decision_evidence=rec
@@ -10312,6 +10312,12 @@ def test_n4_real_cpu_scoring_path_canonical_binding_and_exact_default(stub_steer
     assert all('qd_final_selection_mode' not in r[5] for r in runs[:2])
     assert torch.equal(runs[0][1],runs[2][1])
     assert runs[0][2:4]==runs[2][2:4]  # No extra provider, projection or stub-network call.
+    assert torch.equal(runs[2][1], runs[3][1])
+    assert runs[2][2:4] == runs[3][2:4]
+    n5_final = next(r['values'] for r in runs[3][4] if r['event'] == 'final_selection')
+    assert n5_final['selection_rule'] == 'terminal_grasp_proximity'
+    assert n5_final['terminal_population']['grasp_selection']['target_index'] == 1
+    assert runs[3][5]['search_evaluation_count'] == 176 and runs[3][5]['score_call_count'] == 11
     events=runs[2][4]; byseq={r['sequence']:r for r in events}
     final=next(r['values'] for r in events if r['event']=='final_selection')
     terminal=final['terminal_population']
