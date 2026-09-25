@@ -10388,8 +10388,10 @@ def test_n4_select_action_uses_actual_deployed_fp32_decode(stub_steer, stub_adap
         'decision_evidence':rec.status()})+'\n')
     assert not torch.cuda.is_initialized()
 def test_n6_height_descriptor_real_cpu_loop_preserves_search_compute(stub_steer, stub_adapter, monkeypatch, tmp_path):
+    from collections import defaultdict
     from core.decision_evidence import DecisionEvidence
     from core.qd_ed import height_aware_descriptor
+    from scripts import audit_decision_evidence as audit
     stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
                          sample_batch_size=16, policy_config={'action_chunk_horizon': 8})
     initial = torch.linspace(-.12, .19, 16 * 64 * 128).reshape(16, 64, 128).bfloat16()
@@ -10438,3 +10440,8 @@ def test_n6_height_descriptor_real_cpu_loop_preserves_search_compute(stub_steer,
                    and event['values']['scoring_scope']['role'] != 'auxiliary_pretest')
     assert torch.allclose(last['descriptors'], height_aware_descriptor(
         scoring['values']['projected_xyz'], scoring['values']['keypoints']), atol=1e-7, rtol=0)
+    kinds = defaultdict(list)
+    for event in runs[1][2]:
+        kinds[event['event']].append(event)
+    height_gate = audit._audit_n6_height_assignment(kinds, kinds['final_selection'][0])
+    assert height_gate['assignments_verified'] == 11 and height_gate['candidates_verified'] == 176
