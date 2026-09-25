@@ -68,6 +68,34 @@ def binding(plan, runtime):
             'stage_public_config_sha256': runtime['frozen_stage_provider']['public_config_sha256']}
 
 
+def migrated_runtime(parent, root, runner):
+    """Rebind only resolved paths changed by the user's worktree relocation."""
+    r = api(runner); root = Path(root).resolve()
+    prior = r.read_json(parent['runtime_manifest_path'])
+    r.require(r.digest(parent['runtime_manifest_path']) == parent['runtime_manifest_sha256'],
+              'N5 prior runtime bytes changed')
+    updated = copy.deepcopy(prior)
+    old_root = Path(parent['worktree'])
+    count = 0
+    for record in updated['files']:
+        path = Path(record['path'])
+        r.require(path.is_file() and path.stat().st_size == record['size_bytes']
+                  and r.digest(path) == record['sha256'],
+                  'N5 relocation changed frozen runtime file contents: ' + str(path))
+        if 'resolved_path' not in record:
+            continue
+        actual = path.resolve()
+        if record.get('resolved_path') == str(actual):
+            continue
+        r.require(path.is_relative_to(old_root)
+                  and actual == (root / path.relative_to(old_root)).resolve(),
+                  'N5 unexpected runtime path migration: ' + str(path))
+        record['resolved_path'] = str(actual)
+        count += 1
+    r.require(count > 0, 'N5 expected archived worktree path rebinding missing')
+    return updated, count
+
+
 def validate_contract(plan, manifest, runtime, seeds, root, runner):
     r = api(runner); root = Path(root)
     cohort = plan.get('n5_cohort')
@@ -103,6 +131,12 @@ def validate_contract(plan, manifest, runtime, seeds, root, runner):
               and runtime.get('stage_engineering_condition') == cohort['stage_condition']
               and r.runtime_gpu(runtime) == 3,
               'N5 inherited 180s Codex/GPU3 condition differs')
+    migrated, count = migrated_runtime(r.read_json(PARENT_PLAN), root, runner)
+    r.require(runtime == migrated
+              and cohort.get('runtime_parent') == {'path': r.read_json(PARENT_PLAN)['runtime_manifest_path'],
+                                                   'sha256': r.read_json(PARENT_PLAN)['runtime_manifest_sha256']}
+              and cohort.get('relocated_resolved_paths') == count,
+              'N5 runtime changed beyond verified archive path rebinding')
     paths = {record['path'] for record in plan['code_files']}
     r.require(CODE_ADDITIONS <= paths and set(plan['scientific_config_files']) <= paths,
               'N5 source/protocol fingerprints missing')
@@ -164,11 +198,11 @@ def admission(plan, runtime, row, events, resources, root, runner):
     return {'n5_cohort_id': COHORT, 'n5_frozen_identity': binding(plan, runtime)}
 
 
-def build_plan(parent, root, head, runner):
+def build_plan(parent, root, head, runtime_path, migrated_count, runner):
     r = api(runner); root = Path(root)
     r.require(sha(PARENT_PLAN) == PARENT_PLAN_SHA256 and parent['source_commit'] != head,
               'N5 parent plan/head identity invalid')
-    runtime = r.read_json(parent['runtime_manifest_path'])
+    runtime = r.read_json(runtime_path)
     paths = {record['path'] for record in parent['code_files']} | CODE_ADDITIONS | r.REQUIRED_CODE
     code_files = []
     for relative in sorted(paths):
@@ -182,6 +216,7 @@ def build_plan(parent, root, head, runner):
         plan.pop(key, None)
     plan.update(frozen=True, worktree=str(root), source_commit=head,
         episodes=rows_from_parent(parent), code_files=code_files,
+        runtime_manifest_path=str(runtime_path), runtime_manifest_sha256=r.digest(runtime_path),
         candidate_profiles={'N5': {'path': str(root / PROFILE), 'sha256': r.digest(root / PROFILE)}},
         phase_authorization={'dev': True, 'validation': False, 'formal': False},
         scientific_config_files=sorted(set(parent['scientific_config_files']) | {PROTOCOL, PROFILE}),
@@ -192,7 +227,10 @@ def build_plan(parent, root, head, runner):
         'protocol': {'path': PROTOCOL, 'sha256': r.digest(root / PROTOCOL)},
         'parent_plan': {'path': str(PARENT_PLAN), 'sha256': PARENT_PLAN_SHA256},
         'prior_report': {'path': str(PRIOR_REPORT), 'sha256': PRIOR_REPORT_SHA256},
-        'stage_condition': copy.deepcopy(runtime['stage_engineering_condition'])}
+        'stage_condition': copy.deepcopy(runtime['stage_engineering_condition']),
+        'runtime_parent': {'path': parent['runtime_manifest_path'],
+                           'sha256': parent['runtime_manifest_sha256']},
+        'relocated_resolved_paths': migrated_count}
     return plan
 
 
@@ -200,15 +238,22 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--parent-plan', type=Path, required=True)
     parser.add_argument('--source-head', required=True)
+    parser.add_argument('--runtime-output', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     import qd_ed_final_runner as r
-    r.require(args.parent_plan.resolve() == PARENT_PLAN and not args.output.exists(),
+    r.require(args.parent_plan.resolve() == PARENT_PLAN and not args.output.exists()
+              and not args.runtime_output.exists(),
               'N5 frozen parent or output path differs')
     head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     r.require(head == args.source_head, 'N5 source HEAD differs')
     with r.locked(ROOT / 'data/qd-ed-runner.lock', nonblocking=True):
-        plan = build_plan(r.read_json(PARENT_PLAN), ROOT, head, r.__dict__)
+        parent = r.read_json(PARENT_PLAN)
+        runtime, migrated_count = migrated_runtime(parent, ROOT, r.__dict__)
+        runtime_output = r.owned(args.runtime_output, parent['artifact_root'])
+        runtime_output.parent.mkdir(parents=True, exist_ok=True)
+        r.durable_json(runtime_output, runtime)
+        plan = build_plan(parent, ROOT, head, runtime_output, migrated_count, r.__dict__)
         output = r.owned(args.output, plan['artifact_root'])
         output.parent.mkdir(parents=True, exist_ok=True)
         r.durable_json(output, plan)
