@@ -129,6 +129,12 @@ def validate_contract(plan, manifest, runtime, seeds, root, runner):
     paths = {record['path'] for record in plan['code_files']}
     r.require(CODE_ADDITIONS <= paths and set(plan['scientific_config_files']) <= paths,
               'N7 validation source/protocol fingerprints missing')
+    parent_code = {record['path']: record['sha256'] for record in parent['code_files']}
+    current_code = {record['path']: record['sha256'] for record in plan['code_files']}
+    runner_only = {'scripts/qd_ed_final_runner.py'}
+    r.require(all(current_code.get(path) == digest for path, digest in parent_code.items()
+                  if path not in runner_only),
+              'N7 validation changed frozen Dev scientific or audit source')
     state = r.read_state(root / 'research-state.yaml')
     r.require(state['resource_isolation']['status'] == 'ACTIVE'
               and state['resource_isolation']['validation_status'] == 'PASS'
