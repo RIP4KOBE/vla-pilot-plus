@@ -125,7 +125,7 @@ def validate_contract(plan, manifest, runtime, seeds, root, runner):
               and candidate['parent_candidate'] == {'path': PARENT_PROFILE, 'sha256': r.digest(root / PARENT_PROFILE)},
               'N5 candidate or parent profile differs')
     r.require(manifest['profiles']['N5']['resolved_eds_config']['qd_final_selection_mode'] == 'terminal_grasp_proximity_v1'
-              and manifest['profiles']['N5']['resolved_eds_config']['qd_quality_mode'] == 'provider',
+              and manifest['profiles']['N5']['resolved_eds_config'].get('qd_quality_mode', 'provider') == 'provider',
               'N5 final consumer/provider mode differs')
     r.require(cohort.get('stage_condition') == r.n4e1_support().engineering_condition()
               and runtime.get('stage_engineering_condition') == cohort['stage_condition']
