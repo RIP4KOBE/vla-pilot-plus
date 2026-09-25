@@ -1,0 +1,76 @@
+{
+  "schema": "rdt-qd-ed-exp-archive-overview-v11",
+  "previous_overview": {
+    "path": "archive-overview-v10.json",
+    "sha256": "7c73ce2eade145a758d16049ed8fb1fb45b197a1bad3ccf297941c3cc3c73deb"
+  },
+  "n7": {
+    "dev_decision": "ELIGIBLE_FOR_SEPARATELY_FROZEN_VALIDATION_2_OF_4",
+    "dev_report_sha256": "c6ae8e5864f0e550d8d4c5651422e1b25a38161b2781bc1b7937b93d9edaa463",
+    "algorithm_variant": "variants/n7_direction_height/implementation",
+    "validation_runner_variant": "variants/n7_direction_height/validation_runner",
+    "validation_runner_head": "e5e74e5e7b4615e7c909d271e2fcfd7326b8f59a",
+    "validation_study_source_head": "7575b59e8a363e195dc3208e365ee4cc9a37d99a",
+    "validation_plan_sha256": "f2f0242d11711163603e62fc66ad63967bbfeda1884bb948356f805c7b130f9c",
+    "validation_release_sha256": "5139a7864a126bb9df6801d4173575cfe745a5bd803b06d0fe169fbedecf00cd",
+    "validation_status": "RUNNING_TYPED_STAGE_STREAM_CONTINUATION_ON_GPU3",
+    "validation_artifacts": "variants/n7_direction_height/validation_artifacts",
+    "prior_supervisor_failure": {
+      "status": "failed_before_first_dispatch",
+      "attempt_events": 0,
+      "preserved_status": "artifacts/continuation_20260925/n7-validation-c1-v1/supervisor-status.json"
+    },
+    "validation_stop": {
+      "status": "failed",
+      "completed_count": 6,
+      "invalid_attempt_id": "rdt-qd-ed-final-20260921T093925Z__n7v_b1_t02_c0_20260925__e5df6c421513",
+      "cause": "Codex Stage stream_error events caused query fallback; outcome_valid=false; no automatic retry",
+      "status_path": "artifacts/continuation_20260925/n7-validation-c1-v1/supervisor-status.v2.json",
+      "formal_authorized": false
+    },
+    "validation_continuation": {
+      "source_commit": "aa9cf3ac788a1fab144e8c3162607f0efe79b711",
+      "protocol_commit": "8f519b8",
+      "frozen_plan_sha256": "9fd4ace8f49b3e676d3a00b4aa8b2ca03fc3d2a26bfaffeff0c28cc6ba85f77b",
+      "execution_release_sha256": "86feadb234f23b010e0317839aaa6946651634be800d573eb7b784129f51581f",
+      "status_path": "artifacts/continuation_20260925/n7-validation-c1-recovery-v1/supervisor-status.v1.json",
+      "eligibility_audit_sha256": "0e7f4f0964749e8931b96616f5b1404609f2e14abab3d5bdebab68d734cd8e34",
+      "prior_accepted": 6,
+      "pending_cells": 54,
+      "new_recovery_limit": 1,
+      "gpu": 3,
+      "formal_authorized": false
+    },
+    "conditional_formal_preparation": {
+      "worktree": "variants/n7_direction_height/formal_runner",
+      "source_head": "f3c98064379746ad921942acc2e8ff77948bc713",
+      "protocol_commit": "91dbd99",
+      "status": "CPU_TESTED_NOT_RELEASED_CONDITIONAL_ON_COMPLETE_C1_PASS",
+      "formal_authorized": false,
+      "regression_tests_passed": 79
+    }
+  },
+  "large_artifacts": {
+    "entry": "artifacts",
+    "storage": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z",
+    "strategy": "symlink preserving frozen absolute paths"
+  },
+  "protected_historical_untracked_specification_touched": false,
+  "archived_other_session": {
+    "name": "rdt-qd-ed-gpu6-20260922T063626Z",
+    "owner_stop": "user_confirmed",
+    "study_worktree": "../rdt-qd-ed-gpu6-20260922T063626Z/study_worktree",
+    "artifacts": "../rdt-qd-ed-gpu6-20260922T063626Z/artifacts",
+    "layout": "../rdt-qd-ed-gpu6-20260922T063626Z/archive-layout-v1.json",
+    "old_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-gpu6-20260922T063626Z",
+    "old_path_strategy": "compatibility_symlink"
+  },
+  "n8_structural_screen": {
+    "variant": "variants/n8_direction_radius_height",
+    "status": "NEGATIVE_SCREEN_NO_GPU_DISPATCH",
+    "read_only_artifact_sha256": "5aaaceca88d05268b319424f2bdf4249f01fe8305f1cf30c486c93a8b7206295",
+    "n7_same_cell_split_pairs": 1863,
+    "n7_different_cell_conflated_pairs": 2066,
+    "outcome_effect": "unknown"
+  }
+}

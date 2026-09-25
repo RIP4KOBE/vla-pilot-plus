@@ -1,0 +1,14 @@
+{
+  "schema": "peer-archive-relocation-v1",
+  "session": "rdt-qd-ed-gpu6-20260922T063626Z",
+  "owner_stop": "user-confirmed-2026-09-25",
+  "study_worktree": "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-gpu6-20260922T063626Z/study_worktree",
+  "source_head": "77761b4cda78ac3b6762a6aa60f97b07fde7c1dc",
+  "old_alias": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-gpu6-20260922T063626Z",
+  "artifacts": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z",
+  "strategy": "move_git_worktree_keep_uncommitted_state_and_external_frozen_artifacts",
+  "variant_folders": [
+    "n1v_stage_structured",
+    "n1w_stage_fallback"
+  ]
+}

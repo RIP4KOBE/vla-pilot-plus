@@ -1,0 +1,43 @@
+{
+  "schema": "rdt-qd-ed-exp-archive-overview-v3",
+  "scope": "all directories under .worktrees/exp, with the owning peer session deferred until stop",
+  "previous_overview": {
+    "path": "archive-overview-v2.json",
+    "sha256": "cc4d0093c0b318a5e855a7cc78809dcd5ade13f6a022e1e7e073732ec52a7b7e"
+  },
+  "current_session_relocations": {
+    "path": "archive-layout-v1.json",
+    "sha256": "fb9f5ccd7ae7034a5c253e15b83adeeae69b9be47c6ce42ac7a662a7340757cd"
+  },
+  "historical_relocations": {
+    "path": "../../historical_variants/historical-layout-v1.json",
+    "sha256": "957c6a31c0c8d0906b3158591defb5a5b24209b9853c435fe719e7cb6ae991b9"
+  },
+  "variants": [
+    {
+      "id": "N5",
+      "path": "variants/n5_grasp_timing/implementation",
+      "branch": "exp/rdt-qd-ed-n5-grasp-timing-20260925",
+      "current_head": "d6c228e3f82d3324da4a934db8375f7dbac75f06",
+      "dev_decision": "REJECT_DEV_1_OF_4"
+    },
+    {
+      "id": "N6",
+      "path": "variants/n6_height_aware/implementation",
+      "branch": "exp/rdt-qd-ed-n6-height-20260925",
+      "current_head": "27e31b5b7d6b7b076a54f3f16c3049b53bf25df4",
+      "dev_decision": "RUNNING_FROZEN_FOUR_CELL_COHORT"
+    }
+  ],
+  "deferred_other_session": {
+    "name": "rdt-qd-ed-gpu6-20260922T063626Z",
+    "condition": "migrate after its owning session stops",
+    "state": "pending"
+  },
+  "large_artifacts": {
+    "entry": "artifacts",
+    "storage": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z",
+    "strategy": "symlink preserving frozen absolute paths"
+  },
+  "protected_historical_untracked_specification_touched": false
+}

@@ -1,0 +1,42 @@
+{
+  "created_unix": 1790297785.1598792,
+  "entries": [
+    {
+      "already_moved": true,
+      "archive_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/historical_variants/eds_init_fps",
+      "head": "2628fab7cda767c474cf2d163c3564218d119657",
+      "name": "eds-init-fps",
+      "old_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-fps"
+    },
+    {
+      "already_moved": false,
+      "archive_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/historical_variants/eds_init_pg_diverse_sampling",
+      "head": "b3db98cf4fd98a6479d92683e33ebe3d032f25d9",
+      "name": "eds-init-pg-diverse-sampling",
+      "old_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-pg-diverse-sampling",
+      "submodule_gitfiles_rebased": 1,
+      "tracked_status_before_after": ""
+    },
+    {
+      "already_moved": false,
+      "archive_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/historical_variants/eds_qd_stage_guidance_transition",
+      "head": "4b3ed17476d5a1fb31e4134f0ce8bbbec8d50731",
+      "name": "eds-qd-stage-guidance-transition",
+      "old_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-stage-guidance-transition",
+      "submodule_gitfiles_rebased": 1,
+      "tracked_status_before_after": ""
+    },
+    {
+      "already_moved": false,
+      "archive_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/historical_variants/eds_quality_diversity",
+      "head": "beb8d3f073857f3762a179ce8af4a3c28244b75d",
+      "name": "eds-quality-diversity",
+      "old_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-quality-diversity",
+      "submodule_gitfiles_rebased": 1,
+      "tracked_status_before_after": ""
+    }
+  ],
+  "peer_gpu6_deferred_until_other_session_stops": true,
+  "protected_existing_autoresearch_worktree_touched": false,
+  "schema": "historical-exp-worktree-archive-v1"
+}

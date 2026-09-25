@@ -1,0 +1,52 @@
+{
+  "schema": "rdt-qd-ed-exp-archive-overview-v5",
+  "scope": "all directories under .worktrees/exp, with the owning peer session deferred until stop",
+  "previous_overview": {
+    "path": "archive-overview-v4.json",
+    "sha256": "1bcdf8e53da3a4d37b896f526457fdc94274cbea7782b258a971dc30894fba60"
+  },
+  "current_session_relocations": {
+    "path": "archive-layout-v1.json",
+    "sha256": "fb9f5ccd7ae7034a5c253e15b83adeeae69b9be47c6ce42ac7a662a7340757cd"
+  },
+  "historical_relocations": {
+    "path": "../../historical_variants/historical-layout-v1.json",
+    "sha256": "957c6a31c0c8d0906b3158591defb5a5b24209b9853c435fe719e7cb6ae991b9"
+  },
+  "variants": [
+    {
+      "id": "N5",
+      "path": "variants/n5_grasp_timing/implementation",
+      "current_head": "d6c228e3f82d3324da4a934db8375f7dbac75f06",
+      "dev_decision": "REJECT_DEV_1_OF_4"
+    },
+    {
+      "id": "N6",
+      "path": "variants/n6_height_aware/implementation",
+      "current_head": "27e31b5b7d6b7b076a54f3f16c3049b53bf25df4",
+      "dev_decision": "REJECT_DEV_1_OF_4"
+    },
+    {
+      "id": "N7",
+      "path": "variants/n7_direction_height/implementation",
+      "branch": "exp/rdt-qd-ed-n7-direction-height-20260925",
+      "current_head": "34d420d2c51e3e5f39c98ba5d4bccdb65d6d9cb5",
+      "study_source_head": "7cbe1ad45cd89bf25c87335f6d4327527a3431fe",
+      "dev_decision": "RUNNING_FROZEN_FOUR_CELL_COHORT",
+      "dev_artifacts": "variants/n7_direction_height/dev_artifacts",
+      "frozen_plan_sha256": "9cef973dd2a2f7cd07f82eb1965b96e2bcb3557f372e25dc4cd04dc622b277be",
+      "execution_release_sha256": "0be34473cc170259ea203fcad4f8db70d294f249c5ac72357c05cc565cd0b30c"
+    }
+  ],
+  "deferred_other_session": {
+    "name": "rdt-qd-ed-gpu6-20260922T063626Z",
+    "condition": "migrate after its owning session stops",
+    "state": "pending_owner_stop_confirmation"
+  },
+  "large_artifacts": {
+    "entry": "artifacts",
+    "storage": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z",
+    "strategy": "symlink preserving frozen absolute paths"
+  },
+  "protected_historical_untracked_specification_touched": false
+}

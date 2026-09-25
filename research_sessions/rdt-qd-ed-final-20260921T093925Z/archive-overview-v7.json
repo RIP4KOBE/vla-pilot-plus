@@ -1,0 +1,35 @@
+{
+  "schema": "rdt-qd-ed-exp-archive-overview-v7",
+  "previous_overview": {
+    "path": "archive-overview-v6.json",
+    "sha256": "30cf46ccc4ceadb7f98b042414a0542c5fe0b3fedbd8947789470f70676e5ac2"
+  },
+  "n7": {
+    "dev_decision": "ELIGIBLE_FOR_SEPARATELY_FROZEN_VALIDATION_2_OF_4",
+    "dev_report_sha256": "c6ae8e5864f0e550d8d4c5651422e1b25a38161b2781bc1b7937b93d9edaa463",
+    "algorithm_variant": "variants/n7_direction_height/implementation",
+    "validation_runner_variant": "variants/n7_direction_height/validation_runner",
+    "validation_runner_head": "e5e74e5e7b4615e7c909d271e2fcfd7326b8f59a",
+    "validation_study_source_head": "7575b59e8a363e195dc3208e365ee4cc9a37d99a",
+    "validation_plan_sha256": "f2f0242d11711163603e62fc66ad63967bbfeda1884bb948356f805c7b130f9c",
+    "validation_release_sha256": "5139a7864a126bb9df6801d4173575cfe745a5bd803b06d0fe169fbedecf00cd",
+    "validation_status": "RUNNING_FROZEN_SIXTY_CELL_COHORT",
+    "validation_artifacts": "variants/n7_direction_height/validation_artifacts",
+    "prior_supervisor_failure": {
+      "status": "failed_before_first_dispatch",
+      "attempt_events": 0,
+      "preserved_status": "artifacts/continuation_20260925/n7-validation-c1-v1/supervisor-status.json"
+    }
+  },
+  "deferred_other_session": {
+    "name": "rdt-qd-ed-gpu6-20260922T063626Z",
+    "condition": "migrate after its owning session stops",
+    "state": "pending_owner_stop_confirmation"
+  },
+  "large_artifacts": {
+    "entry": "artifacts",
+    "storage": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z",
+    "strategy": "symlink preserving frozen absolute paths"
+  },
+  "protected_historical_untracked_specification_touched": false
+}

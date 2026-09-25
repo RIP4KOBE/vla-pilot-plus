@@ -1,0 +1,35 @@
+{
+  "schema": "rdt-qd-ed-exp-archive-overview-v6",
+  "previous_overview": {
+    "path": "archive-overview-v5.json",
+    "sha256": "ea7cc650f146f06ada3d03de4f7bfeecde9c14a7a9f7e94afb4974f75a118a8d"
+  },
+  "relocations": {
+    "current_session": "archive-layout-v1.json",
+    "historical": "../../historical_variants/historical-layout-v1.json"
+  },
+  "n7": {
+    "algorithm_variant": "variants/n7_direction_height/implementation",
+    "algorithm_variant_head": "34d420d2c51e3e5f39c98ba5d4bccdb65d6d9cb5",
+    "dev_decision": "ELIGIBLE_FOR_SEPARATELY_FROZEN_VALIDATION_2_OF_4",
+    "dev_report_sha256": "c6ae8e5864f0e550d8d4c5651422e1b25a38161b2781bc1b7937b93d9edaa463",
+    "validation_runner_variant": "variants/n7_direction_height/validation_runner",
+    "validation_runner_head": "114bb7931af741be48f22a0416a1d41fffc84014",
+    "validation_study_source_head": "d24f042e4e4948a2ce804088454800c33a3d4ad7",
+    "validation_plan_sha256": "6e5a47233c79411a6b1b20d633d14ad9cc6170b07f9e6839cd778d349b5be447",
+    "validation_release_sha256": "a4228f2c1c269217c7f5a39af48ef83a35c51e4f350860842f03bb363e7d357a",
+    "validation_status": "RUNNING_FROZEN_SIXTY_CELL_COHORT",
+    "validation_artifacts": "artifacts/continuation_20260925/n7-validation-c1-v1"
+  },
+  "deferred_other_session": {
+    "name": "rdt-qd-ed-gpu6-20260922T063626Z",
+    "condition": "migrate after its owning session stops",
+    "state": "pending_owner_stop_confirmation"
+  },
+  "large_artifacts": {
+    "entry": "artifacts",
+    "storage": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z",
+    "strategy": "symlink preserving frozen absolute paths"
+  },
+  "protected_historical_untracked_specification_touched": false
+}

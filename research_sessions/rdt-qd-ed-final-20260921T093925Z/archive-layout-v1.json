@@ -1,0 +1,92 @@
+{
+  "algorithm_variants": [
+    {
+      "archive_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/support/decision_evidence",
+      "head": "5b36c44ac86834b26c67b9b9e5445f67bc6daedb",
+      "old_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923",
+      "old_path_is_compatibility_symlink": true
+    },
+    {
+      "archive_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n2_executed_quality/implementation",
+      "head": "4e89c129087304263e2c8afd832d680d5e49461f",
+      "old_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923",
+      "old_path_is_compatibility_symlink": true
+    },
+    {
+      "archive_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n2_executed_quality/runner",
+      "head": "ed56611dc45d28dbc59ffa172a810a810360dfc1",
+      "old_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n2-runner-20260923",
+      "old_path_is_compatibility_symlink": true
+    },
+    {
+      "archive_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n3_executed_feedback/runner",
+      "head": "489869b475c694bd0f12cf944de9c5719c1128af",
+      "old_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n3-runner-20260924",
+      "old_path_is_compatibility_symlink": true
+    },
+    {
+      "archive_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n4_terminal_population/implementation",
+      "head": "28ce64219c665916f4049f94b828615109b217f1",
+      "old_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924",
+      "old_path_is_compatibility_symlink": true
+    },
+    {
+      "archive_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n4_terminal_population/audit",
+      "head": "847ebdfa23b6747b627f832a90a7c37e743c77a5",
+      "old_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-audit-20260924",
+      "old_path_is_compatibility_symlink": true
+    },
+    {
+      "archive_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n4_terminal_population/runner",
+      "head": "748123965735152a4cbc930a5834a5f2ae0b9819",
+      "old_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-runner-20260924",
+      "old_path_is_compatibility_symlink": true
+    },
+    {
+      "archive_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n4_terminal_population/evaluation_audit",
+      "head": "5ce667ab85c018a80e3010bd6ec3c267ee699ab2",
+      "old_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-evaluation-audit-20260924",
+      "old_path_is_compatibility_symlink": true
+    },
+    {
+      "archive_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n4_terminal_population/evaluation_runner",
+      "head": "5fab403c8f48c433cdae4b4c08353cc4d6c0c0d0",
+      "old_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-evaluation-runner-20260924",
+      "old_path_is_compatibility_symlink": true
+    },
+    {
+      "archive_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n4_terminal_population/e1_transport_runner",
+      "head": "3306b78aad525a614bc7db9a11888056d25925cd",
+      "old_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-e1-runner-20260924",
+      "old_path_is_compatibility_symlink": true
+    },
+    {
+      "archive_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n4_terminal_population/stage_lifecycle",
+      "head": "d59d99aacdf616cf09a761349fff35586252e62c",
+      "old_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-stage-lifecycle-20260924",
+      "old_path_is_compatibility_symlink": true
+    },
+    {
+      "archive_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree",
+      "head": "b2a3076136b1abf2f22757bc73b6aa6456a43600",
+      "old_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z",
+      "old_path_is_compatibility_symlink": true
+    }
+  ],
+  "artifact_entry": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/artifacts",
+  "artifact_storage": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z",
+  "artifact_strategy": "symlink; original frozen absolute paths remain canonical",
+  "created_unix": 1790297447.368904,
+  "excluded_active_or_other_session": [
+    "rdt-qd-ed-gpu6-20260922T063626Z"
+  ],
+  "excluded_historical": [
+    "eds-init-fps",
+    "eds-init-pg-diverse-sampling",
+    "eds-qd-stage-guidance-transition",
+    "eds-quality-diversity"
+  ],
+  "protected_historical_file_touched": false,
+  "schema": "rdt-qd-ed-current-session-archive-v1",
+  "study_id": "rdt-qd-ed-final-20260921T093925Z"
+}

@@ -1,0 +1,30 @@
+{
+  "schema": "rdt-qd-ed-exp-archive-overview-v2",
+  "scope": "all directories under .worktrees/exp",
+  "current_session_relocations": {
+    "path": "archive-layout-v1.json",
+    "sha256": "fb9f5ccd7ae7034a5c253e15b83adeeae69b9be47c6ce42ac7a662a7340757cd"
+  },
+  "historical_relocations": {
+    "path": "../../historical_variants/historical-layout-v1.json",
+    "sha256": "957c6a31c0c8d0906b3158591defb5a5b24209b9853c435fe719e7cb6ae991b9"
+  },
+  "new_variant": {
+    "id": "N5",
+    "path": "variants/n5_grasp_timing/implementation",
+    "branch": "exp/rdt-qd-ed-n5-grasp-timing-20260925",
+    "protocol_commit": "1dc49cc980cb02ff77c07c2777be3d273ab146d9",
+    "implementation_commit": "0100b1108b429a075a92a4858170b9704addd582"
+  },
+  "deferred_other_session": {
+    "name": "rdt-qd-ed-gpu6-20260922T063626Z",
+    "condition": "migrate after its owning session stops",
+    "state": "pending"
+  },
+  "large_artifacts": {
+    "entry": "artifacts",
+    "storage": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z",
+    "strategy": "symlink preserving frozen absolute paths"
+  },
+  "protected_historical_untracked_specification_touched": false
+}

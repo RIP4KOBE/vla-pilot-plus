@@ -1,0 +1,47 @@
+{
+  "schema": "rdt-qd-ed-exp-archive-overview-v8",
+  "previous_overview": {
+    "path": "archive-overview-v7.json",
+    "sha256": "6d97016a4c187db1e111301224db65eb5534c2f6ba875f1a37355f9b5269561b"
+  },
+  "n7": {
+    "dev_decision": "ELIGIBLE_FOR_SEPARATELY_FROZEN_VALIDATION_2_OF_4",
+    "dev_report_sha256": "c6ae8e5864f0e550d8d4c5651422e1b25a38161b2781bc1b7937b93d9edaa463",
+    "algorithm_variant": "variants/n7_direction_height/implementation",
+    "validation_runner_variant": "variants/n7_direction_height/validation_runner",
+    "validation_runner_head": "e5e74e5e7b4615e7c909d271e2fcfd7326b8f59a",
+    "validation_study_source_head": "7575b59e8a363e195dc3208e365ee4cc9a37d99a",
+    "validation_plan_sha256": "f2f0242d11711163603e62fc66ad63967bbfeda1884bb948356f805c7b130f9c",
+    "validation_release_sha256": "5139a7864a126bb9df6801d4173575cfe745a5bd803b06d0fe169fbedecf00cd",
+    "validation_status": "STOPPED_AFTER_6_ACCEPTED_AND_1_INVALID_STAGE_STREAM_ATTEMPT",
+    "validation_artifacts": "variants/n7_direction_height/validation_artifacts",
+    "prior_supervisor_failure": {
+      "status": "failed_before_first_dispatch",
+      "attempt_events": 0,
+      "preserved_status": "artifacts/continuation_20260925/n7-validation-c1-v1/supervisor-status.json"
+    },
+    "validation_stop": {
+      "status": "failed",
+      "completed_count": 6,
+      "invalid_attempt_id": "rdt-qd-ed-final-20260921T093925Z__n7v_b1_t02_c0_20260925__e5df6c421513",
+      "cause": "Codex Stage stream_error events caused query fallback; outcome_valid=false; no automatic retry",
+      "status_path": "artifacts/continuation_20260925/n7-validation-c1-v1/supervisor-status.v2.json",
+      "formal_authorized": false
+    }
+  },
+  "large_artifacts": {
+    "entry": "artifacts",
+    "storage": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z",
+    "strategy": "symlink preserving frozen absolute paths"
+  },
+  "protected_historical_untracked_specification_touched": false,
+  "archived_other_session": {
+    "name": "rdt-qd-ed-gpu6-20260922T063626Z",
+    "owner_stop": "user_confirmed",
+    "study_worktree": "../rdt-qd-ed-gpu6-20260922T063626Z/study_worktree",
+    "artifacts": "../rdt-qd-ed-gpu6-20260922T063626Z/artifacts",
+    "layout": "../rdt-qd-ed-gpu6-20260922T063626Z/archive-layout-v1.json",
+    "old_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-gpu6-20260922T063626Z",
+    "old_path_strategy": "compatibility_symlink"
+  }
+}
