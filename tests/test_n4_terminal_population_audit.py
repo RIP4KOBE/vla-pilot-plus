@@ -11,11 +11,18 @@ from core.rdt_libero_action_converter import decode_rdt_libero_action_chunk
 from scripts import audit_decision_evidence as audit
 
 
-def episode(tmp_path, *, count=3, variant="different", auxiliary=False, stage_init=None):
+def episode(tmp_path, *, count=3, variant="different", auxiliary=False, stage_init=None, n5=False):
     rec = DecisionEvidence(tmp_path, episode=0)
     provider = lambda keypoints, trajectories: None
+    keypoints = torch.zeros(1, 3, dtype=torch.bfloat16 if n5 else torch.float32)
+    if n5:
+        from core.qd_executed_quality import TEMPLATE
+        path = tmp_path / "guidance.txt"
+        path.write_text(TEMPLATE)
+        provider._guidance_source_text = TEMPLATE
+        provider._guidance_source_path = str(path)
     rec.begin_decision(global_step=0, stage=1, use_guidance=True,
-                       keypoints=torch.zeros(1, 3), providers=[provider])
+                       keypoints=keypoints.double() if n5 else keypoints, providers=[provider])
     first = previous = None
     cell_ids = torch.arange(16, dtype=torch.int64)
     for j in range(11):
@@ -34,6 +41,8 @@ def episode(tmp_path, *, count=3, variant="different", auxiliary=False, stage_in
         actions[:, :, 39] = torch.arange(j * 16, j * 16 + 16).bfloat16()[:, None] / 256
         quality = -(torch.arange(16).bfloat16() / 16 + (j + 1))
         if j == 10:
+            if n5:
+                actions[1, :, 10] = 1
             if variant in {"same", "suffix", "inactive", "signed_zero", "gripper_zero"}:
                 actions[0] = first[0][0]
                 quality[0] = first[1][0]
@@ -52,7 +61,7 @@ def episode(tmp_path, *, count=3, variant="different", auxiliary=False, stage_in
             full = torch.zeros(16, 9, 3, dtype=torch.bfloat16)
             for row in full:
                 rec.record("projection_origin", source_eef_position=np.zeros(3), cast_eef_start=row[0])
-            rec.begin_scoring(samples=actions, keypoints=torch.zeros(1, 3), projected_xyz=full,
+            rec.begin_scoring(samples=actions, keypoints=keypoints, projected_xyz=full,
                               provider_input_xyz=full[:, 1:8], slice_kind="eds")
             for index in range(16):
                 rec.scoring_candidate_index = index; rec.scoring_provider_index = 0
@@ -65,21 +74,28 @@ def episode(tmp_path, *, count=3, variant="different", auxiliary=False, stage_in
                                                 candidates=actions, effective_quality=quality)
         if first is None: first = actions.clone(), quality.clone()
         previous = actions, quality
-    costs = -quality; index = int(torch.argmin(costs)); selected = actions[index:index + 1]
+    costs = -quality; index = 1 if n5 else int(torch.argmin(costs)); selected = actions[index:index + 1]
     archive, rewards = first[0][:4], first[1][:4].float()
     best = min(range(4), key=lambda i: (-rewards[i].item(), audit.fingerprints(archive)[i], i))
     reference = {"population": archive, "rewards": rewards, "costs": -rewards, "cell_ids": cell_ids[:4],
         "global_best_index": best, "selected_latent": archive[best:best + 1], "selected_fingerprint": audit.fingerprints(archive)[best],
         "selected_cell": best, "selected_quality": rewards[best].item(), "selected_cost": -rewards[best].item()}
     raw = quality[index].item()
+    grasp = ({"target_index": 0, "recognition_reason": "recognized_weighted_distance_template",
+              "best_reach_m": 0., "eligible_indices": [1], "native_argmin_index": 0,
+              "absolute_reach_m": 0.06, "relative_reach_m": 0.03,
+              "projected_distances_m": torch.zeros(16, 8),
+              "positive_commands": torch.arange(16)[:, None].expand(16, 8) == 1} if n5 else None)
     rec.record("final_selection", population=actions, selected_latent=selected, selected_index=index,
         selected_quality=raw, selected_cost=costs[index].item(), selected_fingerprint=audit.fingerprints(selected)[0],
-        selected_cell=index, selection_rule="terminal_population_first_argmin", qd_final_selection_mode="terminal_population_v1",
+        selected_cell=index, selection_rule="terminal_grasp_proximity" if n5 else "terminal_population_first_argmin",
+        qd_final_selection_mode="terminal_grasp_proximity_v1" if n5 else "terminal_population_v1",
         terminal_population={"iter_idx": 9, "canonical_event_sequence": canonical_sequence, "scoring_batch_id": score_id,
             "selected_occurrence_id": f"{rec.decision_id}:q{canonical_sequence}:r{index}",
             "minimum_cost_tie_indices": torch.nonzero(costs == costs.min()).reshape(-1).tolist(),
             "native_costs": costs, "raw_provider_quality": quality, "cell_ids": cell_ids,
-            "parent_cell_ids": cell_ids, "selected_parent_cell": index},
+            "parent_cell_ids": cell_ids, "selected_parent_cell": index,
+            **({"grasp_selection": grasp} if n5 else {})},
         archive_reference=reference, stage_reward_reference={"selected_raw_reward": quality[index],
             "reference_costs": -rewards, "reference_scope": "qd_archive_cost_spread"})
     initial = raw if stage_init is None else stage_init
@@ -185,3 +201,15 @@ def test_metric_join_exports_validated_selected_fingerprint_and_native_archive_c
     assert decision["archive_reference_costs"] == audit._native_record(costs)
     assert decision["archive_reference_costs"]["sha256"] == decision["archive_cost_reference_sha256"]
     assert decision["archive_reference_costs"]["values"][decision["archive_reference_index"]] == decision["archive_reference_cost"]
+
+
+def test_n5_audit_accepts_non_argmin_grasp_choice_and_rejects_false_eligibility(tmp_path):
+    rec, compute = episode(tmp_path, n5=True)
+    result = audit.audit_episode(rec.root, compute)
+    assert result["accepted"], result["errors"]
+    decision = result["n5_grasp_timing_audit"]["decisions"][0]
+    assert decision["n5_grasp_selection"]["selected_index"] == 1
+    assert decision["n5_grasp_selection"]["native_argmin_index"] == 0
+    rewrite(rec, "final_selection", lambda row: row["values"]["terminal_population"]["grasp_selection"].update(eligible_indices=[0, 1]))
+    result = audit.audit_episode(rec.root, compute)
+    assert not result["accepted"] and result["errors"] == ["n5_eligibility_mismatch"]

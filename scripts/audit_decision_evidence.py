@@ -156,8 +156,9 @@ def _audit_n4_terminal_population(kinds, context, final_event):
 
     final = final_event["values"]; terminal = final["terminal_population"]; archive = final["archive_reference"]
     last = canonical[-1]; last_values = last["values"]
-    require(final["selection_rule"] == "terminal_population_first_argmin"
-            and final.get("qd_final_selection_mode") == "terminal_population_v1"
+    n5_mode = final.get("qd_final_selection_mode") == "terminal_grasp_proximity_v1"
+    require(final["selection_rule"] == ("terminal_grasp_proximity" if n5_mode else "terminal_population_first_argmin")
+            and final.get("qd_final_selection_mode") == ("terminal_grasp_proximity_v1" if n5_mode else "terminal_population_v1")
             and final.get("quality_mode", "provider") == "provider", "n4_final_mode_mismatch")
     require(last["sequence"] < final_event["sequence"] < one("policy_action_decode")["sequence"], "n4_final_order")
     require(terminal["iter_idx"] == 9 and terminal["canonical_event_sequence"] == last["sequence"]
@@ -167,21 +168,95 @@ def _audit_n4_terminal_population(kinds, context, final_event):
             and same(terminal["raw_provider_quality"], last_values["effective_quality"]), "n4_last_population_cost_raw_mismatch")
     minimum = int(torch.argmin(final_costs).item())
     ties = torch.nonzero(final_costs == final_costs.min(), as_tuple=False).reshape(-1).tolist()
-    require(type(final["selected_index"]) is int and final["selected_index"] == minimum
-            and isinstance(terminal["minimum_cost_tie_indices"], list)
+    require(isinstance(terminal["minimum_cost_tie_indices"], list)
             and all(type(i) is int for i in terminal["minimum_cost_tie_indices"])
             and terminal["minimum_cost_tie_indices"] == ties, "n4_first_native_cost_argmin_or_ties")
-    require(terminal["selected_occurrence_id"] == last_values["occurrence_ids"][minimum], "n4_selected_occurrence_mismatch")
+    selected_index = minimum
+    n5_audit = None
+    if n5_mode:
+        grasp = terminal.get("grasp_selection")
+        require(isinstance(grasp, dict) and grasp.get("absolute_reach_m") == 0.06
+                and grasp.get("relative_reach_m") == 0.03
+                and type(grasp.get("native_argmin_index")) is int
+                and grasp["native_argmin_index"] == minimum, "n5_threshold_or_reference_invalid")
+        target_index = grasp.get("target_index")
+        if target_index is None:
+            require(isinstance(grasp.get("recognition_reason"), str) and grasp["recognition_reason"]
+                    and grasp.get("best_reach_m") is None
+                    and grasp.get("projected_distances_m") is None
+                    and grasp.get("positive_commands") is None
+                    and grasp.get("eligible_indices") == [], "n5_fallback_invalid")
+        else:
+            providers = context["values"]["providers"]
+            require(len(providers) == 1 and type(target_index) is int
+                    and grasp.get("recognition_reason") == "recognized_weighted_distance_template",
+                    "n5_provider_recognition_invalid")
+            source = providers[0]
+            source_path = source.get("source_path")
+            require(source.get("source_text_origin") == "loader_attached_text"
+                    and isinstance(source_path, str) and Path(source_path).is_file(),
+                    "n5_provider_source_missing")
+            source_text = Path(source_path).read_text()
+            require(hashlib.sha256(source_text.encode()).hexdigest() == source.get("source_text_sha256"),
+                    "n5_provider_source_hash_mismatch")
+            from core.qd_executed_quality import _template_index
+            try:
+                _, _, parsed_index = _template_index(source_text)
+            except (ValueError, SyntaxError, TypeError) as exc:
+                raise AuditFailure("n5_provider_template_invalid") from exc
+            require(parsed_index == target_index, "n5_target_index_mismatch")
+            source_keypoints = context["values"]["keypoints"]
+            keypoints = scoring[9]["values"]["keypoints"]
+            projected = scoring[9]["values"]["projected_xyz"]
+            require(tensor(keypoints) and keypoints.ndim == 2 and keypoints.shape[1] == 3
+                    and 0 <= target_index < len(keypoints)
+                    and tensor(projected) and projected.shape == (16, 9, 3)
+                    and projected.dtype == population.dtype == keypoints.dtype
+                    and tensor(source_keypoints) and source_keypoints.shape == keypoints.shape
+                    and torch.equal(source_keypoints.to(keypoints.dtype), keypoints),
+                    "n5_native_projection_or_keypoints_invalid")
+            distances = torch.linalg.vector_norm(
+                projected[:, 1:9].float() - keypoints[target_index].float(), dim=-1)
+            recorded_distances = grasp.get("projected_distances_m")
+            require(tensor(recorded_distances) and recorded_distances.dtype == torch.float32
+                    and recorded_distances.shape == (16, 8)
+                    and torch.equal(recorded_distances, distances)
+                    and grasp.get("best_reach_m") == float(distances.min().item()),
+                    "n5_distance_or_projection_mismatch")
+            decoder_path = Path(__file__).resolve().parents[1] / "core" / "rdt_libero_action_converter.py"
+            spec = importlib.util.spec_from_file_location("n5_audit_deployed_decoder", decoder_path)
+            decoder = importlib.util.module_from_spec(spec); spec.loader.exec_module(decoder)
+            decoded = decoder.rdt_action_to_libero_raw(population[:, :8, :])
+            grip = decoded[:, :, 6]
+            require(grip.shape == (16, 8) and bool(((grip == -1) | (grip == 1)).all()),
+                    "n5_deployed_gripper_command_invalid")
+            positive = grip > 0
+            require(tensor(grasp.get("positive_commands"))
+                    and grasp["positive_commands"].dtype == torch.bool
+                    and torch.equal(grasp["positive_commands"], positive),
+                    "n5_command_sign_mismatch")
+            eligibility = (positive & (distances <= 0.06)
+                           & (distances <= distances.min() + 0.03)).any(dim=1)
+            eligible_indices = torch.nonzero(eligibility, as_tuple=False).reshape(-1).tolist()
+            require(grasp.get("eligible_indices") == eligible_indices, "n5_eligibility_mismatch")
+            if eligible_indices:
+                selected_index = int(torch.argmin(final_costs.masked_fill(~eligibility, float("inf"))).item())
+        n5_audit = {"target_index": target_index, "recognition_reason": grasp["recognition_reason"],
+                    "native_argmin_index": minimum, "eligible_indices": grasp["eligible_indices"],
+                    "selected_index": selected_index}
+    require(type(final["selected_index"]) is int and final["selected_index"] == selected_index,
+            "n5_selector_mismatch" if n5_mode else "n4_first_native_cost_argmin_or_ties")
+    require(terminal["selected_occurrence_id"] == last_values["occurrence_ids"][selected_index], "n4_selected_occurrence_mismatch")
     selected = native(final["selected_latent"], (1, 64, 128), population.dtype)
-    require(same(selected, population[minimum:minimum + 1]) and final["selected_cost"] == final_costs[minimum].item()
-            and final["selected_quality"] == last_values["effective_quality"][minimum].item(), "n4_selected_native_cost_raw_mismatch")
+    require(same(selected, population[selected_index:selected_index + 1]) and final["selected_cost"] == final_costs[selected_index].item()
+            and final["selected_quality"] == last_values["effective_quality"][selected_index].item(), "n4_selected_native_cost_raw_mismatch")
     cells = terminal["cell_ids"]
     require(tensor(cells) and cells.dtype == torch.int64 and cells.shape == (16,)
-            and bool(((cells >= 0) & (cells < 16)).all()) and final["selected_cell"] == cells[minimum].item(), "n4_selected_recorded_cell_mismatch")
+            and bool(((cells >= 0) & (cells < 16)).all()) and final["selected_cell"] == cells[selected_index].item(), "n4_selected_recorded_cell_mismatch")
     parent_cells = terminal["parent_cell_ids"]
     require(tensor(parent_cells) and parent_cells.dtype == torch.int64 and parent_cells.shape == (16,)
             and same(parent_cells, allocations[9]["values"]["parent_cell_ids"])
-            and terminal["selected_parent_cell"] == parent_cells[minimum].item(), "n4_selected_parent_cell_mismatch")
+            and terminal["selected_parent_cell"] == parent_cells[selected_index].item(), "n4_selected_parent_cell_mismatch")
     require(final["selected_fingerprint"] == fingerprints(selected)[0], "n4_selected_fingerprint_mismatch")
 
     ap = archive["population"]
@@ -205,7 +280,7 @@ def _audit_n4_terminal_population(kinds, context, final_event):
 
     reference = final["stage_reward_reference"]
     require(reference["reference_scope"] == "qd_archive_cost_spread" and same(reference["reference_costs"], ac)
-            and same(reference["selected_raw_reward"], last_values["effective_quality"][minimum]), "n4_stage_raw_or_archive_scale_reference")
+            and same(reference["selected_raw_reward"], last_values["effective_quality"][selected_index]), "n4_stage_raw_or_archive_scale_reference")
     binding = one("terminal_population_stage_binding"); bv = binding["values"]
     require(final_event["sequence"] < binding["sequence"] < one("policy_action_decode")["sequence"], "n4_stage_binding_order")
     require(all(type(bv[k]) in (int, float) and math.isfinite(bv[k]) for k in
@@ -232,7 +307,8 @@ def _audit_n4_terminal_population(kinds, context, final_event):
     differences = torch.nonzero(actual[0] != hypothetical[0], as_tuple=False).tolist()
     return {"decision_id": context["decision_id"], "global_step": context["global_step"],
         "canonical_batches_verified": 11, "canonical_candidates_verified": 176, "parent_rounds_verified": 10,
-        "actual_prefix_length": m, "selected_index": minimum, "minimum_cost_tie_indices": ties,
+        "actual_prefix_length": m, "selected_index": selected_index, "minimum_cost_tie_indices": ties,
+        "n5_grasp_selection": n5_audit,
         "selected_occurrence_id": terminal["selected_occurrence_id"], "selected_native_sha256": _native_sha(selected[0]),
         "selected_fingerprint": final["selected_fingerprint"],
         "selected_cell": final["selected_cell"], "selected_parent_cell": terminal["selected_parent_cell"],
@@ -597,19 +673,22 @@ def audit_episode(episode_dir, episode_compute_file):
                         episode_ended = bool(value["terminated"] or value["truncated"])
                         pending = None
             require(pending is None and prefixes > 0, "unfinished_or_unexecuted_decision")
-            n4_markers = any(r["values"].get("selection_rule") == "terminal_population_first_argmin"
-                             or r["values"].get("qd_final_selection_mode") == "terminal_population_v1"
+            n4_markers = any(r["values"].get("selection_rule") in {"terminal_population_first_argmin", "terminal_grasp_proximity"}
+                             or r["values"].get("qd_final_selection_mode") in {"terminal_population_v1", "terminal_grasp_proximity_v1"}
                              or "terminal_population" in r["values"] for r in kinds["final_selection"])
             if n4_markers or kinds["terminal_population_stage_binding"]:
                 require(guided and not dual_active, "n4_unguided_or_dual_quality")
-                n4 = _audit_n4_terminal_population(kinds, context, one("final_selection"))
-                gate = report.setdefault("n4_terminal_population_audit", {
-                    "schema": "n4-native-terminal-population-audit-v1", "checked_decisions": 0,
+                final_event = one("final_selection")
+                n5_mode = final_event["values"].get("qd_final_selection_mode") == "terminal_grasp_proximity_v1"
+                n4 = _audit_n4_terminal_population(kinds, context, final_event)
+                gate = report.setdefault("n5_grasp_timing_audit" if n5_mode else "n4_terminal_population_audit", {
+                    "schema": "n5-native-grasp-timing-audit-v1" if n5_mode else "n4-native-terminal-population-audit-v1",
+                    "checked_decisions": 0,
                     "canonical_batches_verified": 0, "canonical_candidates_verified": 0,
                     "parent_rounds_verified": 0, "actual_actions_verified": 0,
                     "decoded_reference_first8_different_decisions": 0,
                     "decoded_reference_actual_prefix_different_decisions": 0,
-                    "decisions": [], "scope": "N4 last canonical16 native-cost first-index consumer, all canonical/parent associations, original raw/Stage metadata and deployed actual command linkage; stored archive-reference decoding is not a counterfactual rollout"})
+                    "decisions": [], "scope": "N5 last canonical16 grasp-proximity consumer with source target, exact projected-command formula, all canonical/parent associations, original raw/Stage metadata and deployed action linkage; stored reference decoding is not a counterfactual rollout" if n5_mode else "N4 last canonical16 native-cost first-index consumer, all canonical/parent associations, original raw/Stage metadata and deployed actual command linkage; stored archive-reference decoding is not a counterfactual rollout"})
                 gate["checked_decisions"] += 1
                 for field in ("canonical_batches_verified", "canonical_candidates_verified", "parent_rounds_verified"):
                     gate[field] += n4[field]
