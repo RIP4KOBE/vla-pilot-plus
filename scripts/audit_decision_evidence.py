@@ -305,6 +305,12 @@ def _audit_n4_terminal_population(kinds, context, final_event):
         require(numeric_same(row["values"]["action_numpy"], actual[0, index]), "n4_actual_dispatch_mismatch")
     hypothetical = decoder.decode_rdt_libero_action_chunk(archive["selected_latent"].float(), 8)
     differences = torch.nonzero(actual[0] != hypothetical[0], as_tuple=False).tolist()
+    n5_native_reference_differences = None
+    if n5_mode:
+        native_reference = decoder.decode_rdt_libero_action_chunk(
+            population[minimum:minimum + 1].float(), 8)
+        n5_native_reference_differences = torch.nonzero(
+            actual[0] != native_reference[0], as_tuple=False).tolist()
     return {"decision_id": context["decision_id"], "global_step": context["global_step"],
         "canonical_batches_verified": 11, "canonical_candidates_verified": 176, "parent_rounds_verified": 10,
         "actual_prefix_length": m, "selected_index": selected_index, "minimum_cost_tie_indices": ties,
@@ -324,6 +330,10 @@ def _audit_n4_terminal_population(kinds, context, final_event):
         "canonical_sources": batches, "parent_associations": parent_links, "archive_associations": archive_links,
         "decoded_reference_first8_diff_positions": differences,
         "decoded_reference_actual_prefix_diff_positions": [p for p in differences if p[0] < m],
+        "n5_native_argmin_first8_diff_positions": n5_native_reference_differences,
+        "n5_native_argmin_actual_prefix_diff_positions": (
+            [p for p in n5_native_reference_differences if p[0] < m]
+            if n5_native_reference_differences is not None else None),
         "stage_binding_sequence": binding["sequence"], "stage_raw_reward": bv["selected_raw_reward"],
         "stage_init_reward": bv["stage_init_reward"], "normalized_reward_written": bv["normalized_reward"],
         "archive_cost_spread_scale": bv["archive_cost_spread_scale"],
