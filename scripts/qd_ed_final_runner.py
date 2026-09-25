@@ -219,6 +219,18 @@ def expand_candidate(candidate_id, candidate, baseline):
                 'N4 must change only qd_final_selection_mode to terminal_population_v1')
         require(candidate.get('only_algorithm_change') == {field: {'before': 'archive_global_best', 'after': 'terminal_population_v1'}},
                 'N4 declared algorithm delta differs')
+    elif contract == 'n5_grasp_timing_only_v1':
+        require(candidate_id == 'N5', 'N5 contract requires N5 identity')
+        field = 'qd_final_selection_mode'
+        require(original.get(field, 'archive_global_best') == 'archive_global_best', 'N5 Q0 baseline consumer differs')
+        require(set(profile) == set(original) | {field} and profile.get(field) == 'terminal_grasp_proximity_v1'
+                and {k:v for k,v in profile.items() if k != field} == {k:v for k,v in original.items() if k != field},
+                'N5 must preserve Q0 search and change only final selection')
+        require(candidate.get('only_algorithm_change') == {field: {'before': 'terminal_population_v1', 'after': 'terminal_grasp_proximity_v1'}},
+                'N5 declared delta from N4 differs')
+        parent = candidate.get('parent_candidate')
+        require(isinstance(parent, dict) and parent.get('path') == 'configs/qd_ed_final/candidate_n4.json'
+                and parent.get('sha256') == digest(ROOT / parent['path']), 'N5 parent N4 profile identity differs')
     else:
         raise GateError('unknown candidate algorithm contract')
     active = copy.deepcopy(baseline)
@@ -289,6 +301,22 @@ def n4_dispatch_support(plan):
     return n4e1_support() if is_n4e1_plan(plan) else n4_support()
 
 
+def is_n5_plan(plan):
+    return plan.get('n5_cohort') is not None or 'N5' in plan.get('candidate_profiles', {})
+
+
+_N5_SUPPORT = None
+
+
+def n5_support():
+    global _N5_SUPPORT
+    if _N5_SUPPORT is None:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('qd_ed_n5_plan_contract', Path(__file__).with_name('qd_ed_n5_plan.py'))
+        _N5_SUPPORT = importlib.util.module_from_spec(spec); spec.loader.exec_module(_N5_SUPPORT)
+    return _N5_SUPPORT
+
+
 def stage_condition(runtime):
     stage_overrides(runtime)
     return n4e1_support().STAGE_CONDITION if runtime.get('stage_engineering_condition') is not None else CODEX_STAGE_CONDITION
@@ -330,8 +358,8 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
     require(Path(runtime['worktree']).resolve() == root, 'runtime worktree mismatch')
     require(Path(runtime['artifact_root']).resolve() == artifact_root, 'runtime artifact root mismatch')
     stage_overrides(runtime)
-    require((runtime.get('stage_engineering_condition') is not None)==is_n4e1_plan(plan),
-        'E1 transport requires its dedicated cohort; old transport remains unchanged')
+    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan)),
+        '180s transport requires its dedicated N4-E1 or N5 cohort')
     physical_gpu = runtime_gpu(runtime, state)
     if require_frozen:
         require(plan.get('egl_mapping_verified') is True and runtime.get('cuda_egl_verified') is True, f'GPU{physical_gpu}/EGL mapping not verified')
@@ -402,6 +430,8 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
         n3_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
     if is_n4_plan(plan):
         n4_dispatch_support(plan).validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if is_n5_plan(plan):
+        n5_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
     return plan, manifest, runtime
 
 
@@ -945,6 +975,8 @@ def validate_result(output, row, profile, runtime=None):
             require(record.get('qd_quality_mode')=='executed_feedback_v1', 'N3 requested quality mode identity mismatch')
         if eds.get('qd_final_selection_mode','archive_global_best')=='terminal_population_v1':
             require(record.get('qd_final_selection_mode')=='terminal_population_v1', 'N4 requested consumer mode identity mismatch')
+        if eds.get('qd_final_selection_mode','archive_global_best')=='terminal_grasp_proximity_v1':
+            require(record.get('qd_final_selection_mode')=='terminal_grasp_proximity_v1', 'N5 requested consumer mode identity mismatch')
         for key in ('nonfinite_count','gripper_qpos_violation_count','qd_accounting_violation_count','qd_elite_monotonicity_violation_count','qd_final_selection_mismatch_count','qd_secondary_invariant_violation_count'):
             require(type(record.get(key)) is int and record[key]==0, f'metric violation or missing field: {key}')
         require(type(record.get('action_mask_violation_max')) in (int,float) and math.isfinite(record['action_mask_violation_max']) and 0<=record['action_mask_violation_max']<=1e-6, 'action mask violation or missing field')
@@ -1040,6 +1072,8 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
             n3_support().require_scope(plan, root, globals())
         if is_n4_plan(plan):
             n4_dispatch_support(plan).require_scope(plan, root, globals())
+        if is_n5_plan(plan):
+            n5_support().require_scope(plan, root, globals())
         require(plan.get('phase_authorization', {}).get(split) is True, f'{split} has not passed its preregistered phase gate')
         rows=selected_rows(plan,split,iteration)
         if episode_keys:
@@ -1067,6 +1101,11 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                 n4_dispatch_support(plan).require_scope(plan, root, globals(), row)
                 n4_dispatch_support(plan).protected_budget(state, events, resources, row, timeout, globals(), plan=plan)
                 n2_base=n4_dispatch_support(plan).admission(plan,runtime,row,events,resources,root,globals())
+            if is_n5_plan(plan):
+                support=n5_support()
+                support.require_scope(plan,root,globals(),row)
+                support.protected_budget(state,events,resources,row,timeout,globals(),plan=plan)
+                n2_base=support.admission(plan,runtime,row,events,resources,root,globals())
             admission=gpu_admission(physical_gpu=physical_gpu,expected_uuid=runtime['gpu_mapping']['uuid'])
             attempt_id=f"{plan['run_name']}__{row['episode_key']}__{uuid.uuid4().hex[:12]}"
             command,output=build_command(plan,manifest,runtime,row,attempt_id)
@@ -1134,6 +1173,8 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                     terminal['n3_episode_dispatched']=dispatched
                 if is_n4_plan(plan):
                     terminal['n4e1_episode_dispatched' if is_n4e1_plan(plan) else 'n4_episode_dispatched']=dispatched
+                if is_n5_plan(plan):
+                    terminal['n5_episode_dispatched']=dispatched
                 append_event(root,terminal)
                 durable_json(output/'attempt-result.json',terminal)
                 summaries.append(terminal)
@@ -1186,6 +1227,7 @@ def reconcile_ledger(plan_path, attempt_id, *, root=ROOT):
                   'gpu_process_wall_seconds':max(0.,time.time()-dispatched['time_unix']) if dispatched else 0.,
                   'gpu_time_measurement':'conservative upper bound through explicit dead-process reconciliation'}
         if is_n4e1_plan(plan):terminal['n4e1_episode_dispatched']=dispatched is not None
+        if is_n5_plan(plan):terminal['n5_episode_dispatched']=dispatched is not None
         append_event(root,terminal); durable_json(output/'attempt-result.json',terminal)
         return terminal
 
