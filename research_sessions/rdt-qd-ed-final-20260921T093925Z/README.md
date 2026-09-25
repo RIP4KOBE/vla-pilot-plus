@@ -29,8 +29,8 @@ original paths and exact Git heads are in `archive-layout-v1.json`.
 - `artifacts/`: all large run outputs, frozen plans, reports, videos, decision
   bundles and the September 25 same-state diagnostic.
 
-Each variant remains an independent Git worktree with its original commit and
-branch. Legacy paths under `.worktrees/exp/rdt-qd-ed-*` are compatibility
+Each implemented variant remains an independent Git worktree with its original
+commit and branch; the N8 screen is a read-only draft. Legacy paths under `.worktrees/exp/rdt-qd-ed-*` are compatibility
 symlinks, because frozen plans and evidence reference those absolute paths.
 The `artifacts/` entry points to the original 28 GB `/mnt/data` artifact tree:
 the workspace disk cannot hold a duplicate, and relocating its underlying
