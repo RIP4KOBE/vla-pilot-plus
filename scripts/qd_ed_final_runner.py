@@ -166,7 +166,10 @@ def verify_files(records, *, root=None, allowed_roots=None):
         require(key not in seen, f'duplicate fingerprint path: {path}')
         seen.add(key)
         if allowed_roots:
-            require(any(path.is_relative_to(Path(base).resolve()) for base in allowed_roots) and
+            # Archive relocation keeps frozen lexical worktree paths as
+            # compatibility symlinks. Require both an allowed original prefix
+            # and a resolved target inside an owned root.
+            require(any(path.is_relative_to(Path(os.path.abspath(base))) for base in allowed_roots) and
                     any(path.resolve().is_relative_to(Path(base).resolve()) for base in allowed_roots), f'input symlink escapes owned roots: {path}')
         if 'resolved_path' in record:
             require(str(path.resolve())==record['resolved_path'], f'input link resolution changed: {path}')
@@ -364,7 +367,7 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
     if require_frozen:
         require(plan.get('egl_mapping_verified') is True and runtime.get('cuda_egl_verified') is True, f'GPU{physical_gpu}/EGL mapping not verified')
         require(runtime.get('provider_ready') is True, 'frozen Stage provider is not ready')
-    verify_files(runtime['files'],allowed_roots=(root,artifact_root))
+    verify_files(runtime['files'],allowed_roots=(root,state.get('worktree',str(root)),artifact_root))
     inventory_path = owned(plan['runtime_inventory_path'], root)
     require(digest(inventory_path) == plan['runtime_inventory_sha256'], 'model/input inventory fingerprint mismatch')
     inventory = read_json(inventory_path)
