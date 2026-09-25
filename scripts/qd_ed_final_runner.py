@@ -396,7 +396,23 @@ def n7_validation_support():
     return _N7_VALIDATION_SUPPORT
 
 
+_N7_VALIDATION_CONTINUATION_SUPPORT = None
+
+
+def n7_validation_continuation_support():
+    global _N7_VALIDATION_CONTINUATION_SUPPORT
+    if _N7_VALIDATION_CONTINUATION_SUPPORT is None:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('qd_ed_n7_validation_continuation_contract',
+            Path(__file__).with_name('qd_ed_n7_validation_continuation.py'))
+        _N7_VALIDATION_CONTINUATION_SUPPORT = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_N7_VALIDATION_CONTINUATION_SUPPORT)
+    return _N7_VALIDATION_CONTINUATION_SUPPORT
+
+
 def n7_dispatch_support(plan):
+    if plan.get('n7_validation_continuation') is not None:
+        return n7_validation_continuation_support()
     return n7_validation_support() if plan.get('n7_validation') is not None else n7_support()
 
 
@@ -841,6 +857,8 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
 
 
 def check_retry(events, row):
+    if row.get('n7_validation_recovery_contract') is not None:
+        return n7_validation_continuation_support().check_retry(events,row,globals())
     if str(row.get('iteration'))=='N4_E1_TRANSPORT180_DEV_20260924' or row.get('n4e1_recovery_contract') is not None:
         return n4e1_support().check_retry(events,row,globals())
     if str(row.get('iteration')) == 'N4_TERMINAL_POPULATION_DEV_20260924' or row.get('n4_recovery_contract') is not None:
