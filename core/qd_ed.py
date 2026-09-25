@@ -11,6 +11,11 @@ from torch import Tensor
 
 EXECUTION_INTENT_DESCRIPTOR = "target_distance_gripper_duty_v1"
 HEIGHT_AWARE_DESCRIPTOR = "target_horizontal_radius_signed_height_v1"
+DIRECTION_HEIGHT_DESCRIPTOR = "target_xy_quadrant_signed_height_v1"
+DIRECTION_HEIGHT_AXES = (
+    {"name": "target_relative_xy_quadrant", "unit": "category"},
+    {"name": "target_relative_signed_height", "unit": "m"},
+)
 HEIGHT_AWARE_AXES = (
     {"name": "target_horizontal_radius", "unit": "m"},
     {"name": "target_relative_signed_height", "unit": "m"},
@@ -93,6 +98,23 @@ def height_aware_descriptor(trajectories: Tensor, keypoints: Tensor | None) -> T
     height = endpoint[:, 2] - target[2]
     return _finite_tensor(torch.stack((radial, height), dim=1),
                           name="QD height-aware descriptor").detach()
+
+
+def direction_height_descriptor(trajectories: Tensor, keypoints: Tensor | None) -> Tensor:
+    """Use the native eighth projected endpoint's XY sign and signed height."""
+    trajectories = _finite_tensor(trajectories, name="QD trajectories", ndim=3)
+    if trajectories.shape[0] <= 0 or tuple(trajectories.shape[1:]) != (9, 3):
+        raise ValueError("Direction-height QD requires start plus eight projected positions")
+    if keypoints is None:
+        raise ValueError("Direction-height QD requires keypoints")
+    target = _finite_tensor(keypoints, name="QD keypoints").reshape(-1)
+    if target.numel() < 3:
+        raise ValueError("Direction-height QD requires a 3D target")
+    endpoint = trajectories[:, 8, :3].detach().float()
+    delta = endpoint - target[:3].detach().to(endpoint)
+    quadrant = 2 * (delta[:, 0] >= 0).float() + (delta[:, 1] >= 0).float()
+    result = torch.stack((quadrant, delta[:, 2]), dim=1)
+    return _finite_tensor(result, name="QD direction-height descriptor").detach()
 
 
 def execution_intent_descriptor(
@@ -215,6 +237,32 @@ def freeze_execution_intent_bounds(
     payload = {"descriptor": EXECUTION_INTENT_DESCRIPTOR, "axes": EXECUTION_INTENT_AXES,
                "radial_checksum": radial.checksum,
                "descriptors": sorted(descriptors.cpu().tolist()),
+               "lo": lo.cpu().tolist(), "hi": hi.cpu().tolist()}
+    checksum = hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    return QDBounds(lo=lo, hi=hi, checksum=checksum)
+
+
+def freeze_direction_height_bounds(
+    descriptors: Tensor,
+    *,
+    quantiles: tuple[float, float] | list[float],
+    expand_fraction: float,
+    min_axis_span_m: float,
+) -> QDBounds:
+    """Fix categorical columns and freeze metre-valued height from the initial pool."""
+    descriptors = _finite_tensor(descriptors, name="QD direction-height descriptors", ndim=2).detach().float()
+    if descriptors.shape[0] <= 0 or descriptors.shape[1] != 2:
+        raise ValueError("QD direction-height descriptors must have shape (population, 2)")
+    q = descriptors[:, 0]
+    if not bool(((q >= 0) & (q <= 3) & (q == q.round())).all().item()):
+        raise ValueError("QD direction-height quadrant must be an integer in [0,3]")
+    height = descriptors[:, 1:2].expand(-1, 2)
+    base = freeze_bounds(height, quantiles=quantiles,
+                         expand_fraction=expand_fraction, min_axis_span_m=min_axis_span_m)
+    lo = torch.stack((q.new_tensor(-.5), base.lo[0]))
+    hi = torch.stack((q.new_tensor(3.5), base.hi[0]))
+    payload = {"descriptor": DIRECTION_HEIGHT_DESCRIPTOR, "axes": DIRECTION_HEIGHT_AXES,
+               "height_checksum": base.checksum, "descriptors": sorted(descriptors.cpu().tolist()),
                "lo": lo.cpu().tolist(), "hi": hi.cpu().tolist()}
     checksum = hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     return QDBounds(lo=lo, hi=hi, checksum=checksum)
@@ -386,7 +434,7 @@ class QDArchive:
         self.cell_count = self.grid_shape[0] * self.grid_shape[1]
         self.secondary_lane_mode = secondary_lane_mode
         if descriptor_mode not in {"target_relative_endpoint_xy", EXECUTION_INTENT_DESCRIPTOR,
-                                   HEIGHT_AWARE_DESCRIPTOR}:
+                                   HEIGHT_AWARE_DESCRIPTOR, DIRECTION_HEIGHT_DESCRIPTOR}:
             raise ValueError("Unsupported QD archive descriptor mode")
         self.descriptor_mode = descriptor_mode
         self.entries: dict[int, QDArchiveEntry] = {}

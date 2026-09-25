@@ -172,6 +172,106 @@ def _audit_n6_height_assignment(kinds, final_event):
             "parent_slots_from_split_cells": parent_from_split}
 
 
+def _audit_n7_direction_height_assignment(kinds, final_event):
+    """Independently bind N7's categorical direction and signed height to the native pool."""
+    assignments = kinds["qd_descriptor_assignment"]
+    require(len(assignments) == 11 and [x["values"]["iter_idx"] for x in assignments]
+            == list(range(-1, 10)), "n7_assignment_coverage")
+    scoring = {x["sequence"]: x for x in kinds["scoring_inputs"]}
+    canonical = {x["values"]["iter_idx"]: x for x in kinds["canonical_candidate_batch"]}
+    require(set(canonical) == set(range(-1, 10)), "n7_canonical_coverage")
+    initial_bounds = old_bounds = n6_bounds = None
+    split_cells_by_iter = {}
+    old_split_pairs = n6_split_pairs = 0
+
+    def quantile_bounds(values):
+        q = torch.quantile(values, torch.tensor([.05, .95]), dim=0)
+        span = q[1] - q[0]
+        lo, hi = q[0] - .1 * span, q[1] + .1 * span
+        small = hi - lo < .08
+        center = torch.quantile(values, .5, dim=0)
+        return torch.where(small, center - .04, lo), torch.where(small, center + .04, hi)
+
+    def locate(values, bounds):
+        lo, hi = bounds
+        b = torch.floor((values - lo) / (hi - lo) * 4).long().clamp(0, 3)
+        return b[:, 1] * 4 + b[:, 0]
+
+    for record in assignments:
+        v = record["values"]; it = v["iter_idx"]
+        source = scoring.get(v.get("scoring_batch_id"))
+        require(v.get("descriptor_mode") == "target_xy_quadrant_signed_height_v1"
+                and source is not None and canonical[it]["sequence"] < record["sequence"]
+                and tensor(v.get("descriptors")) and v["descriptors"].shape == (16, 2)
+                and v["descriptors"].dtype == torch.float32
+                and tensor(v.get("cell_ids")) and v["cell_ids"].shape == (16,)
+                and v["cell_ids"].dtype == torch.int64
+                and tensor(v.get("overflow")) and v["overflow"].shape == (16,)
+                and v["overflow"].dtype == torch.bool,
+                "n7_assignment_source_or_shape")
+        require(source["values"]["scoring_scope"]["iter_idx"] == it,
+                "n7_scoring_iteration_association")
+        projected = source["values"]["projected_xyz"]
+        keypoints = source["values"]["keypoints"]
+        require(tensor(projected) and projected.shape == (16, 9, 3)
+                and tensor(keypoints) and keypoints.ndim == 2 and keypoints.shape[1] == 3,
+                "n7_source_projection_or_keypoints")
+        delta = projected[:, 8, :3].float() - keypoints[0].float()
+        quadrant = 2 * (delta[:, 0] >= 0).float() + (delta[:, 1] >= 0).float()
+        expected = torch.stack((quadrant, delta[:, 2]), dim=1)
+        require(bool(((expected - v["descriptors"]).abs() <= 1e-7).all()),
+                "n7_descriptor_formula_mismatch")
+        lo, hi = v.get("bounds_lo"), v.get("bounds_hi")
+        require(tensor(lo) and tensor(hi) and lo.shape == hi.shape == (2,)
+                and lo.dtype == hi.dtype == torch.float32 and bool(((hi - lo) > 0).all()),
+                "n7_bounds_invalid")
+        if initial_bounds is None:
+            height_lo, height_hi = quantile_bounds(expected[:, 1:2])
+            require(float(lo[0]) == -.5 and float(hi[0]) == 3.5
+                    and abs(float(lo[1] - height_lo[0])) <= 1e-6
+                    and abs(float(hi[1] - height_hi[0])) <= 1e-6,
+                    "n7_initial_bounds_formula_mismatch")
+            initial_bounds = (lo, hi)
+            old_bounds = quantile_bounds(delta[:, :2])
+            radial = torch.linalg.vector_norm(delta[:, :2], dim=1)
+            n6_bounds = quantile_bounds(torch.stack((radial, delta[:, 2]), dim=1))
+        else:
+            require(torch.equal(lo, initial_bounds[0]) and torch.equal(hi, initial_bounds[1]),
+                    "n7_fixed_initial_bounds_changed")
+        cells = locate(v["descriptors"], (lo, hi))
+        overflow = ((v["descriptors"] < lo) | (v["descriptors"] > hi)).any(dim=1)
+        require(torch.equal(cells, v["cell_ids"]) and torch.equal(overflow, v["overflow"])
+                and torch.equal(locate(expected, (lo, hi)), cells),
+                "n7_cell_or_threshold_association_mismatch")
+        old_cells = locate(delta[:, :2], old_bounds).tolist()
+        radius = torch.linalg.vector_norm(delta[:, :2], dim=1)
+        n6_cells = locate(torch.stack((radius, delta[:, 2]), dim=1), n6_bounds).tolist()
+        new_cells = cells.tolist()
+        split_cells = set()
+        for left in range(16):
+            for right in range(left + 1, 16):
+                if old_cells[left] == old_cells[right] and new_cells[left] != new_cells[right]:
+                    old_split_pairs += 1
+                    split_cells.update((new_cells[left], new_cells[right]))
+                if n6_cells[left] == n6_cells[right] and new_cells[left] != new_cells[right]:
+                    n6_split_pairs += 1
+                    split_cells.update((new_cells[left], new_cells[right]))
+        split_cells_by_iter[it] = split_cells
+    last = assignments[-1]["values"]
+    terminal = final_event["values"]["terminal_population"]
+    require(torch.equal(last["cell_ids"], terminal["cell_ids"])
+            and last["cell_ids"][final_event["values"]["selected_index"]].item()
+            == final_event["values"]["selected_cell"], "n7_terminal_cell_association")
+    parent_from_split = 0
+    for row in kinds["archive_parent_allocation"]:
+        prior = set().union(*(split_cells_by_iter[it] for it in range(-1, row["values"]["iter_idx"])))
+        parent_from_split += sum(int(cell) in prior for cell in row["values"]["parent_cell_ids"].tolist())
+    return {"assignments_verified": 11, "candidates_verified": 176,
+            "old_xy_same_cell_new_split_pairs": old_split_pairs,
+            "n6_same_cell_new_split_pairs": n6_split_pairs,
+            "parent_slots_from_split_cells": parent_from_split}
+
+
 def _audit_n4_terminal_population(kinds, context, final_event):
     """Audit the actual N4 consumer; reference decoding is not a rollout.
 
@@ -811,18 +911,22 @@ def audit_episode(episode_dir, episode_compute_file):
                 gate["decoded_reference_actual_prefix_different_decisions"] += int(bool(n4["decoded_reference_actual_prefix_diff_positions"]))
                 gate["decisions"].append(n4)
                 if kinds["qd_descriptor_assignment"]:
-                    height = _audit_n6_height_assignment(kinds, final_event)
-                    height_gate = report.setdefault("n6_height_audit", {
-                        "schema": "n6-native-height-descriptor-audit-v1",
+                    descriptor_mode = kinds["qd_descriptor_assignment"][0]["values"].get("descriptor_mode")
+                    n7_mode = descriptor_mode == "target_xy_quadrant_signed_height_v1"
+                    assignment = (_audit_n7_direction_height_assignment(kinds, final_event)
+                                  if n7_mode else _audit_n6_height_assignment(kinds, final_event))
+                    height_gate = report.setdefault("n7_direction_height_audit" if n7_mode else "n6_height_audit", {
+                        "schema": "n7-native-direction-height-descriptor-audit-v1" if n7_mode else "n6-native-height-descriptor-audit-v1",
                         "checked_decisions": 0, "assignments_verified": 0,
                         "candidates_verified": 0,
                         "old_xy_same_cell_new_split_pairs": 0,
+                        **({"n6_same_cell_new_split_pairs": 0} if n7_mode else {}),
                         "parent_slots_from_split_cells": 0,
-                        "scope": "Native scored projection, independent radial-height formula, fixed bounds, exact cells and verified parent identities; old XY mapping uses the same native pool only"})
+                        "scope": "Native scored projection, independent categorical-direction/height formula, fixed bounds, exact cells and verified parent identities; N5/N6 reference mappings use only the same native pool" if n7_mode else "Native scored projection, independent radial-height formula, fixed bounds, exact cells and verified parent identities; old XY mapping uses the same native pool only"})
                     height_gate["checked_decisions"] += 1
                     for field in ("assignments_verified", "candidates_verified",
-                                  "old_xy_same_cell_new_split_pairs", "parent_slots_from_split_cells"):
-                        height_gate[field] += height[field]
+                                  "old_xy_same_cell_new_split_pairs", "parent_slots_from_split_cells") + (("n6_same_cell_new_split_pairs",) if n7_mode else ()):
+                        height_gate[field] += assignment[field]
             if dual_mode == "executed_feedback_v1":
                 previous_feedback_certificate = _audit_n3_feedback(
                     kinds, context, final, events, previous_feedback_certificate)
