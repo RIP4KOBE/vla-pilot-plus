@@ -19,12 +19,13 @@ ROOT = Path(__file__).resolve().parents[1]
 def release_check(path, plan_path, plan, keys):
     release = runner.read_json(path)
     runner.require(release == {
-        'schema': 'qd-ed-n5-dev-execution-release-v1',
+        'schema': 'qd-ed-n5-dev-continuation-release-v1',
         'plan_path': str(plan_path.resolve()),
         'plan_sha256': runner.digest(plan_path),
         'source_commit': plan['source_commit'],
         'cohort_id': runner.n5_support().COHORT,
         'episode_keys': keys,
+        'prior_accepted_cell': plan['n5_cohort']['prior_accepted_cell'],
         'physical_gpu': 3,
         'validation_authorized': False,
         'formal_authorized': False,
@@ -78,7 +79,7 @@ def audit_result(summary, row, status, completed):
         grasp = terminal.get('grasp_selection') if isinstance(terminal, dict) else None
         verified = decision.get('n5_grasp_selection')
         runner.require(metric.get('qd_final_selection_mode') == 'terminal_grasp_proximity_v1'
-                       and metric.get('qd_quality_mode') == 'provider'
+                       and runner.n5_support().provider_metric(metric)
                        and metric.get('score_call_count') == 11
                        and metric.get('search_evaluation_count') == 176
                        and isinstance(grasp, dict) and isinstance(verified, dict)
@@ -112,15 +113,18 @@ def main():
     runner.require(Path(runner.read_state(ROOT / 'research-state.yaml')['worktree']).resolve() == ROOT,
                    'N5 supervisor must run from owning study worktree')
     plan, _, runtime = runner.validate_plan(args.plan, root=ROOT)
-    keys = [row['episode_key'] for row in plan['episodes']]
+    proof = runner.n5_support().verify_prior_cell(plan, ROOT, runner.__dict__)
+    first_key = plan['episodes'][0]['episode_key']
+    runner.require(proof['episode_key'] == first_key, 'N5 continuation does not start after task 0')
+    keys = [row['episode_key'] for row in plan['episodes'][1:]]
     release_check(args.release, args.plan, plan, keys)
     status = runner.owned(args.status, plan['artifact_root'])
     runner.require(not status.exists(), 'N5 status already exists; do not duplicate supervisor')
-    completed = []
+    completed = [first_key]
     runner.durable_json(status, {'status': 'started', 'completed_keys': completed,
                                 'selected_physical_gpu': 3})
     try:
-        for row in plan['episodes']:
+        for row in plan['episodes'][1:]:
             wait_gpu3(status, completed)
             runner.durable_json(status, {'status': 'dispatching', 'completed_keys': completed,
                                         'current_key': row['episode_key'], 'selected_physical_gpu': 3})

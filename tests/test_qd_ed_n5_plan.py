@@ -44,3 +44,9 @@ def test_n5_local_gpu_cap_preserves_protected_reserves():
     state['budget']['gpu_hours_consumed'] = 24.
     with pytest.raises(runner.GateError, match='protected GPU-hour reserves'):
         n5.protected_budget(state, [], [], row, 1800, runner.__dict__, plan={})
+
+
+def test_n5_metric_default_provider_matches_explicit_provider_only():
+    assert n5.provider_metric({})
+    assert n5.provider_metric({'qd_quality_mode': 'provider'})
+    assert not n5.provider_metric({'qd_quality_mode': 'custom'})

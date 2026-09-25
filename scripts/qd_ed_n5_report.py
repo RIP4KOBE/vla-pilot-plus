@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def report(plan_path):
     plan, _, _ = runner.validate_plan(plan_path, root=ROOT)
+    prior_cell = n5.verify_prior_cell(plan, ROOT, runner.__dict__)
     prior = runner.read_json(n5.PRIOR_REPORT)
     runner.require(runner.digest(n5.PRIOR_REPORT) == n5.PRIOR_REPORT_SHA256
                    and prior['matrix'] == 'complete_valid_12',
@@ -38,6 +39,8 @@ def report(plan_path):
                        'N5 duplicate valid scientific cell')
         accepted = next((item for item in terminals if item['event'] == 'valid'), None)
         checkpoint = None
+        expected_source = prior_cell['source_commit'] if row['task_id'] == 0 else plan['source_commit']
+        expected_plan_sha = prior_cell['plan']['sha256'] if row['task_id'] == 0 else runner.digest(plan_path)
         if accepted is not None:
             output = Path(accepted['output_dir'])
             checkpoint_path = output / 'eds_eval/n5-cell-audit.json'
@@ -47,14 +50,18 @@ def report(plan_path):
                                and checkpoint.get('attempt_id') == accepted['attempt_id']
                                and checkpoint.get('episode_key') == row['episode_key']
                                and checkpoint.get('success') == accepted['success']
-                               and checkpoint.get('source_commit') == plan['source_commit']
-                               and checkpoint.get('plan_sha256') == runner.digest(plan_path),
+                               and checkpoint.get('source_commit') == expected_source
+                               and checkpoint.get('plan_sha256') == expected_plan_sha
+                               and accepted.get('source_commit') == expected_source
+                               and accepted.get('plan_sha256') == expected_plan_sha,
                                'N5 accepted cell audit identity differs')
         seen_attempts.update(item['attempt_id'] for item in terminals)
         cells.append({'task_id': row['task_id'], 'episode_key': row['episode_key'],
                       'status': 'complete_audited' if checkpoint else 'incomplete_or_invalid',
                       'success': accepted['success'] if checkpoint else None,
                       'accepted_attempt_id': accepted['attempt_id'] if checkpoint else None,
+                      'source_commit': expected_source,
+                      'plan_sha256': expected_plan_sha,
                       'terminal_attempts': [{'attempt_id': item['attempt_id'], 'event': item['event'],
                                              'gpu_process_wall_seconds': item.get('gpu_process_wall_seconds'),
                                              'success': item.get('success')}
