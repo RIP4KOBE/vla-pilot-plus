@@ -334,6 +334,7 @@ def bind_plan(plan_path, plan, runtime, device, row, events_path, *, root=ROOT):
     runner.require(plan.get('n3_cohort') is None, 'N3 generic bind/probe forbidden; use frozen supervised runtime')
     runner.require(not runner.is_n4_plan(plan), 'N4 generic bind/probe forbidden; use frozen supervised runtime')
     runner.require(not runner.is_n5_plan(plan), 'N5 generic bind/probe forbidden; use fixed GPU3 supervisor')
+    runner.require(not runner.is_n6_plan(plan), 'N6 generic bind/probe forbidden; use fixed GPU3 supervisor')
     physical_gpu = device['physical_gpu']
     with runner.locked(root / 'data/qd-ed-runner.lock', nonblocking=True):
         pending_gate(root, row)

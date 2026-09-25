@@ -10387,3 +10387,54 @@ def test_n4_select_action_uses_actual_deployed_fp32_decode(stub_steer, stub_adap
     (tmp_path/'episode_compute.jsonl').write_text(json.dumps({'episode_id':0, 'outcome':'completed',
         'decision_evidence':rec.status()})+'\n')
     assert not torch.cuda.is_initialized()
+def test_n6_height_descriptor_real_cpu_loop_preserves_search_compute(stub_steer, stub_adapter, monkeypatch, tmp_path):
+    from core.decision_evidence import DecisionEvidence
+    from core.qd_ed import height_aware_descriptor
+    stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
+                         sample_batch_size=16, policy_config={'action_chunk_horizon': 8})
+    initial = torch.linspace(-.12, .19, 16 * 64 * 128).reshape(16, 64, 128).bfloat16()
+    monkeypatch.setattr(stub_steer, '_eds_initial_population', lambda **kw: initial.clone())
+    provider = _n2_fixture_provider()
+    keypoints = torch.tensor([[.02, .01, .03], [.13, -.21, .39]], dtype=torch.bfloat16)
+    project = stub_steer._rdt_sample_to_trajectory_3d
+    project_rows = []
+    def tracked_project(actions):
+        project_rows.append(len(actions))
+        return project(actions)
+    monkeypatch.setattr(stub_steer, '_rdt_sample_to_trajectory_3d', tracked_project)
+    runs = []
+    for descriptor in ('target_relative_endpoint_xy', 'target_horizontal_radius_signed_height_v1'):
+        stub_steer.reset(); project_rows.clear()
+        rec = DecisionEvidence(tmp_path / descriptor, episode=0)
+        stub_steer._decision_evidence = rec
+        rec.begin_decision(global_step=0, stage=1, use_guidance=True,
+                           keypoints=keypoints, providers=[provider])
+        cfg = _valid_qd_config(qd_parent_sampling='sparse_priority',
+                               qd_final_selection_mode='terminal_grasp_proximity_v1')
+        cfg['qd_descriptor'] = descriptor
+        resolved = stub_steer._resolve_eds_config_with_reference_defaults(cfg)
+        torch.manual_seed(25191)
+        stub_steer._eds_guided_denoise_loop(x_t=torch.zeros_like(initial),
+            cond=_rollout_cond(stub_steer), keypoints=keypoints,
+            guidance_fns=[provider], eds_config=resolved,
+            verbose=False, global_step=0, current_stage=1)
+        rec.flush()
+        events = [event for path in sorted(rec.root.glob('bundle_*.pt'))
+                  for event in torch.load(path, map_location='cpu', weights_only=True)['events']]
+        runs.append((stub_steer.get_episode_compute_counters(), list(project_rows),
+                     events, stub_steer.get_last_eds_metrics()))
+    assert runs[0][0] == runs[1][0]
+    for _, _, events, _ in runs:
+        canonical_scores = [event for event in events if event['event'] == 'scoring_inputs'
+                            and event['values']['scoring_scope']['role'] != 'auxiliary_pretest']
+        assert len(canonical_scores) == 11
+        assert all(len(event['values']['samples']) == 16 for event in canonical_scores)
+    assert runs[1][3]['score_call_count'] == 11 and runs[1][3]['search_evaluation_count'] == 176
+    assignments = [event for event in runs[1][2] if event['event'] == 'qd_descriptor_assignment']
+    assert [event['values']['iter_idx'] for event in assignments] == list(range(-1, 10))
+    last = assignments[-1]['values']
+    scoring = next(event for event in runs[1][2] if event['event'] == 'scoring_inputs'
+                   and event['values']['scoring_scope']['iter_idx'] == 9
+                   and event['values']['scoring_scope']['role'] != 'auxiliary_pretest')
+    assert torch.allclose(last['descriptors'], height_aware_descriptor(
+        scoring['values']['projected_xyz'], scoring['values']['keypoints']), atol=1e-7, rtol=0)

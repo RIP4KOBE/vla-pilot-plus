@@ -10,6 +10,11 @@ import torch
 from torch import Tensor
 
 EXECUTION_INTENT_DESCRIPTOR = "target_distance_gripper_duty_v1"
+HEIGHT_AWARE_DESCRIPTOR = "target_horizontal_radius_signed_height_v1"
+HEIGHT_AWARE_AXES = (
+    {"name": "target_horizontal_radius", "unit": "m"},
+    {"name": "target_relative_signed_height", "unit": "m"},
+)
 EXECUTION_INTENT_AXES = (
     {"name": "target_distance", "unit": "m"},
     {"name": "positive_gripper_command_duty", "unit": "fraction"},
@@ -69,6 +74,25 @@ def qd_descriptor(trajectories: Tensor, keypoints: Tensor | None) -> Tensor:
     if not bool(torch.isfinite(descriptor).all().item()):
         raise FloatingPointError("QD descriptor contains nonfinite values")
     return descriptor
+
+
+def height_aware_descriptor(trajectories: Tensor, keypoints: Tensor | None) -> Tensor:
+    """Describe native eighth-step horizontal radius and signed target height."""
+    trajectories = _finite_tensor(trajectories, name="QD trajectories", ndim=3)
+    if trajectories.shape[0] <= 0 or tuple(trajectories.shape[1:]) != (9, 3):
+        raise ValueError("Height-aware QD requires start plus eight projected positions")
+    if keypoints is None:
+        raise ValueError("Height-aware QD requires keypoints")
+    keypoints = _finite_tensor(keypoints, name="QD keypoints")
+    target = keypoints.reshape(-1)
+    if target.numel() < 3:
+        raise ValueError("Height-aware QD requires a 3D target")
+    endpoint = trajectories[:, 8, :3].detach().float()
+    target = target[:3].detach().to(endpoint)
+    radial = torch.linalg.vector_norm(endpoint[:, :2] - target[:2], dim=1)
+    height = endpoint[:, 2] - target[2]
+    return _finite_tensor(torch.stack((radial, height), dim=1),
+                          name="QD height-aware descriptor").detach()
 
 
 def execution_intent_descriptor(
@@ -361,7 +385,8 @@ class QDArchive:
         self.grid_shape = _grid_shape(grid_shape)
         self.cell_count = self.grid_shape[0] * self.grid_shape[1]
         self.secondary_lane_mode = secondary_lane_mode
-        if descriptor_mode not in {"target_relative_endpoint_xy", EXECUTION_INTENT_DESCRIPTOR}:
+        if descriptor_mode not in {"target_relative_endpoint_xy", EXECUTION_INTENT_DESCRIPTOR,
+                                   HEIGHT_AWARE_DESCRIPTOR}:
             raise ValueError("Unsupported QD archive descriptor mode")
         self.descriptor_mode = descriptor_mode
         self.entries: dict[int, QDArchiveEntry] = {}
