@@ -53,12 +53,20 @@ def wait_gpu3(status, completed):
             time.sleep(30)
 
 
-def audit_result(summary, row, status, completed):
+def audit_result(summary, row, status, completed, *, precomputed_report_path=None,
+                 reconciliation=None):
     output = Path(summary['output_dir'])
     evidence = output / 'eds_eval/decision_evidence/episode_000'
     compute = output / 'eds_eval/episode_compute.jsonl'
-    report = audit.audit_episode(evidence, compute)
-    runner.durable_json(output / 'eds_eval/decision-evidence-audit.json', report)
+    if precomputed_report_path is None:
+        report = audit.audit_episode(evidence, compute)
+        runner.durable_json(output / 'eds_eval/decision-evidence-audit.json', report)
+    else:
+        runner.require(Path(precomputed_report_path).resolve() ==
+                       (output / 'eds_eval/decision-evidence-audit-reconciled-v1.json').resolve()
+                       and isinstance(reconciliation, dict),
+                       'N5 reconciliation must use its separately recorded native audit')
+        report = runner.read_json(precomputed_report_path)
     runner.require(report.get('accepted') is True and report.get('evidence_complete') is True,
                    'N5 native evidence audit rejected completed episode')
     gate = report.get('n5_grasp_timing_audit')
@@ -97,6 +105,8 @@ def audit_result(summary, row, status, completed):
         'guided_chunks': len(metrics), 'native_argmin_actual_prefix_different_decisions': changed_prefix,
         'n5_native_audit_schema': gate['schema'],
         'source_commit': summary['source_commit'], 'plan_sha256': summary['plan_sha256']}
+    if reconciliation is not None:
+        checkpoint['offline_audit_reconciliation'] = reconciliation
     runner.durable_json(output / 'eds_eval/n5-cell-audit.json', checkpoint)
     runner.durable_json(status, {'status': 'cell_audited', 'completed_keys': completed + [row['episode_key']],
                                 'latest_checkpoint': str(output / 'eds_eval/n5-cell-audit.json'),
