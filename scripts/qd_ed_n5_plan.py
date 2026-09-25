@@ -19,6 +19,7 @@ COHORT = 'N5_GRASP_TIMING_DEV_20260925'
 TASKS = (0, 3, 6, 9)
 FIELDS = ('env_seed', 'policy_seed', 'init_index', 'init_row_sha256', 'init_file_sha256', 'bddl_sha256')
 PROTOCOL = 'experiments/iteration_005_grasp_timing/protocol.md'
+CONTINUATION = 'experiments/iteration_005_grasp_timing/continuation-engineering-v1.md'
 PROFILE = 'configs/qd_ed_final/candidate_n5.json'
 PARENT_PROFILE = 'configs/qd_ed_final/candidate_n4.json'
 PARENT_PLAN = Path('/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/plan.frozen.json')
@@ -27,11 +28,13 @@ PRIOR_REPORT = Path('/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921
 PRIOR_REPORT_SHA256 = '19c53c7568c504ac67f3b170cc42b70b2ec10ce23496a1f2bf130cb0702ca558'
 LIMITS = {'original_cells': 4, 'dispatches': 8, 'recoveries': 4, 'gpu_hours': 4.2,
           'episode_timeout_seconds': 1800, 'cleanup_seconds': 40, 'physical_gpu': 3}
-CODE_ADDITIONS = {PROTOCOL, PROFILE, 'core/qd_grasp_timing.py',
+CODE_ADDITIONS = {PROTOCOL, CONTINUATION, PROFILE, 'core/qd_grasp_timing.py',
                   'scripts/qd_ed_n5_plan.py', 'scripts/qd_ed_n5_supervise.py',
                   'scripts/qd_ed_n5_report.py',
                   'tests/test_qd_grasp_timing.py', 'tests/test_qd_ed_n5_plan.py'}
 _SCOPE = None
+AUDIT_PLUMBING = {'scripts/qd_ed_n5_plan.py', 'scripts/qd_ed_n5_supervise.py',
+                  'scripts/qd_ed_n5_report.py'}
 
 
 def api(value):
@@ -40,6 +43,11 @@ def api(value):
 
 def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def provider_metric(metric):
+    # The metrics writer omits this key for its default provider mode.
+    return metric.get('qd_quality_mode', 'provider') == 'provider'
 
 
 def rows_from_parent(parent):
@@ -66,6 +74,64 @@ def binding(plan, runtime):
             'runtime_inventory_sha256': plan['runtime_inventory_sha256'],
             'seed_plan_sha256': plan['seed_plan_sha256'],
             'stage_public_config_sha256': runtime['frozen_stage_provider']['public_config_sha256']}
+
+
+def verify_prior_cell(plan, root, runner):
+    """Bind task 0 to its original valid attempt and byte-identical science code."""
+    r = api(runner)
+    reference = plan['n5_cohort'].get('prior_accepted_cell')
+    r.require(isinstance(reference, dict) and set(reference) == {'path', 'sha256'},
+              'N5 continuation proof missing')
+    proof_path = r.owned(reference['path'], plan['artifact_root'])
+    r.require(r.digest(proof_path) == reference['sha256'], 'N5 continuation proof changed')
+    proof = r.read_json(proof_path)
+    r.require(proof.get('schema') == 'qd-ed-n5-prior-cell-proof-v1'
+              and proof.get('episode_key') == rows_from_parent(r.read_json(PARENT_PLAN))[0]['episode_key']
+              and proof.get('task_id') == 0, 'N5 prior cell identity differs')
+    old_plan_path = r.owned(proof['plan']['path'], plan['artifact_root'])
+    old_plan = r.read_json(old_plan_path)
+    r.require(r.digest(old_plan_path) == proof['plan']['sha256']
+              and old_plan['source_commit'] == proof['source_commit']
+              and old_plan['episodes'] == plan['episodes']
+              and old_plan['n5_cohort']['cohort_id'] == COHORT,
+              'N5 prior plan identity differs')
+    old_files = {item['path']: item['sha256'] for item in old_plan['code_files']}
+    new_files = {item['path']: item['sha256'] for item in plan['code_files']}
+    r.require(all(new_files.get(path) == sha256 for path, sha256 in old_files.items()
+                  if path not in AUDIT_PLUMBING)
+              and set(new_files) - set(old_files) <= {CONTINUATION},
+              'N5 scientific source changed during audit continuation')
+    result_path = r.owned(proof['result']['path'], plan['artifact_root'])
+    result = r.read_json(result_path)
+    audit_path = r.owned(proof['native_audit']['path'], plan['artifact_root'])
+    native = r.read_json(audit_path)
+    checkpoint_path = r.owned(proof['checkpoint']['path'], plan['artifact_root'])
+    checkpoint = r.read_json(checkpoint_path)
+    r.require(r.digest(result_path) == proof['result']['sha256']
+              and r.digest(audit_path) == proof['native_audit']['sha256']
+              and r.digest(checkpoint_path) == proof['checkpoint']['sha256']
+              and result['event'] == 'valid' and result['outcome_valid'] is True
+              and result['attempt_id'] == proof['attempt_id']
+              and result['episode_key'] == proof['episode_key']
+              and result['identity']['task_id'] == 0
+              and result['source_commit'] == proof['source_commit']
+              and result['plan_sha256'] == proof['plan']['sha256']
+              and result['success'] is False
+              and native['accepted'] is True and native['evidence_complete'] is True
+              and native['n5_grasp_timing_audit']['checked_decisions'] == result['guided_chunks']
+              and checkpoint['accepted'] is True
+              and checkpoint['attempt_id'] == proof['attempt_id']
+              and checkpoint['episode_key'] == proof['episode_key']
+              and checkpoint['source_commit'] == proof['source_commit']
+              and checkpoint['plan_sha256'] == proof['plan']['sha256']
+              and checkpoint['success'] is False,
+              'N5 prior valid result or evidence changed')
+    events = r.read_events(Path(root) / 'data/attempt-ledger.jsonl')
+    valid = [event for event in events if event.get('episode_key') == proof['episode_key']
+             and event.get('event') == 'valid']
+    r.require(len(valid) == 1 and valid[0]['attempt_id'] == proof['attempt_id'],
+              'N5 prior cell ledger identity differs')
+    return proof
 
 
 def migrated_runtime(parent, root, runner):
@@ -107,6 +173,8 @@ def validate_contract(plan, manifest, runtime, seeds, root, runner):
               'N5 plan must contain only its candidate')
     r.require(cohort.get('protocol') == {'path': PROTOCOL, 'sha256': r.digest(root / PROTOCOL)},
               'N5 protocol identity differs')
+    r.require(cohort.get('continuation_protocol') == {'path': CONTINUATION, 'sha256': r.digest(root / CONTINUATION)},
+              'N5 continuation protocol identity differs')
     r.require(cohort.get('parent_plan') == {'path': str(PARENT_PLAN), 'sha256': PARENT_PLAN_SHA256}
               and sha(PARENT_PLAN) == PARENT_PLAN_SHA256,
               'N5 frozen matched parent plan differs')
@@ -140,6 +208,7 @@ def validate_contract(plan, manifest, runtime, seeds, root, runner):
     paths = {record['path'] for record in plan['code_files']}
     r.require(CODE_ADDITIONS <= paths and set(plan['scientific_config_files']) <= paths,
               'N5 source/protocol fingerprints missing')
+    verify_prior_cell(plan, root, runner)
     state = r.read_state(root / 'research-state.yaml')
     r.require(state['resource_isolation']['status'] == 'ACTIVE'
               and state['resource_isolation']['validation_status'] == 'PASS'
@@ -198,7 +267,7 @@ def admission(plan, runtime, row, events, resources, root, runner):
     return {'n5_cohort_id': COHORT, 'n5_frozen_identity': binding(plan, runtime)}
 
 
-def build_plan(parent, root, head, runtime_path, migrated_count, runner):
+def build_plan(parent, root, head, runtime_path, migrated_count, prior_proof_path, runner):
     r = api(runner); root = Path(root)
     r.require(sha(PARENT_PLAN) == PARENT_PLAN_SHA256 and parent['source_commit'] != head,
               'N5 parent plan/head identity invalid')
@@ -219,12 +288,14 @@ def build_plan(parent, root, head, runtime_path, migrated_count, runner):
         runtime_manifest_path=str(runtime_path), runtime_manifest_sha256=r.digest(runtime_path),
         candidate_profiles={'N5': {'path': str(root / PROFILE), 'sha256': r.digest(root / PROFILE)}},
         phase_authorization={'dev': True, 'validation': False, 'formal': False},
-        scientific_config_files=sorted(set(parent['scientific_config_files']) | {PROTOCOL, PROFILE}),
+        scientific_config_files=sorted(set(parent['scientific_config_files']) | {PROTOCOL, CONTINUATION, PROFILE}),
         egl_mapping_verified=True)
     plan['n5_cohort'] = {
         'schema': 'qd-ed-n5-grasp-timing-dev-v1', 'cohort_id': COHORT,
         'limits': copy.deepcopy(LIMITS),
         'protocol': {'path': PROTOCOL, 'sha256': r.digest(root / PROTOCOL)},
+        'continuation_protocol': {'path': CONTINUATION, 'sha256': r.digest(root / CONTINUATION)},
+        'prior_accepted_cell': {'path': str(prior_proof_path), 'sha256': r.digest(prior_proof_path)},
         'parent_plan': {'path': str(PARENT_PLAN), 'sha256': PARENT_PLAN_SHA256},
         'prior_report': {'path': str(PRIOR_REPORT), 'sha256': PRIOR_REPORT_SHA256},
         'stage_condition': copy.deepcopy(runtime['stage_engineering_condition']),
@@ -239,6 +310,7 @@ def main():
     parser.add_argument('--parent-plan', type=Path, required=True)
     parser.add_argument('--source-head', required=True)
     parser.add_argument('--runtime-output', type=Path, required=True)
+    parser.add_argument('--prior-cell-proof', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     import qd_ed_final_runner as r
@@ -253,7 +325,8 @@ def main():
         runtime_output = r.owned(args.runtime_output, parent['artifact_root'])
         runtime_output.parent.mkdir(parents=True, exist_ok=True)
         r.durable_json(runtime_output, runtime)
-        plan = build_plan(parent, ROOT, head, runtime_output, migrated_count, r.__dict__)
+        prior_proof_path = r.owned(args.prior_cell_proof, parent['artifact_root'])
+        plan = build_plan(parent, ROOT, head, runtime_output, migrated_count, prior_proof_path, r.__dict__)
         output = r.owned(args.output, plan['artifact_root'])
         output.parent.mkdir(parents=True, exist_ok=True)
         r.durable_json(output, plan)
