@@ -72,6 +72,106 @@ def _native_record(value):
             "sha256": _native_sha(value), "values": value.tolist()}
 
 
+def _audit_n6_height_assignment(kinds, final_event):
+    """Independently bind every native QD cell to the scored projection."""
+    assignments = kinds["qd_descriptor_assignment"]
+    require(len(assignments) == 11 and [x["values"]["iter_idx"] for x in assignments]
+            == list(range(-1, 10)), "n6_assignment_coverage")
+    scoring = {x["values"]["scoring_scope"]["iter_idx"]: x for x in kinds["scoring_inputs"]
+               if x["values"]["scoring_scope"]["role"] != "auxiliary_pretest"}
+    canonical = {x["values"]["iter_idx"]: x for x in kinds["canonical_candidate_batch"]}
+    require(set(scoring) == set(canonical) == set(range(-1, 10)), "n6_canonical_scoring_coverage")
+    initial_bounds = None
+    split_cells_by_iter = {}
+    split_pairs = 0
+    for record in assignments:
+        v = record["values"]; it = v["iter_idx"]; source = scoring[it]
+        require(v.get("descriptor_mode") == "target_horizontal_radius_signed_height_v1"
+                and v.get("scoring_batch_id") == source["sequence"]
+                and canonical[it]["sequence"] < record["sequence"]
+                and tensor(v.get("descriptors")) and v["descriptors"].shape == (16, 2)
+                and v["descriptors"].dtype == torch.float32
+                and tensor(v.get("cell_ids")) and v["cell_ids"].shape == (16,)
+                and v["cell_ids"].dtype == torch.int64
+                and tensor(v.get("overflow")) and v["overflow"].shape == (16,)
+                and v["overflow"].dtype == torch.bool,
+                "n6_assignment_source_or_shape")
+        projected = source["values"]["projected_xyz"]
+        keypoints = source["values"]["keypoints"]
+        require(tensor(projected) and projected.shape == (16, 9, 3)
+                and tensor(keypoints) and keypoints.ndim == 2 and keypoints.shape[1] == 3,
+                "n6_source_projection_or_keypoints")
+        endpoint = projected[:, 8, :3].float()
+        target = keypoints[0].float()
+        expected = torch.stack((torch.linalg.vector_norm(endpoint[:, :2] - target[:2], dim=1),
+                                endpoint[:, 2] - target[2]), dim=1)
+        recorded = v["descriptors"]
+        require(bool(((expected - recorded).abs() <= 1e-7).all()), "n6_descriptor_formula_mismatch")
+        lo, hi = v.get("bounds_lo"), v.get("bounds_hi")
+        require(tensor(lo) and tensor(hi) and lo.shape == hi.shape == (2,)
+                and lo.dtype == hi.dtype == torch.float32
+                and bool(((hi - lo) > 0).all()), "n6_bounds_invalid")
+        if initial_bounds is None:
+            initial_bounds = (lo, hi)
+            initial = recorded
+            quantiles = torch.quantile(initial, torch.tensor([.05, .95]), dim=0)
+            span = quantiles[1] - quantiles[0]
+            expected_lo = quantiles[0] - .1 * span
+            expected_hi = quantiles[1] + .1 * span
+            small = expected_hi - expected_lo < .08
+            center = torch.quantile(initial, .5, dim=0)
+            expected_lo = torch.where(small, center - .04, expected_lo)
+            expected_hi = torch.where(small, center + .04, expected_hi)
+            require(bool(((lo - expected_lo).abs() <= 1e-6).all())
+                    and bool(((hi - expected_hi).abs() <= 1e-6).all()), "n6_initial_bounds_formula_mismatch")
+        else:
+            require(torch.equal(lo, initial_bounds[0]) and torch.equal(hi, initial_bounds[1]),
+                    "n6_fixed_initial_bounds_changed")
+        def locate(descriptor):
+            normalized = (descriptor - lo) / (hi - lo)
+            cells = torch.floor(normalized * 4).long().clamp(0, 3)
+            return cells[:, 1] * 4 + cells[:, 0], ((descriptor < lo) | (descriptor > hi)).any(dim=1)
+        cells, overflow = locate(recorded)
+        source_cells, source_overflow = locate(expected)
+        require(torch.equal(cells, v["cell_ids"]) and torch.equal(overflow, v["overflow"])
+                and torch.equal(source_cells, cells) and torch.equal(source_overflow, overflow),
+                "n6_cell_or_threshold_association_mismatch")
+        old = torch.stack((endpoint[:, 0] - target[0], endpoint[:, 1] - target[1]), dim=1)
+        # The old mapping uses its own fixed bounds from the same initial pool.
+        if it == -1:
+            q = torch.quantile(old, torch.tensor([.05, .95]), dim=0)
+            span = q[1] - q[0]
+            old_lo, old_hi = q[0] - .1 * span, q[1] + .1 * span
+            small = old_hi - old_lo < .08
+            center = torch.quantile(old, .5, dim=0)
+            old_bounds = (torch.where(small, center - .04, old_lo),
+                          torch.where(small, center + .04, old_hi))
+        old_xy = torch.floor((old - old_bounds[0]) / (old_bounds[1] - old_bounds[0]) * 4).long().clamp(0, 3)
+        old_cells = (old_xy[:, 1] * 4 + old_xy[:, 0]).tolist()
+        new_cells = cells.tolist()
+        split_cells = set()
+        for left in range(16):
+            for right in range(left + 1, 16):
+                if old_cells[left] == old_cells[right] and new_cells[left] != new_cells[right]:
+                    split_pairs += 1
+                    split_cells.update((new_cells[left], new_cells[right]))
+        split_cells_by_iter[it] = split_cells
+    last = assignments[-1]["values"]
+    terminal = final_event["values"]["terminal_population"]
+    require(torch.equal(last["cell_ids"], terminal["cell_ids"])
+            and last["cell_ids"][final_event["values"]["selected_index"]].item()
+            == final_event["values"]["selected_cell"], "n6_terminal_cell_association")
+    parents = kinds["archive_parent_allocation"]
+    parent_from_split = 0
+    for row in parents:
+        prior_split_cells = set().union(*(split_cells_by_iter[it] for it in range(-1, row["values"]["iter_idx"])))
+        parent_from_split += sum(int(cell) in prior_split_cells
+                                 for cell in row["values"]["parent_cell_ids"].tolist())
+    return {"assignments_verified": 11, "candidates_verified": 176,
+            "old_xy_same_cell_new_split_pairs": split_pairs,
+            "parent_slots_from_split_cells": parent_from_split}
+
+
 def _audit_n4_terminal_population(kinds, context, final_event):
     """Audit the actual N4 consumer; reference decoding is not a rollout.
 
@@ -220,8 +320,9 @@ def _audit_n4_terminal_population(kinds, context, final_event):
             recorded_distances = grasp.get("projected_distances_m")
             require(tensor(recorded_distances) and recorded_distances.dtype == torch.float32
                     and recorded_distances.shape == (16, 8)
-                    and torch.equal(recorded_distances, distances)
-                    and grasp.get("best_reach_m") == float(distances.min().item()),
+                    and bool(((recorded_distances - distances).abs() <= 1e-7).all())
+                    and isinstance(grasp.get("best_reach_m"), float)
+                    and abs(grasp["best_reach_m"] - float(distances.min().item())) <= 1e-7,
                     "n5_distance_or_projection_mismatch")
             decoder_path = Path(__file__).resolve().parents[1] / "core" / "rdt_libero_action_converter.py"
             spec = importlib.util.spec_from_file_location("n5_audit_deployed_decoder", decoder_path)
@@ -237,6 +338,9 @@ def _audit_n4_terminal_population(kinds, context, final_event):
                     "n5_command_sign_mismatch")
             eligibility = (positive & (distances <= 0.06)
                            & (distances <= distances.min() + 0.03)).any(dim=1)
+            recorded_eligibility = (positive & (recorded_distances <= 0.06)
+                                    & (recorded_distances <= recorded_distances.min() + 0.03)).any(dim=1)
+            require(torch.equal(recorded_eligibility, eligibility), "n5_numeric_threshold_crossing")
             eligible_indices = torch.nonzero(eligibility, as_tuple=False).reshape(-1).tolist()
             require(grasp.get("eligible_indices") == eligible_indices, "n5_eligibility_mismatch")
             if eligible_indices:
@@ -706,6 +810,19 @@ def audit_episode(episode_dir, episode_compute_file):
                 gate["decoded_reference_first8_different_decisions"] += int(bool(n4["decoded_reference_first8_diff_positions"]))
                 gate["decoded_reference_actual_prefix_different_decisions"] += int(bool(n4["decoded_reference_actual_prefix_diff_positions"]))
                 gate["decisions"].append(n4)
+                if kinds["qd_descriptor_assignment"]:
+                    height = _audit_n6_height_assignment(kinds, final_event)
+                    height_gate = report.setdefault("n6_height_audit", {
+                        "schema": "n6-native-height-descriptor-audit-v1",
+                        "checked_decisions": 0, "assignments_verified": 0,
+                        "candidates_verified": 0,
+                        "old_xy_same_cell_new_split_pairs": 0,
+                        "parent_slots_from_split_cells": 0,
+                        "scope": "Native scored projection, independent radial-height formula, fixed bounds, exact cells and verified parent identities; old XY mapping uses the same native pool only"})
+                    height_gate["checked_decisions"] += 1
+                    for field in ("assignments_verified", "candidates_verified",
+                                  "old_xy_same_cell_new_split_pairs", "parent_slots_from_split_cells"):
+                        height_gate[field] += height[field]
             if dual_mode == "executed_feedback_v1":
                 previous_feedback_certificate = _audit_n3_feedback(
                     kinds, context, final, events, previous_feedback_certificate)

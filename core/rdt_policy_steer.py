@@ -47,6 +47,8 @@ from core.qd_grasp_timing import (
 from core.qd_ed import (
     EXECUTION_INTENT_AXES,
     EXECUTION_INTENT_DESCRIPTOR,
+    HEIGHT_AWARE_AXES,
+    HEIGHT_AWARE_DESCRIPTOR,
     QDArchive,
     QDBounds,
     QDParentAllocation,
@@ -57,6 +59,7 @@ from core.qd_ed import (
     freeze_bounds as qd_freeze_bounds,
     qd_descriptor,
     execution_intent_descriptor,
+    height_aware_descriptor,
     freeze_execution_intent_bounds,
     within_cell_endpoint_sse as qd_within_cell_endpoint_sse,
 )
@@ -4812,6 +4815,10 @@ class RDTSteer:
                 trajectories, keypoints,
                 self._decode_visualization_action_candidates(population),
             )
+        if descriptor_mode == HEIGHT_AWARE_DESCRIPTOR:
+            if self._action_chunk_horizon != 8:
+                raise ValueError("Height-aware QD requires action_chunk_horizon=8")
+            return height_aware_descriptor(trajectories, keypoints)
         return qd_descriptor(trajectories, keypoints)
 
     @staticmethod
@@ -4902,14 +4909,18 @@ class RDTSteer:
             self.record_execution_feedback_overhead("semantic_context_begin", time.perf_counter() - feedback_setup_started)
         quality_kwargs = ({"qd_quality_contract": quality_contract} if quality_contract is not None else {})
         execution_intent = cfg.qd_descriptor == EXECUTION_INTENT_DESCRIPTOR
+        height_aware = cfg.qd_descriptor == HEIGHT_AWARE_DESCRIPTOR
+        non_xy_descriptor = execution_intent or height_aware
         if execution_intent and self._action_chunk_horizon != 8:
             raise ValueError("Execution-intent QD requires action_chunk_horizon=8")
+        if height_aware and self._action_chunk_horizon != 8:
+            raise ValueError("Height-aware QD requires action_chunk_horizon=8")
         def describe_qd(candidates, *, projection_out=None):
             if projection_out is None:
-                if execution_intent:
+                if non_xy_descriptor:
                     return self._eds_qd_descriptor(candidates, keypoints, cfg.qd_descriptor)
                 return self._eds_qd_descriptor(candidates, keypoints)
-            if execution_intent:
+            if non_xy_descriptor:
                 return self._eds_qd_descriptor(candidates, keypoints, cfg.qd_descriptor,
                                                projection_out=projection_out)
             return self._eds_qd_descriptor(candidates, keypoints, projection_out=projection_out)
@@ -4959,8 +4970,9 @@ class RDTSteer:
         metrics.qd_archive_active_for_chunk = metrics.qd_archive_enabled
         metrics.qd_degenerate_fallback_policy = cfg.qd_degenerate_fallback_policy
         metrics.qd_descriptor = cfg.qd_descriptor
-        if execution_intent:
-            metrics.qd_descriptor_axes = [dict(axis) for axis in EXECUTION_INTENT_AXES]
+        if non_xy_descriptor:
+            axes = EXECUTION_INTENT_AXES if execution_intent else HEIGHT_AWARE_AXES
+            metrics.qd_descriptor_axes = [dict(axis) for axis in axes]
         metrics.qd_grid_shape = list(cfg.qd_grid_shape)
         metrics.qd_cell_capacity = cfg.qd_cell_capacity
         metrics.qd_secondary_lane_mode = cfg.qd_secondary_lane_mode
@@ -5100,7 +5112,7 @@ class RDTSteer:
             descriptors = describe_qd(candidates)
             record = {
                 "iter_idx": int(iter_idx),
-                ("descriptor_values" if execution_intent else "descriptors_xy_m"): descriptors.detach().cpu().tolist(),
+                ("descriptor_values" if non_xy_descriptor else "descriptors_xy_m"): descriptors.detach().cpu().tolist(),
                 "rewards": [
                     float(value)
                     for value in rewards.detach().float().cpu().tolist()
@@ -5135,6 +5147,16 @@ class RDTSteer:
             initial_cell_ids, initial_overflow = self._eds_qd_cell_ids(
                 initial_descriptors, qd_bounds, cfg
             )
+            if height_aware and getattr(self, "_decision_evidence", None) is not None:
+                self._decision_evidence.record(
+                    "qd_descriptor_assignment", iter_idx=-1,
+                    descriptor_mode=cfg.qd_descriptor,
+                    descriptors=initial_descriptors,
+                    cell_ids=initial_cell_ids,
+                    overflow=initial_overflow,
+                    bounds_lo=qd_bounds.lo, bounds_hi=qd_bounds.hi,
+                    scoring_batch_id=self._decision_evidence.scoring_batch_id,
+                )
             qd_archive = QDArchive(
                 grid_shape=cfg.qd_grid_shape,
                 secondary_lane_mode=cfg.qd_secondary_lane_mode,
@@ -5157,7 +5179,7 @@ class RDTSteer:
                 qd_bounds.lo.detach().float().cpu().tolist(),
                 qd_bounds.hi.detach().float().cpu().tolist(),
             ]
-            if execution_intent:
+            if non_xy_descriptor:
                 metrics.qd_descriptor_bounds = initial_bounds_values
             else:
                 metrics.qd_bounds_xy_m = initial_bounds_values
@@ -5431,7 +5453,7 @@ class RDTSteer:
                 qd_parent_cell_ids = allocation.parent_cell_ids.to(
                     device=population.device
                 )
-                if execution_intent:
+                if non_xy_descriptor:
                     metrics.qd_parent_descriptor_values_by_iter.append([
                         qd_archive.entries[int(cell)].descriptor_xy_m.detach().float().cpu().tolist()
                         for cell in allocation.parent_cell_ids.tolist()
@@ -6109,6 +6131,16 @@ class RDTSteer:
                 child_cell_ids, child_overflow = self._eds_qd_cell_ids(
                     child_descriptors, qd_bounds, cfg
                 )
+                if height_aware and getattr(self, "_decision_evidence", None) is not None:
+                    self._decision_evidence.record(
+                        "qd_descriptor_assignment", iter_idx=i,
+                        descriptor_mode=cfg.qd_descriptor,
+                        descriptors=child_descriptors,
+                        cell_ids=child_cell_ids,
+                        overflow=child_overflow,
+                        bounds_lo=qd_bounds.lo, bounds_hi=qd_bounds.hi,
+                        scoring_batch_id=self._decision_evidence.scoring_batch_id,
+                    )
                 if terminal_mode and i == 9:
                     # Freeze the actual masked canonical batch before archive consumers can replace it.
                     terminal_population = TerminalPopulation.capture(
@@ -6118,10 +6150,10 @@ class RDTSteer:
                         scoring_batch_id=terminal_scoring_batch_id,
                         decision_id=getattr(getattr(self, "_decision_evidence", None), "decision_id", None),
                     )
-                fixed_initial_sse = (0.0 if execution_intent else qd_within_cell_endpoint_sse(
+                fixed_initial_sse = (0.0 if non_xy_descriptor else qd_within_cell_endpoint_sse(
                     child_descriptors, fixed_initial_cell_ids
                 ))
-                active_sse = (0.0 if execution_intent else qd_within_cell_endpoint_sse(
+                active_sse = (0.0 if non_xy_descriptor else qd_within_cell_endpoint_sse(
                     child_descriptors, child_cell_ids
                 ))
                 resolution_improvement = (
@@ -6144,7 +6176,7 @@ class RDTSteer:
                     time.perf_counter() - qd_update_start
                 )
                 metrics.qd_evaluation_count += cfg.population_size
-                (metrics.qd_descriptor_bounds_by_iter if execution_intent else metrics.qd_bounds_xy_m_by_iter).append(
+                (metrics.qd_descriptor_bounds_by_iter if non_xy_descriptor else metrics.qd_bounds_xy_m_by_iter).append(
                     [
                         qd_bounds.lo.detach().float().cpu().tolist(),
                         qd_bounds.hi.detach().float().cpu().tolist(),
@@ -6173,7 +6205,7 @@ class RDTSteer:
                 metrics.qd_raw_initial_bounds_overflow_ratio_by_iter.append(
                     float(raw_overflow_count / cfg.population_size)
                 )
-                if not execution_intent:
+                if not non_xy_descriptor:
                     metrics.qd_fixed_initial_within_cell_endpoint_sse_by_iter.append(fixed_initial_sse)
                     metrics.qd_active_within_cell_endpoint_sse_by_iter.append(active_sse)
                     metrics.qd_partition_resolution_improvement_by_iter.append(resolution_improvement)
@@ -6233,7 +6265,7 @@ class RDTSteer:
                 metrics.qd_archive_mean_elite_reward_by_iter.append(
                     float(sum(archive_rewards) / len(archive_rewards))
                 )
-                if execution_intent:
+                if non_xy_descriptor:
                     values = qd_archive.elite_tensors()[3].detach().float()
                     metrics.qd_archive_descriptor_axis_span_by_iter.append(
                         (values.amax(0) - values.amin(0)).cpu().tolist())
@@ -7071,7 +7103,7 @@ class RDTSteer:
             "qd_initial_archive": qd_initial_artifact,
             "qd_archive_by_iter": qd_archive_artifacts,
         }
-        if execution_intent:
+        if non_xy_descriptor:
             self._last_eds_artifacts.pop("qd_bounds_xy_m")
             self._last_eds_artifacts.pop("qd_final_bounds_xy_m")
             self._last_eds_artifacts.update({
@@ -7965,7 +7997,11 @@ class RDTSteer:
         if resolved.qd_final_selection_mode in {TERMINAL_POPULATION_MODE, GRASP_TIMING_MODE}:
             required_terminal = {
                 "qd_quality_mode": "provider", "reward_mode": "normal",
-                "qd_archive_mode": "grid_archive", "qd_descriptor": "target_relative_endpoint_xy",
+                "qd_archive_mode": "grid_archive",
+                "qd_descriptor": (HEIGHT_AWARE_DESCRIPTOR
+                                  if resolved.qd_final_selection_mode == GRASP_TIMING_MODE
+                                  and resolved.qd_descriptor == HEIGHT_AWARE_DESCRIPTOR
+                                  else "target_relative_endpoint_xy"),
                 "qd_grid_shape": (4, 4), "qd_cell_capacity": 1, "qd_parent_sampling": "sparse_priority",
                 "qd_bounds_update_policy": "fixed_initial", "qd_bounds_quantiles": (0.05, 0.95),
                 "qd_bounds_expand_fraction": 0.1, "qd_min_axis_span_m": 0.08,
@@ -7976,6 +8012,9 @@ class RDTSteer:
             for name, expected in required_terminal.items():
                 if getattr(resolved, name) != expected:
                     raise ValueError(f"N4 terminal population requires {name}={expected!r}")
+        if (resolved.qd_descriptor == HEIGHT_AWARE_DESCRIPTOR
+                and resolved.qd_final_selection_mode != GRASP_TIMING_MODE):
+            raise ValueError("Height-aware QD requires terminal_grasp_proximity_v1")
         if resolved.qd_quality_mode not in {"provider", "executed_prefix_v1", FEEDBACK_MODE}:
             raise ValueError("EDS qd_quality_mode must be provider, executed_prefix_v1 or executed_feedback_v1")
         if resolved.qd_quality_mode in {"executed_prefix_v1", FEEDBACK_MODE}:
@@ -7999,9 +8038,10 @@ class RDTSteer:
             raise ValueError(
                 "EDS qd_degenerate_fallback_policy must be none or control_v1"
             )
-        if resolved.qd_descriptor not in {"target_relative_endpoint_xy", EXECUTION_INTENT_DESCRIPTOR}:
+        if resolved.qd_descriptor not in {"target_relative_endpoint_xy", EXECUTION_INTENT_DESCRIPTOR,
+                                          HEIGHT_AWARE_DESCRIPTOR}:
             raise ValueError(
-                "EDS qd_descriptor must be target_relative_endpoint_xy or target_distance_gripper_duty_v1"
+                "EDS qd_descriptor must be target_relative_endpoint_xy, target_distance_gripper_duty_v1 or target_horizontal_radius_signed_height_v1"
             )
         if resolved.qd_descriptor == EXECUTION_INTENT_DESCRIPTOR:
             required_intent = {
