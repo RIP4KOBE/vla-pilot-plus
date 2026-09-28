@@ -68,3 +68,4 @@ gemini:
   timeout_seconds: 90
   cli_path: null
   disabled_skill_paths: null
+  allow_recovered_error_events: false # E2 transport opt-in; old E1 default unchanged
