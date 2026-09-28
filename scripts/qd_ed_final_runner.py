@@ -28,6 +28,12 @@ ROOT = Path(__file__).resolve().parents[1]
 PYTHON = Path('/home/hynx/miniconda3/envs/vla-pilot/bin/python')
 SCHEMA = 'qd-ed-final-plan-v1'
 BUCKETS = {'baseline': 20, 'development': 100, 'validation': 60, 'formal': 40, 'recovery': 20}
+AMENDED_BUCKETS = {'baseline': 28, 'development': 125, 'validation': 180, 'formal': 40, 'recovery': 20}
+GPU3_AMENDMENT = {
+    'schema': 'gpu3-n10-budget-amendment-v1',
+    'proposal_sha256': 'e5419d3119d3cb317cf1ff16e1c4cb6c78da8782066cd3e433cc157dff7e186a',
+    'physical_gpu': 3,
+}
 TERMINAL = {'valid', 'aborted'}
 REQUIRED_CODE = {
     'main.py', 'core/rdt_policy_steer.py', 'core/qd_ed.py', 'core/eds_eval_metrics.py',
@@ -878,21 +884,38 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
     selected_gpu = authorized_gpu(state)
     require(physical_gpu is None or (type(physical_gpu) is int and physical_gpu == selected_gpu),
             'GPU policy/runtime physical device mismatch')
-    require(budget['max_episode_attempts'] <= 240 and budget['max_gpu_hours'] <= 48, 'budget exceeds authorization')
+    amendment = budget.get('amendment')
+    if amendment is None:
+        require(budget['max_episode_attempts'] <= 240 and budget['max_gpu_hours'] <= 48,
+                'budget exceeds authorization')
+        bucket_caps = BUCKETS
+    else:
+        require(amendment == GPU3_AMENDMENT and selected_gpu == 3
+                and budget['max_episode_attempts'] == 393
+                and budget['max_gpu_hours'] == 100.0
+                and budget['reserved'] == AMENDED_BUCKETS,
+                'GPU3 amended budget authorization differs')
+        bucket_caps = AMENDED_BUCKETS
     require(snap['running'] == 0, 'unfinished dispatched attempt must be reconciled first')
     require(snap['gpu_healthcheck_inflight']==0, 'unfinished GPU healthcheck reservation must be reconciled first')
     require(budget['dispatched'] == snap['dispatched'], 'state/ledger dispatched mismatch')
     require(abs(budget['gpu_hours_consumed']-snap['gpu_hours_consumed']) < 1e-8, 'state/ledger GPU accounting mismatch')
     require(snap['dispatched'] < budget['max_episode_attempts'], 'episode budget exhausted')
     require(snap['gpu_hours_consumed'] < budget['max_gpu_hours'], 'GPU budget exhausted')
-    require(budget['reserved']['validation'] >= 60 and budget['reserved']['formal'] >= 40, 'validation/formal reserve was reduced')
+    require(budget['reserved']['validation'] >= bucket_caps['validation']
+            and budget['reserved']['formal'] >= bucket_caps['formal'],
+            'validation/formal reserve was reduced')
     bucket = row['budget_bucket']
-    require(snap['by_bucket'][bucket] < min(BUCKETS[bucket], budget['reserved'][bucket]), f'{bucket} reserve exhausted')
+    require(snap['by_bucket'][bucket] < min(bucket_caps[bucket], budget['reserved'][bucket]), f'{bucket} reserve exhausted')
     if bucket not in {'validation', 'formal'}:
-        protected = max(0,60-snap['by_bucket']['validation']) + max(0,40-snap['by_bucket']['formal'])
+        protected = (max(0,bucket_caps['validation']-snap['by_bucket']['validation'])
+                     + max(0,bucket_caps['formal']-snap['by_bucket']['formal']))
         require(snap['dispatched'] + 1 + protected <= budget['max_episode_attempts'], 'would consume protected validation/formal reserve')
     default_reservations={'validation':14.,'formal':10.}
     reservations=budget.get('gpu_hour_reservations',default_reservations)
+    if amendment is not None:
+        require(reservations == {'validation': 32., 'formal': 12.},
+                'GPU3 amended GPU-hour reserves differ')
     require(isinstance(reservations,dict) and set(reservations)<=set(BUCKETS) and all(type(v) in (int,float) and math.isfinite(v) and v>=0 for v in reservations.values()), 'GPU-hour reservation policy invalid')
     require(sum(reservations.values())<=budget['max_gpu_hours'], 'GPU-hour reservations exceed total budget')
     if reservations!=default_reservations:

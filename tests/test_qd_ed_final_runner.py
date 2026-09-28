@@ -146,6 +146,66 @@ def test_budget_preserves_100_validation_formal_attempts():
         runner.check_budget(current,events,validation)
 
 
+def amended_state(events=()):
+    current = synced_state(list(events))
+    current['gpu_pool'] = [3]
+    current['budget'].update(max_episode_attempts=393, max_gpu_hours=100.,
+                             reserved=dict(runner.AMENDED_BUCKETS),
+                             gpu_hour_reservations={'validation':32.,'formal':12.},
+                             amendment=dict(runner.GPU3_AMENDMENT))
+    return current
+
+
+def amended_reservation_event():
+    return [{'event':'gpu_hour_reservations_changed',
+             'gpu_hour_reservations':{'validation':32.,'formal':12.},
+             'rationale':'approved GPU3 N10 prospective amendment', 'time_unix':100.}]
+
+
+def test_amended_gpu3_budget_requires_exact_authorization_and_audited_reserves():
+    current = amended_state()
+    episode = row()
+    assert runner.check_budget(current,[],episode,
+                               reservation_events=amended_reservation_event(),physical_gpu=3) == 100
+    for mutation in (
+        lambda s: s['budget'].pop('amendment'),
+        lambda s: s['budget']['amendment'].update(proposal_sha256='0'*64),
+        lambda s: s['budget'].update(max_episode_attempts=394),
+        lambda s: s['budget']['reserved'].update(validation=60),
+        lambda s: s.update(gpu_pool=[2]),
+    ):
+        changed=copy.deepcopy(current)
+        mutation(changed)
+        with pytest.raises(runner.GateError):
+            runner.check_budget(changed,[],episode,
+                                reservation_events=amended_reservation_event(),physical_gpu=3)
+    with pytest.raises(runner.GateError,match='reallocation requires'):
+        runner.check_budget(current,[],episode,physical_gpu=3)
+
+
+def test_amended_budget_preserves_all_220_validation_formal_attempts_and_hours():
+    events=[]
+    for bucket,count in [('baseline',28),('development',124),('recovery',20)]:
+        for index in range(count):
+            events += events_for(f'{bucket}{index}',bucket=bucket)
+    current=amended_state(events)
+    episode=row()
+    episode.update(budget_bucket='development')
+    assert runner.check_budget(current,events,episode,
+                               reservation_events=amended_reservation_event(),physical_gpu=3) == 100
+    events += events_for('development124',bucket='development')
+    current=amended_state(events)
+    with pytest.raises(runner.GateError,match='reserve exhausted|protected'):
+        runner.check_budget(current,events,episode,
+                            reservation_events=amended_reservation_event(),physical_gpu=3)
+    one=events_for('long',bucket='development')
+    one[-1]['gpu_process_wall_seconds']=56*3600
+    current=amended_state(one)
+    with pytest.raises(runner.GateError,match='termination grace'):
+        runner.check_budget(current,one,episode,
+                            reservation_events=amended_reservation_event(),physical_gpu=3)
+
+
 def test_budget_uses_remaining_gpu_time_and_refuses_unclosed_attempt():
     events=events_for(); events[-1]['gpu_process_wall_seconds']=24*3600-47
     validation=events_for('v',bucket='validation'); validation[-1]['gpu_process_wall_seconds']=14*3600
