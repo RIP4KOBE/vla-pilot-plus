@@ -93,7 +93,7 @@ def validate_contract(plan, manifest, runtime, seeds, root, runner):
               and r.authorized_gpu(state) == 3,
               'owning GPU3 private budget/authority changed')
     required = {'main.py', 'core/keypoint_tracker.py', 'core/decision_evidence.py',
-                'core/codex_stage.py',
+                'core/codex_stage.py', 'configs/perception.yaml',
                 'scripts/qd_ed_final_runner.py', 'scripts/qd_ed_n7_e2_passive_diagnostic.py',
                 'tests/test_keypoint_tracking_evidence.py'}
     r.require(required <= {item['path'] for item in plan['code_files']},
