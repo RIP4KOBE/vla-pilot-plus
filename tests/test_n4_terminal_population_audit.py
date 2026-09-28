@@ -11,7 +11,8 @@ from core.rdt_libero_action_converter import decode_rdt_libero_action_chunk
 from scripts import audit_decision_evidence as audit
 
 
-def episode(tmp_path, *, count=3, variant="different", auxiliary=False, stage_init=None, n5=False, n6=False, n7=False, n11=False):
+def episode(tmp_path, *, count=3, variant="different", auxiliary=False, stage_init=None, n5=False, n6=False, n7=False, n11=False, n11_permuted=False):
+    assert not n11_permuted or n11
     rec = DecisionEvidence(tmp_path, episode=0)
     provider = lambda keypoints, trajectories: None
     keypoints = torch.zeros(1, 3, dtype=torch.bfloat16 if n5 else torch.float32)
@@ -25,29 +26,37 @@ def episode(tmp_path, *, count=3, variant="different", auxiliary=False, stage_in
                        keypoints=keypoints.double() if n5 else keypoints, providers=[provider])
     first = previous = None
     cell_ids = torch.arange(16, dtype=torch.int64)
+    final_parent_cells = cell_ids
     for j in range(11):
         iteration = j - 1
         if previous is not None:
             pa, quality = previous
+            survivor_slots = (sorted(range(16), key=lambda slot: (-float(quality[slot]), slot))[:4]
+                              if n11_permuted else [0, 1, 2, 3])
+            parent_order = survivor_slots + [slot for slot in range(16) if slot not in survivor_slots]
+            parent_indices = torch.tensor(parent_order, dtype=torch.int64)
+            final_parent_cells = cell_ids.index_select(0, parent_indices)
             rec.record("archive_parent_allocation", iter_idx=iteration,
                 parent_fingerprints=audit.fingerprints(pa), parent_lanes=["quality"] * 16,
                 parent_cell_ids=cell_ids, parent_rewards=quality.float(), parent_costs=-quality.float(),
                 original_archive_occurrences=None, weights={"quality": 1.0})
             if n11:
                 rec.record("qd_parent_survivor_selection", iter_idx=iteration,
-                    original_allocation_slots=[0, 1, 2, 3], parent_cells=[0, 1, 2, 3],
-                    parent_fingerprints=audit.fingerprints(pa)[:4],
-                    source_quality=quality[:4].float().tolist(), exact_latent_survival=True)
+                    original_allocation_slots=survivor_slots, parent_cells=survivor_slots,
+                    parent_fingerprints=[audit.fingerprints(pa)[slot] for slot in survivor_slots],
+                    source_quality=quality[survivor_slots].float().tolist(), exact_latent_survival=True)
             rec.record("parent_allocation", iter_idx=iteration, source_population=pa,
-                source_quality=quality.float(), source_costs=-quality.float(), parent_indices=cell_ids,
-                elite_count=4 if n11 else 0, parent_cell_ids=cell_ids, offspring_sources=["quality"] * (12 if n11 else 16))
+                source_quality=quality.float(), source_costs=-quality.float(), parent_indices=parent_indices,
+                elite_count=4 if n11 else 0, parent_cell_ids=final_parent_cells, offspring_sources=["quality"] * (12 if n11 else 16))
         actions = torch.zeros(16, 64, 128, dtype=torch.bfloat16)
         actions[:, :, 10] = -1
         actions[:, :, 39] = torch.arange(j * 16, j * 16 + 16).bfloat16()[:, None] / 256
         quality = -(torch.arange(16).bfloat16() / 16 + (j + 1))
         if n11 and previous is not None:
-            actions[:4] = previous[0][:4]
-            quality[:4] = previous[1][:4]
+            actions[:4] = previous[0].index_select(0, parent_indices[:4])
+            quality[:4] = previous[1].index_select(0, parent_indices[:4])
+        if n11_permuted:
+            quality[4] = quality[0] - .125
         if j == 10:
             if n5:
                 actions[4 if n11 else 1, :, 10] = 1
@@ -116,7 +125,7 @@ def episode(tmp_path, *, count=3, variant="different", auxiliary=False, stage_in
             "minimum_cost_tie_indices": torch.nonzero(costs == costs.min()).reshape(-1).tolist(),
             "native_costs": costs, "raw_provider_quality": quality,
             "cell_ids": torch.full((16,), 11 if n7 else 10, dtype=torch.long) if (n6 or n7) else cell_ids,
-            "parent_cell_ids": cell_ids, "selected_parent_cell": index,
+            "parent_cell_ids": final_parent_cells, "selected_parent_cell": int(final_parent_cells[index]),
             **({"grasp_selection": grasp} if n5 else {})},
         archive_reference=reference, stage_reward_reference={"selected_raw_reward": quality[index],
             "reference_costs": -rewards, "reference_scope": "qd_archive_cost_spread"})
@@ -291,3 +300,14 @@ def test_n11_audit_composes_with_n7_descriptor_and_n5_grasp_selector(tmp_path):
     assert result["n11_parent_survival_audit"]["checked_decisions"] == 1
     assert result["n7_direction_height_audit"]["assignments_verified"] == 11
     assert result["n5_grasp_timing_audit"]["checked_decisions"] == 1
+
+
+def test_n11_audit_accepts_reordered_parent_cells_and_checks_selected_cell(tmp_path):
+    rec, compute = episode(tmp_path, n11=True, n11_permuted=True)
+    accepted = audit.audit_episode(rec.root, compute)
+    assert accepted["accepted"], accepted["errors"]
+    assert accepted["n11_parent_survival_audit"]["survivor_rounds_verified"] == 10
+    rewrite(rec, "final_selection", lambda row: row["values"]["terminal_population"]
+            .update(selected_parent_cell=15))
+    rejected = audit.audit_episode(rec.root, compute)
+    assert rejected["errors"] == ["n4_selected_parent_cell_mismatch"]
