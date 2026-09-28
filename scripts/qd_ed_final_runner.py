@@ -55,6 +55,7 @@ RUNTIME_ENV_ALLOW = {
 }
 _HASH_CACHE = {}
 CODEX_CONFIG_KEYS = ('backend', 'model', 'reasoning_effort', 'timeout_seconds', 'cli_path', 'disabled_skill_paths')
+E2_STAGE_CONDITION = 'codex_login_astra_low_n10_e2_t180_recovered_pre_final_v1'
 CODEX_STAGE_CONDITION = 'codex_login_astra_low_v1'
 GPU_MONITOR_QUERY_TIMEOUT_SECONDS = 15
 # Covers a 15s metadata timeout and two possible 10s child-cleanup waits.
@@ -471,6 +472,8 @@ def n7_dispatch_support(plan):
 
 def stage_condition(runtime):
     stage_overrides(runtime)
+    if runtime.get('stage_recovered_error_condition') is not None:
+        return E2_STAGE_CONDITION
     return n4e1_support().STAGE_CONDITION if runtime.get('stage_engineering_condition') is not None else CODEX_STAGE_CONDITION
 
 
@@ -510,6 +513,9 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
     require(Path(runtime['worktree']).resolve() == root, 'runtime worktree mismatch')
     require(Path(runtime['artifact_root']).resolve() == artifact_root, 'runtime artifact root mismatch')
     stage_overrides(runtime)
+    require((runtime.get('stage_recovered_error_condition') is not None) ==
+            (plan.get('n7_e2_passive_diagnostic') is not None),
+            'E2 Stage condition requires its dedicated prospective diagnostic plan')
     require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan) or is_n7_plan(plan) or is_n9_plan(plan)),
         '180s transport requires its dedicated N4-E1, N5, N6, N7 or N9 cohort')
     physical_gpu = runtime_gpu(runtime, state)
@@ -708,6 +714,14 @@ def stage_overrides(runtime):
     engineering=runtime.get('stage_engineering_condition')
     if engineering is not None:
         require(engineering==n4e1_support().engineering_condition(),'unrecognized public Stage engineering condition')
+    recovered=runtime.get('stage_recovered_error_condition')
+    if recovered is not None:
+        require(recovered == E2_STAGE_CONDITION and engineering is not None
+                and frozen.get('allow_recovered_error_events') is True,
+                'E2 recovered-error transport condition differs')
+    else:
+        require('allow_recovered_error_events' not in frozen,
+                'E2 recovered-error flag requires its dedicated condition')
     require(frozen.get('reasoning_effort') == 'low' and type(frozen.get('timeout_seconds')) is int
             and frozen['timeout_seconds'] == (180 if engineering is not None else 90), 'Codex Stage reasoning/timeout differs from frozen contract')
     require(isinstance(frozen.get('cli_path'), str) and Path(frozen['cli_path']).is_absolute(),
@@ -723,7 +737,10 @@ def stage_overrides(runtime):
             'Codex public invocation fingerprint mismatch')
     require(not any(key in frozen for key in ('api_key', 'base_url', 'credential_env_name', 'access_token')),
             'Codex managed login contract must not contain API credentials/endpoints')
-    return {f'perception.gemini.{key}': frozen[key] for key in CODEX_CONFIG_KEYS}
+    overrides={f'perception.gemini.{key}': frozen[key] for key in CODEX_CONFIG_KEYS}
+    if recovered is not None:
+        overrides['perception.gemini.allow_recovered_error_events']=True
+    return overrides
 
 
 def verify_provider(runtime, env, *, root=ROOT, run=subprocess.run):
@@ -1017,6 +1034,13 @@ def episode_compute(output,row,runtime=None):
     require(isinstance(transport, dict), 'Codex Stage transport metadata missing')
     frozen = runtime['frozen_stage_provider']
     require(all(transport.get(key) == frozen[key] for key in CODEX_CONFIG_KEYS), 'Codex observed Stage transport differs from frozen binding')
+    if runtime.get('stage_recovered_error_condition') is not None:
+        require(transport.get('allow_recovered_error_events') is True
+                and transport.get('recovered_error_policy') == 'pre_final_only_v1'
+                and type(transport.get('recoverable_error_event_count')) is int
+                and type(transport.get('recoverable_error_item_count')) is int
+                and type(transport.get('recovered_error_events_accepted')) is bool,
+                'E2 observed recovered-error transport metadata differs')
     require(transport.get('auth_mode') == 'chatgpt' and
             transport.get('public_config_sha256') == frozen['public_config_sha256'],
             'Codex observed public invocation policy differs from frozen binding')

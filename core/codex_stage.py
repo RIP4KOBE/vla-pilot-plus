@@ -102,6 +102,7 @@ class CodexStageRecognizer(GeminiStageRecognizer):
             "internal_retry_policy": "cli_managed_unknown",
         }
         if self.allow_recovered_error_events:
+            self.transport_metadata["allow_recovered_error_events"] = True
             self.transport_metadata["recovered_error_policy"] = "pre_final_only_v1"
         self._call_transport = {}
         self._call_raw_response = None
