@@ -171,7 +171,8 @@ class DecisionEvidence:
         finally:
             self.overhead_s += time.perf_counter() - started
 
-    def begin_decision(self, *, global_step, stage, use_guidance, keypoints, providers):
+    def begin_decision(self, *, global_step, stage, use_guidance, keypoints, providers,
+                       keypoint_tracking_snapshot=None):
         if self.failed or self.closed:
             return
         if self._dispatch_pending or self._decisions != self._committed:
@@ -198,7 +199,9 @@ class DecisionEvidence:
                     previous_decision_id=previous_decision_id,
                     stage_changed=previous_stage is not None and previous_stage != self.stage,
                     use_guidance=bool(use_guidance), keypoints=keypoints, providers=identities,
-                    target_observation="existing_chunk_keypoint_read")
+                    target_observation="existing_chunk_keypoint_read",
+                    **({"keypoint_tracking_snapshot": keypoint_tracking_snapshot}
+                       if keypoint_tracking_snapshot is not None else {}))
 
     def set_scoring_scope(self, *, role, iter_idx, site):
         """Called at the actual scoring caller, never inferred from equal actions."""

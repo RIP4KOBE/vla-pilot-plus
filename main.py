@@ -449,7 +449,7 @@ sys.modules['calvin_env.scene.objects.light'].LightState = PatchedLightState
 
 # Import adapters
 from core.env_adapters import create_adapter, BaseEnvAdapter
-from core.keypoint_tracker import KeypointTracker
+from core.keypoint_tracker import KeypointTracker, read_keypoints_with_passive_tracking
 from core.keypoint_detector import KeypointDetector
 from core.sam3_segmenter import create_segmenter as create_sam3_segmenter
 from core.gemini_grounder import create_gemini_grounder, create_gemini_stage_recognizer, observe_api_requests
@@ -1671,13 +1671,15 @@ class Main:
             generate_new_chunk = (action_executed == 0)
             if generate_new_chunk:
                 execution_horizon_stage_change = False
+                keypoint_tracking_snapshot = None
 
             if generate_new_chunk:
                 self._append_phase_timing(episode=episode, global_step=global_steps,
                     name="chunk_keypoints_stage", event="enter", elapsed_s=0.0)
             phase_started_s = time.perf_counter()
             if generate_new_chunk and self.config.get("use_guidance", True) and hasattr(self, 'guidance_fns'):
-                keypoints = self.keypoint_tracker.get_keypoint_positions()
+                keypoints, keypoint_tracking_snapshot = read_keypoints_with_passive_tracking(
+                    self.keypoint_tracker, evidence_enabled=evidence is not None)
                 mask_ids = self.keypoint_tracker.get_mask_ids()
 
                 # Update stage recognition
@@ -1804,7 +1806,8 @@ class Main:
             if evidence is not None and generate_new_chunk:
                 evidence.begin_decision(global_step=global_steps, stage=current_stage,
                                         use_guidance=use_guidance, keypoints=keypoints,
-                                        providers=current_guidance_fns)
+                                        providers=current_guidance_fns,
+                                        keypoint_tracking_snapshot=keypoint_tracking_snapshot)
             action_chunk = self.policy.select_action(**select_kwargs)
             select_action_latency_s = float(time.perf_counter() - select_action_start_s)
             self._append_phase_timing(episode=episode, global_step=global_steps,
