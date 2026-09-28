@@ -571,8 +571,10 @@ def _audit_n4_terminal_population(kinds, context, final_event):
     require(tensor(cells) and cells.dtype == torch.int64 and cells.shape == (16,)
             and bool(((cells >= 0) & (cells < 16)).all()) and final["selected_cell"] == cells[selected_index].item(), "n4_selected_recorded_cell_mismatch")
     parent_cells = terminal["parent_cell_ids"]
+    expected_parent_cells = (parents[9]["values"]["parent_cell_ids"] if n11_mode
+                             else allocations[9]["values"]["parent_cell_ids"])
     require(tensor(parent_cells) and parent_cells.dtype == torch.int64 and parent_cells.shape == (16,)
-            and same(parent_cells, allocations[9]["values"]["parent_cell_ids"])
+            and same(parent_cells, expected_parent_cells)
             and terminal["selected_parent_cell"] == parent_cells[selected_index].item(), "n4_selected_parent_cell_mismatch")
     require(final["selected_fingerprint"] == fingerprints(selected)[0], "n4_selected_fingerprint_mismatch")
 
