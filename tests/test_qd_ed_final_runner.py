@@ -552,6 +552,30 @@ def codex_runtime(tmp_path):
                 environment={}, gpu_mapping={'physical_gpu': 7, 'egl_device_index': 4})
 
 
+def test_e2_stage_binding_is_explicit_and_keeps_180_second_condition(tmp_path):
+    runtime=codex_runtime(tmp_path)
+    frozen=runtime['frozen_stage_provider']
+    frozen['timeout_seconds']=180
+    frozen['allow_recovered_error_events']=True
+    frozen['public_config_sha256']=runner.codex_public_config_sha256(frozen)
+    runtime['stage_engineering_condition']=runner.n4e1_support().engineering_condition()
+    runtime['stage_recovered_error_condition']=runner.E2_STAGE_CONDITION
+    overrides=runner.stage_overrides(runtime)
+    assert overrides['perception.gemini.allow_recovered_error_events'] is True
+    assert overrides['perception.gemini.timeout_seconds']==180
+    assert runner.stage_condition(runtime)==runner.E2_STAGE_CONDITION
+    for key,value in [('stage_recovered_error_condition',None),
+                      ('stage_recovered_error_condition','other')]:
+        changed=copy.deepcopy(runtime)
+        changed[key]=value
+        with pytest.raises(runner.GateError):
+            runner.stage_overrides(changed)
+    changed=copy.deepcopy(runtime)
+    changed['frozen_stage_provider'].pop('allow_recovered_error_events')
+    with pytest.raises(runner.GateError):
+        runner.stage_overrides(changed)
+
+
 def codex_compute_case(tmp_path, monkeypatch, *, calls=0):
     episode, profile = no_guidance_case(tmp_path, monkeypatch)
     runtime = codex_runtime(tmp_path)
