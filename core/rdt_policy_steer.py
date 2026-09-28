@@ -44,6 +44,10 @@ from core.qd_terminal_population import (
 from core.qd_grasp_timing import (
     MODE as GRASP_TIMING_MODE, ABSOLUTE_REACH_M, RELATIVE_REACH_M, select_grasp_timing,
 )
+from core.qd_contact_sweep import (
+    MODE as CONTACT_SWEEP_MODE, CONTACT_XY_M, CONTACT_HEIGHT_M,
+    MAX_REACH_LOSS_M, SWEEP_COST_PER_M, select_contact_sweep,
+)
 from core.qd_ed import (
     EXECUTION_INTENT_AXES,
     EXECUTION_INTENT_DESCRIPTOR,
@@ -4884,8 +4888,9 @@ class RDTSteer:
         current_stage: int,
     ) -> Tensor:
         cfg = eds_config
-        grasp_timing_mode = cfg.qd_final_selection_mode == GRASP_TIMING_MODE
-        terminal_mode = cfg.qd_final_selection_mode in {TERMINAL_POPULATION_MODE, GRASP_TIMING_MODE}
+        contact_sweep_mode = cfg.qd_final_selection_mode == CONTACT_SWEEP_MODE
+        grasp_timing_mode = cfg.qd_final_selection_mode in {GRASP_TIMING_MODE, CONTACT_SWEEP_MODE}
+        terminal_mode = cfg.qd_final_selection_mode in {TERMINAL_POPULATION_MODE, GRASP_TIMING_MODE, CONTACT_SWEEP_MODE}
         if terminal_mode and self._action_chunk_horizon != 8:
             raise ValueError("Terminal population selection requires action_chunk_horizon=8")
         terminal_population = None
@@ -4893,6 +4898,7 @@ class RDTSteer:
         grasp_contract = None
         grasp_reason = None
         grasp_selection = None
+        contact_selection = None
         if grasp_timing_mode:
             grasp_contract, grasp_reason = recognize_executed_prefix_provider(guidance_fns, keypoints)
         terminal_canonical_sequence = None
@@ -6818,7 +6824,14 @@ class RDTSteer:
                         target_index=(grasp_contract.target_index if grasp_contract is not None else None),
                         recognition_reason=grasp_reason,
                     )
-                    qd_best_idx = grasp_selection.index
+                    if contact_sweep_mode:
+                        contact_selection = select_contact_sweep(
+                            grasp_selection, terminal_population.costs,
+                            terminal_projected_xyz, keypoints,
+                        )
+                        qd_best_idx = contact_selection.index
+                    else:
+                        qd_best_idx = grasp_selection.index
                 else:
                     qd_best_idx = terminal_population.select_index()
                 chunk_population_sources = ("terminal_canonical_population",) * 16
@@ -6848,6 +6861,18 @@ class RDTSteer:
                         "native_argmin_index": grasp_selection.native_argmin_index,
                         "absolute_reach_m": ABSOLUTE_REACH_M,
                         "relative_reach_m": RELATIVE_REACH_M,
+                    }
+                if contact_selection is not None:
+                    metrics.qd_terminal_population["contact_sweep_selection"] = {
+                        "baseline_grasp_index": contact_selection.grasp_index,
+                        "selected_index": contact_selection.index,
+                        "target_index": contact_selection.target_index,
+                        "reason": contact_selection.reason,
+                        "changed": contact_selection.index != contact_selection.grasp_index,
+                        "contact_xy_m": CONTACT_XY_M,
+                        "contact_height_m": CONTACT_HEIGHT_M,
+                        "max_reach_loss_m": MAX_REACH_LOSS_M,
+                        "sweep_cost_per_m": SWEEP_COST_PER_M,
                     }
 
         metrics.nonfinite_count = int(
@@ -6899,7 +6924,8 @@ class RDTSteer:
                                if quality_contract is not None else {}),
                             selected_fingerprint=metrics.qd_selected_action_fingerprint,
                             selected_cell=metrics.qd_selected_cell,
-                            selection_rule=("terminal_grasp_proximity" if grasp_timing_mode else
+                            selection_rule=("terminal_contact_sweep" if contact_sweep_mode else
+                                            "terminal_grasp_proximity" if grasp_timing_mode else
                                             "terminal_population_first_argmin" if terminal_mode else
                                             "archive_global_best" if qd_archive is not None else "cost_argmin"),
                             **({"qd_final_selection_mode": cfg.qd_final_selection_mode,
@@ -6911,7 +6937,14 @@ class RDTSteer:
                                         **metrics.qd_terminal_population["grasp_selection"],
                                         "projected_distances_m": grasp_selection.projected_distances_m,
                                         "positive_commands": grasp_selection.positive_commands,
-                                    }} if grasp_selection is not None else {})},
+                                    }} if grasp_selection is not None else {}),
+                                    **({"contact_sweep_selection": {
+                                        **metrics.qd_terminal_population["contact_sweep_selection"],
+                                        "projected_reach_m": contact_selection.projected_reach_m,
+                                        "lateral_sweep_m": contact_selection.lateral_sweep_m,
+                                        "adjusted_costs": contact_selection.adjusted_costs,
+                                        "candidate_mask": contact_selection.candidate_mask,
+                                    }} if contact_selection is not None else {})},
                                 "archive_reference": archive_reference,
                                 "stage_reward_reference": {"selected_raw_reward": population_rewards[best_idx],
                                     "reference_costs": stage_reference_costs,
@@ -8006,14 +8039,14 @@ class RDTSteer:
         _validate_direction_rbf_config(resolved.__dict__)
         if resolved.qd_archive_mode not in {"none", "grid_archive"}:
             raise ValueError("EDS qd_archive_mode must be one of none, grid_archive")
-        if resolved.qd_final_selection_mode not in {DEFAULT_FINAL_SELECTION_MODE, TERMINAL_POPULATION_MODE, GRASP_TIMING_MODE}:
-            raise ValueError("EDS qd_final_selection_mode must be archive_global_best, terminal_population_v1 or terminal_grasp_proximity_v1")
-        if resolved.qd_final_selection_mode in {TERMINAL_POPULATION_MODE, GRASP_TIMING_MODE}:
+        if resolved.qd_final_selection_mode not in {DEFAULT_FINAL_SELECTION_MODE, TERMINAL_POPULATION_MODE, GRASP_TIMING_MODE, CONTACT_SWEEP_MODE}:
+            raise ValueError("EDS qd_final_selection_mode is unsupported")
+        if resolved.qd_final_selection_mode in {TERMINAL_POPULATION_MODE, GRASP_TIMING_MODE, CONTACT_SWEEP_MODE}:
             required_terminal = {
                 "qd_quality_mode": "provider", "reward_mode": "normal",
                 "qd_archive_mode": "grid_archive",
                 "qd_descriptor": (resolved.qd_descriptor
-                                  if resolved.qd_final_selection_mode == GRASP_TIMING_MODE
+                                  if resolved.qd_final_selection_mode in {GRASP_TIMING_MODE, CONTACT_SWEEP_MODE}
                                   and resolved.qd_descriptor in {HEIGHT_AWARE_DESCRIPTOR, DIRECTION_HEIGHT_DESCRIPTOR}
                                   else "target_relative_endpoint_xy"),
                 "qd_grid_shape": (4, 4), "qd_cell_capacity": 1, "qd_parent_sampling": "sparse_priority",
@@ -8027,8 +8060,11 @@ class RDTSteer:
                 if getattr(resolved, name) != expected:
                     raise ValueError(f"N4 terminal population requires {name}={expected!r}")
         if (resolved.qd_descriptor in {HEIGHT_AWARE_DESCRIPTOR, DIRECTION_HEIGHT_DESCRIPTOR}
-                and resolved.qd_final_selection_mode != GRASP_TIMING_MODE):
-            raise ValueError("Height or direction-height QD requires terminal_grasp_proximity_v1")
+                and resolved.qd_final_selection_mode not in {GRASP_TIMING_MODE, CONTACT_SWEEP_MODE}):
+            raise ValueError("Height or direction-height QD requires a grasp-aware terminal selector")
+        if (resolved.qd_final_selection_mode == CONTACT_SWEEP_MODE
+                and resolved.qd_descriptor != DIRECTION_HEIGHT_DESCRIPTOR):
+            raise ValueError("N9 contact sweep requires the frozen N7 direction-height descriptor")
         if resolved.qd_quality_mode not in {"provider", "executed_prefix_v1", FEEDBACK_MODE}:
             raise ValueError("EDS qd_quality_mode must be provider, executed_prefix_v1 or executed_feedback_v1")
         if resolved.qd_quality_mode in {"executed_prefix_v1", FEEDBACK_MODE}:
