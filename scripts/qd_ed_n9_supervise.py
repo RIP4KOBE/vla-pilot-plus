@@ -135,7 +135,7 @@ def main():
             wait_gpu3(status, completed)
             runner.durable_json(status, {'status': 'dispatching', 'completed_keys': completed,
                                         'current_key': row['episode_key'], 'selected_physical_gpu': 3})
-            with contract.supervised_scope(plan, ROOT, row['episode_key']):
+            with runner.n9_support().supervised_scope(plan, ROOT, row['episode_key']):
                 summaries = runner.run_plan(args.plan, split='dev', iteration=contract.COHORT,
                                             episode_keys=[row['episode_key']], root=ROOT)
             runner.require(len(summaries) == 1 and summaries[0]['event'] == 'valid'
