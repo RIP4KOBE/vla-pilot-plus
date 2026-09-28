@@ -13,6 +13,37 @@ from .env_adapters import BaseEnvAdapter, Pose3D, TrackedObject, create_adapter
 from utils.logging_utils import SteerLogger
 log = SteerLogger("KeypointTracker")
 
+
+def read_keypoints_with_passive_tracking(tracker, *, evidence_enabled: bool):
+    """Return the existing keypoint read and optional passive tracking metadata.
+
+    This observer does not ask the adapter for a pose.  Only the three safe
+    tracking fields are copied into decision evidence; unexpected metadata is
+    deliberately excluded.  An observer failure is recorded by type only and
+    cannot alter the keypoints consumed by the policy.
+    """
+    keypoints = tracker.get_keypoint_positions()
+    if not evidence_enabled:
+        return keypoints, None
+    try:
+        read_snapshot = getattr(tracker, "execution_feedback_tracking_snapshot", None)
+        if not callable(read_snapshot):
+            raise TypeError("tracking snapshot unavailable")
+        raw = read_snapshot()
+        if not isinstance(raw, dict) or not isinstance(raw.get("targets"), dict):
+            raise TypeError("tracking snapshot malformed")
+        snapshot = {
+            "instance_id": int(raw["instance_id"]),
+            "generation": int(raw["generation"]),
+            "targets": {
+                str(index): {"valid": bool(state["valid"]), "status": str(state["status"])}
+                for index, state in raw["targets"].items()
+            },
+        }
+        return keypoints, snapshot
+    except Exception as error:
+        return keypoints, {"capture_error_type": type(error).__name__}
+
 @dataclass
 class KeypointInfo:
     """
