@@ -12,6 +12,34 @@ from torch import Tensor
 EXECUTION_INTENT_DESCRIPTOR = "target_distance_gripper_duty_v1"
 HEIGHT_AWARE_DESCRIPTOR = "target_horizontal_radius_signed_height_v1"
 DIRECTION_HEIGHT_DESCRIPTOR = "target_xy_quadrant_signed_height_v1"
+
+
+def select_parent_survivor_slots(rewards: Tensor, cell_ids: Tensor, count: int) -> tuple[int, ...]:
+    """Choose exact, distinct-cell parents using existing same-chunk quality."""
+    if type(count) is not int or count not in (0, 4):
+        raise ValueError("QD parent survivor count must be 0 or 4")
+    if rewards.ndim != 1 or cell_ids.ndim != 1 or rewards.numel() != cell_ids.numel():
+        raise ValueError("QD parent survivor inputs must be aligned vectors")
+    if not bool(torch.isfinite(rewards).all().item()):
+        raise FloatingPointError("QD parent survivor rewards are nonfinite")
+    if count == 0:
+        return ()
+    if rewards.numel() != 16:
+        raise ValueError("QD parent survivor allocation must contain 16 slots")
+    qualities = rewards.detach().cpu().tolist()
+    cells = cell_ids.detach().cpu().tolist()
+    if any(type(cell) is not int or cell < 0 for cell in cells):
+        raise ValueError("QD parent survivor cells are invalid")
+    ranked = sorted(range(16), key=lambda slot: (-qualities[slot], cells[slot], slot))
+    chosen = []
+    used_cells = set()
+    for slot in ranked:
+        if cells[slot] not in used_cells:
+            chosen.append(slot)
+            used_cells.add(cells[slot])
+            if len(chosen) == count:
+                break
+    return tuple(chosen)
 DIRECTION_HEIGHT_AXES = (
     {"name": "target_relative_xy_quadrant", "unit": "category"},
     {"name": "target_relative_signed_height", "unit": "m"},

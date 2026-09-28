@@ -2351,6 +2351,79 @@ def _valid_qd_config(**updates):
     }
 
 
+def test_n11_config_only_allows_exact_n7_survivor_lane(stub_steer):
+    valid = _valid_qd_config(
+        qd_descriptor="target_xy_quadrant_signed_height_v1",
+        qd_final_selection_mode="terminal_grasp_proximity_v1",
+        qd_parent_sampling="sparse_priority",
+        qd_parent_survivor_count=4,
+    )
+    resolved = stub_steer._resolve_eds_config_with_reference_defaults(valid)
+    assert resolved.qd_parent_survivor_count == 4
+    assert stub_steer._resolve_eds_config_with_reference_defaults(
+        _valid_qd_config()).qd_parent_survivor_count == 0
+    for key, value in (("qd_descriptor", "target_relative_endpoint_xy"),
+                       ("qd_final_selection_mode", "archive_global_best"),
+                       ("qd_parent_sampling", "uniform_cells"),
+                       ("qd_global_quality_anchor_count", 1)):
+        with pytest.raises(ValueError):
+            stub_steer._resolve_eds_config_with_reference_defaults(
+                {**valid, key: value})
+
+
+def test_n11_survivors_are_exact_canonical_parents_with_fresh_scores(
+    stub_steer, stub_adapter, monkeypatch, tmp_path,
+):
+    from core.decision_evidence import DecisionEvidence
+
+    stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
+                         sample_batch_size=16,
+                         policy_config={"action_chunk_horizon": 8})
+    initial = torch.linspace(-.12, .19, 16 * 64 * 128).reshape(16, 64, 128).bfloat16()
+    monkeypatch.setattr(stub_steer, "_eds_initial_population", lambda **kw: initial.clone())
+    provider = _n2_fixture_provider()
+    keypoints = torch.tensor([[.02, .01, .03], [.13, -.21, .39]], dtype=torch.bfloat16)
+    rec = DecisionEvidence(tmp_path, episode=0)
+    stub_steer._decision_evidence = rec
+    rec.begin_decision(global_step=0, stage=1, use_guidance=True,
+                       keypoints=keypoints, providers=[provider])
+    cfg = stub_steer._resolve_eds_config_with_reference_defaults(_valid_qd_config(
+        qd_parent_sampling="sparse_priority",
+        qd_final_selection_mode="terminal_grasp_proximity_v1",
+        qd_descriptor="target_xy_quadrant_signed_height_v1",
+        qd_parent_survivor_count=4,
+    ))
+    torch.manual_seed(25191)
+    stub_steer._eds_guided_denoise_loop(x_t=torch.zeros_like(initial),
+        cond=_rollout_cond(stub_steer), keypoints=keypoints,
+        guidance_fns=[provider], eds_config=cfg,
+        verbose=False, global_step=0, current_stage=1)
+    rec.flush()
+    events = [event for path in sorted(rec.root.glob("bundle_*.pt"))
+              for event in torch.load(path, map_location="cpu", weights_only=True)["events"]]
+    allocations = {e["values"]["iter_idx"]: e["values"] for e in events
+                   if e["event"] == "parent_allocation"}
+    selections = {e["values"]["iter_idx"]: e["values"] for e in events
+                  if e["event"] == "qd_parent_survivor_selection"}
+    scores = [e["values"] for e in events if e["event"] == "scoring_inputs"
+              and e["values"]["scoring_scope"]["role"] == "canonical_population"]
+    assert set(allocations) == set(selections) == set(range(10))
+    assert len(scores) == 10
+    for iteration in range(10):
+        parent = allocations[iteration]
+        scored = next(s for s in scores if s["scoring_scope"]["iter_idx"] == iteration)
+        selected = selections[iteration]
+        survivor_count = len(selected["original_allocation_slots"])
+        assert 1 <= survivor_count <= 4
+        assert len(set(selected["parent_cells"])) == survivor_count
+        expected = parent["source_population"].index_select(
+            0, parent["parent_indices"][:survivor_count].long())
+        assert torch.equal(scored["samples"][:survivor_count], expected)
+    metrics = stub_steer.get_last_eds_metrics()
+    assert metrics["score_call_count"] == 21
+    assert metrics["search_evaluation_count"] == 296
+
+
 def _n2_fixture_provider(index=1, *, recognized=True):
     from core.qd_executed_quality import TEMPLATE
     from utils.guidance_utils import wrap_guidance_function_with_device_fix
@@ -9919,6 +9992,11 @@ def test_decision_evidence_audit_accepts_actual_main_policy_adapter_cpu_path(
         "log": logging.getLogger("decision-evidence-cpu-integration")}
     exec(compile(ast.Module(body=nodes, type_ignores=[]), str(root / "main.py"), "exec",
                  flags=__future__.annotations.compiler_flag), namespace)
+    tracker_tree = ast.parse((root / "core/keypoint_tracker.py").read_text())
+    tracking_read = next(node for node in tracker_tree.body if isinstance(node, ast.FunctionDef)
+                         and node.name == "read_keypoints_with_passive_tracking")
+    exec(compile(ast.Module(body=[tracking_read], type_ignores=[]),
+                 str(root / "core/keypoint_tracker.py"), "exec"), namespace)
     Main = namespace["Main"]
 
     adapter_tree = ast.parse((root / "core/env_adapters/libero_adapter.py").read_text())

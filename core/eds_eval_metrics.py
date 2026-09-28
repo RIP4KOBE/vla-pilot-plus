@@ -462,6 +462,8 @@ class EDSChunkMetrics:
     qd_secondary_lane_mode: str = "none"
     qd_parent_sampling: str = "uniform_cells"
     qd_global_quality_anchor_count: int = 0
+    qd_parent_survivor_count: int = 0
+    qd_parent_survivor_counts_by_iter: list[int] = field(default_factory=list)
     qd_bounds_update_policy: str = "fixed_initial"
     qd_bounds_xy_m: list[list[float]] = field(default_factory=list)
     qd_bounds_source_initial_checksum: str | None = None
