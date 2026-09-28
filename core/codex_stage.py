@@ -73,6 +73,9 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         self.model = str(config.get("model", "gpt-6-astra"))
         self.reasoning_effort = str(config.get("reasoning_effort", "low"))
         self.timeout_seconds = float(config.get("timeout_seconds", 90))
+        self.allow_recovered_error_events = config.get("allow_recovered_error_events", False)
+        if type(self.allow_recovered_error_events) is not bool:
+            raise ValueError("allow_recovered_error_events must be a boolean")
         if not 0 < self.timeout_seconds <= 600:
             raise ValueError("Codex Stage timeout must be in (0, 600] seconds")
         configured_cli = config.get("cli_path") or shutil.which("codex")
@@ -98,6 +101,8 @@ class CodexStageRecognizer(GeminiStageRecognizer):
             "internal_http_retry_observation_available": False,
             "internal_retry_policy": "cli_managed_unknown",
         }
+        if self.allow_recovered_error_events:
+            self.transport_metadata["recovered_error_policy"] = "pre_final_only_v1"
         self._call_transport = {}
         self._call_raw_response = None
 
@@ -145,12 +150,20 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         event_types = []
         item_types = []
         usages = []
-        for event in events:
+        recoverable_error_indices = []
+        recoverable_error_events = 0
+        recoverable_error_items = 0
+        started_turn_indices = []
+        completed_message_indices = []
+        completed_turn_indices = []
+        for index, event in enumerate(events):
             kind = event.get("type")
             event_types.append(kind if isinstance(kind, str) else "invalid")
             if kind == "turn.started":
                 starts += 1
+                started_turn_indices.append(index)
             elif kind == "turn.completed":
+                completed_turn_indices.append(index)
                 self.api_request_counter.values["completed_turns"] += 1
                 usage = event.get("usage")
                 required = ("input_tokens", "cached_input_tokens", "output_tokens")
@@ -174,14 +187,21 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                 item = event.get("item")
                 item_kind = item.get("type") if isinstance(item, dict) else None
                 item_types.append(item_kind if isinstance(item_kind, str) else "invalid")
-                if item_kind not in ("agent_message", "reasoning"):
+                if item_kind == "error" and kind == "item.completed" and self.allow_recovered_error_events:
+                    recoverable_error_indices.append(index)
+                    recoverable_error_items += 1
+                elif item_kind not in ("agent_message", "reasoning"):
                     error_code = "codex_unexpected_item"
                 if item_kind == "agent_message" and kind == "item.completed":
+                    completed_message_indices.append(index)
                     text = item.get("text")
                     if not isinstance(text, str) or not text.strip():
                         error_code = "codex_empty_response"
                     else:
                         messages.append(text.strip())
+            elif kind == "error" and self.allow_recovered_error_events:
+                recoverable_error_indices.append(index)
+                recoverable_error_events += 1
             elif kind not in ("thread.started",):
                 error_code = "codex_unexpected_event"
         complete_turns = sum(kind == "turn.completed" for kind in event_types)
@@ -191,6 +211,18 @@ class CodexStageRecognizer(GeminiStageRecognizer):
             event_types=event_types, item_types=item_types, observed_usage=usages,
             completed_turns=complete_turns,
         )
+        if self.allow_recovered_error_events:
+            self._call_transport.update(
+                recoverable_error_event_count=recoverable_error_events,
+                recoverable_error_item_count=recoverable_error_items,
+                recovered_error_events_accepted=False,
+            )
+        if recoverable_error_indices and not (
+            len(started_turn_indices) == len(completed_message_indices) == len(completed_turn_indices) == 1
+            and started_turn_indices[0] < min(recoverable_error_indices)
+            and max(recoverable_error_indices) < completed_message_indices[0] < completed_turn_indices[0]
+        ):
+            error_code = "codex_recovery_order_violation"
         if starts == complete_turns == len(usages) == 1 and stream_error is None:
             self.api_request_counter.values["usage_complete_calls"] += 1
         if starts != 1 or complete_turns != 1:
@@ -201,6 +233,8 @@ class CodexStageRecognizer(GeminiStageRecognizer):
             error_code = "codex_expected_one_response"
         if error_code:
             raise CodexStageError(error_code)
+        if self.allow_recovered_error_events:
+            self._call_transport["recovered_error_events_accepted"] = bool(recoverable_error_indices)
         return messages[0]
 
     def _request_stage_response(self, content):
