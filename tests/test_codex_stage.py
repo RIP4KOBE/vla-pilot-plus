@@ -33,7 +33,8 @@ def events(answer=ANSWER, usage=None):
     ]
 
 
-def make(monkeypatch, tmp_path, event_list=None, returncode=0, timeout=False, raw=None):
+def make(monkeypatch, tmp_path, event_list=None, returncode=0, timeout=False, raw=None,
+         allow_recovered_error_events=False):
     calls = []
     cli = tmp_path / "codex"
     cli.touch()
@@ -68,6 +69,7 @@ def make(monkeypatch, tmp_path, event_list=None, returncode=0, timeout=False, ra
         "backend": "codex_cli", "model": "gpt-6-astra", "cli_path": str(cli),
         "stage_template_path": str(template), "disabled_skill_paths": ["/active/one"],
         "timeout_seconds": 90,
+        "allow_recovered_error_events": allow_recovered_error_events,
     })
     return recognizer, calls
 
@@ -168,6 +170,64 @@ def test_invalid_calls_keep_conservative_fallback_and_count_failure(monkeypatch,
     assert result["codex_logical_call_attempts"] == 1
     assert "private value" not in result["error"]
     assert len(calls) == 1
+
+
+def test_opt_in_accepts_pre_final_recovered_errors_with_complete_turn(monkeypatch, tmp_path):
+    recovered = events()[:2] + [
+        {"type": "error", "message": "private value"},
+        {"type": "item.completed", "item": {"type": "error", "message": "private value"}},
+    ] + events()[2:]
+    recognizer, calls = make(monkeypatch, tmp_path, event_list=recovered,
+                             allow_recovered_error_events=True)
+    assert identify(recognizer) == (2, False)
+    result = recognizer.last_result
+    assert result["ok"] is True and result["codex_failed_calls"] == 0
+    assert result["codex_usage_complete_calls"] == 1
+    assert result["transport"]["recovered_error_policy"] == "pre_final_only_v1"
+    assert result["transport"]["recoverable_error_event_count"] == 1
+    assert result["transport"]["recoverable_error_item_count"] == 1
+    assert result["transport"]["recovered_error_events_accepted"] is True
+    assert "private value" not in json.dumps(result["transport"])
+    assert len(calls) == 1
+
+
+def test_opt_in_matches_observed_task3_event_shape_without_fallback(monkeypatch, tmp_path):
+    answer = ("stage 1\nguidance: no\nevidence: The gripper is close to the target, "
+              "but a secure grasp is not visible.")
+    observed_shape = events(answer=answer)[:2] + [{"type": "error"}] * 4 + [
+        {"type": "item.completed", "item": {"type": "error"}},
+    ] + [{"type": "error"}] * 3 + events(answer=answer)[2:]
+    recognizer, _ = make(monkeypatch, tmp_path, event_list=observed_shape,
+                         allow_recovered_error_events=True)
+    assert identify(recognizer) == (1, False)
+    assert recognizer.last_result["transport"]["recoverable_error_event_count"] == 7
+    assert recognizer.last_result["transport"]["recoverable_error_item_count"] == 1
+    assert recognizer.last_result["raw_response"] == answer
+
+
+@pytest.mark.parametrize("event_list,returncode", [
+    (events()[:3] + [{"type": "error"}] + events()[3:], 0),
+    (events() + [{"type": "error"}], 0),
+    (events()[:2] + [{"type": "error"}] + events()[2:-1], 0),
+    (events()[:1] + [{"type": "error"}] + events()[1:], 0),
+    (events()[:2] + [{"type": "item.started", "item": {"type": "error"}}] + events()[2:], 0),
+    (events()[:2] + [{"type": "turn.failed"}] + events()[2:], 0),
+    (events()[:2] + [{"type": "item.completed", "item": {"type": "command_execution"}}] + events()[2:], 0),
+    (events()[:2] + [{"type": "error"}] + events()[2:], 1),
+    (events()[:2] + [{"type": "error"}] + events(usage={"input_tokens": 10})[2:], 0),
+])
+def test_opt_in_still_rejects_bad_order_missing_completion_or_process_failure(
+        monkeypatch, tmp_path, event_list, returncode):
+    recognizer, _ = make(monkeypatch, tmp_path, event_list=event_list,
+                         returncode=returncode, allow_recovered_error_events=True)
+    assert identify(recognizer) == (1, True)
+    assert recognizer.last_result["ok"] is False
+    assert recognizer.last_result["codex_failed_calls"] == 1
+
+
+def test_recovered_error_opt_in_requires_boolean(monkeypatch, tmp_path):
+    with pytest.raises(ValueError, match="must be a boolean"):
+        make(monkeypatch, tmp_path, allow_recovered_error_events="true")
 
 
 def test_nonzero_exit_keeps_usage_but_is_failed(monkeypatch, tmp_path):
