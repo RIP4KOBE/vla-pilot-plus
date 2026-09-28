@@ -62,9 +62,11 @@ def validate_contract(plan, manifest, runtime, seeds, root, runner):
               and meta.get('protocol_path') == str(PROTOCOL)
               and meta.get('protocol_sha256') == sha(PROTOCOL),
               'passive diagnostic metadata/protocol differs')
-    r.require(plan.get('n7_cohort') is None and plan.get('n7_validation') is None
+    r.require(plan.get('n7_cohort') is None and plan.get('n7_passive_diagnostic') is None
+              and plan.get('n7_validation') is None
               and plan.get('n7_validation_continuation') is None
               and plan.get('n9_cohort') is None
+              and plan.get('stage_condition') == r.E2_STAGE_CONDITION
               and set(plan.get('candidate_profiles', {})) == {'N7'}
               and plan.get('phase_authorization') == {'dev': True, 'validation': False, 'formal': False}
               and plan.get('episodes') == expected_rows(),
@@ -80,6 +82,7 @@ def validate_contract(plan, manifest, runtime, seeds, root, runner):
               runtime.get('stage_engineering_condition') ==
               r.n4e1_support().engineering_condition() and
               runtime.get('stage_recovered_error_condition') == r.E2_STAGE_CONDITION and
+              runtime.get('stage_condition') == r.E2_STAGE_CONDITION and
               runtime['frozen_stage_provider'].get('allow_recovered_error_events') is True,
               'GPU3/E2 Stage transport identity changed')
     state = r.read_state(Path(root) / 'research-state.yaml')
