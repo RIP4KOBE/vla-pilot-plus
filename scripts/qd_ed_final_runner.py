@@ -31,7 +31,7 @@ BUCKETS = {'baseline': 20, 'development': 100, 'validation': 60, 'formal': 40, '
 AMENDED_BUCKETS = {'baseline': 28, 'development': 125, 'validation': 180, 'formal': 40, 'recovery': 20}
 GPU3_AMENDMENT = {
     'schema': 'gpu3-n10-budget-amendment-v1',
-    'proposal_sha256': 'e5419d3119d3cb317cf1ff16e1c4cb6c78da8782066cd3e433cc157dff7e186a',
+    'proposal_sha256': '25f7df614f8e8e476cdef7403756081156b192db8ab016e1afa1b2d01f3ffe0b',
     'physical_gpu': 3,
 }
 TERMINAL = {'valid', 'aborted'}
