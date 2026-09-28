@@ -576,6 +576,37 @@ def test_e2_stage_binding_is_explicit_and_keeps_180_second_condition(tmp_path):
         runner.stage_overrides(changed)
 
 
+def test_e2_counts_are_checked_per_call_not_in_static_episode_metadata(tmp_path, monkeypatch):
+    _, _, runtime, path, record = codex_compute_case(tmp_path, monkeypatch, calls=1)
+    frozen = runtime['frozen_stage_provider']
+    frozen['timeout_seconds'] = 180
+    frozen['allow_recovered_error_events'] = True
+    frozen['public_config_sha256'] = runner.codex_public_config_sha256(frozen)
+    runtime['stage_engineering_condition'] = runner.n4e1_support().engineering_condition()
+    runtime['stage_recovered_error_condition'] = runner.E2_STAGE_CONDITION
+    record['stage_transport'].update(timeout_seconds=180,
+        public_config_sha256=frozen['public_config_sha256'],
+        allow_recovered_error_events=True, recovered_error_policy='pre_final_only_v1')
+    path.write_text(json.dumps(record) + '\n')
+    costs = runner.episode_compute(tmp_path, row(), runtime)
+    assert 'recoverable_error_event_count' not in costs['stage_transport']
+    event = dict(query_status='ok', api_request_attempts=None,
+                 api_sdk_retry_attempts=None, api_request_counter_available=False,
+                 transport={**record['stage_transport'], 'recoverable_error_event_count':2,
+                            'recoverable_error_item_count':1,
+                            'recovered_error_events_accepted':True},
+                 codex_call_latency_s=1.25)
+    event.update({'codex_' + suffix: record['provider_' + suffix]
+                  for suffix in runner.CODEX_COUNT_SUFFIXES})
+    stage = tmp_path / 'eds_eval/stage_events.jsonl'
+    stage.write_text(json.dumps(event) + '\n')
+    runner.validate_codex_stage_events(tmp_path, costs)
+    event['transport']['recovered_error_events_accepted'] = False
+    stage.write_text(json.dumps(event) + '\n')
+    with pytest.raises(runner.GateError, match='E2 per-call'):
+        runner.validate_codex_stage_events(tmp_path, costs)
+
+
 def codex_compute_case(tmp_path, monkeypatch, *, calls=0):
     episode, profile = no_guidance_case(tmp_path, monkeypatch)
     runtime = codex_runtime(tmp_path)

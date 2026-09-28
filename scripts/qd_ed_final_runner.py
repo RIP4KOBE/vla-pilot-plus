@@ -1052,11 +1052,8 @@ def episode_compute(output,row,runtime=None):
     require(all(transport.get(key) == frozen[key] for key in CODEX_CONFIG_KEYS), 'Codex observed Stage transport differs from frozen binding')
     if runtime.get('stage_recovered_error_condition') is not None:
         require(transport.get('allow_recovered_error_events') is True
-                and transport.get('recovered_error_policy') == 'pre_final_only_v1'
-                and type(transport.get('recoverable_error_event_count')) is int
-                and type(transport.get('recoverable_error_item_count')) is int
-                and type(transport.get('recovered_error_events_accepted')) is bool,
-                'E2 observed recovered-error transport metadata differs')
+                and transport.get('recovered_error_policy') == 'pre_final_only_v1',
+                'E2 observed static transport policy differs')
     require(transport.get('auth_mode') == 'chatgpt' and
             transport.get('public_config_sha256') == frozen['public_config_sha256'],
             'Codex observed public invocation policy differs from frozen binding')
@@ -1137,6 +1134,17 @@ def validate_codex_stage_events(output, costs):
                 'Codex Stage event lacks one measured call with complete usage')
         require(event.get('transport', {}).get('public_config_sha256') == costs['stage_transport']['public_config_sha256'],
                 'Codex Stage event public invocation differs from frozen contract')
+        if costs.get('stage_condition') == E2_STAGE_CONDITION:
+            transport = event.get('transport', {})
+            errors = transport.get('recoverable_error_event_count')
+            items = transport.get('recoverable_error_item_count')
+            require(transport.get('allow_recovered_error_events') is True
+                    and transport.get('recovered_error_policy') == 'pre_final_only_v1'
+                    and type(errors) is int and errors >= 0
+                    and type(items) is int and items >= 0
+                    and type(transport.get('recovered_error_events_accepted')) is bool
+                    and transport['recovered_error_events_accepted'] == (errors + items > 0),
+                    'E2 per-call recovered-error evidence differs')
     for suffix in CODEX_COUNT_SUFFIXES:
         values = [event.get('codex_' + suffix) for event in actual]
         require(all(type(value) is int and value >= 0 for value in values) and
