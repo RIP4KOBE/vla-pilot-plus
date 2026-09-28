@@ -21,6 +21,7 @@ RUN_DIR = ART / 'continuation_20260928/n7-e2-passive-tracker-diagnostic-v1'
 SOURCE_PLAN = ART / 'continuation_20260925/n7-dev-v1/plan.frozen.v1.json'
 SOURCE_PLAN_SHA = '9cef973dd2a2f7cd07f82eb1965b96e2bcb3557f372e25dc4cd04dc622b277be'
 PROTOCOL = SESSION / 'variants/n10_lineage_survival/e2-prospective-measurement-protocol-v1.md'
+PROTOCOL_SHA = 'c9a66bfdd8dd0848a8f32a565ee2800759941f4865a6ed6c001ee87efb09c62e'
 COHORT = 'N7_E2_PASSIVE_TRACKING_DEV_20260928'
 TASKS = (0, 3, 6, 9)
 LIMITS = {'primary_dispatches': 4, 'gpu_hours': 4.2,
@@ -54,13 +55,14 @@ def expected_rows():
 
 def validate_contract(plan, manifest, runtime, seeds, root, runner):
     r = api(runner)
+    r.require(sha(PROTOCOL) == PROTOCOL_SHA, 'E2 protocol bytes changed')
     meta = plan.get('n7_e2_passive_diagnostic')
     r.require(isinstance(meta, dict) and meta.get('schema') == 'n7-e2-passive-diagnostic-v1'
               and meta.get('cohort_id') == COHORT and meta.get('limits') == LIMITS
               and meta.get('source_plan_sha256') == SOURCE_PLAN_SHA
               and meta.get('run_dir') == str(RUN_DIR)
               and meta.get('protocol_path') == str(PROTOCOL)
-              and meta.get('protocol_sha256') == sha(PROTOCOL),
+              and meta.get('protocol_sha256') == PROTOCOL_SHA,
               'passive diagnostic metadata/protocol differs')
     r.require(plan.get('n7_cohort') is None and plan.get('n7_passive_diagnostic') is None
               and plan.get('n7_validation') is None
