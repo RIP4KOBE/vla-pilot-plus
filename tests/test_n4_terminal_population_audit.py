@@ -11,7 +11,7 @@ from core.rdt_libero_action_converter import decode_rdt_libero_action_chunk
 from scripts import audit_decision_evidence as audit
 
 
-def episode(tmp_path, *, count=3, variant="different", auxiliary=False, stage_init=None, n5=False, n6=False, n7=False):
+def episode(tmp_path, *, count=3, variant="different", auxiliary=False, stage_init=None, n5=False, n6=False, n7=False, n11=False):
     rec = DecisionEvidence(tmp_path, episode=0)
     provider = lambda keypoints, trajectories: None
     keypoints = torch.zeros(1, 3, dtype=torch.bfloat16 if n5 else torch.float32)
@@ -33,16 +33,24 @@ def episode(tmp_path, *, count=3, variant="different", auxiliary=False, stage_in
                 parent_fingerprints=audit.fingerprints(pa), parent_lanes=["quality"] * 16,
                 parent_cell_ids=cell_ids, parent_rewards=quality.float(), parent_costs=-quality.float(),
                 original_archive_occurrences=None, weights={"quality": 1.0})
+            if n11:
+                rec.record("qd_parent_survivor_selection", iter_idx=iteration,
+                    original_allocation_slots=[0, 1, 2, 3], parent_cells=[0, 1, 2, 3],
+                    parent_fingerprints=audit.fingerprints(pa)[:4],
+                    source_quality=quality[:4].float().tolist(), exact_latent_survival=True)
             rec.record("parent_allocation", iter_idx=iteration, source_population=pa,
                 source_quality=quality.float(), source_costs=-quality.float(), parent_indices=cell_ids,
-                elite_count=0, parent_cell_ids=cell_ids, offspring_sources=["quality"] * 16)
+                elite_count=4 if n11 else 0, parent_cell_ids=cell_ids, offspring_sources=["quality"] * (12 if n11 else 16))
         actions = torch.zeros(16, 64, 128, dtype=torch.bfloat16)
         actions[:, :, 10] = -1
         actions[:, :, 39] = torch.arange(j * 16, j * 16 + 16).bfloat16()[:, None] / 256
         quality = -(torch.arange(16).bfloat16() / 16 + (j + 1))
+        if n11 and previous is not None:
+            actions[:4] = previous[0][:4]
+            quality[:4] = previous[1][:4]
         if j == 10:
             if n5:
-                actions[1, :, 10] = 1
+                actions[4 if n11 else 1, :, 10] = 1
             if variant in {"same", "suffix", "inactive", "signed_zero", "gripper_zero"}:
                 actions[0] = first[0][0]
                 quality[0] = first[1][0]
@@ -53,23 +61,27 @@ def episode(tmp_path, *, count=3, variant="different", auxiliary=False, stage_in
             if variant in {"ties", "duplicates"}:
                 quality[1] = quality[0]
                 if variant == "duplicates": actions[1] = actions[0]
-        scopes = [("canonical_initial" if j == 0 else "canonical_offspring", iteration)]
+        scopes = ([("canonical_offspring", iteration), ("canonical_population", iteration)]
+                  if n11 and j > 0 else
+                  [("canonical_initial" if j == 0 else "canonical_offspring", iteration)])
         if auxiliary and j == 10: scopes.insert(0, ("auxiliary_pretest", iteration))
         for role, _ in scopes:
             rec.set_scoring_scope(role=role, iter_idx=iteration, site="synthetic_existing_return")
             rec.begin_score_call()
-            full = torch.zeros(16, 9, 3, dtype=torch.bfloat16)
+            scored_actions = actions[4:] if n11 and role == "canonical_offspring" else actions
+            scored_quality = quality[4:] if n11 and role == "canonical_offspring" else quality
+            full = torch.zeros(len(scored_actions), 9, 3, dtype=torch.bfloat16)
             for row in full:
                 rec.record("projection_origin", source_eef_position=np.zeros(3), cast_eef_start=row[0])
-            rec.begin_scoring(samples=actions, keypoints=keypoints, projected_xyz=full,
+            rec.begin_scoring(samples=scored_actions, keypoints=keypoints, projected_xyz=full,
                               provider_input_xyz=full[:, 1:8], slice_kind="eds")
-            for index in range(16):
+            for index in range(len(scored_actions)):
                 rec.scoring_candidate_index = index; rec.scoring_provider_index = 0
-                rec.provider_return(provider, quality[index])
+                rec.provider_return(provider, scored_quality[index])
             score_id = rec.scoring_batch_id
-            rec.record("scoring_aggregate", scoring_batch_id=score_id, aggregate_before_reward_mode=quality)
-            rec.record("effective_quality", scoring_batch_id=score_id, reward_mode="normal", quality=quality, costs=-quality)
-            if role != "auxiliary_pretest":
+            rec.record("scoring_aggregate", scoring_batch_id=score_id, aggregate_before_reward_mode=scored_quality)
+            rec.record("effective_quality", scoring_batch_id=score_id, reward_mode="normal", quality=scored_quality, costs=-scored_quality)
+            if role != "auxiliary_pretest" and (not n11 or role != "canonical_offspring"):
                 canonical_sequence = rec.record("canonical_candidate_batch", iter_idx=iteration,
                                                 candidates=actions, effective_quality=quality)
                 if n6 or n7:
@@ -83,7 +95,7 @@ def episode(tmp_path, *, count=3, variant="different", auxiliary=False, stage_in
                         scoring_batch_id=score_id)
         if first is None: first = actions.clone(), quality.clone()
         previous = actions, quality
-    costs = -quality; index = 1 if n5 else int(torch.argmin(costs)); selected = actions[index:index + 1]
+    costs = -quality; index = (4 if n11 else 1) if n5 else int(torch.argmin(costs)); selected = actions[index:index + 1]
     archive, rewards = first[0][:4], first[1][:4].float()
     best = min(range(4), key=lambda i: (-rewards[i].item(), audit.fingerprints(archive)[i], i))
     reference = {"population": archive, "rewards": rewards, "costs": -rewards, "cell_ids": cell_ids[:4],
@@ -91,10 +103,10 @@ def episode(tmp_path, *, count=3, variant="different", auxiliary=False, stage_in
         "selected_cell": best, "selected_quality": rewards[best].item(), "selected_cost": -rewards[best].item()}
     raw = quality[index].item()
     grasp = ({"target_index": 0, "recognition_reason": "recognized_weighted_distance_template",
-              "best_reach_m": 0., "eligible_indices": [1], "native_argmin_index": 0,
+              "best_reach_m": 0., "eligible_indices": [index], "native_argmin_index": 0,
               "absolute_reach_m": 0.06, "relative_reach_m": 0.03,
               "projected_distances_m": torch.zeros(16, 8),
-              "positive_commands": torch.arange(16)[:, None].expand(16, 8) == 1} if n5 else None)
+              "positive_commands": torch.arange(16)[:, None].expand(16, 8) == index} if n5 else None)
     rec.record("final_selection", population=actions, selected_latent=selected, selected_index=index,
         selected_quality=raw, selected_cost=costs[index].item(), selected_fingerprint=audit.fingerprints(selected)[0],
         selected_cell=11 if n7 else 10 if n6 else index, selection_rule="terminal_grasp_proximity" if n5 else "terminal_population_first_argmin",
@@ -255,3 +267,27 @@ def test_n7_audit_binds_native_direction_height_cells_and_rejects_false_assignme
     rewrite(rec, "qd_descriptor_assignment", lambda row: row["values"]["cell_ids"][0].fill_(1))
     rejected = audit.audit_episode(rec.root, compute)
     assert not rejected["accepted"] and rejected["errors"] == ["n7_cell_or_threshold_association_mismatch"]
+
+
+def test_n11_audit_checks_extra_scoring_and_exact_survivor_ancestry(tmp_path):
+    rec, compute = episode(tmp_path, n11=True)
+    accepted = audit.audit_episode(rec.root, compute)
+    assert accepted["accepted"], accepted["errors"]
+    gate = accepted["n4_terminal_population_audit"]
+    assert gate["canonical_batches_verified"] == 11
+    assert gate["parent_rounds_verified"] == 10
+    assert accepted["n11_parent_survival_audit"]["survivor_rounds_verified"] == 10
+    rewrite(rec, "qd_parent_survivor_selection",
+            lambda row: row["values"]["original_allocation_slots"].__setitem__(0, 7))
+    rejected = audit.audit_episode(rec.root, compute)
+    assert not rejected["accepted"]
+    assert rejected["errors"] == ["n11_exact_ranked_parent_survival_mismatch"]
+
+
+def test_n11_audit_composes_with_n7_descriptor_and_n5_grasp_selector(tmp_path):
+    rec, compute = episode(tmp_path, n5=True, n7=True, n11=True)
+    result = audit.audit_episode(rec.root, compute)
+    assert result["accepted"], result["errors"]
+    assert result["n11_parent_survival_audit"]["checked_decisions"] == 1
+    assert result["n7_direction_height_audit"]["assignments_verified"] == 11
+    assert result["n5_grasp_timing_audit"]["checked_decisions"] == 1

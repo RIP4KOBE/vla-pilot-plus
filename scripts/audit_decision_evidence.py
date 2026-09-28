@@ -297,10 +297,28 @@ def _audit_n4_terminal_population(kinds, context, final_event):
     canonical = kinds["canonical_candidate_batch"]
     require([r["values"]["iter_idx"] for r in canonical] == list(range(-1, 10)), "n4_canonical_11_coverage")
     sources = [r for r in kinds["scoring_inputs"] if r["values"]["scoring_scope"]["role"] != "auxiliary_pretest"]
-    scoring = {r["values"]["scoring_scope"]["iter_idx"]: r for r in sources}
+    n11_mode = bool(kinds["qd_parent_survivor_selection"])
+    if n11_mode:
+        require(len(sources) == 21 and len(kinds["qd_parent_survivor_selection"]) == 10,
+                "n11_scoring_or_survivor_coverage")
+        scoring = {r["values"]["scoring_scope"]["iter_idx"]: r for r in sources
+                   if r["values"]["scoring_scope"]["role"] in
+                   {"canonical_initial", "canonical_population"}}
+        offspring_scores = {r["values"]["scoring_scope"]["iter_idx"]: r
+                            for r in sources if r["values"]["scoring_scope"]["role"] ==
+                            "canonical_offspring"}
+        require(len(scoring) == 11 and set(scoring) == set(range(-1, 10))
+                and len(offspring_scores) == 10 and set(offspring_scores) == set(range(10)),
+                "n11_canonical_and_offspring_scoring_coverage")
+        survivors = {r["values"]["iter_idx"]: r for r in kinds["qd_parent_survivor_selection"]}
+        require(len(survivors) == 10 and set(survivors) == set(range(10)),
+                "n11_survivor_iteration_coverage")
+    else:
+        scoring = {r["values"]["scoring_scope"]["iter_idx"]: r for r in sources}
+        require(len(sources) == len(scoring) == 11 and set(scoring) == set(range(-1, 10)),
+                "n4_scoring_11_coverage")
     allocations = {r["values"]["iter_idx"]: r for r in kinds["archive_parent_allocation"]}
     parents = {r["values"]["iter_idx"]: r for r in kinds["parent_allocation"]}
-    require(len(sources) == len(scoring) == 11 and set(scoring) == set(range(-1, 10)), "n4_scoring_11_coverage")
     require(len(kinds["archive_parent_allocation"]) == len(kinds["parent_allocation"])
             == len(allocations) == len(parents) == 10 and set(allocations) == set(parents) == set(range(10)),
             "n4_parent_10_coverage")
@@ -309,7 +327,9 @@ def _audit_n4_terminal_population(kinds, context, final_event):
     for row in canonical:
         value = row["values"]; iteration = value["iter_idx"]; source = scoring[iteration]
         scope = source["values"]["scoring_scope"]
-        require(scope["role"] == ("canonical_initial" if iteration == -1 else "canonical_offspring"), "n4_scoring_role")
+        require(scope["role"] == ("canonical_initial" if iteration == -1 else
+                                  "canonical_population" if n11_mode else "canonical_offspring"),
+                "n4_scoring_role")
         actions = native(value["candidates"], (16, 64, 128))
         quality = native(value["effective_quality"], (16,), actions.dtype)
         require(same(actions, source["values"]["samples"]), "n4_same_call_population_mismatch")
@@ -331,15 +351,53 @@ def _audit_n4_terminal_population(kinds, context, final_event):
                         for prior in canonical if prior["values"]["iter_idx"] < iteration), "n4_parent_prior_only_order")
             pa = native(pv["source_population"], (16, 64, 128), actions.dtype)
             indices = pv["parent_indices"]
-            require(pv["elite_count"] == 0 and torch.is_tensor(indices) and indices.dtype == torch.int64
-                    and indices.device.type == "cpu" and torch.equal(indices, torch.arange(16)), "n4_sparse_parent_contract")
+            require(torch.is_tensor(indices) and indices.dtype == torch.int64
+                    and indices.device.type == "cpu" and indices.shape == (16,),
+                    "n4_sparse_parent_indices")
+            if n11_mode:
+                survivor = survivors[iteration]; sv = survivor["values"]
+                allocated_cells = av["parent_cell_ids"]
+                ranked = sorted(range(16), key=lambda slot:
+                    (-float(av["parent_rewards"][slot].item()),
+                     int(allocated_cells[slot].item()), slot))
+                expected_slots = []
+                seen_cells = set()
+                for slot in ranked:
+                    cell = int(allocated_cells[slot].item())
+                    if cell not in seen_cells:
+                        expected_slots.append(slot); seen_cells.add(cell)
+                        if len(expected_slots) == 4:
+                            break
+                remaining = [slot for slot in range(16) if slot not in expected_slots]
+                require(pv["elite_count"] == len(expected_slots)
+                        and 1 <= len(expected_slots) <= 4
+                        and torch.equal(indices, torch.tensor(expected_slots + remaining))
+                        and sv["original_allocation_slots"] == expected_slots
+                        and sv["parent_cells"] == [int(allocated_cells[s].item()) for s in expected_slots]
+                        and sv["parent_fingerprints"] == [av["parent_fingerprints"][s] for s in expected_slots]
+                        and sv["source_quality"] ==
+                        [float(av["parent_rewards"][s].item()) for s in expected_slots]
+                        and sv["exact_latent_survival"] is True
+                        and allocation["sequence"] < survivor["sequence"] < parent["sequence"]
+                        and same(actions[:len(expected_slots)], pa.index_select(0, indices[:len(expected_slots)])),
+                        "n11_exact_ranked_parent_survival_mismatch")
+                offspring_source = offspring_scores[iteration]
+                require(offspring_source["sequence"] < source["sequence"]
+                        and tensor(offspring_source["values"]["samples"])
+                        and offspring_source["values"]["samples"].shape ==
+                        (16 - len(expected_slots), 64, 128),
+                        "n11_offspring_score_or_order_mismatch")
+            else:
+                require(pv["elite_count"] == 0 and torch.equal(indices, torch.arange(16)),
+                        "n4_sparse_parent_contract")
             pr, pc = native(av["parent_rewards"], (16,), torch.float32), native(av["parent_costs"], (16,), torch.float32)
             require(same(pr, pv["source_quality"]) and same(pc, pv["source_costs"])
                     and av["parent_lanes"] == ["quality"] * 16, "n4_parent_values_or_lanes")
             allocated_cells = av["parent_cell_ids"]
             require(tensor(allocated_cells) and allocated_cells.dtype == torch.int64 and allocated_cells.shape == (16,)
                     and bool(((allocated_cells >= 0) & (allocated_cells < 16)).all())
-                    and same(allocated_cells, pv["parent_cell_ids"]), "n4_parent_cell_source_mismatch")
+                    and same(allocated_cells.index_select(0, indices) if n11_mode else allocated_cells,
+                             pv["parent_cell_ids"]), "n4_parent_cell_source_mismatch")
             slots = []
             for index, action in enumerate(pa):
                 matches = known[_native_sha(action)]
@@ -951,6 +1009,18 @@ def audit_episode(episode_dir, episode_compute_file):
                 n9_mode = final_event["values"].get("qd_final_selection_mode") == "terminal_contact_sweep_v1"
                 n5_mode = final_event["values"].get("qd_final_selection_mode") == "terminal_grasp_proximity_v1"
                 n4 = _audit_n4_terminal_population(kinds, context, final_event)
+                if kinds["qd_parent_survivor_selection"]:
+                    n11_gate = report.setdefault("n11_parent_survival_audit", {
+                        "schema":"n11-native-exact-parent-survival-audit-v1",
+                        "checked_decisions":0,"survivor_rounds_verified":0,
+                        "exact_survivor_slots_verified":0,
+                        "scope":"Native quality-ranked distinct-cell parent identity, extra offspring/full-population scoring, canonical costs and deployed action linkage",
+                    })
+                    n11_gate["checked_decisions"] += 1
+                    n11_gate["survivor_rounds_verified"] += 10
+                    n11_gate["exact_survivor_slots_verified"] += sum(
+                        len(row["values"]["original_allocation_slots"])
+                        for row in kinds["qd_parent_survivor_selection"])
                 gate = report.setdefault("n9_contact_sweep_audit" if n9_mode else "n5_grasp_timing_audit" if n5_mode else "n4_terminal_population_audit", {
                     "schema": "n9-native-contact-sweep-audit-v1" if n9_mode else "n5-native-grasp-timing-audit-v1" if n5_mode else "n4-native-terminal-population-audit-v1",
                     "checked_decisions": 0,

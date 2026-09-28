@@ -59,6 +59,7 @@ from core.qd_ed import (
     QDBounds,
     QDParentAllocation,
     allocate_parent_slots,
+    select_parent_survivor_slots,
     cell_ids as qd_cell_ids,
     expand_bounds as qd_expand_bounds,
     fingerprint_action,
@@ -159,6 +160,7 @@ class _EDSConfig:
     qd_secondary_lane_mode: str = "none"
     qd_parent_sampling: str = "uniform_cells"
     qd_global_quality_anchor_count: int = 0
+    qd_parent_survivor_count: int = 0
     qd_sparse_exponent: float = 1.0
     qd_bounds_quantiles: tuple[float, float] = (0.05, 0.95)
     qd_bounds_expand_fraction: float = 0.10
@@ -5000,6 +5002,7 @@ class RDTSteer:
         metrics.qd_global_quality_anchor_count = (
             cfg.qd_global_quality_anchor_count
         )
+        metrics.qd_parent_survivor_count = cfg.qd_parent_survivor_count
         metrics.qd_bounds_update_policy = cfg.qd_bounds_update_policy
         metrics.shadow_qd_observer_enabled = bool(cfg.qd_metrics_observer)
         artifact_iters: list[dict] = []
@@ -5412,6 +5415,8 @@ class RDTSteer:
         adaptive_reward_plateau_count = 0
         adaptive_stable_lineage_count = 0
         selection_trace_iters: list[dict] = []
+        survivor_rescore_evaluations = 0
+        survivor_rescore_calls = 0
         adaptive_rollout_trace_iters: list[dict] = []
         anchor_lineage_ids: Optional[Tensor] = None
         geometry_baseline: dict[str, float | None] | None = None
@@ -5567,9 +5572,46 @@ class RDTSteer:
                     device=population.device,
                     dtype=torch.long,
                 )
+                survivor_slots = (
+                    select_parent_survivor_slots(
+                        population_rewards, qd_parent_cell_ids,
+                        cfg.qd_parent_survivor_count,
+                    ) if cfg.qd_parent_survivor_count else ()
+                )
+                survivor_slot_set = set(survivor_slots)
+                if cfg.qd_parent_survivor_count:
+                    metrics.qd_parent_survivor_counts_by_iter.append(len(survivor_slots))
+                offspring_slots = tuple(
+                    slot for slot in range(cfg.population_size)
+                    if slot not in survivor_slot_set
+                )
+                elite_indices = (
+                    torch.as_tensor(survivor_slots, device=population.device,
+                                    dtype=torch.long)
+                    if survivor_slots else
+                    torch.empty(0, device=population.device, dtype=torch.long)
+                )
+                offspring_indices = (
+                    torch.as_tensor(offspring_slots, device=population.device,
+                                    dtype=torch.long)
+                    if survivor_slots else identity_indices
+                )
+                if survivor_slots and getattr(self, "_decision_evidence", None) is not None:
+                    self._decision_evidence.record(
+                        "qd_parent_survivor_selection", iter_idx=i,
+                        original_allocation_slots=list(survivor_slots),
+                        parent_cells=[int(qd_parent_cell_ids[slot].item())
+                                      for slot in survivor_slots],
+                        parent_fingerprints=[allocation.parent_fingerprints[slot]
+                                             for slot in survivor_slots],
+                        source_quality=[float(population_rewards[slot].item())
+                                        for slot in survivor_slots],
+                        exact_latent_survival=True,
+                    )
                 selection_kind = f"qd_{cfg.qd_parent_sampling}"
                 offspring_sources = tuple(
-                    f"{source}_offspring" for source in chunk_population_sources
+                    f"{chunk_population_sources[slot]}_offspring"
+                    for slot in offspring_slots
                 )
                 parent_selection_kinds = [
                     (
@@ -5583,8 +5625,13 @@ class RDTSteer:
                     )
                     for lane in allocation.parent_lanes
                 ]
+                if survivor_slots:
+                    parent_selection_kinds = (
+                        ["qd_exact_parent_survivor"] * len(survivor_slots)
+                        + [parent_selection_kinds[slot] for slot in offspring_slots]
+                    )
                 qd_parent_count_by_source = {
-                    "elite": 0,
+                    "elite": len(survivor_slots),
                     "anchor_offspring": 0,
                     "weighted_offspring": 0,
                 }
@@ -5595,16 +5642,16 @@ class RDTSteer:
                 quality_count = sum(
                     lane == "quality" for lane in allocation.parent_lanes
                 )
-                qd_parent_count_by_source["qd_archive_offspring"] = quality_count
+                qd_parent_count_by_source["qd_archive_offspring"] = (
+                    quality_count - len(survivor_slots)
+                )
                 if allocation.secondary_parent_count:
                     qd_parent_count_by_source["qd_secondary_lane_offspring"] = int(
                         allocation.secondary_parent_count
                     )
                 plan = EDSParentPlan(
-                    elite_indices=torch.empty(
-                        0, device=population.device, dtype=torch.long
-                    ),
-                    offspring_parent_indices=identity_indices,
+                    elite_indices=elite_indices,
+                    offspring_parent_indices=offspring_indices,
                     offspring_sources=offspring_sources,
                     info={
                         "selection_beta": None,
@@ -5613,7 +5660,7 @@ class RDTSteer:
                         "selection_entropy_normalized": None,
                         "selection_max_probability": None,
                         "selection_degenerate_reward": False,
-                        "elite_count": 0,
+                        "elite_count": len(survivor_slots),
                         "anchor_requested_count": 0,
                         "anchor_count": 0,
                         "anchor_shortfall": 0,
@@ -5621,7 +5668,11 @@ class RDTSteer:
                         "anchor_unique_ratio": None,
                         "anchor_min_pairwise_eef_distance": None,
                         "anchor_fallback_reason": None,
-                        "offspring_unique_parent_ratio": unique_cell_ratio,
+                        "offspring_unique_parent_ratio": (
+                            len({int(qd_parent_cell_ids[slot].item())
+                                 for slot in offspring_slots}) / len(offspring_slots)
+                            if survivor_slots else unique_cell_ratio
+                        ),
                         "parent_mode_coverage": float(
                             covered_count / occupied_count
                         ),
@@ -5655,6 +5706,10 @@ class RDTSteer:
                 [plan.elite_indices, plan.offspring_parent_indices],
                 dim=0,
             )
+            if qd_parent_cell_ids is not None and cfg.qd_parent_survivor_count:
+                qd_parent_cell_ids = qd_parent_cell_ids.index_select(
+                    0, full_parent_indices.to(device=qd_parent_cell_ids.device)
+                )
             evidence = getattr(self, "_decision_evidence", None)
             if evidence is not None:
                 evidence.record("parent_allocation", iter_idx=i, source_population=population,
@@ -6081,6 +6136,9 @@ class RDTSteer:
                 )
                 metrics.score_call_count += 1
                 metrics.search_evaluation_count += cfg.population_size
+                if qd_archive is not None and cfg.qd_parent_survivor_count:
+                    survivor_rescore_calls += 1
+                    survivor_rescore_evaluations += offspring_count
                 rollout_nonreward_info = {
                     key: value
                     for key, value in rollout_info.items()
@@ -7109,15 +7167,19 @@ class RDTSteer:
             ).hexdigest()
         if metrics.qd_archive_enabled:
             expected_evaluations = cfg.population_size * (cfg.cem_iters + 1)
-            if metrics.search_evaluation_count != expected_evaluations:
+            expected_search_evaluations = (
+                expected_evaluations + survivor_rescore_evaluations
+            )
+            if metrics.search_evaluation_count != expected_search_evaluations:
                 raise RuntimeError(
                     "EDS search evaluation accounting mismatch: "
-                    f"{metrics.search_evaluation_count} != {expected_evaluations}"
+                    f"{metrics.search_evaluation_count} != {expected_search_evaluations}"
                 )
-            if metrics.score_call_count != cfg.cem_iters + 1:
+            expected_score_calls = cfg.cem_iters + 1 + survivor_rescore_calls
+            if metrics.score_call_count != expected_score_calls:
                 raise RuntimeError(
                     "EDS score-call accounting mismatch: "
-                    f"{metrics.score_call_count} != {cfg.cem_iters + 1}"
+                    f"{metrics.score_call_count} != {expected_score_calls}"
                 )
         if qd_archive is not None:
             if metrics.qd_evaluation_count != expected_evaluations:
@@ -7826,6 +7888,10 @@ class RDTSteer:
                 cfg.get("qd_global_quality_anchor_count", 0),
                 "qd_global_quality_anchor_count",
             ),
+            qd_parent_survivor_count=_parse_eds_int(
+                cfg.get("qd_parent_survivor_count", 0),
+                "qd_parent_survivor_count",
+            ),
             qd_sparse_exponent=_parse_eds_float(
                 cfg.get("qd_sparse_exponent", 1.0), "qd_sparse_exponent"
             ),
@@ -8109,6 +8175,25 @@ class RDTSteer:
             raise ValueError("EDS qd_grid_shape is not a preregistered square grid")
         if resolved.qd_cell_capacity != 1:
             raise ValueError("EDS qd_cell_capacity must be 1")
+        if resolved.qd_parent_survivor_count not in {0, 4}:
+            raise ValueError("EDS qd_parent_survivor_count must be 0 or 4")
+        if resolved.qd_parent_survivor_count == 4:
+            required_survival = {
+                "qd_archive_mode": "grid_archive",
+                "qd_quality_mode": "provider",
+                "qd_descriptor": DIRECTION_HEIGHT_DESCRIPTOR,
+                "qd_final_selection_mode": GRASP_TIMING_MODE,
+                "qd_parent_sampling": "sparse_priority",
+                "qd_global_quality_anchor_count": 0,
+                "qd_secondary_lane_mode": "none",
+                "qd_bounds_update_policy": "fixed_initial",
+                "elite_carryover_count": 0,
+            }
+            for field_name, expected in required_survival.items():
+                if getattr(resolved, field_name) != expected:
+                    raise ValueError(
+                        f"N11 parent survival requires {field_name}={expected!r}"
+                    )
         if resolved.qd_secondary_lane_mode not in {
             "none",
             "protected_reward_v1",
