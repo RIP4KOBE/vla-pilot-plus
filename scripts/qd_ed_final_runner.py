@@ -441,7 +441,23 @@ def n7_validation_continuation_support():
     return _N7_VALIDATION_CONTINUATION_SUPPORT
 
 
+_N7_PASSIVE_SUPPORT = None
+
+
+def n7_passive_support():
+    global _N7_PASSIVE_SUPPORT
+    if _N7_PASSIVE_SUPPORT is None:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('qd_ed_n7_passive_contract',
+            Path(__file__).with_name('qd_ed_n7_passive_diagnostic.py'))
+        _N7_PASSIVE_SUPPORT = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_N7_PASSIVE_SUPPORT)
+    return _N7_PASSIVE_SUPPORT
+
+
 def n7_dispatch_support(plan):
+    if plan.get('n7_passive_diagnostic') is not None:
+        return n7_passive_support()
     if plan.get('n7_validation_continuation') is not None:
         return n7_validation_continuation_support()
     return n7_validation_support() if plan.get('n7_validation') is not None else n7_support()
