@@ -11,7 +11,8 @@ from core.rdt_libero_action_converter import decode_rdt_libero_action_chunk
 from scripts import audit_decision_evidence as audit
 
 
-def episode(tmp_path, *, count=3, variant="different", auxiliary=False, stage_init=None, n5=False, n6=False, n7=False):
+def episode(tmp_path, *, count=3, variant="different", auxiliary=False, stage_init=None, n5=False, n6=False, n7=False, n9=False):
+    assert not n9 or (n5 and n7)
     rec = DecisionEvidence(tmp_path, episode=0)
     provider = lambda keypoints, trajectories: None
     keypoints = torch.zeros(1, 3, dtype=torch.bfloat16 if n5 else torch.float32)
@@ -95,17 +96,25 @@ def episode(tmp_path, *, count=3, variant="different", auxiliary=False, stage_in
               "absolute_reach_m": 0.06, "relative_reach_m": 0.03,
               "projected_distances_m": torch.zeros(16, 8),
               "positive_commands": torch.arange(16)[:, None].expand(16, 8) == 1} if n5 else None)
+    contact = ({"baseline_grasp_index": 1, "selected_index": 1, "target_index": 0,
+                "reason": "recognized_contact_zone", "changed": False,
+                "contact_xy_m": .08, "contact_height_m": .08,
+                "max_reach_loss_m": .02, "sweep_cost_per_m": .20,
+                "projected_reach_m": torch.zeros(16), "lateral_sweep_m": torch.zeros(16),
+                "adjusted_costs": costs.float(),
+                "candidate_mask": torch.arange(16) == 1} if n9 else None)
     rec.record("final_selection", population=actions, selected_latent=selected, selected_index=index,
         selected_quality=raw, selected_cost=costs[index].item(), selected_fingerprint=audit.fingerprints(selected)[0],
-        selected_cell=11 if n7 else 10 if n6 else index, selection_rule="terminal_grasp_proximity" if n5 else "terminal_population_first_argmin",
-        qd_final_selection_mode="terminal_grasp_proximity_v1" if n5 else "terminal_population_v1",
+        selected_cell=11 if n7 else 10 if n6 else index, selection_rule="terminal_contact_sweep" if n9 else "terminal_grasp_proximity" if n5 else "terminal_population_first_argmin",
+        qd_final_selection_mode="terminal_contact_sweep_v1" if n9 else "terminal_grasp_proximity_v1" if n5 else "terminal_population_v1",
         terminal_population={"iter_idx": 9, "canonical_event_sequence": canonical_sequence, "scoring_batch_id": score_id,
             "selected_occurrence_id": f"{rec.decision_id}:q{canonical_sequence}:r{index}",
             "minimum_cost_tie_indices": torch.nonzero(costs == costs.min()).reshape(-1).tolist(),
             "native_costs": costs, "raw_provider_quality": quality,
             "cell_ids": torch.full((16,), 11 if n7 else 10, dtype=torch.long) if (n6 or n7) else cell_ids,
             "parent_cell_ids": cell_ids, "selected_parent_cell": index,
-            **({"grasp_selection": grasp} if n5 else {})},
+            **({"grasp_selection": grasp} if n5 else {}),
+            **({"contact_sweep_selection": contact} if n9 else {})},
         archive_reference=reference, stage_reward_reference={"selected_raw_reward": quality[index],
             "reference_costs": -rewards, "reference_scope": "qd_archive_cost_spread"})
     initial = raw if stage_init is None else stage_init
@@ -255,3 +264,14 @@ def test_n7_audit_binds_native_direction_height_cells_and_rejects_false_assignme
     rewrite(rec, "qd_descriptor_assignment", lambda row: row["values"]["cell_ids"][0].fill_(1))
     rejected = audit.audit_episode(rec.root, compute)
     assert not rejected["accepted"] and rejected["errors"] == ["n7_cell_or_threshold_association_mismatch"]
+
+
+def test_n9_audit_recomputes_contact_sweep_and_rejects_forged_mask(tmp_path):
+    rec, compute = episode(tmp_path, n5=True, n7=True, n9=True)
+    accepted = audit.audit_episode(rec.root, compute)
+    assert accepted["accepted"], accepted["errors"]
+    assert accepted["n9_contact_sweep_audit"]["checked_decisions"] == 1
+    rewrite(rec, "final_selection", lambda row: row["values"]["terminal_population"]
+            ["contact_sweep_selection"]["candidate_mask"][0].fill_(True))
+    rejected = audit.audit_episode(rec.root, compute)
+    assert not rejected["accepted"] and rejected["errors"] == ["n9_native_selection_mismatch"]
