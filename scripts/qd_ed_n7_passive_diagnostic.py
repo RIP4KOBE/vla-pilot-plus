@@ -227,7 +227,10 @@ def main():
             runner.require(3 in devices, 'GPU3 missing')
             queue.reservation_admission(devices[3])
             runner.gpu_admission(physical_gpu=3, expected_uuid=devices[3]['uuid'])
-            with supervised_scope(plan, ROOT, row['episode_key']):
+            # The command file is __main__, while the runner loads this same
+            # file as its contract module.  Scope must live in that instance.
+            with runner.n7_passive_support().supervised_scope(plan, ROOT,
+                                                               row['episode_key']):
                 summaries = runner.run_plan(args.plan, split='dev', iteration=COHORT,
                                             episode_keys=[row['episode_key']], root=ROOT)
             runner.require(len(summaries) == 1, 'passive diagnostic cell result missing')
