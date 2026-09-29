@@ -10,6 +10,7 @@ import subprocess
 
 import qd_ed_final_runner as runner
 import qd_ed_n20_dev_contract as contract
+import qd_ed_available_gpu_queue as queue
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = contract.RUN_DIR / 'plan.frozen.v1.gpu7.json'
@@ -39,6 +40,21 @@ def main():
                                and event.get('identity', {}).get('iteration') == contract.COHORT
                                for event in events),
                    'N20 matched Dev capacity unavailable or cohort already started')
+    devices = queue.inventory()
+    runner.require(7 in devices and devices[7]['uuid'] == contract.GPU7_UUID,
+                   'N20 GPU7 UUID differs')
+    queue.reservation_admission(devices[7])
+    runner.gpu_admission(physical_gpu=7, expected_uuid=contract.GPU7_UUID)
+    mapping = queue.current_metadata(7, root=ROOT)
+    runner.require(mapping['egl_device_index'] == 4
+                   and mapping['metadata_mapping_verified'] is True,
+                   'N20 GPU7 EGL mapping differs')
+    runtime = runner.read_json(contract.GPU7_RUNTIME)
+    proof = queue.find_probe(runtime, mapping,
+        runner.read_events(ROOT / 'data/gpu-healthcheck-ledger.jsonl'), root=ROOT)
+    runner.require(isinstance(proof, dict)
+                   and proof.get('resource_id') == contract.GPU7_PROOF,
+                   'N20 reusable CUDA/EGL proof unavailable')
     parent = runner.read_json(contract.SOURCE_PLAN)
     runner.require(parent.get('n18_cohort', {}).get('cohort_id') ==
                    'N18_CLOSE_THEN_LIFT_DEV_20260929'
@@ -53,6 +69,7 @@ def main():
              'configs/qd_ed_final/candidate_n7.json',
              'configs/qd_ed_final/candidate_n20.json',
              'scripts/audit_decision_evidence.py', 'scripts/qd_ed_final_runner.py',
+             'scripts/qd_ed_available_gpu_queue.py',
              'scripts/qd_ed_n20_dev_contract.py', 'scripts/qd_ed_n20_dev_prepare.py',
              'scripts/qd_ed_n20_dev_supervise.py', 'tests/test_qd_lift_quality.py',
              'tests/test_qd_terminal_population.py', 'tests/test_rdt_steer.py'}

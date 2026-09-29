@@ -102,6 +102,7 @@ def validate_contract(plan, manifest, runtime, seeds, root, runner):
     required = {'core/qd_lift_quality.py', 'core/rdt_policy_steer.py',
                 'core/qd_terminal_population.py',
                 'scripts/audit_decision_evidence.py', 'scripts/qd_ed_final_runner.py',
+                'scripts/qd_ed_available_gpu_queue.py',
                 'scripts/qd_ed_n20_dev_contract.py', 'scripts/qd_ed_n20_dev_prepare.py',
                 'scripts/qd_ed_n20_dev_supervise.py', relative,
                 'tests/test_qd_lift_quality.py', 'tests/test_qd_terminal_population.py',
