@@ -452,6 +452,12 @@ def _audit_n4_terminal_population(kinds, context, final_event):
 
     final = final_event["values"]; terminal = final["terminal_population"]; archive = final["archive_reference"]
     last = canonical[-1]; last_values = last["values"]
+    lift_mode = final.get("quality_mode") == "close_then_lift_v1"
+    terminal_raw = (last_values.get("raw_provider_quality") if lift_mode
+                    else last_values["effective_quality"])
+    require(tensor(terminal_raw) and terminal_raw.shape == (16,)
+            and terminal_raw.dtype == last_values["effective_quality"].dtype,
+            "n20_last_canonical_raw_reward_missing")
     n9_mode = final.get("qd_final_selection_mode") == "terminal_contact_sweep_v1"
     n5_mode = n9_mode or final.get("qd_final_selection_mode") == "terminal_grasp_proximity_v1"
     require(final["selection_rule"] == ("terminal_contact_sweep" if n9_mode else
@@ -464,7 +470,8 @@ def _audit_n4_terminal_population(kinds, context, final_event):
             and terminal["scoring_batch_id"] == scoring[9]["sequence"], "n4_last_canonical_source_mismatch")
     population = native(final["population"], (16, 64, 128), last_values["candidates"].dtype)
     require(same(population, last_values["candidates"]) and same(terminal["native_costs"], final_costs)
-            and same(terminal["raw_provider_quality"], last_values["effective_quality"]), "n4_last_population_cost_raw_mismatch")
+            and same(terminal["raw_provider_quality"], terminal_raw),
+            "n4_last_population_cost_raw_mismatch")
     minimum = int(torch.argmin(final_costs).item())
     ties = torch.nonzero(final_costs == final_costs.min(), as_tuple=False).reshape(-1).tolist()
     require(isinstance(terminal["minimum_cost_tie_indices"], list)
@@ -605,6 +612,9 @@ def _audit_n4_terminal_population(kinds, context, final_event):
     selected = native(final["selected_latent"], (1, 64, 128), population.dtype)
     require(same(selected, population[selected_index:selected_index + 1]) and final["selected_cost"] == final_costs[selected_index].item()
             and final["selected_quality"] == last_values["effective_quality"][selected_index].item(), "n4_selected_native_cost_raw_mismatch")
+    if lift_mode or "selected_raw_reward" in terminal:
+        require(terminal.get("selected_raw_reward") == terminal_raw[selected_index].item(),
+                "n20_selected_terminal_raw_reward_mismatch")
     cells = terminal["cell_ids"]
     require(tensor(cells) and cells.dtype == torch.int64 and cells.shape == (16,)
             and bool(((cells >= 0) & (cells < 16)).all()) and final["selected_cell"] == cells[selected_index].item(), "n4_selected_recorded_cell_mismatch")
@@ -637,12 +647,14 @@ def _audit_n4_terminal_population(kinds, context, final_event):
 
     reference = final["stage_reward_reference"]
     require(reference["reference_scope"] == "qd_archive_cost_spread" and same(reference["reference_costs"], ac)
-            and same(reference["selected_raw_reward"], last_values["effective_quality"][selected_index]), "n4_stage_raw_or_archive_scale_reference")
+            and same(reference["selected_raw_reward"], terminal_raw[selected_index]),
+            "n4_stage_raw_or_archive_scale_reference")
     binding = one("terminal_population_stage_binding"); bv = binding["values"]
     require(final_event["sequence"] < binding["sequence"] < one("policy_action_decode")["sequence"], "n4_stage_binding_order")
     require(all(type(bv[k]) in (int, float) and math.isfinite(bv[k]) for k in
                 ("selected_raw_reward", "archive_cost_spread_scale", "stage_init_reward", "normalized_reward")), "n4_stage_binding_invalid")
-    require(bv["selected_raw_reward"] == final["selected_quality"] and bv["archive_cost_spread_scale"] >= 0, "n4_stage_written_raw_or_scale_invalid")
+    require(bv["selected_raw_reward"] == terminal_raw[selected_index].item()
+            and bv["archive_cost_spread_scale"] >= 0, "n4_stage_written_raw_or_scale_invalid")
     normalized = max(0.0, min(1.2, 1.0 - bv["selected_raw_reward"] / bv["stage_init_reward"])) if bv["stage_init_reward"] < -1e-6 else 0.0
     require(bv["normalized_reward"] == normalized, "n4_stage_written_normalized_mismatch")
     # Source + real-call CPU tests bind scale to the captured original archive
@@ -675,10 +687,10 @@ def _audit_n4_terminal_population(kinds, context, final_event):
         "selected_occurrence_id": terminal["selected_occurrence_id"], "selected_native_sha256": _native_sha(selected[0]),
         "selected_fingerprint": final["selected_fingerprint"],
         "selected_cell": final["selected_cell"], "selected_parent_cell": terminal["selected_parent_cell"],
-        "selected_cost": final["selected_cost"], "selected_raw_reward": final["selected_quality"],
+        "selected_cost": final["selected_cost"], "selected_raw_reward": terminal_raw[selected_index].item(),
         "terminal_native_ids": [_native_sha(action) for action in population],
         "terminal_native_costs": _native_record(final_costs),
-        "terminal_raw_provider_quality": _native_record(last_values["effective_quality"]),
+        "terminal_raw_provider_quality": _native_record(terminal_raw),
         "archive_reference_native_sha256": _native_sha(archive["selected_latent"][0]),
         "archive_reference_index": best, "archive_reference_cell": archive["selected_cell"],
         "archive_reference_fingerprint": archive["selected_fingerprint"],
@@ -997,11 +1009,14 @@ def audit_episode(episode_dir, episode_compute_file):
                         gate = report.setdefault("n18_lift_quality_audit", {
                             "schema": "n18-native-close-then-lift-audit-v1",
                             "score_batches_verified": 0, "candidate_scores_verified": 0,
-                            "positive_bonus_candidates": 0,
+                            "positive_bonus_candidates": 0, "rank_changed_batches": 0,
                         })
                         gate["score_batches_verified"] += 1
                         gate["candidate_scores_verified"] += len(samples)
                         gate["positive_bonus_candidates"] += changed
+                        gate["rank_changed_batches"] += int(not torch.equal(
+                            torch.argsort(raw, descending=True, stable=True),
+                            torch.argsort(effective[0]["quality"], descending=True, stable=True)))
             for kind in ("provider_return", "effective_quality", "scoring_aggregate"):
                 require(all(r["values"]["scoring_batch_id"] in score_ids for r in kinds[kind]), "orphan_score_result")
             if guided:
