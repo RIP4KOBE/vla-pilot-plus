@@ -54,7 +54,7 @@ def main():
             runner.require(device in devices, f'GPU{device} missing')
             queue.reservation_admission(devices[device])
             runner.gpu_admission(physical_gpu=device, expected_uuid=devices[device]['uuid'])
-            with contract.supervised_scope(plan, ROOT, row['episode_key']):
+            with runner.n18_support().supervised_scope(plan, ROOT, row['episode_key']):
                 summaries = runner.run_plan(args.plan, split='dev', iteration=contract.COHORT,
                                             episode_keys=[row['episode_key']], root=ROOT)
             runner.require(len(summaries) == 1, 'N18 one-cell result missing')
