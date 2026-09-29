@@ -1039,7 +1039,14 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
                 'budget exceeds authorization')
         bucket_caps = BUCKETS
     else:
-        require(amendment == GPU3_AMENDMENT and selected_gpu == 3
+        n18_rebind = state.get('n18_gpu7_rebind', {})
+        gpu_authorized = selected_gpu == 3 or (
+            selected_gpu == 7 and isinstance(n18_rebind, dict)
+            and row.get('iteration') == 'N18_CLOSE_THEN_LIFT_DEV_20260929'
+            and n18_rebind.get('scope') == 'N18_CLOSE_THEN_LIFT_DEV_20260929_only'
+            and n18_rebind.get('user_reply') == '允许改用其他空闲 GPU'
+            and n18_rebind.get('selected_gpu') == 7)
+        require(amendment == GPU3_AMENDMENT and gpu_authorized
                 and budget['max_episode_attempts'] == 393
                 and budget['max_gpu_hours'] == 100.0
                 and budget['reserved'] == AMENDED_BUCKETS,

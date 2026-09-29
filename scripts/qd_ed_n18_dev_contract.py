@@ -16,6 +16,9 @@ RUN_DIR = SESSION / 'variants/n18_lift_quality'
 SOURCE_PLAN = SESSION / 'artifacts/continuation_20260928/n11-parent-survival-dev-v1/plan.frozen.v1.json'
 E2_RUNTIME = SESSION / 'artifacts/continuation_20260928/n7-e2-passive-tracker-diagnostic-v1/runtime-manifest.e2.frozen.v1.json'
 PROTOCOL = RUN_DIR / 'protocol-v1.md'
+GPU7_ADDENDUM = RUN_DIR / 'gpu7-rebind-addendum-v1.md'
+GPU7_UUID = 'GPU-48473162-9548-1a19-04aa-ea86c5349187'
+GPU7_PROOF = 'rdt-qd-ed-final-20260921T093925Z__gpu7_cuda_egl__4fafff3673e5'
 COHORT = 'N18_CLOSE_THEN_LIFT_DEV_20260929'
 TASKS = (0, 3, 6, 9)
 ARMS = ('C0', 'Q0', 'N18')
@@ -75,9 +78,37 @@ def validate_contract(plan, manifest, runtime, seeds, root, runner):
                  and n18['qd_descriptor'] == 'target_xy_quadrant_signed_height_v1'
                  and n18['qd_final_selection_mode'] == 'terminal_grasp_proximity_v1',
                  'N18 algorithm profile differs from N7 quality-only delta')
-    r['require'](plan['runtime_manifest_path'] == str(E2_RUNTIME)
-                 and plan['runtime_manifest_sha256'] == sha(E2_RUNTIME)
-                 and r['runtime_gpu'](runtime) == 3
+    rebind = plan.get('n18_gpu7_rebind')
+    if rebind is None:
+        r['require'](plan['runtime_manifest_path'] == str(E2_RUNTIME)
+                     and plan['runtime_manifest_sha256'] == sha(E2_RUNTIME)
+                     and r['runtime_gpu'](runtime) == 3,
+                     'N18 original GPU3 runtime differs')
+        device = 3
+    else:
+        parent_path = RUN_DIR / 'plan.frozen.v1.json'
+        r['require'](rebind == {
+            'schema': 'n18-gpu7-hardware-only-rebind-v1',
+            'parent_plan': {'path': str(parent_path), 'sha256': sha(parent_path)},
+            'addendum': {'path': str(GPU7_ADDENDUM), 'sha256': sha(GPU7_ADDENDUM)},
+            'runtime': {'path': plan['runtime_manifest_path'],
+                        'sha256': plan['runtime_manifest_sha256']},
+            'physical_gpu': 7, 'uuid': GPU7_UUID,
+            'egl_device_index': 4, 'reused_probe_resource_id': GPU7_PROOF},
+            'N18 GPU7 user-authorized hardware-only binding differs')
+        hardware = {'gpu_mapping', 'cuda_egl_verified', 'cuda_egl_probe',
+                    'metadata_mapping_verified', 'egl_device_metadata_path', 'files'}
+        old = json.loads(E2_RUNTIME.read_text())
+        r['require']({k: v for k, v in runtime.items() if k not in hardware}
+                     == {k: v for k, v in old.items() if k not in hardware}
+                     and r['runtime_gpu'](runtime) == 7
+                     and runtime['gpu_mapping']['uuid'] == GPU7_UUID
+                     and runtime['gpu_mapping']['egl_device_index'] == 4
+                     and runtime.get('cuda_egl_verified') is True
+                     and runtime.get('cuda_egl_probe', {}).get('resource_id') == GPU7_PROOF,
+                     'N18 GPU7 manifest changed nonhardware runtime or proof')
+        device = 7
+    r['require'](r['runtime_gpu'](runtime) == device
                  and runtime.get('stage_recovered_error_condition') == r['E2_STAGE_CONDITION']
                  and runtime.get('stage_engineering_condition') ==
                  r['n4e1_support']().engineering_condition()
@@ -88,6 +119,8 @@ def validate_contract(plan, manifest, runtime, seeds, root, runner):
                 'scripts/qd_ed_n18_dev_contract.py', 'scripts/qd_ed_n18_dev_prepare.py',
                 'scripts/qd_ed_n18_dev_supervise.py', relative,
                 'tests/test_qd_lift_quality.py'}
+    if rebind is not None:
+        required.add('scripts/qd_ed_n18_gpu7_prepare.py')
     r['require'](required <= {item['path'] for item in plan['code_files']}
                  and relative in plan['scientific_config_files'],
                  'N18 source fingerprints incomplete')
@@ -99,8 +132,14 @@ def validate_contract(plan, manifest, runtime, seeds, root, runner):
                  and state['budget']['max_episode_attempts'] == 393
                  and state['budget']['max_gpu_hours'] == 100.0
                  and state['budget']['reserved'] == r['AMENDED_BUCKETS']
-                 and r['authorized_gpu'](state) == 3,
-                 'N18 owning GPU3 budget authority differs')
+                 and r['authorized_gpu'](state) == device
+                 and (device == 3 or state.get('n18_gpu7_rebind') == {
+                     'scope': 'N18_CLOSE_THEN_LIFT_DEV_20260929_only',
+                     'user_reply': '允许改用其他空闲 GPU',
+                     'selected_gpu': 7,
+                     'addendum_path': str(GPU7_ADDENDUM),
+                     'addendum_sha256': sha(GPU7_ADDENDUM)}),
+                 'N18 owning GPU budget/device authority differs')
 
 
 @contextmanager
