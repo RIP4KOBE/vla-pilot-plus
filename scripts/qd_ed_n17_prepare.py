@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SESSION = ROOT.parent
 SOURCE = SESSION / 'artifacts/continuation_20260928/n11-parent-survival-dev-v1/plan.frozen.v1.json'
 PROTOCOL = SESSION / 'variants/n17_passive_physics/protocol-v1.md'
-OUTPUT = SESSION / 'variants/n17_passive_physics/plan.frozen.v1.json'
+OUTPUT = SESSION / 'variants/n17_passive_physics/plan.frozen.v2.json'
 COHORT = 'N17_PASSIVE_PHYSICS_DEV_20260929'
 
 
