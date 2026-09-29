@@ -36,3 +36,26 @@ def test_corrupt_native_batch_fails(bad):
     if bad == 'parent': values[4] = values[4].float()
     with pytest.raises((RuntimeError, FloatingPointError)):
         TerminalPopulation.capture(*values)
+
+
+@pytest.mark.parametrize("dtype", [torch.float32, torch.bfloat16])
+def test_distinct_raw_provider_reward_is_captured_with_canonical_batch(dtype):
+    values = fixture(dtype)
+    raw = values[2] + torch.ones(16, dtype=dtype) * 8
+    saved = TerminalPopulation.capture(*values, raw_rewards=raw)
+    assert saved.raw_rewards.dtype == saved.actions.dtype == dtype
+    assert torch.equal(saved.raw_rewards, raw)
+    assert not torch.equal(saved.raw_rewards, saved.rewards)
+    raw.zero_()
+    assert not torch.equal(saved.raw_rewards, raw)
+
+
+@pytest.mark.parametrize("bad", ["shape", "dtype", "nonfinite"])
+def test_terminal_raw_provider_reward_association_fails_closed(bad):
+    values = fixture()
+    raw = values[2].clone()
+    if bad == "shape": raw = raw.reshape(1, 16)
+    if bad == "dtype": raw = raw.float()
+    if bad == "nonfinite": raw[0] = float("nan")
+    with pytest.raises((RuntimeError, FloatingPointError)):
+        TerminalPopulation.capture(*values, raw_rewards=raw)

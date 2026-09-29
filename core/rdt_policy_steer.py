@@ -6243,6 +6243,8 @@ class RDTSteer:
                         canonical_event_sequence=terminal_canonical_sequence,
                         scoring_batch_id=terminal_scoring_batch_id,
                         decision_id=getattr(getattr(self, "_decision_evidence", None), "decision_id", None),
+                        raw_rewards=(original_rewards(population_info, population_rewards, population)
+                                     if quality_contract is not None else None),
                     )
                 fixed_initial_sse = (0.0 if non_xy_descriptor else qd_within_cell_endpoint_sse(
                     child_descriptors, fixed_initial_cell_ids
@@ -6887,6 +6889,10 @@ class RDTSteer:
                 population, population_scores = terminal_population.actions, terminal_population.costs
                 population_rewards = terminal_population.rewards
                 population_info = {"rewards": population_rewards}
+                if quality_contract is not None:
+                    if terminal_population.raw_rewards is None:
+                        raise RuntimeError("N20 terminal raw provider reward was not captured")
+                    population_info["raw_rewards"] = terminal_population.raw_rewards
                 if grasp_timing_mode:
                     if terminal_projected_xyz is None:
                         raise RuntimeError("N5 missing final canonical projection")
@@ -6922,7 +6928,8 @@ class RDTSteer:
                     "selected_parent_cell": int(terminal_population.parent_cell_ids[qd_best_idx].item()),
                     "selected_fingerprint": metrics.qd_selected_action_fingerprint,
                     "selected_cost": float(population_scores[qd_best_idx].item()),
-                    "selected_raw_reward": metrics.qd_selected_reward,
+                    "selected_raw_reward": (float(terminal_population.raw_rewards[qd_best_idx].item())
+                                            if quality_contract is not None else metrics.qd_selected_reward),
                     "cost_dtype": str(population_scores.dtype),
                     "source_scope": "last canonical row and allocated parent cell; not unique archive ancestry",
                 }
@@ -7004,7 +7011,9 @@ class RDTSteer:
                                             "archive_global_best" if qd_archive is not None else "cost_argmin"),
                             **({"qd_final_selection_mode": cfg.qd_final_selection_mode,
                                 "terminal_population": {**metrics.qd_terminal_population,
-                                    "native_costs": population_scores, "raw_provider_quality": population_rewards,
+                                    "native_costs": population_scores,
+                                    "raw_provider_quality": (stage_raw_rewards if quality_contract is not None
+                                                             else population_rewards),
                                     "cell_ids": terminal_population.cell_ids,
                                     "parent_cell_ids": terminal_population.parent_cell_ids,
                                     **({"grasp_selection": {
@@ -7020,7 +7029,9 @@ class RDTSteer:
                                         "candidate_mask": contact_selection.candidate_mask,
                                     }} if contact_selection is not None else {})},
                                 "archive_reference": archive_reference,
-                                "stage_reward_reference": {"selected_raw_reward": population_rewards[best_idx],
+                                "stage_reward_reference": {"selected_raw_reward": (
+                                    stage_raw_rewards[best_idx] if quality_contract is not None
+                                    else population_rewards[best_idx]),
                                     "reference_costs": stage_reference_costs,
                                     "reference_scope": "qd_archive_cost_spread"}}
                                if terminal_mode else {}))

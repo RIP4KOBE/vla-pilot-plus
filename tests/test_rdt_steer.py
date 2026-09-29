@@ -10417,6 +10417,79 @@ def test_n4_real_cpu_scoring_path_canonical_binding_and_exact_default(stub_steer
     assert not torch.cuda.is_initialized()
 
 
+@pytest.mark.parametrize("dtype", [torch.float32, torch.bfloat16])
+def test_n20_exact_profile_full_cpu_loop_retains_terminal_raw(
+    stub_steer, stub_adapter, monkeypatch, tmp_path, dtype,
+):
+    """Exercise the same quality + descriptor + terminal selector combination that N19 missed."""
+    from core.decision_evidence import DecisionEvidence
+    from core.rdt_libero_action_converter import decode_rdt_libero_action_chunk
+    from scripts.audit_decision_evidence import audit_episode
+    stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
+                         sample_batch_size=16, policy_config={"action_chunk_horizon": 8})
+    profile = json.loads((Path(__file__).resolve().parents[1] /
+        "configs/qd_ed_final/candidate_n20.json").read_text())["profile"]
+    cfg = stub_steer._resolve_eds_config_with_reference_defaults(profile)
+    provider = _n2_fixture_provider(index=0)
+    provider_path = tmp_path / "stage1_guidance.py"
+    provider_path.write_text(provider._guidance_source_text)
+    provider._guidance_source_path = str(provider_path)
+    keypoints = torch.tensor([[.02, .01, .03], [.13, -.21, .39]], dtype=dtype)
+    initial = torch.linspace(-.12, .19, 16 * 64 * 128).reshape(16, 64, 128).to(dtype)
+    monkeypatch.setattr(stub_steer, "_eds_initial_population", lambda **kw: initial.clone())
+    rec = DecisionEvidence(tmp_path, episode=0)
+    stub_steer._decision_evidence = rec
+    original_project = stub_adapter.delta_actions_to_ee_trajectory
+    def project(actions):
+        result = original_project(actions)
+        rec.record("projection_origin", source_eef_position=torch.zeros(3, dtype=actions.dtype),
+                   cast_eef_start=result[0])
+        return result
+    monkeypatch.setattr(stub_adapter, "delta_actions_to_ee_trajectory", project)
+    rec.begin_decision(global_step=0, stage=1, use_guidance=True,
+                       keypoints=keypoints, providers=[provider])
+    torch.manual_seed(25191)
+    selected = stub_steer._eds_guided_denoise_loop(
+        x_t=torch.zeros_like(initial), cond=_rollout_cond(stub_steer),
+        keypoints=keypoints, guidance_fns=[provider], eds_config=cfg,
+        verbose=False, global_step=0, current_stage=1)
+    rec.flush()
+    events = [event for path in sorted(rec.root.glob("bundle_*.pt"))
+              for event in torch.load(path, map_location="cpu", weights_only=True)["events"]]
+    final = next(e["values"] for e in events if e["event"] == "final_selection")
+    canonical = [e["values"] for e in events if e["event"] == "canonical_candidate_batch"]
+    binding = next(e["values"] for e in events if e["event"] == "terminal_population_stage_binding")
+    assert len(canonical) == 11
+    assert torch.equal(final["population"], canonical[-1]["candidates"])
+    assert torch.equal(final["raw_provider_quality"], canonical[-1]["raw_provider_quality"])
+    assert torch.equal(final["terminal_population"]["raw_provider_quality"],
+                       canonical[-1]["raw_provider_quality"])
+    index = final["selected_index"]
+    assert final["selected_raw_provider_quality"] == canonical[-1]["raw_provider_quality"][index].item()
+    assert binding["selected_raw_reward"] == final["selected_raw_provider_quality"]
+    assert torch.equal(selected, final["selected_latent"])
+    metrics = stub_steer.get_last_eds_metrics()
+    assert metrics["score_call_count"] == 11 and metrics["search_evaluation_count"] == 176
+    actions = decode_rdt_libero_action_chunk(selected.float(), 8)
+    rec.record("policy_action_decode", selected_latent=selected.float(), action_chunk=actions)
+    rec.commit_decision(action_chunk=actions, execution_horizon=8)
+    for i in range(8):
+        rec.dispatch(global_step=i, execution_index=i + 1)
+        rec.record("executed_action", action_numpy=actions[0, i].numpy())
+        rec.pre_reset_outcome({"robot0_eef_pos": np.zeros(3)}, reward=0.,
+                              terminated=(i == 7), success=False)
+        rec.step_returned(terminated=(i == 7), truncated=False, success=False)
+    rec.finish()
+    compute = tmp_path / "episode_compute.jsonl"
+    compute.write_text(json.dumps({"episode_id": 0, "outcome": "completed",
+                                   "decision_evidence": rec.status()}) + "\n")
+    report = audit_episode(rec.root, compute)
+    assert report["accepted"], report["errors"]
+    assert report["n18_lift_quality_audit"]["score_batches_verified"] == 11
+    assert report["n5_grasp_timing_audit"]["canonical_candidates_verified"] == 176
+    assert not torch.cuda.is_initialized()
+
+
 @pytest.mark.parametrize('dtype', [torch.float32, torch.bfloat16])
 def test_n4_select_action_uses_actual_deployed_fp32_decode(stub_steer, stub_adapter, mock_batch, monkeypatch, tmp_path, dtype):
     # The ordinary stub has no parameters; give its dtype-selection path a CPU scalar.

@@ -100,15 +100,15 @@ def test_sha_verified_native_score_link_rejects_tampering():
 
 def test_supervisor_and_runner_share_one_scope(tmp_path):
     plan = {"source_commit": "frozen"}
-    episode_key = "n19_dev_t00_c0_20260929"
-    support = runner.n19_support()
+    episode_key = "n20_dev_t00_c0_20260929"
+    support = runner.n20_support()
     with support.supervised_scope(plan, tmp_path, episode_key):
         support.require_scope(plan, tmp_path, runner.__dict__, {"episode_key": episode_key})
 
 
-def test_full_n19_profile_passes_terminal_and_quality_contracts():
+def test_full_n20_profile_passes_terminal_and_quality_contracts():
     profile = json.loads((Path(__file__).resolve().parents[1] /
-        "configs/qd_ed_final/candidate_n19.json").read_text())["profile"]
+        "configs/qd_ed_final/candidate_n20.json").read_text())["profile"]
     resolved = RDTSteer._resolve_eds_config_with_reference_defaults(None, profile)
     assert resolved.qd_quality_mode == "close_then_lift_v1"
     assert resolved.qd_final_selection_mode == "terminal_grasp_proximity_v1"
