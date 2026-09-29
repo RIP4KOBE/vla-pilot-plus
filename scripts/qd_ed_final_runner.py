@@ -384,7 +384,45 @@ def is_n6_plan(plan):
 
 def is_n7_plan(plan):
     return plan.get('n7_cohort') is not None or ('N7' in plan.get('candidate_profiles', {})
-            and not is_n9_plan(plan) and not is_n11_plan(plan))
+            and not is_n9_plan(plan) and not is_n11_plan(plan)
+            and not is_n17_plan(plan))
+
+
+def is_n17_plan(plan):
+    return plan.get('n17_passive_physics') is not None
+
+
+def validate_n17_plan(plan, runtime, root):
+    meta = plan['n17_passive_physics']
+    require(meta.get('schema') == 'n17-passive-physics-dev-v1'
+            and meta.get('cohort_id') == 'N17_PASSIVE_PHYSICS_DEV_20260929'
+            and meta.get('max_dispatches') == 2
+            and meta.get('max_gpu_hours') == 2.0,
+            'N17 protocol limits differ')
+    protocol = Path(meta['protocol_path'])
+    require(digest(protocol) == meta['protocol_sha256']
+            and digest(meta['source_plan_path']) == meta['source_plan_sha256'],
+            'N17 frozen protocol/source plan changed')
+    require(plan.get('phase_authorization') == {'dev': True, 'validation': False, 'formal': False}
+            and plan.get('stage_condition') == E2_STAGE_CONDITION
+            and set(plan.get('candidate_profiles', {})) == {'N7'}
+            and runtime_gpu(runtime) == 3,
+            'N17 phase, profile, Stage or GPU differs')
+    rows = plan['episodes']
+    require(len(rows) == 2 and [(row['task_id'], row['profile'], row['budget_bucket'],
+            row['iteration'], row['timeout_seconds']) for row in rows] == [
+                (task, 'N7', 'development', 'N17_PASSIVE_PHYSICS_DEV_20260929', 1800)
+                for task in (0, 9)],
+            'N17 exact diagnostic identities differ')
+    required = {'main.py', 'core/passive_physics_trace.py', 'configs/config.yaml',
+                'scripts/qd_ed_final_runner.py', 'scripts/qd_ed_n17_prepare.py',
+                'scripts/qd_ed_n17_supervise.py'}
+    require(required <= {record['path'] for record in plan['code_files']},
+            'N17 recorder/runner source not fingerprinted')
+    require(plan['candidate_profiles']['N7'] == {
+        'path': str(Path(root) / 'configs/qd_ed_final/candidate_n7.json'),
+        'sha256': digest(Path(root) / 'configs/qd_ed_final/candidate_n7.json')},
+        'N17 N7 profile differs')
 
 
 def is_n9_plan(plan):
@@ -649,6 +687,8 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
         n9_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
     if is_n11_plan(plan):
         n11_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if is_n17_plan(plan):
+        validate_n17_plan(plan, runtime, root)
     return plan, manifest, runtime
 
 
@@ -694,6 +734,9 @@ def build_command(plan, manifest, runtime, row, attempt_id):
     bindings['+main.require_task_cache_identity'] = True
     require(not (set(values) & set(bindings)), 'duplicate static/runtime override')
     values.update(bindings)
+    if is_n17_plan(plan):
+        require(row['profile'] == 'N7', 'N17 passive trace cannot run another arm')
+        values['main.passive_physics_trace'] = True
     command = [str(PYTHON), str(Path(plan['worktree']) / 'main.py')]
     command += [f'{key}={hydra(value)}' for key, value in values.items()]
     return command, output
@@ -1374,6 +1417,14 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
             physical_gpu = runtime_gpu(runtime, state)
             resources=read_events(root/'data/gpu-healthcheck-ledger.jsonl')
             timeout=check_budget(state,events,row,resources,read_events(root/'data/gpu-hour-reservation-ledger.jsonl'),physical_gpu=physical_gpu)
+            if is_n17_plan(plan):
+                local = [event for event in events if event.get('identity', {}).get('iteration') == 'N17_PASSIVE_PHYSICS_DEV_20260929']
+                require(sum(event.get('event') == 'dispatched' for event in local) < 2,
+                        'N17 two-dispatch cap reached')
+                spent = sum(event.get('gpu_process_wall_seconds', 0.0) for event in local
+                            if event.get('event') in TERMINAL)
+                require(spent + timeout + 40 <= 2 * 3600,
+                        'N17 local GPU-hour cap reached')
             n2_base={}
             if plan.get('n2_cohort') is not None:
                 require(timeout==1800, 'N2 requires its full frozen episode timeout')

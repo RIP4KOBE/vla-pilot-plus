@@ -41,6 +41,7 @@ main:
   use_vlm_stage_recognition: true  # Use Gemini to recognize current stage
   decision_evidence:
     enabled: false  # Independent write-only observer; does not enable mechanism_pretest.
+  passive_physics_trace: false  # N17 Dev diagnosis only; never read by policy.
   vlm_query_limit: 50  # Max VLM queries per episode
   execution_horizon_mode: fixed  # valid: fixed, adaptive_prefix
   execution_horizon_far: 8

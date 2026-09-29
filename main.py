@@ -1582,6 +1582,12 @@ class Main:
         evidence_config = self.config.get("decision_evidence", {}) or {}
         if evidence_config.get("enabled", False):
             evidence = self._enable_decision_evidence(episode)
+        physics_trace = None
+        if self.config.get("passive_physics_trace", False):
+            from core.passive_physics_trace import PassivePhysicsTrace
+            trace_config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
+            trace_root = Path(trace_config.get("output_dir") or self.output_dir)
+            physics_trace = PassivePhysicsTrace(trace_root / f"passive_physics_episode_{episode:03d}.jsonl")
         set_episode_context = getattr(self.policy, "set_eds_episode_context", None)
         if callable(set_episode_context):
             set_episode_context(int(episode), int(episode_seed))
@@ -2098,6 +2104,11 @@ class Main:
             if evidence is not None:
                 evidence.dispatch(global_step=global_steps, execution_index=action_executed + 1)
             obs, reward, terminated, truncated, info = self.adapter.step(action_chunk[0][action_executed])
+            if physics_trace is not None:
+                physics_trace.record(self.adapter, self.keypoint_tracker,
+                    global_step=global_steps, action=action_chunk[0][action_executed],
+                    stage=current_stage, guided=use_guidance,
+                    success=info.get("success", False))
             if feedback_enabled:
                 _acknowledge_execution_feedback(self.policy, obs, global_step=global_steps,
                     execution_index=action_executed + 1, action=action_chunk[0][action_executed],
