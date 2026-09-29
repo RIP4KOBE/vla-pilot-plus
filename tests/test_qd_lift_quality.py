@@ -7,6 +7,7 @@ from core.qd_lift_quality import LiftAfterCloseContract, close_then_lift_bonus
 from core.rdt_libero_action_converter import rdt_action_to_libero_raw
 from core.rdt_policy_steer import RDTSteer
 from scripts.audit_decision_evidence import AuditFailure, _audit_n18_score
+from scripts import qd_ed_final_runner as runner
 
 
 def fixture(z_end=0.05, close_at=1, distance=0.02):
@@ -93,3 +94,11 @@ def test_sha_verified_native_score_link_rejects_tampering():
     assert _audit_n18_score(scoring, effective, aggregate) == 1
     with pytest.raises(AuditFailure, match="n18_raw_plus_bonus_mismatch"):
         _audit_n18_score(scoring, {**effective, "quality": raw}, aggregate)
+
+
+def test_supervisor_and_runner_share_one_scope(tmp_path):
+    plan = {"source_commit": "frozen"}
+    episode_key = "n18_dev_t00_c0_20260929"
+    support = runner.n18_support()
+    with support.supervised_scope(plan, tmp_path, episode_key):
+        support.require_scope(plan, tmp_path, runner.__dict__, {"episode_key": episode_key})

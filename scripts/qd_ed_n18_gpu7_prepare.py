@@ -14,7 +14,7 @@ import qd_ed_n18_dev_contract as contract
 
 ROOT = Path(__file__).resolve().parents[1]
 PARENT = contract.RUN_DIR / 'plan.frozen.v1.json'
-OUTPUT = contract.RUN_DIR / 'plan.frozen.v3.gpu7.json'
+OUTPUT = contract.RUN_DIR / 'plan.frozen.v4.gpu7.json'
 # Runtime fingerprints require the physical owned root, not its archival symlink.
 ARTIFACT_DIR = (Path(json.loads(PARENT.read_text())['artifact_root']) /
                 'continuation_20260929/n18-close-then-lift-dev-v1/gpu7-rebind')
@@ -59,8 +59,8 @@ def main():
                    and proof.get('resource_id') == contract.GPU7_PROOF,
                    'N18 GPU7 reusable CUDA/EGL proof unavailable')
     ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
-    metadata_path = ARTIFACT_DIR / 'egl-device-metadata.gpu7.v2.json'
-    runtime_path = ARTIFACT_DIR / 'runtime-manifest.gpu7.frozen.v2.json'
+    metadata_path = ARTIFACT_DIR / 'egl-device-metadata.gpu7.v3.json'
+    runtime_path = ARTIFACT_DIR / 'runtime-manifest.gpu7.frozen.v3.json'
     runner.require(not metadata_path.exists() and not runtime_path.exists(),
                    'N18 GPU7 runtime already frozen')
     runner.durable_json(metadata_path, mapping)
