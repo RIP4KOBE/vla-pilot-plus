@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def release_check(path, plan_path, plan):
     release = runner.read_json(path)
+    device = 7 if plan.get('n18_gpu7_rebind') is not None else 3
     runner.require(release == {
         'schema': 'n18-dev-execution-release-v1',
         'plan_path': str(Path(plan_path).resolve()),
@@ -24,7 +25,7 @@ def release_check(path, plan_path, plan):
         'source_commit': plan['source_commit'],
         'cohort_id': contract.COHORT,
         'episode_keys': [row['episode_key'] for row in plan['episodes']],
-        'physical_gpu': 3,
+        'physical_gpu': device,
         'validation_authorized': False,
         'formal_authorized': False,
     }, 'N18 release differs from frozen Dev plan')
@@ -37,6 +38,7 @@ def main():
     parser.add_argument('--status', type=Path, required=True)
     args = parser.parse_args()
     plan, _, _ = runner.validate_plan(args.plan, root=ROOT)
+    device = 7 if plan.get('n18_gpu7_rebind') is not None else 3
     release_check(args.release, args.plan, plan)
     status = runner.owned(args.status, plan['artifact_root'])
     runner.require(not status.exists(), 'N18 status already exists')
@@ -45,13 +47,13 @@ def main():
     native = {'score_batches_verified': 0, 'candidate_scores_verified': 0,
               'positive_bonus_candidates': 0}
     runner.durable_json(status, {'status': 'started', 'completed_keys': completed,
-                                'successes': successes, 'physical_gpu': 3})
+                                'successes': successes, 'physical_gpu': device})
     try:
         for row in plan['episodes']:
             devices = queue.inventory()
-            runner.require(3 in devices, 'GPU3 missing')
-            queue.reservation_admission(devices[3])
-            runner.gpu_admission(physical_gpu=3, expected_uuid=devices[3]['uuid'])
+            runner.require(device in devices, f'GPU{device} missing')
+            queue.reservation_admission(devices[device])
+            runner.gpu_admission(physical_gpu=device, expected_uuid=devices[device]['uuid'])
             with contract.supervised_scope(plan, ROOT, row['episode_key']):
                 summaries = runner.run_plan(args.plan, split='dev', iteration=contract.COHORT,
                                             episode_keys=[row['episode_key']], root=ROOT)
@@ -83,17 +85,17 @@ def main():
             completed.append(row['episode_key'])
             runner.durable_json(status, {'status': 'cell_audited', 'completed_keys': completed,
                 'successes': successes, 'native': native,
-                'last_attempt': result['attempt_id'], 'physical_gpu': 3})
+                'last_attempt': result['attempt_id'], 'physical_gpu': device})
         promoted = (successes['N18'] >= 3
                     and successes['N18'] > max(successes['C0'], successes['Q0'])
                     and native['positive_bonus_candidates'] > 0)
         runner.durable_json(status, {'status': 'completed_all_twelve_audited',
             'completed_keys': completed, 'successes': successes, 'native': native,
-            'dev_gate_promoted': promoted, 'physical_gpu': 3})
+            'dev_gate_promoted': promoted, 'physical_gpu': device})
     except BaseException as exc:
         runner.durable_json(status, {'status': 'interrupted' if isinstance(exc, (KeyboardInterrupt, SystemExit)) else 'failed',
             'completed_keys': completed, 'successes': successes, 'native': native,
-            'reason': type(exc).__name__, 'physical_gpu': 3})
+            'reason': type(exc).__name__, 'physical_gpu': device})
         raise
 
 
