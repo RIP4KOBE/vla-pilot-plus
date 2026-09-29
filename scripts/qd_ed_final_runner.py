@@ -603,9 +603,9 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
     require(Path(runtime['artifact_root']).resolve() == artifact_root, 'runtime artifact root mismatch')
     stage_overrides(runtime)
     require((runtime.get('stage_recovered_error_condition') is not None) ==
-            (plan.get('n7_e2_passive_diagnostic') is not None or is_n11_plan(plan)),
+            (plan.get('n7_e2_passive_diagnostic') is not None or is_n11_plan(plan) or is_n17_plan(plan)),
             'E2 Stage condition requires its dedicated prospective cohort plan')
-    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan) or is_n7_plan(plan) or is_n9_plan(plan) or is_n11_plan(plan)),
+    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan) or is_n7_plan(plan) or is_n9_plan(plan) or is_n11_plan(plan) or is_n17_plan(plan)),
         '180s transport requires its dedicated prospective cohort')
     physical_gpu = runtime_gpu(runtime, state)
     if require_frozen:

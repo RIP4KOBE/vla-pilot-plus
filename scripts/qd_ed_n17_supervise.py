@@ -12,7 +12,7 @@ import qd_ed_final_runner as runner
 
 ROOT = Path(__file__).resolve().parents[1]
 SESSION = ROOT.parent
-PLAN = SESSION / 'variants/n17_passive_physics/plan.frozen.v1.json'
+PLAN = SESSION / 'variants/n17_passive_physics/plan.frozen.v2.json'
 STATUS = SESSION / 'variants/n17_passive_physics/supervisor-status.json'
 RELEASE = SESSION / 'variants/n17_passive_physics/execution-release.json'
 COHORT = 'N17_PASSIVE_PHYSICS_DEV_20260929'
