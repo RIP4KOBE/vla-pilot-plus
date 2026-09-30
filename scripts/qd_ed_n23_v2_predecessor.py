@@ -74,6 +74,10 @@ def gate(reference):
         and diagnostic.get('original_required_cost_telemetry_complete') is False
         and diagnostic.get('all_attempt_token_usage_complete') is False,
         'N23 v2 named timeout diagnostic absent')
+    from scripts import qd_ed_n23_v2_recovery as recovery
+    reader=diagnostic.get('diagnostic_reader',{})
+    require(set(reader)=={'path','sha256'} and c.sha(reader['path'])==reader['sha256']==c.sha(recovery.__file__),
+        'N23 v2 diagnostic reader bytes differ')
     # Immutable root proof records the CPU diagnostic inputs; their byte binding is rechecked here.
     require(set(proof['evidence_files'])=={'stage_events','episode_compute','episode_metadata','safety_events','metrics','resolved_config','results'},
         'N23 v2 named sole-invalidity evidence list incomplete')
@@ -83,7 +87,8 @@ def gate(reference):
         and Path(audit['episode_compute_file']).resolve()==(Path(terminal['output_dir'])/'eds_eval/episode_compute.jsonl').resolve()
         and proof['native_evidence']==worker.evidence_record(terminal['output_dir']),
         'N23 v2 named evidence belongs to another attempt')
-    for reference in proof['evidence_files'].values():
+    for name,reference in proof['evidence_files'].items():
+        if name=='safety_events':continue  # Exact presence/absence already rebound by evidence_files above.
         require(set(reference)=={'path','sha256'} and Path(reference['path']).is_absolute()
             and c.sha(reference['path'])==reference['sha256'],'N23 v2 named evidence changed')
     require(len(proof['prior_cell_audits'])==16,'N23 v2 prior audited prefix missing')

@@ -204,7 +204,8 @@ def validate_contract(plan, manifest, runtime, seeds, root, r):
     meta = plan.get('n23_cohort', {})
     r['require'](sha(Path(root) / 'experiments/iteration_023_actuator_clipped_quality/protocol-dev-v2-prospective.md') == PROTOCOL_SHA
         and sha(Path(root) / 'experiments/iteration_023_actuator_clipped_quality/backend-arithmetic-protocol-v2.md') == BACKEND_PROTOCOL_SHA
-        and sha(Path(root) / 'experiments/iteration_023_actuator_clipped_quality/budget-amendment-v2.md') == AMENDMENT_SHA,
+        and sha(Path(root) / 'experiments/iteration_023_actuator_clipped_quality/budget-amendment-v2.md') == AMENDMENT_SHA
+        and sha(Path(root) / 'experiments/iteration_023_actuator_clipped_quality/timeout-observability-addendum-v2.md')==OBSERVABILITY_SHA,
         'N23 tracked protocols or amendment differ')
     r['require'](source['commit'] == plan['source_commit'] and source['files'] == plan['code_files']
         and source_paths(r) <= {v['path'] for v in plan['code_files']}, 'N23 complete sorted committed source differs')

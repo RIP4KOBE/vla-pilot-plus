@@ -125,7 +125,16 @@ def evidence_files(output):
     mapping={'stage_events':'eds_eval/stage_events.jsonl','episode_compute':'eds_eval/episode_compute.jsonl',
         'episode_metadata':'eds_eval/episode_metadata.jsonl','safety_events':'eds_eval/safety_events.jsonl',
         'metrics':'eds_eval/eds_metrics.jsonl','resolved_config':'.hydra/config.yaml','results':'results.txt'}
-    return {k:c.ref(output/name) for k,name in mapping.items()}
+    result={}
+    for key,name in mapping.items():
+        path=output/name
+        if key=='safety_events':
+            worker.require(not path.is_symlink(),'typed safety evidence path cannot be a symlink')
+            result[key]={'path':str(path.resolve()),'present':path.is_file(),
+                'sha256':c.sha(path) if path.is_file() else None}
+            worker.require(path.is_file() or not path.exists(),'typed safety evidence is neither file nor absent')
+        else:result[key]=c.ref(path)
+    return result
 
 
 def terminal_binding(final,row,plan,plan_reference,r):
