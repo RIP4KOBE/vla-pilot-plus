@@ -31,6 +31,7 @@ BUCKETS = {'baseline': 20, 'development': 100, 'validation': 60, 'formal': 40, '
 AMENDED_BUCKETS = {'baseline': 28, 'development': 125, 'validation': 180, 'formal': 40, 'recovery': 20}
 N20_BUCKETS = {'baseline': 30, 'development': 125, 'validation': 180, 'formal': 40, 'recovery': 20}
 N21_BUCKETS = {'baseline': 31, 'development': 127, 'validation': 180, 'formal': 40, 'recovery': 20}
+N22_BUCKETS = {'baseline': 41, 'development': 157, 'validation': 180, 'formal': 40, 'recovery': 20}
 GPU3_AMENDMENT = {
     'schema': 'gpu3-n10-budget-amendment-v1',
     'proposal_sha256': '25f7df614f8e8e476cdef7403756081156b192db8ab016e1afa1b2d01f3ffe0b',
@@ -44,6 +45,11 @@ GPU7_N20_AMENDMENT = {
 GPU7_N21_AMENDMENT = {
     'schema': 'gpu7-n21-budget-amendment-v1',
     'proposal_sha256': 'd7e5dfbfe58ad0509cb19b2733b6397dd101ebaf3d7b73ba671df1881cadf2ec',
+    'physical_gpu': 7,
+}
+GPU7_N22_AMENDMENT = {
+    'schema': 'gpu7-n22-budget-amendment-v1',
+    'proposal_sha256': '11607aa4a056e8defa8c2acafeab5b2270bb18f24ecb7780cb35762e61fe938f',
     'physical_gpu': 7,
 }
 TERMINAL = {'valid', 'aborted'}
@@ -493,8 +499,14 @@ def is_n20_plan(plan):
     return plan.get('n20_cohort') is not None or 'N20' in plan.get('candidate_profiles', {})
 
 
+def is_n22_plan(plan):
+    return plan.get('n22_cohort') is not None or 'N22' in plan.get('candidate_profiles', {})
+
+
 def is_n21_plan(plan):
-    return plan.get('n21_cohort') is not None or 'N21' in plan.get('candidate_profiles', {})
+    # N22 carries N21 as a contemporaneous ablation, not an N21 release.
+    return not is_n22_plan(plan) and (plan.get('n21_cohort') is not None
+                                    or 'N21' in plan.get('candidate_profiles', {}))
 
 
 _N18_SUPPORT = None
@@ -551,6 +563,20 @@ def n21_support():
         _N21_SUPPORT = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(_N21_SUPPORT)
     return _N21_SUPPORT
+
+
+_N22_SUPPORT = None
+
+
+def n22_support():
+    global _N22_SUPPORT
+    if _N22_SUPPORT is None:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('qd_ed_n22_dev_contract',
+            Path(__file__).with_name('qd_ed_n22_dev_contract.py'))
+        _N22_SUPPORT = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_N22_SUPPORT)
+    return _N22_SUPPORT
 
 
 _N11_SUPPORT = None
@@ -723,9 +749,9 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
     require(Path(runtime['artifact_root']).resolve() == artifact_root, 'runtime artifact root mismatch')
     stage_overrides(runtime)
     require((runtime.get('stage_recovered_error_condition') is not None) ==
-            (plan.get('n7_e2_passive_diagnostic') is not None or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan)),
+            (plan.get('n7_e2_passive_diagnostic') is not None or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan)),
             'E2 Stage condition requires its dedicated prospective cohort plan')
-    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan) or is_n7_plan(plan) or is_n9_plan(plan) or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan)),
+    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan) or is_n7_plan(plan) or is_n9_plan(plan) or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan)),
         '180s transport requires its dedicated prospective cohort')
     physical_gpu = runtime_gpu(runtime, state)
     if require_frozen:
@@ -815,6 +841,8 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
         n20_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
     if is_n21_plan(plan):
         n21_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if is_n22_plan(plan):
+        n22_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
     if is_n17_plan(plan):
         validate_n17_plan(plan, runtime, root)
     return plan, manifest, runtime
@@ -1130,6 +1158,18 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
         require(budget['max_episode_attempts'] <= 240 and budget['max_gpu_hours'] <= 48,
                 'budget exceeds authorization')
         bucket_caps = BUCKETS
+    elif amendment == GPU7_N22_AMENDMENT:
+        binding = state.get('n22_gpu7_binding', {})
+        require(selected_gpu == 7 and isinstance(binding, dict)
+                and row.get('iteration') == 'N22_HOLD_LIFT_DEV_20260930'
+                and binding.get('scope') == 'N22_HOLD_LIFT_DEV_20260930_only'
+                and binding.get('selected_gpu') == 7
+                and binding.get('user_reply') == '继续完成满足目标且无需我介入的autoresearch'
+                and budget['max_episode_attempts'] == 438
+                and budget['max_gpu_hours'] == 100.0
+                and budget['reserved'] == N22_BUCKETS,
+                'N22 amended GPU7 budget authorization differs')
+        bucket_caps = N22_BUCKETS
     elif amendment == GPU7_N21_AMENDMENT:
         binding = state.get('n21_gpu7_binding', {})
         require(selected_gpu == 7 and isinstance(binding, dict)
@@ -1576,6 +1616,8 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
             n20_support().require_scope(plan, root, globals())
         if is_n21_plan(plan):
             n21_support().require_scope(plan, root, globals())
+        if is_n22_plan(plan):
+            n22_support().require_scope(plan, root, globals())
         require(plan.get('phase_authorization', {}).get(split) is True, f'{split} has not passed its preregistered phase gate')
         rows=selected_rows(plan,split,iteration)
         if episode_keys:
@@ -1653,6 +1695,11 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                 n2_base=support.admission(plan,runtime,row,events,resources,root,globals())
             if is_n21_plan(plan):
                 support=n21_support()
+                support.require_scope(plan,root,globals(),row)
+                support.protected_budget(state,events,resources,row,timeout,globals(),plan=plan)
+                n2_base=support.admission(plan,runtime,row,events,resources,root,globals())
+            if is_n22_plan(plan):
+                support=n22_support()
                 support.require_scope(plan,root,globals(),row)
                 support.protected_budget(state,events,resources,row,timeout,globals(),plan=plan)
                 n2_base=support.admission(plan,runtime,row,events,resources,root,globals())
@@ -1741,6 +1788,8 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                     terminal['n20_episode_dispatched']=dispatched
                 if is_n21_plan(plan):
                     terminal['n21_episode_dispatched']=dispatched
+                if is_n22_plan(plan):
+                    terminal['n22_episode_dispatched']=dispatched
                 append_event(root,terminal)
                 durable_json(output/'attempt-result.json',terminal)
                 summaries.append(terminal)
@@ -1802,6 +1851,7 @@ def reconcile_ledger(plan_path, attempt_id, *, root=ROOT):
         if is_n19_plan(plan):terminal['n19_episode_dispatched']=dispatched is not None
         if is_n20_plan(plan):terminal['n20_episode_dispatched']=dispatched is not None
         if is_n21_plan(plan):terminal['n21_episode_dispatched']=dispatched is not None
+        if is_n22_plan(plan):terminal['n22_episode_dispatched']=dispatched is not None
         append_event(root,terminal); durable_json(output/'attempt-result.json',terminal)
         return terminal
 
