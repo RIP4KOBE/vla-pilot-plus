@@ -1,0 +1,43 @@
+{
+  "base_commit": "5a65ef15968cc68c82314e8c0773b3365ad45fa0",
+  "files": [
+    {
+      "edits": [
+        {
+          "new": "    if plan.get('n25_infrastructure_continuation') is not None:\n        from scripts import qd_ed_n25_cont_contract\n        return qd_ed_n25_cont_contract\n",
+          "new_end": 654,
+          "new_start": 651,
+          "old": ""
+        },
+        {
+          "new": "    if row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_INFRA_CONTINUATION_V1_20260930':\n        from scripts import qd_ed_n25_cont_contract as n25c\n        n25c.require_state(state, globals())\n        bucket_caps = n25c.CAPS['buckets']\n    elif row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_20260930':\n",
+          "new_end": 1259,
+          "new_start": 1254,
+          "old": "    if row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_20260930':\n"
+        },
+        {
+          "new": "    if row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_INFRA_CONTINUATION_V1_20260930':\n        from scripts import qd_ed_n25_cont_contract as n25c\n        return n25c.check_retry(events, row, globals())\n",
+          "new_end": 1373,
+          "new_start": 1370,
+          "old": ""
+        }
+      ],
+      "new_sha256": "0887d04f5e628504c41ceed2b9503321575a18a3cad4f9cf2d1a9a301c357aab",
+      "old_sha256": "b3e5ccd90b4ae0eee036560809dcdb74ff68bbaecb56792d676b64bec6e2f7f5",
+      "path": "scripts/qd_ed_final_runner.py"
+    },
+    {
+      "edits": [
+        {
+          "new": "    if plan.get('n25_infrastructure_continuation') is not None:\n        from scripts import qd_ed_n25_cont_contract as n25c\n        return n25c.validate_worker_context(context, main_argv, root, output, plan, runtime)\n",
+          "new_end": 140,
+          "new_start": 137,
+          "old": ""
+        }
+      ],
+      "new_sha256": "6a803949c9d2dc37b333ed56bcdb67e7edeca005bdf1513ff9a9856d597e1441",
+      "old_sha256": "dd162c7bd0d9cf91da064fcb2652aa5ee3a0a48d4c70940dfa3ce4cdab5bc74e",
+      "path": "scripts/qd_ed_n23_worker.py"
+    }
+  ]
+}

@@ -649,6 +649,9 @@ def typed_metered_plan(plan):
 
 
 def metered_support(plan):
+    if plan.get('n25_infrastructure_continuation') is not None:
+        from scripts import qd_ed_n25_cont_contract
+        return qd_ed_n25_cont_contract
     if is_n25_plan(plan):
         from scripts import qd_ed_n25_contract
         return qd_ed_n25_contract
@@ -1249,7 +1252,11 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
     require(physical_gpu is None or (type(physical_gpu) is int and physical_gpu == selected_gpu),
             'GPU policy/runtime physical device mismatch')
     amendment = budget.get('amendment')
-    if row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_20260930':
+    if row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_INFRA_CONTINUATION_V1_20260930':
+        from scripts import qd_ed_n25_cont_contract as n25c
+        n25c.require_state(state, globals())
+        bucket_caps = n25c.CAPS['buckets']
+    elif row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_20260930':
         from scripts import qd_ed_n25_contract as n25
         n25.require_state(state, globals())
         bucket_caps = n25.budget_authority()['caps']['buckets']
@@ -1361,6 +1368,9 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
 
 
 def check_retry(events, row):
+    if row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_INFRA_CONTINUATION_V1_20260930':
+        from scripts import qd_ed_n25_cont_contract as n25c
+        return n25c.check_retry(events, row, globals())
     if row.get('n25_recovery_eligibility') is not None:
         from scripts import qd_ed_n25_recovery as recovery
         return recovery.check_retry(events, row, globals())
