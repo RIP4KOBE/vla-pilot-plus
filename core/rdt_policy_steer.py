@@ -39,6 +39,9 @@ from core.qd_executed_quality import (
     ExecutedPrefixContract, executed_prefix_quality, recognize_executed_prefix_provider,
 )
 from core.qd_actuator_clipped_quality import MODE as ACTUATOR_CLIPPED_MODE, ActuatorClippedContract
+from core.qd_actuator_clipped_rbf import (
+    MODE as CLIPPED_RBF_MODE, clipped_rbf_gradient, applied_evidence, bind_decision_metrics, BoundedWitness,
+)
 from core.qd_lift_quality import (
     HOLD_MODE as HOLD_LIFT_MODE, LIFT_MODES,
     LiftAfterCloseContract, close_then_lift_bonus, close_hold_then_lift_bonus,
@@ -98,7 +101,7 @@ RDT_GUIDANCE_SIGN = 1.0
 RDT_DIVERSITY_SIGN = -1.0
 EDS_INITIAL_SAMPLING_MODES = {"iid", "rbf_diverse_denoise"}
 EDS_TRUNCATED_ROLLOUT_MODES = {"baseline", "rbf_diverse"}
-EDS_DIVERSITY_DESCRIPTOR_MODES = {"absolute_eef", "direction_normalized_eef"}
+EDS_DIVERSITY_DESCRIPTOR_MODES = {"absolute_eef", "direction_normalized_eef", CLIPPED_RBF_MODE}
 
 
 @dataclass(frozen=True)
@@ -999,6 +1002,7 @@ class RDTSteer:
         self._debug_first_step = False
         self._action_summary_logged = False
         self._last_visualization_action_candidates: Optional[Tensor] = None
+        self._n25_rbf_witness = BoundedWitness()
         self._last_eds_metrics: Optional[dict] = None
         self._last_eds_artifacts: Optional[dict] = None
         self._last_eds_initial_sampler_info: Optional[dict] = None
@@ -1383,6 +1387,7 @@ class RDTSteer:
         return self
 
     def reset(self) -> None:
+        self._n25_rbf_witness = BoundedWitness()
         self.reset_episode_compute_counters()
         if hasattr(self, "_executed_feedback"):
             self._executed_feedback.clear("episode_reset", reset=True)
@@ -2950,6 +2955,8 @@ class RDTSteer:
         cfg: _EDSConfig,
     ) -> tuple[Tensor, dict]:
         if x_t.shape[0] <= 1:
+            if cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE:
+                raise ValueError("N25 requires population>=2; no fallback")
             return self._eds_initial_fallback_to_iid(
                 x_t=x_t,
                 cond=cond,
@@ -2983,10 +2990,13 @@ class RDTSteer:
                 model_output = self._counted_dit(population, t, cond)
 
             if int(t.item()) > start_step:
+                capture = (self._n25_rbf_witness.prepare("initial", -1)
+                           if cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE else None)
                 div_grad, descriptor_evidence = self._compute_eds_diversity_gradient(
                     population,
                     descriptor_mode=cfg.initial_diversity_descriptor_mode,
                     descriptor_cfg=cfg.__dict__,
+                    **({"capture_out": capture} if capture is not None else {}),
                 )
                 descriptor_evidence_by_step.append(descriptor_evidence)
                 if div_grad is None:
@@ -3019,14 +3029,29 @@ class RDTSteer:
                     dtype=model_output.dtype,
                 )
                 grad_norms.append(float(masked_div.detach().norm().cpu().item()))
-                model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += (
-                    RDT_DIVERSITY_SIGN
-                    * float(cfg.initial_diversity_scale)
-                    * masked_div[:, :, RDT_GUIDED_TRANSLATION_INDICES]
-                )
+                if cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE:
+                    update = (RDT_DIVERSITY_SIGN * float(cfg.initial_diversity_scale)
+                              * masked_div[:, :, RDT_GUIDED_TRANSLATION_INDICES])
+                    applied_evidence(descriptor_evidence, masked=masked_div, update=update,
+                                     phase="initial", iteration=-1, step=i, timestep=int(t.item()))
+                    if capture is not None:
+                        capture["update_operand"] = update[:, :8, :].detach().clone()
+                        capture["model_output_before"] = model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES].detach().clone()
+                    model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += update
+                    if capture is not None:
+                        capture["model_output_after"] = model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES].detach().clone()
+                        self._n25_rbf_witness.emit(capture, descriptor_evidence)
+                else:
+                    model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += (
+                        RDT_DIVERSITY_SIGN
+                        * float(cfg.initial_diversity_scale)
+                        * masked_div[:, :, RDT_GUIDED_TRANSLATION_INDICES]
+                    )
                 diversity_steps += 1
 
             if not torch.isfinite(model_output).all():
+                if cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE:
+                    raise ValueError("N25 nonfinite model_output; no fallback")
                 return self._eds_initial_fallback_to_iid(
                     x_t=x_t,
                     cond=cond,
@@ -3040,6 +3065,8 @@ class RDTSteer:
                 dtype=x_t.dtype
             )
             if not torch.isfinite(population).all():
+                if cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE:
+                    raise ValueError("N25 nonfinite population; no fallback")
                 return self._eds_initial_fallback_to_iid(
                     x_t=x_t,
                     cond=cond,
@@ -3131,7 +3158,8 @@ class RDTSteer:
                 expected_shape=tuple(x_t.shape),
             )
         except (TypeError, ValueError) as exc:
-            if cfg.initial_sampling_mode != "rbf_diverse_denoise":
+            if (cfg.initial_sampling_mode != "rbf_diverse_denoise"
+                    or cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE):
                 raise
             population, info = self._eds_initial_fallback_to_iid(
                 x_t=x_t,
@@ -3807,6 +3835,8 @@ class RDTSteer:
         rbf_step_flags: list[bool] = []
 
         if actual_scale > 0.0 and x_t.shape[0] <= 1:
+            if cfg.rollout_diversity_descriptor_mode == CLIPPED_RBF_MODE:
+                raise ValueError("N25 requires population>=2; no fallback")
             return self._eds_rollout_fallback_to_baseline(
                 reason="population_size<=1",
                 iter_idx=iter_idx,
@@ -3835,10 +3865,13 @@ class RDTSteer:
                 rollout_timesteps,
                 local_step,
             ):
+                capture = (self._n25_rbf_witness.prepare("rollout", int(iter_idx))
+                           if cfg.rollout_diversity_descriptor_mode == CLIPPED_RBF_MODE else None)
                 div_grad, descriptor_evidence = self._compute_eds_diversity_gradient(
                     x_t,
                     descriptor_mode=cfg.rollout_diversity_descriptor_mode,
                     descriptor_cfg=cfg.__dict__,
+                    **({"capture_out": capture} if capture is not None else {}),
                 )
                 info.setdefault("direction_rbf_evidence_by_step", []).append(
                     descriptor_evidence
@@ -3884,17 +3917,33 @@ class RDTSteer:
                     dtype=model_output.dtype,
                 )
                 grad_norms.append(float(masked_div.detach().norm().cpu().item()))
-                model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += (
-                    RDT_DIVERSITY_SIGN
-                    * actual_scale
-                    * masked_div[:, :, RDT_GUIDED_TRANSLATION_INDICES]
-                )
+                if cfg.rollout_diversity_descriptor_mode == CLIPPED_RBF_MODE:
+                    update = (RDT_DIVERSITY_SIGN * actual_scale
+                              * masked_div[:, :, RDT_GUIDED_TRANSLATION_INDICES])
+                    applied_evidence(descriptor_evidence, masked=masked_div, update=update,
+                                     phase="rollout", iteration=int(iter_idx),
+                                     step=local_step, timestep=int(t.item()))
+                    if capture is not None:
+                        capture["update_operand"] = update[:, :8, :].detach().clone()
+                        capture["model_output_before"] = model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES].detach().clone()
+                    model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += update
+                    if capture is not None:
+                        capture["model_output_after"] = model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES].detach().clone()
+                        self._n25_rbf_witness.emit(capture, descriptor_evidence)
+                else:
+                    model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += (
+                        RDT_DIVERSITY_SIGN
+                        * actual_scale
+                        * masked_div[:, :, RDT_GUIDED_TRANSLATION_INDICES]
+                    )
                 steps_applied += 1
                 applied_this_step = True
 
             rbf_step_flags.append(bool(applied_this_step))
 
             if not torch.isfinite(model_output).all():
+                if cfg.rollout_diversity_descriptor_mode == CLIPPED_RBF_MODE:
+                    raise ValueError("N25 nonfinite model_output; no fallback")
                 return self._eds_rollout_fallback_to_baseline(
                     reason=f"non-finite_model_output_at_step={local_step}_t={int(t.item())}",
                     iter_idx=iter_idx,
@@ -3916,6 +3965,8 @@ class RDTSteer:
             if applied_this_step:
                 after_rbf_population = x_t.detach()
             if not torch.isfinite(x_t).all():
+                if cfg.rollout_diversity_descriptor_mode == CLIPPED_RBF_MODE:
+                    raise ValueError("N25 nonfinite x_t; no fallback")
                 return self._eds_rollout_fallback_to_baseline(
                     reason=f"non-finite_population_at_step={local_step}_t={int(t.item())}",
                     iter_idx=iter_idx,
@@ -4921,6 +4972,8 @@ class RDTSteer:
         current_stage: int,
     ) -> Tensor:
         cfg = eds_config
+        if cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE:
+            self._n25_rbf_witness.begin(getattr(self, "_decision_evidence", None))
         contact_sweep_mode = cfg.qd_final_selection_mode == CONTACT_SWEEP_MODE
         grasp_timing_mode = cfg.qd_final_selection_mode in {GRASP_TIMING_MODE, CONTACT_SWEEP_MODE}
         terminal_mode = cfg.qd_final_selection_mode in {TERMINAL_POPULATION_MODE, GRASP_TIMING_MODE, CONTACT_SWEEP_MODE}
@@ -7326,6 +7379,9 @@ class RDTSteer:
             ):
                 raise RuntimeError("QD archive hard-gate violation")
 
+        if cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE:
+            bind_decision_metrics(metrics, global_step=global_step, stage=current_stage)
+            self._n25_rbf_witness.finish()
         self._last_eds_metrics = metrics.to_jsonable()
         self._last_eds_artifacts = {
             "initial_actions": initial_action_candidates,
@@ -7692,8 +7748,16 @@ class RDTSteer:
         *,
         descriptor_mode: str,
         descriptor_cfg: Mapping[str, object],
+        capture_out: dict | None = None,
     ) -> tuple[Optional[Tensor], dict[str, object]]:
         """Dispatch the config-controlled EEF descriptor without mutable scope state."""
+        if descriptor_mode == CLIPPED_RBF_MODE:
+            if self._adapter is None:
+                raise ValueError("N25 requires the native adapter; no fallback")
+            self._increment_compute("rbf_gradient_calls")
+            self._increment_compute("rbf_gradient_batch_rows", x_t.shape[0])
+            return clipped_rbf_gradient(x_t, project=self._rdt_sample_to_trajectory_3d,
+                                        horizon=self._action_chunk_horizon, capture_out=capture_out)
         if descriptor_mode == "absolute_eef":
             return self._compute_diversity_gradient(x_t), {
                 "descriptor_mode": descriptor_mode,
@@ -8429,6 +8493,20 @@ class RDTSteer:
         if resolved.qd_tie_break != "stable_fingerprint":
             raise ValueError("EDS qd_tie_break must be stable_fingerprint")
 
+        clipped_rbf = CLIPPED_RBF_MODE in {
+            resolved.initial_diversity_descriptor_mode, resolved.rollout_diversity_descriptor_mode}
+        if clipped_rbf:
+            n25_required = {
+                "initial_diversity_descriptor_mode": CLIPPED_RBF_MODE,
+                "rollout_diversity_descriptor_mode": CLIPPED_RBF_MODE,
+                "qd_archive_mode": "grid_archive", "qd_quality_mode": ACTUATOR_CLIPPED_MODE,
+                "qd_descriptor": DIRECTION_HEIGHT_DESCRIPTOR,
+                "qd_final_selection_mode": GRASP_TIMING_MODE,
+                "qd_gripper_rescue_mode": "none", "qd_parent_survivor_count": 0,
+            }
+            for field_name, expected in n25_required.items():
+                if getattr(resolved, field_name) != expected:
+                    raise ValueError(f"N25 requires {field_name}={expected!r}")
         if resolved.qd_archive_mode == "grid_archive":
             required = {
                 "population_size": 16,
@@ -8437,11 +8515,11 @@ class RDTSteer:
                 "renoise_t_max": 3,
                 "renoise_t_min": 1,
                 "initial_sampling_mode": "rbf_diverse_denoise",
-                "initial_diversity_descriptor_mode": "absolute_eef",
+                "initial_diversity_descriptor_mode": CLIPPED_RBF_MODE if clipped_rbf else "absolute_eef",
                 "initial_diversity_scale": 20.0,
                 "initial_diversity_start_ratio": 0.8,
                 "truncated_rollout_mode": "rbf_diverse",
-                "rollout_diversity_descriptor_mode": "absolute_eef",
+                "rollout_diversity_descriptor_mode": CLIPPED_RBF_MODE if clipped_rbf else "absolute_eef",
                 "rollout_diversity_scale": 20.0,
                 "rollout_diversity_start_ratio": 0.6,
                 "rollout_diversity_iters": "all",

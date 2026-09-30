@@ -1,0 +1,41 @@
+{
+  "schema": "n25-conditional-native-witness-cpu-preparation-authority-v1",
+  "time": "2026-09-30T19:04:24.947056+00:00",
+  "proposal": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/optional-native-witness-proposal-v1.md",
+    "sha256": "0756cca41304a29aa6ac9bb08dd3263a429b4dffcdfa4eadbb5ba681eca8e000"
+  },
+  "decision": "APPROVE_BOUNDED_CPU_CAPTURE_IMPLEMENTATION_NOT_EXECUTION",
+  "capture_selection": "First guided decision per episode/reset lifecycle only; first active initial call and first active call in each of10rollout iterations, at most11. No saturation/reward/outcome-dependent selection or backfill. Missing scheduled calls explicit.",
+  "numeric_cap_bytes_per_call": 20480,
+  "numeric_cap_bytes_per_episode": 225280,
+  "identity_metadata_cap_bytes_per_call": 16384,
+  "selection_counters_must_reset_with_episode": true,
+  "native_payload_fields": [
+    "first8 xyz16x8x3 only",
+    "same-call pre-cast and cast origins16x3",
+    "projected xyz16x8x3",
+    "pre-normalization xyz gradient",
+    "normalized xyz gradient",
+    "scaled masked xyz update operand",
+    "actual translation model-output slice before update",
+    "actual translation model-output slice after update"
+  ],
+  "binding": [
+    "existing attempt/reset/decision/source/runtime identity",
+    "phase/iteration/timestep/source dtype/shape/stride",
+    "existing runtime GPU identity without additional probe",
+    "actual normalization scalar and dtype"
+  ],
+  "additional_requirements": [
+    "Do not label intended update operand as measured actual output delta. Record actual before/after from original operation for witness.",
+    "No second gradient/projector/origin fetch/model/API/simulator call; preserve original per-candidate projector acquisition/order.",
+    "All-call scalar telemetry remains distinct from first-decision bounded native witness.",
+    "CPU fake-input serialization/roundtrip and caps checked explicitly; no real native payload reads or GPU execution.",
+    "No claim CPU replay certifies CUDA arithmetic.",
+    "No change to activeN24/source/state/ledger/controller/release; later native delivery/audit may remain separate phase."
+  ],
+  "execution_authorized": false,
+  "gpu_model_api_simulator_authorized": false,
+  "phase": "conditional CPU source/test preparation only"
+}
