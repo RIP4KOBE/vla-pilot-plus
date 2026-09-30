@@ -814,3 +814,34 @@ def test_v2_backend_proof_json_binding_without_any_cuda(tmp_path,monkeypatch,fau
     if fault=='none':assert backend.verify_preflight_proof(planref['path'],reference['path'],terminal,source)==reference
     else:
         with pytest.raises(ValueError):backend.verify_preflight_proof(planref['path'],reference['path'],terminal,source)
+
+
+@pytest.mark.parametrize('fault',['none','wrong_root','escaping_target','changed_bytes','resolved_path','link_target'])
+def test_frozen_runtime_compatibility_alias_keeps_strict_file_ownership(tmp_path,fault):
+    root=tmp_path/'canonical/worktree';root.mkdir(parents=True)
+    alias=tmp_path/'compatibility-worktree';alias.symlink_to(root,target_is_directory=True)
+    target=root/'third_party/rdt/.gitignore';target.parent.mkdir(parents=True);target.write_text('frozen bytes')
+    lexical=alias/'third_party/rdt/.gitignore'
+    record={'path':str(lexical),'resolved_path':str(target),'sha256':worker.sha(target),'size_bytes':target.stat().st_size}
+    runtime={'schema':'qd-ed-runtime-setup-v1','worktree':str(alias),'artifact_root':str(tmp_path/'artifacts'),
+        'gpu_mapping':{'physical_gpu':7,'uuid':c.GPU7_UUID,'egl_device_index':4},
+        'cuda_egl_verified':True,'cuda_egl_probe':{'resource_id':c.GPU7_PROOF},
+        'stage_recovered_error_condition':runner.E2_STAGE_CONDITION,'stage_engineering_condition':'synthetic',
+        'frozen_stage_provider':{'allow_recovered_error_events':True},'files':[record]}
+    if fault=='wrong_root':runtime['worktree']=str(tmp_path/'another-root')
+    if fault=='escaping_target':
+        outside=tmp_path/'outside';outside.write_text('frozen bytes');target.unlink();target.symlink_to(outside)
+        record['resolved_path']=str(outside)
+    if fault=='changed_bytes':target.write_text('tampered bytes')
+    if fault=='resolved_path':record['resolved_path']=str(tmp_path/'different')
+    if fault=='link_target':record['link_target']='missing-link-target'
+    r=dict(vars(runner));r['read_json']=lambda *_:runtime
+    r['n4e1_support']=lambda:SimpleNamespace(engineering_condition=lambda:'synthetic')
+    original_verify=r['verify_files']
+    if fault=='none':
+        # The unchanged v1 gate reproduces the former lexical-prefix failure.
+        with pytest.raises(runner.GateError,match='escapes owned roots'):c.v1.validate_runtime(runtime,root,r)
+        c.validate_runtime(runtime,root,r)
+    else:
+        with pytest.raises(runner.GateError):c.validate_runtime(runtime,root,r)
+    assert r['verify_files'] is original_verify

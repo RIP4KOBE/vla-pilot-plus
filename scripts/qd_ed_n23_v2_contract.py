@@ -142,7 +142,19 @@ def protected_budget(state,events,resources,row,timeout,r,*,plan):
     full_capacity(state,events,resources,r)
 
 
-validate_runtime=v1.validate_runtime
+def validate_runtime(runtime,root,r):
+    # Frozen inputs retain the pre-archive lexical prefix. Admit that prefix
+    # only when it resolves to this exact owning worktree; retain every v1
+    # runtime/Stage/GPU/probe check and the original strict file verifier.
+    r['require'](Path(runtime['worktree']).resolve()==Path(root).resolve(),
+        'N23 v2 frozen runtime worktree alias differs')
+    bound=dict(r)
+    def verify_runtime_files(records,*,allowed_roots):
+        r['verify_files'](records,allowed_roots=(*allowed_roots,Path(runtime['worktree'])))
+    bound['verify_files']=verify_runtime_files
+    v1.validate_runtime(runtime,root,bound)
+
+
 read_worker_report=v1.read_worker_report
 
 
