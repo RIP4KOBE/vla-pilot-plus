@@ -66,9 +66,9 @@ def main():
                  'qd_actuator_quality_candidates': 0, 'qd_actuator_clipped_prefix_candidates': 0}
     successes = {arm: 0 for arm in contract.ARMS}
     candidate_successes = []
-    native = {arm: {**{key: 0 for key in NATIVE_FIELDS},
-                    'guided_decisions': 0, 'parent_rounds_verified': 0}
-              for arm in ('N7', 'N23')}
+    native = {'N7': {'guided_decisions': 0, 'parent_rounds_verified': 0},
+              'N23': {**{key: 0 for key in NATIVE_FIELDS},
+                      'guided_decisions': 0, 'parent_rounds_verified': 0}}
     costs = {arm: {key: 0 for key in COST_FIELDS} for arm in contract.ARMS}
     missing_costs = []
 

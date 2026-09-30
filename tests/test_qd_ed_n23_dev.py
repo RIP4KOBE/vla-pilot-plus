@@ -162,6 +162,8 @@ def test_supervisor_rules(tmp_path,monkeypatch,case,count,status,promoted):
     else:m.main()
     result=json.loads(dst.read_text());assert result['status']==status and len(called)==count and result['dev_gate_promoted']==promoted
     assert result['n7_role']=='ablation_control_only_no_promotion'
+    assert set(result['native']['N7'])=={'guided_decisions','parent_rounds_verified'}
+    assert set(result['native']['N23'])==set(m.NATIVE_FIELDS)|{'guided_decisions','parent_rounds_verified'}
     with pytest.raises(r.GateError):m.main()
 
 
