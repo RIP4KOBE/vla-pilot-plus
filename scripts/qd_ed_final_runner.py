@@ -524,6 +524,10 @@ def is_n20_plan(plan):
     return plan.get('n20_cohort') is not None or 'N20' in plan.get('candidate_profiles', {})
 
 
+def is_n23_validation_plan(plan):
+    return plan.get('n23_validation') is not None
+
+
 def is_n23_v2_plan(plan):
     return plan.get('n23_cohort', {}).get('schema') == 'n23-clipped-quality-dev-v2'
 
@@ -602,6 +606,9 @@ _N23_SUPPORT = None
 
 
 def n23_support(plan=None):
+    if plan is not None and is_n23_validation_plan(plan):
+        from scripts import qd_ed_n23_validation_contract
+        return qd_ed_n23_validation_contract
     if plan is not None and is_n23_v2_plan(plan):
         if str(ROOT) not in sys.path: sys.path.insert(0, str(ROOT))
         from scripts import qd_ed_n23_v2_contract
@@ -1212,7 +1219,11 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
     elif amendment == GPU7_N23_V2_AMENDMENT:
         from scripts import qd_ed_n23_v2_contract as n23v2
         n23v2.require_state(state, globals())
-        require(row.get('iteration') in {n23v2.COHORT,n23v2.PREFLIGHT}, 'N23 v2 finite budget scope differs')
+        if row.get('iteration') == 'N23_VALIDATION_20260930':
+            from scripts import qd_ed_n23_validation_contract as n23validation
+            n23validation.require_budget_state(state, globals())
+        else:
+            require(row.get('iteration') in {n23v2.COHORT,n23v2.PREFLIGHT}, 'N23 v2 finite budget scope differs')
         bucket_caps = N23_BUCKETS
     elif amendment == GPU7_N23_AMENDMENT:
         n23_support().require_state(state, globals())
@@ -1309,6 +1320,9 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
 
 
 def check_retry(events, row):
+    if row.get('n23_validation_recovery_eligibility') is not None:
+        from scripts import qd_ed_n23_validation_recovery as recovery
+        return recovery.check_retry(events, row, globals())
     if row.get('n23_v2_recovery_eligibility') is not None:
         from scripts import qd_ed_n23_v2_recovery as recovery
         return recovery.check_retry(events, row, globals())
@@ -1348,6 +1362,9 @@ def append_event_locked(root, event):
     with ledger.open('a') as stream:
         stream.write(json.dumps(event,sort_keys=True,allow_nan=False)+'\n'); stream.flush(); os.fsync(stream.fileno())
     sync_state_from_journal(root,[*events,event])
+    if event.get('identity', {}).get('iteration') == 'N23_VALIDATION_20260930':
+        from scripts import qd_ed_n23_validation_identity as validation_identity
+        validation_identity.register_dispatch(root, event)
 
 
 def sync_state_from_journal(root,events):
@@ -1699,7 +1716,7 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
             # Revalidate hashes per dispatch; no silent reuse after edits or cache mutation.
             plan,manifest,runtime=validate_plan(plan_path,root=root)
             events=read_events(root/'data/attempt-ledger.jsonl')
-            if is_n23_v2_plan(plan):
+            if is_n23_v2_plan(plan) or is_n23_validation_plan(plan):
                 row=n23_support(plan).effective_row(plan,row,events,root,globals())
             check_retry(events,row)
             state = read_state(root/'research-state.yaml')
@@ -1828,7 +1845,7 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                 if is_n23_plan(plan):
                     report = n23_support(plan).read_worker_report(output, globals())
                     require(report.get('evidence_complete') is True, 'N23 in-worker evidence incomplete')
-                    if is_n23_v2_plan(plan):
+                    if is_n23_v2_plan(plan) or is_n23_validation_plan(plan):
                         n23_audit_binding={'n23_worker_receipt':{'path':str(output/'eds_eval/in-worker-audit-receipt.json'),
                             'sha256':digest(output/'eds_eval/in-worker-audit-receipt.json')},'process':read_json(output/'process.json')}
                 outcome=validate_result(output,row,manifest['profiles'][row['profile']],runtime); final_event='valid'
@@ -1839,7 +1856,7 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
             except BaseException as exc:
                 # Fail closed: parser/gate/scientific invalidity is never an automatic recovery retry.
                 final_event,outcome=failed_outcome(exc,output,row,launch_failed=dispatched and process is None,runtime=runtime)
-                if is_n23_v2_plan(plan) and n23_audit_binding is not None:
+                if (is_n23_v2_plan(plan) or is_n23_validation_plan(plan)) and n23_audit_binding is not None:
                     outcome.update(n23_audit_binding)
                 if dispatched and plan.get('n2_cohort') is not None:
                     eligibility=n2_support().transport_recovery_eligibility(exc,outcome,plan,row,runtime,globals())

@@ -128,6 +128,10 @@ def wrapped_command(command, context_path):
 
 
 def validate_context(context, main_argv):
+    validation_plan = read_ref(context['plan'])
+    if validation_plan.get('n23_validation') is not None:
+        from scripts import qd_ed_n23_validation_contract as validation
+        return validation.validate_worker_context(context, main_argv, ROOT)
     require(set(context) == {"schema", "attempt_id", "episode_key", "profile", "output_dir", "worktree",
                              "main_argv", "plan", "runtime", "source"}
             and context['schema'] == 'n23-metered-worker-context-v1', "worker context schema differs")
