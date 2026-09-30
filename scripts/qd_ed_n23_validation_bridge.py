@@ -25,6 +25,9 @@ RUNNER_EDITS=[
  "                if (is_n23_v2_plan(plan) or is_n23_validation_plan(plan)) and n23_audit_binding is not None:"),
 ]
 ADDITIONS={
+'scripts/qd_ed_n23_validation_continuation.py','scripts/qd_ed_n23_historical_n7_metrics_adapter.py',
+ 'tests/test_qd_ed_n23_validation_continuation.py',
+ 'experiments/iteration_023_actuator_clipped_quality/validation-continuation-evidence-addendum-v1.md',
 'scripts/qd_ed_n23_validation_bridge.py','scripts/qd_ed_n23_validation_contract.py',
 'scripts/qd_ed_n23_validation_identity.py','scripts/qd_ed_n23_validation_evidence.py',
 'scripts/qd_ed_n23_validation_recovery.py','scripts/qd_ed_n23_validation_prepare.py',
@@ -61,12 +64,16 @@ def verify_delta(root,parent):
 
 
 def source_record(root,parent,protocol_sha):
+    from scripts import qd_ed_n23_validation_continuation as historical
     changed=verify_delta(root,parent)
+    w.require(w.sha(Path(root)/'experiments/iteration_023_actuator_clipped_quality/validation-continuation-evidence-addendum-v1.md')
+        ==historical.ADDENDUM_SHA,'tracked validation continuation addendum changed')
     w.require(w.sha(Path(root)/'experiments/iteration_023_actuator_clipped_quality/protocol-validation-conditional-v1.md')
         ==protocol_sha,'validation tracked protocol changed')
     source=w.source_record(root,{v['path'] for v in parent['code_files']}|ADDITIONS)
     return source,{'schema':'n23-validation-source-bridge-v1','dev_source':{
         'commit':DEV_COMMIT,'files':parent['code_files'],'sha256':w.canonical_sha(parent['code_files'])},
         'validation_source':source,'changed_paths':changed,'scientific_unchanged':True,
+        'continuation_evidence_addendum':historical.addendum(),
         'worker_change':'exact_validate_context_validation_route_only',
         'runner_change':'exact_closed_validation_routing_insertions'}

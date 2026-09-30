@@ -9,6 +9,7 @@ import threading
 from scripts import qd_ed_n23_worker as w
 from scripts import qd_ed_n23_v2_contract as dev
 from scripts import qd_ed_n23_validation_bridge as bridge
+from scripts import qd_ed_n23_validation_continuation as historical
 
 ROOT=Path(__file__).resolve().parents[1]
 RUN_DIR=dev.RUN_DIR
@@ -17,9 +18,9 @@ ARMS=('C0','Q0','N23')
 FIELDS=('task_id','env_seed','policy_seed','init_index','init_row_sha256','init_file_sha256','bddl_sha256')
 DEV_COMMIT=bridge.DEV_COMMIT
 DEV_PLAN=RUN_DIR/'plan.frozen.v2.gpu7.json'
-DEV_RESULT=RUN_DIR/'result-v2.json'
-DEV_READER=RUN_DIR/'summarize_cohort_cpu_v2.py'
-DEV_READER_SHA='d9918d9f52e4bb37c9f71e7be09af880a7b6f4723ed9a68566bfda38b363224c'
+DEV_RESULT=RUN_DIR/'result-continuation-v1.json'
+DEV_READER=RUN_DIR/'continuation_implementation/continuation/n23_continuation_report.py'
+DEV_READER_SHA='93143e94b06802f2f681380f040b7e52b66b2c675c4fe3e3d3955fc441c0ec12'
 DEV_PLAN_SHA='acd2b2c639f7756cdc353b6a7eea8c93a4d735a8ce6ee25838d9502c938d07f0'
 DEV_REVIEW=RUN_DIR/'validation-dev-promotion-review-v1.json'
 SOURCE_REVIEW=RUN_DIR/'validation-source-review-v1.json'
@@ -58,7 +59,8 @@ def source_record(root,parent):
 def review_source(source,source_bridge,parent):
     record=read_ref(ref(SOURCE_REVIEW))
     require(record=={'schema':'n23-validation-source-review-v1','disposition':'accepted','dev_plan':ref(DEV_PLAN),
-        'protocol':ref(PROTOCOL),'source':source,'source_bridge':source_bridge,
+        'protocol':ref(PROTOCOL),'continuation_evidence_addendum':historical.addendum(),
+        'source':source,'source_bridge':source_bridge,
         'runtime':{'path':parent['runtime_manifest_path'],'sha256':parent['runtime_manifest_sha256']},
         'backend_proof':parent['n23_cohort']['backend_proof'],'no_execution_release':True},
         'validation exact source bridge/root review missing')
@@ -72,15 +74,16 @@ def dev_promotion(root,r):
     review=read_ref(ref(DEV_REVIEW));parent=read(DEV_PLAN)
     require(sha(DEV_PLAN)==DEV_PLAN_SHA and sha(DEV_READER)==DEV_READER_SHA,
         'validation frozen Dev plan/actual result reader changed')
-    require(set(review)=={'schema','disposition','dev_plan','dev_status','dev_result','backend_proof','allow_validation'}
+    require(set(review)=={'schema','disposition','dev_plan','dev_status','dev_result','backend_proof','allow_validation','continuation_evidence_addendum'}
         and review['schema']=='n23-dev-promotion-review-v1' and review['disposition']=='promoted'
         and review['allow_validation'] is True and review['dev_plan']==ref(DEV_PLAN)
+        and review['continuation_evidence_addendum']==historical.addendum()
         and review['dev_result']==ref(DEV_RESULT),'validation actual root Dev promotion required')
     status=read_ref(review['dev_status']);result=read_ref(review['dev_result'])
     require(parent['source_commit']==DEV_COMMIT and parent['episodes']==dev.expected_rows()
         and parent.get('frozen') is True and parent['phase_authorization']=={'dev':True,'validation':False,'formal':False},
         'validation actual original forty-cell Dev plan differs')
-    require(result.get('schema')=='n23-dev-cohort-result-v2' and result.get('cohort_id')==dev.COHORT
+    require(result.get('schema')=='n23-dev-continuation-result-v1' and result.get('cohort_id')==dev.COHORT
         and result.get('source_commit')==DEV_COMMIT and same_ref(result.get('plan'),review['dev_plan'])
         and result.get('reader')==ref(DEV_READER) and result.get('planned')==result.get('audited_cells')==40
         and result.get('dev_gate_promoted') is True
@@ -88,10 +91,11 @@ def dev_promotion(root,r):
         and result.get('goal_status')=='TARGET_NOT_MET','validation terminal Dev result is not complete promotion')
     status_ref=result.get('terminal_status',{})
     require(set(status_ref)=={'path','sha256','content'} and same_ref({k:status_ref[k] for k in ('path','sha256')},review['dev_status'])
-        and status_ref['content']==status and status.get('schema')=='n23-dev-supervisor-status-v2'
+        and status_ref['content']==status and status.get('schema')=='n23-dev-supervisor-status-continuation-v1'
         and status.get('cohort_id')==dev.COHORT and status.get('status')=='completed_all_forty_audited'
         and status.get('dev_gate_promoted') is True and status.get('completed_keys')==[v['episode_key'] for v in parent['episodes']],
         'validation terminal Dev status/source differs')
+    failure=historical.provenance(parent,review,status,result)
     events=r['read_events'](Path(root)/'data/attempt-ledger.jsonl')
     local=[v for v in events if v.get('identity',{}).get('iteration')==dev.COHORT]
     snapshot=result['ledger_snapshot']
@@ -105,6 +109,8 @@ def dev_promotion(root,r):
     accepted=result.get('accepted_cells',[])
     require(len(accepted)==40 and [v['episode_key'] for v in accepted]==[v['episode_key'] for v in parent['episodes']],
         'validation Dev accepted cells missing/order differs')
+    historical.prefix(parent,failure,local,result,r)
+    profiles=manifest(parent,r)
     counts={a:0 for a in dev.ARMS};guided=parents=0;expected_outcomes=[];attempts=[]
     native_totals={'N7':{'guided_decisions':0,'parent_rounds_verified':0},
         'N23':{'guided_decisions':0,'parent_rounds_verified':0,**{k:0 for k in supervision.NATIVE_FIELDS}}}
@@ -118,7 +124,7 @@ def dev_promotion(root,r):
             'worker_receipt':ref(out/'eds_eval/in-worker-audit-receipt.json'),'attempt_result':ref(out/'attempt-result.json')}
         require(entry==expected and read_ref(entry['attempt_result'])==final,'validation reviewed Dev cell association differs')
         report=evidence.historical_receipt(final,row,parent,review['dev_plan'],r)
-        native,aux=supervision.native_counts(final,row,report)
+        native,aux=historical.native_counts(final,row,report,parent=parent,root=root,r=r,manifest=profiles)
         if row['profile'] in native_totals:
             for key,value in native.items():native_totals[row['profile']][key]+=value
         for key,value in aux.items():aux_totals[key]+=value
@@ -136,6 +142,8 @@ def dev_promotion(root,r):
         and guided>0 and parents>0 and status['native']['N23']['guided_decisions']==guided
         and status['native']['N23']['parent_rounds_verified']==parents,'validation Dev aggregate/native promotion differs')
     require(result['attempts']==attempts
+        and result.get('charged_attempts_not_returned_to_supervisor')==[]
+        and result.get('gpu_process_wall_seconds')==sum(v['terminal']['gpu_process_wall_seconds'] for v in attempts)
         and [v['terminal'] for v in status['attempts']]==[v['terminal'] for v in attempts],
         'validation all charged Dev attempts not retained')
     summary=supervision.summarize(expected_outcomes,attempts)
@@ -163,6 +171,7 @@ def validate_contract(plan,profiles,runtime,seeds,root,r):
     parent=read(DEV_PLAN);source,source_bridge=source_record(root,parent);meta=plan.get('n23_validation',{})
     require(sha(PROTOCOL)==PROTOCOL_SHA and meta.get('schema')=='n23-protected-validation-v1'
         and meta.get('cohort_id')==COHORT and meta.get('limits')==LIMITS and meta.get('protocol')==ref(PROTOCOL)
+        and meta.get('continuation_evidence_addendum')==historical.addendum()
         and meta.get('dev_review')==dev_promotion(root,r)
         and meta.get('source_review')==review_source(source,source_bridge,parent)
         and meta.get('source_bridge')==source_bridge
@@ -205,6 +214,7 @@ def validate_worker_context(context,main_argv,root):
     meta=plan.get('n23_validation',{});rows=[v for v in plan['episodes'] if v['episode_key']==context['episode_key']]
     require(meta.get('schema')=='n23-protected-validation-v1' and meta.get('cohort_id')==COHORT
         and meta.get('limits')==LIMITS and meta.get('worker_audit')==w.WORKER_CONTRACT
+        and meta.get('continuation_evidence_addendum')==historical.addendum()
         and context['profile'] in ARMS and plan['phase_authorization']=={'dev':False,'validation':True,'formal':False}
         and len(rows)==1 and rows[0]['profile']==context['profile'] and rows[0]['split']=='validation'
         and rows[0]['iteration']==COHORT and rows[0]['timeout_seconds']==1800,'validation worker frozen scope differs')

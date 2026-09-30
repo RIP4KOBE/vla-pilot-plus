@@ -21,6 +21,7 @@ def build_plan(parent,seeds,cohort,*,source,source_bridge,dev_review=None,source
         episodes=identity.rows_for(seeds,cohort),phase_authorization={'dev':False,'validation':True,'formal':False})
     plan['n23_validation']={'schema':'n23-protected-validation-v1','cohort_id':contract.COHORT,
         'seed_cohort':cohort,'limits':contract.LIMITS,'protocol':contract.ref(contract.PROTOCOL),
+        'continuation_evidence_addendum':contract.historical.addendum(),
         'dev_review':dev_review,'source_review':source_review,'metadata_selection':selection,
         'source_bridge':source_bridge,'backend_proof':parent['n23_cohort']['backend_proof'],'worker_audit':worker.WORKER_CONTRACT}
     return plan

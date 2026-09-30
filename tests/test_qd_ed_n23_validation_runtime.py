@@ -116,7 +116,8 @@ def test_new_worker_validation_route_exact_context(tmp_path,monkeypatch,fault):
     monkeypatch.setattr(c,'VALIDATION_PLAN',tmp_path/'plan.json')
     command=['python',str(tmp_path/'main.py'),'exact=original'];out=tmp_path/'attempts/a'
     meta={'schema':'n23-protected-validation-v1','cohort_id':c.COHORT,'limits':c.LIMITS,'worker_audit':w.WORKER_CONTRACT,
-        'source_bridge':{'strict':True},'source_review':{'review':'bound'}}
+        'source_bridge':{'strict':True},'source_review':{'review':'bound'},
+        'continuation_evidence_addendum':c.historical.addendum()}
     plan={'worktree':str(tmp_path),'artifact_root':str(tmp_path),'runtime_manifest_path':rt['path'],
         'runtime_manifest_sha256':rt['sha256'],'episodes':[row],'n23_validation':meta,'source_commit':'eval','code_files':[],
         'phase_authorization':{'dev':False,'validation':True,'formal':False}}
@@ -149,6 +150,10 @@ def promotion_fixture(tmp_path,monkeypatch):
     c.DEV_READER.write_text('# synthetic reader byte binding\n')
     write(c.DEV_PLAN,parent);monkeypatch.setattr(c,'DEV_PLAN_SHA',c.sha(c.DEV_PLAN));monkeypatch.setattr(c,'DEV_READER_SHA',c.sha(c.DEV_READER))
     monkeypatch.setattr(dev,'expected_rows',lambda:copy.deepcopy(rows))
+    monkeypatch.setattr(c.historical,'provenance',lambda *args:{'synthetic':'history'})
+    monkeypatch.setattr(c.historical,'prefix',lambda *args:None)
+    monkeypatch.setattr(c,'manifest',lambda *_:{})
+    monkeypatch.setattr(c.historical,'native_counts',lambda final,row,report,**kw:ds.native_counts(final,row,report))
     monkeypatch.setattr(evidence,'historical_backend',lambda *args:args[0])
     monkeypatch.setattr(evidence,'historical_receipt',lambda *args:{'accepted':True})
     totals={'N7':{'guided_decisions':10,'parent_rounds_verified':100},
@@ -173,19 +178,21 @@ def promotion_fixture(tmp_path,monkeypatch):
         return next(v for v in ev if v['event']=='valid' and v['episode_key']==row['episode_key'])
     monkeypatch.setattr(recovery,'historical_dev_cell',chosen)
     counts={a:5 for a in dev.ARMS}
-    status={'schema':'n23-dev-supervisor-status-v2','status':'completed_all_forty_audited','cohort_id':dev.COHORT,
+    status={'schema':'n23-dev-supervisor-status-continuation-v1','status':'completed_all_forty_audited','cohort_id':dev.COHORT,
         'completed_keys':[v['episode_key'] for v in rows],'dev_gate_promoted':True,'successes':counts,'native':totals,
         'auxiliary':{k:20 for k in ds.AUX_FIELDS},'outcomes':outcomes,'attempts':attempts,**ds.summarize(outcomes,attempts)}
     physical=tmp_path/'physical';physical.mkdir();logical=tmp_path/'execution';logical.symlink_to(physical,target_is_directory=True)
     status_path=logical/'status.json';status_ref=write(status_path,status)
-    result={'schema':'n23-dev-cohort-result-v2','cohort_id':dev.COHORT,'source_commit':c.DEV_COMMIT,
+    result={'schema':'n23-dev-continuation-result-v1','cohort_id':dev.COHORT,'source_commit':c.DEV_COMMIT,
         'plan':c.ref(c.DEV_PLAN),'terminal_status':{'path':str(status_path),'sha256':status_ref['sha256'],'content':status},
         'planned':40,'dispatched':40,'audited_cells':40,'dev_gate_promoted':True,
         'decision':'ELIGIBLE_FOR_SEPARATELY_FROZEN_VALIDATION','goal_status':'TARGET_NOT_MET','reader':c.ref(c.DEV_READER),
         'backend_proof':parent['n23_cohort']['backend_proof'],'ledger_snapshot':write(tmp_path/'snapshot.jsonl',events,True),
-        'accepted_cells':entries,'attempts':attempts,'counts':{a:{'audited':10,'success':5} for a in dev.ARMS},
+        'accepted_cells':entries,'attempts':attempts,'charged_attempts_not_returned_to_supervisor':[],
+        'gpu_process_wall_seconds':sum(v['terminal']['gpu_process_wall_seconds'] for v in attempts),'counts':{a:{'audited':10,'success':5} for a in dev.ARMS},
         'native':totals,'auxiliary':status['auxiliary'],**ds.summarize(outcomes,attempts)}
     review={'schema':'n23-dev-promotion-review-v1','disposition':'promoted','allow_validation':True,
+        'continuation_evidence_addendum':c.historical.addendum(),
         'dev_plan':c.ref(c.DEV_PLAN),'dev_status':status_ref,'dev_result':write(c.DEV_RESULT,result),'backend_proof':result['backend_proof']}
     write(c.DEV_REVIEW,review)
     api=dict(vars(r));api['read_events']=lambda p:events if str(p).endswith('attempt-ledger.jsonl') else r.read_events(p)
@@ -193,7 +200,7 @@ def promotion_fixture(tmp_path,monkeypatch):
 
 
 @pytest.mark.parametrize('fault',['none','partial','status','invalid','comparison','false_gate','wrong_source','reorder',
-    'missing_native','result_status','missing_receipt','reader','snapshot','unreported_attempt','cost_unknown','backend'])
+    'missing_native','result_status','missing_receipt','reader','snapshot','unreported_attempt','cost_unknown','backend','old_result_schema','old_status_schema','addendum','global_cost','unreturned'])
 def test_real_writer_schema_promotion_and_logical_path_alias(tmp_path,monkeypatch,fault):
     x=promotion_fixture(tmp_path,monkeypatch)
     if fault=='partial':x.result['audited_cells']=39
@@ -211,6 +218,11 @@ def test_real_writer_schema_promotion_and_logical_path_alias(tmp_path,monkeypatc
     if fault=='unreported_attempt':x.result['attempts']=x.result['attempts'][:-1]
     if fault=='cost_unknown':x.result['unknown_token_calls']=99
     if fault=='backend':x.result['backend_proof']={}
+    if fault=='old_result_schema':x.result['schema']='n23-dev-cohort-result-v2'
+    if fault=='old_status_schema':x.status['schema']='n23-dev-supervisor-status-v2'
+    if fault=='addendum':x.review['continuation_evidence_addendum']={}
+    if fault=='global_cost':x.result['gpu_process_wall_seconds']+=1
+    if fault=='unreturned':x.result['charged_attempts_not_returned_to_supervisor']=['old']
     x.review['dev_status']=write(x.status_path,x.status)
     x.result['terminal_status']['sha256']=x.review['dev_status']['sha256']
     x.review['dev_result']=write(c.DEV_RESULT,x.result);write(c.DEV_REVIEW,x.review)
