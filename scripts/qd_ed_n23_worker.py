@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from scripts import audit_decision_evidence as audit
-from scripts.qd_ed_audit_backend import assigned_cuda_identity, create_backend
+from scripts.qd_ed_audit_backend import assigned_cuda_identity, canonical_cuda_uuid, create_backend
 
 WORKER_CONTRACT = {"schema": "n23-same-process-native-audit-v1", "arms": ["C0", "Q0", "N7", "N23"],
                    "n23_backend": "cuda", "other_arm_backend": "cpu", "timeout_includes_audit": True}
@@ -244,11 +244,13 @@ def verify_receipt(context_path, process_record):
     kind = 'cuda' if context['profile'] == 'N23' else 'cpu'
     require(backend.get('kind') == kind and backend.get('logical_device') == ('cuda:0' if kind == 'cuda' else 'cpu'), "worker audit backend differs")
     actual = receipt.get('worker_cuda', {})
+    expected_uuid=canonical_cuda_uuid(runtime['gpu_mapping']['uuid'])
     require(actual.get('physical_gpu') == 7 and actual.get('uuid') == runtime['gpu_mapping']['uuid']
-            and actual.get('actual_uuid') == runtime['gpu_mapping']['uuid'] and actual.get('logical_device') == 'cuda:0',
+            and actual.get('physical_uuid') == expected_uuid
+            and canonical_cuda_uuid(actual.get('actual_uuid')) == expected_uuid and actual.get('logical_device') == 'cuda:0',
             "worker runtime physical UUID differs")
     if kind == 'cuda':
-        require(backend.get('physical_uuid') == actual['actual_uuid'] and isinstance(backend.get('dtype_coverage'), list)
+        require(backend.get('physical_uuid') == actual['physical_uuid'] and isinstance(backend.get('dtype_coverage'), list)
                 and backend.get('torch_version') == actual.get('torch_version')
                 and backend.get('cuda_version') == actual.get('cuda_version'), "worker CUDA audit proof differs")
     report = read_ref(receipt['audit_report'])
