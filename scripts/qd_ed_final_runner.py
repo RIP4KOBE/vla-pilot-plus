@@ -30,6 +30,7 @@ SCHEMA = 'qd-ed-final-plan-v1'
 BUCKETS = {'baseline': 20, 'development': 100, 'validation': 60, 'formal': 40, 'recovery': 20}
 AMENDED_BUCKETS = {'baseline': 28, 'development': 125, 'validation': 180, 'formal': 40, 'recovery': 20}
 N20_BUCKETS = {'baseline': 30, 'development': 125, 'validation': 180, 'formal': 40, 'recovery': 20}
+N21_BUCKETS = {'baseline': 31, 'development': 127, 'validation': 180, 'formal': 40, 'recovery': 20}
 GPU3_AMENDMENT = {
     'schema': 'gpu3-n10-budget-amendment-v1',
     'proposal_sha256': '25f7df614f8e8e476cdef7403756081156b192db8ab016e1afa1b2d01f3ffe0b',
@@ -38,6 +39,11 @@ GPU3_AMENDMENT = {
 GPU7_N20_AMENDMENT = {
     'schema': 'gpu7-n20-budget-amendment-v1',
     'proposal_sha256': '7dccbad9ac063ba404f079573667b26a8d2bd6c9f1e892b144223ff1429673bc',
+    'physical_gpu': 7,
+}
+GPU7_N21_AMENDMENT = {
+    'schema': 'gpu7-n21-budget-amendment-v1',
+    'proposal_sha256': 'd7e5dfbfe58ad0509cb19b2733b6397dd101ebaf3d7b73ba671df1881cadf2ec',
     'physical_gpu': 7,
 }
 TERMINAL = {'valid', 'aborted'}
@@ -307,8 +313,9 @@ def expand_candidate(candidate_id, candidate, baseline):
                 'N11 must change only exact parent survivor count')
     elif contract in {'n18_close_then_lift_quality_only_v1',
                       'n19_corrected_close_then_lift_quality_v1',
-                      'n20_terminal_raw_lift_quality_v1'}:
-        require(candidate_id == ('N20' if contract.startswith('n20_') else
+                      'n20_terminal_raw_lift_quality_v1', 'n21_stage_raw_lift_quality_v1'}:
+        require(candidate_id == ('N21' if contract.startswith('n21_') else
+                                 'N20' if contract.startswith('n20_') else
                                  'N19' if contract.startswith('n19_') else 'N18'),
                 'lift-quality contract candidate identity differs')
         parent = candidate.get('parent_candidate')
@@ -331,7 +338,7 @@ def expand_candidate(candidate_id, candidate, baseline):
     fields = (('qd_descriptor', 'qd_final_selection_mode', 'qd_parent_survivor_count')
               if candidate_id == 'N11' else
               ('qd_descriptor', 'qd_final_selection_mode', 'qd_quality_mode')
-              if candidate_id in {'N18', 'N19', 'N20'} else
+              if candidate_id in {'N18', 'N19', 'N20', 'N21'} else
               ('qd_descriptor', 'qd_final_selection_mode')
               if candidate_id in {'N6', 'N7', 'N9'} else (field,))
     for changed_field in fields:
@@ -471,6 +478,10 @@ def is_n20_plan(plan):
     return plan.get('n20_cohort') is not None or 'N20' in plan.get('candidate_profiles', {})
 
 
+def is_n21_plan(plan):
+    return plan.get('n21_cohort') is not None or 'N21' in plan.get('candidate_profiles', {})
+
+
 _N18_SUPPORT = None
 
 
@@ -511,6 +522,20 @@ def n20_support():
         _N20_SUPPORT = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(_N20_SUPPORT)
     return _N20_SUPPORT
+
+
+_N21_SUPPORT = None
+
+
+def n21_support():
+    global _N21_SUPPORT
+    if _N21_SUPPORT is None:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('qd_ed_n21_dev_contract',
+            Path(__file__).with_name('qd_ed_n21_dev_contract.py'))
+        _N21_SUPPORT = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_N21_SUPPORT)
+    return _N21_SUPPORT
 
 
 _N11_SUPPORT = None
@@ -773,6 +798,8 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
         n19_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
     if is_n20_plan(plan):
         n20_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if is_n21_plan(plan):
+        n21_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
     if is_n17_plan(plan):
         validate_n17_plan(plan, runtime, root)
     return plan, manifest, runtime
@@ -1088,6 +1115,18 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
         require(budget['max_episode_attempts'] <= 240 and budget['max_gpu_hours'] <= 48,
                 'budget exceeds authorization')
         bucket_caps = BUCKETS
+    elif amendment == GPU7_N21_AMENDMENT:
+        binding = state.get('n21_gpu7_binding', {})
+        require(selected_gpu == 7 and isinstance(binding, dict)
+                and row.get('iteration') == 'N21_STAGE_RAW_DEV_20260930'
+                and binding.get('scope') == 'N21_STAGE_RAW_DEV_20260930_only'
+                and binding.get('selected_gpu') == 7
+                and binding.get('user_reply') == '允许改用其他空闲 GPU'
+                and budget['max_episode_attempts'] == 398
+                and budget['max_gpu_hours'] == 100.0
+                and budget['reserved'] == N21_BUCKETS,
+                'N21 amended GPU7 budget authorization differs')
+        bucket_caps = N21_BUCKETS
     elif amendment == GPU7_N20_AMENDMENT:
         binding = state.get('n20_gpu7_binding', {})
         require(selected_gpu == 7 and isinstance(binding, dict)
@@ -1520,6 +1559,8 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
             n19_support().require_scope(plan, root, globals())
         if is_n20_plan(plan):
             n20_support().require_scope(plan, root, globals())
+        if is_n21_plan(plan):
+            n21_support().require_scope(plan, root, globals())
         require(plan.get('phase_authorization', {}).get(split) is True, f'{split} has not passed its preregistered phase gate')
         rows=selected_rows(plan,split,iteration)
         if episode_keys:
@@ -1592,6 +1633,11 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                 n2_base=support.admission(plan,runtime,row,events,resources,root,globals())
             if is_n20_plan(plan):
                 support=n20_support()
+                support.require_scope(plan,root,globals(),row)
+                support.protected_budget(state,events,resources,row,timeout,globals(),plan=plan)
+                n2_base=support.admission(plan,runtime,row,events,resources,root,globals())
+            if is_n21_plan(plan):
+                support=n21_support()
                 support.require_scope(plan,root,globals(),row)
                 support.protected_budget(state,events,resources,row,timeout,globals(),plan=plan)
                 n2_base=support.admission(plan,runtime,row,events,resources,root,globals())

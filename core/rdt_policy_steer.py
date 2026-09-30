@@ -7394,7 +7394,10 @@ class RDTSteer:
         else:
             self._last_eds_mechanism_trace = None
         if terminal_mode:
-            self._eds_update_guidance_metadata_from_cost(population_scores[best_idx], stage_reference_costs)
+            stage_best_cost = (-stage_raw_rewards[best_idx]
+                               if isinstance(quality_contract, LiftAfterCloseContract)
+                               else population_scores[best_idx])
+            self._eds_update_guidance_metadata_from_cost(stage_best_cost, stage_reference_costs)
             if evidence is not None:
                 evidence.record("terminal_population_stage_binding",
                     selected_raw_reward=self._last_raw_reward,
