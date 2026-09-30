@@ -53,6 +53,9 @@ from core.qd_contact_sweep import (
     MODE as CONTACT_SWEEP_MODE, CONTACT_XY_M, CONTACT_HEIGHT_M,
     MAX_REACH_LOSS_M, SWEEP_COST_PER_M, select_contact_sweep,
 )
+from core.qd_gripper_parent_rescue import (
+    MODE as GRIPPER_RESCUE_MODE, CanonicalCloseCache, native_identity,
+)
 from core.qd_ed import (
     EXECUTION_INTENT_AXES,
     EXECUTION_INTENT_DESCRIPTOR,
@@ -157,6 +160,7 @@ class _EDSConfig:
     adaptive_reward_improvement_eps: float = 1e-3
     qd_archive_mode: str = "none"
     qd_quality_mode: str = "provider"
+    qd_gripper_rescue_mode: str = "none"
     qd_final_selection_mode: str = DEFAULT_FINAL_SELECTION_MODE
     qd_degenerate_fallback_policy: str = "none"
     qd_descriptor: str = "target_relative_endpoint_xy"
@@ -5146,12 +5150,37 @@ class RDTSteer:
                     raise RuntimeError("N2 canonical action/raw identity association changed")
             return raw
 
+        rescue_cache = None
+        canonical_link = {}
+        def rescue_context():
+            return {"episode": int(getattr(self, "_eds_episode_index", 0)),
+                    "global_step": int(global_step), "stage": int(current_stage),
+                    "provider": dict(quality_contract.identity),
+                    "controller": dict(quality_contract.metadata["context"]),
+                    "keypoints": native_identity(keypoints)}
+
+        def observe_rescue(iteration, descriptors, cells):
+            if rescue_cache is None:
+                return
+            started = time.perf_counter()
+            witness = rescue_cache.observe(iteration=iteration, actions=population,
+                costs=population_scores, quality=population_rewards,
+                raw=original_rewards(population_info, population_rewards, population),
+                descriptors=descriptors, cells=cells, context=rescue_context(),
+                bounds=(qd_bounds.lo, qd_bounds.hi), **canonical_link)
+            metrics.qd_gripper_rescue_checks += 16
+            metrics.qd_gripper_rescue_updates += witness["update_count"]
+            evidence = getattr(self, "_decision_evidence", None)
+            if evidence is not None:
+                evidence.record("gripper_rescue_cache", **witness)
+            metrics.qd_gripper_rescue_overhead_seconds += time.perf_counter() - started
+
         def record_shadow_qd_candidates(
             iter_idx: int,
             candidates: Tensor,
             rewards: Tensor,
         ) -> None:
-            nonlocal terminal_canonical_sequence, terminal_scoring_batch_id
+            nonlocal terminal_canonical_sequence, terminal_scoring_batch_id, canonical_link
             extra = {}
             if quality_contract is not None:
                 raw = original_rewards(population_info, rewards, candidates)
@@ -5168,6 +5197,9 @@ class RDTSteer:
             if evidence is not None:
                 sequence = evidence.record("canonical_candidate_batch", iter_idx=int(iter_idx),
                                 candidates=candidates, effective_quality=rewards, **extra)
+                if cfg.qd_gripper_rescue_mode == GRIPPER_RESCUE_MODE:
+                    canonical_link = {"canonical_sequence": sequence,
+                        "scoring_batch_id": evidence.scoring_batch_id, "decision_id": evidence.decision_id}
                 if terminal_mode and iter_idx == 9:
                     terminal_canonical_sequence = sequence
                     terminal_scoring_batch_id = evidence.scoring_batch_id
@@ -5221,6 +5253,16 @@ class RDTSteer:
                     bounds_lo=qd_bounds.lo, bounds_hi=qd_bounds.hi,
                     scoring_batch_id=self._decision_evidence.scoring_batch_id,
                 )
+            if cfg.qd_gripper_rescue_mode == GRIPPER_RESCUE_MODE:
+                rescue_cache = CanonicalCloseCache(rescue_context(), (qd_bounds.lo, qd_bounds.hi))
+                metrics.qd_gripper_rescue_mode = GRIPPER_RESCUE_MODE
+                evidence = getattr(self, "_decision_evidence", None)
+                if evidence is not None:
+                    evidence.record("gripper_rescue_begin", mode=GRIPPER_RESCUE_MODE,
+                        context=rescue_context(), run_seed=cfg.shuffle_seed,
+                        sparse_exponent=cfg.qd_sparse_exponent,
+                        bounds_lo=qd_bounds.lo, bounds_hi=qd_bounds.hi)
+                observe_rescue(-1, initial_descriptors, initial_cell_ids)
             qd_archive = QDArchive(
                 grid_shape=cfg.qd_grid_shape,
                 secondary_lane_mode=cfg.qd_secondary_lane_mode,
@@ -5507,23 +5549,41 @@ class RDTSteer:
                         global_quality_anchor_fingerprint=allocation.global_quality_anchor_fingerprint,
                         original_archive_occurrences=None,
                         identity_scope="actual allocation return; original insertion occurrences unavailable")
-                population = allocation.parent_actions.to(
+                rescue_actual = None
+                if rescue_cache is not None:
+                    started = time.perf_counter()
+                    original_descriptors = torch.stack([
+                        qd_archive.entries[int(cell)].descriptor_xy_m
+                        for cell in allocation.parent_cell_ids.tolist()])
+                    rescue_actual = rescue_cache.supply(allocation, original_descriptors,
+                        iteration=i, context=rescue_context(), bounds=(qd_bounds.lo, qd_bounds.hi))
+                    metrics.qd_gripper_rescue_substitutions += int(rescue_actual.slot is not None)
+                    metrics.qd_gripper_rescue_actual_cells_by_iter.append(rescue_actual.cells.tolist())
+                    if evidence is not None:
+                        evidence.record("gripper_rescue_parents", **rescue_actual.witness,
+                            original_actions=allocation.parent_actions,
+                            original_descriptors=original_descriptors,
+                            actual_actions=rescue_actual.actions, actual_costs=rescue_actual.costs,
+                            actual_quality=rescue_actual.quality, actual_raw=rescue_actual.raw,
+                            actual_cells=rescue_actual.cells, actual_descriptors=rescue_actual.descriptors)
+                    metrics.qd_gripper_rescue_overhead_seconds += time.perf_counter() - started
+                population = (rescue_actual.actions if rescue_actual else allocation.parent_actions).to(
                     device=x_t.device, dtype=x_t.dtype
                 )
-                population_scores = allocation.parent_costs.to(
+                population_scores = (rescue_actual.costs if rescue_actual else allocation.parent_costs).to(
                     device=population.device
                 )
-                population_rewards = allocation.parent_rewards.to(
+                population_rewards = (rescue_actual.quality if rescue_actual else allocation.parent_rewards).to(
                     device=population.device
                 )
-                qd_parent_cell_ids = allocation.parent_cell_ids.to(
+                qd_parent_cell_ids = (rescue_actual.cells if rescue_actual else allocation.parent_cell_ids).to(
                     device=population.device
                 )
                 if non_xy_descriptor:
-                    metrics.qd_parent_descriptor_values_by_iter.append([
+                    metrics.qd_parent_descriptor_values_by_iter.append(
+                        rescue_actual.descriptors.detach().float().cpu().tolist() if rescue_actual else [
                         qd_archive.entries[int(cell)].descriptor_xy_m.detach().float().cpu().tolist()
-                        for cell in allocation.parent_cell_ids.tolist()
-                    ])
+                        for cell in allocation.parent_cell_ids.tolist()])
                 anchor_count = allocation.global_quality_anchor_count
                 lane_to_population_source = {
                     "quality_anchor": "qd_global_quality_anchor",
@@ -5534,6 +5594,10 @@ class RDTSteer:
                     lane_to_population_source[lane]
                     for lane in allocation.parent_lanes
                 )
+                if rescue_actual is not None and rescue_actual.slot is not None:
+                    chunk_population_sources = tuple(
+                        "qd_gripper_rescue" if slot == rescue_actual.slot else source
+                        for slot, source in enumerate(chunk_population_sources))
                 occupied_count = len(qd_archive.entries)
                 covered_count = sum(
                     int(count > 0) for count in allocation.slot_counts.values()
@@ -5666,6 +5730,8 @@ class RDTSteer:
                     )
                     for lane in allocation.parent_lanes
                 ]
+                if rescue_actual is not None and rescue_actual.slot is not None:
+                    parent_selection_kinds[rescue_actual.slot] = "qd_gripper_rescue"
                 if survivor_slots:
                     parent_selection_kinds = (
                         ["qd_exact_parent_survivor"] * len(survivor_slots)
@@ -5686,6 +5752,9 @@ class RDTSteer:
                 qd_parent_count_by_source["qd_archive_offspring"] = (
                     quality_count - len(survivor_slots)
                 )
+                if rescue_actual is not None and rescue_actual.slot is not None:
+                    qd_parent_count_by_source["qd_archive_offspring"] -= 1
+                    qd_parent_count_by_source["qd_gripper_rescue_offspring"] = 1
                 if allocation.secondary_parent_count:
                     qd_parent_count_by_source["qd_secondary_lane_offspring"] = int(
                         allocation.secondary_parent_count
@@ -5757,7 +5826,10 @@ class RDTSteer:
                                 source_quality=parent_source_rewards, source_costs=parent_source_scores,
                                 parent_indices=full_parent_indices, elite_count=elite_count,
                                 parent_cell_ids=qd_parent_cell_ids,
-                                offspring_sources=plan.offspring_sources)
+                                offspring_sources=plan.offspring_sources,
+                                **({"gripper_rescue_mode": GRIPPER_RESCUE_MODE,
+                                    "source_raw_rewards": rescue_actual.raw}
+                                   if rescue_cache is not None else {}))
             full_particle_sources = (
                 ("elite",) * elite_count + plan.offspring_sources
             )
@@ -6260,6 +6332,7 @@ class RDTSteer:
                         bounds_lo=qd_bounds.lo, bounds_hi=qd_bounds.hi,
                         scoring_batch_id=self._decision_evidence.scoring_batch_id,
                     )
+                observe_rescue(i, child_descriptors, child_cell_ids)
                 if terminal_mode and i == 9:
                     # Freeze the actual masked canonical batch before archive consumers can replace it.
                     terminal_population = TerminalPopulation.capture(
@@ -7027,6 +7100,7 @@ class RDTSteer:
                 selected=metrics.qd_feedback_selected, reason=quality_contract.reason)
         if evidence is not None:
             evidence.record("final_selection", population=population, selected_latent=selected,
+                            **({"gripper_rescue_mode": GRIPPER_RESCUE_MODE} if rescue_cache is not None else {}),
                             selected_index=best_idx, selected_quality=metrics.selected_reward,
                             selected_cost=metrics.selected_cost,
                             **({"quality_mode": cfg.qd_quality_mode,
@@ -7923,6 +7997,7 @@ class RDTSteer:
             ),
             qd_archive_mode=str(cfg.get("qd_archive_mode", "none")),
             qd_quality_mode=str(cfg.get("qd_quality_mode", "provider")),
+            qd_gripper_rescue_mode=str(cfg.get("qd_gripper_rescue_mode", "none")),
             qd_final_selection_mode=str(cfg.get("qd_final_selection_mode", DEFAULT_FINAL_SELECTION_MODE)),
             qd_degenerate_fallback_policy=str(
                 cfg.get("qd_degenerate_fallback_policy", "none")
@@ -8232,6 +8307,16 @@ class RDTSteer:
             for name, expected in required_lift.items():
                 if getattr(resolved, name) != expected:
                     raise ValueError(f"N18 lift quality requires {name}={expected!r}")
+        if resolved.qd_gripper_rescue_mode not in {"none", GRIPPER_RESCUE_MODE}:
+            raise ValueError("Unsupported QD gripper rescue mode")
+        if resolved.qd_gripper_rescue_mode == GRIPPER_RESCUE_MODE:
+            required_rescue = {"qd_quality_mode": ACTUATOR_CLIPPED_MODE,
+                "qd_parent_survivor_count": 0, "qd_sparse_exponent": 1.0,
+                "qd_metrics_observer": True, "qd_tie_break": "stable_fingerprint",
+                "qd_overflow_policy": "clamp_edge"}
+            for field_name, expected in required_rescue.items():
+                if getattr(resolved, field_name) != expected:
+                    raise ValueError(f"N24 parent rescue requires {field_name}={expected!r}")
         if resolved.qd_degenerate_fallback_policy not in {"none", "control_v1"}:
             raise ValueError(
                 "EDS qd_degenerate_fallback_policy must be none or control_v1"

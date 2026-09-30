@@ -433,6 +433,13 @@ class EDSChunkMetrics:
     qd_final_selection_mode: str = "archive_global_best"
     qd_terminal_population: dict = field(default_factory=dict)
     qd_archive_reference: dict = field(default_factory=dict)
+    qd_gripper_rescue_mode: str = "none"
+    qd_gripper_rescue_checks: int = 0
+    qd_gripper_rescue_updates: int = 0
+    qd_gripper_rescue_substitutions: int = 0
+    qd_gripper_rescue_actual_cells_by_iter: list[list[int]] = field(default_factory=list)
+    qd_gripper_rescue_overhead_seconds: float = 0.0
+    qd_gripper_rescue_allocation_scope: str = "qd slot counts/weights/covered-cell ratio describe original archive allocation; actual cells/descriptors/unique-cell ratio/source counts include rescue"
     qd_quality_mode: str = "provider"
     qd_quality_applicable: bool = False
     qd_quality_reason: str = "provider_mode"
@@ -545,6 +552,10 @@ class EDSChunkMetrics:
 
     def to_jsonable(self) -> dict[str, Any]:
         payload = _to_json_safe(self)
+        if self.qd_gripper_rescue_mode == "none":
+            for key in list(payload):
+                if key.startswith("qd_gripper_rescue_"):
+                    payload.pop(key)
         if self.qd_final_selection_mode == "archive_global_best":
             for key in ("qd_final_selection_mode", "qd_terminal_population", "qd_archive_reference"):
                 payload.pop(key)

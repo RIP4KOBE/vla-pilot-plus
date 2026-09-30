@@ -431,7 +431,7 @@ def _audit_n7_direction_height_assignment(kinds, final_event):
             "parent_slots_from_split_cells": parent_from_split}
 
 
-def _audit_n4_terminal_population(kinds, context, final_event):
+def _audit_n4_terminal_population(kinds, context, final_event, n24_actual=None):
     """Audit the actual N4 consumer; reference decoding is not a rollout.
 
     Called after the generic audit has checked providers, event sequence and
@@ -509,7 +509,7 @@ def _audit_n4_terminal_population(kinds, context, final_event):
         require(source["sequence"] < aggregate["sequence"] < effective["sequence"] < row["sequence"], "n4_same_call_order")
         if iteration >= 0:
             allocation, parent = allocations[iteration], parents[iteration]
-            av, pv = allocation["values"], parent["values"]
+            av, pv = (n24_actual[iteration] if n24_actual is not None else allocation["values"]), parent["values"]
             require(all(prior["sequence"] < allocation["sequence"] < parent["sequence"] < source["sequence"]
                         for prior in canonical if prior["values"]["iter_idx"] < iteration), "n4_parent_prior_only_order")
             pa = native(pv["source_population"], (16, 64, 128), actions.dtype)
@@ -744,7 +744,7 @@ def _audit_n4_terminal_population(kinds, context, final_event):
     require(tensor(cells) and cells.dtype == torch.int64 and cells.shape == (16,)
             and bool(((cells >= 0) & (cells < 16)).all()) and final["selected_cell"] == cells[selected_index].item(), "n4_selected_recorded_cell_mismatch")
     parent_cells = terminal["parent_cell_ids"]
-    expected_parent_cells = (parents[9]["values"]["parent_cell_ids"] if n11_mode
+    expected_parent_cells = (parents[9]["values"]["parent_cell_ids"] if n11_mode or n24_actual is not None
                              else allocations[9]["values"]["parent_cell_ids"])
     require(tensor(parent_cells) and parent_cells.dtype == torch.int64 and parent_cells.shape == (16,)
             and same(parent_cells, expected_parent_cells)
@@ -1069,7 +1069,20 @@ def audit_episode(episode_dir, episode_compute_file, *, arithmetic_backend=None)
                 require(value["source_fingerprints"] == fps, "parent_source_mismatch")
                 require(value["parent_fingerprints"] == [fps[i] for i in value["parent_indices"].tolist()], "parent_selection_mismatch")
                 require(value["original_archive_occurrences"] is None, "unsupported_archive_occurrence_claim")
-            archive_rows = {r["values"]["iter_idx"]: r["values"] for r in kinds["archive_parent_allocation"]}
+            n24_actual = None
+            n24_markers = bool(kinds["gripper_rescue_begin"] or kinds["gripper_rescue_cache"] or kinds["gripper_rescue_parents"]
+                or any(r["values"].get("gripper_rescue_mode") is not None
+                       for kind in ("parent_allocation", "final_selection") for r in kinds[kind]))
+            if n24_markers:
+                require(guided, "n24_unguided_markers")
+                from scripts.audit_gripper_parent_rescue import audit_rescue
+                n24_counts, n24_actual = audit_rescue(kinds, context, require, fingerprints)
+                gate = report.setdefault("n24_gripper_parent_rescue_audit", {
+                    "schema": "n24-native-gripper-parent-rescue-audit-v1",
+                    **{k: 0 for k in n24_counts}})
+                for key, value in n24_counts.items(): gate[key] += value
+            archive_rows = (n24_actual if n24_actual is not None else
+                {r["values"]["iter_idx"]: r["values"] for r in kinds["archive_parent_allocation"]})
             for row in kinds["parent_allocation"]:
                 value = row["values"]
                 if value["iter_idx"] in archive_rows:
@@ -1214,7 +1227,7 @@ def audit_episode(episode_dir, episode_compute_file, *, arithmetic_backend=None)
                 final_event = one("final_selection")
                 n9_mode = final_event["values"].get("qd_final_selection_mode") == "terminal_contact_sweep_v1"
                 n5_mode = final_event["values"].get("qd_final_selection_mode") == "terminal_grasp_proximity_v1"
-                n4 = _audit_n4_terminal_population(kinds, context, final_event)
+                n4 = _audit_n4_terminal_population(kinds, context, final_event, n24_actual=n24_actual)
                 if kinds["qd_parent_survivor_selection"]:
                     n11_gate = report.setdefault("n11_parent_survival_audit", {
                         "schema":"n11-native-exact-parent-survival-audit-v1",

@@ -124,6 +124,7 @@ main:
     qd_descriptor: target_relative_endpoint_xy
     # Optional executed_prefix_v1 (N2) / executed_feedback_v1 (N3); default unchanged.
     qd_quality_mode: provider
+    qd_gripper_rescue_mode: none
     # N4 changes only the final QD consumer; default archive selection is unchanged.
     qd_final_selection_mode: archive_global_best
     qd_grid_shape: [4, 4]

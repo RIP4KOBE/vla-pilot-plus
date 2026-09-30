@@ -328,6 +328,18 @@ def expand_candidate(candidate_id, candidate, baseline):
                 and {k: v for k, v in profile.items() if k != field} == inherited
                 and candidate.get('only_algorithm_change') == {field: {'before': 0, 'after': 4}},
                 'N11 must change only exact parent survivor count')
+    elif contract == 'n24_gripper_mode_parent_rescue_v1':
+        require(candidate_id == 'N24', 'N24 contract requires N24 identity')
+        parent = candidate.get('parent_candidate')
+        require(isinstance(parent, dict) and parent.get('path') == 'configs/qd_ed_final/candidate_n23.json'
+                and parent.get('sha256') == digest(ROOT / parent['path']), 'N24 parent N23 identity differs')
+        inherited = read_json(ROOT / parent['path'])['profile']
+        field = 'qd_gripper_rescue_mode'
+        require(set(profile) == set(inherited) | {field}
+                and profile.get(field) == 'canonical_full_close_v1'
+                and {k: v for k, v in profile.items() if k != field} == inherited
+                and candidate.get('only_algorithm_change') == {field: {'before': 'none', 'after': 'canonical_full_close_v1'}},
+                'N24 must change only the search-local gripper parent rescue')
     elif contract == 'n23_actuator_clipped_provider_quality_v1':
         require(candidate_id == 'N23', 'N23 contract requires N23 identity')
         parent = candidate.get('parent_candidate')
@@ -381,7 +393,9 @@ def expand_candidate(candidate_id, candidate, baseline):
     active = copy.deepcopy(baseline)
     active['historical_label'] = str(candidate['label'])
     active['restored_profile'] = copy.deepcopy(profile)
-    fields = (('qd_descriptor', 'qd_final_selection_mode', 'qd_parent_survivor_count')
+    fields = (('qd_descriptor', 'qd_final_selection_mode', 'qd_quality_mode', 'qd_gripper_rescue_mode')
+              if candidate_id == 'N24' else
+              ('qd_descriptor', 'qd_final_selection_mode', 'qd_parent_survivor_count')
               if candidate_id == 'N11' else
               ('qd_descriptor', 'qd_final_selection_mode', 'qd_quality_mode')
               if candidate_id in {'N18', 'N19', 'N20', 'N21', 'N22', 'N23'} else

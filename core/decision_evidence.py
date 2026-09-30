@@ -156,7 +156,9 @@ class DecisionEvidence:
                 frozen["source_fingerprints"] = fingerprints
                 frozen["parent_fingerprints"] = [fingerprints[i] for i in indices]
                 frozen["parent_source_occurrence_ids"] = [f"{frozen['source_pool_id']}:r{i}" for i in indices]
-                frozen["source_identity_scope"] = "eligible pool slots, which QD has already allocated; not original archive occurrences"
+                frozen["source_identity_scope"] = ("actual parent pool after conditional N24 canonical rescue; not an archive membership claim"
+                    if frozen.get("gripper_rescue_mode") == "canonical_full_close_v1" else
+                    "eligible pool slots, which QD has already allocated; not original archive occurrences")
                 frozen["original_archive_occurrences"] = None
             elif event in ("final_selection", "policy_action_decode"):
                 frozen["selected_canonical_fingerprint"] = _fingerprints(frozen["selected_latent"])[0]
