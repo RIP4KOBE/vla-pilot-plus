@@ -73,16 +73,26 @@ def _native_record(value):
 
 
 def _audit_n18_score(scoring, effective, aggregate):
-    """Recompute the N18 bonus from SHA-verified native candidates and projections."""
-    require(effective.get("quality_mode") == "close_then_lift_v1"
+    return _audit_lift_score(scoring, effective, aggregate, require_hold=False)
+
+
+def _audit_n22_score(scoring, effective, aggregate):
+    return _audit_lift_score(scoring, effective, aggregate, require_hold=True)
+
+
+def _audit_lift_score(scoring, effective, aggregate, *, require_hold):
+    """Independently reconstruct the declared lift mode from verified native evidence."""
+    mode = "close_hold_then_lift_v1" if require_hold else "close_then_lift_v1"
+    prefix = "n22" if require_hold else "n18"
+    require(effective.get("quality_mode") == mode
             and effective.get("target_index") == 0
-            and isinstance(effective.get("provider_identity"), dict), "n18_semantic_identity_missing")
+            and isinstance(effective.get("provider_identity"), dict), f"{prefix}_semantic_identity_missing")
     actions, xyz, keypoints = (scoring[name] for name in ("samples", "projected_xyz", "keypoints"))
     require(tensor(actions) and tensor(xyz) and tensor(keypoints)
             and actions.ndim == 3 and tuple(actions.shape[1:]) == (64, 128)
             and tuple(xyz.shape) == (len(actions), 9, 3)
             and keypoints.ndim == 2 and keypoints.shape[1] == 3 and len(keypoints) > 0,
-            "n18_native_input_shape_invalid")
+            f"{prefix}_native_input_shape_invalid")
     decoder_path = Path(__file__).resolve().parents[1] / "core" / "rdt_libero_action_converter.py"
     spec = importlib.util.spec_from_file_location("n18_audit_deployed_decoder", decoder_path)
     decoder = importlib.util.module_from_spec(spec)
@@ -90,19 +100,27 @@ def _audit_n18_score(scoring, effective, aggregate):
     decoded = decoder.rdt_action_to_libero_raw(actions[:, :8, :])
     require(tuple(decoded.shape) == (len(actions), 8, 7)
             and bool(((decoded[:, :, 6] == -1) | (decoded[:, :, 6] == 1)).all()),
-            "n18_deployed_gripper_decode_invalid")
+            f"{prefix}_deployed_gripper_decode_invalid")
     distance = torch.linalg.vector_norm(xyz[:, 1:9, :].float() - keypoints[0].float(), dim=2)
     eligible = (distance <= 0.04) & (decoded[:, :, 6] > 0)
     first = eligible.int().argmax(dim=1)
     contact_z = xyz.float()[torch.arange(len(actions)), first + 1, 2]
     rise = (xyz[:, 8, 2].float() - contact_z).clamp(min=0.0, max=0.05)
     bonus = torch.where(eligible.any(dim=1), rise.square(), torch.zeros_like(rise))
+    if require_hold:
+        # Independent scalar suffix reconstruction, not the production helper.
+        holds = torch.tensor([
+            all(decoded[row, step, 6].item() > 0
+                for step in range(int(first[row].item()), 8))
+            for row in range(len(actions))
+        ], dtype=torch.bool)
+        bonus = torch.where(holds, bonus, torch.zeros_like(bonus))
     raw = aggregate["aggregate_before_reward_mode"]
     bonus = bonus.to(raw.dtype)
     require(tensor(effective.get("lift_bonus")) and torch.equal(effective["lift_bonus"], bonus),
-            "n18_native_bonus_mismatch")
+            f"{prefix}_native_bonus_mismatch")
     expected = raw if not bool((bonus != 0).any()) else raw + bonus
-    require(torch.equal(effective["quality"], expected), "n18_raw_plus_bonus_mismatch")
+    require(torch.equal(effective["quality"], expected), f"{prefix}_raw_plus_bonus_mismatch")
     return int((bonus != 0).sum().item())
 
 
@@ -372,11 +390,11 @@ def _audit_n4_terminal_population(kinds, context, final_event):
         require(len(aggregates) == len(effectives) == 1, "n4_same_call_score_missing_or_duplicate")
         aggregate, effective = aggregates[0], effectives[0]; ev = effective["values"]
         require(ev.get("quality_mode", "provider") == value.get("quality_mode", "provider")
-                and ev.get("quality_mode", "provider") in {"provider", "close_then_lift_v1"}
+                and ev.get("quality_mode", "provider") in {"provider", "close_then_lift_v1", "close_hold_then_lift_v1"}
                 and ev["reward_mode"] == "normal" and ev["scoring_scope"] == aggregate["values"]["scoring_scope"] == scope,
                 "n4_original_provider_mode_mismatch")
         costs = native(ev["costs"], (16,), actions.dtype)
-        original = (ev.get("raw_provider_quality") if ev.get("quality_mode") == "close_then_lift_v1"
+        original = (ev.get("raw_provider_quality") if ev.get("quality_mode") in {"close_then_lift_v1", "close_hold_then_lift_v1"}
                     else quality)
         require(same(quality, ev["quality"])
                 and same(original, aggregate["values"]["aggregate_before_reward_mode"])
@@ -452,7 +470,7 @@ def _audit_n4_terminal_population(kinds, context, final_event):
 
     final = final_event["values"]; terminal = final["terminal_population"]; archive = final["archive_reference"]
     last = canonical[-1]; last_values = last["values"]
-    lift_mode = final.get("quality_mode") == "close_then_lift_v1"
+    lift_mode = final.get("quality_mode") in {"close_then_lift_v1", "close_hold_then_lift_v1"}
     terminal_raw = (last_values.get("raw_provider_quality") if lift_mode
                     else last_values["effective_quality"])
     require(tensor(terminal_raw) and terminal_raw.shape == (16,)
@@ -464,7 +482,7 @@ def _audit_n4_terminal_population(kinds, context, final_event):
                                          "terminal_grasp_proximity" if n5_mode else "terminal_population_first_argmin")
             and final.get("qd_final_selection_mode") == ("terminal_contact_sweep_v1" if n9_mode else
                                                          "terminal_grasp_proximity_v1" if n5_mode else "terminal_population_v1")
-            and final.get("quality_mode", "provider") in {"provider", "close_then_lift_v1"}, "n4_final_mode_mismatch")
+            and final.get("quality_mode", "provider") in {"provider", "close_then_lift_v1", "close_hold_then_lift_v1"}, "n4_final_mode_mismatch")
     require(last["sequence"] < final_event["sequence"] < one("policy_action_decode")["sequence"], "n4_final_order")
     require(terminal["iter_idx"] == 9 and terminal["canonical_event_sequence"] == last["sequence"]
             and terminal["scoring_batch_id"] == scoring[9]["sequence"], "n4_last_canonical_source_mismatch")
@@ -899,7 +917,7 @@ def audit_episode(episode_dir, episode_compute_file):
             dual_modes = {r["values"].get("quality_mode")
                           for kind in ("canonical_candidate_batch", "effective_quality", "final_selection")
                           for r in kinds[kind] if r["values"].get("quality_mode") in
-                          {"executed_prefix_v1", "executed_feedback_v1", "close_then_lift_v1"}}
+                          {"executed_prefix_v1", "executed_feedback_v1", "close_then_lift_v1", "close_hold_then_lift_v1"}}
             require(len(dual_modes) <= 1, "dual_quality_mixed_modes")
             dual_mode = next(iter(dual_modes), None)
             dual_active = dual_mode is not None
@@ -1004,10 +1022,13 @@ def audit_episode(episode_dir, episode_compute_file):
                     require(tensor(raw) and raw.shape == aggregate.shape and raw.dtype == aggregate.dtype
                             and torch.equal(raw, aggregate), "n2_raw_aggregate_mismatch")
                     require(effective[0]["reward_mode"] == "normal", "n2_reward_mode_invalid")
-                    if dual_mode == "close_then_lift_v1":
-                        changed = _audit_n18_score(score["values"], effective[0], aggregates[0])
-                        gate = report.setdefault("n18_lift_quality_audit", {
-                            "schema": "n18-native-close-then-lift-audit-v1",
+                    if dual_mode in {"close_then_lift_v1", "close_hold_then_lift_v1"}:
+                        hold_mode = dual_mode == "close_hold_then_lift_v1"
+                        auditor = _audit_n22_score if hold_mode else _audit_n18_score
+                        changed = auditor(score["values"], effective[0], aggregates[0])
+                        gate = report.setdefault("n22_hold_lift_quality_audit" if hold_mode else "n18_lift_quality_audit", {
+                            "schema": ("n22-native-close-hold-then-lift-audit-v1" if hold_mode
+                                       else "n18-native-close-then-lift-audit-v1"),
                             "score_batches_verified": 0, "candidate_scores_verified": 0,
                             "positive_bonus_candidates": 0, "rank_changed_batches": 0,
                         })
@@ -1069,7 +1090,7 @@ def audit_episode(episode_dir, episode_compute_file):
                              or r["values"].get("qd_final_selection_mode") in {"terminal_population_v1", "terminal_grasp_proximity_v1", "terminal_contact_sweep_v1"}
                              or "terminal_population" in r["values"] for r in kinds["final_selection"])
             if n4_markers or kinds["terminal_population_stage_binding"]:
-                require(guided and (not dual_active or dual_mode == "close_then_lift_v1"),
+                require(guided and (not dual_active or dual_mode in {"close_then_lift_v1", "close_hold_then_lift_v1"}),
                         "n4_unguided_or_unsupported_quality")
                 final_event = one("final_selection")
                 n9_mode = final_event["values"].get("qd_final_selection_mode") == "terminal_contact_sweep_v1"

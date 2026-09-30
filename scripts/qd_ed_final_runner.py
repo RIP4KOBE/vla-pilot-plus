@@ -311,6 +311,21 @@ def expand_candidate(candidate_id, candidate, baseline):
                 and {k: v for k, v in profile.items() if k != field} == inherited
                 and candidate.get('only_algorithm_change') == {field: {'before': 0, 'after': 4}},
                 'N11 must change only exact parent survivor count')
+    elif contract == 'n22_hold_conditioned_lift_quality_v1':
+        require(candidate_id == 'N22', 'N22 contract requires N22 identity')
+        parent = candidate.get('parent_candidate')
+        require(isinstance(parent, dict) and parent.get('path') == 'configs/qd_ed_final/candidate_n21.json'
+                and parent.get('sha256') == digest(ROOT / parent['path']),
+                'N22 parent N21 profile identity differs')
+        inherited = read_json(ROOT / parent['path'])['profile']
+        field = 'qd_quality_mode'
+        require(set(profile) == set(inherited)
+                and profile.get(field) == 'close_hold_then_lift_v1'
+                and {k: v for k, v in profile.items() if k != field}
+                    == {k: v for k, v in inherited.items() if k != field}
+                and candidate.get('only_algorithm_change') == {
+                    field: {'before': 'close_then_lift_v1', 'after': 'close_hold_then_lift_v1'}},
+                'N22 must change only N21 lift quality hold eligibility')
     elif contract in {'n18_close_then_lift_quality_only_v1',
                       'n19_corrected_close_then_lift_quality_v1',
                       'n20_terminal_raw_lift_quality_v1', 'n21_stage_raw_lift_quality_v1'}:
@@ -338,7 +353,7 @@ def expand_candidate(candidate_id, candidate, baseline):
     fields = (('qd_descriptor', 'qd_final_selection_mode', 'qd_parent_survivor_count')
               if candidate_id == 'N11' else
               ('qd_descriptor', 'qd_final_selection_mode', 'qd_quality_mode')
-              if candidate_id in {'N18', 'N19', 'N20', 'N21'} else
+              if candidate_id in {'N18', 'N19', 'N20', 'N21', 'N22'} else
               ('qd_descriptor', 'qd_final_selection_mode')
               if candidate_id in {'N6', 'N7', 'N9'} else (field,))
     for changed_field in fields:

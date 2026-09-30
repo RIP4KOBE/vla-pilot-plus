@@ -38,7 +38,10 @@ from core.qd_executed_feedback import (
 from core.qd_executed_quality import (
     ExecutedPrefixContract, executed_prefix_quality, recognize_executed_prefix_provider,
 )
-from core.qd_lift_quality import MODE as LIFT_MODE, LiftAfterCloseContract, close_then_lift_bonus
+from core.qd_lift_quality import (
+    HOLD_MODE as HOLD_LIFT_MODE, LIFT_MODES,
+    LiftAfterCloseContract, close_then_lift_bonus, close_hold_then_lift_bonus,
+)
 from core.qd_terminal_population import (
     MODE as TERMINAL_POPULATION_MODE, DEFAULT_MODE as DEFAULT_FINAL_SELECTION_MODE, TerminalPopulation,
 )
@@ -2081,7 +2084,10 @@ class RDTSteer:
             quality_info["qd_scored_actions"] = samples.detach().clone()
             if isinstance(qd_quality_contract, LiftAfterCloseContract):
                 decoded = self._decode_visualization_action_candidates(samples)
-                bonus = close_then_lift_bonus(
+                bonus_function = (close_hold_then_lift_bonus
+                                  if qd_quality_contract.mode == HOLD_LIFT_MODE
+                                  else close_then_lift_bonus)
+                bonus = bonus_function(
                     projection_out["projected_xyz"], scoring_keypoints, decoded,
                     target_index=qd_quality_contract.target_index,
                 ).to(device=rewards.device, dtype=rewards.dtype)
@@ -4920,14 +4926,14 @@ class RDTSteer:
         feedback_setup_started = time.perf_counter() if cfg.qd_quality_mode == FEEDBACK_MODE else None
         quality_contract = None
         quality_reason = "provider_mode"
-        if cfg.qd_quality_mode in {"executed_prefix_v1", FEEDBACK_MODE, LIFT_MODE}:
+        if cfg.qd_quality_mode in {"executed_prefix_v1", FEEDBACK_MODE, *LIFT_MODES}:
             if self._action_chunk_horizon != 8:
                 raise ValueError("Executed-prefix quality requires action_chunk_horizon=8")
             quality_contract, quality_reason = recognize_executed_prefix_provider(guidance_fns, keypoints)
-            if cfg.qd_quality_mode == LIFT_MODE:
+            if cfg.qd_quality_mode in LIFT_MODES:
                 if quality_contract is None:
                     raise RuntimeError(f"N18 provider semantic identity unavailable: {quality_reason}")
-                quality_contract = LiftAfterCloseContract(quality_contract)
+                quality_contract = LiftAfterCloseContract(quality_contract, mode=cfg.qd_quality_mode)
             if cfg.qd_quality_mode == FEEDBACK_MODE:
                 if not hasattr(self, "_executed_feedback"):
                     self._executed_feedback = ExecutedFeedbackHistory()
@@ -8138,11 +8144,11 @@ class RDTSteer:
         if resolved.qd_final_selection_mode not in {DEFAULT_FINAL_SELECTION_MODE, TERMINAL_POPULATION_MODE, GRASP_TIMING_MODE, CONTACT_SWEEP_MODE}:
             raise ValueError("EDS qd_final_selection_mode is unsupported")
         if resolved.qd_final_selection_mode in {TERMINAL_POPULATION_MODE, GRASP_TIMING_MODE, CONTACT_SWEEP_MODE}:
-            terminal_lift_quality = (resolved.qd_quality_mode == LIFT_MODE
+            terminal_lift_quality = (resolved.qd_quality_mode in LIFT_MODES
                                      and resolved.qd_final_selection_mode == GRASP_TIMING_MODE
                                      and resolved.qd_descriptor == DIRECTION_HEIGHT_DESCRIPTOR)
             required_terminal = {
-                "qd_quality_mode": LIFT_MODE if terminal_lift_quality else "provider",
+                "qd_quality_mode": resolved.qd_quality_mode if terminal_lift_quality else "provider",
                 "reward_mode": "normal",
                 "qd_archive_mode": "grid_archive",
                 "qd_descriptor": (resolved.qd_descriptor
@@ -8165,7 +8171,7 @@ class RDTSteer:
         if (resolved.qd_final_selection_mode == CONTACT_SWEEP_MODE
                 and resolved.qd_descriptor != DIRECTION_HEIGHT_DESCRIPTOR):
             raise ValueError("N9 contact sweep requires the frozen N7 direction-height descriptor")
-        if resolved.qd_quality_mode not in {"provider", "executed_prefix_v1", FEEDBACK_MODE, LIFT_MODE}:
+        if resolved.qd_quality_mode not in {"provider", "executed_prefix_v1", FEEDBACK_MODE, *LIFT_MODES}:
             raise ValueError("EDS qd_quality_mode is unsupported")
         if resolved.qd_quality_mode in {"executed_prefix_v1", FEEDBACK_MODE}:
             required_quality = {
@@ -8184,7 +8190,7 @@ class RDTSteer:
             for name, expected in required_quality.items():
                 if getattr(resolved, name) != expected:
                     raise ValueError(f"Executed-prefix quality requires {name}={expected!r}")
-        if resolved.qd_quality_mode == LIFT_MODE:
+        if resolved.qd_quality_mode in LIFT_MODES:
             required_lift = {
                 "reward_mode": "normal", "qd_archive_mode": "grid_archive",
                 "qd_descriptor": DIRECTION_HEIGHT_DESCRIPTOR,

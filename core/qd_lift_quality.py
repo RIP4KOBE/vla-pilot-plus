@@ -9,6 +9,8 @@ from core.qd_executed_quality import ExecutedPrefixContract
 
 
 MODE = "close_then_lift_v1"
+HOLD_MODE = "close_hold_then_lift_v1"
+LIFT_MODES = frozenset({MODE, HOLD_MODE})
 CONTACT_RADIUS_M = 0.04
 LIFT_CAP_M = 0.05
 
@@ -28,12 +30,27 @@ class LiftAfterCloseContract:
 
     def validate(self, providers):
         self.base.validate(providers)
+        if self.mode not in LIFT_MODES:
+            raise RuntimeError("Unsupported lift quality mode")
         if self.target_index != 0:
             raise RuntimeError("N18 requires target keypoint zero")
 
 
 def close_then_lift_bonus(projected_xyz: Tensor, keypoints: Tensor,
                           decoded_actions: Tensor, *, target_index: int) -> Tensor:
+    return _lift_bonus(projected_xyz, keypoints, decoded_actions,
+                       target_index=target_index, require_hold=False)
+
+
+def close_hold_then_lift_bonus(projected_xyz: Tensor, keypoints: Tensor,
+                               decoded_actions: Tensor, *, target_index: int) -> Tensor:
+    """Credit lift only when the first eligible close is held through action eight."""
+    return _lift_bonus(projected_xyz, keypoints, decoded_actions,
+                       target_index=target_index, require_hold=True)
+
+
+def _lift_bonus(projected_xyz: Tensor, keypoints: Tensor, decoded_actions: Tensor,
+                *, target_index: int, require_hold: bool) -> Tensor:
     if not torch.is_tensor(projected_xyz) or projected_xyz.ndim != 3 or tuple(projected_xyz.shape[1:]) != (9, 3):
         raise ValueError("N18 projection must be B×9×3")
     batch = projected_xyz.shape[0]
@@ -56,6 +73,11 @@ def close_then_lift_bonus(projected_xyz: Tensor, keypoints: Tensor,
     contact_z = xyz[torch.arange(batch, device=xyz.device), first + 1, 2]
     lift = (xyz[:, 8, 2] - contact_z).clamp(min=0.0, max=LIFT_CAP_M)
     bonus = torch.where(eligible.any(dim=1), lift.square(), torch.zeros_like(lift))
+    if require_hold:
+        # A later reclose cannot erase an earlier release after first contact.
+        suffix = torch.arange(8, device=grip.device).view(1, 8) >= first.view(-1, 1)
+        holds_to_end = ((grip > 0) | ~suffix).all(dim=1)
+        bonus = torch.where(holds_to_end, bonus, torch.zeros_like(bonus))
     if not bool(torch.isfinite(bonus).all().item()):
         raise FloatingPointError("N18 lift bonus nonfinite")
     return bonus.detach()
