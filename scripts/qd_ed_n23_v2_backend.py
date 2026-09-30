@@ -60,13 +60,15 @@ def validate_plan(plan):
     worker.require(EXTRA_SOURCE <= {r['path'] for r in plan['source']['files']}, 'preflight required source absent')
     worker.require(plan['corpus'] == corpus_from_index(plan['corpus']['index']), 'preflight corpus changed')
     if plan.get('uuid_repair') is not None:
-        from scripts import qd_ed_n23_uuid_repair as repair
+        repair=contract.repair_module(plan['uuid_repair'])
         repair.validate_plan(plan)
     predecessor_gate(plan['predecessor_review'])
     return worker.read_ref(plan['runtime'])
 
 
 def artifact_name(plan,kind):
+    if plan.get('uuid_repair',{}).get('schema')=='n23-uuid-native-repair-binding-v2':
+        return 'n23-backend-uuid-native-repair-'+kind+'-v2.json'
     prefix='n23-backend-uuid-repair' if plan.get('uuid_repair') is not None else 'n23-backend-preflight'
     return prefix+'-'+kind+('-v1.json' if plan.get('uuid_repair') is not None else '.json')
 
@@ -171,6 +173,8 @@ def verify_preflight_proof(plan_path, report_path, attempt_result, future_source
                    and len(report['batches']) == 176 and sum(r['candidates'] for r in report['batches']) == 2816
                    and len(report['synthetic']) == 2 and all(r['accepted'] and not r['mismatches'] for r in report['batches'] + report['synthetic'])
                    and report.get('wrong_bounds_rejected') is True, 'preflight CUDA coverage or strict arithmetic proof missing')
+    if plan.get('uuid_repair',{}).get('schema')=='n23-uuid-native-repair-binding-v2':
+        contract.repair_module(plan['uuid_repair']).verify_identity(backend,runtime)
     return {'path': str(Path(report_path).resolve()), 'sha256': worker.sha(report_path)}
 
 

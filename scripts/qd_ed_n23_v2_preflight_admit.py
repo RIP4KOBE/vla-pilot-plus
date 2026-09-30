@@ -22,13 +22,14 @@ def diagnostic_row(plan=None):
     row= {'split': 'backend_diagnostic', 'iteration': contract.PREFLIGHT, 'profile': 'N23_backend',
             'task_id': -1, 'env_seed': -1, 'policy_seed': -1, 'init_index': -1,
             'episode_key': 'n23_backend_preflight_v2_once', 'budget_bucket': 'recovery', 'timeout_seconds': 120}
-    if plan is not None and plan.get('uuid_repair') is not None:row['episode_key']='n23_backend_uuid_repair_once'
+    if plan is not None and plan.get('uuid_repair') is not None:
+        row['episode_key']='n23_backend_uuid_native_repair_once' if plan['uuid_repair'].get('schema')=='n23-uuid-native-repair-binding-v2' else 'n23_backend_uuid_repair_once'
     return row
 
 
 def admission(plan, state, events, resources, reservations, *, root=ROOT):
     if plan.get('uuid_repair') is not None:
-        from scripts import qd_ed_n23_uuid_repair as repair
+        repair=contract.repair_module(plan['uuid_repair'])
         return repair.admission(plan,state,events,resources,reservations,root=root,r=vars(runner))
     contract.require_state(state, vars(runner))
     runner.require(plan['source'] == worker.source_record(root, contract.source_paths(vars(runner)))
@@ -75,7 +76,8 @@ def run(plan_path, *, root=ROOT):
             device = gpu_gate(runtime, resources, root=root)
             repaired=plan.get('uuid_repair') is not None
             retry={'retry_of':plan['uuid_repair']['retry_of']} if repaired else {}
-            attempt_id=state['run_name']+('__n23_backend_uuid_repair__' if repaired else '__n23_backend_preflight_v2__')+uuid.uuid4().hex[:12]
+            prefix='__n23_backend_uuid_native_repair__' if repaired and plan['uuid_repair'].get('schema')=='n23-uuid-native-repair-binding-v2' else ('__n23_backend_uuid_repair__' if repaired else '__n23_backend_preflight_v2__')
+            attempt_id=state['run_name']+prefix+uuid.uuid4().hex[:12]
             output = runner.owned(Path(plan['artifact_root']) / 'attempts' / attempt_id, plan['artifact_root'])
             runner.require(not output.exists(), 'N23 preflight output already exists')
             output.mkdir(parents=True)
@@ -108,7 +110,7 @@ def run(plan_path, *, root=ROOT):
             with runner.locked(root / 'data/qd-ed-state.lock'):
                 state = runner.read_state(root / 'research-state.yaml'); contract.require_state(state, vars(runner))
                 if repaired:
-                    from scripts import qd_ed_n23_uuid_repair as repair
+                    repair=contract.repair_module(plan['uuid_repair'])
                     repair.authority(plan['uuid_repair'],plan['source'],plan['runtime'],state)
                 runner.require(runner.check_budget(state, runner.read_events(root / 'data/attempt-ledger.jsonl'), row,
                     runner.read_events(root / 'data/gpu-healthcheck-ledger.jsonl'),

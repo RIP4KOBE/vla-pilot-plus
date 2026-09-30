@@ -43,7 +43,9 @@ EXTRA_SOURCE={'scripts/qd_ed_n23_v2_contract.py','scripts/qd_ed_n23_v2_predecess
  'experiments/iteration_023_actuator_clipped_quality/budget-amendment-v2.md',
  'experiments/iteration_023_actuator_clipped_quality/closed-runtime-admission-v2.md',
  'scripts/qd_ed_n23_uuid_repair.py','tests/test_qd_ed_n23_uuid_repair.py',
- 'experiments/iteration_023_actuator_clipped_quality/uuid-repair-engineering-exception-v1.md'}
+ 'experiments/iteration_023_actuator_clipped_quality/uuid-repair-engineering-exception-v1.md',
+ 'scripts/qd_ed_n23_uuid_native_repair.py','tests/test_qd_ed_n23_uuid_native_repair.py',
+ 'experiments/iteration_023_actuator_clipped_quality/uuid-native-repair-engineering-exception-v2.md'}
 sha=worker.sha
 ref=v1.ref
 _SCOPE=None
@@ -164,9 +166,20 @@ SCIENTIFIC_BASE='1bcf888e88181580bfb854b2e7aa1834bf85df99'
 ALLOWED_EXISTING={'scripts/qd_ed_final_runner.py','scripts/qd_ed_n23_preflight_admit.py'}
 
 
+def repair_module(meta):
+    """Only the two explicit historical engineering exception schemas route."""
+    if isinstance(meta,dict) and meta.get('schema')=='n23-uuid-repair-binding-v1':
+        from scripts import qd_ed_n23_uuid_repair as selected
+    elif isinstance(meta,dict) and meta.get('schema')=='n23-uuid-native-repair-binding-v2':
+        from scripts import qd_ed_n23_uuid_native_repair as selected
+    else:
+        raise ValueError('unrecognized N23 UUID repair authority schema')
+    return selected
+
+
 def source_delta(root,*,repair=None):
     if repair is not None:
-        from scripts import qd_ed_n23_uuid_repair as uuid_repair
+        uuid_repair=repair_module(repair)
         worker.require(repair==uuid_repair.binding(),'UUID repair source scope binding differs')
         return uuid_repair.source_delta(root)
     import subprocess
@@ -184,7 +197,7 @@ def predecessor_review():
 
 def final_review(source, runtime_ref,*,repair=None):
     if repair is not None:
-        from scripts import qd_ed_n23_uuid_repair as uuid_repair
+        uuid_repair=repair_module(repair)
         worker.require(repair==uuid_repair.binding(),'UUID repair review binding differs')
         return uuid_repair.final_review(source,runtime_ref)
     reference = ref(FINAL_REVIEW); review = worker.read_ref(reference)
@@ -206,7 +219,7 @@ def backend_proof(reference, source, root, r):
                  and plan['predecessor_review'] == predecessor_review(), 'N23 preflight runtime/source/predecessor differs')
     events = r['read_events'](Path(root) / 'data/attempt-ledger.jsonl')
     if plan.get('uuid_repair') is not None:
-        from scripts import qd_ed_n23_uuid_repair as uuid_repair
+        uuid_repair=repair_module(plan['uuid_repair'])
         terminal=uuid_repair.verify_lineage(plan,reference,events,source,r)
         r['require'](backend.verify_preflight_proof(reference['plan']['path'],reference['report']['path'],terminal,source)
             ==reference['report'],'UUID repair backend proof hash differs')
@@ -272,7 +285,7 @@ def validate_contract(plan, manifest, runtime, seeds, root, r):
     validate_runtime(runtime, root, r)
     state=r['read_state'](Path(root) / 'research-state.yaml');require_state(state,r)
     if meta.get('uuid_repair') is not None:
-        from scripts import qd_ed_n23_uuid_repair as uuid_repair
+        uuid_repair=repair_module(meta['uuid_repair'])
         uuid_repair.authority(meta['uuid_repair'],source,ref(GPU7_RUNTIME),state)
 
 
