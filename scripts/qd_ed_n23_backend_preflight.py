@@ -137,7 +137,8 @@ def check_batch(batch, backend):
            'dtype': str(actions.dtype), 'candidates': len(raw), 'mismatches': [],
            'production_helper_passed': False, 'independent_passed': False}
     # Record every mismatching candidate for both raw boundaries, without a tolerance.
-    weights = torch.tensor([1., 1., 1., 1., 3., 3., 3.], device=actions.device) / 13
+    weights = torch.tensor([1., 1., 1., 1., 3., 3., 3.], device=actions.device)
+    weights = weights / weights.sum()
     for i in range(len(raw)):
         origin = origins[i].to(device=actions.device, dtype=actions.dtype)
         projected = origin + torch.cumsum(actions[i, :8, 39:42] * .01, dim=0)
@@ -191,7 +192,8 @@ def synthetic_batches(backend):
         xyz = torch.stack([torch.cat((origin.to(device=backend.device, dtype=dtype)[None],
                             origin.to(device=backend.device, dtype=dtype) + torch.cumsum(a[:, :3] * .01, dim=0))) for a in guided])
         keypoints = torch.tensor([[.1124, -.071, .3154]], device=backend.device, dtype=dtype)
-        weights = torch.tensor([1., 1., 1., 1., 3., 3., 3.], device=backend.device) / 13
+        weights = torch.tensor([1., 1., 1., 1., 3., 3., 3.], device=backend.device)
+        weights = weights / weights.sum()
         raw = torch.stack([(-(torch.norm(p[None, 1:8] - keypoints[0], dim=-1) ** 2 * weights).sum(1)).mean().to(dtype) for p in xyz])
         yield {'decision_id': 'synthetic_' + str(dtype), 'score_sequence': -1, 'samples': actions,
                'projected_xyz': xyz, 'keypoints': keypoints, 'raw': raw, 'origins': [origin] * 4}

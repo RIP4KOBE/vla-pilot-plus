@@ -600,3 +600,123 @@ def test_v2_preflight_persists_identity_diagnostic_before_any_arithmetic(tmp_pat
     assert report['identity_diagnostic']['expected_uuid']==CANONICAL_GPU7_UUID
     assert report['identity_diagnostic']['visible_device_count']==1
     assert not torch.cuda.is_initialized()
+
+
+class CudaScalarDivisionCpuModel(torch.utils._python_dispatch.TorchDispatchMode):
+    """Pinned CUDA div branch only; other operations intentionally remain CPU.
+
+    PyTorch v2.7.1 BinaryDivTrueKernel.cu32-50 rounds reciprocal before multiply
+    for CPU scalar divisors, unlike device-tensor divisors. This is a falsifiable
+    branch model, not a claim to emulate CUDA reductions or pass a GPU preflight.
+    """
+    def __init__(self):
+        super().__init__();self.scalar_divisions=0;self.tensor_divisions=0
+
+    def __torch_dispatch__(self,func,types,args=(),kwargs=None):
+        if func==torch.ops.aten.div.Tensor and len(args)>1 and args[0].dtype==torch.float32:
+            if isinstance(args[1],(int,float)):
+                import numpy as np
+                self.scalar_divisions+=1
+                reciprocal=float(np.float32(1.)/np.float32(args[1]))
+                return torch.mul(args[0],reciprocal)
+            if torch.is_tensor(args[1]):self.tensor_divisions+=1
+        return func(*args,**(kwargs or {}))
+
+
+def test_cuda_divisor_branch_model_has_exact_weight_and_bf16_rounding_boundary():
+    weights=torch.tensor([1.,1.,1.,1.,3.,3.,3.])
+    with CudaScalarDivisionCpuModel() as model:
+        direct=weights/weights.sum();reciprocal=weights/13
+    assert model.scalar_divisions==model.tensor_divisions==1
+    assert direct.view(torch.int32).tolist()==[1033734617]*4+[1047285445]*3
+    assert reciprocal.view(torch.int32).tolist()==[1033734617]*4+[1047285446]*3
+    distances=torch.tensor([.2421875,.08203125,.08984375,.208984375,.1943359375,.2890625,.2890625],dtype=torch.bfloat16)
+    x=-(distances.square()*direct).sum();y=-(distances.square()*reciprocal).sum()
+    assert x.item()==-.0562744140625 and y.item()==-.0562744177877903
+    assert x.to(torch.bfloat16).item()==-.05615234375
+    assert y.to(torch.bfloat16).item()==-.056396484375
+    assert not torch.cuda.is_initialized()
+
+
+def audit_boundary_fixture(index,dtype):
+    generator=torch.Generator().manual_seed(230930)
+    for _ in range(index+1):actions=(torch.randn(16,64,128,generator=generator)*2).to(dtype)
+    origin=torch.tensor([.12317,-.17312,.23141],dtype=torch.float64)
+    xyz=torch.stack([torch.cat((origin.to(dtype)[None],origin.to(dtype)+torch.cumsum(a*.01,0)))
+        for a in actions[:,:8,[39,40,41]]])
+    keypoints=torch.tensor([[.1124,-.071,.3154]],dtype=dtype)
+    weights=torch.tensor([1.,1.,1.,1.,3.,3.,3.]);weights=weights/weights.sum()
+    raw=torch.stack([(-(torch.norm(v[None,1:8]-keypoints[0],dim=-1)**2*weights).sum(1)).mean().to(dtype) for v in xyz])
+    return {'decision_id':'synthetic_branch_boundary_'+str(index),'score_sequence':-1,'samples':actions,
+        'projected_xyz':xyz,'keypoints':keypoints,'raw':raw,'origins':[origin]*16}
+
+
+def old_scalar_check_batch():
+    """Load only the exact two historical function bodies from committed source."""
+    import ast
+    def historical_function(path,name,namespace):
+        original=subprocess.check_output(['git','show','fbe5ac996467e00fcbc7a1d7e5f24659725f6b3d:'+path],
+            cwd=Path(__file__).resolve().parents[1],text=True)
+        function=next(n for n in ast.parse(original).body if isinstance(n,ast.FunctionDef) and n.name==name)
+        namespace=dict(namespace);exec(compile(ast.Module(body=[function],type_ignores=[]),path,'exec'),namespace)
+        return namespace[name]
+    reconstruction=historical_function('scripts/audit_decision_evidence.py','reconstruct_n23_arithmetic',vars(audit))
+    oldaudit=SimpleNamespace(**{**vars(audit),'reconstruct_n23_arithmetic':reconstruction})
+    return historical_function('scripts/qd_ed_n23_backend_preflight.py','check_batch',{**vars(preflight),'audit':oldaudit})
+
+
+@pytest.mark.parametrize('index,expected_checks',[(4,{'clipped_quality_or_mask'}),(8,{'raw_score','independent_arithmetic'})])
+def test_old_audit_cuda_branch_defect_reproduced_and_corrected_without_tolerance(index,expected_checks):
+    batch=audit_boundary_fixture(index,torch.bfloat16);backend=backends.create_backend('cpu')
+    previous=old_scalar_check_batch()
+    with CudaScalarDivisionCpuModel() as oldmodel:failed=previous(batch,backend)
+    assert {v['check'] for v in failed['mismatches']}==expected_checks and not failed['accepted']
+    assert failed['production_helper_passed'] and oldmodel.scalar_divisions>0
+    with CudaScalarDivisionCpuModel() as fixedmodel:passed=preflight.check_batch(batch,backend)
+    assert passed['accepted'] and passed['production_helper_passed'] and passed['independent_passed']
+    assert passed['wrong_score_rejected'] and fixedmodel.scalar_divisions==0 and fixedmodel.tensor_divisions>0
+    assert not torch.cuda.is_initialized()
+
+
+@pytest.mark.parametrize('dtype',[torch.float32,torch.bfloat16])
+def test_corrected_exact_audit_survives_layout_and_dtype_boundaries(dtype):
+    batch=audit_boundary_fixture(8,dtype);a=batch['samples']
+    gathered=a[:,:8,[39,40,41]];view=a[:,:8,39:42]
+    assert gathered.stride()==(24,3,1) and view.stride()==(8192,128,1)
+    # Different input views produce identical elementwise/projector values on CPU.
+    assert torch.equal(gathered,view)
+    for row in range(16):
+        assert torch.equal(torch.cumsum(gathered[row]*.01,0),torch.cumsum(view[row]*.01,0))
+    with CudaScalarDivisionCpuModel() as model:
+        checked=preflight.check_batch(batch,backends.create_backend('cpu'))
+    assert checked['accepted'] and model.scalar_divisions==0 and model.tensor_divisions==3
+    assert not torch.cuda.is_initialized()
+
+
+@pytest.mark.parametrize('fault',['raw','quality','mask','bounds'])
+def test_corrected_branch_keeps_exact_negative_controls(fault):
+    batch=audit_boundary_fixture(8,torch.bfloat16);backend=backends.create_backend('cpu')
+    with CudaScalarDivisionCpuModel():
+        if fault=='raw':
+            batch['raw'][0]=torch.nextafter(batch['raw'][0],torch.full_like(batch['raw'][0],float('inf')))
+            result=preflight.check_batch(batch,backend)
+            assert not result['accepted'] and any(v['check']=='raw_score' for v in result['mismatches'])
+        elif fault=='bounds':assert preflight.wrong_bounds_rejected()
+        else:
+            quality,mask=audit.reconstruct_n23_arithmetic(batch['samples'],batch['projected_xyz'],batch['keypoints'],batch['raw'],batch['origins'])
+            effective={'quality':quality.clone(),'clipped_prefix_mask':mask.clone()}
+            if fault=='quality':effective['quality'][0]=torch.nextafter(quality[0],torch.full_like(quality[0],float('inf')))
+            else:effective['clipped_prefix_mask'][0]=~mask[0]
+            with pytest.raises(audit.AuditFailure):audit.verify_n23_quality(quality,mask,effective)
+    assert not torch.cuda.is_initialized()
+
+
+def test_both_original_synthetic_cases_use_tensor_denominator_throughout():
+    backend=backends.create_backend('cpu')
+    with CudaScalarDivisionCpuModel() as model:
+        cases=list(preflight.synthetic_batches(backend))
+        rows=[preflight.check_batch(v,backend) for v in cases]
+    assert all(v['accepted'] and v['wrong_score_rejected'] for v in rows)
+    assert [v['samples'].dtype for v in cases]==[torch.float32,torch.bfloat16]
+    assert model.scalar_divisions==0 and model.tensor_divisions==8
+    assert not torch.cuda.is_initialized()

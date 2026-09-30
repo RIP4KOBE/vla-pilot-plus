@@ -160,7 +160,9 @@ def reconstruct_n23_arithmetic(actions, xyz, keypoints, raw, source_origins):
     commands = actions[:, :8, 39:42]
     affected = ((commands[:, :7] > 1) | (commands[:, :7] < -1)).any(dim=(1, 2))
     expected = raw.clone()
-    weights = torch.tensor([1, 1, 1, 1, 3, 3, 3], dtype=torch.float32, device=actions.device) / 13
+    weights = torch.tensor([1, 1, 1, 1, 3, 3, 3], dtype=torch.float32, device=actions.device)
+    # A Python scalar divisor takes a different CUDA reciprocal kernel.
+    weights = weights / weights.sum()
     for i, native_origin in enumerate(source_origins):
         source = native_origin.to(device=actions.device, dtype=actions.dtype)
         full_raw = source + torch.cumsum(commands[i] * 0.01, dim=0)
