@@ -34,7 +34,7 @@ def admission(plan, state, events, resources, reservations, *, root=ROOT):
     contract.validate_runtime(runtime, root, vars(runner))
     runner.require(Path(plan['artifact_root']).resolve() == Path(state['artifacts']).resolve()
         and Path(state.get('worktree', root)).resolve() == Path(root).resolve(), 'N23 private artifact/worktree differs')
-    runner.require(not any(e.get('identity', {}).get('iteration') in {contract.PREFLIGHT, contract.COHORT}
+    runner.require(not any(e.get('identity', {}).get('iteration') in {contract.PREFLIGHT, contract.COHORT, 'N23_BACKEND_PREFLIGHT_V2_20260930', 'N23_CLIPPED_QUALITY_DEV_V2_20260930'}
                            or e.get('n23_backend_preflight') is True for e in events),
                    'N23 preflight or cohort already reserved; no second ID/retry')
     runner.require(runner.check_budget(state, events, diagnostic_row(), resources, reservations, physical_gpu=7) == 120,
