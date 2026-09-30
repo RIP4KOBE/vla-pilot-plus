@@ -41,7 +41,9 @@ EXTRA_SOURCE={'scripts/qd_ed_n23_v2_contract.py','scripts/qd_ed_n23_v2_predecess
  'tests/test_qd_ed_n23_v2.py','experiments/iteration_023_actuator_clipped_quality/timeout-observability-addendum-v2.md','experiments/iteration_023_actuator_clipped_quality/protocol-dev-v2-prospective.md',
  'experiments/iteration_023_actuator_clipped_quality/backend-arithmetic-protocol-v2.md',
  'experiments/iteration_023_actuator_clipped_quality/budget-amendment-v2.md',
- 'experiments/iteration_023_actuator_clipped_quality/closed-runtime-admission-v2.md'}
+ 'experiments/iteration_023_actuator_clipped_quality/closed-runtime-admission-v2.md',
+ 'scripts/qd_ed_n23_uuid_repair.py','tests/test_qd_ed_n23_uuid_repair.py',
+ 'experiments/iteration_023_actuator_clipped_quality/uuid-repair-engineering-exception-v1.md'}
 sha=worker.sha
 ref=v1.ref
 _SCOPE=None
@@ -162,7 +164,11 @@ SCIENTIFIC_BASE='1bcf888e88181580bfb854b2e7aa1834bf85df99'
 ALLOWED_EXISTING={'scripts/qd_ed_final_runner.py','scripts/qd_ed_n23_preflight_admit.py'}
 
 
-def source_delta(root):
+def source_delta(root,*,repair=None):
+    if repair is not None:
+        from scripts import qd_ed_n23_uuid_repair as uuid_repair
+        worker.require(repair==uuid_repair.binding(),'UUID repair source scope binding differs')
+        return uuid_repair.source_delta(root)
     import subprocess
     changed=set(subprocess.check_output(['git','diff','--name-only',SCIENTIFIC_BASE,'HEAD'],cwd=root,text=True).splitlines())
     worker.require(changed<=EXTRA_SOURCE|ALLOWED_EXISTING,'N23 v2 changed frozen scientific/v1 source')
@@ -176,7 +182,11 @@ def predecessor_review():
     return reference
 
 
-def final_review(source, runtime_ref):
+def final_review(source, runtime_ref,*,repair=None):
+    if repair is not None:
+        from scripts import qd_ed_n23_uuid_repair as uuid_repair
+        worker.require(repair==uuid_repair.binding(),'UUID repair review binding differs')
+        return uuid_repair.final_review(source,runtime_ref)
     reference = ref(FINAL_REVIEW); review = worker.read_ref(reference)
     worker.require(sha(PROTOCOL) == PROTOCOL_SHA and sha(BACKEND_PROTOCOL) == BACKEND_PROTOCOL_SHA
                    and sha(BUDGET_AMENDMENT) == AMENDMENT_SHA and sha(OBSERVABILITY)==OBSERVABILITY_SHA, 'N23 frozen protocols/amendment differ')
@@ -195,6 +205,12 @@ def backend_proof(reference, source, root, r):
     r['require'](plan['runtime'] == ref(GPU7_RUNTIME) and plan['source'] == source
                  and plan['predecessor_review'] == predecessor_review(), 'N23 preflight runtime/source/predecessor differs')
     events = r['read_events'](Path(root) / 'data/attempt-ledger.jsonl')
+    if plan.get('uuid_repair') is not None:
+        from scripts import qd_ed_n23_uuid_repair as uuid_repair
+        terminal=uuid_repair.verify_lineage(plan,reference,events,source,r)
+        r['require'](backend.verify_preflight_proof(reference['plan']['path'],reference['report']['path'],terminal,source)
+            ==reference['report'],'UUID repair backend proof hash differs')
+        return reference
     local = [e for e in events if e.get('identity', {}).get('iteration') in ALL_PREFLIGHTS
              or e.get('n23_backend_preflight') is True]
     r['require'](all(e.get('identity',{}).get('iteration')==PREFLIGHT for e in local),'N23 v2 backend cannot reuse/retry v1 preflight')
@@ -212,8 +228,9 @@ def backend_proof(reference, source, root, r):
 
 def validate_contract(plan, manifest, runtime, seeds, root, r):
     source = worker.source_record(root, [v['path'] for v in plan['code_files']])
-    source_delta(root)
     meta = plan.get('n23_cohort', {})
+    if meta.get('uuid_repair') is not None:source_delta(root,repair=meta['uuid_repair'])
+    else:source_delta(root)
     r['require'](sha(Path(root) / 'experiments/iteration_023_actuator_clipped_quality/protocol-dev-v2-prospective.md') == PROTOCOL_SHA
         and sha(Path(root) / 'experiments/iteration_023_actuator_clipped_quality/backend-arithmetic-protocol-v2.md') == BACKEND_PROTOCOL_SHA
         and sha(Path(root) / 'experiments/iteration_023_actuator_clipped_quality/budget-amendment-v2.md') == AMENDMENT_SHA
@@ -224,11 +241,15 @@ def validate_contract(plan, manifest, runtime, seeds, root, r):
     r['require'](meta == {'schema': 'n23-clipped-quality-dev-v2', 'cohort_id': COHORT, 'limits': LIMITS,
         'n7_role': 'ablation_control_only_no_promotion', 'predecessor_review': predecessor_review(),
         'budget_amendment': ref(BUDGET_AMENDMENT), 'protocol': ref(PROTOCOL), 'source_plan': ref(SOURCE_PLAN),
-        'final_review': final_review(source, ref(GPU7_RUNTIME)),
+        'final_review': final_review(source, ref(GPU7_RUNTIME),repair=meta['uuid_repair']) if meta.get('uuid_repair') is not None else final_review(source,ref(GPU7_RUNTIME)),
         'worker_audit': worker.WORKER_CONTRACT, 'timeout_observability':ref(OBSERVABILITY),
         'early_stop': 'numeric_futility_after_complete_task_quadruple',
-        'backend_proof': backend_proof(meta.get('backend_proof'), source, root, r)},
+        'backend_proof': backend_proof(meta.get('backend_proof'), source, root, r),
+        **({'uuid_repair':meta['uuid_repair']} if meta.get('uuid_repair') is not None else {})},
         'N23 prospective cohort, source review or backend proof differs')
+    if meta.get('uuid_repair') is not None:
+        r['require'](worker.read_ref(meta['backend_proof']['plan']).get('uuid_repair')==meta['uuid_repair'],
+            'UUID repair Dev/backend provenance differs')
     r['require'](plan['episodes'] == expected_rows() and set(plan['candidate_profiles']) == {'N7', 'N23'}
         and set(manifest['profiles']) == set(ARMS)
         and plan.get('phase_authorization') == {'dev': True, 'validation': False, 'formal': False}
@@ -249,7 +270,10 @@ def validate_contract(plan, manifest, runtime, seeds, root, r):
     r['require'](plan['runtime_manifest_path'] == str(GPU7_RUNTIME)
                  and plan['runtime_manifest_sha256'] == sha(GPU7_RUNTIME), 'N23 runtime reference differs')
     validate_runtime(runtime, root, r)
-    require_state(r['read_state'](Path(root) / 'research-state.yaml'), r)
+    state=r['read_state'](Path(root) / 'research-state.yaml');require_state(state,r)
+    if meta.get('uuid_repair') is not None:
+        from scripts import qd_ed_n23_uuid_repair as uuid_repair
+        uuid_repair.authority(meta['uuid_repair'],source,ref(GPU7_RUNTIME),state)
 
 
 def accepted_cell(plan,row,events,root,r):

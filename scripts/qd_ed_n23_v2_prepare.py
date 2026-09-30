@@ -13,7 +13,7 @@ from scripts import qd_ed_n23_v2_contract as contract
 from scripts import qd_ed_n23_worker as worker
 
 
-def build_plan(*, predecessor=None, review=None, proof=None):
+def build_plan(*, predecessor=None, review=None, proof=None,uuid_repair=None):
     parent = runner.read_json(contract.SOURCE_PLAN)
     runner.require(parent.get('n22_cohort', {}).get('cohort_id') == 'N22_HOLD_LIFT_DEV_20260930', 'N23 predecessor identity differs')
     source = worker.source_record(ROOT, contract.source_paths(vars(runner)))
@@ -34,6 +34,7 @@ def build_plan(*, predecessor=None, review=None, proof=None):
         'protocol': contract.ref(contract.PROTOCOL), 'source_plan': contract.ref(contract.SOURCE_PLAN),
         'final_review': review, 'timeout_observability':contract.ref(contract.OBSERVABILITY), 'worker_audit': worker.WORKER_CONTRACT, 'backend_proof': proof,
         'early_stop': 'numeric_futility_after_complete_task_quadruple'}
+    if uuid_repair is not None:plan['n23_cohort']['uuid_repair']=uuid_repair
     return plan
 
 
@@ -42,14 +43,15 @@ def freeze(path, proof):
     with runner.locked(ROOT / 'data/qd-ed-runner.lock', nonblocking=True):
         source = worker.source_record(ROOT, contract.source_paths(vars(runner)))
         predecessor = contract.predecessor_review()
-        review = contract.final_review(source, contract.ref(contract.GPU7_RUNTIME))
+        repair=worker.read_ref(proof['plan']).get('uuid_repair')
+        review = contract.final_review(source, contract.ref(contract.GPU7_RUNTIME),repair=repair)
         contract.backend_proof(proof, source, ROOT, vars(runner))
         with runner.locked(ROOT / 'data/qd-ed-state.lock'):
             state = runner.read_state(ROOT / 'research-state.yaml')
             events = runner.read_events(ROOT / 'data/attempt-ledger.jsonl')
             contract.full_capacity(state, events, runner.read_events(ROOT / 'data/gpu-healthcheck-ledger.jsonl'), vars(runner))
             runner.require(not any(e.get('identity', {}).get('iteration') == contract.COHORT for e in events), 'N23 cohort already reserved')
-        plan = build_plan(predecessor=predecessor, review=review, proof=proof); plan['frozen'] = True
+        plan = build_plan(predecessor=predecessor, review=review, proof=proof,uuid_repair=repair); plan['frozen'] = True
         worker.atomic_json(path, plan)
         runner.validate_plan(path, root=ROOT)
         return plan
@@ -73,7 +75,8 @@ def backend_draft(corpus_index=None):
 
 def freeze_backend(plan,path):
     from scripts import qd_ed_n23_v2_preflight_admit as admit
-    runner.require(Path(path).resolve()==(contract.RUN_DIR/'backend-preflight-plan.frozen.v2.json').resolve(),
+    name='backend-preflight-plan.uuid-repair.frozen.v1.json' if plan.get('uuid_repair') is not None else 'backend-preflight-plan.frozen.v2.json'
+    runner.require(Path(path).resolve()==(contract.RUN_DIR/name).resolve(),
         'N23 v2 preflight plan path differs')
     with runner.locked(ROOT/'data/qd-ed-runner.lock',nonblocking=True):
         plan=dict(plan);plan['predecessor_review']=contract.predecessor_review()
@@ -86,10 +89,15 @@ def freeze_backend(plan,path):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--kind',choices=['dev','backend'],required=True);p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--kind',choices=['dev','backend','uuid-repair'],required=True);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--freeze',action='store_true');p.add_argument('--corpus-index',type=Path);p.add_argument('--backend-proof',type=Path)
     args=p.parse_args()
-    if args.kind=='backend':
+    if args.kind=='uuid-repair':
+        from scripts import qd_ed_n23_uuid_repair as repair
+        plan=repair.build_plan(ROOT,vars(runner))
+        if args.freeze:plan=freeze_backend(plan,args.output)
+        else:worker.atomic_json(args.output,plan)
+    elif args.kind=='backend':
         plan=backend_draft(args.corpus_index)
         if args.freeze:runner.require(args.corpus_index is not None,'N23 v2 preflight corpus not reviewed');plan=freeze_backend(plan,args.output)
         else:worker.atomic_json(args.output,plan)

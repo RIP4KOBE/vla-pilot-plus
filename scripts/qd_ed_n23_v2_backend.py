@@ -47,6 +47,7 @@ def build_plan(*, root, protocol, runtime, corpus_index, source_paths, artifact_
 def validate_plan(plan):
     worker.require(set(plan) == {'schema', 'worktree', 'artifact_root', 'limits', 'protocol', 'runtime', 'source', 'corpus',
                                 'predecessor_review', 'timeout_observability', 'synthetic_cases', 'task_outcome', 'requires_separate_release'}
+                   | ({'uuid_repair'} if plan.get('uuid_repair') is not None else set())
                    and plan['schema'] == 'n23-backend-preflight-plan-v2' and plan['limits'] == LIMITS
                    and plan['worktree'] == str(ROOT.resolve()) and plan['task_outcome'] is False
                    and plan['requires_separate_release'] is True
@@ -58,8 +59,16 @@ def validate_plan(plan):
     worker.verify_source(ROOT, plan['source'])
     worker.require(EXTRA_SOURCE <= {r['path'] for r in plan['source']['files']}, 'preflight required source absent')
     worker.require(plan['corpus'] == corpus_from_index(plan['corpus']['index']), 'preflight corpus changed')
+    if plan.get('uuid_repair') is not None:
+        from scripts import qd_ed_n23_uuid_repair as repair
+        repair.validate_plan(plan)
     predecessor_gate(plan['predecessor_review'])
     return worker.read_ref(plan['runtime'])
+
+
+def artifact_name(plan,kind):
+    prefix='n23-backend-uuid-repair' if plan.get('uuid_repair') is not None else 'n23-backend-preflight'
+    return prefix+'-'+kind+('-v1.json' if plan.get('uuid_repair') is not None else '.json')
 
 
 def run_preflight(plan_path, release_path, attempt_context_path):
@@ -69,22 +78,24 @@ def run_preflight(plan_path, release_path, attempt_context_path):
     runtime = validate_plan(plan)
     release = json.loads(Path(release_path).read_text())
     context = json.loads(Path(attempt_context_path).read_text())
-    worker.require(set(context) == {'schema', 'attempt_id', 'output_dir', 'budget_bucket', 'plan', 'timeout_seconds', 'cleanup_seconds'}
+    retry={'retry_of':plan['uuid_repair']['retry_of']} if plan.get('uuid_repair') is not None else {}
+    worker.require(set(context) == {'schema', 'attempt_id', 'output_dir', 'budget_bucket', 'plan', 'timeout_seconds', 'cleanup_seconds'}|set(retry)
+                   and all(context.get(k)==v for k,v in retry.items())
                    and context['schema'] == 'n23-recovery-attempt-context-v2' and context['budget_bucket'] == 'recovery'
                    and context['plan'] == plan_ref and context['timeout_seconds'] == 120 and context['cleanup_seconds'] == 40,
                    'preflight requires separately charged recovery attempt context')
     worker.require(release == {'schema': 'n23-backend-preflight-release-v2', 'plan': plan_ref,
                                'source': plan['source'], 'runtime': plan['runtime'], 'limits': LIMITS,
-                               'attempt_id': context['attempt_id'], 'predecessor_review': plan['predecessor_review']},
+                               'attempt_id': context['attempt_id'], 'predecessor_review': plan['predecessor_review'],**retry},
                    'preflight release differs from finite plan')
     output = Path(context['output_dir']).resolve()
     worker.require(output.name == context['attempt_id']
                    and output == Path(plan['artifact_root']).resolve() / 'attempts' / context['attempt_id'],
                    'preflight attempt/output identity differs')
-    report_path = output / 'n23-backend-preflight-report.json'
+    report_path = output / artifact_name(plan,'report')
     worker.require(not report_path.exists(), 'preflight cannot retry or overwrite output')
     identity = worker.process_identity()
-    worker.atomic_json(output / 'n23-backend-preflight-start.json', {
+    worker.atomic_json(output / artifact_name(plan,'start'), {
         'schema': 'n23-backend-preflight-start-v2', 'process': identity, 'plan': plan_ref,
         'attempt_id': context['attempt_id'], 'source': plan['source']})
     report = {'schema': 'n23-backend-preflight-proof-v2', 'accepted': False, 'task_outcome': False,
@@ -92,6 +103,7 @@ def run_preflight(plan_path, release_path, attempt_context_path):
               'attempt_context': {'path': str(Path(attempt_context_path).resolve()), 'sha256': worker.sha(attempt_context_path)},
               'attempt_id': context['attempt_id'], 'process': identity, 'source': plan['source'],
               'runtime': plan['runtime'], 'limits': LIMITS, 'batches': [], 'synthetic': [], 'errors': []}
+    if retry:report['uuid_repair']=plan['uuid_repair'];report.update(retry)
     try:
         backend = create_backend('cuda', binding=worker.cuda_binding(runtime))
         for batch in iter_batches(plan['corpus']):
@@ -129,10 +141,14 @@ def verify_preflight_proof(plan_path, report_path, attempt_result, future_source
                    and report.get('source') == plan['source'] == future_source
                    and report.get('runtime') == plan['runtime'] and report.get('limits') == LIMITS,
                    'preflight proof/source/finite scope differs from future Dev')
-    worker.require(json.loads((Path(report_path).parent / 'n23-backend-preflight-start.json').read_text()) == {
+    worker.require(json.loads((Path(report_path).parent / artifact_name(plan,'start')).read_text()) == {
         'schema': 'n23-backend-preflight-start-v2', 'process': report['process'], 'plan': report['plan'],
         'attempt_id': report['attempt_id'], 'source': report['source']}, 'preflight start/process binding differs')
-    worker.read_ref(report['release']); worker.read_ref(report['attempt_context'])
+    release=worker.read_ref(report['release']);context=worker.read_ref(report['attempt_context'])
+    if plan.get('uuid_repair') is not None:
+        worker.require(report.get('uuid_repair')==plan['uuid_repair'] and report.get('retry_of')==plan['uuid_repair']['retry_of']
+            and attempt_result.get('retry_of')==report['retry_of'] and release.get('retry_of')==report['retry_of']
+            and context.get('retry_of')==report['retry_of'],'UUID repair report/context/terminal lineage differs')
     worker.require(attempt_result.get('budget_bucket') == 'recovery'
                    and attempt_result.get('attempt_id') == report.get('attempt_id')
                    and attempt_result.get('outcome_valid') is True

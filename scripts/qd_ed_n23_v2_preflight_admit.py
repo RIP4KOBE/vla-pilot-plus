@@ -18,13 +18,18 @@ from scripts import qd_ed_n23_worker as worker
 from scripts import qd_ed_n23_v2_backend as backend
 
 
-def diagnostic_row():
-    return {'split': 'backend_diagnostic', 'iteration': contract.PREFLIGHT, 'profile': 'N23_backend',
+def diagnostic_row(plan=None):
+    row= {'split': 'backend_diagnostic', 'iteration': contract.PREFLIGHT, 'profile': 'N23_backend',
             'task_id': -1, 'env_seed': -1, 'policy_seed': -1, 'init_index': -1,
             'episode_key': 'n23_backend_preflight_v2_once', 'budget_bucket': 'recovery', 'timeout_seconds': 120}
+    if plan is not None and plan.get('uuid_repair') is not None:row['episode_key']='n23_backend_uuid_repair_once'
+    return row
 
 
 def admission(plan, state, events, resources, reservations, *, root=ROOT):
+    if plan.get('uuid_repair') is not None:
+        from scripts import qd_ed_n23_uuid_repair as repair
+        return repair.admission(plan,state,events,resources,reservations,root=root,r=vars(runner))
     contract.require_state(state, vars(runner))
     runner.require(plan['source'] == worker.source_record(root, contract.source_paths(vars(runner)))
         and plan['runtime'] == contract.ref(contract.GPU7_RUNTIME)
@@ -68,25 +73,29 @@ def run(plan_path, *, root=ROOT):
             runtime = admission(plan, state, events, resources,
                 runner.read_events(root / 'data/gpu-hour-reservation-ledger.jsonl'), root=root)
             device = gpu_gate(runtime, resources, root=root)
-            attempt_id = state['run_name'] + '__n23_backend_preflight_v2__' + uuid.uuid4().hex[:12]
+            repaired=plan.get('uuid_repair') is not None
+            retry={'retry_of':plan['uuid_repair']['retry_of']} if repaired else {}
+            attempt_id=state['run_name']+('__n23_backend_uuid_repair__' if repaired else '__n23_backend_preflight_v2__')+uuid.uuid4().hex[:12]
             output = runner.owned(Path(plan['artifact_root']) / 'attempts' / attempt_id, plan['artifact_root'])
             runner.require(not output.exists(), 'N23 preflight output already exists')
             output.mkdir(parents=True)
             context = {'schema': 'n23-recovery-attempt-context-v2', 'attempt_id': attempt_id,
                 'output_dir': str(output), 'budget_bucket': 'recovery', 'plan': plan_ref,
-                'timeout_seconds': 120, 'cleanup_seconds': 40}
+                'timeout_seconds': 120, 'cleanup_seconds': 40,**retry}
             release = {'schema': 'n23-backend-preflight-release-v2', 'plan': plan_ref,
                 'source': plan['source'], 'runtime': plan['runtime'], 'limits': backend.LIMITS,
-                'attempt_id': attempt_id, 'predecessor_review': plan['predecessor_review']}
+                'attempt_id': attempt_id, 'predecessor_review': plan['predecessor_review'],**retry}
             worker.atomic_json(output / 'attempt-context.json', context)
             worker.atomic_json(output / 'release.json', release)
-            row = diagnostic_row()
+            row = diagnostic_row(plan)
             base = {'attempt_id': attempt_id, 'identity': runner.episode_identity(row),
                 'episode_key': row['episode_key'], 'budget_bucket': 'recovery', 'output_dir': str(output),
                 'plan_sha256': plan_ref['sha256'], 'source_commit': plan['source']['commit'],
                 'runtime_manifest_sha256': plan['runtime']['sha256'], 'physical_gpu': 7,
                 'n23_backend_preflight': True, 'task_outcome': False,
-                'n23_final_review': contract.ref(contract.FINAL_REVIEW), 'retry_of': None}
+                'n23_final_review': contract.final_review(plan['source'],plan['runtime'],repair=plan['uuid_repair']) if repaired else contract.ref(contract.FINAL_REVIEW),
+                'retry_of':retry.get('retry_of')}
+            if repaired:base['n23_uuid_repair']=plan['uuid_repair']
             runner.append_event_locked(root, {**base, 'event': 'reserved', 'time_unix': time.time(), 'admission': device})
         command = backend.command(runner.PYTHON, plan_path, output / 'release.json', output / 'attempt-context.json', root=root)
         worker.atomic_json(output / 'command.json', {'argv': command})
@@ -98,6 +107,9 @@ def run(plan_path, *, root=ROOT):
             # Atomic charge before Popen; failures to start remain charged.
             with runner.locked(root / 'data/qd-ed-state.lock'):
                 state = runner.read_state(root / 'research-state.yaml'); contract.require_state(state, vars(runner))
+                if repaired:
+                    from scripts import qd_ed_n23_uuid_repair as repair
+                    repair.authority(plan['uuid_repair'],plan['source'],plan['runtime'],state)
                 runner.require(runner.check_budget(state, runner.read_events(root / 'data/attempt-ledger.jsonl'), row,
                     runner.read_events(root / 'data/gpu-healthcheck-ledger.jsonl'),
                     runner.read_events(root / 'data/gpu-hour-reservation-ledger.jsonl'), physical_gpu=7) == 120,
@@ -113,7 +125,7 @@ def run(plan_path, *, root=ROOT):
                 worker.atomic_json(output / 'process.json', {**identity, 'attempt_id': attempt_id})
                 code = runner.wait_exclusively(process, 120, physical_gpu=7); finished = time.monotonic()
             runner.require(code == 0, f'N23 backend worker exit {code}')
-            report = output / 'n23-backend-preflight-report.json'
+            report = output / backend.artifact_name(plan,'report')
             proposal = {**base, 'event': 'valid', 'outcome_valid': True, 'process': identity,
                 'gpu_process_wall_seconds': finished - started, 'backend_preflight_report': contract.ref(report)}
             backend.verify_preflight_proof(plan_path, report, proposal, plan['source'])
