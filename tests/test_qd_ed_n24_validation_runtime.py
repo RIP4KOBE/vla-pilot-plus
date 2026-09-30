@@ -418,3 +418,51 @@ def test_existing_worker_dev_routes_remain_unchanged(worker_job,monkeypatch,old_
     assert w.run_worker(job.context_path,job.command[1:])==0
     assert job.calls==['identity','cuda' if old_arm in {'N23','N24'} else 'cpu','audit']
     job.calls.clear();assert w.verify_receipt(job.context_path,job.process)['accepted'] and not job.calls
+
+@pytest.mark.parametrize('fault',['none','different_variant','attempt_root','escape_link'])
+def test_production_split_variant_and_attempt_roots(tmp_path,monkeypatch,fault):
+    variant=tmp_path/'source-volume/variant';variant.mkdir(parents=True)
+    artifacts=tmp_path/'artifact-volume/attempt-data';artifacts.mkdir(parents=True)
+    monkeypatch.setattr(c,'RUN_DIR',variant);monkeypatch.setattr(sup,'ROOT',tmp_path/'worktree')
+    plan={'source_commit':'synthetic','artifact_root':str(artifacts),'episodes':rows(),
+        'n24_validation':{'seed_cohort':'c2','source_bridge':{},'dev_review':{},'metadata_selection':{}}}
+    path=variant/'plan.json';write(path,plan);monkeypatch.setattr(c,'VALIDATION_PLAN',path)
+    output=variant/'validation-execution'
+    if fault=='different_variant':output=variant/'elsewhere'
+    if fault=='attempt_root':output=artifacts/'validation-execution'
+    if fault=='escape_link':output.symlink_to(artifacts/'escaped-controller',target_is_directory=True)
+    monkeypatch.setattr(r,'validate_plan',lambda *a,**k:(plan,{'profiles':{}},{}))
+    monkeypatch.setattr(r,'read_events',lambda *a:[])
+    monkeypatch.setattr(sup,'release_check',lambda *a:None)
+    monkeypatch.setattr(sup.dev_supervisor,'device_check',lambda:None)
+    monkeypatch.setattr(sup,'one_attempt',lambda *a,**k:(_ for _ in ()).throw(ValueError('synthetic before first attempt')))
+    if fault=='none':
+        with pytest.raises(ValueError,match='synthetic'):sup.launch(path,variant/'release.json',output)
+        assert (output/'aggregate-disposition-v1.json').is_file()
+        value=json.loads((output/'protected-detail-v1.json').read_text())
+        assert value['dispatched']==0 and value['accepted_cells']==0 and value['decision']=='INVALID'
+        assert list(artifacts.iterdir())==[]
+    else:
+        # Every public boundary enforces the same exact owned controller path.
+        for call in (lambda:sup.launch(path,variant/'release.json',output),
+                     lambda:sup.execute(path,plan,{'profiles':{}},{},output),
+                     lambda:reporting.write_reports(plan,[],output,tmp_path,vars(r))):
+            with pytest.raises((ValueError,r.GateError)):call()
+        assert not (artifacts/'escaped-controller').exists()
+
+@pytest.mark.parametrize('name',['execution/attempt.json','validation-execution/protected-detail-v1.json','validation-execution-release-v1.json',
+    'plan.frozen.v1.gpu7.json','validation-plan.frozen.v1.gpu7.json','result-v1.json','root-review-v1.json',
+    'adoption-v1/authority.json','validation-adoption-v1/authority.json','validation-source-review-v1.json'])
+def test_guard_v3_sensitive_paths_deny_read_and_write_without_io(tmp_path,name):
+    import ast
+    # Execute only the guard callback in a synthetic namespace, never open a sensitive path.
+    tree=ast.parse((Path(r.ROOT).parent/'n24_validation_cpu_guard_v3.py').read_text())
+    node=next(x for x in tree.body if isinstance(x,ast.FunctionDef) and x.name=='audit')
+    namespace={'Path':Path,'os':os,'HERE':tmp_path/'variant','ROOT':tmp_path,'WORKTREES':(), 'STATIC':tmp_path/'static.json','BLOCKED':[]}
+    exec(compile(ast.Module(body=[node],type_ignores=[]),'<synthetic-guard-callback>','exec'),namespace)
+    for mode,flags in [('r',os.O_RDONLY),('w',os.O_WRONLY|os.O_CREAT),('a',os.O_WRONLY|os.O_APPEND)]:
+        with pytest.raises(PermissionError):namespace['audit']('open',(str(namespace['HERE']/name),mode,flags))
+    assert len(namespace['BLOCKED'])==3 and not namespace['HERE'].exists()
+    # Drafts are in the distinct non-executable template directory, never execution-prefix exceptions.
+    namespace['audit']('open',(str(namespace['HERE']/'validation-cpu-templates-v2/release.json'),'w',os.O_WRONLY|os.O_CREAT))
+    assert len(namespace['BLOCKED'])==3

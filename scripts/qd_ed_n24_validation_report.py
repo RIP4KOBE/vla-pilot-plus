@@ -6,6 +6,13 @@ from scripts import qd_ed_n24_native as native
 from scripts import qd_ed_n23_worker as w
 
 
+def output_directory(directory,r):
+    """Controller evidence belongs to the fixed variant directory, not attempt storage."""
+    path=r['owned'](directory,c.RUN_DIR)
+    c.require(path==(c.RUN_DIR/'validation-execution').resolve(),'N24 exact validation controller directory differs')
+    return path
+
+
 def summarize(plan,events,root,r,*,force_invalid=False,controller_completed=None):
     local=[e for e in events if e.get('identity',{}).get('iteration')==c.COHORT]
     keys=[x['episode_key'] for x in plan['episodes']]
@@ -60,7 +67,7 @@ def summarize(plan,events,root,r,*,force_invalid=False,controller_completed=None
 
 
 def write_reports(plan,events,directory,root,r,*,force_invalid=False,controller_completed=None):
-    directory=r['owned'](directory,plan['artifact_root']);directory.mkdir(parents=True,exist_ok=True)
+    directory=output_directory(directory,r);directory.mkdir(parents=True,exist_ok=True)
     try:detail,aggregate=summarize(plan,events,root,r,force_invalid=force_invalid,controller_completed=controller_completed)
     except (ValueError,RuntimeError,KeyError,OSError,TypeError) as exc:
         detail={'schema':'n24-protected-validation-unadjudicated-v1','failure_class':type(exc).__name__,

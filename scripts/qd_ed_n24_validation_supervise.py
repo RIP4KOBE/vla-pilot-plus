@@ -46,7 +46,7 @@ def one_attempt(plan_path,plan,row,*,eligibility=None):
 
 
 def execute(plan_path,plan,profiles,runtime,output):
-    output=r.owned(output,plan['artifact_root']);output.mkdir(parents=True,exist_ok=True)
+    output=reporting.output_directory(output,vars(r));output.mkdir(parents=True,exist_ok=True)
     status=output/'aggregate-progress-v1.json';c.require(not status.exists(),'N24 validation cannot resume')
     completed=0;failed=True
     def progress(phase):
@@ -77,8 +77,8 @@ def execute(plan_path,plan,profiles,runtime,output):
 
 def launch(plan_path,release,output):
     plan,profiles,runtime=r.validate_plan(plan_path,root=ROOT)
-    c.require(Path(output).resolve()==(c.RUN_DIR/'validation-execution').resolve(),'N24 protected output path differs')
-    Path(output).mkdir(parents=True,exist_ok=True)
+    output=reporting.output_directory(output,vars(r))
+    output.mkdir(parents=True,exist_ok=True)
     with r.locked(Path(output)/'supervisor.lock',nonblocking=True):
         c.require(not (Path(output)/'aggregate-progress-v1.json').exists() and not (Path(output)/'aggregate-disposition-v1.json').exists(),
             'N24 validation no restart/result overwrite')
