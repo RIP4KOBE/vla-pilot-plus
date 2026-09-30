@@ -135,6 +135,9 @@ def validate_context(context, main_argv):
     require(root == ROOT.resolve() and context['main_argv'] == list(main_argv)
             and main_argv[0] == str(root / 'main.py') and output.name == context['attempt_id'], "worker command/root/attempt differs")
     plan, runtime = read_ref(context['plan']), read_ref(context['runtime'])
+    if plan.get('n24_cohort') is not None:
+        from scripts import qd_ed_n24_contract as n24
+        return n24.validate_worker_context(context, main_argv, root, output, plan, runtime)
     require(plan.get('n23_cohort', {}).get('worker_audit') == WORKER_CONTRACT
             and plan['worktree'] == str(root) and context['profile'] in WORKER_CONTRACT['arms']
             and output == Path(plan['artifact_root']).resolve() / 'attempts' / context['attempt_id']
@@ -188,7 +191,7 @@ def run_worker(context_path, main_argv):
             require(process_identity() == identity and sha(context_path) == context_sha, "worker identity/context changed during main")
             verify_source(root, context['source']); read_ref(context['runtime']); read_ref(context['plan'])
             receipt['worker_cuda'] = assigned_cuda_identity(cuda_binding(runtime))
-            backend = create_backend('cuda', binding=cuda_binding(runtime)) if context['profile'] == 'N23' else create_backend('cpu')
+            backend = create_backend('cuda', binding=cuda_binding(runtime)) if context['profile'] in {'N23', 'N24'} else create_backend('cpu')
             backend.synchronize()
             audit_started = time.perf_counter()
             before = evidence_record(output)
@@ -199,6 +202,12 @@ def run_worker(context_path, main_argv):
             receipt['audit_seconds'] = time.perf_counter() - audit_started
             require(before == after, "worker evidence mutated during audit")
             receipt['evidence'] = after
+            if context['profile'] == 'N24' or read_ref(context['plan']).get('n24_cohort') is not None:
+                from scripts import qd_ed_n24_native as n24_native
+                receipt['n24_native_counts'], receipt['n24_auxiliary'] = n24_native.from_output(context['profile'], output, report)
+                metric_path = output / 'eds_eval/eds_metrics.jsonl'
+                receipt['n24_metrics'] = {'path': str(metric_path), 'present': metric_path.is_file(),
+                    'sha256': sha(metric_path) if metric_path.is_file() else None}
             atomic_json(report_path, report)
             receipt['audit_report'] = {"path": str(report_path), "sha256": sha(report_path)}
             receipt['accepted'] = report.get('accepted') is True
@@ -241,7 +250,7 @@ def verify_receipt(context_path, process_record):
             and receipt.get('main_argv_sha256') == canonical_sha(context['main_argv'])
             and receipt.get('evidence') == evidence_record(output), "worker source/runtime/evidence binding differs")
     backend = receipt.get('audit_backend', {})
-    kind = 'cuda' if context['profile'] == 'N23' else 'cpu'
+    kind = 'cuda' if context['profile'] in {'N23', 'N24'} else 'cpu'
     require(backend.get('kind') == kind and backend.get('logical_device') == ('cuda:0' if kind == 'cuda' else 'cpu'), "worker audit backend differs")
     actual = receipt.get('worker_cuda', {})
     expected_uuid=canonical_cuda_uuid(runtime['gpu_mapping']['uuid'])
@@ -273,6 +282,14 @@ def verify_receipt(context_path, process_record):
     require(type(receipt.get('audit_seconds')) in (int, float) and math.isfinite(receipt['audit_seconds']) and math.isfinite(receipt['worker_wall_seconds'])
             and 0 <= receipt['audit_seconds'] <= receipt['worker_wall_seconds'],
             "worker audit metering missing")
+    if read_ref(context['plan']).get('n24_cohort') is not None:
+        from scripts import qd_ed_n24_native as n24_native
+        metric_path=output/'eds_eval/eds_metrics.jsonl'
+        require(receipt.get('n24_metrics') == {'path':str(metric_path),'present':metric_path.is_file(),
+            'sha256':sha(metric_path) if metric_path.is_file() else None}, 'N24 serialized metrics binding differs')
+        counts,aux=n24_native.from_output(context['profile'],output,report)
+        require(receipt.get('n24_native_counts')==counts and receipt.get('n24_auxiliary')==aux,
+                'N24 profile-bound native counters differ')
     return report
 
 
