@@ -10920,7 +10920,9 @@ def test_n23_full_native_cpu_loop_static_metadata_and_independent_rejection(
         rec.finish()
         compute = tmp_path / mode / "episode_compute.jsonl"
         compute.write_text(json.dumps({"episode_id": 0, "outcome": "completed", "decision_evidence": rec.status()}) + "\n")
-        report = audit_episode(rec.root, compute)
+        from scripts.qd_ed_audit_backend import create_backend
+        report = audit_episode(rec.root, compute, arithmetic_backend=create_backend("cpu"))
+        assert report["n23_arithmetic_backend"]["kind"] == "cpu"
         (tmp_path / mode / "audit-report.json").write_text(json.dumps(report, indent=2) + "\n")
         (tmp_path / mode / "metrics.json").write_text(json.dumps(metrics, indent=2) + "\n")
         if case == "valid":
@@ -10960,7 +10962,7 @@ def test_n23_full_native_cpu_loop_static_metadata_and_independent_rejection(
     assert not torch.cuda.is_initialized()
 
 
-@pytest.mark.parametrize("fault", ["unknown_provider", "target1", "bounds", "reset"])
+@pytest.mark.parametrize("fault", ["unknown_provider", "constant_zero_stage2", "target1", "bounds", "reset"])
 def test_n23_invalid_contract_fails_before_canonical_search(stub_steer, stub_adapter, monkeypatch, fault):
     from test_qd_actuator_clipped_quality import static_adapter_fixture
     from core.qd_actuator_clipped_quality import ActuatorClippedContract
@@ -10972,6 +10974,14 @@ def test_n23_invalid_contract_fails_before_canonical_search(stub_steer, stub_ada
     cfg = stub_steer._resolve_eds_config_with_reference_defaults(profile)
     fn = _n2_fixture_provider(index=1 if fault == "target1" else 0)
     if fault == "unknown_provider": fn = lambda k, a: a.sum() * 0
+    if fault == "constant_zero_stage2":
+        from utils.guidance_utils import wrap_guidance_function_with_device_fix
+        source = "def approach(keypoints, ee_trajectories):\n    return 0.0\n"
+        namespace = {}
+        exec(compile(source, "<synthetic-zero-stage2>", "exec"), namespace)
+        fn = wrap_guidance_function_with_device_fix(namespace["approach"])
+        fn._guidance_original_func = namespace["approach"]
+        fn._guidance_source_text = source
     if fault == "bounds": stub_adapter._env[0]._env.robots[0].controller.input_max[0] = .9
     if fault == "reset":
         original = ActuatorClippedContract.__post_init__

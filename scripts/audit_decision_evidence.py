@@ -72,14 +72,8 @@ def _native_record(value):
             "sha256": _native_sha(value), "values": value.tolist()}
 
 
-def _audit_n23_score(score, effective, aggregate, kinds, events, context):
-    """Independent native reconstruction: no N23 production helper import."""
-    snapshots = kinds["actuator_metadata_snapshot"]
-    require(len(snapshots) == 1 and snapshots[0]["sequence"] < score["sequence"]
-            and snapshots[0]["reset_sequence"] == score["reset_sequence"], "n23_snapshot_lifecycle")
-    metadata = snapshots[0]["values"].get("metadata")
-    require(isinstance(metadata, dict) and metadata == effective.get("actuator_metadata")
-            and metadata.get("schema") == "n23-static-actuator-snapshot-v1", "n23_snapshot_binding")
+def _audit_n23_metadata(metadata):
+    """Static actuator metadata checks, independent of the production reader."""
     sem = metadata.get("semantics", {})
     require(sem.get("controller_type") == "robosuite.controllers.osc.OperationalSpaceController"
             and sem.get("name") == "OSC_POSE" and sem.get("use_delta") is True
@@ -105,9 +99,22 @@ def _audit_n23_score(score, effective, aggregate, kinds, events, context):
         require(path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest() == proof.get("sha256")
                 and isinstance(proof.get("qualname"), str) and proof["qualname"].endswith("." + name),
                 "n23_controller_source_hash")
+
+
+def _audit_n23_score(score, effective, aggregate, kinds, events, context, *, arithmetic_backend=None):
+    """Independent native reconstruction: no N23 production helper import."""
+    snapshots = kinds["actuator_metadata_snapshot"]
+    require(len(snapshots) == 1 and snapshots[0]["sequence"] < score["sequence"]
+            and snapshots[0]["reset_sequence"] == score["reset_sequence"], "n23_snapshot_lifecycle")
+    metadata = snapshots[0]["values"].get("metadata")
+    require(isinstance(metadata, dict) and metadata == effective.get("actuator_metadata")
+            and metadata.get("schema") == "n23-static-actuator-snapshot-v1", "n23_snapshot_binding")
+    _audit_n23_metadata(metadata)
     v = score["values"]
     actions, xyz, keypoints = (v[n] for n in ("samples", "projected_xyz", "keypoints"))
     raw = aggregate["aggregate_before_reward_mode"]
+    if arithmetic_backend is not None:
+        actions, xyz, keypoints, raw = (arithmetic_backend.native(t) for t in (actions, xyz, keypoints, raw))
     require(effective.get("quality_mode") == "actuator_clipped_provider_v1"
             and effective.get("target_index") == 0 and len(context["values"]["providers"]) == 1
             and effective.get("provider_identity", {}).get("source_text_sha256")
@@ -126,16 +133,36 @@ def _audit_n23_score(score, effective, aggregate, kinds, events, context):
     require(parsed_index == 0, "n23_provider_target0")
     require(actions.shape == (len(raw), 64, 128) and xyz.shape == (len(raw), 9, 3)
             and actions.dtype == xyz.dtype == keypoints.dtype == raw.dtype, "n23_native_shape_dtype")
-    # Translation indices follow the unchanged RDT action decoder; this is not
-    # the FP64 offline screen. Rebuild each candidate in native arithmetic.
+    source_origins = [events[sequence - 1]["values"]["source_eef_position"]
+                      for sequence in v["projection_origin_sequences"]]
+    expected, affected = reconstruct_n23_arithmetic(actions, xyz, keypoints, raw, source_origins)
+    verify_n23_quality(expected, affected, effective)
+    return int(affected.sum().item())
+
+
+def verify_n23_quality(expected, affected, effective):
+    require(tensor(effective.get("clipped_prefix_mask"))
+            and torch.equal(effective["clipped_prefix_mask"], affected.cpu()), "n23_clipped_mask")
+    require(tensor(effective.get("quality")) and _native_sha(expected) == _native_sha(effective["quality"]),
+            "n23_native_clipped_quality")
+
+
+def reconstruct_n23_arithmetic(actions, xyz, keypoints, raw, source_origins):
+    """Independent exact reconstruction on explicitly supplied native device tensors.
+
+    No device is selected here. The wrapper selects a bound backend, and the
+    arithmetic-only preflight passes tensors already transferred to that backend.
+    """
+    require(actions.device == xyz.device == keypoints.device == raw.device
+            and actions.dtype == xyz.dtype == keypoints.dtype == raw.dtype
+            and actions.shape == (len(raw), 64, 128) and xyz.shape == (len(raw), 9, 3)
+            and len(source_origins) == len(raw), "n23_reconstruction_native_binding")
     commands = actions[:, :8, 39:42]
     affected = ((commands[:, :7] > 1) | (commands[:, :7] < -1)).any(dim=(1, 2))
-    require(tensor(effective.get("clipped_prefix_mask"))
-            and torch.equal(effective["clipped_prefix_mask"], affected), "n23_clipped_mask")
     expected = raw.clone()
-    weights = torch.tensor([1, 1, 1, 1, 3, 3, 3], dtype=torch.float32) / 13
-    for i, sequence in enumerate(v["projection_origin_sequences"]):
-        source = events[sequence - 1]["values"]["source_eef_position"].to(actions.dtype)
+    weights = torch.tensor([1, 1, 1, 1, 3, 3, 3], dtype=torch.float32, device=actions.device) / 13
+    for i, native_origin in enumerate(source_origins):
+        source = native_origin.to(device=actions.device, dtype=actions.dtype)
         full_raw = source + torch.cumsum(commands[i] * 0.01, dim=0)
         require(torch.equal(source, xyz[i, 0]) and torch.equal(full_raw, xyz[i, 1:]),
                 "n23_native_raw_projection")
@@ -147,8 +174,7 @@ def _audit_n23_score(score, effective, aggregate, kinds, events, context):
             bounded = torch.minimum(torch.maximum(commands[i], torch.full_like(commands[i], -1)),
                                     torch.ones_like(commands[i]))
             expected[i] = native_score(source + torch.cumsum(bounded * .01, dim=0))
-    require(_native_sha(expected) == _native_sha(effective["quality"]), "n23_native_clipped_quality")
-    return int(affected.sum().item())
+    return expected, affected
 
 
 def _audit_n18_score(scoring, effective, aggregate):
@@ -924,7 +950,7 @@ def _audit_n3_feedback(kinds, context, final, events, previous):
     return None if completed is None else {"context": current, "completed": completed}
 
 
-def audit_episode(episode_dir, episode_compute_file):
+def audit_episode(episode_dir, episode_compute_file, *, arithmetic_backend=None):
     report = {"schema": "qd-ed-decision-evidence-audit-v1", "accepted": False,
               "episode_dir": str(Path(episode_dir).resolve()),
               "episode_compute_file": str(Path(episode_compute_file).resolve()),
@@ -1102,7 +1128,7 @@ def audit_episode(episode_dir, episode_compute_file):
                             and torch.equal(raw, aggregate), "n2_raw_aggregate_mismatch")
                     require(effective[0]["reward_mode"] == "normal", "n2_reward_mode_invalid")
                     if dual_mode == "actuator_clipped_provider_v1":
-                        changed = _audit_n23_score(score, effective[0], aggregates[0], kinds, events, context)
+                        changed = _audit_n23_score(score, effective[0], aggregates[0], kinds, events, context, arithmetic_backend=arithmetic_backend)
                         gate = report.setdefault("n23_actuator_clipped_quality_audit", {
                             "schema": "n23-native-actuator-clipped-quality-audit-v1",
                             "score_batches_verified": 0, "candidate_scores_verified": 0,
@@ -1258,6 +1284,8 @@ def audit_episode(episode_dir, episode_compute_file):
         report["accepted"] = True
     except Exception as error:
         report["errors"].append(str(error) if isinstance(error, AuditFailure) else "invalid_or_missing_evidence:" + type(error).__name__)
+    if arithmetic_backend is not None:
+        report["n23_arithmetic_backend"] = arithmetic_backend.report()
     return report
 
 
