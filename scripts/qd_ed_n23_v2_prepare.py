@@ -77,6 +77,7 @@ def freeze_backend(plan,path):
     from scripts import qd_ed_n23_v2_preflight_admit as admit
     name='backend-preflight-plan.uuid-repair.frozen.v1.json' if plan.get('uuid_repair') is not None else 'backend-preflight-plan.frozen.v2.json'
     if plan.get('uuid_repair',{}).get('schema')=='n23-uuid-native-repair-binding-v2':name='backend-preflight-plan.uuid-native-repair.frozen.v2.json'
+    if plan.get('uuid_repair',{}).get('schema')=='n23-arithmetic-repair-binding-v3':name='backend-preflight-plan.arithmetic-repair.frozen.v3.json'
     runner.require(Path(path).resolve()==(contract.RUN_DIR/name).resolve(),
         'N23 v2 preflight plan path differs')
     with runner.locked(ROOT/'data/qd-ed-runner.lock',nonblocking=True):
@@ -90,11 +91,12 @@ def freeze_backend(plan,path):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--kind',choices=['dev','backend','uuid-repair','uuid-native-repair'],required=True);p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--kind',choices=['dev','backend','uuid-repair','uuid-native-repair','arithmetic-repair'],required=True);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--freeze',action='store_true');p.add_argument('--corpus-index',type=Path);p.add_argument('--backend-proof',type=Path)
     args=p.parse_args()
-    if args.kind in {'uuid-repair','uuid-native-repair'}:
-        if args.kind=='uuid-native-repair':from scripts import qd_ed_n23_uuid_native_repair as repair
+    if args.kind in {'uuid-repair','uuid-native-repair','arithmetic-repair'}:
+        if args.kind=='arithmetic-repair':from scripts import qd_ed_n23_arithmetic_repair as repair
+        elif args.kind=='uuid-native-repair':from scripts import qd_ed_n23_uuid_native_repair as repair
         else:from scripts import qd_ed_n23_uuid_repair as repair
         plan=repair.build_plan(ROOT,vars(runner))
         if args.freeze:plan=freeze_backend(plan,args.output)

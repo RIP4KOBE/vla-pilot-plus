@@ -24,6 +24,8 @@ def diagnostic_row(plan=None):
             'episode_key': 'n23_backend_preflight_v2_once', 'budget_bucket': 'recovery', 'timeout_seconds': 120}
     if plan is not None and plan.get('uuid_repair') is not None:
         row['episode_key']='n23_backend_uuid_native_repair_once' if plan['uuid_repair'].get('schema')=='n23-uuid-native-repair-binding-v2' else 'n23_backend_uuid_repair_once'
+    if plan is not None and plan.get('uuid_repair',{}).get('schema')=='n23-arithmetic-repair-binding-v3':
+        row['episode_key']='n23_backend_arithmetic_repair_once'
     return row
 
 
@@ -77,6 +79,7 @@ def run(plan_path, *, root=ROOT):
             repaired=plan.get('uuid_repair') is not None
             retry={'retry_of':plan['uuid_repair']['retry_of']} if repaired else {}
             prefix='__n23_backend_uuid_native_repair__' if repaired and plan['uuid_repair'].get('schema')=='n23-uuid-native-repair-binding-v2' else ('__n23_backend_uuid_repair__' if repaired else '__n23_backend_preflight_v2__')
+            if repaired and plan['uuid_repair'].get('schema')=='n23-arithmetic-repair-binding-v3':prefix='__n23_backend_arithmetic_repair__'
             attempt_id=state['run_name']+prefix+uuid.uuid4().hex[:12]
             output = runner.owned(Path(plan['artifact_root']) / 'attempts' / attempt_id, plan['artifact_root'])
             runner.require(not output.exists(), 'N23 preflight output already exists')

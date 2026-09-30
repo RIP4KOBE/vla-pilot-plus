@@ -67,6 +67,8 @@ def validate_plan(plan):
 
 
 def artifact_name(plan,kind):
+    if plan.get('uuid_repair',{}).get('schema')=='n23-arithmetic-repair-binding-v3':
+        return 'n23-backend-arithmetic-repair-'+kind+'-v3.json'
     if plan.get('uuid_repair',{}).get('schema')=='n23-uuid-native-repair-binding-v2':
         return 'n23-backend-uuid-native-repair-'+kind+'-v2.json'
     prefix='n23-backend-uuid-repair' if plan.get('uuid_repair') is not None else 'n23-backend-preflight'
@@ -173,8 +175,10 @@ def verify_preflight_proof(plan_path, report_path, attempt_result, future_source
                    and len(report['batches']) == 176 and sum(r['candidates'] for r in report['batches']) == 2816
                    and len(report['synthetic']) == 2 and all(r['accepted'] and not r['mismatches'] for r in report['batches'] + report['synthetic'])
                    and report.get('wrong_bounds_rejected') is True, 'preflight CUDA coverage or strict arithmetic proof missing')
-    if plan.get('uuid_repair',{}).get('schema')=='n23-uuid-native-repair-binding-v2':
+    if plan.get('uuid_repair',{}).get('schema') in {'n23-uuid-native-repair-binding-v2','n23-arithmetic-repair-binding-v3'}:
         contract.repair_module(plan['uuid_repair']).verify_identity(backend,runtime)
+    if plan.get('uuid_repair',{}).get('schema')=='n23-arithmetic-repair-binding-v3':
+        contract.repair_module(plan['uuid_repair']).verify_arithmetic_success(report)
     return {'path': str(Path(report_path).resolve()), 'sha256': worker.sha(report_path)}
 
 

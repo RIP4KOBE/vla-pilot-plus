@@ -45,7 +45,9 @@ EXTRA_SOURCE={'scripts/qd_ed_n23_v2_contract.py','scripts/qd_ed_n23_v2_predecess
  'scripts/qd_ed_n23_uuid_repair.py','tests/test_qd_ed_n23_uuid_repair.py',
  'experiments/iteration_023_actuator_clipped_quality/uuid-repair-engineering-exception-v1.md',
  'scripts/qd_ed_n23_uuid_native_repair.py','tests/test_qd_ed_n23_uuid_native_repair.py',
- 'experiments/iteration_023_actuator_clipped_quality/uuid-native-repair-engineering-exception-v2.md'}
+ 'experiments/iteration_023_actuator_clipped_quality/uuid-native-repair-engineering-exception-v2.md',
+ 'scripts/qd_ed_n23_arithmetic_repair.py','tests/test_qd_ed_n23_arithmetic_repair.py',
+ 'experiments/iteration_023_actuator_clipped_quality/arithmetic-repair-engineering-exception-v3.md'}
 sha=worker.sha
 ref=v1.ref
 _SCOPE=None
@@ -167,11 +169,13 @@ ALLOWED_EXISTING={'scripts/qd_ed_final_runner.py','scripts/qd_ed_n23_preflight_a
 
 
 def repair_module(meta):
-    """Only the two explicit historical engineering exception schemas route."""
+    """Only explicit historical engineering exception schemas route."""
     if isinstance(meta,dict) and meta.get('schema')=='n23-uuid-repair-binding-v1':
         from scripts import qd_ed_n23_uuid_repair as selected
     elif isinstance(meta,dict) and meta.get('schema')=='n23-uuid-native-repair-binding-v2':
         from scripts import qd_ed_n23_uuid_native_repair as selected
+    elif isinstance(meta,dict) and meta.get('schema')=='n23-arithmetic-repair-binding-v3':
+        from scripts import qd_ed_n23_arithmetic_repair as selected
     else:
         raise ValueError('unrecognized N23 UUID repair authority schema')
     return selected
