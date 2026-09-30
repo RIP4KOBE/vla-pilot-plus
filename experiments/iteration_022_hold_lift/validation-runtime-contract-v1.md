@@ -10,7 +10,7 @@ The inherited runtime uses current Codex CLI ChatGPT login, unchanged frozen mod
 
 ## External review and authorization schemas
 
-All `{path, sha256}` references use absolute paths and current byte SHA256. No review or later release digest is compiled into source. JSON below describes exact field sets; values in angle brackets are placeholders, not executable drafts.
+All `{path, sha256}` references use absolute paths and current byte SHA256. The existing Dev result writer preserves the logical execution-symlink path; comparison to the canonical review reference requires the same resolved file, identical SHA and exact embedded status content, not identical path spelling. No review or later release digest is compiled into source. JSON below describes exact field sets; values in angle brackets are placeholders, not executable drafts.
 
 `validation-dev-promotion-review-v1.json` in this variant directory:
 

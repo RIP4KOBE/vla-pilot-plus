@@ -46,6 +46,12 @@ def require(ok,message):
 def sha(path): return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 def ref(path): return {'path':str(Path(path).resolve()),'sha256':sha(path)}
 def read(path): return json.loads(Path(path).read_text())
+def same_ref(a,b):
+    return (isinstance(a,dict) and isinstance(b,dict) and set(a)==set(b)=={'path','sha256'}
+        and Path(a['path']).is_absolute() and Path(b['path']).is_absolute()
+        and Path(a['path']).resolve()==Path(b['path']).resolve() and a['sha256']==b['sha256'])
+
+
 def read_ref(v):
     require(isinstance(v,dict) and set(v)=={'path','sha256'} and Path(v['path']).is_absolute()
             and sha(v['path'])==v['sha256'],'validation reference missing/changed')
@@ -81,7 +87,10 @@ def dev_promotion(root,r):
     status=read_ref(review['dev_status']);rows=parent['episodes'];result=read_ref(review['dev_result'])
     require(review['dev_result']==ref(DEV_RESULT) and result.get('schema')=='n22-dev-cohort-result-v1'
         and result.get('cohort_id')==DEV_COHORT and result.get('source_commit')==DEV_COMMIT
-        and result.get('plan')==review['dev_plan'] and result.get('terminal_status')=={**review['dev_status'],'content':status}
+        and same_ref(result.get('plan'),review['dev_plan'])
+        and set(result.get('terminal_status',{}))=={'path','sha256','content'}
+        and same_ref({k:result['terminal_status'][k] for k in ('path','sha256')},review['dev_status'])
+        and result['terminal_status']['content']==status
         and result.get('decision')=='ELIGIBLE_FOR_SEPARATELY_FROZEN_VALIDATION' and result.get('dev_gate_promoted') is True
         and result.get('dispatched')==result.get('audited_cells')==result.get('planned')==40
         and result.get('cost_missing_fields')==[] and result.get('reader_sha256')==sha(DEV_READER),

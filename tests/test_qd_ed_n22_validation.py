@@ -444,3 +444,17 @@ def test_supervisor_mocked_real_event_shapes_full_matrix_or_immediate_stop(tmp_p
         sup.main();assert len(seen)==60 and c.read(output/'aggregate-disposition.json')['gate_passed']
         assert c.read(output/'aggregate-progress.json')['completed_count']==60
         with pytest.raises(ValueError,match='cannot resume'):sup.main()
+
+
+def test_dev_result_writer_logical_status_path_equals_canonical_symlink_reference(tmp_path,monkeypatch):
+    parent,status,result,review,events,r=dev_fixture(tmp_path,monkeypatch)
+    physical=tmp_path/'physical-execution';physical.mkdir()
+    logical=tmp_path/'execution';logical.symlink_to(physical,target_is_directory=True)
+    status_path=logical/'supervisor-status-gpu7-v1.json';monkeypatch.setattr(c,'DEV_STATUS',status_path)
+    review['dev_status']=dump(status_path,status)  # Contract reference is canonical/physical.
+    result['terminal_status']={'path':str(status_path),'sha256':c.sha(status_path),'content':status}  # Existing writer preserves logical path.
+    review['dev_result']=dump(c.DEV_RESULT,result);dump(c.DEV_REVIEW,review)
+    assert result['terminal_status']['path']!=review['dev_status']['path']
+    assert c.dev_promotion(tmp_path,r)==c.ref(c.DEV_REVIEW)
+    result['terminal_status']['sha256']='wrong';review['dev_result']=dump(c.DEV_RESULT,result);dump(c.DEV_REVIEW,review)
+    with pytest.raises(ValueError,match='terminal result'):c.dev_promotion(tmp_path,r)
