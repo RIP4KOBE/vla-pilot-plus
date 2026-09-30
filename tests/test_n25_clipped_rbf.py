@@ -60,25 +60,26 @@ def test_custom_derivative_and_native_forward(dtype):
 
 
 @pytest.mark.parametrize('dtype',[torch.float32,torch.bfloat16])
-def test_interior_original_bitwise_parity_origin_count_rng(stub_steer,stub_adapter,monkeypatch,dtype):
+@pytest.mark.parametrize('batch',[4,16])
+def test_interior_original_bitwise_parity_origin_count_rng(stub_steer,stub_adapter,monkeypatch,dtype,batch):
     from core.qd_actuator_clipped_rbf import MODE
     origins=native_adapter(stub_adapter,monkeypatch)
-    stub_steer.post_init(adapter=stub_adapter,postprocessor=lambda x:x,sample_batch_size=4,
+    stub_steer.post_init(adapter=stub_adapter,postprocessor=lambda x:x,sample_batch_size=batch,
                          policy_config={'action_chunk_horizon':8})
-    x=input_tensor(dtype);saved=x.clone();rng=torch.random.get_rng_state().clone()
+    x=input_tensor(dtype,batch);saved=x.clone();rng=torch.random.get_rng_state().clone()
     old=stub_steer._compute_diversity_gradient(x)
     new,evidence=stub_steer._compute_eds_diversity_gradient(x,descriptor_mode=MODE,descriptor_cfg={})
-    assert torch.equal(old,new)
-    assert len(origins)==8 and torch.equal(x,saved)
+    assert torch.equal(old.contiguous().view(torch.uint8),new.contiguous().view(torch.uint8))
+    assert len(origins)==2*batch and torch.equal(x,saved)
     assert torch.equal(rng,torch.random.get_rng_state())
     assert evidence['clipped_components']==evidence['boundary_components']==0
-    assert evidence['interior_components']==4*8*3
+    assert evidence['interior_components']==batch*8*3
     assert evidence['summary_only_not_exact_replay'] is True
     assert torch.count_nonzero(new[:,8:])==0
     inactive=[k for k in range(128) if k not in (39,40,41)]
     assert torch.count_nonzero(new[:,:,inactive])==0
     counters=stub_steer.get_episode_compute_counters()
-    assert counters['rbf_gradient_calls']==2 and counters['rbf_gradient_batch_rows']==8
+    assert counters['rbf_gradient_calls']==2 and counters['rbf_gradient_batch_rows']==2*batch
     assert counters['model_forward_calls']==counters['reward_calls']==0
 
 
