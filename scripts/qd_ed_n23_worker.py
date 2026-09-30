@@ -249,6 +249,11 @@ def verify_receipt(context_path, process_record):
             and actual.get('physical_uuid') == expected_uuid
             and canonical_cuda_uuid(actual.get('actual_uuid')) == expected_uuid and actual.get('logical_device') == 'cuda:0',
             "worker runtime physical UUID differs")
+    require(actual.get('actual_uuid_type') in {'builtins.str','torch._C._CUuuid'},'worker public UUID type missing')
+    native_hex=actual.get('actual_uuid_bytes_hex')
+    require((actual['actual_uuid_type']=='builtins.str' and native_hex is None)
+        or (actual['actual_uuid_type']=='torch._C._CUuuid' and native_hex==expected_uuid[4:].replace('-','')),
+        'worker serialized native UUID bytes differ')
     if kind == 'cuda':
         require(backend.get('physical_uuid') == actual['physical_uuid'] and isinstance(backend.get('dtype_coverage'), list)
                 and backend.get('torch_version') == actual.get('torch_version')

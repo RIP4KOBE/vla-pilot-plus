@@ -58,7 +58,7 @@ def owned_job(tmp_path, monkeypatch):
     calls = []
     def gpu_identity(binding):
         calls.append('identity')
-        return {**binding, 'actual_uuid': binding['uuid'], 'physical_uuid': binding['uuid'], 'device_name': 'synthetic',
+        return {**binding, 'actual_uuid': binding['uuid'], 'physical_uuid': binding['uuid'], 'actual_uuid_type':'builtins.str','actual_uuid_bytes_hex':None,'device_name': 'synthetic',
                 'cuda_visible_devices': '7', 'torch_version': 'cpu-fixture', 'cuda_version': 'synthetic'}
     def backend(kind, *, binding=None):
         calls.append(kind)
@@ -452,4 +452,151 @@ def test_worker_receipt_rejects_inconsistent_raw_or_canonical_uuid(owned_job,fau
     if fault=='canonical_wrong':actual['physical_uuid']='GPU-00000000-0000-0000-0000-000000000001'
     write_json(path,receipt)
     with pytest.raises(ValueError):worker.verify_receipt(job.context_path,job.process)
+    assert not torch.cuda.is_initialized()
+
+
+@pytest.fixture
+def native_uuid_class(monkeypatch):
+    # PyTorch's registered CUuuid has no public constructor. Its documented
+    # surface is readonly vector<uint8_t>[16] bytes plus hyphenated __str__.
+    class NativeUuid:
+        def __init__(self,raw=CANONICAL_GPU7_UUID[4:],data=None):
+            self.raw=raw;self.data=list(bytes.fromhex(CANONICAL_GPU7_UUID[4:].replace('-',''))) if data is None else data
+        @property
+        def bytes(self):return self.data
+        def __str__(self):return self.raw
+    monkeypatch.setattr(torch._C,'_CUuuid',NativeUuid)
+    return NativeUuid
+
+
+@pytest.mark.parametrize('raw',[CANONICAL_GPU7_UUID[4:],CANONICAL_GPU7_UUID,CANONICAL_GPU7_UUID.upper()])
+def test_installed_native_uuid_surface_serializes_string_type_bytes_and_canonical(native_uuid_class,raw):
+    observed=native_uuid_class(raw)
+    assert not isinstance(observed,str)
+    result=backends.serialize_cuda_uuid(observed)
+    assert result=={'actual_uuid':raw,'actual_uuid_type':'torch._C._CUuuid',
+        'actual_uuid_bytes_hex':CANONICAL_GPU7_UUID[4:].replace('-',''),'physical_uuid':CANONICAL_GPU7_UUID}
+    assert json.loads(json.dumps(result))==result and not torch.cuda.is_initialized()
+
+
+@pytest.mark.parametrize('fault',['wrong_bytes','short_bytes','bool_byte','overflow_byte','malformed_string','generic_object','fake_named_class'])
+def test_native_uuid_requires_actual_type_and_matching_public_bytes(native_uuid_class,fault):
+    observed=native_uuid_class()
+    if fault=='wrong_bytes':observed.data[0]=0
+    if fault=='short_bytes':observed.data.pop()
+    if fault=='bool_byte':observed.data[0]=True
+    if fault=='overflow_byte':observed.data[0]=256
+    if fault=='malformed_string':observed.raw='malformed'
+    if fault=='generic_object':
+        class Generic:
+            def __str__(self):raise AssertionError('generic object must never be stringified')
+        observed=Generic()
+    if fault=='fake_named_class':
+        Forged=type('_CUuuid',(),{'__module__':'torch._C','__str__':lambda _:CANONICAL_GPU7_UUID[4:]})
+        observed=Forged()
+    with pytest.raises(ValueError):backends.serialize_cuda_uuid(observed)
+    assert not torch.cuda.is_initialized()
+
+
+def cpu_identity_properties(monkeypatch,observed):
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES','7')
+    monkeypatch.setattr(torch.cuda,'is_available',lambda:True)
+    monkeypatch.setattr(torch.cuda,'device_count',lambda:1)
+    monkeypatch.setattr(torch.cuda,'current_device',lambda:0)
+    monkeypatch.setattr(torch.cuda,'get_device_properties',lambda _:SimpleNamespace(name='fixture',uuid=observed))
+
+
+def test_native_identity_metadata_is_json_serializable_and_matches_backend(native_uuid_class,monkeypatch):
+    cpu_identity_properties(monkeypatch,native_uuid_class())
+    binding={'physical_gpu':7,'uuid':CANONICAL_GPU7_UUID,'logical_device':'cuda:0'}
+    identity=backends.assigned_cuda_identity(binding);result=backends.create_backend('cuda',binding=binding).report()
+    assert identity['actual_uuid_type']=='torch._C._CUuuid' and identity['actual_uuid']==CANONICAL_GPU7_UUID[4:]
+    assert identity['physical_uuid']==result['physical_uuid']==CANONICAL_GPU7_UUID
+    assert json.loads(json.dumps(identity))==identity and json.loads(json.dumps(result))==result
+    assert identity['identity_diagnostic']['status']=='matched' and not torch.cuda.is_initialized()
+
+
+@pytest.mark.parametrize('kind',['missing','malformed','generic','native_bytes_mismatch','wrong_uuid','wrong_count','wrong_current','bad_mask'])
+def test_identity_failures_retain_only_bounded_public_diagnostic(native_uuid_class,monkeypatch,kind):
+    observed=native_uuid_class()
+    if kind=='missing':observed=None
+    if kind=='malformed':observed='not-public-uuid-sensitive-marker'
+    if kind=='generic':
+        class Generic:
+            def __str__(self):raise AssertionError('do not stringify arbitrary objects')
+        observed=Generic()
+    if kind=='native_bytes_mismatch':observed.data[0]=0
+    if kind=='wrong_uuid':observed='00000000-0000-0000-0000-000000000001'
+    cpu_identity_properties(monkeypatch,observed)
+    if kind=='wrong_count':monkeypatch.setattr(torch.cuda,'device_count',lambda:2)
+    if kind=='wrong_current':monkeypatch.setattr(torch.cuda,'current_device',lambda:1)
+    if kind=='bad_mask':monkeypatch.setenv('CUDA_VISIBLE_DEVICES','not-public-mask-sensitive-marker')
+    with pytest.raises(RuntimeError) as caught:
+        backends.assigned_cuda_identity({'physical_gpu':7,'uuid':CANONICAL_GPU7_UUID,'logical_device':'cuda:0'})
+    diagnostic=caught.value.identity_diagnostic
+    assert diagnostic['schema']=='n23-public-cuda-identity-diagnostic-v1'
+    assert diagnostic['expected_uuid']==CANONICAL_GPU7_UUID and diagnostic['expected_physical_gpu']==7
+    assert 'sensitive-marker' not in json.dumps(diagnostic)
+    if kind not in {'wrong_count','wrong_current','bad_mask'}:
+        assert diagnostic['visible_device_count']==1 and diagnostic['current_device']==0
+        assert diagnostic['uuid_public_type'] is not None and diagnostic['serialized_raw_uuid'] is not None
+    if kind=='wrong_uuid':assert diagnostic['canonical_uuid']=='GPU-00000000-0000-0000-0000-000000000001'
+    assert not torch.cuda.is_initialized()
+
+
+@pytest.mark.parametrize('profile',['C0','N23'])
+def test_worker_native_object_identity_survives_receipt_json(owned_job,native_uuid_class,monkeypatch,profile):
+    job=owned_job;refresh_job(job,profile=profile);cpu_identity_properties(monkeypatch,native_uuid_class())
+    monkeypatch.setattr(worker,'assigned_cuda_identity',backends.assigned_cuda_identity)
+    # Wrapper arithmetic is synthetic CPU; device identity uses the real helper on faithful native-object fixture.
+    def backend(kind,*,binding=None):
+        if kind=='cpu':return backends.create_backend('cpu')
+        actual=backends.assigned_cuda_identity(binding)
+        return backends.AuditBackend(torch.device('cpu'),{'kind':'cuda',**actual})
+    monkeypatch.setattr(worker,'create_backend',backend)
+    assert worker.run_worker(job.context_path,job.command[1:])==0
+    assert worker.verify_receipt(job.context_path,job.process)['accepted']
+    receipt=json.loads((job.output/'eds_eval/in-worker-audit-receipt.json').read_text())
+    assert receipt['worker_cuda']['actual_uuid_type']=='torch._C._CUuuid'
+    assert receipt['worker_cuda']['actual_uuid']==CANONICAL_GPU7_UUID[4:]
+    assert not torch.cuda.is_initialized()
+
+
+@pytest.mark.parametrize('fault',['unknown_type','native_bad_bytes','native_missing_bytes','str_extra_bytes'])
+def test_worker_rejects_serialized_native_type_or_byte_drift(owned_job,fault):
+    job=owned_job;assert worker.run_worker(job.context_path,job.command[1:])==0
+    path=job.output/'eds_eval/in-worker-audit-receipt.json';receipt=json.loads(path.read_text());actual=receipt['worker_cuda']
+    if fault=='unknown_type':actual['actual_uuid_type']='arbitrary.Type'
+    if fault=='native_bad_bytes':actual.update(actual_uuid_type='torch._C._CUuuid',actual_uuid_bytes_hex='0'*32)
+    if fault=='native_missing_bytes':actual['actual_uuid_type']='torch._C._CUuuid';actual.pop('actual_uuid_bytes_hex')
+    if fault=='str_extra_bytes':actual['actual_uuid_bytes_hex']=CANONICAL_GPU7_UUID[4:].replace('-','')
+    write_json(path,receipt)
+    with pytest.raises(ValueError):worker.verify_receipt(job.context_path,job.process)
+
+
+def test_v2_preflight_persists_identity_diagnostic_before_any_arithmetic(tmp_path,native_uuid_class,monkeypatch):
+    from scripts import qd_ed_n23_v2_backend as b
+    attempt='synthetic-native-diagnostic';output=tmp_path/'artifacts/attempts'/attempt
+    runtime={'gpu_mapping':{'physical_gpu':7,'uuid':CANONICAL_GPU7_UUID}}
+    plan={'artifact_root':str(tmp_path/'artifacts'),'source':{'commit':'fixture'},'runtime':write_json(tmp_path/'runtime.json',runtime),
+        'limits':b.LIMITS,'corpus':{},'predecessor_review':{'synthetic':True}}
+    planref=write_json(tmp_path/'plan.json',plan)
+    context={'schema':'n23-recovery-attempt-context-v2','attempt_id':attempt,'output_dir':str(output),'budget_bucket':'recovery',
+        'plan':planref,'timeout_seconds':120,'cleanup_seconds':40}
+    ctxref=write_json(tmp_path/'context.json',context)
+    release={'schema':'n23-backend-preflight-release-v2','plan':planref,'source':plan['source'],'runtime':plan['runtime'],
+        'limits':b.LIMITS,'attempt_id':attempt,'predecessor_review':plan['predecessor_review']}
+    relref=write_json(tmp_path/'release.json',release)
+    monkeypatch.setattr(b,'validate_plan',lambda _:runtime)
+    monkeypatch.setattr(b,'create_backend',backends.create_backend)
+    malformed=native_uuid_class();malformed.data.pop();cpu_identity_properties(monkeypatch,malformed)
+    monkeypatch.setattr(b,'iter_batches',lambda _:(_ for _ in ()).throw(AssertionError('no arithmetic after identity error')))
+    assert b.run_preflight(planref['path'],relref['path'],ctxref['path'])==2
+    report=json.loads((output/b.artifact_name(plan,'report')).read_text())
+    assert report['accepted'] is False and report['batches']==report['synthetic']==[]
+    assert report['errors']==['RuntimeError:audit physical CUDA UUID differs or unavailable']
+    assert report['identity_diagnostic']['uuid_public_type']=='torch._C._CUuuid'
+    assert report['identity_diagnostic']['serialized_raw_uuid']=='<malformed or unsupported UUID>'
+    assert report['identity_diagnostic']['expected_uuid']==CANONICAL_GPU7_UUID
+    assert report['identity_diagnostic']['visible_device_count']==1
     assert not torch.cuda.is_initialized()

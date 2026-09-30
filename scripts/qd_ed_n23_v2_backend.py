@@ -122,6 +122,8 @@ def run_preflight(plan_path, release_path, attempt_context_path):
                               and report['wrong_bounds_rejected'] and len(report['synthetic']) == 2)
     except Exception as exc:
         report['errors'].append(type(exc).__name__ + ':' + str(exc))
+        if isinstance(getattr(exc,'identity_diagnostic',None),dict):
+            report['identity_diagnostic']=exc.identity_diagnostic
     finally:
         report['worker_wall_seconds'] = time.perf_counter() - started
         if report['worker_wall_seconds'] > 120:
