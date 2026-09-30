@@ -1,0 +1,47 @@
+# Conditional N25 validation controller v1
+
+This is CPU preparation, not a release. The protocol and routing addendum in this directory are authoritative. Every old N25 Dev scientific, profile, provider, controller arithmetic, native witness and cost function is retained. No efficacy claim follows from synthetic checks.
+
+## Source and evidence bridge
+
+`qd_ed_n25_validation_bridge.source_record` inventories all 257 files of Dev commit `5a65ef15968cc68c82314e8c0773b3365ad45fa0`, plus 13 evaluation files. The only two modified old files are `qd_ed_final_runner.py` and `qd_ed_n23_worker.py`. Exact reverse replacements reconstruct both original files byte for byte. The other 255 old files are unchanged. The worker insertion is solely within `validate_context`; `run_worker`, `verify_receipt` and every other function remain byte-identical. Production never clones function code or replaces shared globals.
+
+The explicit `n25_validation` marker is routed before old Dev contracts. The plan retains an exact `n25_cohort.worker_audit` binding so the unchanged worker applies the original N25 native audit, including first-guided bounded witnesses, all-call summaries, profile-bound gates and valid zero gradients. Controls retain original CPU native audit; N25 retains assigned CUDA native arithmetic inside the same metered process. There is no supervisor CUDA audit or new preflight.
+
+The original Dev writer remains source-bound. Promotion is reconstructed from its actual result, status, Dev-only journal snapshot, all 40 accepted cells and all attempts, immutable receipts/contexts/process identities, original source manifest, original 12-case tensor proof and the earlier settled quality proof. Historical verification uses the recorded Dev source and process identity, not a demand that the new evaluation HEAD equal old HEAD. Original tensor authority schema, budget/source-review links and recorded boot ID are retained. Both proofs must remain settled and correctly charged. Reference paths may resolve through compatibility symlinks only with identical bytes and same resolved file. The private identity verifier is imported lazily by the new evidence module; old helpers are unchanged.
+
+## Separate gates and schemas
+
+All authority documents are external, hash-bound records. They do not occur inside their own source manifest. Exact live locations are under the N25 variant; disabled examples live separately in `validation-cpu-templates-v1` and are never admitted as live authority.
+
+* `validation-dev-promotion-review-v1.json`: schema `n25-dev-promotion-review-v1`; exact keys `schema, disposition, dev_plan, dev_status, dev_result, dev_source_bridge, allow_validation`. Requires disposition `promoted`, allow-validation true and actual complete 40-cell Dev promotion. All numeric/native/cost/status conditions are independently reconstructed; numeric futility, invalid, incomplete and fake promotion fail.
+* `validation-source-review-v1.json`: schema `n25-validation-source-review-v1`; exact keys `schema, disposition, dev_plan, protocol, routing_addendum, source, source_bridge, runtime, dev_source_bridge, no_execution_release`. Accepted review binds the complete evaluation source record and reverse bridge, immutable protocols and unchanged runtime. It grants no execution.
+* `validation-adoption-v1/authority.json`: schema `n25-validation-authority-v1`; exact keys `schema, cohort_id, seed_cohort, source, dev_review, source_review, protocol, routing_addendum, runtime, limits, caps, recorded_at, authority_interpretation, validation_authorized, formal_authorized`. A separate private-state `n25_validation_authority` hash reference is required. Cohort is `N25_VALIDATION_20260930`, seed cohort is the currently first unused c1..c4, validation true and formal false. The existing N25 budget authority must independently match exact caps.
+* `validation-plan.frozen.v1.gpu7.json`: original runtime/scientific profiles, new 270-file source and exact 60-row matrix; `n25_validation` carries `schema, cohort_id, seed_cohort, limits, protocol, routing_addendum, dev_review, source_review, authority, source_bridge, metadata_selection`. Only the prepare freeze path may bind actual gates and freeze it.
+* `validation-execution-release-v1.json`: schema `n25-validation-execution-release-v1`; exact keys `schema, plan, source_commit, cohort_id, seed_cohort, episode_keys, limits, dev_review, source_review, authority, physical_gpu, uuid, validation_authorized, formal_authorized`. All values must equal the frozen plan, GPU7 and frozen UUID. Fresh metadata is checked again under the original locks before the first dispatch.
+
+Paths/SHA references contain exactly `path, sha256`. The executable schemas deliberately reject disabled-template wrappers. No actual future result/status/review hash is invented during preparation.
+
+## Matrix, identity and budget
+
+Order is block b1 then b2, task0..9, C0/Q0/N25: 60 primaries, 20 per arm. Select the first completely untouched preregistered cohort using frozen identity metadata, historical exposure inventory, exposure registry and reserved/dispatched identity fields only. Outcomes are not selection inputs. Any prior exposure consumes the entire cohort. Release rechecks freshness; later dispatches allow only this cohort's already registered prefix. Registration appends identity-only exposure after the original journal write while its state lock is held.
+
+Exact cumulative caps are 494 attempts / 100 GPU hours and buckets baseline55/development199/validation180/formal40/recovery20, with protected validation32/formal12 hours. No mutation or transfer is implemented. Full remaining primary/recovery capacity and the remaining 32-hour local allowance must fit while retaining formal reserves. Each episode must also fit a full 1800+40 seconds in the local allowance. All original invalid attempts and costs remain charged. No model/provider/simulation cost is omitted.
+
+Only the unchanged E2 sole-Codex-timeout classifier may authorize at most two whole-episode recovery attempts, at most one per cell. The original terminal must be complete, native accepted, and have only the narrowly enumerated timeout derivative failures. Missing, nonfinite, semantic, interruption, worker timeout, other API, failed recovery and valid task failure never retry. Original incomplete tokens stay incomplete; unknown counts are not zero-imputed. Strict zero-guided missing-metrics compatibility retains agreement between original terminal, native canonical count and episode compute, plus evidence-reader identity and absent-file binding. Removing all N25 markers cannot downgrade the profile even for zero-guided episodes.
+
+## Reporting and ownership
+
+Controller files belong exactly to `N25/validation-execution`; attempt payloads stay under the frozen attempt artifact root. Both paths are independently owned; neither is treated as the other's child. Symlink/path escapes fail. The original runner locks, admission, cleanup, process identity, timeout, managed Codex login and append-only costs are reused without copying `run_plan`.
+
+No partial promotion or numeric futility is applied. All 60 native-valid cells, substantive QD/ED, N25 >=10/20 and >=C0/Q0 are needed. A status/postprocessing failure after valid journaling preserves the journal prefix, controller count disagreement and all attempt costs, and yields INVALID. No restart/resume is authorized. Detailed paired outcomes/errors/denominators/costs remain on disk in `protected-detail-v1.json`; CLI and `aggregate-disposition-v1.json` expose only aggregate disposition. If adjudication itself fails, the unadjudicated protected record preserves the complete local events and fails closed. Formal remains closed and the overall research goal is still unmet.
+
+## Root-only prospective activation
+
+1. After immutable complete Dev promotion, root writes the actual Dev promotion review and reviews the final evaluation commit, all source bytes/reverse bridge, runtime and historical settled proofs. If Dev does not promote, stop here.
+2. Root integrates only the exact reviewed commit after Dev ends, checks metadata-only freshness and capacity under original locks, writes source review and separate finite authority, and adopts its exact reference. No authority from N24 or Dev substitutes for this step.
+3. From that owning worktree run `scripts/qd_ed_n25_validation_prepare.py --freeze --output <N25>/validation-plan.frozen.v1.gpu7.json` with the existing Python environment. The command must pass actual admission; a preview is never executable.
+4. Root writes the exact execution release from the frozen plan, then invokes `scripts/qd_ed_n25_validation_supervise.py --plan <frozen-plan> --release <exact-release> --output-dir <N25>/validation-execution`. It rechecks source/runtime/identity/authority/resource/capacity and never creates a new GPU proof.
+5. Root uses only aggregate validation disposition for further algorithm steering. The detailed protected report is final evaluation evidence, not development input. Formal acceptance and compute-matched replacement ablation remain separately closed.
+
+These commands are prospective documentation only. CPU preparation does not read actual Dev/protected payloads, alter active state, adopt authority, integrate source or launch them.
