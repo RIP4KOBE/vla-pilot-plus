@@ -38,6 +38,7 @@ from core.qd_executed_feedback import (
 from core.qd_executed_quality import (
     ExecutedPrefixContract, executed_prefix_quality, recognize_executed_prefix_provider,
 )
+from core.qd_actuator_clipped_quality import MODE as ACTUATOR_CLIPPED_MODE, ActuatorClippedContract
 from core.qd_lift_quality import (
     HOLD_MODE as HOLD_LIFT_MODE, LIFT_MODES,
     LiftAfterCloseContract, close_then_lift_bonus, close_hold_then_lift_bonus,
@@ -2058,7 +2059,7 @@ class RDTSteer:
             )
             scoring_keypoints = keypoints.index_select(0, perm)
 
-        projection_out = ({"capture_origin": True} if isinstance(qd_quality_contract, FeedbackContract)
+        projection_out = ({"capture_origin": True} if isinstance(qd_quality_contract, (FeedbackContract, ActuatorClippedContract))
                           else {} if qd_quality_contract is not None else None)
         if qd_quality_contract is not None:
             if reward_mode != "normal":
@@ -2082,7 +2083,12 @@ class RDTSteer:
                 raise FloatingPointError("N2 original provider reward is nonfinite")
             quality_info["raw_rewards"] = rewards.detach().clone()
             quality_info["qd_scored_actions"] = samples.detach().clone()
-            if isinstance(qd_quality_contract, LiftAfterCloseContract):
+            if isinstance(qd_quality_contract, ActuatorClippedContract):
+                rewards, clipped_mask = qd_quality_contract.score(
+                    samples[:, :8, RDT_GUIDED_TRANSLATION_INDICES], projection_out["source_origins"],
+                    projection_out["projected_xyz"], scoring_keypoints, rewards)
+                quality_info["clipped_prefix_mask"] = clipped_mask
+            elif isinstance(qd_quality_contract, LiftAfterCloseContract):
                 decoded = self._decode_visualization_action_candidates(samples)
                 bonus_function = (close_hold_then_lift_bonus
                                   if qd_quality_contract.mode == HOLD_LIFT_MODE
@@ -2117,6 +2123,9 @@ class RDTSteer:
                                 "raw_provider_quality": quality_info["raw_rewards"],
                                 "target_index": qd_quality_contract.target_index,
                                 "provider_identity": qd_quality_contract.identity,
+                                **({"actuator_metadata": qd_quality_contract.metadata,
+                                    "clipped_prefix_mask": quality_info["clipped_prefix_mask"]}
+                                   if isinstance(qd_quality_contract, ActuatorClippedContract) else {}),
                                 **({"lift_bonus": quality_info["lift_bonus"]}
                                    if isinstance(qd_quality_contract, LiftAfterCloseContract) else {})}
                                if qd_quality_contract is not None else {}))
@@ -4926,7 +4935,7 @@ class RDTSteer:
         feedback_setup_started = time.perf_counter() if cfg.qd_quality_mode == FEEDBACK_MODE else None
         quality_contract = None
         quality_reason = "provider_mode"
-        if cfg.qd_quality_mode in {"executed_prefix_v1", FEEDBACK_MODE, *LIFT_MODES}:
+        if cfg.qd_quality_mode in {"executed_prefix_v1", FEEDBACK_MODE, ACTUATOR_CLIPPED_MODE, *LIFT_MODES}:
             if self._action_chunk_horizon != 8:
                 raise ValueError("Executed-prefix quality requires action_chunk_horizon=8")
             quality_contract, quality_reason = recognize_executed_prefix_provider(guidance_fns, keypoints)
@@ -4934,6 +4943,14 @@ class RDTSteer:
                 if quality_contract is None:
                     raise RuntimeError(f"N18 provider semantic identity unavailable: {quality_reason}")
                 quality_contract = LiftAfterCloseContract(quality_contract, mode=cfg.qd_quality_mode)
+            if cfg.qd_quality_mode == ACTUATOR_CLIPPED_MODE:
+                if quality_contract is None:
+                    raise RuntimeError(f"N23 provider semantic identity unavailable: {quality_reason}")
+                quality_contract = ActuatorClippedContract(quality_contract, self._adapter)
+                quality_contract.validate(guidance_fns)
+                evidence = getattr(self, "_decision_evidence", None)
+                if evidence is not None:
+                    evidence.record("actuator_metadata_snapshot", metadata=quality_contract.metadata)
             if cfg.qd_quality_mode == FEEDBACK_MODE:
                 if not hasattr(self, "_executed_feedback"):
                     self._executed_feedback = ExecutedFeedbackHistory()
@@ -4994,6 +5011,8 @@ class RDTSteer:
         if quality_contract is not None:
             metrics.qd_quality_target_index = quality_contract.target_index
             metrics.qd_quality_identity = dict(quality_contract.identity)
+        if isinstance(quality_contract, ActuatorClippedContract):
+            metrics.qd_actuator_metadata = dict(quality_contract.metadata)
         if isinstance(quality_contract, FeedbackContract):
             metrics.qd_feedback_active = quality_contract.active
             metrics.qd_feedback_reason = quality_contract.reason
@@ -6985,6 +7004,11 @@ class RDTSteer:
         stage_raw_rewards = None
         if quality_contract is not None:
             quality_contract.validate(guidance_fns)
+            if isinstance(quality_contract, ActuatorClippedContract):
+                metrics.qd_actuator_overhead_seconds = quality_contract.overhead_seconds
+                metrics.qd_actuator_quality_batches = quality_contract.batches
+                metrics.qd_actuator_quality_candidates = quality_contract.candidates
+                metrics.qd_actuator_clipped_prefix_candidates = quality_contract.changed_prefix_candidates
             stage_raw_rewards = original_rewards(population_info, final_rewards, None if qd_archive is not None else population)
             metrics.qd_selected_raw_reward = float(stage_raw_rewards[best_idx].item())
             metrics.qd_final_best_raw_reward = float(stage_raw_rewards.max().item())
@@ -7401,7 +7425,7 @@ class RDTSteer:
             self._last_eds_mechanism_trace = None
         if terminal_mode:
             stage_best_cost = (-stage_raw_rewards[best_idx]
-                               if isinstance(quality_contract, LiftAfterCloseContract)
+                               if isinstance(quality_contract, (LiftAfterCloseContract, ActuatorClippedContract))
                                else population_scores[best_idx])
             self._eds_update_guidance_metadata_from_cost(stage_best_cost, stage_reference_costs)
             if evidence is not None:
@@ -8144,7 +8168,7 @@ class RDTSteer:
         if resolved.qd_final_selection_mode not in {DEFAULT_FINAL_SELECTION_MODE, TERMINAL_POPULATION_MODE, GRASP_TIMING_MODE, CONTACT_SWEEP_MODE}:
             raise ValueError("EDS qd_final_selection_mode is unsupported")
         if resolved.qd_final_selection_mode in {TERMINAL_POPULATION_MODE, GRASP_TIMING_MODE, CONTACT_SWEEP_MODE}:
-            terminal_lift_quality = (resolved.qd_quality_mode in LIFT_MODES
+            terminal_lift_quality = (resolved.qd_quality_mode in {*LIFT_MODES, ACTUATOR_CLIPPED_MODE}
                                      and resolved.qd_final_selection_mode == GRASP_TIMING_MODE
                                      and resolved.qd_descriptor == DIRECTION_HEIGHT_DESCRIPTOR)
             required_terminal = {
@@ -8171,7 +8195,7 @@ class RDTSteer:
         if (resolved.qd_final_selection_mode == CONTACT_SWEEP_MODE
                 and resolved.qd_descriptor != DIRECTION_HEIGHT_DESCRIPTOR):
             raise ValueError("N9 contact sweep requires the frozen N7 direction-height descriptor")
-        if resolved.qd_quality_mode not in {"provider", "executed_prefix_v1", FEEDBACK_MODE, *LIFT_MODES}:
+        if resolved.qd_quality_mode not in {"provider", "executed_prefix_v1", FEEDBACK_MODE, ACTUATOR_CLIPPED_MODE, *LIFT_MODES}:
             raise ValueError("EDS qd_quality_mode is unsupported")
         if resolved.qd_quality_mode in {"executed_prefix_v1", FEEDBACK_MODE}:
             required_quality = {
@@ -8190,7 +8214,7 @@ class RDTSteer:
             for name, expected in required_quality.items():
                 if getattr(resolved, name) != expected:
                     raise ValueError(f"Executed-prefix quality requires {name}={expected!r}")
-        if resolved.qd_quality_mode in LIFT_MODES:
+        if resolved.qd_quality_mode in {*LIFT_MODES, ACTUATOR_CLIPPED_MODE}:
             required_lift = {
                 "reward_mode": "normal", "qd_archive_mode": "grid_archive",
                 "qd_descriptor": DIRECTION_HEIGHT_DESCRIPTOR,

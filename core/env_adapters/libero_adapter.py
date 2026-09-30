@@ -789,6 +789,8 @@ class LiberoEnv(gym.Env):
         return observation
 
     def reset(self, seed=None, **kwargs):
+        if hasattr(self, "_actuator_quality_reset_generation"):
+            self._actuator_quality_reset_generation += 1
         super().reset(seed=seed)
         self._env.seed(seed)
         raw_obs = self._env.reset()

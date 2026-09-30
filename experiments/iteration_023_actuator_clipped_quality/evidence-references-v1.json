@@ -1,0 +1,41 @@
+{
+  "schema": "n23-cpu-evidence-references-v1",
+  "references": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/diagnostics/20260930_executed_projection/protocol-readonly-v1.md",
+      "sha256": "2e4f89aa77e8294a0022367e0901e5e26311f2eabdd1ceadced2edb8599221e9"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/diagnostics/20260930_executed_projection/audit_readonly_v1.py",
+      "sha256": "f4cf33f140fe5f2c46b80073fbb35d2584f28c26845757a0440bd2f011de53f7"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/diagnostics/20260930_executed_projection/audit-result-v1.json",
+      "sha256": "fe49c99ce0c3528c9a1e1f3e30b07a71639eac00282807eff8522a1cf287bcc3"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/diagnostics/20260930_executed_projection/independent-review-v1.md",
+      "sha256": "abe0636264e4857cac69958618775ce4b4c0f917b2afc05c0ff5db74a1e5baed"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/diagnostics/20260930_executed_projection/independent-review-v1.json",
+      "sha256": "fce182839dcff5177dd8486f764162c1b3c0102d191f9c3e8bae960ba3915345"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/diagnostics/20260930_executed_projection/clipped-ranking-screen-protocol-v1.md",
+      "sha256": "2a87f6151376480daa728dd3fcce486ee8f07feaf2c01d01dc6bd4ae3f62d234"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/diagnostics/20260930_executed_projection/clipped_ranking_screen_v1.py",
+      "sha256": "f4a60609f622d735129abf4ec111913a258bea60c31e3ce754dc9a506f9cade2"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/diagnostics/20260930_executed_projection/clipped-ranking-result-v1.json",
+      "sha256": "a77c8a4f4dd833f3fb0fd97ed52722d9ee95eda0933a3fd6eb04b8db68d40652"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/diagnostics/20260930_executed_projection/clipped-ranking-conclusion-v1.md",
+      "sha256": "02e2e471d8d84bcaaecde7af76d16ae638c095a92c3f84cc86a1a90363b689d8"
+    }
+  ]
+}

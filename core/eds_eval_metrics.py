@@ -440,6 +440,12 @@ class EDSChunkMetrics:
     qd_quality_identity: dict = field(default_factory=dict)
     qd_quality_batches: list[dict] = field(default_factory=list)
     qd_quality_changed_candidates: int = 0
+    qd_actuator_metadata: dict = field(default_factory=dict)
+    qd_actuator_overhead_seconds: float = 0.0
+    qd_actuator_overhead_scope: str = "static_snapshot_validation_and_internal_tensor_quality; origin/evidence_copy_excluded_from_timer_but_in_total_wall"
+    qd_actuator_quality_batches: int = 0
+    qd_actuator_quality_candidates: int = 0
+    qd_actuator_clipped_prefix_candidates: int = 0
     qd_feedback_active: bool = False
     qd_feedback_reason: str = "not_requested"
     qd_feedback_context: dict = field(default_factory=dict)
@@ -542,6 +548,10 @@ class EDSChunkMetrics:
         if self.qd_final_selection_mode == "archive_global_best":
             for key in ("qd_final_selection_mode", "qd_terminal_population", "qd_archive_reference"):
                 payload.pop(key)
+        if self.qd_quality_mode != "actuator_clipped_provider_v1":
+            for key in list(payload):
+                if key.startswith("qd_actuator_"):
+                    payload.pop(key)
         if self.qd_quality_mode != "executed_feedback_v1":
             for key in list(payload):
                 if key.startswith("qd_feedback_"):

@@ -72,6 +72,85 @@ def _native_record(value):
             "sha256": _native_sha(value), "values": value.tolist()}
 
 
+def _audit_n23_score(score, effective, aggregate, kinds, events, context):
+    """Independent native reconstruction: no N23 production helper import."""
+    snapshots = kinds["actuator_metadata_snapshot"]
+    require(len(snapshots) == 1 and snapshots[0]["sequence"] < score["sequence"]
+            and snapshots[0]["reset_sequence"] == score["reset_sequence"], "n23_snapshot_lifecycle")
+    metadata = snapshots[0]["values"].get("metadata")
+    require(isinstance(metadata, dict) and metadata == effective.get("actuator_metadata")
+            and metadata.get("schema") == "n23-static-actuator-snapshot-v1", "n23_snapshot_binding")
+    sem = metadata.get("semantics", {})
+    require(sem.get("controller_type") == "robosuite.controllers.osc.OperationalSpaceController"
+            and sem.get("name") == "OSC_POSE" and sem.get("use_delta") is True
+            and sem.get("use_ori") is True and type(sem.get("control_dim")) is int
+            and sem["control_dim"] == 6 and sem.get("impedance_mode") == "fixed",
+            "n23_controller_semantics")
+    for name in ("input_min", "input_max", "output_min", "output_max"):
+        v = sem.get(name)
+        require(isinstance(v, list) and len(v) == 6
+                and all(type(x) is float and math.isfinite(x) for x in v)
+                and sem.get(name + "_dtype") in {"float16", "float32", "float64"},
+                "n23_controller_bounds_shape_type")
+    require(sem["input_min"][:3] == [-1.] * 3 and sem["input_max"][:3] == [1.] * 3,
+            "n23_controller_bounds")
+    identity = metadata.get("context", {})
+    require(set(identity) == {"pid", "adapter_id", "wrapper_id", "environment_id", "controller_id",
+                             "task_index", "episode_index", "inner_reset_generation"}
+            and all(type(v) is int and v >= 0 for v in identity.values()), "n23_controller_identity")
+    sources = metadata.get("source", {})
+    require(set(sources) == {"set_goal", "scale_action"}, "n23_controller_source_missing")
+    for name, proof in sources.items():
+        path = Path(proof.get("path", ""))
+        require(path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest() == proof.get("sha256")
+                and isinstance(proof.get("qualname"), str) and proof["qualname"].endswith("." + name),
+                "n23_controller_source_hash")
+    v = score["values"]
+    actions, xyz, keypoints = (v[n] for n in ("samples", "projected_xyz", "keypoints"))
+    raw = aggregate["aggregate_before_reward_mode"]
+    require(effective.get("quality_mode") == "actuator_clipped_provider_v1"
+            and effective.get("target_index") == 0 and len(context["values"]["providers"]) == 1
+            and effective.get("provider_identity", {}).get("source_text_sha256")
+                == context["values"]["providers"][0].get("source_text_sha256"), "n23_provider_binding")
+    provider_source = context["values"]["providers"][0]
+    source_path = Path(provider_source.get("source_path", ""))
+    require(source_path.is_file(), "n23_provider_source_missing")
+    source_text = source_path.read_text()
+    require(hashlib.sha256(source_text.encode()).hexdigest() == provider_source.get("source_text_sha256"),
+            "n23_provider_source_hash")
+    from core.qd_executed_quality import _template_index
+    try:
+        _, _, parsed_index = _template_index(source_text)
+    except (ValueError, SyntaxError, TypeError) as exc:
+        raise AuditFailure("n23_provider_template") from exc
+    require(parsed_index == 0, "n23_provider_target0")
+    require(actions.shape == (len(raw), 64, 128) and xyz.shape == (len(raw), 9, 3)
+            and actions.dtype == xyz.dtype == keypoints.dtype == raw.dtype, "n23_native_shape_dtype")
+    # Translation indices follow the unchanged RDT action decoder; this is not
+    # the FP64 offline screen. Rebuild each candidate in native arithmetic.
+    commands = actions[:, :8, 39:42]
+    affected = ((commands[:, :7] > 1) | (commands[:, :7] < -1)).any(dim=(1, 2))
+    require(tensor(effective.get("clipped_prefix_mask"))
+            and torch.equal(effective["clipped_prefix_mask"], affected), "n23_clipped_mask")
+    expected = raw.clone()
+    weights = torch.tensor([1, 1, 1, 1, 3, 3, 3], dtype=torch.float32) / 13
+    for i, sequence in enumerate(v["projection_origin_sequences"]):
+        source = events[sequence - 1]["values"]["source_eef_position"].to(actions.dtype)
+        full_raw = source + torch.cumsum(commands[i] * 0.01, dim=0)
+        require(torch.equal(source, xyz[i, 0]) and torch.equal(full_raw, xyz[i, 1:]),
+                "n23_native_raw_projection")
+        def native_score(points):
+            distances = torch.norm(points[None, :7] - keypoints[0], dim=-1)
+            return (-(distances ** 2 * weights).sum(dim=1)).mean().to(raw.dtype)
+        require(torch.equal(native_score(full_raw), raw[i]), "n23_seven_point_raw_provider")
+        if bool(affected[i]):
+            bounded = torch.minimum(torch.maximum(commands[i], torch.full_like(commands[i], -1)),
+                                    torch.ones_like(commands[i]))
+            expected[i] = native_score(source + torch.cumsum(bounded * .01, dim=0))
+    require(_native_sha(expected) == _native_sha(effective["quality"]), "n23_native_clipped_quality")
+    return int(affected.sum().item())
+
+
 def _audit_n18_score(scoring, effective, aggregate):
     return _audit_lift_score(scoring, effective, aggregate, require_hold=False)
 
@@ -390,11 +469,11 @@ def _audit_n4_terminal_population(kinds, context, final_event):
         require(len(aggregates) == len(effectives) == 1, "n4_same_call_score_missing_or_duplicate")
         aggregate, effective = aggregates[0], effectives[0]; ev = effective["values"]
         require(ev.get("quality_mode", "provider") == value.get("quality_mode", "provider")
-                and ev.get("quality_mode", "provider") in {"provider", "close_then_lift_v1", "close_hold_then_lift_v1"}
+                and ev.get("quality_mode", "provider") in {"provider", "close_then_lift_v1", "close_hold_then_lift_v1", "actuator_clipped_provider_v1"}
                 and ev["reward_mode"] == "normal" and ev["scoring_scope"] == aggregate["values"]["scoring_scope"] == scope,
                 "n4_original_provider_mode_mismatch")
         costs = native(ev["costs"], (16,), actions.dtype)
-        original = (ev.get("raw_provider_quality") if ev.get("quality_mode") in {"close_then_lift_v1", "close_hold_then_lift_v1"}
+        original = (ev.get("raw_provider_quality") if ev.get("quality_mode") in {"close_then_lift_v1", "close_hold_then_lift_v1", "actuator_clipped_provider_v1"}
                     else quality)
         require(same(quality, ev["quality"])
                 and same(original, aggregate["values"]["aggregate_before_reward_mode"])
@@ -470,7 +549,7 @@ def _audit_n4_terminal_population(kinds, context, final_event):
 
     final = final_event["values"]; terminal = final["terminal_population"]; archive = final["archive_reference"]
     last = canonical[-1]; last_values = last["values"]
-    lift_mode = final.get("quality_mode") in {"close_then_lift_v1", "close_hold_then_lift_v1"}
+    lift_mode = final.get("quality_mode") in {"close_then_lift_v1", "close_hold_then_lift_v1", "actuator_clipped_provider_v1"}
     terminal_raw = (last_values.get("raw_provider_quality") if lift_mode
                     else last_values["effective_quality"])
     require(tensor(terminal_raw) and terminal_raw.shape == (16,)
@@ -482,7 +561,7 @@ def _audit_n4_terminal_population(kinds, context, final_event):
                                          "terminal_grasp_proximity" if n5_mode else "terminal_population_first_argmin")
             and final.get("qd_final_selection_mode") == ("terminal_contact_sweep_v1" if n9_mode else
                                                          "terminal_grasp_proximity_v1" if n5_mode else "terminal_population_v1")
-            and final.get("quality_mode", "provider") in {"provider", "close_then_lift_v1", "close_hold_then_lift_v1"}, "n4_final_mode_mismatch")
+            and final.get("quality_mode", "provider") in {"provider", "close_then_lift_v1", "close_hold_then_lift_v1", "actuator_clipped_provider_v1"}, "n4_final_mode_mismatch")
     require(last["sequence"] < final_event["sequence"] < one("policy_action_decode")["sequence"], "n4_final_order")
     require(terminal["iter_idx"] == 9 and terminal["canonical_event_sequence"] == last["sequence"]
             and terminal["scoring_batch_id"] == scoring[9]["sequence"], "n4_last_canonical_source_mismatch")
@@ -917,7 +996,7 @@ def audit_episode(episode_dir, episode_compute_file):
             dual_modes = {r["values"].get("quality_mode")
                           for kind in ("canonical_candidate_batch", "effective_quality", "final_selection")
                           for r in kinds[kind] if r["values"].get("quality_mode") in
-                          {"executed_prefix_v1", "executed_feedback_v1", "close_then_lift_v1", "close_hold_then_lift_v1"}}
+                          {"executed_prefix_v1", "executed_feedback_v1", "close_then_lift_v1", "close_hold_then_lift_v1", "actuator_clipped_provider_v1"}}
             require(len(dual_modes) <= 1, "dual_quality_mixed_modes")
             dual_mode = next(iter(dual_modes), None)
             dual_active = dual_mode is not None
@@ -1022,6 +1101,18 @@ def audit_episode(episode_dir, episode_compute_file):
                     require(tensor(raw) and raw.shape == aggregate.shape and raw.dtype == aggregate.dtype
                             and torch.equal(raw, aggregate), "n2_raw_aggregate_mismatch")
                     require(effective[0]["reward_mode"] == "normal", "n2_reward_mode_invalid")
+                    if dual_mode == "actuator_clipped_provider_v1":
+                        changed = _audit_n23_score(score, effective[0], aggregates[0], kinds, events, context)
+                        gate = report.setdefault("n23_actuator_clipped_quality_audit", {
+                            "schema": "n23-native-actuator-clipped-quality-audit-v1",
+                            "score_batches_verified": 0, "candidate_scores_verified": 0,
+                            "clipped_prefix_candidates": 0, "rank_changed_batches": 0})
+                        gate["score_batches_verified"] += 1
+                        gate["candidate_scores_verified"] += len(samples)
+                        gate["clipped_prefix_candidates"] += changed
+                        gate["rank_changed_batches"] += int(not torch.equal(
+                            torch.argsort(raw, descending=True, stable=True),
+                            torch.argsort(effective[0]["quality"], descending=True, stable=True)))
                     if dual_mode in {"close_then_lift_v1", "close_hold_then_lift_v1"}:
                         hold_mode = dual_mode == "close_hold_then_lift_v1"
                         auditor = _audit_n22_score if hold_mode else _audit_n18_score
@@ -1090,7 +1181,7 @@ def audit_episode(episode_dir, episode_compute_file):
                              or r["values"].get("qd_final_selection_mode") in {"terminal_population_v1", "terminal_grasp_proximity_v1", "terminal_contact_sweep_v1"}
                              or "terminal_population" in r["values"] for r in kinds["final_selection"])
             if n4_markers or kinds["terminal_population_stage_binding"]:
-                require(guided and (not dual_active or dual_mode in {"close_then_lift_v1", "close_hold_then_lift_v1"}),
+                require(guided and (not dual_active or dual_mode in {"close_then_lift_v1", "close_hold_then_lift_v1", "actuator_clipped_provider_v1"}),
                         "n4_unguided_or_unsupported_quality")
                 final_event = one("final_selection")
                 n9_mode = final_event["values"].get("qd_final_selection_mode") == "terminal_contact_sweep_v1"

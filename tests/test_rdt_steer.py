@@ -10801,3 +10801,187 @@ def test_n6_height_descriptor_real_cpu_loop_preserves_search_compute(stub_steer,
         kinds[event['event']].append(event)
     height_gate = audit._audit_n6_height_assignment(kinds, kinds['final_selection'][0])
     assert height_gate['assignments_verified'] == 11 and height_gate['candidates_verified'] == 176
+
+
+@pytest.mark.parametrize("dtype", [torch.float32, torch.bfloat16])
+@pytest.mark.parametrize("case", ["valid", "unclipped_quality", "wrong_bounds"])
+def test_n23_full_native_cpu_loop_static_metadata_and_independent_rejection(
+    stub_steer, stub_adapter, monkeypatch, tmp_path, dtype, case,
+):
+    import ast
+    import copy
+    from types import MethodType, SimpleNamespace
+    from core.decision_evidence import DecisionEvidence
+    from core.rdt_libero_action_converter import decode_rdt_libero_action_chunk
+    from scripts.audit_decision_evidence import audit_episode
+    from test_qd_actuator_clipped_quality import static_adapter_fixture
+    root = Path(__file__).resolve().parents[1]
+    for name, value in vars(static_adapter_fixture()).items():
+        monkeypatch.setattr(stub_adapter, name, value, raising=False)
+    monkeypatch.setattr(stub_adapter, "get_ee_pose_world", lambda: SimpleNamespace(
+        position=np.array([.12317, -.17312, .23141], dtype=np.float64)), raising=False)
+    tree = ast.parse((root / "core/env_adapters/libero_adapter.py").read_text())
+    cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "LiberoAdapter")
+    node = next(n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name == "delta_actions_to_ee_trajectory")
+    scope = {"np": np, "torch": torch}
+    import __future__
+    exec(compile(ast.Module(body=[node], type_ignores=[]), "libero_adapter.py", "exec",
+                 flags=__future__.annotations.compiler_flag), scope)
+    native_project = MethodType(scope["delta_actions_to_ee_trajectory"], stub_adapter)
+    counts = {"project": 0, "decode": 0}
+    projection_sites = {}
+    original_batch_project = stub_steer._rdt_sample_to_trajectory_3d
+    def traced_batch_project(samples, **kwargs):
+        import inspect
+        caller = inspect.currentframe().f_back
+        site = f"{caller.f_code.co_name}:{caller.f_lineno}"
+        record = projection_sites.setdefault(site, {"calls": 0, "rows": 0})
+        record["calls"] += 1
+        record["rows"] += len(samples)
+        return original_batch_project(samples, **kwargs)
+    monkeypatch.setattr(stub_steer, "_rdt_sample_to_trajectory_3d", traced_batch_project)
+    def traced_project(actions, **kwargs):
+        counts["project"] += 1
+        return native_project(actions, **kwargs)
+    monkeypatch.setattr(stub_adapter, "delta_actions_to_ee_trajectory", traced_project)
+    original_decode = stub_steer._decode_visualization_action_candidates
+    def traced_decode(actions):
+        counts["decode"] += 1
+        return original_decode(actions)
+    monkeypatch.setattr(stub_steer, "_decode_visualization_action_candidates", traced_decode)
+    stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
+                         sample_batch_size=16, policy_config={"action_chunk_horizon": 8})
+    provider = _n2_fixture_provider(index=0)
+    provider_path = tmp_path / "stage1_guidance.py"
+    provider_path.write_text(provider._guidance_source_text)
+    provider._guidance_source_path = str(provider_path)
+    keypoints = torch.tensor([[.1124, -.071, .3154], [.13, -.21, .39]], dtype=dtype)
+    initial = torch.linspace(-.12, .19, 16 * 64 * 128).reshape(16, 64, 128).to(dtype)
+    monkeypatch.setattr(stub_steer, "_eds_initial_population", lambda **kw: initial.clone())
+    runs = []
+    for mode in (["N7", "N23"] if case == "valid" else ["N23"]):
+        stub_steer.reset()
+        for name in counts: counts[name] = 0
+        projection_sites.clear()
+        rec = DecisionEvidence(tmp_path / mode, episode=0)
+        stub_steer._decision_evidence = rec
+        monkeypatch.setattr(stub_adapter, "_decision_evidence", rec, raising=False)
+        original_record = rec.record
+        def recorded(event, **values):
+            if case == "unclipped_quality" and event == "effective_quality":
+                if values.get("quality_mode") == "actuator_clipped_provider_v1":
+                    values = dict(values, quality=values["raw_provider_quality"], costs=-values["raw_provider_quality"])
+            if case == "wrong_bounds" and event in {"actuator_metadata_snapshot", "effective_quality"}:
+                key = "metadata" if event == "actuator_metadata_snapshot" else "actuator_metadata"
+                if key in values:
+                    values = copy.deepcopy(values)
+                    values[key]["semantics"]["input_max"][0] = .5
+            return original_record(event, **values)
+        monkeypatch.setattr(rec, "record", recorded)
+        rec.begin_decision(global_step=0, stage=1, use_guidance=True, keypoints=keypoints, providers=[provider])
+        profile = json.loads((root / f"configs/qd_ed_final/candidate_{mode.lower()}.json").read_text())["profile"]
+        cfg = stub_steer._resolve_eds_config_with_reference_defaults(profile)
+        torch.manual_seed(25191)
+        selected = stub_steer._eds_guided_denoise_loop(
+            x_t=torch.zeros_like(initial), cond=_rollout_cond(stub_steer), keypoints=keypoints,
+            guidance_fns=[provider], eds_config=cfg, verbose=False, global_step=0, current_stage=1)
+        rec.flush()
+        events = [event for path in sorted(rec.root.glob("bundle_*.pt"))
+                  for event in torch.load(path, map_location="cpu", weights_only=True)["events"]]
+        final = next(e["values"] for e in events if e["event"] == "final_selection")
+        binding = next(e["values"] for e in events if e["event"] == "terminal_population_stage_binding")
+        canonical = [e["values"] for e in events if e["event"] == "canonical_candidate_batch"]
+        metrics = stub_steer.get_last_eds_metrics()
+        assert len(canonical) == 11 and metrics["search_evaluation_count"] == 176 and metrics["score_call_count"] == 11
+        assert torch.equal(selected, final["selected_latent"])
+        if mode == "N23":
+            index = final["selected_index"]
+            raw = canonical[-1]["raw_provider_quality"][index].item()
+            assert final["selected_raw_provider_quality"] == raw == binding["selected_raw_reward"]
+            assert metrics["qd_actuator_quality_batches"] == 11
+            assert metrics["qd_actuator_quality_candidates"] == 176
+            assert metrics["qd_actuator_clipped_prefix_candidates"] > 0
+            assert metrics["qd_actuator_overhead_seconds"] > 0
+        else:
+            assert not any(k.startswith("qd_actuator_") for k in metrics)
+            assert not any(e["event"] == "actuator_metadata_snapshot" for e in events)
+            assert not hasattr(stub_adapter._env[0], "_actuator_quality_reset_generation")
+        archive_rewards = -final["stage_reward_reference"]["reference_costs"]
+        expected_scale = float(torch.clamp(archive_rewards.max() - archive_rewards.mean(), min=0.).item())
+        assert binding["archive_cost_spread_scale"] == expected_scale
+        actions = decode_rdt_libero_action_chunk(selected.float(), 8)
+        rec.record("policy_action_decode", selected_latent=selected.float(), action_chunk=actions)
+        rec.commit_decision(action_chunk=actions, execution_horizon=8)
+        for i in range(8):
+            rec.dispatch(global_step=i, execution_index=i + 1)
+            rec.record("executed_action", action_numpy=actions[0, i].numpy())
+            rec.pre_reset_outcome({"robot0_eef_pos": np.zeros(3)}, reward=0., terminated=(i == 7), success=False)
+            rec.step_returned(terminated=(i == 7), truncated=False, success=False)
+        rec.finish()
+        compute = tmp_path / mode / "episode_compute.jsonl"
+        compute.write_text(json.dumps({"episode_id": 0, "outcome": "completed", "decision_evidence": rec.status()}) + "\n")
+        report = audit_episode(rec.root, compute)
+        (tmp_path / mode / "audit-report.json").write_text(json.dumps(report, indent=2) + "\n")
+        (tmp_path / mode / "metrics.json").write_text(json.dumps(metrics, indent=2) + "\n")
+        if case == "valid":
+            assert report["accepted"], report["errors"]
+            if mode == "N23":
+                gate = report["n23_actuator_clipped_quality_audit"]
+                assert gate["score_batches_verified"] == 11 and gate["candidate_scores_verified"] == 176
+                assert gate["clipped_prefix_candidates"] > 0 and gate["rank_changed_batches"] > 0
+        else:
+            assert not report["accepted"]
+            assert ("n23_native_clipped_quality" if case == "unclipped_quality" else "n23_controller_bounds") in str(report["errors"])
+        runs.append({"counts": dict(counts), "projection_sites": copy.deepcopy(projection_sites), "compute": stub_steer.get_episode_compute_counters(),
+                     "provider_returns": sum(e["event"] == "provider_return" for e in events),
+                     "parent_rows": [e["values"]["parent_fingerprints"] for e in events if e["event"] == "archive_parent_allocation"],
+                     "final": final["selected_canonical_fingerprint"], "report": report})
+    if case == "valid":
+        assert runs[0]["counts"]["decode"] == runs[1]["counts"]["decode"]
+        left, right = runs[0]["projection_sites"], runs[1]["projection_sites"]
+        assert left.keys() == right.keys()
+        # Every external projection invocation has the same existing caller.
+        # The final target-distance diagnostic projects the occupied archive,
+        # whose row count is an algorithm-dependent outcome (not fixed work).
+        for site in left:
+            assert left[site]["calls"] == right[site]["calls"]
+            if site.startswith("_eds_target_distance:"):
+                assert left[site]["calls"] == right[site]["calls"] == 2
+                assert 0 < left[site]["rows"] <= 32 and 0 < right[site]["rows"] <= 32
+            else:
+                assert left[site]["rows"] == right[site]["rows"]
+        assert sum(v["rows"] for v in left.values()) == runs[0]["counts"]["project"]
+        assert sum(v["rows"] for v in right.values()) == runs[1]["counts"]["project"]
+        assert runs[0]["compute"] == runs[1]["compute"]
+        assert runs[0]["provider_returns"] == runs[1]["provider_returns"] == 176
+        assert runs[0]["parent_rows"] != runs[1]["parent_rows"] or runs[0]["final"] != runs[1]["final"]
+        (tmp_path / "compute-comparison.json").write_text(json.dumps([
+            {k: v for k, v in r.items() if k not in {"report", "parent_rows"}} for r in runs], indent=2) + "\n")
+    assert not torch.cuda.is_initialized()
+
+
+@pytest.mark.parametrize("fault", ["unknown_provider", "target1", "bounds", "reset"])
+def test_n23_invalid_contract_fails_before_canonical_search(stub_steer, stub_adapter, monkeypatch, fault):
+    from test_qd_actuator_clipped_quality import static_adapter_fixture
+    from core.qd_actuator_clipped_quality import ActuatorClippedContract
+    for name, value in vars(static_adapter_fixture()).items():
+        monkeypatch.setattr(stub_adapter, name, value, raising=False)
+    stub_steer.post_init(adapter=stub_adapter, postprocessor=lambda x: x,
+                         sample_batch_size=16, policy_config={"action_chunk_horizon": 8})
+    profile = json.loads((Path(__file__).resolve().parents[1] / "configs/qd_ed_final/candidate_n23.json").read_text())["profile"]
+    cfg = stub_steer._resolve_eds_config_with_reference_defaults(profile)
+    fn = _n2_fixture_provider(index=1 if fault == "target1" else 0)
+    if fault == "unknown_provider": fn = lambda k, a: a.sum() * 0
+    if fault == "bounds": stub_adapter._env[0]._env.robots[0].controller.input_max[0] = .9
+    if fault == "reset":
+        original = ActuatorClippedContract.__post_init__
+        def reset_after_snapshot(self):
+            original(self)
+            self._wrapper._actuator_quality_reset_generation += 1
+        monkeypatch.setattr(ActuatorClippedContract, "__post_init__", reset_after_snapshot)
+    with pytest.raises(RuntimeError):
+        stub_steer._eds_guided_denoise_loop(x_t=torch.zeros(16, 64, 128), cond=_rollout_cond(stub_steer),
+            keypoints=torch.zeros(2, 3), guidance_fns=[fn], eds_config=cfg,
+            verbose=False, global_step=0, current_stage=1)
+    assert stub_steer.get_episode_compute_counters()["reward_calls"] == 0
+    assert not torch.cuda.is_initialized()

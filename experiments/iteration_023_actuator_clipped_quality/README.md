@@ -1,0 +1,13 @@
+# N23 conditional CPU prototype
+
+Status: **CONDITIONAL_BACKEND_NOT_READY**. No GPU admission, experiment budget, dispatch contract, supervisor or protected-set plan is included.
+
+The sole opt-in scientific field relative to N7 is `qd_quality_mode=actuator_clipped_provider_v1`. The internal view clips each translation component to the verified controller input bounds [-1,1], then follows native 0.01 multiply/cumsum/add and the existing seven-point weighted target0-distance expression. It preserves raw bits for candidates with no out-of-range translation in the scored first seven commands. Raw external provider/projector/Stage feedback, decoder and deployed actions retain their channels; N7 direction-height descriptors and N5 eligibility retain raw geometry.
+
+`ActuatorClippedContract` reads static metadata from the applicable live controller only when opted in. It binds adapter, active wrapper, environment, controller, task/episode and passive inner-reset generation, with method source file hashes and required OSC_POSE/fixed/delta semantics. No simulator methods are called for metadata. `LiberoEnv.reset` increments the passive generation only after opt-in. Provider, metadata, reset or projection mismatch fails closed.
+
+The auditor independently reconstructs the native projection and seven-point expression, validates metadata/source evidence, and checks raw/effective/parent/terminal/Stage linkage through the existing native audit. It does not import the N23 production quality helper. The older provider-template recognizer is reused for the source contract, not for numeric reconstruction.
+
+CPU tests pass with FP32/BF16 model/controller stubs and the source-extracted unchanged adapter projector. Actual-GPU saved BF16 evidence does **not** reproduce exactly under the CPU backend: 22/6512 recorded raw qualities and 5718/6512 projected candidate paths differ across the three explicitly exposed paths. No tolerance has been introduced. The CPU auditor must not be used to claim GPU-native readiness until a separately reviewed backend contract/preflight resolves this difference. Historical controller-instance bounds remain unknown; the new live snapshot is prospective.
+
+Variant-parent artifacts contain reproducible commands, CPU fixtures, failed preflight logs, compact counters, the read-only CPU/GPU arithmetic replay, and the implementation report. The frozen CPU protocol and declaration copied here are byte-identical to their root-owned originals. Existing archive-size-dependent diagnostic projection row counts can differ even with identical projector invocation counts; the separate parent `cpu-call-count-clarification-v1.md` documents this without padding or changing existing work.
