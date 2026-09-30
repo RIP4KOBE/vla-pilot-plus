@@ -476,7 +476,7 @@ def is_n6_plan(plan):
 
 
 def is_n7_plan(plan):
-    return not is_n24_plan(plan) and not is_n23_plan(plan) and (plan.get('n7_cohort') is not None or ('N7' in plan.get('candidate_profiles', {})
+    return not is_n24_validation_plan(plan) and not is_n24_plan(plan) and not is_n23_plan(plan) and (plan.get('n7_cohort') is not None or ('N7' in plan.get('candidate_profiles', {})
             and not is_n9_plan(plan) and not is_n11_plan(plan)
             and not is_n17_plan(plan)))
 
@@ -538,8 +538,12 @@ def is_n20_plan(plan):
     return plan.get('n20_cohort') is not None or 'N20' in plan.get('candidate_profiles', {})
 
 
+def is_n24_validation_plan(plan):
+    return plan.get('n24_validation') is not None
+
+
 def is_n24_plan(plan):
-    return plan.get('n24_cohort') is not None or 'N24' in plan.get('candidate_profiles', {})
+    return not is_n24_validation_plan(plan) and (plan.get('n24_cohort') is not None or 'N24' in plan.get('candidate_profiles', {}))
 
 
 def is_n23_v2_plan(plan):
@@ -547,7 +551,7 @@ def is_n23_v2_plan(plan):
 
 
 def is_n23_plan(plan):
-    return not is_n24_plan(plan) and (plan.get('n23_cohort') is not None or 'N23' in plan.get('candidate_profiles', {}))
+    return not is_n24_validation_plan(plan) and not is_n24_plan(plan) and (plan.get('n23_cohort') is not None or 'N23' in plan.get('candidate_profiles', {}))
 
 
 def is_n22_plan(plan):
@@ -634,14 +638,17 @@ def n23_support(plan=None):
 
 
 def metered_plan(plan):
-    return is_n23_plan(plan) or is_n24_plan(plan)
+    return is_n23_plan(plan) or is_n24_plan(plan) or is_n24_validation_plan(plan)
 
 
 def typed_metered_plan(plan):
-    return is_n23_v2_plan(plan) or is_n24_plan(plan)
+    return is_n23_v2_plan(plan) or is_n24_plan(plan) or is_n24_validation_plan(plan)
 
 
 def metered_support(plan):
+    if is_n24_validation_plan(plan):
+        from scripts import qd_ed_n24_validation_contract
+        return qd_ed_n24_validation_contract
     if is_n24_plan(plan):
         from scripts import qd_ed_n24_contract
         return qd_ed_n24_contract
@@ -832,9 +839,9 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
     require(Path(runtime['artifact_root']).resolve() == artifact_root, 'runtime artifact root mismatch')
     stage_overrides(runtime)
     require((runtime.get('stage_recovered_error_condition') is not None) ==
-            (plan.get('n7_e2_passive_diagnostic') is not None or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan)),
+            (plan.get('n7_e2_passive_diagnostic') is not None or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n24_validation_plan(plan)),
             'E2 Stage condition requires its dedicated prospective cohort plan')
-    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan) or is_n7_plan(plan) or is_n9_plan(plan) or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan)),
+    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan) or is_n7_plan(plan) or is_n9_plan(plan) or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n24_validation_plan(plan)),
         '180s transport requires its dedicated prospective cohort')
     physical_gpu = runtime_gpu(runtime, state)
     if require_frozen:
@@ -1247,6 +1254,9 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
         from scripts import qd_ed_n24_contract as n24
         if row.get('iteration') == n24.COHORT:
             n24.require_state(state, globals())
+        elif row.get('iteration') == 'N24_VALIDATION_20260930':
+            from scripts import qd_ed_n24_validation_contract as validation
+            validation.require_budget_state(state, globals())
         else:
             from scripts import qd_ed_n23_v2_contract as n23v2
             n23v2.require_state(state, globals())
@@ -1347,6 +1357,9 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
 
 
 def check_retry(events, row):
+    if row.get('n24_validation_recovery_eligibility') is not None:
+        from scripts import qd_ed_n24_validation_recovery as recovery
+        return recovery.check_retry(events, row, globals())
     if row.get('n24_recovery_eligibility') is not None:
         from scripts import qd_ed_n24_recovery as recovery
         return recovery.check_retry(events, row, globals())
@@ -1389,6 +1402,9 @@ def append_event_locked(root, event):
     with ledger.open('a') as stream:
         stream.write(json.dumps(event,sort_keys=True,allow_nan=False)+'\n'); stream.flush(); os.fsync(stream.fileno())
     sync_state_from_journal(root,[*events,event])
+    if event.get('identity', {}).get('iteration') == 'N24_VALIDATION_20260930':
+        from scripts import qd_ed_n24_validation_identity as validation_identity
+        validation_identity.register_dispatch(root, event)
 
 
 def sync_state_from_journal(root,events):
@@ -1926,7 +1942,7 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                 if is_n21_plan(plan):
                     terminal['n21_episode_dispatched']=dispatched
                 if metered_plan(plan):
-                    terminal['n24_episode_dispatched' if is_n24_plan(plan) else 'n23_episode_dispatched']=dispatched
+                    terminal['n24_validation_episode_dispatched' if is_n24_validation_plan(plan) else 'n24_episode_dispatched' if is_n24_plan(plan) else 'n23_episode_dispatched']=dispatched
                 if is_n22_plan(plan):
                     terminal['n22_episode_dispatched']=dispatched
                 append_event(root,terminal)
@@ -1992,7 +2008,7 @@ def reconcile_ledger(plan_path, attempt_id, *, root=ROOT):
         if is_n19_plan(plan):terminal['n19_episode_dispatched']=dispatched is not None
         if is_n20_plan(plan):terminal['n20_episode_dispatched']=dispatched is not None
         if is_n21_plan(plan):terminal['n21_episode_dispatched']=dispatched is not None
-        if metered_plan(plan):terminal['n24_episode_dispatched' if is_n24_plan(plan) else 'n23_episode_dispatched']=dispatched is not None
+        if metered_plan(plan):terminal['n24_validation_episode_dispatched' if is_n24_validation_plan(plan) else 'n24_episode_dispatched' if is_n24_plan(plan) else 'n23_episode_dispatched']=dispatched is not None
         if is_n22_plan(plan):terminal['n22_episode_dispatched']=dispatched is not None
         append_event(root,terminal); durable_json(output/'attempt-result.json',terminal)
         return terminal
