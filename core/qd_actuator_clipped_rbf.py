@@ -147,6 +147,10 @@ class BoundedWitness:
     NUMERIC_EPISODE_CAP = 220 * 1024
     METADATA_CALL_CAP = 16 * 1024
     SLOTS = (("initial", -1),) + tuple(("rollout", i) for i in range(10))
+    SOURCE = SOURCE
+    SCHEMA = "n25-bounded-rbf-witness-v1"
+    EVENT = "n25_rbf_witness"
+    COVERAGE_EVENT = "n25_rbf_witness_coverage"
 
     def __init__(self):
         self.first_consumed = False
@@ -192,7 +196,7 @@ class BoundedWitness:
         count = sum(v.numel() * v.element_size() for v in capture.values())
         if count > self.NUMERIC_CALL_CAP or self.numeric_bytes + count > self.NUMERIC_EPISODE_CAP:
             raise ValueError("N25 witness numeric byte cap exceeded")
-        metadata = {"schema": "n25-bounded-rbf-witness-v1", "source": SOURCE,
+        metadata = {"schema": self.SCHEMA, "source": self.SOURCE,
                     "call": dict(evidence), "numeric_bytes": count,
                     "tensors": {name:{"dtype":str(value.dtype), "shape":list(value.shape),
                                       "capture_stride_before_serialization":list(value.stride())} for name,value in capture.items()},
@@ -200,13 +204,13 @@ class BoundedWitness:
                     "exact_cuda_replay_claim": False}
         if len(json.dumps(metadata, allow_nan=False).encode()) > self.METADATA_CALL_CAP:
             raise ValueError("N25 witness identity metadata cap exceeded")
-        self.recorder.record("n25_rbf_witness", metadata=metadata, tensors=capture)
+        self.recorder.record(self.EVENT, metadata=metadata, tensors=capture)
         self.numeric_bytes += count
         self.recorded.append(key)
 
     def finish(self):
         if self.active and self.recorder is not None:
-            self.recorder.record("n25_rbf_witness_coverage", selected_slots=[list(x) for x in self.recorded],
+            self.recorder.record(self.COVERAGE_EVENT, selected_slots=[list(x) for x in self.recorded],
                                  missing_slots=[list(x) for x in self.SLOTS if x not in self.recorded],
                                  numeric_bytes=self.numeric_bytes, max_calls=11,
                                  numeric_cap_bytes=self.NUMERIC_EPISODE_CAP)
