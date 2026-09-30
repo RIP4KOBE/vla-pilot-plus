@@ -499,8 +499,12 @@ def is_n20_plan(plan):
     return plan.get('n20_cohort') is not None or 'N20' in plan.get('candidate_profiles', {})
 
 
+def is_n22_validation_plan(plan):
+    return plan.get('n22_validation') is not None
+
+
 def is_n22_plan(plan):
-    return plan.get('n22_cohort') is not None or 'N22' in plan.get('candidate_profiles', {})
+    return not is_n22_validation_plan(plan) and (plan.get('n22_cohort') is not None or 'N22' in plan.get('candidate_profiles', {}))
 
 
 def is_n21_plan(plan):
@@ -563,6 +567,18 @@ def n21_support():
         _N21_SUPPORT = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(_N21_SUPPORT)
     return _N21_SUPPORT
+
+
+_N22_VALIDATION_SUPPORT = None
+
+
+def n22_validation_support():
+    global _N22_VALIDATION_SUPPORT
+    if _N22_VALIDATION_SUPPORT is None:
+        if str(ROOT) not in sys.path: sys.path.insert(0, str(ROOT))
+        from scripts import qd_ed_n22_validation_contract
+        _N22_VALIDATION_SUPPORT = qd_ed_n22_validation_contract
+    return _N22_VALIDATION_SUPPORT
 
 
 _N22_SUPPORT = None
@@ -749,9 +765,9 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
     require(Path(runtime['artifact_root']).resolve() == artifact_root, 'runtime artifact root mismatch')
     stage_overrides(runtime)
     require((runtime.get('stage_recovered_error_condition') is not None) ==
-            (plan.get('n7_e2_passive_diagnostic') is not None or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan)),
+            (plan.get('n7_e2_passive_diagnostic') is not None or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n22_validation_plan(plan)),
             'E2 Stage condition requires its dedicated prospective cohort plan')
-    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan) or is_n7_plan(plan) or is_n9_plan(plan) or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan)),
+    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan) or is_n7_plan(plan) or is_n9_plan(plan) or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n22_validation_plan(plan)),
         '180s transport requires its dedicated prospective cohort')
     physical_gpu = runtime_gpu(runtime, state)
     if require_frozen:
@@ -841,6 +857,8 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
         n20_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
     if is_n21_plan(plan):
         n21_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if is_n22_validation_plan(plan):
+        n22_validation_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
     if is_n22_plan(plan):
         n22_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
     if is_n17_plan(plan):
@@ -1158,6 +1176,10 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
         require(budget['max_episode_attempts'] <= 240 and budget['max_gpu_hours'] <= 48,
                 'budget exceeds authorization')
         bucket_caps = BUCKETS
+    elif amendment == GPU7_N22_AMENDMENT and row.get('iteration') == n22_validation_support().COHORT:
+        n22_validation_support().require_budget_state(state, globals())
+        require(row.get('split') == row.get('budget_bucket') == 'validation', 'N22 validation budget scope differs')
+        bucket_caps = N22_BUCKETS
     elif amendment == GPU7_N22_AMENDMENT:
         binding = state.get('n22_gpu7_binding', {})
         require(selected_gpu == 7 and isinstance(binding, dict)
@@ -1279,6 +1301,8 @@ def append_event(root, event):
             stream.write(json.dumps(event,sort_keys=True,allow_nan=False)+'\n'); stream.flush(); os.fsync(stream.fileno())
         # Journal first; a crash before replace is repaired explicitly from the durable ledger.
         sync_state_from_journal(root,[*events,event])
+        if event.get('identity', {}).get('iteration') == 'N22_VALIDATION_20260930':
+            n22_validation_support().register_dispatch(root, event)
 
 
 def sync_state_from_journal(root,events):
@@ -1616,6 +1640,8 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
             n20_support().require_scope(plan, root, globals())
         if is_n21_plan(plan):
             n21_support().require_scope(plan, root, globals())
+        if is_n22_validation_plan(plan):
+            n22_validation_support().require_scope(plan, root, globals())
         if is_n22_plan(plan):
             n22_support().require_scope(plan, root, globals())
         require(plan.get('phase_authorization', {}).get(split) is True, f'{split} has not passed its preregistered phase gate')
@@ -1695,6 +1721,11 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                 n2_base=support.admission(plan,runtime,row,events,resources,root,globals())
             if is_n21_plan(plan):
                 support=n21_support()
+                support.require_scope(plan,root,globals(),row)
+                support.protected_budget(state,events,resources,row,timeout,globals(),plan=plan)
+                n2_base=support.admission(plan,runtime,row,events,resources,root,globals())
+            if is_n22_validation_plan(plan):
+                support=n22_validation_support()
                 support.require_scope(plan,root,globals(),row)
                 support.protected_budget(state,events,resources,row,timeout,globals(),plan=plan)
                 n2_base=support.admission(plan,runtime,row,events,resources,root,globals())
@@ -1788,6 +1819,8 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
                     terminal['n20_episode_dispatched']=dispatched
                 if is_n21_plan(plan):
                     terminal['n21_episode_dispatched']=dispatched
+                if is_n22_validation_plan(plan):
+                    terminal['n22_validation_episode_dispatched']=dispatched
                 if is_n22_plan(plan):
                     terminal['n22_episode_dispatched']=dispatched
                 append_event(root,terminal)
@@ -1851,6 +1884,7 @@ def reconcile_ledger(plan_path, attempt_id, *, root=ROOT):
         if is_n19_plan(plan):terminal['n19_episode_dispatched']=dispatched is not None
         if is_n20_plan(plan):terminal['n20_episode_dispatched']=dispatched is not None
         if is_n21_plan(plan):terminal['n21_episode_dispatched']=dispatched is not None
+        if is_n22_validation_plan(plan):terminal['n22_validation_episode_dispatched']=dispatched is not None
         if is_n22_plan(plan):terminal['n22_episode_dispatched']=dispatched is not None
         append_event(root,terminal); durable_json(output/'attempt-result.json',terminal)
         return terminal
