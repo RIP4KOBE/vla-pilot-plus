@@ -300,7 +300,11 @@ def test_source_bridge_all257_scope(fault,monkeypatch):
 @pytest.fixture
 def promoted_dev(tmp_path,monkeypatch):
     root=tmp_path/'root';path=root/'scripts/qd_ed_n25_report.py';path.parent.mkdir(parents=True);path.write_bytes((r.ROOT/'scripts/qd_ed_n25_report.py').read_bytes())
-    parent={'source_commit':c.DEV_COMMIT,'episodes':dev_rows(),'code_files':[{'path':'scripts/qd_ed_n25_report.py','sha256':w.sha(path)}]}
+    source_bytes=(r.ROOT.parent/'source-manifest-controller-v1.json').read_bytes()
+    source_path=tmp_path/'dev-source.json';source_path.write_bytes(source_bytes)
+    monkeypatch.setattr(c,'DEV_SOURCE_MANIFEST',source_path)
+    monkeypatch.setattr(c,'DEV_ROOT_REVIEW',tmp_path/'root-terminal-review.json')
+    parent={'source_commit':c.DEV_COMMIT,'episodes':dev_rows(),'code_files':json.loads(source_bytes)['files']}
     planref=write(tmp_path/'dev-plan.json',parent);monkeypatch.setattr(c,'DEV_PLAN',Path(planref['path']));monkeypatch.setattr(c,'original_plan',lambda:parent)
     for key,name in [('DEV_RESULT','result.json'),('DEV_STATUS','status.json'),('DEV_REVIEW','review.json')]:monkeypatch.setattr(c,key,tmp_path/name)
     events=[];entries={};native={}
@@ -331,8 +335,13 @@ def promoted_dev(tmp_path,monkeypatch):
     result.update(plan=planref,terminal_status={**c.ref(c.DEV_STATUS),'content':status},ledger_snapshot=snapshot,reader=c.ref(path),source_bridge=source_bridge,
         controller_evidence={'completed_keys':prefix,'journal_accepted_keys':prefix,'consistent':True,'status_phase':'completed_all_forty_audited'})
     write(c.DEV_RESULT,result)
+    terminal_review={'schema':'n25-root-terminal-review-v1','decision':'ACCEPT_TERMINAL_RECONSTRUCTION',
+        'cohort_disposition':'ELIGIBLE_FOR_SEPARATELY_FROZEN_VALIDATION','result':c.ref(c.DEV_RESULT),
+        'plan':planref,'source':c.ref(c.DEV_SOURCE_MANIFEST),'ledger':snapshot}
+    write(c.DEV_ROOT_REVIEW,terminal_review)
     review={'schema':'n25-dev-promotion-review-v1','disposition':'promoted','dev_plan':planref,'dev_status':c.ref(c.DEV_STATUS),
-        'dev_result':c.ref(c.DEV_RESULT),'dev_source_bridge':source_bridge,'allow_validation':True};write(c.DEV_REVIEW,review)
+        'dev_result':c.ref(c.DEV_RESULT),'dev_source_bridge':source_bridge,'root_terminal_review':c.ref(c.DEV_ROOT_REVIEW),
+        'allow_validation':True};write(c.DEV_REVIEW,review)
     return root,parent,result,status,review,entries,native
 
 
@@ -354,10 +363,30 @@ def test_actual_dev_result_schema_promotion_recomputed(promoted_dev,fault):
     if fault=='path_alias':
         alias=c.DEV_STATUS.parent/'logical-status.json';alias.symlink_to(c.DEV_STATUS)
         result['terminal_status']['path']=str(alias)
-    write(c.DEV_RESULT,result);review['dev_result']=c.ref(c.DEV_RESULT);write(c.DEV_REVIEW,review)
+    write(c.DEV_RESULT,result);review['dev_result']=c.ref(c.DEV_RESULT)
+    root_review=json.loads(c.DEV_ROOT_REVIEW.read_text());root_review['result']=c.ref(c.DEV_RESULT)
+    write(c.DEV_ROOT_REVIEW,root_review);review['root_terminal_review']=c.ref(c.DEV_ROOT_REVIEW);write(c.DEV_REVIEW,review)
     if fault in {'none','path_alias'}:assert c.dev_promotion(root,vars(r))==c.ref(c.DEV_REVIEW)
     else:
         with pytest.raises((ValueError,r.GateError)):c.dev_promotion(root,vars(r))
+
+
+@pytest.mark.parametrize('fault',['none','missing','schema','decision','disposition','result','plan','source','ledger','manifest'])
+def test_actual_root_terminal_review_bound_without_invented_top_level_fields(promoted_dev,fault):
+    root,parent,result,status,review,entries,native=promoted_dev
+    terminal=json.loads(c.DEV_ROOT_REVIEW.read_text())
+    assert 'accepted' not in terminal and 'source_commit' not in terminal
+    if fault in {'schema','decision','disposition'}:terminal[{'disposition':'cohort_disposition'}.get(fault,fault)]='wrong'
+    if fault in {'result','plan','source','ledger'}:terminal[fault]['sha256']='wrong'
+    if fault=='manifest':
+        source=json.loads(c.DEV_SOURCE_MANIFEST.read_text());source['commit']='wrong';write(c.DEV_SOURCE_MANIFEST,source)
+        terminal['source']=c.ref(c.DEV_SOURCE_MANIFEST)
+    write(c.DEV_ROOT_REVIEW,terminal);review['root_terminal_review']=c.ref(c.DEV_ROOT_REVIEW)
+    if fault=='missing':review.pop('root_terminal_review')
+    write(c.DEV_REVIEW,review)
+    if fault=='none':assert c.dev_promotion(root,vars(r))==c.ref(c.DEV_REVIEW)
+    else:
+        with pytest.raises(ValueError):c.dev_promotion(root,vars(r))
 
 @pytest.fixture
 def validation_draft(tmp_path,monkeypatch):

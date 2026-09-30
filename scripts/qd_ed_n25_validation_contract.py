@@ -18,6 +18,9 @@ DEV_PLAN=RUN_DIR/'plan.frozen.v1.gpu7.json'
 DEV_PLAN_SHA='1f0c94ccd3458a3a786acb9525728a1b64e3df439e4f920731f6566dd3a95eb3'
 DEV_RESULT=RUN_DIR/'result-v1.json'
 DEV_STATUS=RUN_DIR/'execution/supervisor-status-v1.json'
+DEV_ROOT_REVIEW=RUN_DIR/'root-terminal-review-v1.json'
+DEV_SOURCE_MANIFEST=RUN_DIR/'source-manifest-controller-v1.json'
+DEV_SOURCE_MANIFEST_SHA='fafcb0d881c95d567cb14a6690145d4ad933abc84a5e0175dfbe1512efd836ee'
 DEV_REVIEW=RUN_DIR/'validation-dev-promotion-review-v1.json'
 SOURCE_REVIEW=RUN_DIR/'validation-source-review-v1.json'
 AUTHORITY=RUN_DIR/'validation-adoption-v1/authority.json'
@@ -69,12 +72,25 @@ def dev_promotion(root,r):
     from scripts import qd_ed_n25_validation_recovery as recovery
     from scripts import qd_ed_n25_report as reporting
     parent=original_plan();review=read_ref(ref(DEV_REVIEW))
-    require(set(review)=={'schema','disposition','dev_plan','dev_status','dev_result','dev_source_bridge','allow_validation'}
+    require(set(review)=={'schema','disposition','dev_plan','dev_status','dev_result','dev_source_bridge','root_terminal_review','allow_validation'}
         and review['schema']=='n25-dev-promotion-review-v1' and review['disposition']=='promoted'
         and review['allow_validation'] is True and same_ref(review['dev_plan'],ref(DEV_PLAN))
         and same_ref(review['dev_status'],ref(DEV_STATUS)) and same_ref(review['dev_result'],ref(DEV_RESULT)),
         'N25 validation root review of actual Dev promotion missing')
     result=read_ref(review['dev_result']);status=read_ref(review['dev_status'])
+    require(same_ref(review['root_terminal_review'],ref(DEV_ROOT_REVIEW)),'N25 original root terminal review path/hash differs')
+    terminal_review=read_ref(review['root_terminal_review'])
+    require(terminal_review.get('schema')=='n25-root-terminal-review-v1'
+        and terminal_review.get('decision')=='ACCEPT_TERMINAL_RECONSTRUCTION'
+        and terminal_review.get('cohort_disposition')=='ELIGIBLE_FOR_SEPARATELY_FROZEN_VALIDATION'
+        and same_ref(terminal_review.get('result'),review['dev_result'])
+        and same_ref(terminal_review.get('plan'),review['dev_plan'])
+        and same_ref(terminal_review.get('ledger'),result.get('ledger_snapshot'))
+        and same_ref(terminal_review.get('source'),ref(DEV_SOURCE_MANIFEST))
+        and sha(DEV_SOURCE_MANIFEST)==DEV_SOURCE_MANIFEST_SHA,
+        'N25 original root terminal reconstruction/provenance differs')
+    require(read_ref(terminal_review['source'])=={'commit':DEV_COMMIT,'files':parent['code_files'],
+        'sha256':w.canonical_sha(parent['code_files'])},'N25 root terminal source manifest differs')
     require(result.get('schema')=='n25-dev-cohort-result-v1' and result.get('cohort_id')==dev.COHORT
         and result.get('source_commit')==DEV_COMMIT and result.get('planned')==result.get('audited_cells')==40
         and result.get('dev_gate_promoted') is True and result.get('decision')=='ELIGIBLE_FOR_SEPARATELY_FROZEN_VALIDATION'
