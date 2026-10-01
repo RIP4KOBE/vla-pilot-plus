@@ -1,0 +1,46 @@
+# N29 execution integration — bounded CPU Phase B v1
+
+Root accepts pure Phase A commit427b98703938f4e2a14ff810ff56ed5b7bcbd715, base52b9eb0a8a365ee2ea12daffdb7a98c76bec0a72. See root-phase-a-cpu-review-v1.json SHA b537cd39e51c2a440947e2f6cdcdb1dd3f4ab3d2b09d2a7896de27902dd3822a. This is a CPU preparation release under the user's continuing explicit Arbor task. It does not adopt a production source, change an attempt/GPU budget, authorize native GPU proof or dispatch an episode.
+
+## Science and source boundary
+Continue the same N29 implementation worktree/branch; do not write main study_worktree. Keep Phase A helper/math/input-domain unchanged unless reporting a concrete defect to root. N29 differs from N28 only by invoking that helper instead of the old box-only ray at all14 existing locations (4initial +10parent). Retain RBF geometry/raw scale20, selected-parent placement, original model/renoise/noise draws, model21batches/176candidate/11score batches per complete guided chunk, QD descriptor/archive/allocation/quality/final selector, native action conversion and executed8-action prefix. No new coefficient, fallback, sweep, covariance projection, persistent state, task/seed branch or success-guided choice.
+
+Use opt-in mode population_relative_trust_v1 with explicit new profile and minimal routing. N28 control and all earlier default science/provider paths remain unchanged. Explicit config validation must accept the new mode only with N28 parent placement and reject incompatible legacy/adaptive-controller combinations. Do not let a failed new-mode condition silently run a legacy update. Source diff must identify every shared-file change and explain inactive-path parity.
+
+## Evidence and native arithmetic preparation
+Prepare an independent exact-native audit of the literal FP32 mean/square/sum/mean/sqrt/norm/beta/cast formula and original feasible ray. The independent formula must not call the new helper. CPU comparisons are not CUDA proof. Preserve true-zero versus underflow gates, raw support-before-beta, original zero-update bytes, finite/shape/domain rejection, tail and non-translation identity. Do not claim an exact real-valued post-cast distance bound; report actual applied values.
+
+Initial evidence must distinguish original raw proposal, scaled operand, beta/radius/raw row norms and actual assigned prefix. Parent evidence must bind actual selected-offspring bytes and allocation identity to assignment and unchanged original renoise entry. Keep original initial same-forward semantics, native origin/geometry/gradient/normalization and quality/QD/selection audits. New schemas/sources/events must describe N29; do not mislabel trust-scaled arithmetic as old N27/N28 arithmetic. Controls continue their original audits.
+
+Retain bounded first-guided witness selection: first active initial slot and ten parent slots, max11; no selection by outcome. Raw and scaled operand and small beta/radius/norm tensors fit within existing20KiB combined per-call /220KiB episode /16KiB metadata-per-call caps; prove this accounting, including parent boundary observations. All14-call scalar evidence must account for additional reduction/helper latency and preserve total gradient/model/score/encoder/renoise counts. No new model/score/RNG/projector call to produce diagnostics. Handle zero-guided episodes explicitly without fabricating tensors or counts. Same-worker assigned-CUDA audit remains included in worker wall time; no unmetered secondary replay.
+
+Prepare one bounded native helper/wrapper proof with independently fixed cases: at most24 cases (6 semantic cases ×2native dtypes ×2layouts), no models/simulator/API and <=120s GPU process including cleanup. Cover new reduction/cast/scatter math, zero-spread/zero-operand, box composition and true model-like layouts; reuse unchanged old-ray proofs with honest scope. Code can be prepared and CPU-checked here, but real proof execution requires a later root release and actual idle GPU admission.
+
+## Prospective Dev plan and lifecycle
+Implement N29_POPULATION_RELATIVE_TRUST_DEV_20261001, task-major C0/Q0/N28/N29 on all original Dev tasks0..9,40 unique primary cells, frozen original task/seed/init mapping from immutable existing Dev plans. No inherited results, valid-failure retry, automatic recovery or data-dependent task ordering. Historical Dev reuse is disclosed; no validation/formal identities or payloads may be read.
+
+Use matched-dev-design-draft-v1.md as the prospective design to compile. Promotion requires all40valid and N29>=5/10 and >=same-cohort C0/Q0, substantive QD/ED and original validity gates. Report N28 comparison and per-task gains/losses, without pretending a tie is superiority. Future validation/formal remain closed; a passing Dev is not goal completion.
+
+Check mathematical futility only after completed four-arm task blocks: observed N29 success + unrun N29 tasks <5 means REJECT_NUMERIC_DEV_FUTILITY and closes remaining undispatched cells. 0/6 is futile;0/4 is not. Never substitute zeros for unrun. Any engineering/provider/identity/native invalidity closes the cohort; preserve all costs and outcomes, no retry. Budget/resource stop is incomplete, not scientific rejection. Preserve timeout/API/unknown-cost receipts and full process lifecycle ownership; do not erase failed attempts.
+
+## Provider and runtime
+Pin unchanged current official Codex CLI/current managed ChatGPT login/gpt-6-astra low180s Stage. No Poe, alternate provider/account/API-key fallback. Preserve saved Poe credentials without reading/exporting/changing them. No experimental API calls in this CPU phase. Grounding/guidance extra external API remains0. Prepare actual four-arm Hydra command composition and static provider routing checks. Root will verify managed login without exposing secrets before release.
+
+Prepare complete scientific source manifest and explicit bridge to closed N28/N27 control proofs, runtime/data/model fingerprints and provenance. Never label an incomplete new-file list a release manifest. Existing frozen GPU7 UUID/EGL runtime is the starting binding; no GPU is probed or used in this phase. Root may later rebind only under the user's idle-GPU authorization with a real reviewed runtime. One owned GPU worker maximum.
+
+## Budget preparation, not adoption
+Prospective caps only:538→578 attempts, buckets66/232/180/40/20→76/262/180/40/20.100GPUh and protected validation32/formal12h unchanged. Current371attempts/49.99373352883483GPUh; unspent protected36.240824002430815h, unprotected13.76544246873435h. Native proof and cohort share tentative13.5GPUh local ceiling. Reserve full1800s+40s cleanup before every episode launch, and separate120s before proof; count all actual worker time/invalid attempts.
+
+A40-cell worst case exceeds13.5h: do not assert full-matrix worst-case guarantee. Require local/global/remaining protected capacity for each concrete dispatch, and full remaining attempt-bucket capacity. If hours cannot admit next whole attempt, stop without launching and mark RESOURCE_BUDGET_INCOMPLETE. Old N28 helper's full-screen-hours logic must not be copied with a false guarantee.
+
+Implement gates bound to real root budget authority, reviewed source/runtime/native proof, plan/adoption and execution release; synthetic fixtures never authorize production. No production ledger/state writes or real budget change here. Last explicit user numeric approval was395/100; later finite root adoptions use recorded autonomy delegation. Never say the user separately approved578.
+
+## Tests, artifacts, delivery
+Run meaningful focused synthetic tests for exact arithmetic, integration/call schedule/tail/RNG parity, default-control regression, witness bound and tamper rejection, zero-guided, row mapping/command composition, no-Poe routing and controller futility/invalid/resource outcomes. Do not rerun already passed unchanged pure cases without a concrete regression reason. Preserve all failures, original logs and measured resource use; do not widen guards to protected/credential/model/tensor-artifact data to make a test pass. Statically compile source without importing heavy environment/model code where practical.
+
+Cumulative N29 CPU preparation/test cap remains180CPU seconds, used21.522822255, remaining158.477177745;2threads/affinity2, CUDA hidden. Record failed subprocesses and startup/preparation allowances. No actual historical .pt/.npz payload/model/simulator/API/credential reads, no GPU init. If remaining cap cannot cover a needed check, give root concrete remaining work/cost rather than exceeding or restarting the cap.
+
+All code/spec/test artifacts remain in this N29 implementation; external report/log/manifest under N29. Future large artifacts will be accessed through N29/artifacts pointing into existing data-volume R/artifacts/variants/n29_population_relative_trust; root will create the entry later. Do not move old artifacts or copy model payloads.
+
+Existing /root/n22_cpu_executor only; no new agents. Commit only owned necessary source/spec/tests once ready, no push or merge. Deliver exact commit, full changed paths/scientific manifest, actual tests and resource accounting, concise integration/math/provider risks and explicit unknowns. Root will perform source review/adoption and any real execution release separately.
+
