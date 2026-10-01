@@ -1,0 +1,53 @@
+{
+  "base_commit": "095cfeecd6af55477d2529441c307ab712e8a8da",
+  "files": {
+    "configs/config.yaml": {
+      "old_sha256": "0fafab23cb97a4171d27e47d9b016eea84a909302ed02892922f040ca41c52b7",
+      "new_sha256": "654508563250e59ac56695ed3853157992ac946401179c593d74f10082282ee0",
+      "edits": [
+        {
+          "new_start": 82,
+          "new_end": 83,
+          "old": "",
+          "new": "    diversity_update_mode: legacy_additive\n"
+        }
+      ]
+    },
+    "scripts/qd_ed_final_runner.py": {
+      "old_sha256": "792b44e5011b5f8c83d41b49e892eaffc7714ad62b7dd0323cc5f3e1d7aca6df",
+      "new_sha256": "58599c3700ba8883530d4f4599346fca9acfd5edf7a3f74bd15d2f32ceda43af",
+      "edits": [
+        {
+          "new_start": 665,
+          "new_end": 668,
+          "old": "",
+          "new": "    if plan.get(\"n27_hydra_continuation\") is not None:\n        from scripts import qd_ed_n27_cont_contract\n        return qd_ed_n27_cont_contract\n"
+        },
+        {
+          "new_start": 1277,
+          "new_end": 1282,
+          "old": "    if row.get('iteration') == 'N27_FEASIBLE_RAY_SCREEN_20261001':\n",
+          "new": "    if row.get('iteration') == 'N27_HYDRA_CONTINUATION_V1_20261001':\n        from scripts import qd_ed_n27_cont_contract as n27c\n        n27c.require_state(state, globals())\n        bucket_caps = n27c.CAPS['buckets']\n    elif row.get('iteration') == 'N27_FEASIBLE_RAY_SCREEN_20261001':\n"
+        },
+        {
+          "new_start": 1405,
+          "new_end": 1408,
+          "old": "",
+          "new": "    if row.get(\"iteration\") == \"N27_HYDRA_CONTINUATION_V1_20261001\":\n        from scripts import qd_ed_n27_cont_contract as n27c\n        return n27c.check_retry(events, row, globals())\n"
+        }
+      ]
+    },
+    "scripts/qd_ed_n23_worker.py": {
+      "old_sha256": "14a050b15a49d98bfffbfdb2032335415c8bfbed9720027702e96d31a47ba7fc",
+      "new_sha256": "67fb073f20d618414936dd2e1bbfb6aae00f7156f87ffb645875997b6d03aaa6",
+      "edits": [
+        {
+          "new_start": 137,
+          "new_end": 140,
+          "old": "",
+          "new": "    if plan.get(\"n27_hydra_continuation\") is not None:\n        from scripts import qd_ed_n27_cont_contract as n27c\n        return n27c.validate_worker_context(context, main_argv, root, output, plan, runtime)\n"
+        }
+      ]
+    }
+  }
+}

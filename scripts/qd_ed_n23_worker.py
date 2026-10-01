@@ -135,6 +135,9 @@ def validate_context(context, main_argv):
     require(root == ROOT.resolve() and context['main_argv'] == list(main_argv)
             and main_argv[0] == str(root / 'main.py') and output.name == context['attempt_id'], "worker command/root/attempt differs")
     plan, runtime = read_ref(context['plan']), read_ref(context['runtime'])
+    if plan.get("n27_hydra_continuation") is not None:
+        from scripts import qd_ed_n27_cont_contract as n27c
+        return n27c.validate_worker_context(context, main_argv, root, output, plan, runtime)
     if plan.get('n27_cohort') is not None or 'N27' in plan.get('candidate_profiles', {}):
         from scripts import qd_ed_n27_contract as n27
         return n27.validate_worker_context(context, main_argv, root, output, plan, runtime)

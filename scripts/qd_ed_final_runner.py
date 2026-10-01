@@ -663,6 +663,9 @@ def typed_metered_plan(plan):
 
 
 def metered_support(plan):
+    if plan.get("n27_hydra_continuation") is not None:
+        from scripts import qd_ed_n27_cont_contract
+        return qd_ed_n27_cont_contract
     if is_n27_plan(plan):
         from scripts import qd_ed_n27_contract
         return qd_ed_n27_contract
@@ -1272,7 +1275,11 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
     require(physical_gpu is None or (type(physical_gpu) is int and physical_gpu == selected_gpu),
             'GPU policy/runtime physical device mismatch')
     amendment = budget.get('amendment')
-    if row.get('iteration') == 'N27_FEASIBLE_RAY_SCREEN_20261001':
+    if row.get('iteration') == 'N27_HYDRA_CONTINUATION_V1_20261001':
+        from scripts import qd_ed_n27_cont_contract as n27c
+        n27c.require_state(state, globals())
+        bucket_caps = n27c.CAPS['buckets']
+    elif row.get('iteration') == 'N27_FEASIBLE_RAY_SCREEN_20261001':
         from scripts import qd_ed_n27_contract as n27
         n27.require_state(state, globals())
         bucket_caps = n27.BASE_CAPS['buckets']
@@ -1396,6 +1403,9 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
 
 
 def check_retry(events, row):
+    if row.get("iteration") == "N27_HYDRA_CONTINUATION_V1_20261001":
+        from scripts import qd_ed_n27_cont_contract as n27c
+        return n27c.check_retry(events, row, globals())
     if row.get('n27_recovery_eligibility') is not None:
         from scripts import qd_ed_n27_recovery as recovery
         return recovery.check_retry(events, row, globals())
