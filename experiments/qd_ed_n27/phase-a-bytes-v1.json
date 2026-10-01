@@ -1,0 +1,5 @@
+{
+  "core/qd_feasible_ray_update.py": "146163977866af87d2c643b0446be9ebac12f83cf9337d534b736874c623203e",
+  "docs/n27-feasible-ray-cpu-note.md": "c6d5b3a2673085e75836295cd6d5325fb3f695906b86b32325991b4908f64f2e",
+  "tests/test_n27_feasible_ray_update.py": "f15a54c25a502ad9c6aa966e02b438abcc2ef02979d219fdf506952e3de86c31"
+}

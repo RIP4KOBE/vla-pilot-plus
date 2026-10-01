@@ -46,6 +46,10 @@ from core.qd_clean_output_rbf import (
     NOISY_SOURCE, CLEAN_SOURCE, CleanOutputWitness, validate_source_option,
     require_sample_scheduler, geometry_input, bind_input_evidence,
 )
+from core.qd_feasible_ray_rbf import (
+    LEGACY as LEGACY_RBF_UPDATE, MODE as FEASIBLE_RBF_UPDATE, FeasibleRayWitness,
+    validate_update_option, step as feasible_rbf_step, observe as observe_feasible_rbf,
+)
 from core.qd_lift_quality import (
     HOLD_MODE as HOLD_LIFT_MODE, LIFT_MODES,
     LiftAfterCloseContract, close_then_lift_bonus, close_hold_then_lift_bonus,
@@ -126,6 +130,7 @@ class _EDSConfig:
     shuffle_seed: int = 0
     mechanism_pretest: Optional[dict] = None
     diversity_input_source: str = NOISY_SOURCE
+    diversity_update_mode: str = LEGACY_RBF_UPDATE
     initial_sampling_mode: str = "iid"
     initial_diversity_scale: float = 1.0
     initial_diversity_start_ratio: Optional[float] = None
@@ -1009,6 +1014,7 @@ class RDTSteer:
         self._last_visualization_action_candidates: Optional[Tensor] = None
         self._n25_rbf_witness = BoundedWitness()
         self._n26_rbf_witness = CleanOutputWitness()
+        self._n27_rbf_witness = FeasibleRayWitness()
         self._last_eds_metrics: Optional[dict] = None
         self._last_eds_artifacts: Optional[dict] = None
         self._last_eds_initial_sampler_info: Optional[dict] = None
@@ -1395,6 +1401,7 @@ class RDTSteer:
     def reset(self) -> None:
         self._n25_rbf_witness = BoundedWitness()
         self._n26_rbf_witness = CleanOutputWitness()
+        self._n27_rbf_witness = FeasibleRayWitness()
         self.reset_episode_compute_counters()
         if hasattr(self, "_executed_feedback"):
             self._executed_feedback.clear("episode_reset", reset=True)
@@ -2955,6 +2962,8 @@ class RDTSteer:
         return population, info
 
     def _eds_rbf_witness(self, cfg):
+        if cfg.diversity_update_mode == FEASIBLE_RBF_UPDATE:
+            return self._n27_rbf_witness
         return self._n26_rbf_witness if cfg.diversity_input_source == CLEAN_SOURCE else self._n25_rbf_witness
 
     def _eds_initial_denoise_rbf_diverse(
@@ -3050,7 +3059,15 @@ class RDTSteer:
                     if capture is not None:
                         capture["update_operand"] = update[:, :8, :].detach().clone()
                         capture["model_output_before"] = model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES].detach().clone()
-                    model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += update
+                    if cfg.diversity_update_mode == FEASIBLE_RBF_UPDATE:
+                        before_feasible = model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES].detach().clone()
+                        feasible, feasible_started = feasible_rbf_step(before_feasible, update[:, :8, :], cfg, scheduler)
+                        model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES] = feasible.prefix
+                        observe_feasible_rbf(descriptor_evidence, before_feasible,
+                                             model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES],
+                                             update[:, :8, :], feasible.alpha, feasible_started)
+                    else:
+                        model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += update
                     if capture is not None:
                         capture["model_output_after"] = model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES].detach().clone()
                         self._eds_rbf_witness(cfg).emit(capture, descriptor_evidence)
@@ -3942,7 +3959,15 @@ class RDTSteer:
                     if capture is not None:
                         capture["update_operand"] = update[:, :8, :].detach().clone()
                         capture["model_output_before"] = model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES].detach().clone()
-                    model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += update
+                    if cfg.diversity_update_mode == FEASIBLE_RBF_UPDATE:
+                        before_feasible = model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES].detach().clone()
+                        feasible, feasible_started = feasible_rbf_step(before_feasible, update[:, :8, :], cfg, scheduler)
+                        model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES] = feasible.prefix
+                        observe_feasible_rbf(descriptor_evidence, before_feasible,
+                                             model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES],
+                                             update[:, :8, :], feasible.alpha, feasible_started)
+                    else:
+                        model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += update
                     if capture is not None:
                         capture["model_output_after"] = model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES].detach().clone()
                         self._eds_rbf_witness(cfg).emit(capture, descriptor_evidence)
@@ -7955,6 +7980,7 @@ class RDTSteer:
             shuffle_seed=int(cfg.get("shuffle_seed", 0)),
             mechanism_pretest=cfg.get("mechanism_pretest", None),
             diversity_input_source=str(cfg.get("diversity_input_source", NOISY_SOURCE)),
+            diversity_update_mode=str(cfg.get("diversity_update_mode", LEGACY_RBF_UPDATE)),
             initial_sampling_mode=str(cfg.get("initial_sampling_mode", "iid")),
             initial_diversity_scale=float(cfg.get("initial_diversity_scale", 1.0)),
             initial_diversity_start_ratio=(
@@ -8511,6 +8537,7 @@ class RDTSteer:
             raise ValueError("EDS qd_tie_break must be stable_fingerprint")
 
         validate_source_option(resolved)
+        validate_update_option(resolved)
         clipped_rbf = CLIPPED_RBF_MODE in {
             resolved.initial_diversity_descriptor_mode, resolved.rollout_diversity_descriptor_mode}
         if clipped_rbf:
