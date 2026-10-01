@@ -50,6 +50,10 @@ from core.qd_feasible_ray_rbf import (
     LEGACY as LEGACY_RBF_UPDATE, MODE as FEASIBLE_RBF_UPDATE, FeasibleRayWitness,
     validate_update_option, step as feasible_rbf_step, observe as observe_feasible_rbf,
 )
+from core.qd_parent_before_renoise import (
+    DEFAULT as DEFAULT_RBF_PLACEMENT, MODE as PARENT_RBF_PLACEMENT, ParentWitness,
+    validate_placement, mutate as mutate_parent_offspring,
+)
 from core.qd_lift_quality import (
     HOLD_MODE as HOLD_LIFT_MODE, LIFT_MODES,
     LiftAfterCloseContract, close_then_lift_bonus, close_hold_then_lift_bonus,
@@ -131,6 +135,7 @@ class _EDSConfig:
     mechanism_pretest: Optional[dict] = None
     diversity_input_source: str = NOISY_SOURCE
     diversity_update_mode: str = LEGACY_RBF_UPDATE
+    rollout_diversity_placement: str = DEFAULT_RBF_PLACEMENT
     initial_sampling_mode: str = "iid"
     initial_diversity_scale: float = 1.0
     initial_diversity_start_ratio: Optional[float] = None
@@ -1015,6 +1020,7 @@ class RDTSteer:
         self._n25_rbf_witness = BoundedWitness()
         self._n26_rbf_witness = CleanOutputWitness()
         self._n27_rbf_witness = FeasibleRayWitness()
+        self._n28_rbf_witness = ParentWitness()
         self._last_eds_metrics: Optional[dict] = None
         self._last_eds_artifacts: Optional[dict] = None
         self._last_eds_initial_sampler_info: Optional[dict] = None
@@ -1402,6 +1408,7 @@ class RDTSteer:
         self._n25_rbf_witness = BoundedWitness()
         self._n26_rbf_witness = CleanOutputWitness()
         self._n27_rbf_witness = FeasibleRayWitness()
+        self._n28_rbf_witness = ParentWitness()
         self.reset_episode_compute_counters()
         if hasattr(self, "_executed_feedback"):
             self._executed_feedback.clear("episode_reset", reset=True)
@@ -2962,6 +2969,8 @@ class RDTSteer:
         return population, info
 
     def _eds_rbf_witness(self, cfg):
+        if cfg.rollout_diversity_placement == PARENT_RBF_PLACEMENT:
+            return self._n28_rbf_witness
         if cfg.diversity_update_mode == FEASIBLE_RBF_UPDATE:
             return self._n27_rbf_witness
         return self._n26_rbf_witness if cfg.diversity_input_source == CLEAN_SOURCE else self._n25_rbf_witness
@@ -3728,6 +3737,8 @@ class RDTSteer:
         rollout_timesteps: Tensor,
         local_step: int,
     ) -> bool:
+        if cfg.rollout_diversity_placement == PARENT_RBF_PLACEMENT:
+            return False
         if rollout_timesteps.numel() == 0:
             return False
         step_count = int(math.ceil(float(rollout_timesteps.numel()) * float(cfg.rollout_diversity_start_ratio)))
@@ -5914,9 +5925,10 @@ class RDTSteer:
                 qd_parent_cell_ids = qd_parent_cell_ids.index_select(
                     0, full_parent_indices.to(device=qd_parent_cell_ids.device)
                 )
+            parent_allocation_sequence = None
             evidence = getattr(self, "_decision_evidence", None)
             if evidence is not None:
-                evidence.record("parent_allocation", iter_idx=i, source_population=population,
+                parent_allocation_sequence = evidence.record("parent_allocation", iter_idx=i, source_population=population,
                                 source_quality=parent_source_rewards, source_costs=parent_source_scores,
                                 parent_indices=full_parent_indices, elite_count=elite_count,
                                 parent_cell_ids=qd_parent_cell_ids,
@@ -6101,6 +6113,15 @@ class RDTSteer:
                     )
                 )
 
+            parent_mutation_evidence = None
+            if cfg.rollout_diversity_placement == PARENT_RBF_PLACEMENT:
+                parent_mutation_evidence = mutate_parent_offspring(
+                    offspring, cfg=cfg, scheduler=self._noise_scheduler,
+                    compute_gradient=self._compute_eds_diversity_gradient,
+                    mask_gradient=self._mask_guidance_gradient,
+                    witness=self._eds_rbf_witness(cfg), iteration=i,
+                    parent_allocation_sequence=parent_allocation_sequence,
+                )
             offspring_before_renoise = offspring
             offspring = self._eds_renoise_reference(offspring, n_trunc_steps)
             if tuple(offspring.shape) != (offspring_count, 64, 128):
@@ -6189,6 +6210,8 @@ class RDTSteer:
                 rollout_scores,
                 offspring_count,
             )
+            if parent_mutation_evidence is not None:
+                rollout_info.setdefault("direction_rbf_evidence_by_step", []).append(parent_mutation_evidence)
             metrics.score_call_count += 1
             metrics.search_evaluation_count += offspring_count
             if controller_decision is not None:
@@ -7981,6 +8004,7 @@ class RDTSteer:
             mechanism_pretest=cfg.get("mechanism_pretest", None),
             diversity_input_source=str(cfg.get("diversity_input_source", NOISY_SOURCE)),
             diversity_update_mode=str(cfg.get("diversity_update_mode", LEGACY_RBF_UPDATE)),
+            rollout_diversity_placement=str(cfg.get("rollout_diversity_placement", DEFAULT_RBF_PLACEMENT)),
             initial_sampling_mode=str(cfg.get("initial_sampling_mode", "iid")),
             initial_diversity_scale=float(cfg.get("initial_diversity_scale", 1.0)),
             initial_diversity_start_ratio=(
@@ -8538,6 +8562,7 @@ class RDTSteer:
 
         validate_source_option(resolved)
         validate_update_option(resolved)
+        validate_placement(resolved)
         clipped_rbf = CLIPPED_RBF_MODE in {
             resolved.initial_diversity_descriptor_mode, resolved.rollout_diversity_descriptor_mode}
         if clipped_rbf:

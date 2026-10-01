@@ -81,6 +81,7 @@ main:
     save_ed_cache: false
     diversity_input_source: noisy_sample
     diversity_update_mode: legacy_additive
+    rollout_diversity_placement: model_output
     initial_sampling_mode: iid
     initial_diversity_descriptor_mode: absolute_eef
     initial_diversity_scale: 1.0
