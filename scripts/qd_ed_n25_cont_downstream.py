@@ -75,7 +75,7 @@ def historical_sources(old,new,objects):
     # Current pure reader/helper modules must still have their exact historical bytes.
     # Current runner/worker HEAD is not required to be historical; their relevant
     # primitive function bodies, rather than administrative routes, are bound below.
-    for path in bridge.MODULES|{'scripts/qd_ed_n25_backend.py','scripts/qd_ed_n25_reference.py','scripts/qd_ed_audit_backend.py','scripts/qd_ed_n25_report.py'}:
+    for path in bridge.MODULES|{'scripts/qd_ed_n25_backend.py','scripts/qd_ed_n25_reference.py','scripts/qd_ed_audit_backend.py','scripts/qd_ed_n25_report.py','scripts/qd_ed_n25_contract.py'}:
         e.require((ROOT/path).read_bytes()==objects(HISTORICAL,path),'current continuation helper drift')
     worker='scripts/qd_ed_n23_worker.py'
     oldfunc=bridge.functions(objects(HISTORICAL,worker).decode());current=bridge.functions((ROOT/worker).read_text())
@@ -125,8 +125,10 @@ def cost_summary(attempts,fields):
 
 
 def settled_resource(reader,reference,source,runtime,resource_projection):
-    from scripts import qd_ed_n25_backend as backend
-    e.require(Path(backend.__file__).resolve()==ROOT/'scripts/qd_ed_n25_backend.py','historical proof helper shadowing')
+    from scripts import qd_ed_n25_backend as backend,qd_ed_audit_backend as audit_backend,qd_ed_n25_reference as arithmetic_reference
+    e.require(backend.c is c.old and backend.w is terminal.w,'historical proof shared helper identity differs')
+    for module in (backend,backend.c,audit_backend,arithmetic_reference):
+        e.require(Path(module.__file__).resolve()==ROOT/'scripts'/Path(module.__file__).name,'historical proof helper shadowing')
     proof=reader.json(reference)
     e.require(set(proof)=={'schema','accepted','source','runtime','plan','report','process','terminal'}
         and proof['schema']=='n25-metered-tensor-proof-v1' and proof['accepted'] is True
@@ -155,7 +157,7 @@ def build(data,*,objects=None,cleanup=e.process_cleanup):
     owner=Path(data['owning_root']).resolve()
     e.require(owner==ROOT.resolve() and owner.name=='study_worktree' and c.SEAL.resolve().parent==c.RUN_DIR.resolve()
         and c.RUN_DIR.resolve()==owner.parent/'variants/n25_actuator_clipped_rbf/infrastructure-continuation-v1', 'same approved owning study path required')
-    for module in (c,e,terminal,bridge,terminal.w,terminal.report,terminal.report.old_report):
+    for module in (c,c.old,e,terminal,bridge,terminal.w,terminal.report,terminal.report.old_report):
         e.require(Path(module.__file__).resolve()==owner/'scripts'/Path(module.__file__).name,'historical helper imports must come from owning study')
     reader=MetadataReader(data['files']);refs=data['references'];get=lambda key:reader.json(refs[key])
     same(refs['seal'],e.ref_from_inventory(reader,c.SEAL));same(refs['plan'],e.ref_from_inventory(reader,c.PLAN))

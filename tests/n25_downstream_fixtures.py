@@ -104,7 +104,7 @@ def historical_fixture(tmp,monkeypatch):
 
 from scripts import qd_ed_n25_cont_downstream as d,qd_ed_n25_cont_bridge as bridge
 from scripts import qd_ed_n25_cont_seal as sealer,qd_ed_n25_cont_report as reporting,qd_ed_n25_cont_terminal as terminal
-from scripts import qd_ed_n25_backend as backend,qd_ed_n23_worker as w
+from scripts import qd_ed_n25_backend as backend,qd_ed_n23_worker as w,qd_ed_audit_backend as audit_backend,qd_ed_n25_reference as reference
 from n25_cont_fixtures import fake_cleanup,new_events,materialize_new
 import ast,difflib
 ACTUAL=Path(__file__).resolve().parents[1]
@@ -122,7 +122,7 @@ def source_fixture(root):
     wb='\n\n'.join(worker[k] for k in ('require','sha','canonical_sha','read_ref'))+'\n\ndef validate_context():\n    return "old"\n'
     rb='\n\n'.join(f'def {n}():\n    return "old"' for n in sorted(bridge.ROUTES['scripts/qd_ed_final_runner.py']))+'\n'
     old={'scripts/qd_ed_n23_worker.py':wb.encode(),'scripts/qd_ed_final_runner.py':rb.encode()}
-    for name in ('qd_ed_n25_backend','qd_ed_n25_reference','qd_ed_audit_backend','qd_ed_n25_report'):old['scripts/'+name+'.py']=(ACTUAL/'scripts'/ (name+'.py')).read_bytes()
+    for name in ('qd_ed_n25_backend','qd_ed_n25_reference','qd_ed_audit_backend','qd_ed_n25_report','qd_ed_n25_contract'):old['scripts/'+name+'.py']=(ACTUAL/'scripts'/ (name+'.py')).read_bytes()
     for i in range(257-len(old)):old[f'fake_source_{i:03}.py']=f'n={i}\n'.encode()
     files=[{'path':p,'sha256':d.digest(b)} for p,b in sorted(old.items())]
     source={'commit':e.BASE,'files':files,'sha256':e.canonical(files)};new=dict(old)
@@ -172,7 +172,7 @@ def complete_fixture(tmp,monkeypatch,disposition='promotion'):
         if commit==d.HISTORICAL:p=root/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b)
     target=root/d.DOC/'protocol-v1.md';target.parent.mkdir(parents=True);target.write_bytes((ACTUAL/d.DOC/'protocol-v1.md').read_bytes())
     monkeypatch.setattr(d,'ROOT',root)
-    for module in (c,e,terminal,bridge,terminal.w,terminal.report,terminal.report.old_report,backend):monkeypatch.setattr(module,'__file__',str(root/'scripts'/Path(module.__file__).name))
+    for module in (c,c.old,e,terminal,bridge,terminal.w,terminal.report,terminal.report.old_report,backend,audit_backend,reference):monkeypatch.setattr(module,'__file__',str(root/'scripts'/Path(module.__file__).name))
     run=root.parent/'variants/n25_actuator_clipped_rbf/infrastructure-continuation-v1';monkeypatch.setattr(c,'RUN_DIR',run)
     for name,file in (('SEAL','seal.json'),('PLAN','plan.json'),('PROTOCOL','protocol.md')):monkeypatch.setattr(c,name,run/file)
     c.PROTOCOL.parent.mkdir(parents=True,exist_ok=True);c.PROTOCOL.write_bytes((ACTUAL/'experiments/qd_ed_n25_continuation/protocol-v1.md').read_bytes())

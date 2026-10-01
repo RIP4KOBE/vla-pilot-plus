@@ -157,3 +157,23 @@ def test_imported_helper_identity_is_owning_source(tmp_path,monkeypatch,which):
 def test_raw_stage_index_or_full_ledger_inventory_rejected_without_read(tmp_path,name):
     with pytest.raises(ValueError,match='forbidden'):
         d.MetadataReader([{'path':str(tmp_path/name),'sha256':'a'*64}])
+
+
+@pytest.mark.parametrize('which',['qd_ed_n25_contract','qd_ed_audit_backend','qd_ed_n25_reference'])
+def test_transitive_proof_helper_bytes_bound(tmp_path,monkeypatch,which):
+    data,objects=complete_fixture(tmp_path,monkeypatch)
+    (d.ROOT/'scripts'/(which+'.py')).write_text('changed helper')
+    with pytest.raises(ValueError,match='helper drift'):d.build(data,objects=objects,cleanup=fake_cleanup)
+
+
+@pytest.mark.parametrize('which',['original_contract','backend_contract_identity','audit_backend','reference'])
+def test_transitive_proof_helper_imports_owned(tmp_path,monkeypatch,which):
+    from types import SimpleNamespace
+    from scripts import qd_ed_n25_backend as backend,qd_ed_audit_backend as audit_backend,qd_ed_n25_reference as reference
+    data,objects=complete_fixture(tmp_path,monkeypatch)
+    if which=='backend_contract_identity':
+        monkeypatch.setattr(backend,'c',SimpleNamespace(__file__=d.c.old.__file__))
+    else:
+        module={'original_contract':d.c.old,'audit_backend':audit_backend,'reference':reference}[which]
+        monkeypatch.setattr(module,'__file__',str(tmp_path/'shadow.py'))
+    with pytest.raises(ValueError,match='owning study|shadowing|helper identity'):d.build(data,objects=objects,cleanup=fake_cleanup)
