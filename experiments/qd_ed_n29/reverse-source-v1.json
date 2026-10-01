@@ -1,0 +1,453 @@
+{
+  "schema": "n29-exact-reverse-source-v1",
+  "base_commit": "52b9eb0a8a365ee2ea12daffdb7a98c76bec0a72",
+  "files": {
+    "core/rdt_policy_steer.py": {
+      "old_sha256": "ccb051f4708e9509a40f10392838f0267870841963b41033983d9334a740df5b",
+      "new_sha256": "861509f3a491e28390a901623bc48523795a34ddacf25ccb839f122a13fce3a7",
+      "hunks": [
+        {
+          "start": 55,
+          "end": 60,
+          "new": [
+            ")\n",
+            "from core.qd_population_relative_rbf import (\n",
+            "    MODE as TRUST_RBF_UPDATE, TrustWitness, validate_option as validate_trust_option,\n",
+            "    step as trust_rbf_step, observe as observe_trust_rbf, capture_trust,\n",
+            "    mutate as mutate_trust_parent,\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 1028,
+          "end": 1029,
+          "new": [
+            "        self._n29_rbf_witness = TrustWitness()\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 1417,
+          "end": 1418,
+          "new": [
+            "        self._n29_rbf_witness = TrustWitness()\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 2978,
+          "end": 2980,
+          "new": [
+            "        if cfg.diversity_update_mode == TRUST_RBF_UPDATE:\n",
+            "            return self._n29_rbf_witness\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 3079,
+          "end": 3088,
+          "new": [
+            "                    if cfg.diversity_update_mode == TRUST_RBF_UPDATE:\n",
+            "                        before_trust = model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES].detach().clone()\n",
+            "                        trust, trust_started = trust_rbf_step(before_trust, update[:, :8, :], cfg, scheduler)\n",
+            "                        model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES] = trust.prefix\n",
+            "                        observe_trust_rbf(descriptor_evidence, before_trust,\n",
+            "                                          model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES],\n",
+            "                                          update[:, :8, :], trust, trust_started)\n",
+            "                        capture_trust(capture, trust)\n",
+            "                    elif cfg.diversity_update_mode == FEASIBLE_RBF_UPDATE:\n"
+          ],
+          "old": [
+            "                    if cfg.diversity_update_mode == FEASIBLE_RBF_UPDATE:\n"
+          ]
+        },
+        {
+          "start": 3246,
+          "end": 3247,
+          "new": [
+            "        self._n29_rbf_witness.observe_renoise_input(population_trajectories, t)\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 6136,
+          "end": 6137,
+          "new": [
+            "                parent_mutation_evidence = (mutate_trust_parent if cfg.diversity_update_mode == TRUST_RBF_UPDATE else mutate_parent_offspring)(\n"
+          ],
+          "old": [
+            "                parent_mutation_evidence = mutate_parent_offspring(\n"
+          ]
+        },
+        {
+          "start": 8582,
+          "end": 8587,
+          "new": [
+            "        if resolved.diversity_update_mode == TRUST_RBF_UPDATE:\n",
+            "            validate_trust_option(resolved)\n",
+            "        else:\n",
+            "            validate_update_option(resolved)\n",
+            "            validate_placement(resolved)\n"
+          ],
+          "old": [
+            "        validate_update_option(resolved)\n",
+            "        validate_placement(resolved)\n"
+          ]
+        }
+      ]
+    },
+    "scripts/qd_ed_final_runner.py": {
+      "old_sha256": "4d8a23cca235ffc98c7ba985f1bf7803449d00797d016e993f145968dee6ee21",
+      "new_sha256": "5cfa3e2c3239e1270fe9f960a2219f298f13ce7149c1d80813203b2c542d3a14",
+      "hunks": [
+        {
+          "start": 225,
+          "end": 228,
+          "new": [
+            "    if candidate_id == 'N29':\n",
+            "        from scripts import qd_ed_n29_contract\n",
+            "        return qd_ed_n29_contract.expand_candidate(candidate, baseline, globals())\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 485,
+          "end": 486,
+          "new": [
+            "    return not is_n29_plan(plan) and (plan.get('n5_cohort') is not None or 'N5' in plan.get('candidate_profiles', {}))\n"
+          ],
+          "old": [
+            "    return plan.get('n5_cohort') is not None or 'N5' in plan.get('candidate_profiles', {})\n"
+          ]
+        },
+        {
+          "start": 489,
+          "end": 490,
+          "new": [
+            "    return not is_n29_plan(plan) and (plan.get('n6_cohort') is not None or 'N6' in plan.get('candidate_profiles', {}))\n"
+          ],
+          "old": [
+            "    return plan.get('n6_cohort') is not None or 'N6' in plan.get('candidate_profiles', {})\n"
+          ]
+        },
+        {
+          "start": 493,
+          "end": 494,
+          "new": [
+            "    return not is_n29_plan(plan) and not is_n28_plan(plan) and not is_n27_plan(plan) and not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and not is_n23_plan(plan) and (plan.get('n7_cohort') is not None or ('N7' in plan.get('candidate_profiles', {})\n"
+          ],
+          "old": [
+            "    return not is_n28_plan(plan) and not is_n27_plan(plan) and not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and not is_n23_plan(plan) and (plan.get('n7_cohort') is not None or ('N7' in plan.get('candidate_profiles', {})\n"
+          ]
+        },
+        {
+          "start": 499,
+          "end": 500,
+          "new": [
+            "    return not is_n29_plan(plan) and (plan.get('n17_passive_physics') is not None)\n"
+          ],
+          "old": [
+            "    return plan.get('n17_passive_physics') is not None\n"
+          ]
+        },
+        {
+          "start": 544,
+          "end": 545,
+          "new": [
+            "    return not is_n29_plan(plan) and (plan.get('n18_cohort') is not None or 'N18' in plan.get('candidate_profiles', {}))\n"
+          ],
+          "old": [
+            "    return plan.get('n18_cohort') is not None or 'N18' in plan.get('candidate_profiles', {})\n"
+          ]
+        },
+        {
+          "start": 548,
+          "end": 549,
+          "new": [
+            "    return not is_n29_plan(plan) and (plan.get('n19_cohort') is not None or 'N19' in plan.get('candidate_profiles', {}))\n"
+          ],
+          "old": [
+            "    return plan.get('n19_cohort') is not None or 'N19' in plan.get('candidate_profiles', {})\n"
+          ]
+        },
+        {
+          "start": 552,
+          "end": 557,
+          "new": [
+            "    return not is_n29_plan(plan) and (plan.get('n20_cohort') is not None or 'N20' in plan.get('candidate_profiles', {}))\n",
+            "\n",
+            "\n",
+            "def is_n29_plan(plan):\n",
+            "    return plan.get('n29_cohort') is not None or 'N29' in plan.get('candidate_profiles', {})\n"
+          ],
+          "old": [
+            "    return plan.get('n20_cohort') is not None or 'N20' in plan.get('candidate_profiles', {})\n"
+          ]
+        },
+        {
+          "start": 560,
+          "end": 561,
+          "new": [
+            "    return not is_n29_plan(plan) and (plan.get('n28_cohort') is not None or 'N28' in plan.get('candidate_profiles', {}))\n"
+          ],
+          "old": [
+            "    return plan.get('n28_cohort') is not None or 'N28' in plan.get('candidate_profiles', {})\n"
+          ]
+        },
+        {
+          "start": 564,
+          "end": 565,
+          "new": [
+            "    return not is_n29_plan(plan) and not is_n28_plan(plan) and (plan.get('n27_cohort') is not None or 'N27' in plan.get('candidate_profiles', {}))\n"
+          ],
+          "old": [
+            "    return not is_n28_plan(plan) and (plan.get('n27_cohort') is not None or 'N27' in plan.get('candidate_profiles', {}))\n"
+          ]
+        },
+        {
+          "start": 568,
+          "end": 569,
+          "new": [
+            "    return not is_n29_plan(plan) and not is_n28_plan(plan) and not is_n27_plan(plan) and (plan.get('n26_cohort') is not None or 'N26' in plan.get('candidate_profiles', {}))\n"
+          ],
+          "old": [
+            "    return not is_n28_plan(plan) and not is_n27_plan(plan) and (plan.get('n26_cohort') is not None or 'N26' in plan.get('candidate_profiles', {}))\n"
+          ]
+        },
+        {
+          "start": 572,
+          "end": 573,
+          "new": [
+            "    return not is_n29_plan(plan) and not is_n28_plan(plan) and not is_n27_plan(plan) and not is_n26_plan(plan) and (plan.get('n25_cohort') is not None or 'N25' in plan.get('candidate_profiles', {}))\n"
+          ],
+          "old": [
+            "    return not is_n28_plan(plan) and not is_n27_plan(plan) and not is_n26_plan(plan) and (plan.get('n25_cohort') is not None or 'N25' in plan.get('candidate_profiles', {}))\n"
+          ]
+        },
+        {
+          "start": 576,
+          "end": 577,
+          "new": [
+            "    return not is_n29_plan(plan) and (plan.get('n24_cohort') is not None or 'N24' in plan.get('candidate_profiles', {}))\n"
+          ],
+          "old": [
+            "    return plan.get('n24_cohort') is not None or 'N24' in plan.get('candidate_profiles', {})\n"
+          ]
+        },
+        {
+          "start": 580,
+          "end": 581,
+          "new": [
+            "    return not is_n29_plan(plan) and not is_n28_plan(plan) and not is_n27_plan(plan) and not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and plan.get('n23_cohort', {}).get('schema') == 'n23-clipped-quality-dev-v2'\n"
+          ],
+          "old": [
+            "    return not is_n28_plan(plan) and not is_n27_plan(plan) and not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and plan.get('n23_cohort', {}).get('schema') == 'n23-clipped-quality-dev-v2'\n"
+          ]
+        },
+        {
+          "start": 584,
+          "end": 585,
+          "new": [
+            "    return not is_n29_plan(plan) and not is_n28_plan(plan) and not is_n27_plan(plan) and not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and (plan.get('n23_cohort') is not None or 'N23' in plan.get('candidate_profiles', {}))\n"
+          ],
+          "old": [
+            "    return not is_n28_plan(plan) and not is_n27_plan(plan) and not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and (plan.get('n23_cohort') is not None or 'N23' in plan.get('candidate_profiles', {}))\n"
+          ]
+        },
+        {
+          "start": 588,
+          "end": 589,
+          "new": [
+            "    return not is_n29_plan(plan) and (plan.get('n22_cohort') is not None or 'N22' in plan.get('candidate_profiles', {}))\n"
+          ],
+          "old": [
+            "    return plan.get('n22_cohort') is not None or 'N22' in plan.get('candidate_profiles', {})\n"
+          ]
+        },
+        {
+          "start": 671,
+          "end": 672,
+          "new": [
+            "    return is_n29_plan(plan) or is_n28_plan(plan) or is_n27_plan(plan) or is_n26_plan(plan) or is_n25_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan)\n"
+          ],
+          "old": [
+            "    return is_n28_plan(plan) or is_n27_plan(plan) or is_n26_plan(plan) or is_n25_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan)\n"
+          ]
+        },
+        {
+          "start": 675,
+          "end": 676,
+          "new": [
+            "    return is_n29_plan(plan) or is_n28_plan(plan) or is_n27_plan(plan) or is_n26_plan(plan) or is_n25_plan(plan) or is_n23_v2_plan(plan) or is_n24_plan(plan)\n"
+          ],
+          "old": [
+            "    return is_n28_plan(plan) or is_n27_plan(plan) or is_n26_plan(plan) or is_n25_plan(plan) or is_n23_v2_plan(plan) or is_n24_plan(plan)\n"
+          ]
+        },
+        {
+          "start": 679,
+          "end": 682,
+          "new": [
+            "    if is_n29_plan(plan):\n",
+            "        from scripts import qd_ed_n29_contract\n",
+            "        return qd_ed_n29_contract\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 863,
+          "end": 868,
+          "new": [
+            "    if is_n29_plan(plan):\n",
+            "        n29_artifact = metered_support(plan).RUN_DIR / 'artifacts'\n",
+            "        require(n29_artifact.is_symlink() and artifact_root == n29_artifact.resolve() ==\n",
+            "                runtime_artifact_root / 'variants/n29_population_relative_trust', 'N29 artifact root mismatch')\n",
+            "    elif is_n28_plan(plan):\n"
+          ],
+          "old": [
+            "    if is_n28_plan(plan):\n"
+          ]
+        },
+        {
+          "start": 900,
+          "end": 901,
+          "new": [
+            "            (plan.get('n7_e2_passive_diagnostic') is not None or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n25_plan(plan) or is_n26_plan(plan) or is_n27_plan(plan) or is_n28_plan(plan) or is_n29_plan(plan)),\n"
+          ],
+          "old": [
+            "            (plan.get('n7_e2_passive_diagnostic') is not None or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n25_plan(plan) or is_n26_plan(plan) or is_n27_plan(plan) or is_n28_plan(plan)),\n"
+          ]
+        },
+        {
+          "start": 902,
+          "end": 903,
+          "new": [
+            "    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan) or is_n7_plan(plan) or is_n9_plan(plan) or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n25_plan(plan) or is_n26_plan(plan) or is_n27_plan(plan) or is_n28_plan(plan) or is_n29_plan(plan)),\n"
+          ],
+          "old": [
+            "    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan) or is_n7_plan(plan) or is_n9_plan(plan) or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n25_plan(plan) or is_n26_plan(plan) or is_n27_plan(plan) or is_n28_plan(plan)),\n"
+          ]
+        },
+        {
+          "start": 1307,
+          "end": 1313,
+          "new": [
+            "    if row.get('iteration') == 'N29_POPULATION_RELATIVE_TRUST_DEV_20261001':\n",
+            "        from scripts import qd_ed_n29_contract as n29\n",
+            "        n29.require_state(state, globals())\n",
+            "        n29.whole_attempt_hours(state, snap, row, globals())\n",
+            "        bucket_caps = n29.BASE_CAPS['buckets']\n",
+            "    elif row.get('iteration') == 'N28_PARENT_BEFORE_RENOISE_SCREEN_20261001':\n"
+          ],
+          "old": [
+            "    if row.get('iteration') == 'N28_PARENT_BEFORE_RENOISE_SCREEN_20261001':\n"
+          ]
+        },
+        {
+          "start": 1444,
+          "end": 1447,
+          "new": [
+            "    if row.get(\"iteration\") == \"N29_POPULATION_RELATIVE_TRUST_DEV_20261001\":\n",
+            "        from scripts import qd_ed_n29_contract as n29\n",
+            "        return n29.check_retry(events, row, globals())\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 2044,
+          "end": 2045,
+          "new": [
+            "                    terminal['n29_episode_dispatched' if is_n29_plan(plan) else 'n28_episode_dispatched' if is_n28_plan(plan) else 'n27_episode_dispatched' if is_n27_plan(plan) else 'n26_episode_dispatched' if is_n26_plan(plan) else 'n25_episode_dispatched' if is_n25_plan(plan) else 'n24_episode_dispatched' if is_n24_plan(plan) else 'n23_episode_dispatched']=dispatched\n"
+          ],
+          "old": [
+            "                    terminal['n28_episode_dispatched' if is_n28_plan(plan) else 'n27_episode_dispatched' if is_n27_plan(plan) else 'n26_episode_dispatched' if is_n26_plan(plan) else 'n25_episode_dispatched' if is_n25_plan(plan) else 'n24_episode_dispatched' if is_n24_plan(plan) else 'n23_episode_dispatched']=dispatched\n"
+          ]
+        },
+        {
+          "start": 2110,
+          "end": 2111,
+          "new": [
+            "        if metered_plan(plan):terminal['n29_episode_dispatched' if is_n29_plan(plan) else 'n28_episode_dispatched' if is_n28_plan(plan) else 'n27_episode_dispatched' if is_n27_plan(plan) else 'n26_episode_dispatched' if is_n26_plan(plan) else 'n25_episode_dispatched' if is_n25_plan(plan) else 'n24_episode_dispatched' if is_n24_plan(plan) else 'n23_episode_dispatched']=dispatched is not None\n"
+          ],
+          "old": [
+            "        if metered_plan(plan):terminal['n28_episode_dispatched' if is_n28_plan(plan) else 'n27_episode_dispatched' if is_n27_plan(plan) else 'n26_episode_dispatched' if is_n26_plan(plan) else 'n25_episode_dispatched' if is_n25_plan(plan) else 'n24_episode_dispatched' if is_n24_plan(plan) else 'n23_episode_dispatched']=dispatched is not None\n"
+          ]
+        }
+      ]
+    },
+    "scripts/qd_ed_n23_worker.py": {
+      "old_sha256": "c50dcb656b2d4a90b9a6988814021e412cab950a9e527d56ee05b7d87f006ac8",
+      "new_sha256": "46255e63ea6ea38dae7dc39cf54d8d981737396cf2f5529d532eefa3bc151be7",
+      "hunks": [
+        {
+          "start": 137,
+          "end": 140,
+          "new": [
+            "    if plan.get('n29_cohort') is not None or 'N29' in plan.get('candidate_profiles', {}):\n",
+            "        from scripts import qd_ed_n29_contract as n29\n",
+            "        return n29.validate_worker_context(context, main_argv, root, output, plan, runtime)\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 214,
+          "end": 215,
+          "new": [
+            "            backend = create_backend('cuda', binding=cuda_binding(runtime)) if context['profile'] in {'N23', 'N24', 'N25', 'N26', 'N27', 'N28', 'N29'} else create_backend('cpu')\n"
+          ],
+          "old": [
+            "            backend = create_backend('cuda', binding=cuda_binding(runtime)) if context['profile'] in {'N23', 'N24', 'N25', 'N26', 'N27', 'N28'} else create_backend('cpu')\n"
+          ]
+        },
+        {
+          "start": 220,
+          "end": 223,
+          "new": [
+            "            if read_ref(context['plan']).get('n29_cohort') is not None:\n",
+            "                from scripts import qd_ed_n29_native as n29_native\n",
+            "                report = n29_native.audit_output(context['profile'], output, report, backend)\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 245,
+          "end": 251,
+          "new": [
+            "                    'sha256': sha(metric_path) if metric_path.is_file() else None}\n",
+            "            if read_ref(context['plan']).get('n29_cohort') is not None:\n",
+            "                from scripts import qd_ed_n29_native as n29_native\n",
+            "                receipt['n29_native_counts'], receipt['n29_auxiliary'] = n29_native.from_output(context['profile'], output, report)\n",
+            "                metric_path = output / 'eds_eval/eds_metrics.jsonl'\n",
+            "                receipt['n29_metrics'] = {'path': str(metric_path), 'present': metric_path.is_file(),\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 318,
+          "end": 319,
+          "new": [
+            "    kind = 'cuda' if context['profile'] in {'N23', 'N24', 'N25', 'N26', 'N27', 'N28', 'N29'} else 'cpu'\n"
+          ],
+          "old": [
+            "    kind = 'cuda' if context['profile'] in {'N23', 'N24', 'N25', 'N26', 'N27', 'N28'} else 'cpu'\n"
+          ]
+        },
+        {
+          "start": 358,
+          "end": 366,
+          "new": [
+            "    if read_ref(context['plan']).get('n29_cohort') is not None:\n",
+            "        from scripts import qd_ed_n29_native as n29_native\n",
+            "        metric_path = output / 'eds_eval/eds_metrics.jsonl'\n",
+            "        require(receipt.get('n29_metrics') == {'path':str(metric_path),'present':metric_path.is_file(),\n",
+            "            'sha256':sha(metric_path) if metric_path.is_file() else None}, 'N29 serialized metrics binding differs')\n",
+            "        counts,aux = n29_native.from_output(context['profile'],output,report)\n",
+            "        require(receipt.get('n29_native_counts')==counts and receipt.get('n29_auxiliary')==aux,\n",
+            "                'N29 profile-bound native counters differ')\n"
+          ],
+          "old": []
+        }
+      ]
+    }
+  }
+}

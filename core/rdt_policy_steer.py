@@ -54,6 +54,11 @@ from core.qd_parent_before_renoise import (
     DEFAULT as DEFAULT_RBF_PLACEMENT, MODE as PARENT_RBF_PLACEMENT, ParentWitness,
     validate_placement, mutate as mutate_parent_offspring,
 )
+from core.qd_population_relative_rbf import (
+    MODE as TRUST_RBF_UPDATE, TrustWitness, validate_option as validate_trust_option,
+    step as trust_rbf_step, observe as observe_trust_rbf, capture_trust,
+    mutate as mutate_trust_parent,
+)
 from core.qd_lift_quality import (
     HOLD_MODE as HOLD_LIFT_MODE, LIFT_MODES,
     LiftAfterCloseContract, close_then_lift_bonus, close_hold_then_lift_bonus,
@@ -1021,6 +1026,7 @@ class RDTSteer:
         self._n26_rbf_witness = CleanOutputWitness()
         self._n27_rbf_witness = FeasibleRayWitness()
         self._n28_rbf_witness = ParentWitness()
+        self._n29_rbf_witness = TrustWitness()
         self._last_eds_metrics: Optional[dict] = None
         self._last_eds_artifacts: Optional[dict] = None
         self._last_eds_initial_sampler_info: Optional[dict] = None
@@ -1409,6 +1415,7 @@ class RDTSteer:
         self._n26_rbf_witness = CleanOutputWitness()
         self._n27_rbf_witness = FeasibleRayWitness()
         self._n28_rbf_witness = ParentWitness()
+        self._n29_rbf_witness = TrustWitness()
         self.reset_episode_compute_counters()
         if hasattr(self, "_executed_feedback"):
             self._executed_feedback.clear("episode_reset", reset=True)
@@ -2969,6 +2976,8 @@ class RDTSteer:
         return population, info
 
     def _eds_rbf_witness(self, cfg):
+        if cfg.diversity_update_mode == TRUST_RBF_UPDATE:
+            return self._n29_rbf_witness
         if cfg.rollout_diversity_placement == PARENT_RBF_PLACEMENT:
             return self._n28_rbf_witness
         if cfg.diversity_update_mode == FEASIBLE_RBF_UPDATE:
@@ -3068,7 +3077,15 @@ class RDTSteer:
                     if capture is not None:
                         capture["update_operand"] = update[:, :8, :].detach().clone()
                         capture["model_output_before"] = model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES].detach().clone()
-                    if cfg.diversity_update_mode == FEASIBLE_RBF_UPDATE:
+                    if cfg.diversity_update_mode == TRUST_RBF_UPDATE:
+                        before_trust = model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES].detach().clone()
+                        trust, trust_started = trust_rbf_step(before_trust, update[:, :8, :], cfg, scheduler)
+                        model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES] = trust.prefix
+                        observe_trust_rbf(descriptor_evidence, before_trust,
+                                          model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES],
+                                          update[:, :8, :], trust, trust_started)
+                        capture_trust(capture, trust)
+                    elif cfg.diversity_update_mode == FEASIBLE_RBF_UPDATE:
                         before_feasible = model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES].detach().clone()
                         feasible, feasible_started = feasible_rbf_step(before_feasible, update[:, :8, :], cfg, scheduler)
                         model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES] = feasible.prefix
@@ -3227,6 +3244,7 @@ class RDTSteer:
 
     def _eds_renoise_reference(self, population_trajectories: Tensor, t: int) -> Tensor:
         self._n28_rbf_witness.observe_renoise_input(population_trajectories, t)
+        self._n29_rbf_witness.observe_renoise_input(population_trajectories, t)
         scheduler = self._noise_scheduler
         if not hasattr(scheduler, "add_noise"):
             raise RuntimeError("EDS requires a scheduler with add_noise()")
@@ -6116,7 +6134,7 @@ class RDTSteer:
 
             parent_mutation_evidence = None
             if cfg.rollout_diversity_placement == PARENT_RBF_PLACEMENT:
-                parent_mutation_evidence = mutate_parent_offspring(
+                parent_mutation_evidence = (mutate_trust_parent if cfg.diversity_update_mode == TRUST_RBF_UPDATE else mutate_parent_offspring)(
                     offspring, cfg=cfg, scheduler=self._noise_scheduler,
                     compute_gradient=self._compute_eds_diversity_gradient,
                     mask_gradient=self._mask_guidance_gradient,
@@ -8562,8 +8580,11 @@ class RDTSteer:
             raise ValueError("EDS qd_tie_break must be stable_fingerprint")
 
         validate_source_option(resolved)
-        validate_update_option(resolved)
-        validate_placement(resolved)
+        if resolved.diversity_update_mode == TRUST_RBF_UPDATE:
+            validate_trust_option(resolved)
+        else:
+            validate_update_option(resolved)
+            validate_placement(resolved)
         clipped_rbf = CLIPPED_RBF_MODE in {
             resolved.initial_diversity_descriptor_mode, resolved.rollout_diversity_descriptor_mode}
         if clipped_rbf:
