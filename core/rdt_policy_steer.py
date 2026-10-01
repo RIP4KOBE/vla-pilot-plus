@@ -3226,6 +3226,7 @@ class RDTSteer:
         return population
 
     def _eds_renoise_reference(self, population_trajectories: Tensor, t: int) -> Tensor:
+        self._n28_rbf_witness.observe_renoise_input(population_trajectories, t)
         scheduler = self._noise_scheduler
         if not hasattr(scheduler, "add_noise"):
             raise RuntimeError("EDS requires a scheduler with add_noise()")

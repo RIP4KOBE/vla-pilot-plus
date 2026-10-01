@@ -65,6 +65,7 @@ def mutate(offspring, *, cfg, scheduler, compute_gradient, mask_gradient,
                        parent_offspring_before=before,
                        parent_offspring_after=after.detach().clone())
         witness.emit(capture, evidence)
+        witness.pending_parent = (offspring, iteration, parent_allocation_sequence)
     return evidence
 
 
@@ -75,6 +76,38 @@ class ParentWitness(FeasibleRayWitness):
     EVENT = "n28_rbf_witness"
     COVERAGE_EVENT = "n28_rbf_witness_coverage"
     SLOTS = (("initial", -1),) + tuple(("parent", i) for i in range(10))
+
+    def __init__(self):
+        super().__init__()
+        self.pending_parent = None
+        self.parent_event_sequence = None
+        self.parent_numeric_bytes = 0
+        self.parent_metadata_bytes = 0
+
+    def observe_renoise_input(self, offspring, steps):
+        if self.pending_parent is None:
+            return
+        original, iteration, allocation = self.pending_parent
+        if offspring is not original or steps != (3,2,2,2,2,1,1,1,1,1)[iteration]:
+            raise ValueError("N28 actual renoise argument identity/schedule differs")
+        prefix = offspring[:, :8, (39,40,41)].detach().clone()
+        size = prefix.numel() * prefix.element_size()
+        metadata = {"schema":"n28-parent-renoise-boundary-v1", "iteration":iteration,
+            "parent_allocation_sequence":allocation, "parent_witness_sequence":self.parent_event_sequence,
+            "n_trunc_steps":steps, "same_tensor_object_verified":True, "numeric_bytes":size,
+            "observation":"actual _eds_renoise_reference entry before noise draw"}
+        if (self.parent_numeric_bytes + size > self.NUMERIC_CALL_CAP
+                or self.numeric_bytes + size > self.NUMERIC_EPISODE_CAP
+                or self.parent_metadata_bytes + len(json.dumps(metadata).encode()) > self.METADATA_CALL_CAP):
+            raise ValueError("N28 combined parent/boundary evidence cap")
+        self.recorder.record("n28_parent_renoise_input", metadata=metadata, prefix=prefix)
+        self.numeric_bytes += size
+        self.pending_parent = None
+
+    def finish(self):
+        if self.pending_parent is not None:
+            raise ValueError("N28 parent assignment did not reach original renoise")
+        super().finish()
 
     def emit(self, capture, evidence):
         if capture is None:
@@ -115,6 +148,8 @@ class ParentWitness(FeasibleRayWitness):
             "exact_cuda_replay_claim": False}
         if len(json.dumps(metadata, allow_nan=False).encode()) > self.METADATA_CALL_CAP:
             raise ValueError("N28 metadata witness cap")
-        self.recorder.record(self.EVENT, metadata=metadata, tensors=capture)
+        self.parent_event_sequence = self.recorder.record(self.EVENT, metadata=metadata, tensors=capture)
+        self.parent_numeric_bytes = count
+        self.parent_metadata_bytes = len(json.dumps(metadata, allow_nan=False).encode())
         self.numeric_bytes += count
         self.recorded.append(key)

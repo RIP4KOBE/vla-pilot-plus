@@ -1,0 +1,18 @@
+{
+  "review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-v1/root-terminal-review-v1.json",
+    "sha256": "5da47f07b800bbc8ac3b8c7a949f7aed4f412da8c180801ebe159ca95b4454a2"
+  },
+  "plan": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/plan.frozen.v1.gpu7.json",
+    "sha256": "8632a2f39f0cde0c198f358c1b1700907707d3e0474a75df6b9296cf18f7441f"
+  },
+  "bridge": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-v1/source-bridge-v1.json",
+    "sha256": "fbd61cfdb7762a13b42cf406f28c42d88c5827ed11b3064c5aafc280157e2972"
+  },
+  "proof": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/arithmetic-preflight/proof-v1.json",
+    "sha256": "6b30df73287a84ce950d441346a92777920159128823fcda486ea4408770e401"
+  }
+}

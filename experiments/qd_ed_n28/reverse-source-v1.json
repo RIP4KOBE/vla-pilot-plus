@@ -1,0 +1,466 @@
+{
+  "base_commit": "e21d48ab33dbd3aca017349b6004c2ba7d981493",
+  "files": {
+    "configs/config.yaml": {
+      "old_sha256": "654508563250e59ac56695ed3853157992ac946401179c593d74f10082282ee0",
+      "new_sha256": "883a907cda4b8d062cf23f3e7ab99b0b33c8757c6e60aedd20a6ef1e65fa2b93",
+      "hunks": [
+        {
+          "start": 83,
+          "end": 84,
+          "new": [
+            "    rollout_diversity_placement: model_output\n"
+          ],
+          "old": []
+        }
+      ]
+    },
+    "core/rdt_policy_steer.py": {
+      "old_sha256": "768fd9d1072f1f2abc0e3a1f87f764facd69b99e102399c041b73167b6ef00fe",
+      "new_sha256": "ccb051f4708e9509a40f10392838f0267870841963b41033983d9334a740df5b",
+      "hunks": [
+        {
+          "start": 51,
+          "end": 55,
+          "new": [
+            ")\n",
+            "from core.qd_parent_before_renoise import (\n",
+            "    DEFAULT as DEFAULT_RBF_PLACEMENT, MODE as PARENT_RBF_PLACEMENT, ParentWitness,\n",
+            "    validate_placement, mutate as mutate_parent_offspring,\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 137,
+          "end": 138,
+          "new": [
+            "    rollout_diversity_placement: str = DEFAULT_RBF_PLACEMENT\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 1022,
+          "end": 1023,
+          "new": [
+            "        self._n28_rbf_witness = ParentWitness()\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 1410,
+          "end": 1411,
+          "new": [
+            "        self._n28_rbf_witness = ParentWitness()\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 2971,
+          "end": 2973,
+          "new": [
+            "        if cfg.rollout_diversity_placement == PARENT_RBF_PLACEMENT:\n",
+            "            return self._n28_rbf_witness\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 3228,
+          "end": 3229,
+          "new": [
+            "        self._n28_rbf_witness.observe_renoise_input(population_trajectories, t)\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 3740,
+          "end": 3742,
+          "new": [
+            "        if cfg.rollout_diversity_placement == PARENT_RBF_PLACEMENT:\n",
+            "            return False\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 5928,
+          "end": 5929,
+          "new": [
+            "            parent_allocation_sequence = None\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 5931,
+          "end": 5932,
+          "new": [
+            "                parent_allocation_sequence = evidence.record(\"parent_allocation\", iter_idx=i, source_population=population,\n"
+          ],
+          "old": [
+            "                evidence.record(\"parent_allocation\", iter_idx=i, source_population=population,\n"
+          ]
+        },
+        {
+          "start": 6116,
+          "end": 6125,
+          "new": [
+            "            parent_mutation_evidence = None\n",
+            "            if cfg.rollout_diversity_placement == PARENT_RBF_PLACEMENT:\n",
+            "                parent_mutation_evidence = mutate_parent_offspring(\n",
+            "                    offspring, cfg=cfg, scheduler=self._noise_scheduler,\n",
+            "                    compute_gradient=self._compute_eds_diversity_gradient,\n",
+            "                    mask_gradient=self._mask_guidance_gradient,\n",
+            "                    witness=self._eds_rbf_witness(cfg), iteration=i,\n",
+            "                    parent_allocation_sequence=parent_allocation_sequence,\n",
+            "                )\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 6213,
+          "end": 6215,
+          "new": [
+            "            if parent_mutation_evidence is not None:\n",
+            "                rollout_info.setdefault(\"direction_rbf_evidence_by_step\", []).append(parent_mutation_evidence)\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 8007,
+          "end": 8008,
+          "new": [
+            "            rollout_diversity_placement=str(cfg.get(\"rollout_diversity_placement\", DEFAULT_RBF_PLACEMENT)),\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 8565,
+          "end": 8566,
+          "new": [
+            "        validate_placement(resolved)\n"
+          ],
+          "old": []
+        }
+      ]
+    },
+    "scripts/qd_ed_final_runner.py": {
+      "old_sha256": "58599c3700ba8883530d4f4599346fca9acfd5edf7a3f74bd15d2f32ceda43af",
+      "new_sha256": "4d8a23cca235ffc98c7ba985f1bf7803449d00797d016e993f145968dee6ee21",
+      "hunks": [
+        {
+          "start": 225,
+          "end": 228,
+          "new": [
+            "    if candidate_id == 'N28':\n",
+            "        from scripts import qd_ed_n28_contract\n",
+            "        return qd_ed_n28_contract.expand_candidate(candidate, baseline, globals())\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 490,
+          "end": 491,
+          "new": [
+            "    return not is_n28_plan(plan) and not is_n27_plan(plan) and not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and not is_n23_plan(plan) and (plan.get('n7_cohort') is not None or ('N7' in plan.get('candidate_profiles', {})\n"
+          ],
+          "old": [
+            "    return not is_n27_plan(plan) and not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and not is_n23_plan(plan) and (plan.get('n7_cohort') is not None or ('N7' in plan.get('candidate_profiles', {})\n"
+          ]
+        },
+        {
+          "start": 552,
+          "end": 556,
+          "new": [
+            "def is_n28_plan(plan):\n",
+            "    return plan.get('n28_cohort') is not None or 'N28' in plan.get('candidate_profiles', {})\n",
+            "\n",
+            "\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 557,
+          "end": 558,
+          "new": [
+            "    return not is_n28_plan(plan) and (plan.get('n27_cohort') is not None or 'N27' in plan.get('candidate_profiles', {}))\n"
+          ],
+          "old": [
+            "    return plan.get('n27_cohort') is not None or 'N27' in plan.get('candidate_profiles', {})\n"
+          ]
+        },
+        {
+          "start": 561,
+          "end": 562,
+          "new": [
+            "    return not is_n28_plan(plan) and not is_n27_plan(plan) and (plan.get('n26_cohort') is not None or 'N26' in plan.get('candidate_profiles', {}))\n"
+          ],
+          "old": [
+            "    return not is_n27_plan(plan) and (plan.get('n26_cohort') is not None or 'N26' in plan.get('candidate_profiles', {}))\n"
+          ]
+        },
+        {
+          "start": 565,
+          "end": 566,
+          "new": [
+            "    return not is_n28_plan(plan) and not is_n27_plan(plan) and not is_n26_plan(plan) and (plan.get('n25_cohort') is not None or 'N25' in plan.get('candidate_profiles', {}))\n"
+          ],
+          "old": [
+            "    return not is_n27_plan(plan) and not is_n26_plan(plan) and (plan.get('n25_cohort') is not None or 'N25' in plan.get('candidate_profiles', {}))\n"
+          ]
+        },
+        {
+          "start": 573,
+          "end": 574,
+          "new": [
+            "    return not is_n28_plan(plan) and not is_n27_plan(plan) and not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and plan.get('n23_cohort', {}).get('schema') == 'n23-clipped-quality-dev-v2'\n"
+          ],
+          "old": [
+            "    return not is_n27_plan(plan) and not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and plan.get('n23_cohort', {}).get('schema') == 'n23-clipped-quality-dev-v2'\n"
+          ]
+        },
+        {
+          "start": 577,
+          "end": 578,
+          "new": [
+            "    return not is_n28_plan(plan) and not is_n27_plan(plan) and not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and (plan.get('n23_cohort') is not None or 'N23' in plan.get('candidate_profiles', {}))\n"
+          ],
+          "old": [
+            "    return not is_n27_plan(plan) and not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and (plan.get('n23_cohort') is not None or 'N23' in plan.get('candidate_profiles', {}))\n"
+          ]
+        },
+        {
+          "start": 664,
+          "end": 665,
+          "new": [
+            "    return is_n28_plan(plan) or is_n27_plan(plan) or is_n26_plan(plan) or is_n25_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan)\n"
+          ],
+          "old": [
+            "    return is_n27_plan(plan) or is_n26_plan(plan) or is_n25_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan)\n"
+          ]
+        },
+        {
+          "start": 668,
+          "end": 669,
+          "new": [
+            "    return is_n28_plan(plan) or is_n27_plan(plan) or is_n26_plan(plan) or is_n25_plan(plan) or is_n23_v2_plan(plan) or is_n24_plan(plan)\n"
+          ],
+          "old": [
+            "    return is_n27_plan(plan) or is_n26_plan(plan) or is_n25_plan(plan) or is_n23_v2_plan(plan) or is_n24_plan(plan)\n"
+          ]
+        },
+        {
+          "start": 672,
+          "end": 675,
+          "new": [
+            "    if is_n28_plan(plan):\n",
+            "        from scripts import qd_ed_n28_contract\n",
+            "        return qd_ed_n28_contract\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 852,
+          "end": 859,
+          "new": [
+            "    runtime_artifact_root = Path(state['artifacts']).resolve()\n",
+            "    if is_n28_plan(plan):\n",
+            "        n28_artifact = metered_support(plan).RUN_DIR / 'artifacts'\n",
+            "        require(n28_artifact.is_symlink() and artifact_root == n28_artifact.resolve() ==\n",
+            "                runtime_artifact_root / 'variants/n28_parent_before_renoise', 'N28 artifact root mismatch')\n",
+            "    else:\n",
+            "        require(artifact_root == runtime_artifact_root, 'artifact root mismatch')\n"
+          ],
+          "old": [
+            "    require(artifact_root == Path(state['artifacts']).resolve(), 'artifact root mismatch')\n"
+          ]
+        },
+        {
+          "start": 878,
+          "end": 879,
+          "new": [
+            "    runtime_path = owned(plan['runtime_manifest_path'], runtime_artifact_root)\n"
+          ],
+          "old": [
+            "    runtime_path = owned(plan['runtime_manifest_path'], artifact_root)\n"
+          ]
+        },
+        {
+          "start": 883,
+          "end": 884,
+          "new": [
+            "    require(Path(runtime['artifact_root']).resolve() == runtime_artifact_root, 'runtime artifact root mismatch')\n"
+          ],
+          "old": [
+            "    require(Path(runtime['artifact_root']).resolve() == artifact_root, 'runtime artifact root mismatch')\n"
+          ]
+        },
+        {
+          "start": 886,
+          "end": 887,
+          "new": [
+            "            (plan.get('n7_e2_passive_diagnostic') is not None or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n25_plan(plan) or is_n26_plan(plan) or is_n27_plan(plan) or is_n28_plan(plan)),\n"
+          ],
+          "old": [
+            "            (plan.get('n7_e2_passive_diagnostic') is not None or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n25_plan(plan) or is_n26_plan(plan) or is_n27_plan(plan)),\n"
+          ]
+        },
+        {
+          "start": 888,
+          "end": 889,
+          "new": [
+            "    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan) or is_n7_plan(plan) or is_n9_plan(plan) or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n25_plan(plan) or is_n26_plan(plan) or is_n27_plan(plan) or is_n28_plan(plan)),\n"
+          ],
+          "old": [
+            "    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan) or is_n7_plan(plan) or is_n9_plan(plan) or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n25_plan(plan) or is_n26_plan(plan) or is_n27_plan(plan)),\n"
+          ]
+        },
+        {
+          "start": 894,
+          "end": 895,
+          "new": [
+            "    verify_files(runtime['files'],allowed_roots=(root,state.get('worktree',str(root)),runtime_artifact_root))\n"
+          ],
+          "old": [
+            "    verify_files(runtime['files'],allowed_roots=(root,state.get('worktree',str(root)),artifact_root))\n"
+          ]
+        },
+        {
+          "start": 916,
+          "end": 917,
+          "new": [
+            "    owned(runtime['environment']['LIBERO_CONFIG_PATH'], runtime_artifact_root)\n"
+          ],
+          "old": [
+            "    owned(runtime['environment']['LIBERO_CONFIG_PATH'], artifact_root)\n"
+          ]
+        },
+        {
+          "start": 953,
+          "end": 954,
+          "new": [
+            "        owned(task['cache_dir'], runtime_artifact_root)\n"
+          ],
+          "old": [
+            "        owned(task['cache_dir'], artifact_root)\n"
+          ]
+        },
+        {
+          "start": 1293,
+          "end": 1298,
+          "new": [
+            "    if row.get('iteration') == 'N28_PARENT_BEFORE_RENOISE_SCREEN_20261001':\n",
+            "        from scripts import qd_ed_n28_contract as n28\n",
+            "        n28.require_state(state, globals())\n",
+            "        bucket_caps = n28.BASE_CAPS['buckets']\n",
+            "    elif row.get('iteration') == 'N27_HYDRA_CONTINUATION_V1_20261001':\n"
+          ],
+          "old": [
+            "    if row.get('iteration') == 'N27_HYDRA_CONTINUATION_V1_20261001':\n"
+          ]
+        },
+        {
+          "start": 1425,
+          "end": 1428,
+          "new": [
+            "    if row.get(\"iteration\") == \"N28_PARENT_BEFORE_RENOISE_SCREEN_20261001\":\n",
+            "        from scripts import qd_ed_n28_contract as n28\n",
+            "        return n28.check_retry(events, row, globals())\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 2022,
+          "end": 2023,
+          "new": [
+            "                    terminal['n28_episode_dispatched' if is_n28_plan(plan) else 'n27_episode_dispatched' if is_n27_plan(plan) else 'n26_episode_dispatched' if is_n26_plan(plan) else 'n25_episode_dispatched' if is_n25_plan(plan) else 'n24_episode_dispatched' if is_n24_plan(plan) else 'n23_episode_dispatched']=dispatched\n"
+          ],
+          "old": [
+            "                    terminal['n27_episode_dispatched' if is_n27_plan(plan) else 'n26_episode_dispatched' if is_n26_plan(plan) else 'n25_episode_dispatched' if is_n25_plan(plan) else 'n24_episode_dispatched' if is_n24_plan(plan) else 'n23_episode_dispatched']=dispatched\n"
+          ]
+        },
+        {
+          "start": 2088,
+          "end": 2089,
+          "new": [
+            "        if metered_plan(plan):terminal['n28_episode_dispatched' if is_n28_plan(plan) else 'n27_episode_dispatched' if is_n27_plan(plan) else 'n26_episode_dispatched' if is_n26_plan(plan) else 'n25_episode_dispatched' if is_n25_plan(plan) else 'n24_episode_dispatched' if is_n24_plan(plan) else 'n23_episode_dispatched']=dispatched is not None\n"
+          ],
+          "old": [
+            "        if metered_plan(plan):terminal['n27_episode_dispatched' if is_n27_plan(plan) else 'n26_episode_dispatched' if is_n26_plan(plan) else 'n25_episode_dispatched' if is_n25_plan(plan) else 'n24_episode_dispatched' if is_n24_plan(plan) else 'n23_episode_dispatched']=dispatched is not None\n"
+          ]
+        }
+      ]
+    },
+    "scripts/qd_ed_n23_worker.py": {
+      "old_sha256": "67fb073f20d618414936dd2e1bbfb6aae00f7156f87ffb645875997b6d03aaa6",
+      "new_sha256": "c50dcb656b2d4a90b9a6988814021e412cab950a9e527d56ee05b7d87f006ac8",
+      "hunks": [
+        {
+          "start": 137,
+          "end": 140,
+          "new": [
+            "    if plan.get('n28_cohort') is not None or 'N28' in plan.get('candidate_profiles', {}):\n",
+            "        from scripts import qd_ed_n28_contract as n28\n",
+            "        return n28.validate_worker_context(context, main_argv, root, output, plan, runtime)\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 211,
+          "end": 212,
+          "new": [
+            "            backend = create_backend('cuda', binding=cuda_binding(runtime)) if context['profile'] in {'N23', 'N24', 'N25', 'N26', 'N27', 'N28'} else create_backend('cpu')\n"
+          ],
+          "old": [
+            "            backend = create_backend('cuda', binding=cuda_binding(runtime)) if context['profile'] in {'N23', 'N24', 'N25', 'N26', 'N27'} else create_backend('cpu')\n"
+          ]
+        },
+        {
+          "start": 217,
+          "end": 220,
+          "new": [
+            "            if read_ref(context['plan']).get('n28_cohort') is not None:\n",
+            "                from scripts import qd_ed_n28_native as n28_native\n",
+            "                report = n28_native.audit_output(context['profile'], output, report, backend)\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 239,
+          "end": 245,
+          "new": [
+            "                    'sha256': sha(metric_path) if metric_path.is_file() else None}\n",
+            "            if read_ref(context['plan']).get('n28_cohort') is not None:\n",
+            "                from scripts import qd_ed_n28_native as n28_native\n",
+            "                receipt['n28_native_counts'], receipt['n28_auxiliary'] = n28_native.from_output(context['profile'], output, report)\n",
+            "                metric_path = output / 'eds_eval/eds_metrics.jsonl'\n",
+            "                receipt['n28_metrics'] = {'path': str(metric_path), 'present': metric_path.is_file(),\n"
+          ],
+          "old": []
+        },
+        {
+          "start": 306,
+          "end": 307,
+          "new": [
+            "    kind = 'cuda' if context['profile'] in {'N23', 'N24', 'N25', 'N26', 'N27', 'N28'} else 'cpu'\n"
+          ],
+          "old": [
+            "    kind = 'cuda' if context['profile'] in {'N23', 'N24', 'N25', 'N26', 'N27'} else 'cpu'\n"
+          ]
+        },
+        {
+          "start": 346,
+          "end": 354,
+          "new": [
+            "    if read_ref(context['plan']).get('n28_cohort') is not None:\n",
+            "        from scripts import qd_ed_n28_native as n28_native\n",
+            "        metric_path = output / 'eds_eval/eds_metrics.jsonl'\n",
+            "        require(receipt.get('n28_metrics') == {'path':str(metric_path),'present':metric_path.is_file(),\n",
+            "            'sha256':sha(metric_path) if metric_path.is_file() else None}, 'N28 serialized metrics binding differs')\n",
+            "        counts,aux = n28_native.from_output(context['profile'],output,report)\n",
+            "        require(receipt.get('n28_native_counts')==counts and receipt.get('n28_auxiliary')==aux,\n",
+            "                'N28 profile-bound native counters differ')\n"
+          ],
+          "old": []
+        }
+      ]
+    }
+  }
+}

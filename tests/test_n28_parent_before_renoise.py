@@ -93,7 +93,7 @@ def base_methods(steer):
     """Actual e21 source functions, compiled only for a synthetic old-path comparison."""
     source=Path(os.environ['N28_BASE_POLICY']).read_text();tree=ast.parse(source)
     cls=next(x for x in tree.body if isinstance(x,ast.ClassDef) and x.name=='RDTSteer')
-    names={'_eds_guided_denoise_loop','_eds_rollout_diversity_step_mask','_eds_rbf_witness'}
+    names={'_eds_guided_denoise_loop','_eds_rollout_diversity_step_mask','_eds_rbf_witness','_eds_renoise_reference'}
     import core.rdt_policy_steer as module
     scope=dict(vars(module));nodes=[x for x in cls.body if isinstance(x,ast.FunctionDef) and x.name in names]
     exec(compile(ast.Module(body=nodes,type_ignores=[]),'e21_synthetic_original_methods','exec'),scope)
@@ -129,7 +129,9 @@ def test_full_loop_original_parity_n28_allocation_order_witness(stub_steer,stub_
     monkeypatch.setattr(stub_steer,'_eds_rollout_rbf_diverse_reference',rollout)
     monkeypatch.setattr(stub_steer._noise_scheduler,'step',step)
     for mode,recording,baseline in [('N27',False,True),('N27',False,False),('N28',False,False),('N28',True,False)]:
-        for n,m in (old_methods if baseline else new_methods).items():monkeypatch.setattr(stub_steer,n,m)
+        for n,m in (old_methods if baseline else new_methods).items():
+            if n!='_eds_renoise_reference':monkeypatch.setattr(stub_steer,n,m)
+        original_renoise=(old_methods if baseline else new_methods)['_eds_renoise_reference']
         stub_steer.reset();torch.manual_seed(2828);origins.clear();order.clear();pending.clear();denoise.clear();saved=[]
         rec=DecisionEvidence(tmp_path/'synthetic',episode=0) if recording else None
         if rec:
@@ -205,6 +207,7 @@ def test_parent_witness_fail_closed_and_no_later_backfill(stub_steer,stub_adapte
     mutate(input_tensor(torch.float32,16),cfg=config(stub_steer,'N28'),scheduler=stub_steer._noise_scheduler,
            compute_gradient=stub_steer._compute_eds_diversity_gradient,mask_gradient=stub_steer._mask_guidance_gradient,
            witness=w,iteration=0,parent_allocation_sequence=123)
+    w.observe_renoise_input(w.pending_parent[0],3)
     _,v=saved[0];original=v['metadata']['call'];capture=v['tensors']
     for field,value in [('schema','n27-rbf-call-summary-v1'),('input_source','model_output_sample_v1'),
                         ('input_binding','same_forward_unmodified_model_output'),('denoising_step',0)]:
