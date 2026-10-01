@@ -1,0 +1,44 @@
+{
+  "schema": "n26-logical-to-accepted-shared-reverse-v1",
+  "base_commit": "c09dffe956c391d85ecc02e3288b9fa982e86ce7",
+  "files": [
+    {
+      "path": "scripts/qd_ed_final_runner.py",
+      "old_sha256": "bc7bbff41fc623d4b3c388ed8c13fe7b6a0360238cae4c36200b157b9711c327",
+      "new_sha256": "cff374a636a410579aaaff679c52f07eeda6fce9fb6cdf6b71773ab1f8f68806",
+      "edits": [
+        {
+          "new_start": 658,
+          "new_end": 661,
+          "new": "    if plan.get('n25_infrastructure_continuation') is not None:\n        from scripts import qd_ed_n25_cont_contract\n        return qd_ed_n25_cont_contract\n",
+          "old": ""
+        },
+        {
+          "new_start": 1264,
+          "new_end": 1269,
+          "new": "    if row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_INFRA_CONTINUATION_V1_20260930':\n        from scripts import qd_ed_n25_cont_contract as n25c\n        n25c.require_state(state, globals())\n        bucket_caps = n25c.CAPS['buckets']\n    elif row.get('iteration') == 'N26_CLEAN_OUTPUT_RBF_DEV_20260930':\n",
+          "old": "    if row.get('iteration') == 'N26_CLEAN_OUTPUT_RBF_DEV_20260930':\n"
+        },
+        {
+          "new_start": 1384,
+          "new_end": 1387,
+          "new": "    if row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_INFRA_CONTINUATION_V1_20260930':\n        from scripts import qd_ed_n25_cont_contract as n25c\n        return n25c.check_retry(events, row, globals())\n",
+          "old": ""
+        }
+      ]
+    },
+    {
+      "path": "scripts/qd_ed_n23_worker.py",
+      "old_sha256": "664738f1dd1c8c264a4c7dd72f0d5388cf81a0a9fb15cd2e2bcba1e1f41579ea",
+      "new_sha256": "58ca3729fbb4d80aeac441a68d6b6a13c5d0b06ccce9a7329007a1731be59ce1",
+      "edits": [
+        {
+          "new_start": 137,
+          "new_end": 140,
+          "new": "    if plan.get('n25_infrastructure_continuation') is not None:\n        from scripts import qd_ed_n25_cont_contract as n25c\n        return n25c.validate_worker_context(context, main_argv, root, output, plan, runtime)\n",
+          "old": ""
+        }
+      ]
+    }
+  ]
+}

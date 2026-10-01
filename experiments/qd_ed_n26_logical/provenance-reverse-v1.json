@@ -1,0 +1,136 @@
+{
+  "schema": "n26-logical-provenance-reverse-v1",
+  "base_commit": "c09dffe956c391d85ecc02e3288b9fa982e86ce7",
+  "files": [
+    {
+      "path": "scripts/qd_ed_n26_contract.py",
+      "old_sha256": "4110e481d8a4d38e0414da78e7452b657afb3e3c923d29fdaa6bf0c858d15c04",
+      "new_sha256": "e7a58c965f635062ba72a81acf2e84c26bcae735ca6b580862adae426d4d299f",
+      "edits": [
+        {
+          "new_start": 25,
+          "new_end": 28,
+          "new": "FINAL_REVIEW=RUN_DIR/'final-source-runtime-review.logical-v1.json'\nAUTHORITY=RUN_DIR/'logical-adoption-v1/authority.json'\nBRIDGE=RUN_DIR/'source-equivalence-bridge.logical-v1.json'\n",
+          "old": "FINAL_REVIEW=RUN_DIR/'final-source-runtime-review-v1.json'\nAUTHORITY=RUN_DIR/'adoption-v1/authority.json'\nBRIDGE=RUN_DIR/'source-equivalence-bridge-v1.json'\n"
+        },
+        {
+          "new_start": 37,
+          "new_end": 40,
+          "new": "PREDECESSOR=RUN_DIR/'predecessor-logical-review-v1.json'\nLOGICAL_PROTOCOL=SESSION/'variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-adapter-design-v1/root-conditional-controller-cpu-protocol-v1.md'\nBUDGET_AUTHORITY=RUN_DIR/'budget-logical-adoption-v1/authority.json'\n",
+          "old": "PREDECESSOR=RUN_DIR/'predecessor-review-v1.json'\nBUDGET_AUTHORITY=RUN_DIR/'budget-adoption-v1/authority.json'\n"
+        },
+        {
+          "new_start": 88,
+          "new_end": 90,
+          "new": "    from scripts import qd_ed_n26_logical as logical\n    return logical.source_paths(Path(r['ROOT'])) | r['REQUIRED_CODE'] | w.REQUIRED_SOURCE\n",
+          "old": "    phase_a=w.read_ref(ref(Path(r['ROOT'])/PHASE_A_MANIFEST))\n    w.require(phase_a['commit']==PHASE_A,'N26 Phase A manifest differs')\n    return {v['path'] for v in phase_a['files']} | r['REQUIRED_CODE'] | w.REQUIRED_SOURCE | EXTRA_SOURCE\n"
+        },
+        {
+          "new_start": 109,
+          "new_end": 111,
+          "new": "      'arithmetic_protocol':ref(ARITHMETIC_PROTOCOL),'admission_clarification':ref(CLARIFICATION),'composition_protocol':ref(LOGICAL_PROTOCOL),\n      'logical_admission_addendum':ref(Path(root)/'experiments/qd_ed_n26_logical/admission-addendum-v1.md'),'no_gpu_release':True}\n",
+          "old": "      'arithmetic_protocol':ref(ARITHMETIC_PROTOCOL),'admission_clarification':ref(CLARIFICATION),'no_gpu_release':True}\n"
+        },
+        {
+          "new_start": 119,
+          "new_end": 120,
+          "new": "          'recorded_at','authority_interpretation','admission_clarification','composition_protocol','logical_predecessor','validation_authorized','formal_authorized'}\n",
+          "old": "          'recorded_at','authority_interpretation','admission_clarification','validation_authorized','formal_authorized'}\n"
+        },
+        {
+          "new_start": 125,
+          "new_end": 126,
+          "new": "        and record['composition_protocol']==ref(LOGICAL_PROTOCOL) and record['logical_predecessor']==predecessor()\n",
+          "old": ""
+        },
+        {
+          "new_start": 227,
+          "new_end": 228,
+          "new": "        'composition_protocol':ref(LOGICAL_PROTOCOL),'logical_predecessor':predecessor(),\n",
+          "old": ""
+        },
+        {
+          "new_start": 318,
+          "new_end": 320,
+          "new": "    from scripts import qd_ed_n26_logical as logical\n    logical.protocol(root)\n",
+          "old": ""
+        },
+        {
+          "new_start": 329,
+          "new_end": 331,
+          "new": "    from scripts import qd_ed_n26_logical as logical\n    logical.read_gate(root=ROOT)\n",
+          "old": "    record=w.read_ref(ref(PREDECESSOR))\n    w.require(set(record)=={'schema','source_commit','dev_result','dev_root_review','disposition','allow_n26','admission_clarification'}\n        and record['schema']=='n26-predecessor-review-v1' and record['source_commit']==BASE\n        and record['allow_n26'] is True and record['disposition']=='VALID_DEV_REJECTION'\n        and record['admission_clarification']==ref(CLARIFICATION),'N26 valid Dev rejection predecessor missing')\n    w.require(w.sha(CLARIFICATION)==CLARIFICATION_SHA,'N26 predecessor restriction drift')\n    dev=w.read_ref(record['dev_result']);review=w.read_ref(record['dev_root_review']);source=w.read_ref(review['source'])\n    w.require(dev.get('source_commit')==BASE and review.get('result')==record['dev_result']\n        and review.get('schema')=='n25-root-terminal-review-v1'\n        and review.get('decision')=='ACCEPT_TERMINAL_RECONSTRUCTION'\n        and source.get('commit')==BASE and len(source.get('files',[]))==257\n        and source.get('sha256')==w.canonical_sha(source['files']) and review.get('source_files_verified')==257\n        and review.get('cohort_disposition')==dev.get('decision')\n        and review.get('accepted_cells')==dev.get('audited_cells')\n        and review.get('counts')==dev.get('counts') and review.get('native')==dev.get('native')\n        and review.get('plan')==dev.get('plan') and review.get('ledger')==dev.get('ledger_snapshot')\n        and dev.get('controller_evidence',{}).get('consistent') is True,\n        'N26 predecessor source/result root reconstruction differs')\n    w.require(dev.get('decision') in {'REJECT','REJECT_NUMERIC_FUTILITY'} and dev.get('dev_gate_promoted') is False,\n              'N26 promotion/invalid predecessor not authorized by this protocol')\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/qd_ed_n26_bridge.py",
+      "old_sha256": "3a48b7f5af0e16a4ecc58e9b64534e241621b82fcf26c715b83ee22001926859",
+      "new_sha256": "1a9354faecf3a182f27187666beaf22e8e560727a2d4e3666bce50be55283fc7",
+      "edits": [
+        {
+          "new_start": 21,
+          "new_end": 23,
+          "new": "    from scripts import qd_ed_n26_logical as logical\n    root=Path(root);composition=logical.verify_composition(root,source);phase=w.read_ref(c.ref(root/c.PHASE_A_MANIFEST))\n",
+          "old": "    root=Path(root);phase=w.read_ref(c.ref(root/c.PHASE_A_MANIFEST))\n"
+        },
+        {
+          "new_start": 25,
+          "new_end": 26,
+          "new": "    w.require(changed<=logical.source_paths(root),'N26 changed scientific source')\n",
+          "old": "    w.require(changed<=c.CONTROLLER_DELTA,'N26 changed scientific source')\n"
+        },
+        {
+          "new_start": 40,
+          "new_end": 42,
+          "new": "    return {'schema':'n26-source-equivalence-bridge-logical-v1','composition':composition,\n        'logical_predecessor':c.predecessor(),'composition_protocol':c.ref(c.LOGICAL_PROTOCOL),'phase_a_source':c.PHASE_A,'new_source':source,'runtime':runtime,\n",
+          "old": "    return {'schema':'n26-source-equivalence-bridge-v1','phase_a_source':c.PHASE_A,'new_source':source,'runtime':runtime,\n"
+        },
+        {
+          "new_start": 59,
+          "new_end": 61,
+          "new": "        from scripts import qd_ed_n26_logical as logical\n        current=logical.restore_shared(root,row['path']).decode();lines=current.splitlines(keepends=True)\n",
+          "old": "        current=(Path(root)/row['path']).read_text();lines=current.splitlines(keepends=True)\n"
+        },
+        {
+          "new_start": 99,
+          "new_end": 101,
+          "new": "    from scripts import qd_ed_n26_logical as logical\n    logical.current_matching(events,resources)\n",
+          "old": ""
+        }
+      ]
+    },
+    {
+      "path": "scripts/qd_ed_n26_prepare.py",
+      "old_sha256": "e286f63e421cd682894dd4bacdb6f103cda5e78c0189ed8e0c499fa585b0a0cd",
+      "new_sha256": "21e0dcdcde7f813b8afd5a35a10a490c29f7c41ea788132f8457145e1ba09b11",
+      "edits": [
+        {
+          "new_start": 14,
+          "new_end": 15,
+          "new": "def build_plan(*,source=None,root=ROOT,review=None,authority=None,predecessor_ref=None):\n",
+          "old": "def build_plan(*,source=None,root=ROOT,review=None,authority=None):\n"
+        },
+        {
+          "new_start": 27,
+          "new_end": 29,
+          "new": "        'final_review':review,'authority':authority,'composition_protocol':c.ref(c.LOGICAL_PROTOCOL),\n        'logical_predecessor':predecessor_ref if review is None else c.predecessor(),'worker_audit':c.WORKER_CONTRACT,\n",
+          "old": "        'final_review':review,'authority':authority,'worker_audit':c.WORKER_CONTRACT,\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/qd_ed_n26_backend.py",
+      "old_sha256": "236eefedd0910f6bee67314857f199ac1aa0a8eb48d8e85ed506515dd69cbd73",
+      "new_sha256": "53970bca912aa8d413fae17ca9e9df243e6f8538344d7448f5efab387b1e4062",
+      "edits": [
+        {
+          "new_start": 22,
+          "new_end": 25,
+          "new": "        'budget_authority':c.ref(c.BUDGET_AUTHORITY),'composition_protocol':c.ref(c.LOGICAL_PROTOCOL),\n        'logical_admission_addendum':c.ref(Path(root)/'experiments/qd_ed_n26_logical/admission-addendum-v1.md'),\n        'limits':LIMITS,'gpu_release':False}\n",
+          "old": "        'budget_authority':c.ref(c.BUDGET_AUTHORITY),'limits':LIMITS,'gpu_release':False}\n"
+        }
+      ]
+    }
+  ]
+}

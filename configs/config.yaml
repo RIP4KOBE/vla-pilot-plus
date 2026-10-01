@@ -79,6 +79,7 @@ main:
     use_initial_cache: false
     save_initial_cache: false
     save_ed_cache: false
+    diversity_input_source: noisy_sample
     initial_sampling_mode: iid
     initial_diversity_descriptor_mode: absolute_eef
     initial_diversity_scale: 1.0

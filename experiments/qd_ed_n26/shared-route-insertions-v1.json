@@ -1,0 +1,146 @@
+{
+  "base_commit": "8fd01eb77e2e83a100e54b21dc955c34bda9a3cc",
+  "files": [
+    {
+      "edits": [
+        {
+          "new": "    if candidate_id == 'N26':\n        from scripts import qd_ed_n26_contract\n        return qd_ed_n26_contract.expand_candidate(candidate, baseline, globals())\n",
+          "new_end": 228,
+          "new_start": 225,
+          "old": ""
+        },
+        {
+          "new": "    return not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and not is_n23_plan(plan) and (plan.get('n7_cohort') is not None or ('N7' in plan.get('candidate_profiles', {})\n",
+          "new_end": 485,
+          "new_start": 484,
+          "old": "    return not is_n25_plan(plan) and not is_n24_plan(plan) and not is_n23_plan(plan) and (plan.get('n7_cohort') is not None or ('N7' in plan.get('candidate_profiles', {})\n"
+        },
+        {
+          "new": "def is_n26_plan(plan):\n    return plan.get('n26_cohort') is not None or 'N26' in plan.get('candidate_profiles', {})\n\n\n",
+          "new_end": 550,
+          "new_start": 546,
+          "old": ""
+        },
+        {
+          "new": "    return not is_n26_plan(plan) and (plan.get('n25_cohort') is not None or 'N25' in plan.get('candidate_profiles', {}))\n",
+          "new_end": 552,
+          "new_start": 551,
+          "old": "    return plan.get('n25_cohort') is not None or 'N25' in plan.get('candidate_profiles', {})\n"
+        },
+        {
+          "new": "    return not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and plan.get('n23_cohort', {}).get('schema') == 'n23-clipped-quality-dev-v2'\n",
+          "new_end": 560,
+          "new_start": 559,
+          "old": "    return not is_n25_plan(plan) and not is_n24_plan(plan) and plan.get('n23_cohort', {}).get('schema') == 'n23-clipped-quality-dev-v2'\n"
+        },
+        {
+          "new": "    return not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and (plan.get('n23_cohort') is not None or 'N23' in plan.get('candidate_profiles', {}))\n",
+          "new_end": 564,
+          "new_start": 563,
+          "old": "    return not is_n25_plan(plan) and not is_n24_plan(plan) and (plan.get('n23_cohort') is not None or 'N23' in plan.get('candidate_profiles', {}))\n"
+        },
+        {
+          "new": "    return is_n26_plan(plan) or is_n25_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan)\n",
+          "new_end": 651,
+          "new_start": 650,
+          "old": "    return is_n25_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan)\n"
+        },
+        {
+          "new": "    return is_n26_plan(plan) or is_n25_plan(plan) or is_n23_v2_plan(plan) or is_n24_plan(plan)\n",
+          "new_end": 655,
+          "new_start": 654,
+          "old": "    return is_n25_plan(plan) or is_n23_v2_plan(plan) or is_n24_plan(plan)\n"
+        },
+        {
+          "new": "    if is_n26_plan(plan):\n        from scripts import qd_ed_n26_contract\n        return qd_ed_n26_contract\n",
+          "new_end": 661,
+          "new_start": 658,
+          "old": ""
+        },
+        {
+          "new": "            (plan.get('n7_e2_passive_diagnostic') is not None or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n25_plan(plan) or is_n26_plan(plan)),\n",
+          "new_end": 855,
+          "new_start": 854,
+          "old": "            (plan.get('n7_e2_passive_diagnostic') is not None or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n25_plan(plan)),\n"
+        },
+        {
+          "new": "    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan) or is_n7_plan(plan) or is_n9_plan(plan) or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n25_plan(plan) or is_n26_plan(plan)),\n",
+          "new_end": 857,
+          "new_start": 856,
+          "old": "    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan) or is_n7_plan(plan) or is_n9_plan(plan) or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n25_plan(plan)),\n"
+        },
+        {
+          "new": "    if row.get('iteration') == 'N26_CLEAN_OUTPUT_RBF_DEV_20260930':\n        from scripts import qd_ed_n26_contract as n26\n        n26.require_state(state, globals())\n        bucket_caps = n26.budget_authority()['caps']['buckets']\n    elif row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_20260930':\n",
+          "new_end": 1266,
+          "new_start": 1261,
+          "old": "    if row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_20260930':\n"
+        },
+        {
+          "new": "    if row.get('n26_recovery_eligibility') is not None:\n        from scripts import qd_ed_n26_recovery as recovery\n        return recovery.check_retry(events, row, globals())\n",
+          "new_end": 1380,
+          "new_start": 1377,
+          "old": ""
+        },
+        {
+          "new": "                    terminal['n26_episode_dispatched' if is_n26_plan(plan) else 'n25_episode_dispatched' if is_n25_plan(plan) else 'n24_episode_dispatched' if is_n24_plan(plan) else 'n23_episode_dispatched']=dispatched\n",
+          "new_end": 1963,
+          "new_start": 1962,
+          "old": "                    terminal['n25_episode_dispatched' if is_n25_plan(plan) else 'n24_episode_dispatched' if is_n24_plan(plan) else 'n23_episode_dispatched']=dispatched\n"
+        },
+        {
+          "new": "        if metered_plan(plan):terminal['n26_episode_dispatched' if is_n26_plan(plan) else 'n25_episode_dispatched' if is_n25_plan(plan) else 'n24_episode_dispatched' if is_n24_plan(plan) else 'n23_episode_dispatched']=dispatched is not None\n",
+          "new_end": 2029,
+          "new_start": 2028,
+          "old": "        if metered_plan(plan):terminal['n25_episode_dispatched' if is_n25_plan(plan) else 'n24_episode_dispatched' if is_n24_plan(plan) else 'n23_episode_dispatched']=dispatched is not None\n"
+        }
+      ],
+      "new_sha256": "bc7bbff41fc623d4b3c388ed8c13fe7b6a0360238cae4c36200b157b9711c327",
+      "old_sha256": "b3e5ccd90b4ae0eee036560809dcdb74ff68bbaecb56792d676b64bec6e2f7f5",
+      "path": "scripts/qd_ed_final_runner.py"
+    },
+    {
+      "edits": [
+        {
+          "new": "    if plan.get('n26_cohort') is not None:\n        from scripts import qd_ed_n26_contract as n26\n        return n26.validate_worker_context(context, main_argv, root, output, plan, runtime)\n",
+          "new_end": 140,
+          "new_start": 137,
+          "old": ""
+        },
+        {
+          "new": "            backend = create_backend('cuda', binding=cuda_binding(runtime)) if context['profile'] in {'N23', 'N24', 'N25', 'N26'} else create_backend('cpu')\n",
+          "new_end": 200,
+          "new_start": 199,
+          "old": "            backend = create_backend('cuda', binding=cuda_binding(runtime)) if context['profile'] in {'N23', 'N24', 'N25'} else create_backend('cpu')\n"
+        },
+        {
+          "new": "            if read_ref(context['plan']).get('n26_cohort') is not None:\n                from scripts import qd_ed_n26_native as n26_native\n                report = n26_native.audit_output(context['profile'], output, report, backend)\n",
+          "new_end": 208,
+          "new_start": 205,
+          "old": ""
+        },
+        {
+          "new": "                    'sha256': sha(metric_path) if metric_path.is_file() else None}\n            if read_ref(context['plan']).get('n26_cohort') is not None:\n                from scripts import qd_ed_n26_native as n26_native\n                receipt['n26_native_counts'], receipt['n26_auxiliary'] = n26_native.from_output(context['profile'], output, report)\n                metric_path = output / 'eds_eval/eds_metrics.jsonl'\n                receipt['n26_metrics'] = {'path': str(metric_path), 'present': metric_path.is_file(),\n",
+          "new_end": 227,
+          "new_start": 221,
+          "old": ""
+        },
+        {
+          "new": "    kind = 'cuda' if context['profile'] in {'N23', 'N24', 'N25', 'N26'} else 'cpu'\n",
+          "new_end": 277,
+          "new_start": 276,
+          "old": "    kind = 'cuda' if context['profile'] in {'N23', 'N24', 'N25'} else 'cpu'\n"
+        },
+        {
+          "new": "    if read_ref(context['plan']).get('n26_cohort') is not None:\n        from scripts import qd_ed_n26_native as n26_native\n        metric_path = output / 'eds_eval/eds_metrics.jsonl'\n        require(receipt.get('n26_metrics') == {'path':str(metric_path),'present':metric_path.is_file(),\n            'sha256':sha(metric_path) if metric_path.is_file() else None}, 'N26 serialized metrics binding differs')\n        counts,aux = n26_native.from_output(context['profile'],output,report)\n        require(receipt.get('n26_native_counts')==counts and receipt.get('n26_auxiliary')==aux,\n                'N26 profile-bound native counters differ')\n",
+          "new_end": 324,
+          "new_start": 316,
+          "old": ""
+        }
+      ],
+      "new_sha256": "664738f1dd1c8c264a4c7dd72f0d5388cf81a0a9fb15cd2e2bcba1e1f41579ea",
+      "old_sha256": "dd162c7bd0d9cf91da064fcb2652aa5ee3a0a48d4c70940dfa3ce4cdab5bc74e",
+      "path": "scripts/qd_ed_n23_worker.py"
+    }
+  ],
+  "schema": "n26-reversible-shared-routes-v1"
+}

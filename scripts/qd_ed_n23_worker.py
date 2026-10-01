@@ -138,6 +138,9 @@ def validate_context(context, main_argv):
     if plan.get('n25_infrastructure_continuation') is not None:
         from scripts import qd_ed_n25_cont_contract as n25c
         return n25c.validate_worker_context(context, main_argv, root, output, plan, runtime)
+    if plan.get('n26_cohort') is not None:
+        from scripts import qd_ed_n26_contract as n26
+        return n26.validate_worker_context(context, main_argv, root, output, plan, runtime)
     if plan.get('n25_cohort') is not None:
         from scripts import qd_ed_n25_contract as n25
         return n25.validate_worker_context(context, main_argv, root, output, plan, runtime)
@@ -197,12 +200,15 @@ def run_worker(context_path, main_argv):
             require(process_identity() == identity and sha(context_path) == context_sha, "worker identity/context changed during main")
             verify_source(root, context['source']); read_ref(context['runtime']); read_ref(context['plan'])
             receipt['worker_cuda'] = assigned_cuda_identity(cuda_binding(runtime))
-            backend = create_backend('cuda', binding=cuda_binding(runtime)) if context['profile'] in {'N23', 'N24', 'N25'} else create_backend('cpu')
+            backend = create_backend('cuda', binding=cuda_binding(runtime)) if context['profile'] in {'N23', 'N24', 'N25', 'N26'} else create_backend('cpu')
             backend.synchronize()
             audit_started = time.perf_counter()
             before = evidence_record(output)
             report = audit.audit_episode(output / 'eds_eval/decision_evidence/episode_000',
                                          output / 'eds_eval/episode_compute.jsonl', arithmetic_backend=backend)
+            if read_ref(context['plan']).get('n26_cohort') is not None:
+                from scripts import qd_ed_n26_native as n26_native
+                report = n26_native.audit_output(context['profile'], output, report, backend)
             if read_ref(context['plan']).get('n25_cohort') is not None:
                 from scripts import qd_ed_n25_native as n25_native
                 report = n25_native.audit_output(context['profile'], output, report, backend)
@@ -216,6 +222,12 @@ def run_worker(context_path, main_argv):
                 receipt['n24_native_counts'], receipt['n24_auxiliary'] = n24_native.from_output(context['profile'], output, report)
                 metric_path = output / 'eds_eval/eds_metrics.jsonl'
                 receipt['n24_metrics'] = {'path': str(metric_path), 'present': metric_path.is_file(),
+                    'sha256': sha(metric_path) if metric_path.is_file() else None}
+            if read_ref(context['plan']).get('n26_cohort') is not None:
+                from scripts import qd_ed_n26_native as n26_native
+                receipt['n26_native_counts'], receipt['n26_auxiliary'] = n26_native.from_output(context['profile'], output, report)
+                metric_path = output / 'eds_eval/eds_metrics.jsonl'
+                receipt['n26_metrics'] = {'path': str(metric_path), 'present': metric_path.is_file(),
                     'sha256': sha(metric_path) if metric_path.is_file() else None}
             if read_ref(context['plan']).get('n25_cohort') is not None:
                 from scripts import qd_ed_n25_native as n25_native
@@ -265,7 +277,7 @@ def verify_receipt(context_path, process_record):
             and receipt.get('main_argv_sha256') == canonical_sha(context['main_argv'])
             and receipt.get('evidence') == evidence_record(output), "worker source/runtime/evidence binding differs")
     backend = receipt.get('audit_backend', {})
-    kind = 'cuda' if context['profile'] in {'N23', 'N24', 'N25'} else 'cpu'
+    kind = 'cuda' if context['profile'] in {'N23', 'N24', 'N25', 'N26'} else 'cpu'
     require(backend.get('kind') == kind and backend.get('logical_device') == ('cuda:0' if kind == 'cuda' else 'cpu'), "worker audit backend differs")
     actual = receipt.get('worker_cuda', {})
     expected_uuid=canonical_cuda_uuid(runtime['gpu_mapping']['uuid'])
@@ -305,6 +317,14 @@ def verify_receipt(context_path, process_record):
         counts,aux=n24_native.from_output(context['profile'],output,report)
         require(receipt.get('n24_native_counts')==counts and receipt.get('n24_auxiliary')==aux,
                 'N24 profile-bound native counters differ')
+    if read_ref(context['plan']).get('n26_cohort') is not None:
+        from scripts import qd_ed_n26_native as n26_native
+        metric_path = output / 'eds_eval/eds_metrics.jsonl'
+        require(receipt.get('n26_metrics') == {'path':str(metric_path),'present':metric_path.is_file(),
+            'sha256':sha(metric_path) if metric_path.is_file() else None}, 'N26 serialized metrics binding differs')
+        counts,aux = n26_native.from_output(context['profile'],output,report)
+        require(receipt.get('n26_native_counts')==counts and receipt.get('n26_auxiliary')==aux,
+                'N26 profile-bound native counters differ')
     if read_ref(context['plan']).get('n25_cohort') is not None:
         from scripts import qd_ed_n25_native as n25_native
         metric_path = output / 'eds_eval/eds_metrics.jsonl'

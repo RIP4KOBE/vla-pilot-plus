@@ -42,6 +42,10 @@ from core.qd_actuator_clipped_quality import MODE as ACTUATOR_CLIPPED_MODE, Actu
 from core.qd_actuator_clipped_rbf import (
     MODE as CLIPPED_RBF_MODE, clipped_rbf_gradient, applied_evidence, bind_decision_metrics, BoundedWitness,
 )
+from core.qd_clean_output_rbf import (
+    NOISY_SOURCE, CLEAN_SOURCE, CleanOutputWitness, validate_source_option,
+    require_sample_scheduler, geometry_input, bind_input_evidence,
+)
 from core.qd_lift_quality import (
     HOLD_MODE as HOLD_LIFT_MODE, LIFT_MODES,
     LiftAfterCloseContract, close_then_lift_bonus, close_hold_then_lift_bonus,
@@ -121,6 +125,7 @@ class _EDSConfig:
     reward_mode: str = "normal"
     shuffle_seed: int = 0
     mechanism_pretest: Optional[dict] = None
+    diversity_input_source: str = NOISY_SOURCE
     initial_sampling_mode: str = "iid"
     initial_diversity_scale: float = 1.0
     initial_diversity_start_ratio: Optional[float] = None
@@ -1003,6 +1008,7 @@ class RDTSteer:
         self._action_summary_logged = False
         self._last_visualization_action_candidates: Optional[Tensor] = None
         self._n25_rbf_witness = BoundedWitness()
+        self._n26_rbf_witness = CleanOutputWitness()
         self._last_eds_metrics: Optional[dict] = None
         self._last_eds_artifacts: Optional[dict] = None
         self._last_eds_initial_sampler_info: Optional[dict] = None
@@ -1388,6 +1394,7 @@ class RDTSteer:
 
     def reset(self) -> None:
         self._n25_rbf_witness = BoundedWitness()
+        self._n26_rbf_witness = CleanOutputWitness()
         self.reset_episode_compute_counters()
         if hasattr(self, "_executed_feedback"):
             self._executed_feedback.clear("episode_reset", reset=True)
@@ -2947,6 +2954,9 @@ class RDTSteer:
         info["initial_diversity_grad_failure_count"] = int(grad_failure_count)
         return population, info
 
+    def _eds_rbf_witness(self, cfg):
+        return self._n26_rbf_witness if cfg.diversity_input_source == CLEAN_SOURCE else self._n25_rbf_witness
+
     def _eds_initial_denoise_rbf_diverse(
         self,
         *,
@@ -2954,6 +2964,7 @@ class RDTSteer:
         cond: dict,
         cfg: _EDSConfig,
     ) -> tuple[Tensor, dict]:
+        require_sample_scheduler(cfg, self._noise_scheduler)
         if x_t.shape[0] <= 1:
             if cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE:
                 raise ValueError("N25 requires population>=2; no fallback")
@@ -2990,14 +3001,16 @@ class RDTSteer:
                 model_output = self._counted_dit(population, t, cond)
 
             if int(t.item()) > start_step:
-                capture = (self._n25_rbf_witness.prepare("initial", -1)
+                capture = (self._eds_rbf_witness(cfg).prepare("initial", -1)
                            if cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE else None)
+                rbf_input = geometry_input(population, model_output, cfg, scheduler)
                 div_grad, descriptor_evidence = self._compute_eds_diversity_gradient(
-                    population,
+                    rbf_input,
                     descriptor_mode=cfg.initial_diversity_descriptor_mode,
                     descriptor_cfg=cfg.__dict__,
                     **({"capture_out": capture} if capture is not None else {}),
                 )
+                bind_input_evidence(descriptor_evidence, cfg, scheduler)
                 descriptor_evidence_by_step.append(descriptor_evidence)
                 if div_grad is None:
                     grad_failures += 1
@@ -3040,7 +3053,7 @@ class RDTSteer:
                     model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += update
                     if capture is not None:
                         capture["model_output_after"] = model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES].detach().clone()
-                        self._n25_rbf_witness.emit(capture, descriptor_evidence)
+                        self._eds_rbf_witness(cfg).emit(capture, descriptor_evidence)
                 else:
                     model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += (
                         RDT_DIVERSITY_SIGN
@@ -3804,6 +3817,7 @@ class RDTSteer:
         qd_quality_contract: ExecutedPrefixContract | FeedbackContract | None = None,
     ) -> tuple[Tensor, Tensor, dict]:
         scheduler = self._noise_scheduler
+        require_sample_scheduler(cfg, scheduler)
         self._increment_compute("denoising_invocations")
         scheduler.set_timesteps(self._num_inference_steps)
         n_trunc_steps = int(max(1, min(n_trunc_steps, len(scheduler.timesteps))))
@@ -3865,14 +3879,16 @@ class RDTSteer:
                 rollout_timesteps,
                 local_step,
             ):
-                capture = (self._n25_rbf_witness.prepare("rollout", int(iter_idx))
+                capture = (self._eds_rbf_witness(cfg).prepare("rollout", int(iter_idx))
                            if cfg.rollout_diversity_descriptor_mode == CLIPPED_RBF_MODE else None)
+                rbf_input = geometry_input(x_t, model_output, cfg, scheduler)
                 div_grad, descriptor_evidence = self._compute_eds_diversity_gradient(
-                    x_t,
+                    rbf_input,
                     descriptor_mode=cfg.rollout_diversity_descriptor_mode,
                     descriptor_cfg=cfg.__dict__,
                     **({"capture_out": capture} if capture is not None else {}),
                 )
+                bind_input_evidence(descriptor_evidence, cfg, scheduler)
                 info.setdefault("direction_rbf_evidence_by_step", []).append(
                     descriptor_evidence
                 )
@@ -3929,7 +3945,7 @@ class RDTSteer:
                     model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += update
                     if capture is not None:
                         capture["model_output_after"] = model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES].detach().clone()
-                        self._n25_rbf_witness.emit(capture, descriptor_evidence)
+                        self._eds_rbf_witness(cfg).emit(capture, descriptor_evidence)
                 else:
                     model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += (
                         RDT_DIVERSITY_SIGN
@@ -4973,7 +4989,7 @@ class RDTSteer:
     ) -> Tensor:
         cfg = eds_config
         if cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE:
-            self._n25_rbf_witness.begin(getattr(self, "_decision_evidence", None))
+            self._eds_rbf_witness(cfg).begin(getattr(self, "_decision_evidence", None))
         contact_sweep_mode = cfg.qd_final_selection_mode == CONTACT_SWEEP_MODE
         grasp_timing_mode = cfg.qd_final_selection_mode in {GRASP_TIMING_MODE, CONTACT_SWEEP_MODE}
         terminal_mode = cfg.qd_final_selection_mode in {TERMINAL_POPULATION_MODE, GRASP_TIMING_MODE, CONTACT_SWEEP_MODE}
@@ -7381,7 +7397,7 @@ class RDTSteer:
 
         if cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE:
             bind_decision_metrics(metrics, global_step=global_step, stage=current_stage)
-            self._n25_rbf_witness.finish()
+            self._eds_rbf_witness(cfg).finish()
         self._last_eds_metrics = metrics.to_jsonable()
         self._last_eds_artifacts = {
             "initial_actions": initial_action_candidates,
@@ -7938,6 +7954,7 @@ class RDTSteer:
             reward_mode=str(cfg.get("reward_mode", "normal")),
             shuffle_seed=int(cfg.get("shuffle_seed", 0)),
             mechanism_pretest=cfg.get("mechanism_pretest", None),
+            diversity_input_source=str(cfg.get("diversity_input_source", NOISY_SOURCE)),
             initial_sampling_mode=str(cfg.get("initial_sampling_mode", "iid")),
             initial_diversity_scale=float(cfg.get("initial_diversity_scale", 1.0)),
             initial_diversity_start_ratio=(
@@ -8493,6 +8510,7 @@ class RDTSteer:
         if resolved.qd_tie_break != "stable_fingerprint":
             raise ValueError("EDS qd_tie_break must be stable_fingerprint")
 
+        validate_source_option(resolved)
         clipped_rbf = CLIPPED_RBF_MODE in {
             resolved.initial_diversity_descriptor_mode, resolved.rollout_diversity_descriptor_mode}
         if clipped_rbf:
