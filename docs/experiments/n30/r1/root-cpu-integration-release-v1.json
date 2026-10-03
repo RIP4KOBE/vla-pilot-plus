@@ -1,0 +1,23 @@
+{
+  "schema": "n30-r1-root-cpu-integration-release-v1",
+  "at": "2026-10-03T21:01:45.498240+00:00",
+  "scope": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/cpu-integration-scope-v1.md",
+    "sha256": "29cd0a694376c929a317be83df79fe76aaab13ff1d1ae0cd3e64f46b15f65a8e"
+  },
+  "base_commit": "7c0d80d734fa8300173e56d9a8de03415bc55fe2",
+  "closed_original": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/root-terminal-review-v1.json",
+    "sha256": "7d64075cbe49bb44d1f644912c87595f58236bb41db31d37e17d80d579429e17"
+  },
+  "repair_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/initial-observation-repair-v1/root-cpu-repair-review-v1.json",
+    "sha256": "6e5dc3c0a83236d463ed6d920d5f724f676094547c70189e7e4c224d10ba75fa"
+  },
+  "agent": "/root/n22_cpu_executor",
+  "max_cpu_seconds": 1200,
+  "threads": 2,
+  "gpu_release": false,
+  "budget_expansion": false,
+  "protected_authorized": false
+}
