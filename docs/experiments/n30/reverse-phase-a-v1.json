@@ -1,0 +1,105 @@
+{
+  "schema": "n30-exact-source-reverse-v1",
+  "base_commit": "9029b384a34343efd73b4ea02184d83c5e52de61",
+  "files": {
+    "configs/config.yaml": {
+      "old_sha256": "0acd3900021b9e2b12b018c7a2f5a3847e4e88f39726a51c1b5390a23c8b01ef",
+      "new_sha256": "0162b33c39673351a5ecfe093a9384dd8a3caeb28d7aa27a29264b5c14a3b237",
+      "hunks": [
+        {
+          "start": 118,
+          "end": 119,
+          "old": [],
+          "new": [
+            "    executed_progress_continuation_control: \"none\"\n"
+          ]
+        }
+      ]
+    },
+    "core/qd_executed_progress.py": {
+      "old_sha256": "8868bd68144c68a955b5512f5bf8e58b7ecf428ab6610c3639796148413aa75f",
+      "new_sha256": "7aead7c81424a2b247e4d74ae211947e0b78a47cf6fa1a8a97fb112a9739d9c0",
+      "hunks": [
+        {
+          "start": 42,
+          "end": 45,
+          "old": [],
+          "new": [
+            "    control = getattr(cfg, \"executed_progress_continuation_control\", \"none\")\n",
+            "    if control not in {\"none\", \"qd_off_v1\"} or (mode == OFF and control != \"none\"):\n",
+            "        raise ValueError(\"N30 future control requires explicit continuation\")\n"
+          ]
+        },
+        {
+          "start": 50,
+          "end": 53,
+          "old": [
+            "        \"qd_archive_mode\": \"grid_archive\", \"qd_quality_mode\": \"provider\",\n"
+          ],
+          "new": [
+            "        \"qd_archive_mode\": \"none\" if control == \"qd_off_v1\" else \"grid_archive\",\n",
+            "        \"qd_parent_sampling\": \"uniform_cells\" if control == \"qd_off_v1\" else \"sparse_priority\",\n",
+            "        \"qd_quality_mode\": \"provider\",\n"
+          ]
+        }
+      ]
+    },
+    "core/rdt_policy_steer.py": {
+      "old_sha256": "ff1bbe63347853082de8b67f875f2706503f568aa453fc6cd105c51af159ad5e",
+      "new_sha256": "ba1728c637a30d1aeb42e257b8af5fea0248089c26aaf84c65f813fbd719928a",
+      "hunks": [
+        {
+          "start": 180,
+          "end": 181,
+          "old": [],
+          "new": [
+            "    executed_progress_continuation_control: str = \"none\"\n"
+          ]
+        },
+        {
+          "start": 5270,
+          "end": 5271,
+          "old": [
+            "            metrics.executed_progress_continuation = history.scalar()\n"
+          ],
+          "new": [
+            "            metrics.executed_progress_continuation = {**history.scalar(), \"control\": cfg.executed_progress_continuation_control}\n"
+          ]
+        },
+        {
+          "start": 5273,
+          "end": 5274,
+          "old": [
+            "            self._record_progress_event(\"n30_initial_proposal\", current_context=history.current,\n"
+          ],
+          "new": [
+            "            self._record_progress_event(\"n30_initial_proposal\", control=cfg.executed_progress_continuation_control, current_context=history.current,\n"
+          ]
+        },
+        {
+          "start": 8208,
+          "end": 8209,
+          "old": [],
+          "new": [
+            "            executed_progress_continuation_control=str(cfg.get(\"executed_progress_continuation_control\", \"none\")),\n"
+          ]
+        }
+      ]
+    },
+    "main.py": {
+      "old_sha256": "866e8a7c3debabe4e0c135d88e2138f2359132c803d2fd88c3a20665aed8b2f4",
+      "new_sha256": "13085b64032cf8372af900223c2f4be3da2da2c8f6f5aee39147402c444eb74f",
+      "hunks": [
+        {
+          "start": 1844,
+          "end": 1846,
+          "old": [],
+          "new": [
+            "                if continuation_enabled:\n",
+            "                    evidence.record(\"n30_observation_context\", packet=select_kwargs[\"executed_progress_context\"])\n"
+          ]
+        }
+      ]
+    }
+  }
+}

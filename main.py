@@ -1842,6 +1842,8 @@ class Main:
                                         use_guidance=use_guidance, keypoints=keypoints,
                                         providers=current_guidance_fns,
                                         keypoint_tracking_snapshot=keypoint_tracking_snapshot)
+                if continuation_enabled:
+                    evidence.record("n30_observation_context", packet=select_kwargs["executed_progress_context"])
             action_chunk = self.policy.select_action(**select_kwargs)
             select_action_latency_s = float(time.perf_counter() - select_action_start_s)
             self._append_phase_timing(episode=episode, global_step=global_steps,

@@ -178,6 +178,7 @@ class _EDSConfig:
     rollout_diversity_decay_floor: float = 0.25
     chunk_population_mode: str = "fresh"
     executed_progress_continuation_mode: str = "off"
+    executed_progress_continuation_control: str = "none"
     chunk_memory_fraction: float = 0.0
     chunk_memory_renoise_steps: int = 2
     chunk_memory_reward_guard_quantile: float = 0.25
@@ -5267,10 +5268,10 @@ class RDTSteer:
         chunk_population_sources = ("fresh",) * int(cfg.population_size)
         if progress_mode:
             history = self._executed_progress
-            metrics.executed_progress_continuation = history.scalar()
+            metrics.executed_progress_continuation = {**history.scalar(), "control": cfg.executed_progress_continuation_control}
             if history.active:
                 chunk_population_sources = ("fresh",) * 15 + (PROGRESS_MODE,)
-            self._record_progress_event("n30_initial_proposal", current_context=history.current,
+            self._record_progress_event("n30_initial_proposal", control=cfg.executed_progress_continuation_control, current_context=history.current,
                 previous_native_plan=None if history.previous is None else history.previous["native_plan"],
                 previous_native_identity=None if history.previous is None else history.previous["native_identity"],
                 fresh_native_population=progress_fresh,
@@ -8205,6 +8206,7 @@ class RDTSteer:
             ),
             chunk_population_mode=str(cfg.get("chunk_population_mode", "fresh")),
             executed_progress_continuation_mode=str(cfg.get("executed_progress_continuation_mode", "off")),
+            executed_progress_continuation_control=str(cfg.get("executed_progress_continuation_control", "none")),
             chunk_memory_fraction=_parse_eds_float(
                 cfg.get("chunk_memory_fraction", 0.0), "chunk_memory_fraction"
             ),

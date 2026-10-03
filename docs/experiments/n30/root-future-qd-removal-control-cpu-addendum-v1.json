@@ -1,0 +1,36 @@
+{
+  "schema": "n30-future-qd-removal-control-cpu-addendum-v1",
+  "at": "2026-10-03T19:39:54.218754+00:00",
+  "phase_b_scope": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/execution-integration-cpu-scope-v1.md",
+    "sha256": "b909b3113984f4e3794c2a9ccd1a86ac14b2b779403aef247b9b09cf15f5acab"
+  },
+  "original_spec": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/docs/01_specs/2026-09-21-rdt-qd-ed-autoresearch-execution-prompt.md",
+    "sha256": "3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef"
+  },
+  "requirement": "Original specification sections7.3/8/10 require a compute-matched QD removal/replacement ablation before formal acceptance. Preserve continuation in that ablation to isolate QD instead of silently removing both.",
+  "finding": "PhaseA continuation validation requires qd_archive_mode=grid_archive, preventing the required matched QD-off configuration. Frozen Q0 parent sampling is sparse_priority; C0 is uniform_cells.",
+  "cpu_only_extension": {
+    "option": "executed_progress_continuation_control",
+    "default": "none",
+    "future_control": "qd_off_v1",
+    "none_requires": {
+      "qd_archive_mode": "grid_archive",
+      "qd_parent_sampling": "sparse_priority"
+    },
+    "qd_off_v1_requires": {
+      "qd_archive_mode": "none",
+      "qd_parent_sampling": "uniform_cells"
+    },
+    "invariants": "All other fixed N30 fields, feedback eligibility, native copy/shift, ED, scores/model/RNG and execution remain unchanged. Option is semantic configuration and telemetry only, never a task/seed/job-label branch. Normal N30/C0/Q0 prospective Dev profiles remain unchanged.",
+    "tests": "Synthetic two-chunk feedback and continuation activation with real archive/parent decisions absent; shadow grid metrics do not establish activeQD. Check actual frozen pretest totals256/16,19RBF,21B16forwards per guided, and unchanged default/normal candidate paths.",
+    "current_dispatch_boundary": "Current twelve-cell plan/profile/worker contract must reject the future control flag. No ablation arm, candidate promotion or validation/formal execution is enabled. Future formal profile/plan still requires separate root freeze."
+  },
+  "source_handling": "Keep PhaseA immutable. Explicitly review this minimal configuration compatibility and tests in PhaseB before any Dev/validation source freeze. No new formal controller or broad refactor is requested.",
+  "phase_b_cpu_seconds_cap_unchanged": 600,
+  "gpu_execution_authorized": false,
+  "new_budget_authorized": false,
+  "validation_authorized": false,
+  "formal_authorized": false
+}

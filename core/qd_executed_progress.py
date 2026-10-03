@@ -40,12 +40,17 @@ def capture_context(observation, keypoints, tracking, episode):
 
 def validate_config(cfg, horizon):
     mode = cfg.executed_progress_continuation_mode
+    control = getattr(cfg, "executed_progress_continuation_control", "none")
+    if control not in {"none", "qd_off_v1"} or (mode == OFF and control != "none"):
+        raise ValueError("N30 future control requires explicit continuation")
     if mode == OFF:
         return
     if mode != MODE:
         raise ValueError("N30 continuation mode unsupported")
     required = {"population_size": 16, "cem_iters": 10,
-        "qd_archive_mode": "grid_archive", "qd_quality_mode": "provider",
+        "qd_archive_mode": "none" if control == "qd_off_v1" else "grid_archive",
+        "qd_parent_sampling": "uniform_cells" if control == "qd_off_v1" else "sparse_priority",
+        "qd_quality_mode": "provider",
         "qd_descriptor": "target_relative_endpoint_xy", "qd_final_selection_mode": "archive_global_best",
         "chunk_population_mode": "fresh", "chunk_memory_fraction": 0.,
         "qd_gripper_rescue_mode": "none", "qd_parent_survivor_count": 0,

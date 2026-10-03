@@ -1,0 +1,21 @@
+{
+  "schema": "n30-main-observation-evidence-addendum-v1",
+  "at": "2026-10-03T19:32:44.460307+00:00",
+  "phase_b_scope": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/execution-integration-cpu-scope-v1.md",
+    "sha256": "b909b3113984f4e3794c2a9ccd1a86ac14b2b779403aef247b9b09cf15f5acab"
+  },
+  "phase_a_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/root-phase-a-cpu-review-v1.json",
+    "sha256": "041cf4681ec43a22e2a7a78af9099615569f2ab7b05c78745d259c5be8c7f432"
+  },
+  "finding": "Generic decision_context has keypoints/tracker but not the original Main EEF observation. projection_origin is controller state and cannot be assumed byte-identical to policy-observation EEF. An independent native auditor cannot verify step0 Main-to-policy context from scalar claims alone.",
+  "allowed_change": "Only when N30 and decision evidence are enabled, after evidence.begin_decision and before policy.select_action, record n30_observation_context containing the already constructed original packet: EEF source dtype, original keypoints, tracker identity and episode. No additional observation/query or scientific decision change.",
+  "verification": "Bind policy CPU-float64 context to this Main packet and, for step>0, to the previous actual pre_reset_outcome observation. Keep controller projection origins distinct. Verify source/event order and reject forged associations. Recorder remains passive.",
+  "source_provenance": "Retain immutable PhaseA commit9029 and its reviews; document this extra passive Main instrumentation in the PhaseB commit/source review.",
+  "budget_changed": false,
+  "gpu_execution_authorized": false,
+  "scientific_rule_changed": false,
+  "validation_authorized": false,
+  "formal_authorized": false
+}
