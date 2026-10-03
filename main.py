@@ -1646,6 +1646,9 @@ class Main:
             and str(self.config.get("guidance_type", "vls")).lower() == "eds"
             and (self.config.get("eds_config") or {}).get("executed_progress_continuation_mode", "off")
                 == "executed_progress_continuation_v1")
+        if continuation_enabled:
+            # Raw cached reset observation; policy preprocessing removes robot_state.
+            obs = self.adapter.get_obs()
         action_executed = 0
         use_guidance = False
         action_horizon = self.policy._action_chunk_horizon
