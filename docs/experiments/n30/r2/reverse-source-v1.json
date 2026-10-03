@@ -1,0 +1,123 @@
+{
+  "schema": "n30-r2-whole-file-reverse-v1",
+  "base_commit": "debda23a0e8eda86a3bb4f398e9596edf05b37e5",
+  "files": {
+    "scripts/qd_ed_final_runner.py": {
+      "old_sha256": "e80db8246848df3e778ac52a51b2aae18ff428029e61c24b72ab19929f78d478",
+      "new_sha256": "3b088ad2c30fb4326182d340cde461c6ea1e902737a91408f4b43dcdea0b41e3",
+      "hunks": [
+        {
+          "start": 559,
+          "end": 560,
+          "old": [
+            "    return plan.get('n30_r1_cohort') is not None or plan.get('n30_cohort') is not None or 'N30' in plan.get('candidate_profiles', {})\n"
+          ],
+          "new": [
+            "    return plan.get('n30_r2_cohort') is not None or plan.get('n30_r1_cohort') is not None or plan.get('n30_cohort') is not None or 'N30' in plan.get('candidate_profiles', {})\n"
+          ]
+        },
+        {
+          "start": 686,
+          "end": 689,
+          "old": [],
+          "new": [
+            "    if plan.get('n30_r2_cohort') is not None:\n",
+            "        from scripts import qd_ed_n30_r2_contract\n",
+            "        return qd_ed_n30_r2_contract\n"
+          ]
+        },
+        {
+          "start": 874,
+          "end": 875,
+          "old": [
+            "        require(set(plan.get('candidate_profiles', {})) == {'N30'} and not any(re.fullmatch(r'n[0-9]+_.*', k) and k != ('n30_r1_cohort' if plan.get('n30_r1_cohort') is not None else 'n30_cohort') for k in plan), 'N30 mixed cohort/profile markers forbidden')\n"
+          ],
+          "new": [
+            "        require(set(plan.get('candidate_profiles', {})) == {'N30'} and not any(re.fullmatch(r'n[0-9]+_.*', k) and k != ('n30_r2_cohort' if plan.get('n30_r2_cohort') is not None else 'n30_r1_cohort' if plan.get('n30_r1_cohort') is not None else 'n30_cohort') for k in plan), 'N30 mixed cohort/profile markers forbidden')\n"
+          ]
+        },
+        {
+          "start": 882,
+          "end": 883,
+          "old": [
+            "        n30_artifact = metered_support(plan).ARTIFACT_DIR if plan.get('n30_r1_cohort') is not None else metered_support(plan).RUN_DIR / 'artifacts'\n"
+          ],
+          "new": [
+            "        n30_artifact = metered_support(plan).ARTIFACT_DIR if plan.get('n30_r2_cohort') is not None or plan.get('n30_r1_cohort') is not None else metered_support(plan).RUN_DIR / 'artifacts'\n"
+          ]
+        },
+        {
+          "start": 1329,
+          "end": 1335,
+          "old": [
+            "    if row.get('iteration') == 'N30_INITIAL_OBSERVATION_REPAIR_DEV_20261003':\n"
+          ],
+          "new": [
+            "    if row.get('iteration') == 'N30_TERMINAL_BOOLEAN_REPAIR_DEV_20261003':\n",
+            "        from scripts import qd_ed_n30_r2_contract as n30r2\n",
+            "        n30r2.require_state(state, globals())\n",
+            "        n30r2.whole_attempt_hours(state, snap, row, globals())\n",
+            "        bucket_caps = n30r2.BASE_CAPS['buckets']\n",
+            "    elif row.get('iteration') == 'N30_INITIAL_OBSERVATION_REPAIR_DEV_20261003':\n"
+          ]
+        },
+        {
+          "start": 1481,
+          "end": 1484,
+          "old": [],
+          "new": [
+            "    if row.get(\"iteration\") == \"N30_TERMINAL_BOOLEAN_REPAIR_DEV_20261003\":\n",
+            "        from scripts import qd_ed_n30_r2_contract as n30r2\n",
+            "        return n30r2.check_retry(events, row, globals())\n"
+          ]
+        }
+      ]
+    },
+    "scripts/qd_ed_n23_worker.py": {
+      "old_sha256": "77caf8b35b9cb3c9842f40ef6b1bb7956b18ff004f0ecf9aef091cf5743c998d",
+      "new_sha256": "e150aa0bba4639658b05493ff0d1f54f075e943e2b43d5d715d3ebddd171e557",
+      "hunks": [
+        {
+          "start": 137,
+          "end": 140,
+          "old": [],
+          "new": [
+            "    if plan.get('n30_r2_cohort') is not None:\n",
+            "        from scripts import qd_ed_n30_r2_contract as n30r2\n",
+            "        return n30r2.validate_worker_context(context, main_argv, root, output, plan, runtime)\n"
+          ]
+        },
+        {
+          "start": 229,
+          "end": 230,
+          "old": [
+            "            if read_ref(context['plan']).get('n30_cohort') is not None or read_ref(context['plan']).get('n30_r1_cohort') is not None:\n"
+          ],
+          "new": [
+            "            if read_ref(context['plan']).get('n30_cohort') is not None or read_ref(context['plan']).get('n30_r1_cohort') is not None or read_ref(context['plan']).get('n30_r2_cohort') is not None:\n"
+          ]
+        },
+        {
+          "start": 258,
+          "end": 259,
+          "old": [
+            "            if read_ref(context['plan']).get('n30_cohort') is not None or read_ref(context['plan']).get('n30_r1_cohort') is not None:\n"
+          ],
+          "new": [
+            "            if read_ref(context['plan']).get('n30_cohort') is not None or read_ref(context['plan']).get('n30_r1_cohort') is not None or read_ref(context['plan']).get('n30_r2_cohort') is not None:\n"
+          ]
+        },
+        {
+          "start": 376,
+          "end": 377,
+          "old": [
+            "    if read_ref(context['plan']).get('n30_cohort') is not None or read_ref(context['plan']).get('n30_r1_cohort') is not None:\n"
+          ],
+          "new": [
+            "    if read_ref(context['plan']).get('n30_cohort') is not None or read_ref(context['plan']).get('n30_r1_cohort') is not None or read_ref(context['plan']).get('n30_r2_cohort') is not None:\n"
+          ]
+        }
+      ]
+    }
+  }
+}
