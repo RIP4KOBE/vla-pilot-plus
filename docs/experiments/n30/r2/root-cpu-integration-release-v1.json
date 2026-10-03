@@ -1,0 +1,32 @@
+{
+  "schema": "n30-r2-root-cpu-integration-release-v1",
+  "at": "2026-10-03T22:10:45.827227+00:00",
+  "scope": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/feedback-repair-continuation-v1/cpu-integration-scope-v1.md",
+    "sha256": "e76f7c36a6339fb27f1c1e418f33990ed0278cd14080a35f0012010e26034cc9"
+  },
+  "prospective_draft": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/feedback-repair-continuation-v1/prospective-continuation-draft-v1.md",
+    "sha256": "db7e056a0aa9febc165dba08fe685055e46ce01fe34df3e70c890f052dadb589"
+  },
+  "accepted_repair_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/terminal-feedback-binding-repair-v1/root-cpu-repair-review-v1.json",
+    "sha256": "ed8d17d91231f516f699c076c21172fe95c3b508513f4646a1ecb70f0e282805"
+  },
+  "closed_r1_execution_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/root-terminal-review-v1.json",
+    "sha256": "89377494b0fcd9030735c8ed27e2168bfa1204f8637328bb27ff6449f6f4cda4"
+  },
+  "base_source_commit": "debda23a0e8eda86a3bb4f398e9596edf05b37e5",
+  "agent": "/root/n22_cpu_executor",
+  "cpu_seconds_limit": 1200,
+  "threads": 2,
+  "historical_tensor_reads": 0,
+  "gpu_release": false,
+  "api_authorized": false,
+  "owning_state_mutation_authorized": false,
+  "budget_caps_unchanged": true,
+  "new_gpu_retry_authorized": false,
+  "validation_authorized": false,
+  "formal_authorized": false
+}
