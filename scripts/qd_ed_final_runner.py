@@ -557,7 +557,7 @@ def is_n20_plan(plan):
 
 
 def is_n30_plan(plan):
-    return plan.get('n30_cohort') is not None or 'N30' in plan.get('candidate_profiles', {})
+    return plan.get('n30_r1_cohort') is not None or plan.get('n30_cohort') is not None or 'N30' in plan.get('candidate_profiles', {})
 
 
 def is_n29_plan(plan):
@@ -684,6 +684,9 @@ def typed_metered_plan(plan):
 
 
 def metered_support(plan):
+    if plan.get('n30_r1_cohort') is not None:
+        from scripts import qd_ed_n30_r1_contract
+        return qd_ed_n30_r1_contract
     if is_n30_plan(plan):
         from scripts import qd_ed_n30_contract
         return qd_ed_n30_contract
@@ -866,7 +869,7 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
     plan = read_json(path)
     require(plan.get('schema') == SCHEMA, 'plan schema mismatch')
     if is_n30_plan(plan):
-        require(set(plan.get('candidate_profiles', {})) == {'N30'} and not any(re.fullmatch(r'n[0-9]+_.*', k) and k != 'n30_cohort' for k in plan), 'N30 mixed cohort/profile markers forbidden')
+        require(set(plan.get('candidate_profiles', {})) == {'N30'} and not any(re.fullmatch(r'n[0-9]+_.*', k) and k != ('n30_r1_cohort' if plan.get('n30_r1_cohort') is not None else 'n30_cohort') for k in plan), 'N30 mixed cohort/profile markers forbidden')
     require(plan.get('frozen') is True or not require_frozen, 'plan is not frozen')
     require(Path(plan['worktree']).resolve() == root, 'plan worktree mismatch')
     state = read_state(root / 'research-state.yaml')
@@ -874,7 +877,7 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
     artifact_root = Path(plan['artifact_root']).resolve()
     runtime_artifact_root = Path(state['artifacts']).resolve()
     if is_n30_plan(plan):
-        n30_artifact = metered_support(plan).RUN_DIR / 'artifacts'
+        n30_artifact = metered_support(plan).ARTIFACT_DIR if plan.get('n30_r1_cohort') is not None else metered_support(plan).RUN_DIR / 'artifacts'
         require(n30_artifact.is_symlink() and artifact_root == n30_artifact.resolve() ==
                 runtime_artifact_root / 'variants/n30_executed_progress_continuation', 'N30 artifact root mismatch')
     elif is_n29_plan(plan):
@@ -1321,7 +1324,12 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
     require(physical_gpu is None or (type(physical_gpu) is int and physical_gpu == selected_gpu),
             'GPU policy/runtime physical device mismatch')
     amendment = budget.get('amendment')
-    if row.get('iteration') == 'N30_EXECUTED_PROGRESS_CONTINUATION_DEV_20261003':
+    if row.get('iteration') == 'N30_INITIAL_OBSERVATION_REPAIR_DEV_20261003':
+        from scripts import qd_ed_n30_r1_contract as n30r1
+        n30r1.require_state(state, globals())
+        n30r1.whole_attempt_hours(state, snap, row, globals())
+        bucket_caps = n30r1.BASE_CAPS['buckets']
+    elif row.get('iteration') == 'N30_EXECUTED_PROGRESS_CONTINUATION_DEV_20261003':
         from scripts import qd_ed_n30_contract as n30
         n30.require_state(state, globals())
         n30.whole_attempt_hours(state, snap, row, globals())
@@ -1463,6 +1471,9 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
 
 
 def check_retry(events, row):
+    if row.get("iteration") == "N30_INITIAL_OBSERVATION_REPAIR_DEV_20261003":
+        from scripts import qd_ed_n30_r1_contract as n30r1
+        return n30r1.check_retry(events, row, globals())
     if row.get("iteration") == "N30_EXECUTED_PROGRESS_CONTINUATION_DEV_20261003":
         from scripts import qd_ed_n30_contract as n30
         return n30.check_retry(events, row, globals())
