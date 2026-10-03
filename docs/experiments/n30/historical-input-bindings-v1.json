@@ -1,0 +1,74 @@
+{
+  "schema": "n30-historical-input-bindings-v1",
+  "at": "2026-10-03T19:31:55.241060+00:00",
+  "closed_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/root-terminal-review-v1.json",
+    "sha256": "9905c0a5b2ab7c27c599597a5cbc3dde83a643bd337820cfd7dba37afe866fb4"
+  },
+  "source_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/final-source-runtime-review-v1.json",
+    "sha256": "8327520b8628cde21d9f6c0960de8e17a8bc4cfb4dca46a868fdcfee37aaa6c2"
+  },
+  "source_location": "source member of source_review; commit d855,411 relative-path file records; no separate source-manifest required",
+  "source_record_sha256": "5a5f57234d7b3127b262c8b095bb859680972b16fc21f075ba37446b8a992440",
+  "source_plan": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/plan.frozen.v1.gpu7.json",
+    "sha256": "151ce8fdb088012676982703aad0cbc2a9952f1f656864bb3cea58d4ca223bc0"
+  },
+  "runtime": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260929/n18-close-then-lift-dev-v1/gpu7-rebind/runtime-manifest.gpu7.frozen.v3.json",
+    "sha256": "8b9aebb5af45ab355f4c03bf7669ed78c50b595185ff1e624ebc180dcca89dd7"
+  },
+  "budget_authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/budget-adoption-v1/authority.json",
+    "sha256": "237d929b2135470921c6050e321f9776e41bfdc266c2c298a8134cd2c275c251"
+  },
+  "caps": {
+    "attempts": 578,
+    "gpu_hours": 100.0,
+    "buckets": {
+      "baseline": 76,
+      "development": 262,
+      "validation": 180,
+      "formal": 40,
+      "recovery": 20
+    },
+    "protected_gpu_hours": {
+      "validation": 32.0,
+      "formal": 12.0
+    }
+  },
+  "closed_result": {
+    "decision": "REJECT_NUMERIC_DEV_FUTILITY",
+    "dispatched": 24,
+    "audited_cells": 24,
+    "counts": {
+      "C0": {
+        "audited": 6,
+        "success": 0
+      },
+      "Q0": {
+        "audited": 6,
+        "success": 0
+      },
+      "N28": {
+        "audited": 6,
+        "success": 0
+      },
+      "N29": {
+        "audited": 6,
+        "success": 0
+      }
+    }
+  },
+  "source_arm_order": [
+    "C0",
+    "Q0",
+    "N28",
+    "N29"
+  ],
+  "source_plan_cells": 40,
+  "n30_usage": "Copy only original Dev task0..3 identity fields for fresh C0/Q0/N30. N29 local40-cell/13.5h scope is closed and does not transfer; N30 is12cell/6h. Current cumulative caps alone are reused. These small metadata refs are sufficient; do not recursively reopen old proof/native payload/controller chains.",
+  "gpu_execution_authorized": false,
+  "new_budget_authorized": false
+}
