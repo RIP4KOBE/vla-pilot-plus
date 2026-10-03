@@ -115,6 +115,7 @@ main:
     rollout_diversity_scale_max: 20.0
     rollout_diversity_decay_floor: 0.25
     chunk_population_mode: fresh
+    executed_progress_continuation_mode: "off"
     chunk_memory_fraction: 0.0
     chunk_memory_renoise_steps: 2
     chunk_memory_reward_guard_quantile: 0.25

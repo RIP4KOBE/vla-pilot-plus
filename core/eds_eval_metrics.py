@@ -368,6 +368,7 @@ class EDSChunkMetrics:
     parent_coverage_mode: str = "none"
     rollout_diversity_control_mode: str = "fixed"
     chunk_population_mode: str = "fresh"
+    executed_progress_continuation: dict | None = None
     search_schedule_mode: str = "legacy_linear"
     selection_beta_mean: float | None = None
     selection_ess_mean: float | None = None
@@ -552,6 +553,8 @@ class EDSChunkMetrics:
 
     def to_jsonable(self) -> dict[str, Any]:
         payload = _to_json_safe(self)
+        if self.executed_progress_continuation is None:
+            payload.pop("executed_progress_continuation")
         if self.qd_gripper_rescue_mode == "none":
             for key in list(payload):
                 if key.startswith("qd_gripper_rescue_"):

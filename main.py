@@ -81,6 +81,27 @@ def _acknowledge_execution_feedback(policy, observation, *, global_step, executi
         policy.record_execution_feedback_overhead("main_eef_copy_and_ack", time.perf_counter() - started)
 
 
+def _progress_continuation_context(observation, keypoints, tracking, episode):
+    from core.qd_executed_progress import capture_context
+    return capture_context(observation, keypoints, tracking, episode)
+
+
+def _acknowledge_progress_continuation(policy, observation, *, global_step, execution_index,
+                                      action, terminated, truncated):
+    if not policy.executed_progress_pending():
+        return
+    try:
+        endpoint = observation["observation.robot_state"]["eef"]["pos"]
+    except (KeyError, TypeError, AttributeError):
+        endpoint = None
+    if torch.is_tensor(endpoint) and tuple(endpoint.shape) in {(3,), (1, 3)}:
+        endpoint = endpoint.detach().reshape(3).cpu().clone()
+    else:
+        endpoint = None
+    policy.acknowledge_executed_progress(global_step=global_step, execution_index=execution_index,
+        action=action, endpoint=endpoint, terminated=terminated, truncated=truncated)
+
+
 def _config_section_to_dict(section: Any, section_name: str) -> dict:
     """Return a fresh plain dict for optional grouped config sections."""
     if section is None:
@@ -1621,6 +1642,10 @@ class Main:
         keypoints = None
         mask_ids = None
         generate_new_chunk = False
+        continuation_enabled = (self.policy_type == "rdt"
+            and str(self.config.get("guidance_type", "vls")).lower() == "eds"
+            and (self.config.get("eds_config") or {}).get("executed_progress_continuation_mode", "off")
+                == "executed_progress_continuation_v1")
         action_executed = 0
         use_guidance = False
         action_horizon = self.policy._action_chunk_horizon
@@ -1685,7 +1710,7 @@ class Main:
             phase_started_s = time.perf_counter()
             if generate_new_chunk and self.config.get("use_guidance", True) and hasattr(self, 'guidance_fns'):
                 keypoints, keypoint_tracking_snapshot = read_keypoints_with_passive_tracking(
-                    self.keypoint_tracker, evidence_enabled=evidence is not None)
+                    self.keypoint_tracker, evidence_enabled=evidence is not None or continuation_enabled)
                 mask_ids = self.keypoint_tracker.get_mask_ids()
 
                 # Update stage recognition
@@ -1800,6 +1825,9 @@ class Main:
                     )
                 select_kwargs.update(legacy_vls_kwargs)
 
+            if continuation_enabled and generate_new_chunk:
+                select_kwargs["executed_progress_context"] = _progress_continuation_context(
+                    obs, keypoints, keypoint_tracking_snapshot, episode)
             feedback_enabled = (self.policy_type == "rdt" and guidance_type == "eds"
                                 and eds_config.get("qd_quality_mode") == "executed_feedback_v1")
             if feedback_enabled:
@@ -1891,6 +1919,8 @@ class Main:
                         )
                     )
 
+            if continuation_enabled and generate_new_chunk:
+                self.policy.commit_executed_progress(action_chunk, resolved_action_horizon, global_steps)
             if feedback_enabled and generate_new_chunk:
                 self.policy.commit_executed_feedback(action_chunk, resolved_action_horizon, global_steps)
             if evidence is not None and generate_new_chunk:
@@ -2109,6 +2139,10 @@ class Main:
                     global_step=global_steps, action=action_chunk[0][action_executed],
                     stage=current_stage, guided=use_guidance,
                     success=info.get("success", False))
+            if continuation_enabled:
+                _acknowledge_progress_continuation(self.policy, obs, global_step=global_steps,
+                    execution_index=action_executed + 1, action=action_chunk[0][action_executed],
+                    terminated=terminated, truncated=truncated)
             if feedback_enabled:
                 _acknowledge_execution_feedback(self.policy, obs, global_step=global_steps,
                     execution_index=action_executed + 1, action=action_chunk[0][action_executed],

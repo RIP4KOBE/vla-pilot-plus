@@ -32,6 +32,9 @@ from core.eds_eval_metrics import (
 from core.eds_mechanism_trace import EDSMechanismTrace, EDSParticleStage
 from core.env_adapters import BaseEnvAdapter
 from core.fkd_class import FKD
+from core.qd_executed_progress import (
+    MODE as PROGRESS_MODE, ProgressContinuation, validate_config as validate_progress_config,
+)
 from core.qd_executed_feedback import (
     MODE as FEEDBACK_MODE, ExecutedFeedbackHistory, FeedbackContract, executed_feedback_quality,
 )
@@ -174,6 +177,7 @@ class _EDSConfig:
     rollout_diversity_scale_max: float = 20.0
     rollout_diversity_decay_floor: float = 0.25
     chunk_population_mode: str = "fresh"
+    executed_progress_continuation_mode: str = "off"
     chunk_memory_fraction: float = 0.0
     chunk_memory_renoise_steps: int = 2
     chunk_memory_reward_guard_quantile: float = 0.25
@@ -1419,6 +1423,8 @@ class RDTSteer:
         self.reset_episode_compute_counters()
         if hasattr(self, "_executed_feedback"):
             self._executed_feedback.clear("episode_reset", reset=True)
+        if hasattr(self, "_executed_progress"):
+            self._executed_progress.clear("episode_reset", reset=True)
         self.reset_eds_chunk_memory("episode_reset")
         self._cached_action_chunk = None
         self._cached_action_steps_remaining = 0
@@ -1451,6 +1457,8 @@ class RDTSteer:
     def reset_stage(self) -> None:
         if hasattr(self, "_executed_feedback"):
             self._executed_feedback.clear("stage_change")
+        if hasattr(self, "_executed_progress"):
+            self._executed_progress.clear("stage_change")
         self.reset_eds_chunk_memory("stage_change")
         self._stage_init_reward = None
 
@@ -1580,6 +1588,7 @@ class RDTSteer:
         global_step: int = 0,
         current_stage: int = 1,
         execution_feedback_context: dict | None = None,
+        executed_progress_context: dict | None = None,
     ) -> Tensor:
         if self._obs_processor is None:
             raise RuntimeError("RDTSteer.post_init must be called before select_action")
@@ -1593,6 +1602,10 @@ class RDTSteer:
 
         if should_sample:
             self._execution_feedback_context = execution_feedback_context
+            self._executed_progress_context = executed_progress_context
+            progress_mode = (eds_config or {}).get("executed_progress_continuation_mode", "off") == PROGRESS_MODE
+            if hasattr(self, "_executed_progress") and (not progress_mode or not use_guidance):
+                self._executed_progress.clear("guidance_gap_or_mode_off")
             feedback_mode = (eds_config or {}).get("qd_quality_mode") == FEEDBACK_MODE
             if hasattr(self, "_executed_feedback") and (not feedback_mode or not use_guidance):
                 self._executed_feedback.clear("guidance_off_or_mode_changed")
@@ -1643,6 +1656,9 @@ class RDTSteer:
                 )
 
             self._cached_action_chunk = self._postprocess_actions(raw)
+            if progress_mode and hasattr(self, "_executed_progress"):
+                self._executed_progress.bind_decode(raw, self._cached_action_chunk)
+                self._record_progress_event("n30_decode_binding", actions=self._cached_action_chunk)
             if feedback_mode and hasattr(self, "_executed_feedback"):
                 feedback_started = time.perf_counter()
                 self._executed_feedback.bind_decode(raw, self._cached_action_chunk, ACTIVE_ACTION_INDICES_SORTED)
@@ -1698,6 +1714,30 @@ class RDTSteer:
                     terminated=packet["terminated"], truncated=packet["truncated"],
                     completed=completed, history_reason=history.reason,
                     selected_native_sha256=selected_native_sha256)
+
+    def _record_progress_event(self, event, **values):
+        evidence = getattr(self, "_decision_evidence", None)
+        history = getattr(self, "_executed_progress", None)
+        if evidence is not None and history is not None:
+            evidence.record(event, progress_state=history.scalar(), **values)
+
+    def commit_executed_progress(self, actions, horizon, step):
+        history = getattr(self, "_executed_progress", None)
+        if history is not None:
+            history.commit(actions, horizon, step)
+            self._record_progress_event("n30_commit_binding", actions=actions,
+                execution_horizon=horizon, step=step,
+                committed=history.pending is not None and history.pending["committed"])
+
+    def executed_progress_pending(self):
+        h = getattr(self, "_executed_progress", None)
+        return h is not None and (h.pending is not None or h.completed is not None)
+
+    def acknowledge_executed_progress(self, **packet):
+        history = getattr(self, "_executed_progress", None)
+        if history is not None:
+            completed = history.acknowledge(**packet)
+            self._record_progress_event("n30_actual_ack", **packet, completed=completed)
 
     # ── Unguided path ─────────────────────────────────────────────────────────
 
@@ -5043,6 +5083,21 @@ class RDTSteer:
         current_stage: int,
     ) -> Tensor:
         cfg = eds_config
+        progress_mode = cfg.executed_progress_continuation_mode == PROGRESS_MODE
+        progress_semantic = None
+        if progress_mode:
+            if not hasattr(self, "_executed_progress"):
+                self._executed_progress = ProgressContinuation()
+            progress_recognition_error = False
+            try:
+                progress_semantic, _ = recognize_executed_prefix_provider(guidance_fns, keypoints)
+            except (ValueError, TypeError, FloatingPointError):
+                progress_semantic = None
+                progress_recognition_error = True
+            self._executed_progress.begin(progress_semantic,
+                getattr(self, "_executed_progress_context", None), stage=current_stage, step=global_step)
+            if progress_recognition_error:
+                self._executed_progress.clear("invalid_provider_or_keypoints", invalid=True)
         if cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE:
             self._eds_rbf_witness(cfg).begin(getattr(self, "_decision_evidence", None))
         contact_sweep_mode = cfg.qd_final_selection_mode == CONTACT_SWEEP_MODE
@@ -5199,9 +5254,30 @@ class RDTSteer:
             int(item.get("nonfinite_count", 0))
             for item in metrics.initial_direction_rbf_evidence_by_step
         )
+        progress_tail = progress_fresh = None
+        if progress_mode:
+            if progress_semantic is not None:
+                progress_semantic.validate(guidance_fns)
+            if self._executed_progress.active:
+                progress_tail = population[15, 56:64].detach().clone()
+                if getattr(self, "_decision_evidence", None) is not None:
+                    progress_fresh = population.detach().clone()
+            population = self._executed_progress.propose(population)
         population = self._apply_action_mask(population, cond)
         chunk_population_sources = ("fresh",) * int(cfg.population_size)
-        initial_trace_particle_sources = None
+        if progress_mode:
+            history = self._executed_progress
+            metrics.executed_progress_continuation = history.scalar()
+            if history.active:
+                chunk_population_sources = ("fresh",) * 15 + (PROGRESS_MODE,)
+            self._record_progress_event("n30_initial_proposal", current_context=history.current,
+                previous_native_plan=None if history.previous is None else history.previous["native_plan"],
+                previous_native_identity=None if history.previous is None else history.previous["native_identity"],
+                fresh_native_population=progress_fresh,
+                initial_final_trace_semantics=("composed_canonical_reuses_its_score" if history.active else "unchanged_fresh"),
+                fresh_tail=progress_tail, inserted_row=None if not history.active else population[15],
+                action_mask=cond["action_mask"])
+        initial_trace_particle_sources = chunk_population_sources if progress_mode and self._executed_progress.active else None
         previous_selected_population = None
         precomputed_population_scores = None
         precomputed_population_info = None
@@ -5537,6 +5613,10 @@ class RDTSteer:
                 "_last_eds_initial_sampler_trace_stages",
                 [],
             ):
+                if progress_mode and self._executed_progress.active and stage_name == "initial_final":
+                    # N30 canonical proposal, not a fabricated score for discarded fresh row15.
+                    # The original fresh tensor is retained by the passive N30 event above.
+                    stage_population = population
                 stage_population = self._apply_action_mask(
                     stage_population.to(device=population.device, dtype=population.dtype),
                     cond,
@@ -7234,6 +7314,11 @@ class RDTSteer:
             evidence.record("execution_feedback_selection", active=quality_contract.active,
                 context=quality_contract.context, previous=quality_contract.previous_record(),
                 selected=metrics.qd_feedback_selected, reason=quality_contract.reason)
+        if progress_mode:
+            if progress_semantic is not None:
+                progress_semantic.validate(guidance_fns)
+            progress_selected = self._executed_progress.select(selected)
+            self._record_progress_event("n30_selected_native_plan", selected=progress_selected, native_plan=selected)
         if evidence is not None:
             evidence.record("final_selection", population=population, selected_latent=selected,
                             **({"gripper_rescue_mode": GRIPPER_RESCUE_MODE} if rescue_cache is not None else {}),
@@ -8119,6 +8204,7 @@ class RDTSteer:
                 "rollout_diversity_decay_floor",
             ),
             chunk_population_mode=str(cfg.get("chunk_population_mode", "fresh")),
+            executed_progress_continuation_mode=str(cfg.get("executed_progress_continuation_mode", "off")),
             chunk_memory_fraction=_parse_eds_float(
                 cfg.get("chunk_memory_fraction", 0.0), "chunk_memory_fraction"
             ),
@@ -8631,6 +8717,7 @@ class RDTSteer:
                         "EDS grid_archive requires "
                         f"{field_name}={expected!r}"
                     )
+        validate_progress_config(resolved, self._action_chunk_horizon)
         return resolved
 
     def _adaptive_scale_for_scheduler_t(
