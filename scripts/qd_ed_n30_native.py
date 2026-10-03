@@ -22,6 +22,15 @@ def require(ok,message):
     if not ok:raise ValueError('N30 native: '+message)
 
 
+def terminal_bool(value):
+    """Decode the two native recorder representations without truthiness coercion."""
+    if type(value) is bool:
+        return value
+    require(type(value) is torch.Tensor and value.device.type=='cpu'
+        and value.dtype==torch.bool and value.ndim==0, 'terminal boolean type/shape/device differs')
+    return value.item()
+
+
 def identity(x):
     require(torch.is_tensor(x) and x.device.type=='cpu' and x.is_floating_point() and bool(torch.isfinite(x).all()),'finite CPU native tensor required')
     return hashlib.sha256(str((str(x.dtype),tuple(x.shape))).encode()+x.contiguous().reshape(-1).view(torch.uint8).numpy().tobytes()).hexdigest()
@@ -94,7 +103,7 @@ def audit_events(profile,metrics,events,compute):
         require(packet['episode']==context['episode'] and same_optional(packet['keypoints'],context['values']['keypoints'])
             and packet['tracker']==context['values'].get('keypoint_tracking_snapshot'),'Main/context association')
         start=shaped(packet['start_eef'],(3,))
-        if prior_outcome is not None and not prior_outcome['values']['terminated'] and context['global_step']>0:
+        if prior_outcome is not None and not terminal_bool(prior_outcome['values']['terminated']) and context['global_step']>0:
             require(prior_outcome['global_step']==context['global_step']-1
                 and same(start,prior_outcome['values']['observation']['robot0_eef_pos'].reshape(3)),'raw EEF previous actual outcome association')
         counts['observation_contexts_verified']+=1
@@ -178,8 +187,12 @@ def audit_events(profile,metrics,events,compute):
                 and a['global_step']==cur['step']+i and a['execution_index']==i+1
                 and act['sequence']<out['sequence']<ack['sequence']<ret['sequence'],'ordered 1-based actual acknowledgments differ')
             require(same(a['action'],actions[0,i]) and same(act['values']['action_numpy'],actions[0,i]),'actual command differs')
-            require(a['terminated'] is rv['terminated'] and a['truncated'] is rv['truncated'] and q['terminated'] is rv['terminated'],'terminal feedback binding')
-            terminal=rv['terminated'] or rv['truncated'];counts['actual_acknowledgments_verified']+=1
+            ack_terminal=terminal_bool(a['terminated']);ack_truncated=terminal_bool(a['truncated'])
+            returned_terminal=terminal_bool(rv['terminated']);returned_truncated=terminal_bool(rv['truncated'])
+            outcome_terminal=terminal_bool(q['terminated'])
+            require(ack_terminal==returned_terminal and ack_truncated==returned_truncated
+                and outcome_terminal==returned_terminal,'terminal feedback binding')
+            terminal=returned_terminal or returned_truncated;counts['actual_acknowledgments_verified']+=1
             if terminal:require(a['completed'] is None,'terminal cannot certify progress');continue
             endpoint=shaped(q['observation']['robot0_eef_pos'].reshape(3),(3,));require(same(a['endpoint'],endpoint),'actual EEF acknowledgment differs')
             require(a['progress_state']['invalid_evidence_count']==0,'invalid actual feedback')
