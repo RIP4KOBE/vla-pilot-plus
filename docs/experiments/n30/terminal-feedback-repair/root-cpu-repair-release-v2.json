@@ -1,0 +1,29 @@
+{
+  "schema": "n30-terminal-feedback-cpu-repair-release-v2",
+  "at": "2026-10-03T21:52:32.317830+00:00",
+  "scope": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/terminal-feedback-binding-repair-v1/cpu-repair-scope-v2.md",
+    "sha256": "5497de51af1f881431a844cc351287b88181cf21d4d9cc97a3336eeee4704fd7"
+  },
+  "base_source_commit": "b2775fa2008a8a88e374c43a5753f8862485af1f",
+  "closed_execution_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/root-terminal-review-v1.json",
+    "sha256": "89377494b0fcd9030735c8ed27e2168bfa1204f8637328bb27ff6449f6f4cda4"
+  },
+  "agent": "/root/n22_cpu_executor",
+  "cpu_seconds_limit": 900,
+  "threads": 2,
+  "max_real_episodes": 1,
+  "max_bundle_bytes": 536870912,
+  "max_bundles": 2500,
+  "old_and_repaired_replays_each": 1,
+  "gpu_release": false,
+  "api_authorized": false,
+  "historical_receipt_mutation": false,
+  "validation_authorized": false,
+  "formal_authorized": false,
+  "supersedes_undispatched_release": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/terminal-feedback-binding-repair-v1/root-cpu-repair-release-v1.json",
+    "sha256": "3e8421e2b9c3a555ef32592f2cea6e2bc6a3d88adf213d023f29e54c289ab788"
+  }
+}
