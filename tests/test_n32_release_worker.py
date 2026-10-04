@@ -8,6 +8,7 @@ import torch
 from scripts import qd_ed_n32_worker as worker, qd_ed_n32_bridge as b, qd_ed_n32_contract as c
 from scripts import qd_ed_n23_worker as w
 from test_n32_release import draft, trusted, write
+from test_n32_worker_entrypoint import worker_entrypoint_inventory
 from test_rdt_steer import _patch_core_imports, stub_adapter, mock_batch, stub_steer
 
 
@@ -27,7 +28,7 @@ def test_exact_constructor_matches_full_policy_resolver(trusted, stub_steer, arm
 
 
 @pytest.mark.parametrize('arm', ['C0', 'Q0', 'N32'])
-def test_same_process_external_manifest_native_receipt(trusted, monkeypatch, stub_adapter, mock_batch, arm):
+def test_same_process_external_manifest_native_receipt(trusted, monkeypatch, stub_adapter, mock_batch, worker_entrypoint_inventory, arm):
     import test_n32_runtime_native as synthetic
     plan, runtime, plan_ref = trusted
     row = next(r for r in plan['episodes'] if r['profile'] == arm)
@@ -70,6 +71,32 @@ def test_same_process_external_manifest_native_receipt(trusted, monkeypatch, stu
         worker.verify_terminal(plan_ref, row, {**terminal, 'success': True})
     with pytest.raises(ValueError, match='replay/duplicate'): worker._run_in_process(context_ref)
     receipt = w.read_ref(receipt_ref)
+    # Feed actual -m inventories into the real parent receipt verifier while
+    # retaining this fixture's full synthetic generic/native outcome evidence.
+    worker_name = 'scripts.qd_ed_n32_worker'
+    for phase, child_phase in (('loaded_before', 'before'), ('loaded_after', 'after')):
+        receipt[phase][worker_name] = worker_entrypoint_inventory[child_phase][worker_name]
+    receipt_ref = write(Path(receipt_ref['path']), receipt)
+    assert worker.verify_receipt(context_ref, receipt_ref, {**identity, 'attempt_id': row['episode_key']})['accepted']
+    for phase in ('loaded_before', 'loaded_after'):
+        for fault in ('missing', 'origin', 'spec_name', 'module_name', 'sha256', 'path', 'metadata', 'phase_drift'):
+            bad = copy.deepcopy(receipt)
+            record = bad[phase][worker_name]
+            if fault == 'missing': del bad[phase][worker_name]
+            elif fault == 'metadata': record.pop('spec_name')
+            elif fault == 'path': record.update(bad[phase]['scripts.qd_ed_n32_bridge'])
+            elif fault == 'phase_drift': record['module_name'] = worker_name
+            else: record[fault] = 'wrong'
+            bad_ref = write(Path(receipt_ref['path']), bad)
+            with pytest.raises(ValueError):
+                worker.verify_receipt(context_ref, bad_ref, {**identity, 'attempt_id': row['episode_key']})
+    # Exact legacy omission reaches the parent's original strict failure.
+    bad = copy.deepcopy(receipt)
+    bad['loaded_before'] = worker_entrypoint_inventory['old']
+    bad_ref = write(Path(receipt_ref['path']), bad)
+    with pytest.raises(ValueError, match='loaded source attestation absent'):
+        worker.verify_receipt(context_ref, bad_ref, {**identity, 'attempt_id': row['episode_key']})
+    write(Path(receipt_ref['path']), receipt)
     for fault in ('expected_manifest', 'process', 'native_counts', 'source', 'row', 'loaded_after'):
         bad = copy.deepcopy(receipt)
         if fault == 'expected_manifest': bad[fault]['sha256'] = 'b'*64

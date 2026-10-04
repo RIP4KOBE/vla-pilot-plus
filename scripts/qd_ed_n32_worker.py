@@ -16,6 +16,41 @@ from scripts import audit_decision_evidence as generic
 from scripts.qd_ed_audit_backend import create_backend, assigned_cuda_identity, canonical_cuda_uuid
 
 
+def attest_worker_loaded(root, source):
+    """Bind the executing worker, including Python's -m __main__, to frozen bytes.
+
+    Do not import a second worker or register an alias: attest this function's
+    actual module. Main's temporary __main__ is restored by runpy before the
+    post-run inventory. This is source attestation, not bytecode attestation.
+    """
+    loaded = b.attest_loaded(root, source)
+    canonical = 'scripts.qd_ed_n32_worker'
+    relative = 'scripts/qd_ed_n32_worker.py'
+    module = sys.modules.get(__name__)
+    spec = getattr(module, '__spec__', None)
+    w.require(module is not None and vars(module) is globals()
+              and __name__ in ('__main__', canonical)
+              and getattr(spec, 'name', None) == canonical
+              and getattr(spec, 'has_location', False), 'worker module spec differs')
+    expected = Path(root).resolve() / relative
+    file, origin = getattr(module, '__file__', None), getattr(spec, 'origin', None)
+    w.require(file and origin and expected.is_file() and not expected.is_symlink()
+              and Path(file).resolve() == expected and Path(origin).resolve() == expected,
+              'worker module origin differs')
+    actual = w.sha(expected)
+    index = {v['path']: v['sha256'] for v in source['files']}
+    w.require(index.get(relative) == actual, 'worker source not frozen')
+    record = {'path': relative, 'sha256': actual, 'module_name': __name__,
+              'spec_name': spec.name, 'origin': str(expected)}
+    # Any separately imported canonical copy must already pass the generic
+    # origin/hash checks and agree with this executing module's source.
+    if canonical in loaded:
+        w.require(loaded[canonical] == {'path': relative, 'sha256': actual},
+                  'worker canonical source differs')
+    loaded[canonical] = record
+    return loaded
+
+
 def validate_context(reference):
     context = w.read_ref(reference)
     w.require(set(context) == {'schema', 'plan', 'expected_manifest', 'episode_key', 'attempt_id', 'main_argv', 'worker_contract'} | ({'release'} if 'release' in context else set()), 'worker context fields')
@@ -91,7 +126,7 @@ def _run_in_process(context_ref):
                'main_exit_code': None, 'http_counters': 'Unknown'}
     old_argv, old_cwd = sys.argv, Path.cwd()
     try:
-        receipt['loaded_before'] = b.attest_loaded(root, plan['source'])
+        receipt['loaded_before'] = attest_worker_loaded(root, plan['source'])
         sys.argv = context['main_argv']
         os.chdir(root)
         try:
@@ -101,7 +136,7 @@ def _run_in_process(context_ref):
         receipt['main_exit_code'] = 0
         validate_context(context_ref)
         w.require(w.process_identity() == identity, 'worker process changed')
-        receipt['loaded_after'] = b.attest_loaded(root, plan['source'])
+        receipt['loaded_after'] = attest_worker_loaded(root, plan['source'])
         receipt['worker_cuda'] = assigned_cuda_identity(w.cuda_binding(runtime))
         backend = create_backend('cpu')
         before = evidence(output)
@@ -163,6 +198,16 @@ def verify_receipt(context_ref, receipt_ref, process_record):
         w.require(isinstance(inventory, dict) and required <= set(inventory), 'loaded source attestation absent')
         index = {v['path']: v['sha256'] for v in plan['source']['files']}
         w.require(all(index.get(v['path']) == v['sha256'] for v in inventory.values()), 'loaded source receipt mismatch')
+        worker = inventory['scripts.qd_ed_n32_worker']
+        w.require(worker == {'path': 'scripts/qd_ed_n32_worker.py',
+                            'sha256': index.get('scripts/qd_ed_n32_worker.py'),
+                            'module_name': worker.get('module_name'),
+                            'spec_name': 'scripts.qd_ed_n32_worker',
+                            'origin': str(Path(plan['worktree']).resolve() / 'scripts/qd_ed_n32_worker.py')}
+                  and worker.get('module_name') in ('__main__', 'scripts.qd_ed_n32_worker'),
+                  'worker source receipt identity differs')
+    w.require(receipt['loaded_before']['scripts.qd_ed_n32_worker']
+              == receipt['loaded_after']['scripts.qd_ed_n32_worker'], 'worker source identity changed')
     w.require(receipt['audit_report']['path'] == str(output / 'eds_eval/decision-evidence-audit.json'), 'audit path')
     report = w.read_ref(receipt['audit_report'])
     w.require(report.get('n23_arithmetic_backend') == receipt['audit_backend'], 'generic backend receipt')
