@@ -10,26 +10,31 @@ from test_n32_production import admit, historical
 from test_n32_release import journal
 
 
-OLD_COHORT = 'N32_ARCHIVE_ELIGIBLE_CAPTURE_DEV_20261004'
+@pytest.fixture(params=[
+    ('N32_ARCHIVE_ELIGIBLE_CAPTURE_DEV_20261004', 'n32_dev_', 0.19622250473834962),
+    ('N32R1_ARCHIVE_ELIGIBLE_CAPTURE_DEV_20261004', 'n32r1_dev_', 0.32240994476748813),
+], ids=['original-n32', 'previous-n32r1'])
+def prior_identity(request):
+    return request.param
 
 
-def old_rows():
+def old_rows(prior_identity):
     tasks = json.loads((c.ROOT / 'configs/qd_ed_final/n31_dev_task_identities.json').read_text())['tasks']
-    return [{**task, 'iteration': OLD_COHORT, 'profile': arm, 'timeout_seconds': 1800,
-             'episode_key': f'n32_dev_t{task["task_id"]:02d}_{arm.lower()}_20261004',
+    return [{**task, 'iteration': prior_identity[0], 'profile': arm, 'timeout_seconds': 1800,
+             'episode_key': f'{prior_identity[1]}t{task["task_id"]:02d}_{arm.lower()}_20261004',
              'budget_bucket': 'baseline' if arm == 'C0' else 'development'}
             for task in tasks for arm in ('C0', 'Q0', 'N32')]
 
 
-def test_fixed_fresh_identities_preserve_all_other_row_fields():
-    rows, old = c.expected_rows(), old_rows()
-    assert c.COHORT == 'N32R1_ARCHIVE_ELIGIBLE_CAPTURE_DEV_20261004'
+def test_fixed_fresh_identities_preserve_all_other_row_fields(prior_identity):
+    rows, old = c.expected_rows(), old_rows(prior_identity)
+    assert c.COHORT == 'N32R2_ARCHIVE_ELIGIBLE_CAPTURE_DEV_20261004'
     assert rows == c.expected_rows() and len(rows) == 30
     assert len({row['episode_key'] for row in rows}) == 30
     assert {row['episode_key'] for row in rows}.isdisjoint(row['episode_key'] for row in old)
     for row, prior in zip(rows, old):
         assert row['iteration'] == c.COHORT != prior['iteration']
-        assert row['episode_key'] == f'n32r1_dev_t{row["task_id"]:02d}_{row["profile"].lower()}_20261004'
+        assert row['episode_key'] == f'n32r2_dev_t{row["task_id"]:02d}_{row["profile"].lower()}_20261004'
         assert {k: v for k, v in row.items() if k not in ('iteration', 'episode_key')} == {
             k: v for k, v in prior.items() if k not in ('iteration', 'episode_key')}
     assert sum(row['budget_bucket'] == 'baseline' for row in rows) == 10
@@ -39,11 +44,11 @@ def test_fixed_fresh_identities_preserve_all_other_row_fields():
 
 
 @pytest.mark.parametrize('old_terminal', ['invalid', 'valid'])
-def test_old_events_never_supply_new_accepted_cells(old_terminal):
+def test_old_events_never_supply_new_accepted_cells(old_terminal, prior_identity):
     rows = c.expected_rows()
     plan = {'episodes': rows, 'worktree': str(c.ROOT)}
     # Also challenge isolation with a hypothetical fully successful old matrix.
-    old = journal(old_rows(), range(30)) if old_terminal == 'valid' else journal(old_rows()[:1])
+    old = journal(old_rows(prior_identity), range(30)) if old_terminal == 'valid' else journal(old_rows(prior_identity)[:1])
     if old_terminal == 'invalid':
         old[-1]['outcome_valid'] = False
     before = copy.deepcopy(old)
@@ -62,10 +67,10 @@ def test_old_events_never_supply_new_accepted_cells(old_terminal):
     assert old == before
 
 
-def test_old_invalid_c0_charge_remains_global_not_new_primary(tmp_path, monkeypatch):
-    hours = 0.19622250473834962
+def test_old_invalid_c0_charge_remains_global_not_new_primary(tmp_path, monkeypatch, prior_identity):
+    hours = prior_identity[2]
     # The ledger records completed invalid outcomes as event=valid/outcome_valid=False.
-    events = historical(hours * 3600, 'baseline', old_rows()[0]['episode_key'], OLD_COHORT)
+    events = historical(hours * 3600, 'baseline', old_rows(prior_identity)[0]['episode_key'], prior_identity[0])
     before = copy.deepcopy(events)
     observed = []
     guard = c.pre_dispatch
@@ -90,7 +95,7 @@ def test_old_invalid_c0_charge_remains_global_not_new_primary(tmp_path, monkeypa
 
 
 @pytest.mark.parametrize('identity', ['cohort', 'episode_key', 'both'])
-def test_release_rejects_old_identity_without_relaxing_validation(identity):
+def test_release_rejects_old_identity_without_relaxing_validation(identity, prior_identity):
     rows = c.expected_rows()
     plan = {'schema': 'n32-released-plan-v1', 'frozen': True, 'release_enabled': True,
             'episodes': rows, 'worktree': str(c.ROOT), 'limits': c.LIMITS,
@@ -98,7 +103,7 @@ def test_release_rejects_old_identity_without_relaxing_validation(identity):
             'stop_path': c.stop_path(), 'phase_authorization': {'dev': True, 'validation': False, 'formal': False},
             'attempt_identity': 'episode_key', 'expected_manifests': {row['episode_key']: {} for row in rows}}
     release.validate_plan(plan)
-    for row, prior in zip(rows, old_rows()):
+    for row, prior in zip(rows, old_rows(prior_identity)):
         if identity in ('cohort', 'both'):
             row['iteration'] = prior['iteration']
         if identity in ('episode_key', 'both'):
