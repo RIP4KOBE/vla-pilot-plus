@@ -24,7 +24,17 @@ def ref(path):
 
 
 def stop_path(root=ROOT):
-    return str(Path(root).resolve().parents[2] / 'autonomy_20261004/STOP')
+    """Locate the session STOP in supported checkouts; layout grants no release."""
+    root = Path(root).resolve()
+    if root.name == 'study_worktree':
+        session = root.parent
+    elif (root.name == 'implementation_worktree'
+          and root.parent.parent.name == 'variants'):
+        session = root.parent.parent.parent
+    else:
+        raise ValueError('unsupported N32 worktree layout: ' + str(root))
+    # Do not resolve STOP itself: even a dangling symlink must stop admission.
+    return str(session / 'autonomy_20261004/STOP')
 
 
 def expected_rows(root=ROOT):

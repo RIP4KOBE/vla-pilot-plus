@@ -248,3 +248,34 @@ def test_resume_and_stop_composition(draft, tmp_path, monkeypatch):
     # A live handle is reconciled without trying admission, dispatch or signalling.
     result = supervisor.next_dispatch(plan, events, lambda *args: None, allowance(), now=now, live_handles=['live'])
     assert result['status'] == 'LIVE_OR_UNSETTLED' and result['next_row'] is None
+
+
+@pytest.mark.parametrize('layout', ['study_worktree', 'variants/n32_archive_eligible_capture/implementation_worktree'])
+@pytest.mark.parametrize('kind', ['absent', 'file', 'symlink', 'dangling_symlink'])
+def test_supported_layout_stop_admission(tmp_path, layout, kind):
+    root = tmp_path / layout
+    root.mkdir(parents=True)
+    stop = tmp_path / 'autonomy_20261004/STOP'
+    assert c.stop_path(root) == str(stop)
+    stop.parent.mkdir()
+    if kind == 'file':
+        stop.touch()
+    elif kind != 'absent':
+        target = tmp_path / 'stop-target'
+        if kind == 'symlink': target.touch()
+        stop.symlink_to(target)
+    row = c.expected_rows()[0]
+    now = dt.datetime(2026, 10, 4, 16, tzinfo=dt.timezone.utc)
+    if kind == 'absent':
+        assert c.pre_dispatch(row, allowance(), now=now, stop_path=c.stop_path(root)) == 1840
+    else:
+        with pytest.raises(ValueError, match='STOP pre-dispatch'):
+            c.pre_dispatch(row, allowance(), now=now, stop_path=c.stop_path(root))
+
+
+@pytest.mark.parametrize('layout', ['', 'checkout', 'implementation_worktree',
+    'variants/implementation_worktree', 'other/n32/implementation_worktree',
+    'variants/n32/nested/implementation_worktree', 'study_worktree/nested'])
+def test_unknown_stop_layout_rejected(tmp_path, layout):
+    with pytest.raises(ValueError, match='unsupported N32 worktree layout'):
+        c.stop_path(tmp_path / layout)

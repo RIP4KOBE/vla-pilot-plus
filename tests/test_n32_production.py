@@ -130,9 +130,13 @@ def test_prefix_append_allowed_rewrite_rejected(tmp_path):
 
 @pytest.fixture
 def lifecycle(tmp_path, monkeypatch):
+    tmp_path = tmp_path / 'study_worktree'
+    tmp_path.mkdir()
     rows = c.expected_rows()
     monkeypatch.setattr(c, 'expected_rows', lambda root=None: rows)
     plan, authority, state, reservations = budget_fixture(tmp_path)
+    plan['stop_path'] = c.stop_path(tmp_path)
+    Path(plan['stop_path']).parent.mkdir()
     plan.update(worktree=str(tmp_path), artifact_root=str(tmp_path / 'artifacts/n32'), episodes=rows,
                 run_name='synthetic', source={'commit': 'a'*40}, runtime={'path': str(tmp_path / 'runtime'), 'sha256': 'b'*64},
                 runtime_inventory_sha256='c'*64, expected_manifests={})
@@ -250,10 +254,20 @@ def test_timeout_exact_owned_cleanup_retains_charge(lifecycle, monkeypatch):
     assert result['terminal']['gpu_process_wall_seconds'] > 0
 
 
-def test_stop_before_dispatch_no_device_probe(lifecycle, monkeypatch):
+@pytest.mark.parametrize('kind', ['file', 'symlink', 'dangling_symlink'])
+def test_stop_before_dispatch_no_device_probe(lifecycle, monkeypatch, kind):
     root, plan, plan_ref, release_ref = lifecycle
-    Path(plan['stop_path']).touch()
+    stop = root.parent / 'autonomy_20261004/STOP'
+    assert plan['stop_path'] == str(stop)
+    stop.parent.mkdir(exist_ok=True)
+    if kind == 'file':
+        stop.touch()
+    else:
+        target = root / 'stop-target'
+        if kind == 'symlink': target.touch()
+        stop.symlink_to(target)
     monkeypatch.setattr(adapter, 'device_check', lambda: pytest.fail('STOP must precede device probe'))
+    monkeypatch.setattr(adapter.subprocess, 'Popen', lambda *a, **kw: pytest.fail('STOP must prevent dispatch'))
     with pytest.raises(ValueError, match='STOP'): adapter.execute_one(plan_ref, release_ref)
     assert r.read_events(root / 'data/attempt-ledger.jsonl') == []
 
