@@ -223,6 +223,9 @@ def episode_identity(row):
 
 def expand_candidate(candidate_id, candidate, baseline):
     """Versioned, closed algorithm deltas; baseline dictionaries stay unchanged."""
+    if candidate_id == 'N31':
+        from scripts import qd_ed_n31_contract
+        return qd_ed_n31_contract.expand_candidate(candidate, baseline, globals())
     if candidate_id == 'N30':
         from scripts import qd_ed_n30_contract
         return qd_ed_n30_contract.expand_candidate(candidate, baseline, globals())
@@ -451,8 +454,8 @@ _N4_SUPPORT = None
 
 
 def is_n4_plan(plan):
-    return (is_n4e1_plan(plan) or 'N4' in plan.get('candidate_profiles', {}) or plan.get('n4_cohort') is not None
-            or any(str(row.get('iteration')) == 'N4_TERMINAL_POPULATION_DEV_20260924' for row in plan.get('episodes', [])))
+    return not is_n31_plan(plan) and ((is_n4e1_plan(plan) or 'N4' in plan.get('candidate_profiles', {}) or plan.get('n4_cohort') is not None
+            or any(str(row.get('iteration')) == 'N4_TERMINAL_POPULATION_DEV_20260924' for row in plan.get('episodes', []))))
 
 
 def n4_support():
@@ -468,8 +471,8 @@ _N4E1_SUPPORT = None
 
 
 def is_n4e1_plan(plan):
-    return (plan.get('n4e1_cohort') is not None or any(str(row.get('iteration'))=='N4_E1_TRANSPORT180_DEV_20260924'
-        for row in plan.get('episodes', [])))
+    return not is_n31_plan(plan) and ((plan.get('n4e1_cohort') is not None or any(str(row.get('iteration'))=='N4_E1_TRANSPORT180_DEV_20260924'
+        for row in plan.get('episodes', []))))
 
 
 def n4e1_support():
@@ -486,21 +489,21 @@ def n4_dispatch_support(plan):
 
 
 def is_n5_plan(plan):
-    return not is_n30_plan(plan) and not is_n29_plan(plan) and (plan.get('n5_cohort') is not None or 'N5' in plan.get('candidate_profiles', {}))
+    return not is_n31_plan(plan) and (not is_n30_plan(plan) and not is_n29_plan(plan) and (plan.get('n5_cohort') is not None or 'N5' in plan.get('candidate_profiles', {})))
 
 
 def is_n6_plan(plan):
-    return not is_n30_plan(plan) and not is_n29_plan(plan) and (plan.get('n6_cohort') is not None or 'N6' in plan.get('candidate_profiles', {}))
+    return not is_n31_plan(plan) and (not is_n30_plan(plan) and not is_n29_plan(plan) and (plan.get('n6_cohort') is not None or 'N6' in plan.get('candidate_profiles', {})))
 
 
 def is_n7_plan(plan):
-    return not is_n30_plan(plan) and not is_n29_plan(plan) and not is_n28_plan(plan) and not is_n27_plan(plan) and not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and not is_n23_plan(plan) and (plan.get('n7_cohort') is not None or ('N7' in plan.get('candidate_profiles', {})
+    return not is_n31_plan(plan) and (not is_n30_plan(plan) and not is_n29_plan(plan) and not is_n28_plan(plan) and not is_n27_plan(plan) and not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and not is_n23_plan(plan) and (plan.get('n7_cohort') is not None or ('N7' in plan.get('candidate_profiles', {})
             and not is_n9_plan(plan) and not is_n11_plan(plan)
-            and not is_n17_plan(plan)))
+            and not is_n17_plan(plan))))
 
 
 def is_n17_plan(plan):
-    return not is_n30_plan(plan) and not is_n29_plan(plan) and (plan.get('n17_passive_physics') is not None)
+    return not is_n31_plan(plan) and (not is_n30_plan(plan) and not is_n29_plan(plan) and (plan.get('n17_passive_physics') is not None))
 
 
 def validate_n17_plan(plan, runtime, root):
@@ -537,69 +540,73 @@ def validate_n17_plan(plan, runtime, root):
 
 
 def is_n9_plan(plan):
-    return plan.get('n9_cohort') is not None or 'N9' in plan.get('candidate_profiles', {})
+    return not is_n31_plan(plan) and (plan.get('n9_cohort') is not None or 'N9' in plan.get('candidate_profiles', {}))
 
 
 def is_n11_plan(plan):
-    return plan.get('n11_cohort') is not None or 'N11' in plan.get('candidate_profiles', {})
+    return not is_n31_plan(plan) and (plan.get('n11_cohort') is not None or 'N11' in plan.get('candidate_profiles', {}))
 
 
 def is_n18_plan(plan):
-    return not is_n30_plan(plan) and not is_n29_plan(plan) and (plan.get('n18_cohort') is not None or 'N18' in plan.get('candidate_profiles', {}))
+    return not is_n31_plan(plan) and (not is_n30_plan(plan) and not is_n29_plan(plan) and (plan.get('n18_cohort') is not None or 'N18' in plan.get('candidate_profiles', {})))
 
 
 def is_n19_plan(plan):
-    return not is_n30_plan(plan) and not is_n29_plan(plan) and (plan.get('n19_cohort') is not None or 'N19' in plan.get('candidate_profiles', {}))
+    return not is_n31_plan(plan) and (not is_n30_plan(plan) and not is_n29_plan(plan) and (plan.get('n19_cohort') is not None or 'N19' in plan.get('candidate_profiles', {})))
 
 
 def is_n20_plan(plan):
-    return not is_n30_plan(plan) and not is_n29_plan(plan) and (plan.get('n20_cohort') is not None or 'N20' in plan.get('candidate_profiles', {}))
+    return not is_n31_plan(plan) and (not is_n30_plan(plan) and not is_n29_plan(plan) and (plan.get('n20_cohort') is not None or 'N20' in plan.get('candidate_profiles', {})))
+
+
+def is_n31_plan(plan):
+    return plan.get('n31_cohort') is not None or 'N31' in plan.get('candidate_profiles', {})
 
 
 def is_n30_plan(plan):
-    return plan.get('n30_r2_cohort') is not None or plan.get('n30_r1_cohort') is not None or plan.get('n30_cohort') is not None or 'N30' in plan.get('candidate_profiles', {})
+    return not is_n31_plan(plan) and (plan.get('n30_r2_cohort') is not None or plan.get('n30_r1_cohort') is not None or plan.get('n30_cohort') is not None or 'N30' in plan.get('candidate_profiles', {}))
 
 
 def is_n29_plan(plan):
-    return not is_n30_plan(plan) and (plan.get('n29_cohort') is not None or 'N29' in plan.get('candidate_profiles', {}))
+    return not is_n31_plan(plan) and (not is_n30_plan(plan) and (plan.get('n29_cohort') is not None or 'N29' in plan.get('candidate_profiles', {})))
 
 
 def is_n28_plan(plan):
-    return not is_n30_plan(plan) and not is_n29_plan(plan) and (plan.get('n28_cohort') is not None or 'N28' in plan.get('candidate_profiles', {}))
+    return not is_n31_plan(plan) and (not is_n30_plan(plan) and not is_n29_plan(plan) and (plan.get('n28_cohort') is not None or 'N28' in plan.get('candidate_profiles', {})))
 
 
 def is_n27_plan(plan):
-    return not is_n30_plan(plan) and not is_n29_plan(plan) and not is_n28_plan(plan) and (plan.get('n27_cohort') is not None or 'N27' in plan.get('candidate_profiles', {}))
+    return not is_n31_plan(plan) and (not is_n30_plan(plan) and not is_n29_plan(plan) and not is_n28_plan(plan) and (plan.get('n27_cohort') is not None or 'N27' in plan.get('candidate_profiles', {})))
 
 
 def is_n26_plan(plan):
-    return not is_n30_plan(plan) and not is_n29_plan(plan) and not is_n28_plan(plan) and not is_n27_plan(plan) and (plan.get('n26_cohort') is not None or 'N26' in plan.get('candidate_profiles', {}))
+    return not is_n31_plan(plan) and (not is_n30_plan(plan) and not is_n29_plan(plan) and not is_n28_plan(plan) and not is_n27_plan(plan) and (plan.get('n26_cohort') is not None or 'N26' in plan.get('candidate_profiles', {})))
 
 
 def is_n25_plan(plan):
-    return not is_n30_plan(plan) and not is_n29_plan(plan) and not is_n28_plan(plan) and not is_n27_plan(plan) and not is_n26_plan(plan) and (plan.get('n25_cohort') is not None or 'N25' in plan.get('candidate_profiles', {}))
+    return not is_n31_plan(plan) and (not is_n30_plan(plan) and not is_n29_plan(plan) and not is_n28_plan(plan) and not is_n27_plan(plan) and not is_n26_plan(plan) and (plan.get('n25_cohort') is not None or 'N25' in plan.get('candidate_profiles', {})))
 
 
 def is_n24_plan(plan):
-    return not is_n30_plan(plan) and not is_n29_plan(plan) and (plan.get('n24_cohort') is not None or 'N24' in plan.get('candidate_profiles', {}))
+    return not is_n31_plan(plan) and (not is_n30_plan(plan) and not is_n29_plan(plan) and (plan.get('n24_cohort') is not None or 'N24' in plan.get('candidate_profiles', {})))
 
 
 def is_n23_v2_plan(plan):
-    return not is_n30_plan(plan) and not is_n29_plan(plan) and not is_n28_plan(plan) and not is_n27_plan(plan) and not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and plan.get('n23_cohort', {}).get('schema') == 'n23-clipped-quality-dev-v2'
+    return not is_n31_plan(plan) and (not is_n30_plan(plan) and not is_n29_plan(plan) and not is_n28_plan(plan) and not is_n27_plan(plan) and not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and plan.get('n23_cohort', {}).get('schema') == 'n23-clipped-quality-dev-v2')
 
 
 def is_n23_plan(plan):
-    return not is_n30_plan(plan) and not is_n29_plan(plan) and not is_n28_plan(plan) and not is_n27_plan(plan) and not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and (plan.get('n23_cohort') is not None or 'N23' in plan.get('candidate_profiles', {}))
+    return not is_n31_plan(plan) and (not is_n30_plan(plan) and not is_n29_plan(plan) and not is_n28_plan(plan) and not is_n27_plan(plan) and not is_n26_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and (plan.get('n23_cohort') is not None or 'N23' in plan.get('candidate_profiles', {})))
 
 
 def is_n22_plan(plan):
-    return not is_n30_plan(plan) and not is_n29_plan(plan) and (plan.get('n22_cohort') is not None or 'N22' in plan.get('candidate_profiles', {}))
+    return not is_n31_plan(plan) and (not is_n30_plan(plan) and not is_n29_plan(plan) and (plan.get('n22_cohort') is not None or 'N22' in plan.get('candidate_profiles', {})))
 
 
 def is_n21_plan(plan):
     # N22 carries N21 as a contemporaneous ablation, not an N21 release.
-    return not is_n30_plan(plan) and not is_n22_plan(plan) and (plan.get('n21_cohort') is not None
-                                    or 'N21' in plan.get('candidate_profiles', {}))
+    return not is_n31_plan(plan) and (not is_n30_plan(plan) and not is_n22_plan(plan) and (plan.get('n21_cohort') is not None
+                                    or 'N21' in plan.get('candidate_profiles', {})))
 
 
 _N18_SUPPORT = None
@@ -676,14 +683,17 @@ def n23_support(plan=None):
 
 
 def metered_plan(plan):
-    return is_n30_plan(plan) or is_n29_plan(plan) or is_n28_plan(plan) or is_n27_plan(plan) or is_n26_plan(plan) or is_n25_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan)
+    return is_n31_plan(plan) or is_n30_plan(plan) or is_n29_plan(plan) or is_n28_plan(plan) or is_n27_plan(plan) or is_n26_plan(plan) or is_n25_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan)
 
 
 def typed_metered_plan(plan):
-    return is_n30_plan(plan) or is_n29_plan(plan) or is_n28_plan(plan) or is_n27_plan(plan) or is_n26_plan(plan) or is_n25_plan(plan) or is_n23_v2_plan(plan) or is_n24_plan(plan)
+    return is_n31_plan(plan) or is_n30_plan(plan) or is_n29_plan(plan) or is_n28_plan(plan) or is_n27_plan(plan) or is_n26_plan(plan) or is_n25_plan(plan) or is_n23_v2_plan(plan) or is_n24_plan(plan)
 
 
 def metered_support(plan):
+    if is_n31_plan(plan):
+        from scripts import qd_ed_n31_contract
+        return qd_ed_n31_contract
     if plan.get('n30_r2_cohort') is not None:
         from scripts import qd_ed_n30_r2_contract
         return qd_ed_n30_r2_contract
@@ -871,6 +881,8 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
     root = Path(root).resolve()
     plan = read_json(path)
     require(plan.get('schema') == SCHEMA, 'plan schema mismatch')
+    if is_n31_plan(plan):
+        require(set(plan.get('candidate_profiles', {})) == {'N31'} and not any(re.fullmatch(r'n[0-9]+_.*', k) and k != 'n31_cohort' for k in plan), 'N31 mixed cohort/profile markers forbidden')
     if is_n30_plan(plan):
         require(set(plan.get('candidate_profiles', {})) == {'N30'} and not any(re.fullmatch(r'n[0-9]+_.*', k) and k != ('n30_r2_cohort' if plan.get('n30_r2_cohort') is not None else 'n30_r1_cohort' if plan.get('n30_r1_cohort') is not None else 'n30_cohort') for k in plan), 'N30 mixed cohort/profile markers forbidden')
     require(plan.get('frozen') is True or not require_frozen, 'plan is not frozen')
@@ -879,7 +891,11 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
     require(plan['run_name'] == state['run_name'], 'run identity mismatch')
     artifact_root = Path(plan['artifact_root']).resolve()
     runtime_artifact_root = Path(state['artifacts']).resolve()
-    if is_n30_plan(plan):
+    if is_n31_plan(plan):
+        n31_artifact = metered_support(plan).RUN_DIR / 'artifacts'
+        require(n31_artifact.is_symlink() and artifact_root == n31_artifact.resolve() ==
+                runtime_artifact_root / 'variants/n31_capture_dwell_proposal', 'N31 artifact root mismatch')
+    elif is_n30_plan(plan):
         n30_artifact = metered_support(plan).ARTIFACT_DIR if plan.get('n30_r2_cohort') is not None or plan.get('n30_r1_cohort') is not None else metered_support(plan).RUN_DIR / 'artifacts'
         require(n30_artifact.is_symlink() and artifact_root == n30_artifact.resolve() ==
                 runtime_artifact_root / 'variants/n30_executed_progress_continuation', 'N30 artifact root mismatch')
@@ -920,9 +936,9 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
     require(Path(runtime['artifact_root']).resolve() == runtime_artifact_root, 'runtime artifact root mismatch')
     stage_overrides(runtime)
     require((runtime.get('stage_recovered_error_condition') is not None) ==
-            (plan.get('n7_e2_passive_diagnostic') is not None or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n25_plan(plan) or is_n26_plan(plan) or is_n27_plan(plan) or is_n28_plan(plan) or is_n29_plan(plan) or is_n30_plan(plan)),
+            (plan.get('n7_e2_passive_diagnostic') is not None or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n25_plan(plan) or is_n26_plan(plan) or is_n27_plan(plan) or is_n28_plan(plan) or is_n29_plan(plan) or is_n30_plan(plan) or is_n31_plan(plan)),
             'E2 Stage condition requires its dedicated prospective cohort plan')
-    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan) or is_n7_plan(plan) or is_n9_plan(plan) or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n25_plan(plan) or is_n26_plan(plan) or is_n27_plan(plan) or is_n28_plan(plan) or is_n29_plan(plan) or is_n30_plan(plan)),
+    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan) or is_n7_plan(plan) or is_n9_plan(plan) or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n25_plan(plan) or is_n26_plan(plan) or is_n27_plan(plan) or is_n28_plan(plan) or is_n29_plan(plan) or is_n30_plan(plan) or is_n31_plan(plan)),
         '180s transport requires its dedicated prospective cohort')
     physical_gpu = runtime_gpu(runtime, state)
     if require_frozen:
@@ -1327,7 +1343,12 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
     require(physical_gpu is None or (type(physical_gpu) is int and physical_gpu == selected_gpu),
             'GPU policy/runtime physical device mismatch')
     amendment = budget.get('amendment')
-    if row.get('iteration') == 'N30_TERMINAL_BOOLEAN_REPAIR_DEV_20261003':
+    if row.get('iteration') == 'N31_CAPTURE_DWELL_PROPOSAL_DEV_20261004':
+        from scripts import qd_ed_n31_contract as n31
+        n31.require_state(state, globals())
+        n31.whole_attempt_hours(state, snap, row, globals())
+        bucket_caps = n31.budget_authority()['caps']['buckets']
+    elif row.get('iteration') == 'N30_TERMINAL_BOOLEAN_REPAIR_DEV_20261003':
         from scripts import qd_ed_n30_r2_contract as n30r2
         n30r2.require_state(state, globals())
         n30r2.whole_attempt_hours(state, snap, row, globals())
@@ -1479,6 +1500,9 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
 
 
 def check_retry(events, row):
+    if row.get("iteration") == "N31_CAPTURE_DWELL_PROPOSAL_DEV_20261004":
+        from scripts import qd_ed_n31_contract as n31
+        return n31.check_retry(events, row, globals())
     if row.get("iteration") == "N30_TERMINAL_BOOLEAN_REPAIR_DEV_20261003":
         from scripts import qd_ed_n30_r2_contract as n30r2
         return n30r2.check_retry(events, row, globals())

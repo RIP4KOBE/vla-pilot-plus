@@ -135,6 +135,9 @@ def validate_context(context, main_argv):
     require(root == ROOT.resolve() and context['main_argv'] == list(main_argv)
             and main_argv[0] == str(root / 'main.py') and output.name == context['attempt_id'], "worker command/root/attempt differs")
     plan, runtime = read_ref(context['plan']), read_ref(context['runtime'])
+    if plan.get('n31_cohort') is not None or 'N31' in plan.get('candidate_profiles', {}):
+        from scripts import qd_ed_n31_contract as n31
+        return n31.validate_worker_context(context, main_argv, root, output, plan, runtime)
     if plan.get('n30_r2_cohort') is not None:
         from scripts import qd_ed_n30_r2_contract as n30r2
         return n30r2.validate_worker_context(context, main_argv, root, output, plan, runtime)
@@ -226,7 +229,11 @@ def run_worker(context_path, main_argv):
             audit_started = time.perf_counter()
             before = evidence_record(output)
             report = audit.audit_episode(output / 'eds_eval/decision_evidence/episode_000',
-                                         output / 'eds_eval/episode_compute.jsonl', arithmetic_backend=backend)
+                                         output / 'eds_eval/episode_compute.jsonl', arithmetic_backend=backend,
+                                         **({'n31_empty_provider_search': True} if read_ref(context['plan']).get('n31_cohort') is not None else {}))
+            if read_ref(context['plan']).get('n31_cohort') is not None:
+                from scripts import qd_ed_n31_native as n31_native
+                report = n31_native.audit_output(context['profile'], output, report, backend)
             if read_ref(context['plan']).get('n30_cohort') is not None or read_ref(context['plan']).get('n30_r1_cohort') is not None or read_ref(context['plan']).get('n30_r2_cohort') is not None:
                 from scripts import qd_ed_n30_native as n30_native
                 report = n30_native.audit_output(context['profile'], output, report, backend)
@@ -255,6 +262,12 @@ def run_worker(context_path, main_argv):
                 receipt['n24_native_counts'], receipt['n24_auxiliary'] = n24_native.from_output(context['profile'], output, report)
                 metric_path = output / 'eds_eval/eds_metrics.jsonl'
                 receipt['n24_metrics'] = {'path': str(metric_path), 'present': metric_path.is_file(),
+                    'sha256': sha(metric_path) if metric_path.is_file() else None}
+            if read_ref(context['plan']).get('n31_cohort') is not None:
+                from scripts import qd_ed_n31_native as n31_native
+                receipt['n31_native_counts'], receipt['n31_auxiliary'] = n31_native.from_output(context['profile'], output, report)
+                metric_path = output / 'eds_eval/eds_metrics.jsonl'
+                receipt['n31_metrics'] = {'path': str(metric_path), 'present': metric_path.is_file(),
                     'sha256': sha(metric_path) if metric_path.is_file() else None}
             if read_ref(context['plan']).get('n30_cohort') is not None or read_ref(context['plan']).get('n30_r1_cohort') is not None or read_ref(context['plan']).get('n30_r2_cohort') is not None:
                 from scripts import qd_ed_n30_native as n30_native
@@ -374,6 +387,14 @@ def verify_receipt(context_path, process_record):
         counts,aux=n24_native.from_output(context['profile'],output,report)
         require(receipt.get('n24_native_counts')==counts and receipt.get('n24_auxiliary')==aux,
                 'N24 profile-bound native counters differ')
+    if read_ref(context['plan']).get('n31_cohort') is not None:
+        from scripts import qd_ed_n31_native as n31_native
+        metric_path = output / 'eds_eval/eds_metrics.jsonl'
+        require(receipt.get('n31_metrics') == {'path':str(metric_path),'present':metric_path.is_file(),
+            'sha256':sha(metric_path) if metric_path.is_file() else None}, 'N30 serialized metrics binding differs')
+        counts,aux = n31_native.from_output(context['profile'],output,report)
+        require(receipt.get('n31_native_counts')==counts and receipt.get('n31_auxiliary')==aux,
+                'N30 profile-bound native counters differ')
     if read_ref(context['plan']).get('n30_cohort') is not None or read_ref(context['plan']).get('n30_r1_cohort') is not None or read_ref(context['plan']).get('n30_r2_cohort') is not None:
         from scripts import qd_ed_n30_native as n30_native
         metric_path = output / 'eds_eval/eds_metrics.jsonl'

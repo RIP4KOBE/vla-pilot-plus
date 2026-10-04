@@ -952,7 +952,7 @@ def _audit_n3_feedback(kinds, context, final, events, previous):
     return None if completed is None else {"context": current, "completed": completed}
 
 
-def audit_episode(episode_dir, episode_compute_file, *, arithmetic_backend=None):
+def audit_episode(episode_dir, episode_compute_file, *, arithmetic_backend=None, n31_empty_provider_search=False):
     report = {"schema": "qd-ed-decision-evidence-audit-v1", "accepted": False,
               "episode_dir": str(Path(episode_dir).resolve()),
               "episode_compute_file": str(Path(episode_compute_file).resolve()),
@@ -1019,7 +1019,9 @@ def audit_episode(episode_dir, episode_compute_file, *, arithmetic_backend=None)
             horizon = chunk.shape[1]
             require(0 < committed["values"]["execution_horizon"] <= horizon, "execution_horizon_invalid")
             require(decoded["selected_canonical_fingerprint"] == fingerprints(decoded["selected_latent"])[0], "decoded_fingerprint_mismatch")
-            guided = context["values"]["use_guidance"] and bool(context["values"]["providers"])
+            empty_search = (n31_empty_provider_search is True and context["values"]["use_guidance"] is True
+                            and context["values"]["providers"] == [])
+            guided = context["values"]["use_guidance"] and (bool(context["values"]["providers"]) or empty_search)
             candidate_rows = kinds["canonical_candidate_batch"]
             dual_modes = {r["values"].get("quality_mode")
                           for kind in ("canonical_candidate_batch", "effective_quality", "final_selection")
@@ -1170,22 +1172,73 @@ def audit_episode(episode_dir, episode_compute_file, *, arithmetic_backend=None)
                         gate["rank_changed_batches"] += int(not torch.equal(
                             torch.argsort(raw, descending=True, stable=True),
                             torch.argsort(effective[0]["quality"], descending=True, stable=True)))
-            for kind in ("provider_return", "effective_quality", "scoring_aggregate"):
-                require(all(r["values"]["scoring_batch_id"] in score_ids for r in kinds[kind]), "orphan_score_result")
+            if empty_search:
+                require(not kinds["scoring_inputs"] and not kinds["provider_return"] and not kinds["scoring_aggregate"], "n31_empty_provider_scoring_present")
+                effects = [e for e in kinds["effective_quality"] if e["values"]["scoring_scope"]["role"] != "auxiliary_pretest"]
+                auxiliary = [e for e in kinds["effective_quality"] if e["values"]["scoring_scope"]["role"] == "auxiliary_pretest"]
+                require(len(effects) == len(candidate_rows) == 11, "n31_empty_provider_batch_coverage")
+                require([e["values"]["scoring_scope"] for e in auxiliary] == [
+                    {"role": "auxiliary_pretest", "iter_idx": 0, "site": site}
+                    for site in ("initial_sampler_trace", "initial_sampler_trace", "renoise_trace",
+                                 "rollout_trace", "rollout_trace")], "n31_empty_provider_auxiliary_order")
+                parents = kinds["parent_allocation"]
+                require(len(parents) == 10 and [e["values"]["iter_idx"] for e in parents] == list(range(10)),
+                        "n31_empty_provider_parent_coverage")
+                # Frozen pretest: two initial traces before allocation0, one renoise
+                # trace before its canonical score, two rollout traces after batch0.
+                require(candidate_rows[0]["sequence"] < auxiliary[0]["sequence"] < auxiliary[1]["sequence"]
+                        < parents[0]["sequence"] < auxiliary[2]["sequence"] < effects[1]["sequence"]
+                        < candidate_rows[1]["sequence"] < auxiliary[3]["sequence"] < auxiliary[4]["sequence"]
+                        < parents[1]["sequence"], "n31_empty_provider_auxiliary_placement")
+                for effect in auxiliary:
+                    ev=effect["values"];scope=ev["scoring_scope"]
+                    require(scope["iter_idx"] == 0 and scope["site"] in {"initial_sampler_trace", "renoise_trace", "rollout_trace"}
+                            and ev["scoring_batch_id"] is None and ev["reward_mode"] == "normal"
+                            and tensor(ev["quality"]) and ev["quality"].shape == (16,)
+                            and tensor(ev["costs"]) and ev["costs"].shape == (16,)
+                            and ev["quality"].dtype == ev["costs"].dtype == candidate_rows[0]["values"]["candidates"].dtype
+                            and _native_sha(ev["quality"]) == _native_sha(torch.zeros_like(ev["quality"]))
+                            and _native_sha(ev["costs"]) == _native_sha(-torch.zeros_like(ev["quality"])),
+                            "n31_empty_provider_auxiliary_signed_zero")
+                require(len(effects) == len(candidate_rows) == 11, "n31_empty_provider_batch_coverage")
+                for it, effect, canonical in zip(range(-1, 10), effects, candidate_rows):
+                    ev, cv = effect["values"], canonical["values"]
+                    scope = {"role": "canonical_initial" if it == -1 else "canonical_offspring",
+                             "iter_idx": it, "site": "initial_population" if it == -1 else "rollout"}
+                    actions, quality, costs = cv["candidates"], ev["quality"], ev["costs"]
+                    require(cv["iter_idx"] == it and ev["scoring_scope"] == scope
+                            and ev["scoring_batch_id"] is None and ev["reward_mode"] == "normal"
+                            and effect["sequence"] < canonical["sequence"]
+                            and (it == -1 or candidate_rows[it]["sequence"] < effect["sequence"]),
+                            "n31_empty_provider_canonical_link")
+                    require(tensor(actions) and actions.shape == (16, 64, 128)
+                            and actions.dtype in (torch.float32, torch.bfloat16)
+                            and tensor(quality) and tensor(costs)
+                            and quality.shape == costs.shape == cv["effective_quality"].shape == (16,)
+                            and quality.dtype == costs.dtype == cv["effective_quality"].dtype == actions.dtype,
+                            "n31_empty_provider_native_shape_dtype")
+                    zero = torch.zeros_like(quality)
+                    require(_native_sha(quality) == _native_sha(zero) == _native_sha(cv["effective_quality"])
+                            and _native_sha(costs) == _native_sha(-zero), "n31_empty_provider_native_signed_zero")
+            else:
+                for kind in ("provider_return", "effective_quality", "scoring_aggregate"):
+                    require(all(r["values"]["scoring_batch_id"] in score_ids for r in kinds[kind]), "orphan_score_result")
             if guided:
-                require(bool(score_ids), "guided_scoring_missing")
+                require(bool(score_ids) or empty_search, "guided_scoring_missing")
                 iterations = [r["values"]["iter_idx"] for r in candidate_rows]
                 require(iterations == list(range(-1, len(iterations) - 1)), "canonical_iteration_gap")
                 offspring_iters = [r["values"]["scoring_scope"]["iter_idx"] for r in kinds["scoring_inputs"]
                                    if r["values"]["scoring_scope"]["role"] == "canonical_offspring"]
-                require(offspring_iters == iterations[1:], "canonical_offspring_count_mismatch")
+                require((offspring_iters == iterations[1:]) if not empty_search else
+                        (iterations == list(range(-1, 10)) and not offspring_iters), "canonical_offspring_count_mismatch")
                 require([r["values"]["iter_idx"] for r in kinds["parent_allocation"]] == iterations[1:], "parent_allocation_count_mismatch")
                 if final["selection_rule"] == "archive_global_best":
                     require(list(archive_rows) == iterations[1:], "archive_allocation_missing")
                 initial_roles = Counter(r["values"]["scoring_scope"]["role"] for r in kinds["scoring_inputs"]
                                         if r["values"]["scoring_scope"]["iter_idx"] == -1)
-                require(initial_roles == {"canonical_initial": 1} or initial_roles == {
-                    "canonical_memory_fresh": 1, "canonical_memory_adapted": 1}, "canonical_initial_count_mismatch")
+                require((initial_roles == {"canonical_initial": 1} or initial_roles == {
+                    "canonical_memory_fresh": 1, "canonical_memory_adapted": 1}) if not empty_search else not initial_roles,
+                    "canonical_initial_count_mismatch")
             pending, prefixes = None, 0
             for row in rows:
                 require(row["reset_sequence"] == reset_sequence, "reset_sequence_mismatch")

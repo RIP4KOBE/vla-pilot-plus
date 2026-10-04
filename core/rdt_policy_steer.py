@@ -5513,6 +5513,10 @@ class RDTSteer:
                 source_iter=-1,
                 **({"raw_rewards": original_rewards(population_info, population_rewards, population)} if quality_contract is not None else {}),
             )
+            if self._capture_dwell is not None and getattr(self, "_decision_evidence", None) is not None:
+                self._decision_evidence.record("n31_archive_update", iter_idx=-1, cell_ids=initial_cell_ids,
+                    descriptors=initial_descriptors, bounds_lo=qd_bounds.lo, bounds_hi=qd_bounds.hi,
+                    archive=qd_archive.snapshot(), parent_cell_ids=None)
             metrics.qd_archive_update_latency_s += float(
                 time.perf_counter() - qd_update_start
             )
@@ -6620,6 +6624,10 @@ class RDTSteer:
                     parent_cell_ids=qd_parent_cell_ids,
                     **({"raw_rewards": original_rewards(population_info, population_rewards, population)} if quality_contract is not None else {}),
                 )
+                if self._capture_dwell is not None and evidence is not None:
+                    evidence.record("n31_archive_update", iter_idx=i, cell_ids=child_cell_ids,
+                        descriptors=child_descriptors, bounds_lo=qd_bounds.lo, bounds_hi=qd_bounds.hi,
+                        archive=qd_archive.snapshot(), parent_cell_ids=qd_parent_cell_ids)
                 metrics.qd_archive_update_latency_s += float(
                     time.perf_counter() - qd_update_start
                 )

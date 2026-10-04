@@ -211,6 +211,7 @@ class CaptureDwellDecision:
         if evidence is not None:
             evidence.record("n31_canonical_cache", identity=self.identity, role=role, iter_idx=iteration,
                             site=site, scoring_batch_id=evidence.scoring_batch_id,
+                            action_mask=self.mask,
                             native_identities=ids, occurrence_start=len(self.entries)-16,
                             source_origins=origins, cast_origins=None if xyz is None else xyz[:, 0],
                             projected_outcomes=None if xyz is None else xyz[:, 1:9],
@@ -262,6 +263,10 @@ class CaptureDwellDecision:
             raise ValueError("N31 rollout native shape/dtype")
         candidate = record["candidate"]
         before = population[15].detach().clone()
+        # Passive commitment taken before substitution; absent with recorder off.
+        ordinary_other15 = None if evidence is None else {
+            "dtype": str(population.dtype), "shape": [15, 64, 128],
+            "native_identity": native_id(population[:15])}
         if candidate is not None:
             if candidate.dtype != population.dtype or candidate.device != population.device:
                 raise ValueError("N31 replacement dtype/device")
@@ -277,7 +282,8 @@ class CaptureDwellDecision:
         self.pending = None
         if evidence is not None:
             evidence.record("n31_capture_dwell_opportunity", **record, original_post_rollout_slot15=before,
-                            actual_scored_population=population, observation=self.packet)
+                            actual_scored_population=population, observation=self.packet,
+                            ordinary_other15=ordinary_other15)
         self.overhead_seconds += time.perf_counter() - start
         return population
 
@@ -292,7 +298,7 @@ class CaptureDwellDecision:
             "overhead_seconds": self.overhead_seconds,
             "overhead_scope": "decision_init_record_prepare_apply_including_observer",
             "overhead_excludes": ["Main_packet", "provider_recognition", "score_validate",
-                                  "adapter_capture_origin_copy", "whole_selection"]}
+                                  "adapter_capture_origin_copy", "archive_snapshot_observer", "whole_selection"]}
         self.entries.clear()
         self.closed = True
         return summary
