@@ -69,7 +69,9 @@ def validate_release(plan_ref, release_ref):
     w.require(Path(plan['artifact_root']).resolve() != Path(runtime['artifact_root']).resolve(), 'distinct N32 artifact directory required')
     # Use the same inventory/checkpoint/task/seed validators as the generic runner.
     state_view = {'artifacts': runtime['artifact_root']}
-    r.verify_files(runtime['files'], allowed_roots=(plan['worktree'], runtime['artifact_root']))
+    # The runtime worktree alias was checked above to resolve to this checkout.
+    # Preserve its frozen lexical paths while retaining both containment checks.
+    r.verify_files(runtime['files'], allowed_roots=(plan['worktree'], runtime['worktree'], runtime['artifact_root']))
     fingerprints = {str(Path(x['path']).resolve()) for x in runtime['files']}
     for task in runtime['tasks'].values():
         cache = Path(task['cache_dir'])
