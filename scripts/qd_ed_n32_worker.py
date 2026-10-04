@@ -1,7 +1,7 @@
 """N32 metered worker and hash-only parent receipt verification.
 
-The public launch remains closed pending root release integration. `_run_in_process`
-provides the reviewable same-PID implementation, exercised on synthetic CPU data.
+The public launch requires a detached root release. Draft contexts remain closed.
+`_run_in_process` provides the same-PID implementation tested on synthetic CPU data.
 """
 import os
 from pathlib import Path
@@ -18,10 +18,15 @@ from scripts.qd_ed_audit_backend import create_backend, assigned_cuda_identity, 
 
 def validate_context(reference):
     context = w.read_ref(reference)
-    w.require(set(context) == {'schema', 'plan', 'expected_manifest', 'episode_key', 'attempt_id', 'main_argv', 'worker_contract'}, 'worker context fields')
+    w.require(set(context) == {'schema', 'plan', 'expected_manifest', 'episode_key', 'attempt_id', 'main_argv', 'worker_contract'} | ({'release'} if 'release' in context else set()), 'worker context fields')
     w.require(context['schema'] == 'n32-worker-context-v1' and context['worker_contract'] == c.WORKER_CONTRACT, 'worker contract')
     plan = w.read_ref(context['plan'])
-    c.validate_draft(plan)
+    if 'release' in context:
+        from scripts import qd_ed_n32_release as release
+        released, _, _ = release.validate_release(context['plan'], context['release'])
+        w.require(released == plan, 'released worker plan differs')
+    else:
+        c.validate_draft(plan)
     rows = [r for r in plan['episodes'] if r['episode_key'] == context['episode_key']]
     w.require(len(rows) == 1 and context['attempt_id'] == context['episode_key'], 'exact primary attempt')
     row = rows[0]
@@ -33,14 +38,15 @@ def validate_context(reference):
     return context, plan, runtime, row, manifest
 
 
-def context_for(plan_ref, row):
+def context_for(plan_ref, row, release_ref=None):
     plan = w.read_ref(plan_ref)
     manifest_ref = plan['expected_manifests'][row['episode_key']]
     manifest = w.read_ref(manifest_ref)
     w.require(row in plan['episodes'] and manifest['row'] == row, 'context row')
     return {'schema': 'n32-worker-context-v1', 'plan': plan_ref, 'expected_manifest': manifest_ref,
             'episode_key': row['episode_key'], 'attempt_id': row['episode_key'],
-            'main_argv': manifest['argv'][1:], 'worker_contract': c.WORKER_CONTRACT}
+            'main_argv': manifest['argv'][1:], 'worker_contract': c.WORKER_CONTRACT,
+            **({'release': release_ref} if release_ref is not None else {})}
 
 
 def native_counts(profile, output, report, expected, guided=None):
@@ -57,11 +63,22 @@ def evidence(output):
     return result
 
 
+def verify_dispatch_record(context_ref, context, output, identity):
+    """A released child must match the parent's durable record before Main."""
+    record = w.read_ref(c.ref(Path(output) / 'process.json'))
+    w.require({k: record[k] for k in ('pid', 'proc_start_ticks', 'boot_id')} == identity
+              and record['attempt_id'] == context['attempt_id']
+              and record['context'] == context_ref and record['release'] == context['release'],
+              'parent dispatch process/context/release differs')
+
+
 def _run_in_process(context_ref):
     """Internal implementation, to be called only by a root-released bounded runner."""
     context, plan, runtime, row, manifest = validate_context(context_ref)
     root, output = Path(plan['worktree']), Path(manifest['output_dir'])
     identity = w.process_identity()
+    if 'release' in context:
+        verify_dispatch_record(context_ref, context, output, identity)
     started = time.perf_counter()
     receipt_path = output / 'eds_eval/n32-worker-receipt.json'
     start_path = output / 'eds_eval/n32-worker-start.json'
@@ -156,7 +173,7 @@ def verify_receipt(context_ref, receipt_ref, process_record):
     return report
 
 
-def verify_terminal(plan_ref, row, terminal):
+def verify_terminal(plan_ref, row, terminal, release_ref=None):
     """Parent binds generic terminal identity and telemetry to the metered receipt."""
     from scripts import qd_ed_n32_supervise as s
     plan = w.read_ref(plan_ref)
@@ -173,6 +190,12 @@ def verify_terminal(plan_ref, row, terminal):
     context_ref = c.ref(output / 'n32-worker-context.json')
     context = w.read_ref(context_ref)
     w.require(context['plan'] == plan_ref and context['episode_key'] == row['episode_key'], 'terminal context binding')
+    if release_ref is not None:
+        w.require(context.get('release') == release_ref and terminal.get('release') == release_ref
+                  and terminal.get('context') == context_ref
+                  and terminal.get('runtime_inventory_sha256') == plan['runtime_inventory_sha256'], 'terminal release binding')
+        record = w.read_ref(c.ref(output / 'process.json'))
+        w.require(record.get('context') == context_ref and record.get('release') == release_ref, 'process context/release binding')
     report = verify_receipt(context_ref, terminal['n32_worker_receipt'], w.read_ref(c.ref(output / 'process.json')))
     native_counts(row['profile'], output, report, manifest['expected_runtime'], terminal['guided_chunks'])
     # Retain the original generic result/video/Stage/token/counter gates. A receipt
@@ -186,5 +209,22 @@ def verify_terminal(plan_ref, row, terminal):
 
 def run_worker(context_ref):
     context = w.read_ref(context_ref)
-    c.require_release(w.read_ref(context['plan']))
+    if 'release' not in context:
+        c.require_release(w.read_ref(context['plan']))
+    validate_context(context_ref)
     return _run_in_process(context_ref)
+
+
+def main():
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--context', required=True)
+    parser.add_argument('--context-sha256', required=True)
+    args = parser.parse_args()
+    # The parent durably records PID/boot/start identity before opening this gate.
+    w.require(sys.stdin.buffer.read(1) == b'G', 'parent dispatch gate absent')
+    return run_worker({'path': args.context, 'sha256': args.context_sha256})
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

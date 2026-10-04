@@ -945,6 +945,44 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
         require(plan.get('egl_mapping_verified') is True and runtime.get('cuda_egl_verified') is True, f'GPU{physical_gpu}/EGL mapping not verified')
         require(runtime.get('provider_ready') is True, 'frozen Stage provider is not ready')
     verify_files(runtime['files'],allowed_roots=(root,state.get('worktree',str(root)),runtime_artifact_root))
+    seeds = validate_runtime_inputs(plan, runtime, manifest, root, state, require_frozen=require_frozen)
+    if 'N2' in plan.get('candidate_profiles', {}) or plan.get('n2_cohort') is not None:
+        n2_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if 'N3' in plan.get('candidate_profiles', {}) or plan.get('n3_cohort') is not None:
+        n3_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if is_n4_plan(plan):
+        n4_dispatch_support(plan).validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if is_n5_plan(plan):
+        n5_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if is_n6_plan(plan):
+        n6_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if is_n7_plan(plan):
+        n7_dispatch_support(plan).validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if is_n9_plan(plan):
+        n9_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if is_n11_plan(plan):
+        n11_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if is_n18_plan(plan):
+        n18_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if is_n19_plan(plan):
+        n19_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if is_n20_plan(plan):
+        n20_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if is_n21_plan(plan):
+        n21_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if metered_plan(plan):
+        metered_support(plan).validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if is_n22_plan(plan):
+        n22_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
+    if is_n17_plan(plan):
+        validate_n17_plan(plan, runtime, root)
+    return plan, manifest, runtime
+
+
+def validate_runtime_inputs(plan, runtime, manifest, root, state, *, require_frozen=True):
+    """Shared frozen checkpoint/cache/task/seed gates; no dispatch or mutation."""
+    root = Path(root).resolve()
+    runtime_artifact_root = Path(state['artifacts']).resolve()
     inventory_path = owned(plan['runtime_inventory_path'], root)
     require(digest(inventory_path) == plan['runtime_inventory_sha256'], 'model/input inventory fingerprint mismatch')
     inventory = read_json(inventory_path)
@@ -1004,37 +1042,7 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
             require(row.get(field) == matching[0][field], f'episode differs from frozen seed plan: {field}')
         require(digest(task['bddl_path']) == row['bddl_sha256'] and digest(task['init_path']) == row['init_file_sha256'], 'runtime task inputs differ from frozen seed plan')
         owned(task['cache_dir'], runtime_artifact_root)
-    if 'N2' in plan.get('candidate_profiles', {}) or plan.get('n2_cohort') is not None:
-        n2_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
-    if 'N3' in plan.get('candidate_profiles', {}) or plan.get('n3_cohort') is not None:
-        n3_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
-    if is_n4_plan(plan):
-        n4_dispatch_support(plan).validate_contract(plan, manifest, runtime, seeds, root, globals())
-    if is_n5_plan(plan):
-        n5_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
-    if is_n6_plan(plan):
-        n6_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
-    if is_n7_plan(plan):
-        n7_dispatch_support(plan).validate_contract(plan, manifest, runtime, seeds, root, globals())
-    if is_n9_plan(plan):
-        n9_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
-    if is_n11_plan(plan):
-        n11_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
-    if is_n18_plan(plan):
-        n18_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
-    if is_n19_plan(plan):
-        n19_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
-    if is_n20_plan(plan):
-        n20_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
-    if is_n21_plan(plan):
-        n21_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
-    if metered_plan(plan):
-        metered_support(plan).validate_contract(plan, manifest, runtime, seeds, root, globals())
-    if is_n22_plan(plan):
-        n22_support().validate_contract(plan, manifest, runtime, seeds, root, globals())
-    if is_n17_plan(plan):
-        validate_n17_plan(plan, runtime, root)
-    return plan, manifest, runtime
+    return seeds
 
 
 def selected_rows(plan, split, iteration):
@@ -1253,7 +1261,7 @@ def check_exclusive_gpu(process, run=subprocess.run, *, physical_gpu=7):
         require(pid==process.pid or own_group, f'external GPU{physical_gpu} process appeared during owned attempt')
 
 
-def wait_exclusively(process, timeout, *, physical_gpu=7):
+def wait_exclusively(process, timeout, *, physical_gpu=7, monitor=None):
     deadline=time.monotonic()+timeout
     while True:
         remaining=deadline-time.monotonic()
@@ -1262,7 +1270,10 @@ def wait_exclusively(process, timeout, *, physical_gpu=7):
         try:
             return process.wait(timeout=min(5.,remaining))
         except subprocess.TimeoutExpired:
-            check_exclusive_gpu(process, physical_gpu=physical_gpu)
+            if monitor is None:
+                check_exclusive_gpu(process, physical_gpu=physical_gpu)
+            else:
+                monitor(process, max(0., deadline-time.monotonic()))
 
 
 @contextlib.contextmanager
@@ -1467,6 +1478,12 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(), 
                 and budget['reserved'] == AMENDED_BUCKETS,
                 'GPU3 amended budget authorization differs')
         bucket_caps = AMENDED_BUCKETS
+    return check_budget_limits(state, snap, row, reservation_events, bucket_caps=bucket_caps, amendment=amendment)
+
+
+def check_budget_limits(state, snap, row, reservation_events, *, bucket_caps, amendment):
+    """Shared arithmetic after caller has validated authority and GPU policy."""
+    budget = state['budget']
     require(snap['running'] == 0, 'unfinished dispatched attempt must be reconciled first')
     require(snap['gpu_healthcheck_inflight']==0, 'unfinished GPU healthcheck reservation must be reconciled first')
     require(budget['dispatched'] == snap['dispatched'], 'state/ledger dispatched mismatch')
