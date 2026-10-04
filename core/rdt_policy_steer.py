@@ -32,6 +32,9 @@ from core.eds_eval_metrics import (
 from core.eds_mechanism_trace import EDSMechanismTrace, EDSParticleStage
 from core.env_adapters import BaseEnvAdapter
 from core.fkd_class import FKD
+from core.qd_capture_dwell import (
+    MODE as CAPTURE_DWELL_MODE, CaptureDwellDecision, validate_config as validate_capture_dwell_config,
+)
 from core.qd_executed_progress import (
     MODE as PROGRESS_MODE, ProgressContinuation, validate_config as validate_progress_config,
 )
@@ -177,6 +180,7 @@ class _EDSConfig:
     rollout_diversity_scale_max: float = 20.0
     rollout_diversity_decay_floor: float = 0.25
     chunk_population_mode: str = "fresh"
+    capture_dwell_proposal_mode: str = "off"
     executed_progress_continuation_mode: str = "off"
     executed_progress_continuation_control: str = "none"
     chunk_memory_fraction: float = 0.0
@@ -1426,6 +1430,8 @@ class RDTSteer:
             self._executed_feedback.clear("episode_reset", reset=True)
         if hasattr(self, "_executed_progress"):
             self._executed_progress.clear("episode_reset", reset=True)
+        self._capture_dwell = None
+        self._capture_dwell_context = None
         self.reset_eds_chunk_memory("episode_reset")
         self._cached_action_chunk = None
         self._cached_action_steps_remaining = 0
@@ -1460,10 +1466,14 @@ class RDTSteer:
             self._executed_feedback.clear("stage_change")
         if hasattr(self, "_executed_progress"):
             self._executed_progress.clear("stage_change")
+        self._capture_dwell = None
+        self._capture_dwell_context = None
         self.reset_eds_chunk_memory("stage_change")
         self._stage_init_reward = None
 
     def reset_eds_chunk_memory(self, reason: str, *, warn: bool = False) -> None:
+        self._capture_dwell = None
+        self._capture_dwell_context = None
         self._eds_chunk_memory = None
         self._eds_chunk_memory_reset_reason = str(reason)
         if warn:
@@ -1590,6 +1600,7 @@ class RDTSteer:
         current_stage: int = 1,
         execution_feedback_context: dict | None = None,
         executed_progress_context: dict | None = None,
+        capture_dwell_context: dict | None = None,
     ) -> Tensor:
         if self._obs_processor is None:
             raise RuntimeError("RDTSteer.post_init must be called before select_action")
@@ -1602,6 +1613,8 @@ class RDTSteer:
         )
 
         if should_sample:
+            self._capture_dwell = None
+            self._capture_dwell_context = capture_dwell_context
             self._execution_feedback_context = execution_feedback_context
             self._executed_progress_context = executed_progress_context
             progress_mode = (eds_config or {}).get("executed_progress_continuation_mode", "off") == PROGRESS_MODE
@@ -2100,6 +2113,9 @@ class RDTSteer:
         return actions * action_mask
 
     def _observe_eds_score_call(self, *, role, iter_idx, site):
+        dwell = getattr(self, "_capture_dwell", None)
+        if dwell is not None:
+            dwell.set_scope(role, iter_idx, site)
         evidence = getattr(self, "_decision_evidence", None)
         if evidence is not None:
             evidence.set_scoring_scope(role=role, iter_idx=iter_idx, site=site)
@@ -2137,8 +2153,13 @@ class RDTSteer:
             )
             scoring_keypoints = keypoints.index_select(0, perm)
 
+        dwell = getattr(self, "_capture_dwell", None)
+        if dwell is not None:
+            dwell.validate(scoring_keypoints, guidance_fns)
         projection_out = ({"capture_origin": True} if isinstance(qd_quality_contract, (FeedbackContract, ActuatorClippedContract))
                           else {} if qd_quality_contract is not None else None)
+        if dwell is not None and dwell.canonical():
+            projection_out = {"capture_origin": True}
         if qd_quality_contract is not None:
             if reward_mode != "normal":
                 raise RuntimeError("N2 canonical quality requires original normal reward mode")
@@ -2193,6 +2214,9 @@ class RDTSteer:
             if rewards.shape != quality_info["raw_rewards"].shape or rewards.dtype != samples.dtype:
                 raise RuntimeError("N2 canonical quality/raw association mismatch")
         costs = -rewards
+        if dwell is not None:
+            dwell.record_score(samples, projection_out, rewards, costs, getattr(self, "_decision_evidence", None),
+                               projection_unavailable=keypoints is None or not guidance_fns)
         evidence = getattr(self, "_decision_evidence", None)
         if evidence is not None:
             evidence.record("effective_quality", scoring_batch_id=evidence.scoring_batch_id,
@@ -3746,6 +3770,8 @@ class RDTSteer:
             noisy_action=noisy_action,
             n_trunc_steps=n_trunc_steps,
         )
+        if getattr(self, "_capture_dwell", None) is not None:
+            x_t = self._capture_dwell.apply(x_t, getattr(self, "_decision_evidence", None))
         costs, info = self._eds_score_population_as_cost(
             x_t,
             keypoints=keypoints,
@@ -4100,6 +4126,8 @@ class RDTSteer:
         x_t = x_t * mask
         if after_rbf_population is not None:
             after_rbf_population = after_rbf_population * mask
+        if getattr(self, "_capture_dwell", None) is not None:
+            x_t = self._capture_dwell.apply(x_t, getattr(self, "_decision_evidence", None))
         final_population = x_t.detach()
         costs, score_info = self._eds_score_population_as_cost(
             x_t,
@@ -5084,6 +5112,12 @@ class RDTSteer:
         current_stage: int,
     ) -> Tensor:
         cfg = eds_config
+        self._capture_dwell = None
+        if cfg.capture_dwell_proposal_mode == CAPTURE_DWELL_MODE:
+            semantic, _ = recognize_executed_prefix_provider(guidance_fns, keypoints)
+            self._capture_dwell = CaptureDwellDecision(semantic, getattr(self, "_capture_dwell_context", None),
+                keypoints, episode=int(getattr(self, "_eds_episode_index", 0)),
+                stage=current_stage, step=global_step, action_mask=cond["action_mask"])
         progress_mode = cfg.executed_progress_continuation_mode == PROGRESS_MODE
         progress_semantic = None
         if progress_mode:
@@ -5710,6 +5744,9 @@ class RDTSteer:
         geometry_baseline: dict[str, float | None] | None = None
 
         for i in range(cfg.cem_iters):
+            if self._capture_dwell is not None:
+                self._capture_dwell.prepare(qd_archive, i, guidance_fns, keypoints,
+                                            getattr(self, "_decision_evidence", None))
             if cfg.search_schedule_mode == "legacy_linear":
                 n_trunc_steps = int(trunc_step_schedule[i])
                 resolved_renoise_reason = "legacy_linear"
@@ -7552,6 +7589,9 @@ class RDTSteer:
             bind_decision_metrics(metrics, global_step=global_step, stage=current_stage)
             self._eds_rbf_witness(cfg).finish()
         self._last_eds_metrics = metrics.to_jsonable()
+        if self._capture_dwell is not None:
+            self._last_eds_metrics["capture_dwell_proposal"] = self._capture_dwell.close()
+            self._capture_dwell = None
         self._last_eds_artifacts = {
             "initial_actions": initial_action_candidates,
             "final_actions": self._decode_visualization_action_candidates(population).detach().cpu(),
@@ -8205,6 +8245,7 @@ class RDTSteer:
                 "rollout_diversity_decay_floor",
             ),
             chunk_population_mode=str(cfg.get("chunk_population_mode", "fresh")),
+            capture_dwell_proposal_mode=str(cfg.get("capture_dwell_proposal_mode", "off")),
             executed_progress_continuation_mode=str(cfg.get("executed_progress_continuation_mode", "off")),
             executed_progress_continuation_control=str(cfg.get("executed_progress_continuation_control", "none")),
             chunk_memory_fraction=_parse_eds_float(
@@ -8719,6 +8760,7 @@ class RDTSteer:
                         "EDS grid_archive requires "
                         f"{field_name}={expected!r}"
                     )
+        validate_capture_dwell_config(resolved, self._action_chunk_horizon)
         validate_progress_config(resolved, self._action_chunk_horizon)
         return resolved
 
