@@ -51,20 +51,71 @@ def read_ref(reference):
     return json.loads(path.read_text())
 
 
+# Only this explicitly inventoried dependency may cross a gitlink. The source
+# record's superproject commit transitively binds the submodule commit and blob;
+# retain the existing record schema for all source/bridge/context consumers.
+PINNED_SUBMODULE_SOURCES = {
+    "third_party/rdt/scripts/maniskill_model.py": "third_party/rdt",
+}
+
+
+def _source_git(root, *args, database=None):
+    command = ["git", "--no-replace-objects"]
+    if database is not None:
+        command.append("--git-dir=" + str(database))
+    # Object inspection must never trigger a partial-clone fetch.
+    return subprocess.check_output(command + list(args), cwd=root,
+                                   env={**os.environ, "GIT_NO_LAZY_FETCH": "1"})
+
+
+def _source_entry(root, commit, relative, database=None):
+    rows = _source_git(root, "ls-tree", "-z", commit, "--", relative,
+                       database=database).split(b"\0")
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+    metadata, name = rows[0].split(b"\t", 1)
+    require(name.decode() == relative, "source Git path differs")
+    return metadata.decode().split()
+
+
+def _committed_source(root, commit, relative):
+    database = None
+    if relative in PINNED_SUBMODULE_SOURCES:
+        submodule = PINNED_SUBMODULE_SOURCES[relative]
+        mode, kind, pin = _source_entry(root, commit, submodule)
+        require((mode, kind) == ("160000", "commit"), "source submodule gitlink differs")
+        common = Path(_source_git(root, "rev-parse", "--git-common-dir").decode().strip())
+        database = (root / common / "modules" / submodule).resolve()
+        require(database.is_dir(), "source submodule object database missing")
+        require(_source_git(root, "cat-file", "-t", pin, database=database).strip() == b"commit",
+                "source submodule pin not a commit")
+        # Read the registered local object database only. Never consult a
+        # submodule worktree, its HEAD, or an adjacent checkout's source bytes.
+        commit, relative = pin, relative[len(submodule) + 1:]
+    mode, kind, blob = _source_entry(root, commit, relative, database)
+    require(mode in ("100644", "100755") and kind == "blob", "source Git object not regular")
+    return _source_git(root, "cat-file", "blob", blob, database=database)
+
+
 def source_record(root, paths):
     root = Path(root).resolve()
     paths = sorted(set(paths))
     require(REQUIRED_SOURCE <= set(paths), "N23 source manifest incomplete")
-    commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
+    require(Path(_source_git(root, "rev-parse", "--show-toplevel").decode().strip()).resolve() == root,
+            "source repository root differs")
+    commit = _source_git(root, "rev-parse", "HEAD").decode().strip()
     files = []
     for relative in paths:
         name = Path(relative)
-        require(not name.is_absolute() and ".." not in name.parts, "unsafe source path")
+        require(not name.is_absolute() and ".." not in name.parts and str(name) == relative
+                and name.parts, "unsafe source path")
         path = root / name
-        require(path.is_file() and not path.is_symlink() and path.resolve().is_relative_to(root), "source path missing or linked")
-        committed = subprocess.check_output(["git", "show", commit + ":" + relative], cwd=root)
-        require(path.read_bytes() == committed, "uncommitted source bytes")
-        files.append({"path": relative, "sha256": sha(path)})
+        require(path.is_file() and not any((root / Path(*name.parts[:i])).is_symlink()
+                for i in range(1, len(name.parts) + 1)) and path.resolve().is_relative_to(root),
+                "source path missing or linked")
+        committed = _committed_source(root, commit, relative)
+        data = path.read_bytes()
+        require(data == committed, "uncommitted source bytes")
+        files.append({"path": relative, "sha256": hashlib.sha256(data).hexdigest()})
     return {"commit": commit, "files": files, "sha256": canonical_sha(files)}
 
 
