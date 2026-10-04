@@ -6,7 +6,8 @@ from pathlib import Path
 from scripts import qd_ed_n23_worker as w
 
 ROOT = Path(__file__).resolve().parents[1]
-COHORT = 'N32_ARCHIVE_ELIGIBLE_CAPTURE_DEV_20261004'
+# Fresh engineering-recovery primaries; prior N32 events remain globally charged.
+COHORT = 'N32R1_ARCHIVE_ELIGIBLE_CAPTURE_DEV_20261004'
 ARMS = ('C0', 'Q0', 'N32')
 DEADLINE = '2026-10-10T17:42:00Z'
 GPU_UUID = 'GPU-48473162-9548-1a19-04aa-ea86c5349187'
@@ -41,7 +42,7 @@ def expected_rows(root=ROOT):
     tasks = json.loads((Path(root) / 'configs/qd_ed_final/n31_dev_task_identities.json').read_text())['tasks']
     w.require([x['task_id'] for x in tasks] == list(range(10)) and all(x['split'] == 'dev' for x in tasks), 'ten exposed Dev tasks')
     return [{**task, 'iteration': COHORT, 'profile': arm, 'timeout_seconds': 1800,
-             'episode_key': f'n32_dev_t{task["task_id"]:02d}_{arm.lower()}_20261004',
+             'episode_key': f'n32r1_dev_t{task["task_id"]:02d}_{arm.lower()}_20261004',
              'budget_bucket': 'baseline' if arm == 'C0' else 'development'} for task in tasks for arm in ARMS]
 
 
