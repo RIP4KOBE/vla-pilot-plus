@@ -32,6 +32,9 @@ from core.eds_eval_metrics import (
 from core.eds_mechanism_trace import EDSMechanismTrace, EDSParticleStage
 from core.env_adapters import BaseEnvAdapter
 from core.fkd_class import FKD
+from core.qd_archive_eligible_runtime import (
+    MODE as ARCHIVE_ELIGIBLE_MODE, ArchiveEligibleDecision, validate_config as validate_archive_eligible_config,
+)
 from core.qd_capture_dwell import (
     MODE as CAPTURE_DWELL_MODE, CaptureDwellDecision, validate_config as validate_capture_dwell_config,
 )
@@ -180,6 +183,8 @@ class _EDSConfig:
     rollout_diversity_scale_max: float = 20.0
     rollout_diversity_decay_floor: float = 0.25
     chunk_population_mode: str = "fresh"
+    archive_eligible_capture_mode: str = "off"
+    n32_runtime_binding: dict | None = None
     capture_dwell_proposal_mode: str = "off"
     executed_progress_continuation_mode: str = "off"
     executed_progress_continuation_control: str = "none"
@@ -5118,6 +5123,11 @@ class RDTSteer:
             self._capture_dwell = CaptureDwellDecision(semantic, getattr(self, "_capture_dwell_context", None),
                 keypoints, episode=int(getattr(self, "_eds_episode_index", 0)),
                 stage=current_stage, step=global_step, action_mask=cond["action_mask"])
+        if cfg.archive_eligible_capture_mode == ARCHIVE_ELIGIBLE_MODE:
+            semantic, _ = recognize_executed_prefix_provider(guidance_fns, keypoints)
+            self._capture_dwell = ArchiveEligibleDecision(semantic, getattr(self, "_capture_dwell_context", None),
+                keypoints, episode=int(getattr(self, "_eds_episode_index", 0)),
+                stage=current_stage, step=global_step, action_mask=cond["action_mask"], config=cfg)
         progress_mode = cfg.executed_progress_continuation_mode == PROGRESS_MODE
         progress_semantic = None
         if progress_mode:
@@ -5514,7 +5524,7 @@ class RDTSteer:
                 **({"raw_rewards": original_rewards(population_info, population_rewards, population)} if quality_contract is not None else {}),
             )
             if self._capture_dwell is not None and getattr(self, "_decision_evidence", None) is not None:
-                self._decision_evidence.record("n31_archive_update", iter_idx=-1, cell_ids=initial_cell_ids,
+                self._decision_evidence.record(getattr(self._capture_dwell, "event_prefix", "n31") + "_archive_update", iter_idx=-1, cell_ids=initial_cell_ids,
                     descriptors=initial_descriptors, bounds_lo=qd_bounds.lo, bounds_hi=qd_bounds.hi,
                     archive=qd_archive.snapshot(), parent_cell_ids=None)
             metrics.qd_archive_update_latency_s += float(
@@ -6625,7 +6635,7 @@ class RDTSteer:
                     **({"raw_rewards": original_rewards(population_info, population_rewards, population)} if quality_contract is not None else {}),
                 )
                 if self._capture_dwell is not None and evidence is not None:
-                    evidence.record("n31_archive_update", iter_idx=i, cell_ids=child_cell_ids,
+                    evidence.record(getattr(self._capture_dwell, "event_prefix", "n31") + "_archive_update", iter_idx=i, cell_ids=child_cell_ids,
                         descriptors=child_descriptors, bounds_lo=qd_bounds.lo, bounds_hi=qd_bounds.hi,
                         archive=qd_archive.snapshot(), parent_cell_ids=qd_parent_cell_ids)
                 metrics.qd_archive_update_latency_s += float(
@@ -8253,6 +8263,8 @@ class RDTSteer:
                 "rollout_diversity_decay_floor",
             ),
             chunk_population_mode=str(cfg.get("chunk_population_mode", "fresh")),
+            archive_eligible_capture_mode=str(cfg.get("archive_eligible_capture_mode", "off")),
+            n32_runtime_binding=(dict(cfg["n32_runtime_binding"]) if cfg.get("n32_runtime_binding") is not None else None),
             capture_dwell_proposal_mode=str(cfg.get("capture_dwell_proposal_mode", "off")),
             executed_progress_continuation_mode=str(cfg.get("executed_progress_continuation_mode", "off")),
             executed_progress_continuation_control=str(cfg.get("executed_progress_continuation_control", "none")),
@@ -8768,6 +8780,7 @@ class RDTSteer:
                         "EDS grid_archive requires "
                         f"{field_name}={expected!r}"
                     )
+        validate_archive_eligible_config(resolved, self._action_chunk_horizon)
         validate_capture_dwell_config(resolved, self._action_chunk_horizon)
         validate_progress_config(resolved, self._action_chunk_horizon)
         return resolved

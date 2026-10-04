@@ -115,6 +115,8 @@ main:
     rollout_diversity_scale_max: 20.0
     rollout_diversity_decay_floor: 0.25
     chunk_population_mode: fresh
+    archive_eligible_capture_mode: "off"
+    n32_runtime_binding: null
     capture_dwell_proposal_mode: "off"
     executed_progress_continuation_mode: "off"
     executed_progress_continuation_control: "none"

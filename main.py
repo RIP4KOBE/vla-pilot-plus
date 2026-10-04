@@ -1648,8 +1648,9 @@ class Main:
                 == "executed_progress_continuation_v1")
         capture_dwell_enabled = (self.policy_type == "rdt"
             and str(self.config.get("guidance_type", "vls")).lower() == "eds"
-            and (self.config.get("eds_config") or {}).get("capture_dwell_proposal_mode", "off")
-                == "capture_dwell_proposal_v1")
+            and ((self.config.get("eds_config") or {}).get("capture_dwell_proposal_mode", "off")
+                == "capture_dwell_proposal_v1" or (self.config.get("eds_config") or {}).get("archive_eligible_capture_mode", "off")
+                == "archive_eligible_capture_v1"))
         if continuation_enabled or capture_dwell_enabled:
             # Raw cached reset observation; policy preprocessing removes robot_state.
             obs = self.adapter.get_obs()
@@ -1839,6 +1840,8 @@ class Main:
                 from core.qd_capture_dwell import capture_context
                 select_kwargs["capture_dwell_context"] = capture_context(
                     obs, keypoints, keypoint_tracking_snapshot, episode)
+                if eds_config.get("archive_eligible_capture_mode") == "archive_eligible_capture_v1":
+                    select_kwargs["capture_dwell_context"]["task_id"] = _adapter_actual_task_id(self.adapter)
             feedback_enabled = (self.policy_type == "rdt" and guidance_type == "eds"
                                 and eds_config.get("qd_quality_mode") == "executed_feedback_v1")
             if feedback_enabled:
@@ -1856,7 +1859,7 @@ class Main:
                 if continuation_enabled:
                     evidence.record("n30_observation_context", packet=select_kwargs["executed_progress_context"])
                 if capture_dwell_enabled:
-                    evidence.record("n31_observation_context", packet=select_kwargs["capture_dwell_context"])
+                    evidence.record("n32_observation_context" if (self.config.get("eds_config") or {}).get("archive_eligible_capture_mode") == "archive_eligible_capture_v1" else "n31_observation_context", packet=select_kwargs["capture_dwell_context"])
             action_chunk = self.policy.select_action(**select_kwargs)
             select_action_latency_s = float(time.perf_counter() - select_action_start_s)
             self._append_phase_timing(episode=episode, global_step=global_steps,
