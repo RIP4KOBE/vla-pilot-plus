@@ -30,6 +30,12 @@ def source_paths(root=ROOT):
     # Hydra composition and imported numerical dependencies are part of the freeze.
     for folder, suffix in (('configs', '*.yaml'), ('core', '*.py'), ('utils', '*.py')):
         paths.update(str(p.relative_to(root)) for p in (root / folder).rglob(suffix))
+    # RDT prepends third_party/rdt to sys.path in from_pretrained, so this
+    # vendored file is loaded as scripts.maniskill_model and is attested too.
+    # Require it even in an uninitialized checkout: a glob would silently omit
+    # the exact dependency that invalidated the first N32 C0 attempt. Freezing
+    # submodule bytes requires a separately reviewed source-record integration.
+    paths.add('third_party/rdt/scripts/maniskill_model.py')
     return paths
 
 
