@@ -1,4 +1,4 @@
-"""Prospective N34R1 CPU contract tests; no owning data or release creation."""
+"""Prospective N34R2 CPU contract tests; no owning data or release creation."""
 import copy
 from collections import Counter
 import datetime as dt
@@ -14,6 +14,10 @@ from test_n34_lifecycle import budget_fixture, old_invalid
 from test_n34_production_integration import journal, allowance
 
 NOW = dt.datetime(2026, 10, 8, tzinfo=dt.timezone.utc)
+STALE_CLOSURE = {
+    'path': '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000610/terminal-closure-v1.json',
+    'sha256': '212ed90e3cb06c5797175cf772f5808d09f024fbe3f398e7ba079154e092bff1',
+}
 
 
 def plan():
@@ -28,7 +32,7 @@ def test_fresh_matrix_identical_science_and_exact_mapping():
     assert Counter(x['budget_bucket'] for x in rows) == {'baseline': 9, 'development': 20, 'recovery': 1}
     for row in rows:
         assert all(row[k] == v for k, v in tasks[row['task_id']].items())
-        assert row['episode_key'] == f'n34r1_dev_t{row["task_id"]:02d}_{row["profile"].lower()}_20261008'
+        assert row['episode_key'] == f'n34r2_dev_t{row["task_id"]:02d}_{row["profile"].lower()}_20261008'
         assert row['iteration'] == c.COHORT
     assert rows[0]['replacement'] == c.REPLACEMENT
     assert all(row['replacement'] is None for row in rows[1:])
@@ -36,6 +40,107 @@ def test_fresh_matrix_identical_science_and_exact_mapping():
     # Mutable consumers cannot silently rewrite future provenance defaults.
     rows[0]['replacement']['terminal_closure']['sha256'] = '0' * 64
     assert c.expected_rows()[0]['replacement'] == c.REPLACEMENT
+
+
+def test_exact_second_recovery_authority_binding():
+    assert c.COHORT == 'N34R2_OBSERVED_JAW_APPROACH_DEV_20261008'
+    assert c.REPLACEMENT == {
+        'old_episode_key': 'n34r1_dev_t00_c0_20261008',
+        'new_episode_key': 'n34r2_dev_t00_c0_20261008',
+        'budget_bucket': 'recovery', 'automatic': False,
+        'terminal_closure': {
+            'path': '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000624/terminal-closure-v1.json',
+            'sha256': 'ed88e8a29c196be8bc37f7ca8d00a067bc346d213a7c28647fb89e456ff2fdfc',
+        },
+    }
+
+
+@pytest.mark.parametrize('field', ['path', 'sha256', 'both'])
+def test_stale_terminal_closure_rejected_by_rows_events_and_authority(tmp_path, field):
+    replacement = copy.deepcopy(c.REPLACEMENT)
+    for key in ('path', 'sha256') if field == 'both' else (field,):
+        replacement['terminal_closure'][key] = STALE_CLOSURE[key]
+    row = c.expected_rows()[0]
+    row['replacement'] = replacement
+    with pytest.raises(ValueError, match='exact N34R2'):
+        c.require_row(row)
+    events = journal(c.expected_rows()[:1], True)
+    events[-1]['replacement'] = replacement
+    with pytest.raises(ValueError, match='accounting/replacement'):
+        s.reconcile(plan(), events, lambda *a: None)
+    history = old_invalid()
+    p, authority, state, reservations = budget_fixture(tmp_path, history)
+    authority['prospective_recovery'] = replacement
+    with pytest.raises(ValueError, match='explicit root recovery authority'):
+        release.admission(p, authority, state, history, [], reservations,
+                          c.expected_rows()[0], now=NOW, gpu_idle=True)
+
+
+@pytest.mark.parametrize('index', range(30))
+def test_every_stale_n34r1_row_rejected(index):
+    p = plan()
+    row = p['episodes'][index]
+    row['episode_key'] = row['episode_key'].replace('n34r2_', 'n34r1_')
+    row['iteration'] = c.OLD_COHORT
+    with pytest.raises(ValueError, match='exact N34R2'):
+        c.require_row(row)
+    with pytest.raises(ValueError, match='exact task-major matrix'):
+        s.reconcile(p, [], lambda *a: None)
+
+
+@pytest.mark.parametrize('history_index', [0, 1])
+@pytest.mark.parametrize('fault', ['missing', 'bucket', 'cohort', 'success', 'valid', 'telemetry', 'unknown_cost'])
+def test_each_invalid_history_is_required_and_never_repaired(history_index, fault):
+    events = old_invalid(900.)
+    start = history_index * 3
+    terminal = events[start + 2]
+    if fault == 'missing': del events[start:start + 3]
+    if fault == 'bucket': terminal['budget_bucket'] = 'development'
+    if fault == 'cohort': terminal['identity'] = {'iteration': c.COHORT}
+    if fault == 'success': terminal['success'] = False
+    if fault == 'valid': terminal['outcome_valid'] = True
+    if fault == 'telemetry': terminal['required_cost_telemetry_complete'] = True
+    if fault == 'unknown_cost': terminal['gpu_process_wall_seconds'] = None
+    before = copy.deepcopy(events)
+    with pytest.raises(ValueError):
+        c.require_replacement_history(events)
+    assert events == before
+
+
+@pytest.mark.parametrize('fault,reason', [
+    ('identity', 'generic terminal identity/cost'),
+    ('episode_key', 'generic terminal identity/cost'),
+    ('attempt_id', 'generic terminal identity/cost'),
+    ('replacement', 'accounting/replacement'),
+    ('context', 'terminal context binding'),
+    ('none', 'process context/release binding'),
+])
+def test_parent_terminal_rejects_stale_n34r1_bindings(tmp_path, monkeypatch, fault, reason):
+    from scripts import qd_ed_n34_worker as worker
+    from test_n34_production_integration import write
+    row = c.expected_rows()[0]
+    plan_ref, release_ref = {'sha256': 'a' * 64}, {'sha256': 'b' * 64}
+    p = {'source': {'commit': 'c' * 40}, 'runtime': {'sha256': 'd' * 64},
+         'runtime_inventory_sha256': 'e' * 64,
+         'expected_manifests': {row['episode_key']: write(tmp_path / 'manifest.json',
+                                                       {'output_dir': str(tmp_path)})}}
+    monkeypatch.setattr(release, 'validate_release', lambda *a: (p, {}, {}))
+    context = {'plan': plan_ref, 'release': release_ref, 'episode_key': row['episode_key']}
+    if fault == 'context': context['episode_key'] = c.OLD_EPISODE
+    context_ref = write(tmp_path / 'n34-worker-context.json', context)
+    # An empty process binding deliberately stops the valid identity case before
+    # receipt/native audits; stale identities must fail earlier in the parent.
+    write(tmp_path / 'process.json', {})
+    terminal = journal([row], True)[-1]
+    terminal.update(source_commit=p['source']['commit'], plan_sha256=plan_ref['sha256'],
+                    runtime_manifest_sha256=p['runtime']['sha256'], init_row_sha256=row['init_row_sha256'],
+                    physical_gpu=7, output_dir=str(tmp_path), context=context_ref,
+                    release=release_ref, runtime_inventory_sha256=p['runtime_inventory_sha256'])
+    if fault == 'identity': terminal['identity']['iteration'] = c.OLD_COHORT
+    if fault in ('episode_key', 'attempt_id'): terminal[fault] = c.OLD_EPISODE
+    if fault == 'replacement': terminal['replacement']['terminal_closure'] = STALE_CLOSURE
+    with pytest.raises(ValueError, match=reason):
+        worker.verify_terminal(plan_ref, row, terminal, release_ref)
 
 
 @pytest.mark.parametrize('fault', ['old_key', 'old_cohort', 'bucket', 'task', 'retry', 'recovery', 'replacement', 'closure'])
@@ -49,7 +154,7 @@ def test_admission_and_manifest_reject_noncontract_rows(tmp_path, fault):
     if fault == 'recovery': row['recovery_of'] = c.OLD_EPISODE
     if fault == 'replacement': row['replacement'] = None
     if fault == 'closure': row['replacement']['terminal_closure']['sha256'] = '0' * 64
-    with pytest.raises(ValueError, match='exact N34R1'):
+    with pytest.raises(ValueError, match='exact N34R2'):
         c.pre_dispatch(row, allowance(), now=NOW, stop_path=tmp_path / 'STOP')
     with pytest.raises(ValueError, match='exact fresh N34 matrix'):
         b.command({**plan(), 'episodes': [row]}, {}, row)
@@ -100,18 +205,18 @@ def test_exact_accounting_and_old_invalid_is_never_carried(tmp_path):
     assert fresh['dispatched'] == fresh['valid'] == 30
     assert fresh['by_bucket'] == dict(baseline=9, development=20, recovery=1, validation=0, formal=0)
     total = r.budget_snapshot(events)
-    assert total['dispatched'] == 31 and total['invalid'] == 1
-    assert total['by_bucket']['baseline'] == 10 and total['by_bucket']['recovery'] == 1
-    assert total['gpu_hours_consumed'] == pytest.approx(1830 / 3600)
-    assert old == before and events[:3] == before
+    assert total['dispatched'] == 32 and total['invalid'] == 2
+    assert total['by_bucket']['baseline'] == 10 and total['by_bucket']['recovery'] == 2
+    assert total['gpu_hours_consumed'] == pytest.approx(3630 / 3600)
+    assert old == before and events[:6] == before
     assert s.reconcile(plan(), old, lambda *a: None)['next_row'] == rows[0]
     result = s.reconcile(plan(), events, lambda *a: None)
     assert result['status'] == 'COMPLETE' and len(result['outcomes']) == 30
-    assert all(o['episode_key'] != c.OLD_EPISODE for o in result['outcomes'])
+    assert all(o['episode_key'] not in {h[0] for h in c.INVALID_HISTORY} for o in result['outcomes'])
     assert report.summary(result, events)['charges_and_health_events_preserved'] == events
     p, authority, state, reservations = budget_fixture(tmp_path, old)
     snap = release.admission(p, authority, state, old, [], reservations, rows[0], now=NOW, gpu_idle=True)
-    assert snap['invalid'] == 1 and snap['gpu_hours_consumed'] == .5
+    assert snap['invalid'] == 2 and snap['gpu_hours_consumed'] == 1.
 
 
 @pytest.mark.parametrize('fault', ['missing_old', 'old_success', 'old_valid', 'old_bucket', 'authority', 'unauthorized', 'next', 'misbucket'])
@@ -120,7 +225,7 @@ def test_real_accounting_admission_rejects_replacement_abuse(tmp_path, fault):
     if fault == 'missing_old': events = []
     if fault == 'old_success': events[-1]['success'] = False
     if fault == 'old_valid': events[-1]['outcome_valid'] = True
-    if fault == 'old_bucket': events[-1]['budget_bucket'] = 'recovery'
+    if fault == 'old_bucket': events[-1]['budget_bucket'] = 'baseline'
     if fault == 'misbucket':
         events += journal(c.expected_rows()[:1], True)
         events[-1]['budget_bucket'] = 'baseline'
@@ -184,7 +289,7 @@ def test_shared_runtime_gate_accepts_only_exact_recovery_and_keeps_seed_audit(tm
                                         {'artifacts': str(tmp_path)}, require_frozen=False)
     assert validate() == seeds
     p['episodes'][1]['budget_bucket'] = 'recovery'
-    with pytest.raises(ValueError, match='exact N34R1'): validate()
+    with pytest.raises(ValueError, match='exact N34R2'): validate()
     p['episodes'] = c.expected_rows()
     # The exception does not skip the subsequent frozen seed audit.
     seeds['blocks']['dev'][0]['policy_seed'] += 1
@@ -194,16 +299,20 @@ def test_shared_runtime_gate_accepts_only_exact_recovery_and_keeps_seed_audit(tm
     with pytest.raises(r.GateError, match='policy_seed'): validate()
 
 
-def test_historical_preparation_costs_global_but_not_new_cohort(tmp_path):
+@pytest.mark.parametrize('cohort,kind', [
+    ('N34_OBSERVED_JAW_APPROACH_DEV_20261008', 'n34_resource_preparation_v1'),
+    ('N34R1_OBSERVED_JAW_APPROACH_DEV_20261008', 'n34r1_resource_preparation_v1'),
+])
+def test_historical_preparation_costs_global_but_not_new_cohort(tmp_path, cohort, kind):
     from test_n34_lifecycle import health
     old = old_invalid()
-    resources = health(18000., c.OLD_COHORT)
-    for event in resources: event['kind'] = 'n34_resource_preparation_v1'
+    resources = health(18000., cohort)
+    for event in resources: event['kind'] = kind
     p, authority, state, reservations = budget_fixture(tmp_path, old, resources)
     snap = release.admission(p, authority, state, old, resources, reservations,
                              c.expected_rows()[0], now=NOW, gpu_idle=True)
     assert snap['gpu_hours_consumed'] == 5.
-    for event in resources: event.update(cohort=c.COHORT, kind='n34r1_resource_preparation_v1')
+    for event in resources: event.update(cohort=c.COHORT, kind='n34r2_resource_preparation_v1')
     with pytest.raises(ValueError, match='cohort_seconds_remaining'):
         release.admission(p, authority, state, old, resources, reservations,
                           c.expected_rows()[0], now=NOW, gpu_idle=True)
@@ -216,11 +325,11 @@ def test_all_thirty_admissions_follow_exact_task_major_accounting(tmp_path):
         p, authority, state, reservations = budget_fixture(tmp_path, events)
         snap = release.admission(p, authority, state, events, [], reservations,
                                  row, now=NOW, gpu_idle=True)
-        assert snap['dispatched'] == index + 1  # old invalid remains charged
+        assert snap['dispatched'] == index + 2  # both old invalids remain charged
         events.extend(journal([row], True))
     p, authority, state, reservations = budget_fixture(tmp_path, events)
     with pytest.raises(ValueError, match='next fresh contiguous row'):
         release.admission(p, authority, state, events, [], reservations,
                           rows[0], now=NOW, gpu_idle=True)
     assert r.budget_snapshot(events)['by_bucket'] == dict(
-        baseline=10, development=20, recovery=1, validation=0, formal=0)
+        baseline=10, development=20, recovery=2, validation=0, formal=0)

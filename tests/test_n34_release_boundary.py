@@ -294,17 +294,32 @@ def test_real_cli_fails_closed_without_parent_gate_or_side_effects(tmp_path, mod
     assert sorted(p.name for p in tmp_path.iterdir()) == before
 
 
-@pytest.mark.parametrize('fault', ['missing', 'different_old', 'different_closure', 'automatic', 'caps'])
+@pytest.mark.parametrize('fault', ['missing', 'different_old', 'different_closure', 'stale_closure', 'stale_closure_path', 'automatic', 'caps'])
 def test_recovery_requires_exact_detached_root_authority(fixture, fault):
     f = fixture
     if fault == 'missing': f.authority.pop('prospective_recovery')
     if fault == 'different_old': f.authority['prospective_recovery']['old_episode_key'] = 'arbitrary'
     if fault == 'different_closure': f.authority['prospective_recovery']['terminal_closure']['sha256'] = '0' * 64
+    if fault in ('stale_closure', 'stale_closure_path'):
+        from test_n34_recovery_identity import STALE_CLOSURE
+        closure = f.authority['prospective_recovery']['terminal_closure']
+        closure['path'] = STALE_CLOSURE['path']
+        if fault == 'stale_closure': closure['sha256'] = STALE_CLOSURE['sha256']
     if fault == 'automatic': f.authority['prospective_recovery']['automatic'] = True
     if fault == 'caps': f.authority['caps']['gpu_hours'] += 1
     f.plan['authority'] = write(f.root / 'authority.json', f.authority)
     freeze(f)
     with pytest.raises(ValueError, match='recovery authority|unchanged root caps'):
+        release.validate_release(f.plan_ref, f.release_ref)
+
+
+def test_stale_n34r1_release_matrix_rejected(fixture):
+    f = fixture
+    for row in f.plan['episodes']:
+        row['episode_key'] = row['episode_key'].replace('n34r2_', 'n34r1_')
+        row['iteration'] = c.OLD_COHORT
+    freeze(f)
+    with pytest.raises(ValueError, match='released plan contract'):
         release.validate_release(f.plan_ref, f.release_ref)
 
 
