@@ -29,6 +29,12 @@ def source_paths(root=ROOT):
     paths = helpers.source_paths(root)
     for folder, pattern in (('scripts', '*.py'), ('tests', '*n34*.py'), ('docs/experiments', 'n34*.md')):
         paths.update(str(p.relative_to(root)) for p in (root / folder).glob(pattern))
+    # Keep deleted committed patches visible; include new local files so the
+    # existing source_record check rejects bytes that are not committed.
+    raw = w._source_git(root, 'ls-tree', '-r', '--name-only', '-z', 'HEAD', '--', 'patches')
+    paths.update(name.decode() for name in raw.split(b'\0') if name
+                 and Path(name.decode()).suffix == '.py')
+    paths.update(str(p.relative_to(root)) for p in (root / 'patches').rglob('*.py'))
     paths.add('configs/qd_ed_final/candidate_n34.json')
     paths.update(closure.dependency_paths(root))
     return paths
