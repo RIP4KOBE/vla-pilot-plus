@@ -65,6 +65,8 @@ def _verify_release_contents(plan_ref, release_ref):
               and authority['validation_authorized'] is False and authority['formal_authorized'] is False
               and authority['coordinator_ends_at'] == COORDINATOR_END
               and caps['protected_gpu_hours'] == {'validation': 32., 'formal': 12.}, 'finite root budget authority')
+    w.require(authority.get('prospective_recovery') == c.REPLACEMENT, 'explicit root recovery authority')
+    w.read_ref(c.REPLACEMENT['terminal_closure'])
     validate_caps(caps)
     window_end = dt.datetime.fromisoformat(authority['weekly_window']['ends_at'].replace('Z', '+00:00'))
     w.require(window_end.tzinfo is not None and window_end <= dt.datetime.fromisoformat(c.DEADLINE.replace('Z', '+00:00')), 'weekly authorization deadline')
@@ -116,6 +118,7 @@ def _verify_release_contents(plan_ref, release_ref):
 
 def validate_caps(caps):
     """Accept only explicit root caps, never copy a predecessor's stale balances."""
+    w.require(caps == c.CAPS, 'N34R1 unchanged root caps/protected reserves')
     buckets = caps['buckets']
     w.require(set(buckets) == {'baseline', 'development', 'validation', 'formal', 'recovery'}
               and all(type(v) is int and v >= 0 for v in buckets.values())
@@ -136,6 +139,14 @@ def prefix(path, expected):
 
 def admission(plan, authority, state, events, resources, reservations, row, *, now, gpu_idle):
     """Caller holds normal runner/state locks; all balances come from journals."""
+    c.require_row(row)
+    w.require(authority.get('prospective_recovery') == c.REPLACEMENT, 'explicit root recovery authority')
+    c.require_replacement_history(events)
+    from scripts import qd_ed_n34_supervise as supervisor
+    rows = c.expected_rows()
+    # Accounting continuity only; runner separately reverifies native terminals.
+    reconciled = supervisor.reconcile({'episodes': rows, 'worktree': str(c.ROOT)}, events, lambda *args: None)
+    w.require(reconciled['next_row'] == row, 'accounting requires next fresh contiguous row')
     caps, budget = authority['caps'], state['budget']
     validate_caps(caps)
     w.require(state.get('n34_budget_authority') == plan['authority'] and r.authorized_gpu(state) == 7
@@ -159,11 +170,14 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
     w.require(r.check_budget_limits(effective_state, snap, row, reservations,
               bucket_caps=caps['buckets'], amendment=budget['amendment']) == 1800, 'weekly full1840s admission')
     protected = sum(max(0., h - snap['gpu_hours_by_bucket'][k]) for k, h in caps['protected_gpu_hours'].items())
-    local = [e for e in events if e.get('identity', {}).get('iteration') == c.COHORT]
+    local = c.cohort_events(rows, events)
     local_ids = {e['resource_id'] for e in resources if e.get('cohort') == c.COHORT
-                 or e.get('kind') == 'n34_resource_preparation_v1'}
+                 or e.get('kind') == 'n34r1_resource_preparation_v1'}
     local_resources = [e for e in resources if e['resource_id'] in local_ids]
     cohort = r.budget_snapshot(local, local_resources)
+    w.require(all(cohort['by_bucket'][k] <= c.LIMITS[k] for k in ('baseline', 'development', 'recovery')),
+              'N34R1 bucket ceilings')
+    w.require(cohort['by_bucket'][row['budget_bucket']] < c.LIMITS[row['budget_bucket']], 'N34R1 bucket exhausted')
     allowance = {'authority_starts_at': authority['starts_at'],
                  'authority_ends_at': min(authority['coordinator_ends_at'], window['ends_at']),
                  'private_budget': True, 'gpu_idle': gpu_idle, 'physical_gpu': 7, 'gpu_uuid': c.GPU_UUID,

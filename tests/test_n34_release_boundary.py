@@ -30,6 +30,13 @@ class BoundaryReached(Exception):
 @pytest.fixture
 def fixture(tmp_path, monkeypatch):
     calls = []
+    read_ref = w.read_ref
+    def synthetic_closure(reference):
+        if reference == c.REPLACEMENT['terminal_closure']:
+            calls.append('terminal_closure')
+            return {'synthetic_only': True}
+        return read_ref(reference)
+    monkeypatch.setattr(w, 'read_ref', synthetic_closure)
     runtime = {'schema': 'qd-ed-runtime-setup-v1', 'worktree': str(b.ROOT),
                'artifact_root': str(tmp_path), 'files': [], 'tasks': {},
                'gpu_mapping': {'physical_gpu': 7, 'uuid': c.GPU_UUID, 'egl_device_index': 4},
@@ -56,11 +63,9 @@ def fixture(tmp_path, monkeypatch):
                               'at_least_both_controls': True, 'matched_controls_required': True},
                 'futility': 'complete_valid_triples_only', 'validation_authorized': False, 'formal_authorized': False}
     authority = {'schema': 'n34-budget-authority-v1', 'approved': True, 'cohort': c.COHORT,
-                 'limits': c.LIMITS, 'validation_authorized': False, 'formal_authorized': False,
+                 'limits': c.LIMITS, 'prospective_recovery': copy.deepcopy(c.REPLACEMENT), 'validation_authorized': False, 'formal_authorized': False,
                  'coordinator_ends_at': release.COORDINATOR_END,
-                 'caps': {'attempts': 250, 'gpu_hours': 50.,
-                          'buckets': {'baseline': 10, 'development': 20, 'validation': 180, 'formal': 40, 'recovery': 0},
-                          'protected_gpu_hours': {'validation': 32., 'formal': 12.}},
+                 'caps': copy.deepcopy(c.CAPS),
                  'weekly_window': {'ends_at': c.DEADLINE, 'origin_gpu_hours': 0., 'increment_gpu_hours': 50.},
                  'approval_basis': write(tmp_path / 'basis.json', {'synthetic_only': True})}
     plan['protocol'] = write(tmp_path / 'protocol.json', protocol)
@@ -287,3 +292,29 @@ def test_real_cli_fails_closed_without_parent_gate_or_side_effects(tmp_path, mod
     assert ('released plan contract' if fault == 'draft' else 'file reference hash/path differs') in result.stderr
     assert 'parent dispatch gate absent' not in result.stderr
     assert sorted(p.name for p in tmp_path.iterdir()) == before
+
+
+@pytest.mark.parametrize('fault', ['missing', 'different_old', 'different_closure', 'automatic', 'caps'])
+def test_recovery_requires_exact_detached_root_authority(fixture, fault):
+    f = fixture
+    if fault == 'missing': f.authority.pop('prospective_recovery')
+    if fault == 'different_old': f.authority['prospective_recovery']['old_episode_key'] = 'arbitrary'
+    if fault == 'different_closure': f.authority['prospective_recovery']['terminal_closure']['sha256'] = '0' * 64
+    if fault == 'automatic': f.authority['prospective_recovery']['automatic'] = True
+    if fault == 'caps': f.authority['caps']['gpu_hours'] += 1
+    f.plan['authority'] = write(f.root / 'authority.json', f.authority)
+    freeze(f)
+    with pytest.raises(ValueError, match='recovery authority|unchanged root caps'):
+        release.validate_release(f.plan_ref, f.release_ref)
+
+
+def test_recovery_terminal_closure_hash_is_verified(fixture, monkeypatch):
+    f = fixture
+    read_ref = w.read_ref
+    def reject_closure(reference):
+        if reference == c.REPLACEMENT['terminal_closure']:
+            raise ValueError('synthetic terminal closure hash mismatch')
+        return read_ref(reference)
+    monkeypatch.setattr(w, 'read_ref', reject_closure)
+    with pytest.raises(ValueError, match='terminal closure hash mismatch'):
+        release.validate_release(f.plan_ref, f.release_ref)

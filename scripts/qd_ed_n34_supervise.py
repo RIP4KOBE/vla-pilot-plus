@@ -6,10 +6,7 @@ def reconcile(plan, events, verify_terminal, *, live_handles=()):
     """Reverify the unique contiguous prefix; never select/retry a duplicate cell."""
     rows = plan['episodes']
     w.require(rows == c.expected_rows(plan['worktree']), 'exact task-major matrix')
-    w.require(all(isinstance(e.get('identity', {}), dict) for e in events), 'malformed journal identity')
-    keys = {r['episode_key'] for r in rows}
-    local = [e for e in events if e.get('identity', {}).get('iteration') == c.COHORT
-             or e.get('attempt_id') in keys or e.get('episode_key') in keys]
+    local = c.cohort_events(rows, events)
     groups = []
     for event in local:
         w.require(all(event.get(k) is None for k in ('retry_of', 'recovery_of')), 'zero automatic recovery')
@@ -25,7 +22,7 @@ def reconcile(plan, events, verify_terminal, *, live_handles=()):
         if plan.get('schema') == 'n34-released-plan-v1':
             immutable = ('attempt_id', 'identity', 'episode_key', 'budget_bucket', 'plan_sha256', 'release',
                          'source_commit', 'runtime_manifest_sha256', 'runtime_inventory_sha256',
-                         'init_row_sha256', 'output_dir', 'physical_gpu', 'ledger_prefix', 'context')
+                         'init_row_sha256', 'output_dir', 'physical_gpu', 'ledger_prefix', 'context', 'replacement')
             w.require(all(all(key in e and e[key] == group[0][key] for key in immutable) for e in group),
                       'lifecycle binding changed')
         kinds = [e['event'] for e in group]

@@ -69,6 +69,7 @@ def prepare_candidates(directory, *, root=ROOT):
             'http_counters': 'Unknown',
             'required_root_steps': ['reconcile current accounting and protected reserves; retain all historical charges',
                 'verify fresh attempt IDs against complete owning journal',
+                'explicitly authorize pinned task0/C0 replacement in root budget authority prospective_recovery',
                 'materialize and verify pinned RDT sources without substituting another revision',
                 'review deployed runtime, module closure and actual controller delta semantics',
                 'freeze both source identities and all30 external resolved-config manifests',

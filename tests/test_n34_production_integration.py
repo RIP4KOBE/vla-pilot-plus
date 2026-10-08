@@ -177,6 +177,7 @@ def test_same_worker_native_audit_external_anchor(prospective, monkeypatch, stub
 
 def journal(rows, success=False):
     return [dict(event=k,identity=supervisor.c_identity(row),episode_key=row['episode_key'],attempt_id=row['episode_key'],
+                 budget_bucket=row['budget_bucket'], replacement=copy.deepcopy(row['replacement']),
                  outcome_valid=True,required_cost_telemetry_complete=True,success=success,gpu_process_wall_seconds=1.)
             for row in rows for k in ('reserved','dispatched','valid')]
 
@@ -202,7 +203,7 @@ def allowance():
     return dict(authority_starts_at='2026-10-08T00:00:00Z',authority_ends_at=c.DEADLINE,
                 private_budget=True,gpu_idle=True,physical_gpu=7,gpu_uuid=c.GPU_UUID,live_handles=[],unsettled_reservations=0,
                 global_seconds_remaining=200000,private_seconds_remaining=200000,cohort_seconds_remaining=18000,
-                protected_seconds_remaining=158400,bucket_attempts_remaining={'baseline':10,'development':20},
+                protected_seconds_remaining=158400,bucket_attempts_remaining={'baseline':9,'development':20,'recovery':1},
                 global_attempts_remaining=250,cohort_attempts_remaining=30,protected_attempts_remaining=220)
 
 
