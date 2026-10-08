@@ -73,7 +73,7 @@ def test_generic_historical_charges_and_health_preserved(tmp_path):
     assert snap['gpu_hours_by_bucket']['development'] == 1.
     assert snap['gpu_healthcheck_hours'] == .1
     assert snap['gpu_hours_by_bucket']['recovery'] == .1
-    assert snap['dispatched'] == 7 and snap['aborted'] == 1
+    assert snap['dispatched'] == len(c.INVALID_HISTORY) + 2 and snap['aborted'] == 1
 
 
 @pytest.mark.parametrize('kind', ['reserved', 'dispatched', 'health_reserved', 'health_dispatched', 'unknown_episode', 'unknown_health'])
@@ -201,14 +201,14 @@ def test_reserve_dispatch_terminal_and_resume_next(lifecycle):
     first = adapter.execute_one(plan_ref, release_ref)
     assert first['status'] == 'VALID'
     events = r.read_events(root / 'data/attempt-ledger.jsonl')
-    assert events[:9] == old_invalid()
-    assert [e['event'] for e in events[9:]] == ['reserved', 'dispatched', 'valid']
-    assert all(e['attempt_id'] == plan['episodes'][0]['episode_key'] for e in events[9:])
-    assert all(e['replacement'] == c.REPLACEMENT and e['budget_bucket'] == 'recovery' for e in events[9:])
+    assert events[:len(old_invalid())] == old_invalid()
+    assert [e['event'] for e in events[len(old_invalid()):]] == ['reserved', 'dispatched', 'valid']
+    assert all(e['attempt_id'] == plan['episodes'][0]['episode_key'] for e in events[len(old_invalid()):])
+    assert all(e['replacement'] == c.REPLACEMENT and e['budget_bucket'] == 'recovery' for e in events[len(old_invalid()):])
     before = copy.deepcopy(events)
     assert adapter.execute_one(plan_ref, release_ref)['status'] == 'VALID'
-    assert r.read_events(root / 'data/attempt-ledger.jsonl')[:12] == before
-    assert r.read_state(root / 'research-state.yaml')['budget']['dispatched'] == 5
+    assert r.read_events(root / 'data/attempt-ledger.jsonl')[:len(before)] == before
+    assert r.read_state(root / 'research-state.yaml')['budget']['dispatched'] == len(c.INVALID_HISTORY) + 2
     assert not (root / 'driver.lock').exists() and not (root / 'coordinator.lease').exists()
 
 
@@ -226,7 +226,7 @@ def test_invalid_charged_stop_no_retry(lifecycle, monkeypatch, fault):
     terminal = result['terminal']
     assert terminal['success'] is None and terminal['task_failure'] is False and terminal['gpu_process_wall_seconds'] > 0
     assert adapter.execute_one(plan_ref, release_ref)['status'] == 'INVALID_STOP'
-    assert len(r.read_events(root / 'data/attempt-ledger.jsonl')) == 12
+    assert len(r.read_events(root / 'data/attempt-ledger.jsonl')) == len(old_invalid()) + 3
 
 
 def test_live_unknown_never_signalled_or_restarted(lifecycle, monkeypatch):
@@ -237,7 +237,7 @@ def test_live_unknown_never_signalled_or_restarted(lifecycle, monkeypatch):
     with pytest.raises(KeyboardInterrupt): adapter.execute_one(plan_ref, release_ref)
     Path(plan['stop_path']).touch()
     assert adapter.execute_one(plan_ref, release_ref)['status'] == 'LIVE_OR_UNSETTLED'
-    assert [e['event'] for e in r.read_events(root / 'data/attempt-ledger.jsonl')[9:]] == ['reserved', 'dispatched']
+    assert [e['event'] for e in r.read_events(root / 'data/attempt-ledger.jsonl')[len(old_invalid()):]] == ['reserved', 'dispatched']
 
 
 def test_timeout_exact_owned_cleanup_retains_charge(lifecycle, monkeypatch):
