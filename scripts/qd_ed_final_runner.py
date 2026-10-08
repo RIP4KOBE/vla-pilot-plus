@@ -1023,6 +1023,11 @@ def validate_runtime_inputs(plan, runtime, manifest, root, state, *, require_fro
         if plan.get('schema') == 'n32r3-released-plan-v1' and row['budget_bucket'] == 'recovery':
             from scripts.qd_ed_n32r3_contract import require_recovery_row
             require_recovery_row(plan, row)
+        elif plan.get('schema') == 'n34-released-plan-v1':
+            from scripts import qd_ed_n34_contract as n34
+            n34.require_row(row, plan['worktree'])
+            if row['budget_bucket'] == 'recovery':
+                n34.require_recovery_row(plan, row)
         elif not row.get('retry_of'):
             require((row['split'] == 'dev' and row['budget_bucket'] in {'baseline', 'development'}) or row['split'] == row['budget_bucket'], 'split/budget mismatch')
         else:

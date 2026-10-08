@@ -23,7 +23,7 @@ CAPS = {'attempts': 1800, 'gpu_hours': 224., 'buckets': {'baseline': 400, 'devel
 
 
 def budget_fixture(tmp_path, events=(), resources=()):
-    authority = {'caps': copy.deepcopy(CAPS), 'amendment': {'synthetic': True}, 'starts_at': '2026-10-01T00:00:00Z',
+    authority = {'prospective_recovery': copy.deepcopy(c.REPLACEMENT), 'caps': copy.deepcopy(CAPS), 'amendment': {'synthetic': True}, 'starts_at': '2026-10-01T00:00:00Z',
                  'coordinator_ends_at': release.COORDINATOR_END,
                  'weekly_window': {'origin_gpu_hours': 53.08404692669838, 'increment_gpu_hours': 168., 'ends_at': c.DEADLINE}}
     reference = write(tmp_path / 'authority.json', authority)
@@ -43,12 +43,19 @@ def historical(seconds=3600., bucket='development', attempt='old', cohort='HISTO
             {**base, 'event': end, 'gpu_process_wall_seconds': seconds, 'outcome_valid': False}]
 
 
+def old_invalid(seconds=0.):
+    events = historical(seconds, 'baseline', c.OLD_EPISODE, c.OLD_COHORT, 'valid')
+    events[-1].update(success=None, required_cost_telemetry_complete=False)
+    return events
+
+
 def health(seconds=360., cohort='HISTORY'):
     return [{'resource_id': 'probe', 'event': kind, 'cohort': cohort, 'gpu_process_wall_seconds': seconds}
             for kind in ('reserved', 'dispatched', 'completed')]
 
 
 def admit(tmp_path, events=(), resources=(), change=None):
+    events = old_invalid() + list(events)
     plan, authority, state, reservations = budget_fixture(tmp_path, events, resources)
     if change:
         change(plan, authority, state, reservations)
@@ -63,7 +70,7 @@ def test_generic_historical_charges_and_health_preserved(tmp_path):
     assert snap['gpu_hours_by_bucket']['development'] == 1.
     assert snap['gpu_healthcheck_hours'] == .1
     assert snap['gpu_hours_by_bucket']['recovery'] == .1
-    assert snap['dispatched'] == 2 and snap['aborted'] == 1
+    assert snap['dispatched'] == 3 and snap['aborted'] == 1
 
 
 @pytest.mark.parametrize('kind', ['reserved', 'dispatched', 'health_reserved', 'health_dispatched', 'unknown_episode', 'unknown_health'])
@@ -85,7 +92,7 @@ def test_unsettled_or_unknown_never_zero_cost(tmp_path, kind):
 def test_admission_boundaries(tmp_path, kind):
     events = []
     if kind == 'bucket':
-        events = [e for i in range(400) for e in historical(0., 'baseline', f'h{i}')]
+        events = [e for i in range(60) for e in historical(0., 'recovery', f'h{i}')]
     if kind == 'global':
         events = [e for i in range(1800) for e in historical(0., 'development', f'h{i}')]
     if kind == 'protected_attempts':
@@ -120,7 +127,7 @@ def lifecycle(tmp_path, monkeypatch):
     tmp_path.mkdir()
     rows = c.expected_rows()
     monkeypatch.setattr(c, 'expected_rows', lambda root=None: rows)
-    plan, authority, state, reservations = budget_fixture(tmp_path)
+    plan, authority, state, reservations = budget_fixture(tmp_path, old_invalid())
     plan['stop_path'] = c.stop_path(tmp_path)
     Path(plan['stop_path']).parent.mkdir()
     plan.update(worktree=str(tmp_path), artifact_root=str(tmp_path / 'artifacts/n34'), episodes=rows,
@@ -135,6 +142,7 @@ def lifecycle(tmp_path, monkeypatch):
     (tmp_path / 'data').mkdir()
     for name in ('attempt-ledger.jsonl', 'gpu-healthcheck-ledger.jsonl'):
         (tmp_path / 'data' / name).write_text('')
+    (tmp_path / 'data/attempt-ledger.jsonl').write_text(''.join(json.dumps(e) + '\n' for e in old_invalid()))
     (tmp_path / 'data/gpu-hour-reservation-ledger.jsonl').write_text(json.dumps(reservations[0]) + '\n')
     (tmp_path / 'research-state.yaml').write_text(yaml.safe_dump(state))
     authority['ledger_prefixes'] = {name: adapter.journal_prefix(tmp_path / 'data' / name) for name in ('attempt-ledger.jsonl', 'gpu-healthcheck-ledger.jsonl')}
@@ -190,12 +198,14 @@ def test_reserve_dispatch_terminal_and_resume_next(lifecycle):
     first = adapter.execute_one(plan_ref, release_ref)
     assert first['status'] == 'VALID'
     events = r.read_events(root / 'data/attempt-ledger.jsonl')
-    assert [e['event'] for e in events] == ['reserved', 'dispatched', 'valid']
-    assert all(e['attempt_id'] == plan['episodes'][0]['episode_key'] for e in events)
+    assert events[:3] == old_invalid()
+    assert [e['event'] for e in events[3:]] == ['reserved', 'dispatched', 'valid']
+    assert all(e['attempt_id'] == plan['episodes'][0]['episode_key'] for e in events[3:])
+    assert all(e['replacement'] == c.REPLACEMENT and e['budget_bucket'] == 'recovery' for e in events[3:])
     before = copy.deepcopy(events)
     assert adapter.execute_one(plan_ref, release_ref)['status'] == 'VALID'
-    assert r.read_events(root / 'data/attempt-ledger.jsonl')[:3] == before
-    assert r.read_state(root / 'research-state.yaml')['budget']['dispatched'] == 2
+    assert r.read_events(root / 'data/attempt-ledger.jsonl')[:6] == before
+    assert r.read_state(root / 'research-state.yaml')['budget']['dispatched'] == 3
     assert not (root / 'driver.lock').exists() and not (root / 'coordinator.lease').exists()
 
 
@@ -213,7 +223,7 @@ def test_invalid_charged_stop_no_retry(lifecycle, monkeypatch, fault):
     terminal = result['terminal']
     assert terminal['success'] is None and terminal['task_failure'] is False and terminal['gpu_process_wall_seconds'] > 0
     assert adapter.execute_one(plan_ref, release_ref)['status'] == 'INVALID_STOP'
-    assert len(r.read_events(root / 'data/attempt-ledger.jsonl')) == 3
+    assert len(r.read_events(root / 'data/attempt-ledger.jsonl')) == 6
 
 
 def test_live_unknown_never_signalled_or_restarted(lifecycle, monkeypatch):
@@ -224,7 +234,7 @@ def test_live_unknown_never_signalled_or_restarted(lifecycle, monkeypatch):
     with pytest.raises(KeyboardInterrupt): adapter.execute_one(plan_ref, release_ref)
     Path(plan['stop_path']).touch()
     assert adapter.execute_one(plan_ref, release_ref)['status'] == 'LIVE_OR_UNSETTLED'
-    assert [e['event'] for e in r.read_events(root / 'data/attempt-ledger.jsonl')] == ['reserved', 'dispatched']
+    assert [e['event'] for e in r.read_events(root / 'data/attempt-ledger.jsonl')[3:]] == ['reserved', 'dispatched']
 
 
 def test_timeout_exact_owned_cleanup_retains_charge(lifecycle, monkeypatch):
@@ -255,12 +265,13 @@ def test_stop_before_dispatch_no_device_probe(lifecycle, monkeypatch, kind):
     monkeypatch.setattr(adapter, 'device_check', lambda: pytest.fail('STOP must precede device probe'))
     monkeypatch.setattr(adapter.subprocess, 'Popen', lambda *a, **kw: pytest.fail('STOP must prevent dispatch'))
     with pytest.raises(ValueError, match='STOP'): adapter.execute_one(plan_ref, release_ref)
-    assert r.read_events(root / 'data/attempt-ledger.jsonl') == []
+    assert r.read_events(root / 'data/attempt-ledger.jsonl') == old_invalid()
 
 
 def test_explicit_caps_do_not_inherit_old_private_budget():
     caps={'attempts':393,'gpu_hours':100.,'buckets':{'baseline':28,'development':125,'validation':180,'formal':40,'recovery':20},
           'protected_gpu_hours':{'validation':32.,'formal':12.}}
-    release.validate_caps(caps)
+    with pytest.raises(ValueError, match='unchanged root caps'): release.validate_caps(caps)
+    release.validate_caps(copy.deepcopy(c.CAPS))
     caps['buckets']['formal']=39;caps['attempts']-=1
     with pytest.raises(ValueError,match='protected'):release.validate_caps(caps)

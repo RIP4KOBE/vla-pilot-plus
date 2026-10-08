@@ -316,6 +316,7 @@ def verify_terminal(plan_ref, row, terminal, release_ref=None):
               and terminal['output_dir'] == str(output) and terminal['outcome_valid'] is True
               and terminal['required_cost_telemetry_complete'] is True and type(terminal['success']) is bool,
               'generic terminal identity/cost differs')
+    c.event_binding(row, terminal)
     c.finite(terminal['gpu_process_wall_seconds'], 'terminal charge')
     context_ref = c.ref(output / 'n34-worker-context.json')
     context = w.read_ref(context_ref)

@@ -102,7 +102,7 @@ def execute_one(plan_ref, release_ref):
             context_ref = c.ref(context_path)
             command = [manifest['argv'][0], '-m', 'scripts.qd_ed_n34_worker', '--context', str(context_path), '--context-sha256', context_ref['sha256']]
             base = {'attempt_id': row['episode_key'], 'episode_key': row['episode_key'], 'identity': supervisor.c_identity(row),
-                    'budget_bucket': row['budget_bucket'], 'plan_sha256': plan_ref['sha256'], 'release': release_ref,
+                    'budget_bucket': row['budget_bucket'], 'replacement': row['replacement'], 'plan_sha256': plan_ref['sha256'], 'release': release_ref,
                     'source_commit': plan['source']['commit'], 'runtime_manifest_sha256': plan['runtime']['sha256'],
                     'runtime_inventory_sha256': plan['runtime_inventory_sha256'], 'init_row_sha256': row['init_row_sha256'],
                     'output_dir': str(output), 'physical_gpu': 7, 'retry_of': None, 'recovery_of': None,
