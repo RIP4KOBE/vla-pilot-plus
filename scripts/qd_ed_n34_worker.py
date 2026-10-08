@@ -1,7 +1,7 @@
 """N34 metered worker and hash-only parent receipt verification.
 
 The public launch requires a detached root release. Draft contexts remain closed.
-`_run_in_process` provides the same-PID implementation tested on synthetic CPU data.
+Every execution and receipt consumer requires the same detached release closure.
 """
 import os
 import json
@@ -55,20 +55,14 @@ def attest_worker_loaded(root, source):
 
 def validate_context(reference):
     context = w.read_ref(reference)
-    w.require(set(context) == {'schema', 'plan', 'expected_manifest', 'episode_key', 'attempt_id', 'main_argv', 'worker_contract'} | ({'release'} if 'release' in context else set()), 'worker context fields')
+    w.require(set(context) == {'schema', 'plan', 'release', 'expected_manifest', 'episode_key', 'attempt_id', 'main_argv', 'worker_contract'}, 'worker context fields: explicit detached release required')
     w.require(context['schema'] == 'n34-worker-context-v1' and context['worker_contract'] == c.WORKER_CONTRACT, 'worker contract')
-    plan = w.read_ref(context['plan'])
-    if 'release' in context:
-        from scripts import qd_ed_n34_release as release
-        released, _, _ = release.validate_release(context['plan'], context['release'])
-        w.require(released == plan, 'released worker plan differs')
-    else:
-        c.validate_draft(plan)
+    from scripts import qd_ed_n34_release as release
+    plan, runtime, _ = release.validate_release(context['plan'], context['release'])
     rows = [r for r in plan['episodes'] if r['episode_key'] == context['episode_key']]
     w.require(len(rows) == 1 and context['attempt_id'] == context['episode_key'], 'exact primary attempt')
     row = rows[0]
     w.require(context['expected_manifest'] == plan['expected_manifests'][row['episode_key']], 'plan/command external anchor')
-    runtime = w.read_ref(plan['runtime'])
     manifest = b.verify_manifest(context['expected_manifest'], plan, runtime, row)
     w.require(context['main_argv'] == manifest['argv'][1:], 'exact candidate command')
     w.require(runtime['gpu_mapping']['physical_gpu'] == 7 and runtime['gpu_mapping']['uuid'] == c.GPU_UUID, 'assigned GPU mapping')
@@ -76,14 +70,15 @@ def validate_context(reference):
 
 
 def context_for(plan_ref, row, release_ref=None):
-    plan = w.read_ref(plan_ref)
+    from scripts import qd_ed_n34_release as release
+    plan, _, _ = release.validate_release(plan_ref, release_ref)
     manifest_ref = plan['expected_manifests'][row['episode_key']]
     manifest = w.read_ref(manifest_ref)
     w.require(row in plan['episodes'] and manifest['row'] == row, 'context row')
     return {'schema': 'n34-worker-context-v1', 'plan': plan_ref, 'expected_manifest': manifest_ref,
             'episode_key': row['episode_key'], 'attempt_id': row['episode_key'],
             'main_argv': manifest['argv'][1:], 'worker_contract': c.WORKER_CONTRACT,
-            **({'release': release_ref} if release_ref is not None else {})}
+            'release': release_ref}
 
 
 def native_counts(profile, output, report, expected, guided=None):
@@ -161,8 +156,7 @@ def _run_in_process(context_ref):
     context, plan, runtime, row, manifest = validate_context(context_ref)
     root, output = Path(plan['worktree']), Path(manifest['output_dir'])
     identity = w.process_identity()
-    if 'release' in context:
-        verify_dispatch_record(context_ref, context, output, identity)
+    verify_dispatch_record(context_ref, context, output, identity)
     started = time.perf_counter()
     receipt_path = output / 'eds_eval/n34-worker-receipt.json'
     start_path = output / 'eds_eval/n34-worker-start.json'
@@ -292,7 +286,8 @@ def verify_receipt(context_ref, receipt_ref, process_record):
 def verify_terminal(plan_ref, row, terminal, release_ref=None):
     """Parent binds generic terminal identity and telemetry to the metered receipt."""
     from scripts import qd_ed_n34_supervise as s
-    plan = w.read_ref(plan_ref)
+    from scripts import qd_ed_n34_release as release
+    plan, _, _ = release.validate_release(plan_ref, release_ref)
     manifest = w.read_ref(plan['expected_manifests'][row['episode_key']])
     output = Path(manifest['output_dir'])
     w.require(terminal['identity'] == s.c_identity(row) and terminal['episode_key'] == row['episode_key']
@@ -306,12 +301,11 @@ def verify_terminal(plan_ref, row, terminal, release_ref=None):
     context_ref = c.ref(output / 'n34-worker-context.json')
     context = w.read_ref(context_ref)
     w.require(context['plan'] == plan_ref and context['episode_key'] == row['episode_key'], 'terminal context binding')
-    if release_ref is not None:
-        w.require(context.get('release') == release_ref and terminal.get('release') == release_ref
-                  and terminal.get('context') == context_ref
-                  and terminal.get('runtime_inventory_sha256') == plan['runtime_inventory_sha256'], 'terminal release binding')
-        record = w.read_ref(c.ref(output / 'process.json'))
-        w.require(record.get('context') == context_ref and record.get('release') == release_ref, 'process context/release binding')
+    w.require(context.get('release') == release_ref and terminal.get('release') == release_ref
+              and terminal.get('context') == context_ref
+              and terminal.get('runtime_inventory_sha256') == plan['runtime_inventory_sha256'], 'terminal release binding')
+    record = w.read_ref(c.ref(output / 'process.json'))
+    w.require(record.get('context') == context_ref and record.get('release') == release_ref, 'process context/release binding')
     command = w.read_ref(c.ref(output / 'command.json'))
     w.require(command == {'argv': [manifest['argv'][0], '-m', 'scripts.qd_ed_n34_worker',
               '--context', context_ref['path'], '--context-sha256', context_ref['sha256']],
@@ -328,9 +322,6 @@ def verify_terminal(plan_ref, row, terminal, release_ref=None):
 
 
 def run_worker(context_ref):
-    context = w.read_ref(context_ref)
-    if 'release' not in context:
-        c.require_release(w.read_ref(context['plan']))
     validate_context(context_ref)
     return _run_in_process(context_ref)
 
@@ -341,9 +332,13 @@ def main():
     parser.add_argument('--context', required=True)
     parser.add_argument('--context-sha256', required=True)
     args = parser.parse_args()
+    context_ref = {'path': args.context, 'sha256': args.context_sha256}
+    # Reject missing/draft/tampered authority before waiting on the parent gate.
+    # run_worker and the in-process consumer revalidate after that wait.
+    validate_context(context_ref)
     # The parent durably records PID/boot/start identity before opening this gate.
     w.require(sys.stdin.buffer.read(1) == b'G', 'parent dispatch gate absent')
-    return run_worker({'path': args.context, 'sha256': args.context_sha256})
+    return run_worker(context_ref)
 
 
 if __name__ == '__main__':
