@@ -29,6 +29,17 @@ def validate_release(plan_ref, release_ref):
 
 def verify_prospective_release(plan_ref, release_ref):
     """Full release closure; dispatch additionally requires locked admission."""
+    plan, runtime, authority, _ = _verify_release_transaction(plan_ref, release_ref)
+    return plan, runtime, authority
+
+
+def _verify_release_transaction(plan_ref, release_ref):
+    # No reusable token/cache escapes: each caller starts a new full transaction.
+    with b.closure.verification_phase('release'):
+        return _verify_release_contents(plan_ref, release_ref)
+
+
+def _verify_release_contents(plan_ref, release_ref):
     plan = w.read_ref(plan_ref)
     validate_plan(plan)
     release = w.read_ref(release_ref)
@@ -63,9 +74,11 @@ def verify_prospective_release(plan_ref, release_ref):
         c.finite(authority['weekly_window'][name], name)
     w.require(authority['weekly_window']['increment_gpu_hours'] <= 168., 'weekly ceiling')
     w.require(Path(plan['worktree']).resolve() == b.ROOT.resolve(), 'actual imported checkout differs')
-    b.verify_sources(plan)
+    with b.closure.verification_phase('source_closure'):
+        b.verify_sources(plan)
     b.attest_loaded(plan['worktree'], plan['source'])
-    runtime_closure = b.closure.verify_runtime(w.read_ref(plan['runtime_closure']), plan['runtime'])
+    with b.closure.verification_phase('runtime_closure'):
+        runtime_closure = b.closure.verify_runtime(w.read_ref(plan['runtime_closure']), plan['runtime'])
     from scripts.qd_ed_n34_controller import verify_semantics
     verify_semantics(plan['controller_semantics'], plan['runtime'], runtime_closure)
     w.require(b.source_paths(plan['worktree']) <= {x['path'] for x in plan['source']['files']}, 'source inventory incomplete')
@@ -84,16 +97,21 @@ def verify_prospective_release(plan_ref, release_ref):
     state_view = {'artifacts': runtime['artifact_root']}
     # The runtime worktree alias was checked above to resolve to this checkout.
     # Preserve its frozen lexical paths while retaining both containment checks.
-    r.verify_files(runtime['files'], allowed_roots=(plan['worktree'], runtime['worktree'], runtime['artifact_root']))
+    with b.closure.verification_phase('runtime_files'):
+        r.verify_files(runtime['files'], allowed_roots=(plan['worktree'], runtime['worktree'], runtime['artifact_root']))
     fingerprints = {str(Path(x['path']).resolve()) for x in runtime['files']}
     for task in runtime['tasks'].values():
         cache = Path(task['cache_dir'])
         actual = {str(p.resolve()) for p in cache.rglob('*') if p.is_file()}
         w.require(actual and actual <= fingerprints, 'task cache inventory incomplete')
-    r.validate_runtime_inputs(plan, runtime, b.profiles(plan['worktree']), Path(plan['worktree']), state_view)
-    for row in plan['episodes']:
-        b.verify_manifest(plan['expected_manifests'][row['episode_key']], plan, runtime, row)
-    return plan, runtime, authority
+    with b.closure.verification_phase('runtime_inputs'):
+        r.validate_runtime_inputs(plan, runtime, b.profiles(plan['worktree']), Path(plan['worktree']), state_view)
+    manifests = {}
+    with b.closure.verification_phase('all_manifests'):
+        for row in plan['episodes']:
+            manifests[row['episode_key']] = b._verify_manifest_bound(
+                plan['expected_manifests'][row['episode_key']], plan, runtime, row)
+    return plan, runtime, authority, manifests
 
 
 def validate_caps(caps):
