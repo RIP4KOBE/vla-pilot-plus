@@ -1020,7 +1020,10 @@ def validate_runtime_inputs(plan, runtime, manifest, root, state, *, require_fro
             require(type(row[seed_field]) is int and 0 <= row[seed_field] < 2**31, f'invalid {seed_field}')
         require(row['init_index'] == 0 and type(row['init_index']) is int, 'single-episode backend currently requires init_index=0')
         require(row['budget_bucket'] in BUCKETS, 'unknown budget bucket')
-        if not row.get('retry_of'):
+        if plan.get('schema') == 'n32r3-released-plan-v1' and row['budget_bucket'] == 'recovery':
+            from scripts.qd_ed_n32r3_contract import require_recovery_row
+            require_recovery_row(plan, row)
+        elif not row.get('retry_of'):
             require((row['split'] == 'dev' and row['budget_bucket'] in {'baseline', 'development'}) or row['split'] == row['budget_bucket'], 'split/budget mismatch')
         else:
             require(row['budget_bucket'] == 'recovery', 'retry must consume recovery reserve')
