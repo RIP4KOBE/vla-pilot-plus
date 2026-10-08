@@ -93,7 +93,7 @@ def fixture(tmp_path, monkeypatch):
     monkeypatch.setattr(release.r, 'stage_overrides', checked('stage', lambda *a: []))
     monkeypatch.setattr(release.r, 'verify_files', checked('files', lambda *a, **kw: None))
     monkeypatch.setattr(release.r, 'validate_runtime_inputs', checked('inputs', lambda *a: None))
-    monkeypatch.setattr(b, 'verify_manifest', checked('manifest', manifest_check))
+    monkeypatch.setattr(b, '_verify_manifest_bound', checked('manifest', manifest_check))
     # Pure real profiles, ownership, runtime_gpu, reference hashes, plan/protocol/
     # root review/authority/caps/phase validators remain in use.
     f = SimpleNamespace(root=tmp_path, plan=plan, authority=authority, protocol=protocol,
@@ -147,7 +147,7 @@ def consume(f, name, monkeypatch):
         monkeypatch.setattr(worker.sys, 'argv', ['worker', '--context', context_ref['path'], '--context-sha256', context_ref['sha256']])
         class Gate:
             def read(self, size):
-                assert f.calls.count('manifest') >= 31  # release plus context, before gate
+                assert f.calls.count('manifest') == 30  # every row, before gate
                 return b'G'
         monkeypatch.setattr(worker.sys, 'stdin', SimpleNamespace(buffer=Gate()))
         return worker.main()
@@ -242,10 +242,10 @@ def test_missing_external_reference(fixture, consumer, monkeypatch):
 
 
 @pytest.mark.parametrize('leaf', ['verify_sources', 'attest_loaded', 'verify_runtime', 'verify_semantics',
-                                  'stage_overrides', 'verify_files', 'validate_runtime_inputs', 'verify_manifest'])
+                                  'stage_overrides', 'verify_files', 'validate_runtime_inputs', '_verify_manifest_bound'])
 @pytest.mark.parametrize('consumer', CONSUMERS)
 def test_leaf_failure_propagates_without_consumer_bypass(fixture, leaf, consumer, monkeypatch):
-    owner = (b if leaf in ('verify_sources', 'attest_loaded', 'verify_manifest') else
+    owner = (b if leaf in ('verify_sources', 'attest_loaded', '_verify_manifest_bound') else
              b.closure if leaf == 'verify_runtime' else worker.controller if leaf == 'verify_semantics' else release.r)
     def reject(*a, **kw): raise ValueError('full verifier leaf rejected: ' + leaf)
     monkeypatch.setattr(owner, leaf, reject)

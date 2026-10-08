@@ -129,6 +129,11 @@ def verify_manifest(reference, plan, runtime, row):
     verify_sources(plan)
     w.require(w.read_ref(plan['runtime']) == runtime, 'runtime changed')
     closure.verify_runtime(w.read_ref(plan['runtime_closure']), plan['runtime'])
+    return _verify_manifest_bound(reference, plan, runtime, row)
+
+
+def _verify_manifest_bound(reference, plan, runtime, row):
+    """Private row check inside a fully validating release/manifest transaction."""
     actual = w.read_ref(reference)
     w.require(actual == json.loads(json.dumps(manifest(plan, runtime, row))), 'external manifest/config/task/source differs')
     return actual

@@ -3,6 +3,11 @@
 No fetch, model import, installation or candidate-receipt discovery is performed.
 """
 import ast
+from contextlib import contextmanager
+import json
+import os
+import subprocess
+import time
 import hashlib
 import importlib.machinery
 import importlib.metadata
@@ -181,26 +186,104 @@ def dependency_paths(root, commit='HEAD'):
     return paths
 
 
+@contextmanager
+def verification_phase(name):
+    """Untrusted stderr diagnostics only; never an acceptance/start receipt."""
+    started = time.perf_counter()
+    def emit(event, **extra):
+        print(json.dumps({'schema': 'n34-verification-phase-v1', 'phase': name,
+                          'event': event, 'pid': os.getpid(),
+                          'monotonic_seconds': time.perf_counter(), **extra}),
+              file=sys.stderr, flush=True)
+    emit('begin')
+    try:
+        yield
+    except BaseException:
+        emit('failed', elapsed_seconds=time.perf_counter() - started)
+        raise
+    else:
+        emit('end', elapsed_seconds=time.perf_counter() - started)
+
+
+def _source_tree(root, commit, database):
+    entries = {}
+    raw = w._source_git(root, 'ls-tree', '-r', '-z', commit, database=database)
+    for row in raw.split(b'\0'):
+        if not row:
+            continue
+        metadata, name = row.split(b'\t', 1)
+        name = name.decode()
+        w.require(name not in entries, 'duplicate source Git path')
+        entries[name] = metadata.decode().split()
+    return entries
+
+
+def _source_blobs(root, blobs, database):
+    """One local batch per database, discarded at the end of this call."""
+    blobs = sorted(set(blobs))
+    if not blobs:
+        return {}
+    command = ['git', '--no-replace-objects']
+    if database is not None:
+        command.append('--git-dir=' + str(database))
+    raw = subprocess.check_output(command + ['cat-file', '--batch'], cwd=root,
+        input=('\n'.join(blobs) + '\n').encode('ascii'),
+        env={**os.environ, 'GIT_NO_LAZY_FETCH': '1'})
+    result, offset = {}, 0
+    for blob in blobs:
+        end = raw.find(b'\n', offset)
+        w.require(end >= offset, 'source Git batch header missing')
+        fields = raw[offset:end].split()
+        w.require(len(fields) == 3 and fields[0].decode() == blob
+                  and fields[1] == b'blob' and fields[2].isdigit(),
+                  'source Git batch object/type differs')
+        size = int(fields[2]); offset = end + 1
+        data = raw[offset:offset + size]
+        w.require(len(data) == size and raw[offset + size:offset + size + 1] == b'\n',
+                  'source Git batch body differs')
+        # Also reject corrupt local object content, not merely wrong batch IDs.
+        w.require(len(blob) in (40, 64), 'source Git object id differs')
+        digest = hashlib.new('sha1' if len(blob) == 40 else 'sha256',
+                             b'blob ' + str(size).encode() + b'\0' + data).hexdigest()
+        w.require(digest == blob, 'source Git blob digest differs')
+        result[blob] = data
+        offset += size + 1
+    w.require(offset == len(raw), 'source Git batch trailing bytes')
+    return result
+
+
 def source_record(root, paths, *, commit=None):
     root = Path(root).resolve()
     w.require(Path(w._source_git(root, 'rev-parse', '--show-toplevel').decode().strip()).resolve() == root, 'source root differs')
     commit = commit or w._source_git(root, 'rev-parse', 'HEAD').decode().strip()
-    files = []
+    # Resolve each registered database/pin once, never from dependency HEAD.
+    groups = {}
     for relative in sorted(set(paths)):
         name = Path(relative); path = root / name
         w.require(not name.is_absolute() and '..' not in name.parts and str(name) == relative and name.parts, 'unsafe source path')
         w.require(path.is_file() and not any((root / Path(*name.parts[:i])).is_symlink() for i in range(1,len(name.parts)+1)), 'source path missing or linked')
         submodule = next((s for s in PINNED_SUBMODULES if relative.startswith(s + '/')), None)
-        if submodule is not None:
-            pin, database = submodule_pin(root, submodule, commit)
-            mode, kind, blob = w._source_entry(root, pin, relative[len(submodule)+1:], database)
-            w.require(mode in ('100644', '100755') and kind == 'blob', 'dependency source not regular')
-            committed = w._source_git(root, 'cat-file', 'blob', blob, database=database)
-        else:
-            committed = w._committed_source(root, commit, relative)
-        data = path.read_bytes()
-        w.require(data == committed, 'uncommitted source bytes: ' + relative)
-        files.append({'path': relative, 'sha256': hashlib.sha256(data).hexdigest()})
+        groups.setdefault(submodule, []).append(relative)
+    files = []
+    for submodule, names in groups.items():
+        pin, database = submodule_pin(root, submodule, commit) if submodule else (commit, None)
+        entries = _source_tree(root, pin, database)
+        selected = {}
+        for relative in names:
+            key = relative[len(submodule)+1:] if submodule else relative
+            w.require(key in entries, 'source Git object missing')
+            mode, kind, blob = entries[key]
+            w.require(mode in ('100644', '100755') and kind == 'blob', 'source Git object not regular')
+            selected[relative] = blob
+        committed = _source_blobs(root, selected.values(), database)
+        for relative, blob in selected.items():
+            path = root / relative
+            name = Path(relative)
+            w.require(path.is_file() and not any((root / Path(*name.parts[:i])).is_symlink() for i in range(1,len(name.parts)+1)), 'source path missing or linked')
+            data = path.read_bytes()
+            w.require(data == committed[blob], 'uncommitted source bytes: ' + relative)
+            files.append({'path': relative, 'sha256': hashlib.sha256(data).hexdigest()})
+    files.sort(key=lambda row: row['path'])
     return {'commit': commit, 'files': files, 'sha256': w.canonical_sha(files)}
 
 

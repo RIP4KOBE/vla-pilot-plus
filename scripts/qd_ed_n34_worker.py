@@ -10,12 +10,26 @@ import runpy
 import sys
 import time
 
+# Emit before project imports so import/setup stalls leave phase evidence.
+if __name__ == '__main__':
+    _imports_started = time.perf_counter()
+    print(json.dumps({'schema': 'n34-verification-phase-v1', 'phase': 'worker_imports',
+                      'event': 'begin', 'pid': os.getpid(),
+                      'monotonic_seconds': time.perf_counter()}), file=sys.stderr, flush=True)
+
 from scripts import qd_ed_n23_worker as w
 from scripts import qd_ed_n34_bridge as b, qd_ed_n34_contract as c
 from scripts import qd_ed_n34_native as n34, qd_ed_n31_native as controls
 from scripts import audit_decision_evidence as generic
 from scripts import qd_ed_n34_source as closure, qd_ed_n34_controller as controller
 from scripts.qd_ed_audit_backend import create_backend, assigned_cuda_identity, canonical_cuda_uuid
+
+if __name__ == '__main__':
+    print(json.dumps({'schema': 'n34-verification-phase-v1', 'phase': 'worker_imports',
+                      'event': 'end', 'pid': os.getpid(),
+                      'monotonic_seconds': time.perf_counter(),
+                      'elapsed_seconds': time.perf_counter() - _imports_started}),
+          file=sys.stderr, flush=True)
 
 
 def attest_worker_loaded(root, source):
@@ -54,16 +68,21 @@ def attest_worker_loaded(root, source):
 
 
 def validate_context(reference):
+    with closure.verification_phase('context'):
+        return _validate_context(reference)
+
+
+def _validate_context(reference):
     context = w.read_ref(reference)
     w.require(set(context) == {'schema', 'plan', 'release', 'expected_manifest', 'episode_key', 'attempt_id', 'main_argv', 'worker_contract'}, 'worker context fields: explicit detached release required')
     w.require(context['schema'] == 'n34-worker-context-v1' and context['worker_contract'] == c.WORKER_CONTRACT, 'worker contract')
     from scripts import qd_ed_n34_release as release
-    plan, runtime, _ = release.validate_release(context['plan'], context['release'])
+    plan, runtime, _, manifests = release._verify_release_transaction(context['plan'], context['release'])
     rows = [r for r in plan['episodes'] if r['episode_key'] == context['episode_key']]
     w.require(len(rows) == 1 and context['attempt_id'] == context['episode_key'], 'exact primary attempt')
     row = rows[0]
     w.require(context['expected_manifest'] == plan['expected_manifests'][row['episode_key']], 'plan/command external anchor')
-    manifest = b.verify_manifest(context['expected_manifest'], plan, runtime, row)
+    manifest = manifests[row['episode_key']]
     w.require(context['main_argv'] == manifest['argv'][1:], 'exact candidate command')
     w.require(runtime['gpu_mapping']['physical_gpu'] == 7 and runtime['gpu_mapping']['uuid'] == c.GPU_UUID, 'assigned GPU mapping')
     return context, plan, runtime, row, manifest
@@ -322,7 +341,7 @@ def verify_terminal(plan_ref, row, terminal, release_ref=None):
 
 
 def run_worker(context_ref):
-    validate_context(context_ref)
+    # _run_in_process owns this transaction, including standalone calls.
     return _run_in_process(context_ref)
 
 
@@ -334,7 +353,7 @@ def main():
     args = parser.parse_args()
     context_ref = {'path': args.context, 'sha256': args.context_sha256}
     # Reject missing/draft/tampered authority before waiting on the parent gate.
-    # run_worker and the in-process consumer revalidate after that wait.
+    # The in-process consumer starts a fresh full transaction after that wait.
     validate_context(context_ref)
     # The parent durably records PID/boot/start identity before opening this gate.
     w.require(sys.stdin.buffer.read(1) == b'G', 'parent dispatch gate absent')
