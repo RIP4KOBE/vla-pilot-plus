@@ -1,4 +1,4 @@
-"""Prospective N34R6 CPU contract tests; no owning data or release creation."""
+"""Prospective N34R7 CPU contract tests; no owning data or release creation."""
 import copy
 from collections import Counter
 import datetime as dt
@@ -15,8 +15,8 @@ from test_n34_production_integration import journal, allowance
 
 NOW = dt.datetime(2026, 10, 8, tzinfo=dt.timezone.utc)
 STALE_CLOSURE = {
-    'path': '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000654/terminal-closure-v1.json',
-    'sha256': '468171b469a48973f6770c9cbc6efd22d056214e99d4dc752659044e868cd665',
+    'path': '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000664/terminal-closure-v1.json',
+    'sha256': 'd56a3651f67c2d0563ccc03b3659b530485cbc65a29a8e8683cb7844b0ebe1f8',
 }
 
 
@@ -32,7 +32,7 @@ def test_fresh_matrix_identical_science_and_exact_mapping():
     assert Counter(x['budget_bucket'] for x in rows) == {'baseline': 9, 'development': 20, 'recovery': 1}
     for row in rows:
         assert all(row[k] == v for k, v in tasks[row['task_id']].items())
-        assert row['episode_key'] == f'n34r6_dev_t{row["task_id"]:02d}_{row["profile"].lower()}_20261008'
+        assert row['episode_key'] == f'n34r7_dev_t{row["task_id"]:02d}_{row["profile"].lower()}_20261008'
         assert row['iteration'] == c.COHORT
     assert rows[0]['replacement'] == c.REPLACEMENT
     assert all(row['replacement'] is None for row in rows[1:])
@@ -42,8 +42,8 @@ def test_fresh_matrix_identical_science_and_exact_mapping():
     assert c.expected_rows()[0]['replacement'] == c.REPLACEMENT
 
 
-def test_exact_sixth_recovery_authority_binding():
-    assert c.COHORT == 'N34R6_OBSERVED_JAW_APPROACH_DEV_20261008'
+def test_exact_seventh_recovery_authority_binding():
+    assert c.COHORT == 'N34R7_OBSERVED_JAW_APPROACH_DEV_20261008'
     assert b.SCIENTIFIC_COMMIT == '71ffff1a0f70d9874b309db9ef1843c02bf17ebf'
     assert c.INVALID_HISTORY == (
         ('n34_dev_t00_c0_20261008', 'N34_OBSERVED_JAW_APPROACH_DEV_20261008', 'baseline'),
@@ -52,14 +52,15 @@ def test_exact_sixth_recovery_authority_binding():
         ('n34r3_dev_t00_c0_20261008', 'N34R3_OBSERVED_JAW_APPROACH_DEV_20261008', 'recovery'),
         ('n34r4_dev_t00_c0_20261008', 'N34R4_OBSERVED_JAW_APPROACH_DEV_20261008', 'recovery'),
         ('n34r5_dev_t00_c0_20261008', 'N34R5_OBSERVED_JAW_APPROACH_DEV_20261008', 'recovery'),
+        ('n34r6_dev_t00_c0_20261008', 'N34R6_OBSERVED_JAW_APPROACH_DEV_20261008', 'recovery'),
     )
     assert c.REPLACEMENT == {
-        'old_episode_key': 'n34r5_dev_t00_c0_20261008',
-        'new_episode_key': 'n34r6_dev_t00_c0_20261008',
+        'old_episode_key': 'n34r6_dev_t00_c0_20261008',
+        'new_episode_key': 'n34r7_dev_t00_c0_20261008',
         'budget_bucket': 'recovery', 'automatic': False,
         'terminal_closure': {
-            'path': '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000664/terminal-closure-v1.json',
-            'sha256': 'd56a3651f67c2d0563ccc03b3659b530485cbc65a29a8e8683cb7844b0ebe1f8',
+            'path': '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000674/terminal-closure-v1.json',
+            'sha256': '6ecf4d613b27b100e2c68892fec8dce09e996ca94001dfce9a76776f0c78940e',
         },
     }
 
@@ -71,7 +72,7 @@ def test_stale_terminal_closure_rejected_by_rows_events_and_authority(tmp_path, 
         replacement['terminal_closure'][key] = STALE_CLOSURE[key]
     row = c.expected_rows()[0]
     row['replacement'] = replacement
-    with pytest.raises(ValueError, match='exact N34R6'):
+    with pytest.raises(ValueError, match='exact N34R7'):
         c.require_row(row)
     events = journal(c.expected_rows()[:1], True)
     events[-1]['replacement'] = replacement
@@ -92,20 +93,21 @@ def test_stale_terminal_closure_rejected_by_rows_events_and_authority(tmp_path, 
     ('n34r3', 'N34R3_OBSERVED_JAW_APPROACH_DEV_20261008'),
     ('n34r4', 'N34R4_OBSERVED_JAW_APPROACH_DEV_20261008'),
     ('n34r5', 'N34R5_OBSERVED_JAW_APPROACH_DEV_20261008'),
+    ('n34r6', 'N34R6_OBSERVED_JAW_APPROACH_DEV_20261008'),
 ])
 @pytest.mark.parametrize('index', range(30))
 def test_every_stale_row_rejected(index, prefix, cohort):
     p = plan()
     row = p['episodes'][index]
-    row['episode_key'] = row['episode_key'].replace('n34r6_', prefix + '_')
+    row['episode_key'] = row['episode_key'].replace('n34r7_', prefix + '_')
     row['iteration'] = cohort
-    with pytest.raises(ValueError, match='exact N34R6'):
+    with pytest.raises(ValueError, match='exact N34R7'):
         c.require_row(row)
     with pytest.raises(ValueError, match='exact task-major matrix'):
         s.reconcile(p, [], lambda *a: None)
 
 
-@pytest.mark.parametrize('history_index', [0, 1, 2, 3, 4, 5])
+@pytest.mark.parametrize('history_index', range(7))
 @pytest.mark.parametrize('fault', ['missing', 'bucket', 'cohort', 'success', 'valid', 'telemetry', 'unknown_cost'])
 def test_each_invalid_history_is_required_and_never_repaired(history_index, fault):
     events = old_invalid(900.)
@@ -132,7 +134,7 @@ def test_each_invalid_history_is_required_and_never_repaired(history_index, faul
     ('context', 'terminal context binding'),
     ('none', 'process context/release binding'),
 ])
-def test_parent_terminal_rejects_stale_n34r5_bindings(tmp_path, monkeypatch, fault, reason):
+def test_parent_terminal_rejects_stale_n34r6_bindings(tmp_path, monkeypatch, fault, reason):
     from scripts import qd_ed_n34_worker as worker
     from test_n34_production_integration import write
     row = c.expected_rows()[0]
@@ -171,7 +173,7 @@ def test_admission_and_manifest_reject_noncontract_rows(tmp_path, fault):
     if fault == 'recovery': row['recovery_of'] = c.OLD_EPISODE
     if fault == 'replacement': row['replacement'] = None
     if fault == 'closure': row['replacement']['terminal_closure']['sha256'] = '0' * 64
-    with pytest.raises(ValueError, match='exact N34R6'):
+    with pytest.raises(ValueError, match='exact N34R7'):
         c.pre_dispatch(row, allowance(), now=NOW, stop_path=tmp_path / 'STOP')
     with pytest.raises(ValueError, match='exact fresh N34 matrix'):
         b.command({**plan(), 'episodes': [row]}, {}, row)
@@ -222,10 +224,10 @@ def test_exact_accounting_and_old_invalid_is_never_carried(tmp_path):
     assert fresh['dispatched'] == fresh['valid'] == 30
     assert fresh['by_bucket'] == dict(baseline=9, development=20, recovery=1, validation=0, formal=0)
     total = r.budget_snapshot(events)
-    assert total['dispatched'] == 36 and total['invalid'] == 6
-    assert total['by_bucket']['baseline'] == 10 and total['by_bucket']['recovery'] == 6
-    assert total['gpu_hours_consumed'] == pytest.approx(10830 / 3600)
-    assert old == before and events[:18] == before
+    assert total['dispatched'] == 37 and total['invalid'] == 7
+    assert total['by_bucket']['baseline'] == 10 and total['by_bucket']['recovery'] == 7
+    assert total['gpu_hours_consumed'] == pytest.approx(12630 / 3600)
+    assert old == before and events[:21] == before
     assert s.reconcile(plan(), old, lambda *a: None)['next_row'] == rows[0]
     result = s.reconcile(plan(), events, lambda *a: None)
     assert result['status'] == 'COMPLETE' and len(result['outcomes']) == 30
@@ -233,7 +235,7 @@ def test_exact_accounting_and_old_invalid_is_never_carried(tmp_path):
     assert report.summary(result, events)['charges_and_health_events_preserved'] == events
     p, authority, state, reservations = budget_fixture(tmp_path, old)
     snap = release.admission(p, authority, state, old, [], reservations, rows[0], now=NOW, gpu_idle=True)
-    assert snap['invalid'] == 6 and snap['gpu_hours_consumed'] == 3.0
+    assert snap['invalid'] == 7 and snap['gpu_hours_consumed'] == 3.5
 
 
 @pytest.mark.parametrize('fault', ['missing_old', 'old_success', 'old_valid', 'old_bucket', 'authority', 'unauthorized', 'next', 'misbucket'])
@@ -306,7 +308,7 @@ def test_shared_runtime_gate_accepts_only_exact_recovery_and_keeps_seed_audit(tm
                                         {'artifacts': str(tmp_path)}, require_frozen=False)
     assert validate() == seeds
     p['episodes'][1]['budget_bucket'] = 'recovery'
-    with pytest.raises(ValueError, match='exact N34R6'): validate()
+    with pytest.raises(ValueError, match='exact N34R7'): validate()
     p['episodes'] = c.expected_rows()
     # The exception does not skip the subsequent frozen seed audit.
     seeds['blocks']['dev'][0]['policy_seed'] += 1
@@ -323,8 +325,10 @@ def test_shared_runtime_gate_accepts_only_exact_recovery_and_keeps_seed_audit(tm
     ('N34R3_OBSERVED_JAW_APPROACH_DEV_20261008', 'n34r3_resource_preparation_v1'),
     ('N34R4_OBSERVED_JAW_APPROACH_DEV_20261008', 'n34r4_resource_preparation_v1'),
     ('N34R5_OBSERVED_JAW_APPROACH_DEV_20261008', 'n34r5_resource_preparation_v1'),
+    ('N34R6_OBSERVED_JAW_APPROACH_DEV_20261008', 'n34r6_resource_preparation_v1'),
 ])
-def test_historical_preparation_costs_global_but_not_new_cohort(tmp_path, cohort, kind):
+@pytest.mark.parametrize('tag', ['cohort', 'kind', 'both'])
+def test_historical_preparation_costs_global_but_not_new_cohort(tmp_path, cohort, kind, tag):
     from test_n34_lifecycle import health
     old = old_invalid()
     resources = health(18000., cohort)
@@ -333,7 +337,9 @@ def test_historical_preparation_costs_global_but_not_new_cohort(tmp_path, cohort
     snap = release.admission(p, authority, state, old, resources, reservations,
                              c.expected_rows()[0], now=NOW, gpu_idle=True)
     assert snap['gpu_hours_consumed'] == 5.
-    for event in resources: event.update(cohort=c.COHORT, kind='n34r6_resource_preparation_v1')
+    for event in resources:
+        if tag in ('cohort', 'both'): event['cohort'] = c.COHORT
+        if tag in ('kind', 'both'): event['kind'] = 'n34r7_resource_preparation_v1'
     with pytest.raises(ValueError, match='cohort_seconds_remaining'):
         release.admission(p, authority, state, old, resources, reservations,
                           c.expected_rows()[0], now=NOW, gpu_idle=True)
@@ -346,20 +352,21 @@ def test_all_thirty_admissions_follow_exact_task_major_accounting(tmp_path):
         p, authority, state, reservations = budget_fixture(tmp_path, events)
         snap = release.admission(p, authority, state, events, [], reservations,
                                  row, now=NOW, gpu_idle=True)
-        assert snap['dispatched'] == index + 6  # all six old invalids remain charged
+        assert snap['dispatched'] == index + 7  # all seven old invalids remain charged
         events.extend(journal([row], True))
     p, authority, state, reservations = budget_fixture(tmp_path, events)
     with pytest.raises(ValueError, match='next fresh contiguous row'):
         release.admission(p, authority, state, events, [], reservations,
                           rows[0], now=NOW, gpu_idle=True)
     assert r.budget_snapshot(events)['by_bucket'] == dict(
-        baseline=10, development=20, recovery=6, validation=0, formal=0)
+        baseline=10, development=20, recovery=7, validation=0, formal=0)
 
 
 @pytest.mark.parametrize('history_index,reason', [
     (3, 'missing torch.utils.serialization runtime coverage'),
     (4, 'missing lazy OpenGL conversion-handler runtime coverage'),
     (5, 'missing lazy OpenGL conversion-handler runtime coverage'),
+    (6, 'missing lazy Numba JIT dependency runtime coverage'),
 ])
 def test_computed_control_remains_invalid_unknown_and_charged(tmp_path, history_index, reason):
     events = old_invalid(900.)
@@ -380,8 +387,8 @@ def test_computed_control_remains_invalid_unknown_and_charged(tmp_path, history_
     p, authority, state, reservations = budget_fixture(tmp_path, events)
     snap = release.admission(p, authority, state, events, [], reservations,
                              c.expected_rows()[0], now=NOW, gpu_idle=True)
-    assert snap['invalid'] == 6 and snap['valid'] == 0
-    assert snap['gpu_hours_consumed'] == 1.5
+    assert snap['invalid'] == 7 and snap['valid'] == 0
+    assert snap['gpu_hours_consumed'] == 1.75
     assert events == before
 
 
@@ -404,7 +411,7 @@ def test_every_cell_enforces_exact_bucket_and_replacement(index, fault):
         row['budget_bucket'] = 'baseline' if index == 0 else 'recovery'
     else:
         row['replacement'] = None if index == 0 else copy.deepcopy(c.REPLACEMENT)
-    with pytest.raises(ValueError, match='exact N34R6'):
+    with pytest.raises(ValueError, match='exact N34R7'):
         c.require_row(row)
     events = journal(c.expected_rows()[:index + 1], True)
     events[-1][fault if fault == 'replacement' else 'budget_bucket'] = row[
