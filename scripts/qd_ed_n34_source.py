@@ -2,10 +2,14 @@
 
 No fetch, model import, installation or candidate-receipt discovery is performed.
 """
+import ast
 import hashlib
+import importlib.machinery
 import importlib.metadata
+import importlib.util
 from pathlib import Path
 import sys
+import tempfile
 from scripts import qd_ed_n23_worker as w
 
 RDT = 'third_party/rdt'
@@ -20,6 +24,117 @@ RUNTIME_PREFIXES = ('libero', 'robosuite', 'mujoco', 'transformers', 'diffusers'
                     'torch', 'numpy', 'scipy', 'safetensors', 'tokenizers', 'cv2',
                     'PIL', 'einops', 'timm', 'huggingface_hub', 'hydra', 'omegaconf')
 RDT_PREFIXES = ('models', 'configs', 'data', 'rdt')
+
+# This rule supports exactly the reviewed installed implementation. A Torch
+# upgrade requires a new reviewed rule, not just a newly observed content hash.
+GENERATED_NAME = '_remote_module_non_scriptable'
+GENERATOR_NAME = 'torch.distributed.nn.jit.instantiator'
+TEMPLATE_NAME = 'torch.distributed.nn.jit.templates.remote_module_template'
+GENERATED_RULE = 'torch-remote-non-scriptable-v1'
+GENERATOR_SHA = '567d1314ee27ff0b3bd22e7c4d1157246469de25e7a3183d96debe167b193615'
+TEMPLATE_SHA = '0ff1856bbd031b5298d46c06c0502abc20bd804f42c1949ed4127e8c773660cc'
+
+
+def _runtime_file(record):
+    w.require(isinstance(record, dict) and set(record) == {'path', 'sha256'},
+              'runtime file record schema')
+    path = Path(record['path'])
+    w.require(path.is_absolute() and path.is_file() and not path.is_symlink()
+              and str(path.resolve()) == str(path) and w.sha(path) == record['sha256'],
+              'runtime source bytes differ')
+    return path
+
+
+def _live_source(name, path):
+    """Bind all import origin fields, without importing the module to attest it."""
+    module = sys.modules.get(name)
+    spec = getattr(module, '__spec__', None)
+    loader = getattr(spec, 'loader', None)
+    cached = importlib.util.cache_from_source(str(path))
+    w.require(module is not None and getattr(module, '__name__', None) == name
+              and getattr(module, '__file__', None) == str(path)
+              and getattr(module, '__package__', None) == name.rpartition('.')[0]
+              and isinstance(spec, importlib.machinery.ModuleSpec)
+              and spec.name == name and spec.origin == str(path)
+              and spec.has_location and spec.submodule_search_locations is None
+              and spec.loader_state is None
+              and spec.cached == cached and getattr(module, '__cached__', None) == cached
+              and type(loader) is importlib.machinery.SourceFileLoader
+              and getattr(module, '__loader__', None) is loader
+              and loader.name == name and loader.path == str(path),
+              'generated runtime live origin/spec differs: ' + name)
+    return module
+
+
+def _generated_runtime(closure):
+    """Validate a prospective rule and any live instance; never learn trust from it."""
+    rules = closure.get('generated_modules', {})
+    if closure.get('schema') != 'n34-runtime-source-closure-v2':
+        w.require(not rules and 'generated_modules' not in closure,
+                  'generated runtime requires closure v2')
+        return {}
+    w.require(isinstance(rules, dict) and set(rules) == {GENERATED_NAME},
+              'generated runtime names differ')
+    rule = rules[GENERATED_NAME]
+    w.require(isinstance(rule, dict)
+              and set(rule) == {'rule', 'generator', 'template', 'sha256'}
+              and rule['rule'] == GENERATED_RULE, 'generated runtime rule schema')
+    w.require(GENERATED_NAME not in closure['modules']
+              and GENERATED_NAME in closure['required_after'],
+              'generated runtime must be separately required')
+    for key, name, digest in (('generator', GENERATOR_NAME, GENERATOR_SHA),
+                              ('template', TEMPLATE_NAME, TEMPLATE_SHA)):
+        path = _runtime_file(rule[key])
+        w.require(rule[key]['sha256'] == digest
+                  and closure['modules'].get(name) == rule[key],
+                  'unsupported generated runtime ' + key)
+        if name in sys.modules:
+            _live_source(name, path)
+
+    # Parse only frozen string literals: no Torch execution or probe import is
+    # needed to calculate the prospective content commitment.
+    tree = ast.parse(Path(rule['template']['path']).read_bytes())
+    strings = {node.targets[0].id: ast.literal_eval(node.value)
+               for node in tree.body if isinstance(node, ast.Assign)
+               and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name)}
+    content = (strings['_TEMPLATE_PREFIX']
+               + strings['_REMOTE_FORWARD_TEMPLATE_ENABLE_MOVING_CPU_TENSORS_TO_CUDA']).format(
+                   assign_module_interface_cls='module_interface_cls = None',
+                   args='*args', kwargs='**kwargs', arg_types='*args, **kwargs',
+                   arrow_and_return_type='', arrow_and_future_return_type='',
+                   jit_script_decorator='').encode('utf-8')
+    w.require(hashlib.sha256(content).hexdigest() == rule['sha256'],
+              'generated runtime prospective content differs')
+
+    generator = sys.modules.get(GENERATOR_NAME)
+    directory = None
+    if generator is not None:
+        owner = getattr(generator, '_TEMP_DIR', None)
+        w.require(type(owner) is tempfile.TemporaryDirectory,
+                  'generated runtime directory owner differs')
+        directory = Path(owner.name)
+        finalizer = owner._finalizer.peek()
+        w.require(directory.is_absolute() and directory.is_dir()
+                  and str(directory.resolve()) == str(directory) and not directory.is_symlink()
+                  and getattr(generator, 'INSTANTIATED_TEMPLATE_DIR_PATH', None) == str(directory)
+                  and finalizer is not None and finalizer[0] is owner
+                  and finalizer[2] == (str(directory),),
+                  'generated runtime directory binding differs')
+    inventory = {}
+    if GENERATED_NAME in sys.modules:
+        w.require(directory is not None and TEMPLATE_NAME in sys.modules,
+                  'generated runtime owner/template not loaded')
+        path = directory / (GENERATED_NAME + '.py')
+        record = {'path': str(path), 'sha256': rule['sha256']}
+        _runtime_file(record)
+        _live_source(GENERATED_NAME, path)
+        inventory[GENERATED_NAME] = record
+    for name, module in list(sys.modules.items()):
+        file = getattr(module, '__file__', None)
+        in_directory = file is not None and directory is not None and Path(file).resolve().is_relative_to(directory)
+        w.require(name == GENERATED_NAME or not (name.startswith('_remote_module_') or in_directory),
+                  'unexpected generated runtime module: ' + name)
+    return inventory
 
 
 def submodule_pin(root, submodule, commit='HEAD'):
@@ -119,15 +234,16 @@ def attest_loaded(root, source):
 
 
 def verify_runtime(closure, runtime_ref):
-    w.require(closure['schema'] == 'n34-runtime-source-closure-v1' and closure['runtime'] == runtime_ref,
+    w.require(closure['schema'] in ('n34-runtime-source-closure-v1', 'n34-runtime-source-closure-v2')
+              and closure['runtime'] == runtime_ref,
               'runtime closure binding')
     modules = closure['modules']
     w.require(isinstance(modules, dict) and modules and closure['required_after']
-              and set(closure['required_after']) <= set(modules), 'runtime modules required')
+              and set(closure['required_after']) <= set(modules) | set(closure.get('generated_modules', {})),
+              'runtime modules required')
     for record in modules.values():
-        path = Path(record['path'])
-        w.require(path.is_absolute() and path.is_file() and not path.is_symlink()
-                  and str(path.resolve()) == str(path) and w.sha(path) == record['sha256'], 'runtime source bytes differ')
+        _runtime_file(record)
+    _generated_runtime(closure)
     w.require(closure['interpreter'] == {'path': str(Path(sys.executable).resolve()),
               'sha256': w.sha(Path(sys.executable).resolve()), 'version': sys.version}, 'runtime interpreter differs')
     w.require(isinstance(closure['versions'], dict) and all(closure['versions'].get(k) for k in ('python', 'torch', 'libero', 'robosuite', 'mujoco')), 'runtime versions required')
@@ -139,8 +255,10 @@ def verify_runtime(closure, runtime_ref):
 
 def attest_runtime(closure, runtime_ref, *, after=False):
     verify_runtime(closure, runtime_ref)
-    inventory = {}
+    inventory = _generated_runtime(closure)
     for name, module in list(sys.modules.items()):
+        if name in inventory:
+            continue  # already attested against the explicit prospective rule
         if name in ('torch.ops', 'torch.classes'):
             continue  # no backing source file; torch._ops / torch._classes are inventoried
         file = getattr(module, '__file__', None)
