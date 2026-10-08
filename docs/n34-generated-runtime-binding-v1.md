@@ -141,3 +141,88 @@ commitment. Child processes use `-B`, disable bytecode writes and have a 120-sec
 timeout. Their generated temporary files disappear on process exit. The fixture
 inventory is neither exported to owning state nor acceptable as production
 approval. These checks establish this rule's behavior only.
+
+## Retained parent receipt (operational repair)
+
+New workers emit `n34-worker-receipt-v2`; the parent requires that version and
+rejects old flat receipts. Both `runtime_before` and `runtime_after` now use
+`n34-runtime-receipt-v2`, with exactly these fields:
+
+- `schema`: the runtime receipt version.
+- `binding`: the context reference, externally frozen `runtime_closure` reference,
+  worker process identity (`pid`, `proc_start_ticks`, `boot_id`), and phase name.
+- `modules`: ordinary runtime records, still exact name/path/hash matches to the
+  external closure. Unexpected names and extra record fields fail closed.
+- `generated_modules`: only explicitly authorized generated names, each retaining
+  its exact frozen rule, live path/content record, generated UTF-8 source,
+  module/spec/loader origin claims for generated source and generator/template,
+  and checked TemporaryDirectory owner/finalizer/directory claims.
+
+`attest_runtime` remains the live inventory API. The worker now calls
+`attest_runtime_receipt`, which first runs that complete attestation and only then
+captures the retained evidence. This does not bypass generated-source checks or
+exempt generated names from ordinary completeness checking: generated names must
+be disjoint from ordinary names, owner/template ordinary records must be present,
+and `required_after` is checked over their union. If a generated instance was
+already present before Main, its full retained evidence must remain identical
+after Main and auditing.
+
+The parent still verifies the external closure, including generator/template
+files, supported implementation hashes, interpreter/distribution bindings, and
+prospectively reconstructed source content. It verifies the retained generated
+bytes against that frozen content hash, all retained metadata against the exact
+supported origin structure, and the owner directory against the retained source
+path. It also retains the existing context/process/start, source, CUDA identity,
+controller semantics/instance, evidence, native counts, and terminal gates.
+No parent generated-path lookup is needed: UTF-8 bytes and origin claims live
+inside the durable, hash-referenced worker receipt. `verify_terminal` consumes
+this through the same `verify_receipt` path after worker exit. The parent’s own
+loaded instance, if any, is still subject to live closure checks; its temporary
+path need not equal the worker’s path.
+
+For prospective adoption, root must independently freeze the complete ordinary
+inventory and the v2 generated rule described above, update the operational source
+commitment to this implementation, and use matching v2 producer/consumer code.
+The closure schema remains `n34-runtime-source-closure-v2`; ordinary-only closure
+v1 is still supported with v2 worker/runtime receipts. There is no migration that
+turns an old generated path into authority, and no fallback to flat receipts.
+The test-discovered ordinary inventory is ephemeral test data, not a production
+manifest. This repair creates no production closure or release.
+
+### What retained origin evidence proves
+
+The frozen worker checks actual live import metadata, regular/canonical source,
+actual TemporaryDirectory type, owner identity and live finalizer before emitting
+these claims. The process/context/phase bindings and the existing outer receipt
+hash retain that checked observation. After cleanup, the parent can independently
+recheck content, supported rule, binding and internal origin consistency; it
+cannot re-observe a destroyed directory or finalizer. The claims are explicitly
+worker attestations, not reconstructed filesystem facts or cryptographic hardware
+attestations. A party able to replace the entire receipt, its trusted hash and all
+consistent origin claims can forge this history. Arbitrary in-process memory
+forgery, post-check races and a malicious worker remain outside the existing source
+attestation trust model. Copying an internally consistent historical claim and
+also forging its enclosing process/context bindings is not independently detectable.
+No claim of replay resistance against that attacker or of native/runtime readiness
+is made.
+
+### Parent integration validation
+
+`tests/test_n34_generated_receipt.py` uses the specified interpreter with `-B`,
+empty CUDA visibility and two-thread limits. A discovery child builds an ephemeral
+ordinary fixture; two fresh children verify that frozen fixture and import the
+installed Torch generator without invoking any generated forward function. Their
+retained receipts are consumed by the actual `verify_receipt` only after process
+exit and verified TemporaryDirectory removal. Both distinct origins pass.
+
+Only dispatch/context setup is substituted in the parent fixture. Synthetic
+source records, controller review documents, device identity fields and scalar
+native report/compute records satisfy the surrounding receipt validators; their
+validators are not removed or mocked. These are schema fixtures, not executed
+controller/model/simulation evidence. Tests also corrupt controller and native
+fields to ensure those gates remain active. Runtime closure verification,
+controller semantics verification, native receipt validation, evidence hashing
+and parent receipt consumption run normally. Tampering covers the frozen rule,
+retained content/hash, module/loader/cache/origin/owner metadata, process/context/
+closure/phase binding, ordinary records, missing generated records, and changed
+before/after origins.

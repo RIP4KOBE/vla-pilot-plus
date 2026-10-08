@@ -151,6 +151,11 @@ def verify_dispatch_record(context_ref, context, output, identity):
               'parent dispatch process/context/release differs')
 
 
+def runtime_receipt_binding(context_ref, plan, process, phase):
+    return {'context': context_ref, 'runtime_closure': plan['runtime_closure'],
+            'process': process, 'phase': phase}
+
+
 def _run_in_process(context_ref):
     """Internal implementation, to be called only by a root-released bounded runner."""
     context, plan, runtime, row, manifest = validate_context(context_ref)
@@ -164,7 +169,7 @@ def _run_in_process(context_ref):
     report_path = output / 'eds_eval/decision-evidence-audit.json'
     w.require(not any(p.exists() for p in (receipt_path, start_path, report_path)), 'replay/duplicate worker artifacts')
     w.atomic_json(start_path, {'context': context_ref, 'process': identity})
-    receipt = {'schema': 'n34-worker-receipt-v1', 'context': context_ref, 'plan': context['plan'],
+    receipt = {'schema': 'n34-worker-receipt-v2', 'context': context_ref, 'plan': context['plan'],
                'expected_manifest': context['expected_manifest'], 'source': plan['source'], 'scientific_source': plan['scientific_source'], 'row': row,
                'attempt_id': context['attempt_id'], 'process': identity, 'accepted': False,
                'main_exit_code': None, 'http_counters': 'Unknown'}
@@ -172,7 +177,8 @@ def _run_in_process(context_ref):
     try:
         runtime_closure = w.read_ref(plan['runtime_closure'])
         proof = controller.verify_semantics(plan['controller_semantics'], plan['runtime'], runtime_closure)
-        receipt['runtime_before'] = closure.attest_runtime(runtime_closure, plan['runtime'])
+        receipt['runtime_before'] = closure.attest_runtime_receipt(runtime_closure, plan['runtime'],
+            binding=runtime_receipt_binding(context_ref, plan, identity, 'runtime_before'))
         receipt['loaded_before'] = attest_worker_loaded(root, plan['source'])
         sys.argv = context['main_argv']
         os.chdir(root)
@@ -186,7 +192,8 @@ def _run_in_process(context_ref):
         validate_context(context_ref)
         w.require(w.process_identity() == identity, 'worker process changed')
         receipt['loaded_after'] = attest_worker_loaded(root, plan['source'])
-        receipt['runtime_after'] = closure.attest_runtime(runtime_closure, plan['runtime'], after=True)
+        receipt['runtime_after'] = closure.attest_runtime_receipt(runtime_closure, plan['runtime'], after=True,
+            binding=runtime_receipt_binding(context_ref, plan, identity, 'runtime_after'))
         receipt['worker_cuda'] = assigned_cuda_identity(w.cuda_binding(runtime))
         backend = create_backend('cpu')
         before = evidence(output)
@@ -200,7 +207,8 @@ def _run_in_process(context_ref):
         w.require(before == evidence(output), 'evidence changed during audit')
         validate_context(context_ref)
         receipt['loaded_after'] = attest_worker_loaded(root, plan['source'])
-        receipt['runtime_after'] = closure.attest_runtime(runtime_closure, plan['runtime'], after=True)
+        receipt['runtime_after'] = closure.attest_runtime_receipt(runtime_closure, plan['runtime'], after=True,
+            binding=runtime_receipt_binding(context_ref, plan, identity, 'runtime_after'))
         receipt.update(audit_seconds=time.perf_counter() - audit_started, native_counts=counts, auxiliary=auxiliary,
                        evidence=before, audit_backend=backend.report())
         w.atomic_json(report_path, report)
@@ -223,7 +231,7 @@ def verify_receipt(context_ref, receipt_ref, process_record):
     process = {key: process_record[key] for key in ('pid', 'proc_start_ticks', 'boot_id')}
     w.require(process_record['attempt_id'] == context['attempt_id'] and receipt.get('process') == process
               and receipt.get('process_unchanged') is True and receipt.get('accepted') is True
-              and receipt.get('main_exit_code') == 0 and receipt.get('schema') == 'n34-worker-receipt-v1', 'receipt process/outcome')
+              and receipt.get('main_exit_code') == 0 and receipt.get('schema') == 'n34-worker-receipt-v2', 'receipt process/outcome')
     for key, expected in {'context': context_ref, 'plan': context['plan'], 'expected_manifest': context['expected_manifest'],
                           'source': plan['source'], 'scientific_source': plan['scientific_source'], 'row': row, 'attempt_id': context['attempt_id'], 'evidence': evidence(output)}.items():
         w.require(receipt.get(key) == expected, 'receipt binding ' + key)
@@ -265,10 +273,13 @@ def verify_receipt(context_ref, receipt_ref, process_record):
     expected_controller = {k: proof[k] for k in ('source', 'module', 'class', 'instance')}
     w.require(receipt.get('controller_instances') and all(x == expected_controller for x in receipt['controller_instances']), 'deployed controller receipt differs')
     for phase in ('runtime_before', 'runtime_after'):
-        inventory = receipt[phase]
-        w.require(all(runtime_closure['modules'].get(k) == v for k,v in inventory.items()), 'runtime receipt source differs')
-        if phase == 'runtime_after':
-            w.require(set(runtime_closure['required_after']) <= set(inventory), 'runtime receipt incomplete')
+        closure.verify_runtime_receipt(runtime_closure, receipt[phase],
+            binding=runtime_receipt_binding(context_ref, plan, process, phase),
+            after=phase == 'runtime_after')
+    before_generated = receipt['runtime_before']['generated_modules']
+    after_generated = receipt['runtime_after']['generated_modules']
+    w.require(all(after_generated.get(k) == v for k, v in before_generated.items()),
+              'generated runtime identity changed')
     report = w.read_ref(receipt['audit_report'])
     w.require(report.get('n23_arithmetic_backend') == receipt['audit_backend'], 'generic backend receipt')
     counts, auxiliary = native_counts(row['profile'], output, report, manifest['expected_runtime'])

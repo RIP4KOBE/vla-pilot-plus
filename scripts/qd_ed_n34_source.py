@@ -273,3 +273,88 @@ def attest_runtime(closure, runtime_ref, *, after=False):
     if after:
         w.require(set(closure['required_after']) <= set(inventory), 'required runtime modules not loaded')
     return inventory
+
+
+def _retained_origin(name, path):
+    """Canonical claims emitted only after the live origin/owner checks pass."""
+    path = str(path)
+    return {'module_name': name, 'file': path, 'package': name.rpartition('.')[0],
+            'cached': importlib.util.cache_from_source(path),
+            'spec': {'name': name, 'origin': path, 'has_location': True,
+                     'submodule_search_locations': None, 'loader_state': None,
+                     'cached': importlib.util.cache_from_source(path)},
+            'loader': {'type': 'importlib.machinery.SourceFileLoader',
+                       'name': name, 'path': path, 'module_loader_is_spec_loader': True}}
+
+
+def attest_runtime_receipt(closure, runtime_ref, *, binding, after=False):
+    """Retain checked source/origin claims inside the process-bound receipt.
+
+    No temporary path becomes authority. Content is independently committed by
+    the prospective rule; origin remains a trusted worker's point-in-time claim.
+    """
+    inventory = attest_runtime(closure, runtime_ref, after=after)
+    generated = {}
+    for name, rule in closure.get('generated_modules', {}).items():
+        if name not in inventory:
+            continue
+        record = inventory.pop(name)
+        path = Path(record['path'])
+        content = path.read_bytes()
+        w.require(hashlib.sha256(content).hexdigest() == rule['sha256'],
+                  'retained generated content differs')
+        generated[name] = {'rule': rule, 'record': record,
+                           'source_utf8': content.decode('utf-8'),
+                           'origin': _retained_origin(name, path),
+                           'generator_origin': _retained_origin(GENERATOR_NAME, rule['generator']['path']),
+                           'template_origin': _retained_origin(TEMPLATE_NAME, rule['template']['path']),
+                           'owner': {'type': 'tempfile.TemporaryDirectory', 'name': str(path.parent),
+                                     'exported_directory': str(path.parent),
+                                     'finalizer_owner_identity': True,
+                                     'finalizer_args': [str(path.parent)],
+                                     'canonical_directory': True, 'regular_source': True}}
+    return {'schema': 'n34-runtime-receipt-v2', 'binding': binding,
+            'modules': inventory, 'generated_modules': generated}
+
+
+def verify_runtime_receipt(closure, receipt, *, binding, after=False):
+    """Parent consumption after process exit: never reopen worker temp paths."""
+    w.require(isinstance(receipt, dict) and set(receipt) == {
+        'schema', 'binding', 'modules', 'generated_modules'}
+        and receipt['schema'] == 'n34-runtime-receipt-v2'
+        and receipt['binding'] == binding, 'runtime receipt schema/binding differs')
+    ordinary, generated = receipt['modules'], receipt['generated_modules']
+    rules = closure.get('generated_modules', {})
+    w.require(isinstance(ordinary, dict) and isinstance(generated, dict)
+              and not set(ordinary) & set(rules) and set(generated) <= set(rules),
+              'runtime receipt names differ')
+    w.require(all(name in closure['modules'] and closure['modules'][name] == record
+                  for name, record in ordinary.items()), 'runtime receipt source differs')
+    for name, evidence in generated.items():
+        rule = rules[name]
+        w.require(isinstance(evidence, dict) and isinstance(evidence.get('record'), dict)
+                  and isinstance(evidence['record'].get('path'), str)
+                  and isinstance(evidence.get('source_utf8'), str), 'generated receipt schema')
+        path = Path(evidence['record']['path'])
+        # Lexical check only: the owning TemporaryDirectory has been cleaned up.
+        w.require(path.is_absolute() and str(path) == evidence['record']['path']
+                  and '..' not in path.parts and path.name == name + '.py',
+                  'generated receipt path differs')
+        expected = {'rule': rule, 'record': {'path': str(path), 'sha256': rule['sha256']},
+                    'source_utf8': evidence['source_utf8'],
+                    'origin': _retained_origin(name, path),
+                    'generator_origin': _retained_origin(GENERATOR_NAME, rule['generator']['path']),
+                    'template_origin': _retained_origin(TEMPLATE_NAME, rule['template']['path']),
+                    'owner': {'type': 'tempfile.TemporaryDirectory', 'name': str(path.parent),
+                              'exported_directory': str(path.parent),
+                              'finalizer_owner_identity': True, 'finalizer_args': [str(path.parent)],
+                              'canonical_directory': True, 'regular_source': True}}
+        w.require(w.canonical_sha(evidence) == w.canonical_sha(expected)
+                  and hashlib.sha256(evidence['source_utf8'].encode('utf-8')).hexdigest() == rule['sha256'],
+                  'generated receipt rule/content/origin differs')
+        w.require(ordinary.get(GENERATOR_NAME) == rule['generator']
+                  and ordinary.get(TEMPLATE_NAME) == rule['template'],
+                  'generated receipt owner/template absent')
+    if after:
+        w.require(set(closure['required_after']) <= set(ordinary) | set(generated),
+                  'runtime receipt incomplete')
