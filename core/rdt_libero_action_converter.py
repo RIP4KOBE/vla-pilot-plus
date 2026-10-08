@@ -60,3 +60,21 @@ def decode_rdt_libero_action_chunk(pred_actions_128, action_chunk_horizon: int) 
 
     first_particle = pred_actions_128[0:1, :action_chunk_horizon, :]
     return rdt_action_to_libero_raw(first_particle).to(device=pred_actions_128.device)
+
+
+def encode_libero_prefix(template: torch.Tensor, commands: torch.Tensor) -> torch.Tensor:
+    """Write normalized LIBERO delta commands into a native RDT plan copy.
+
+    This is the inverse of rdt_action_to_libero_raw for binary gripper commands.
+    Channels 39:42 are translation, 42:45 rotation increments, 10 gripper.
+    No absolute-pose / ortho6d conversion or affine normalization is involved.
+    """
+    if (template.shape != (64, 128) or commands.ndim != 2 or commands.shape[1] != 7
+            or not 1 <= len(commands) <= 64 or template.dtype not in (torch.float32, torch.bfloat16)
+            or commands.dtype != template.dtype or commands.device != template.device
+            or not bool(torch.isfinite(commands).all())
+            or not bool(((commands[:, 6] == -1) | (commands[:, 6] == 1)).all())):
+        raise ValueError('invalid native LIBERO prefix')
+    result = template.detach().clone()
+    result[:len(commands), LIBERO_ACTION_INDICES] = commands
+    return result
