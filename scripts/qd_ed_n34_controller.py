@@ -14,6 +14,23 @@ FIELDS = ('control_delta', 'control_ori', 'control_dim', 'impedance_mode',
           'input_min', 'input_max', 'output_min', 'output_max', 'policy_freq',
           'uncouple_pos_ori', 'interpolator_pos', 'interpolator_ori')
 
+# Reviewed robosuite 1.4.0 instance storage. Proof/receipt keys remain canonical;
+# this is an exact adapter, not attribute discovery or a compatibility fallback.
+INSTANCE_ATTRIBUTES = {
+    'control_delta': 'use_delta',
+    'control_ori': 'use_ori',
+    'control_dim': 'control_dim',
+    'impedance_mode': 'impedance_mode',
+    'input_min': 'input_min',
+    'input_max': 'input_max',
+    'output_min': 'output_min',
+    'output_max': 'output_max',
+    'policy_freq': 'control_freq',
+    'uncouple_pos_ori': 'uncoupling',
+    'interpolator_pos': 'interpolator_pos',
+    'interpolator_ori': 'interpolator_ori',
+}
+
 
 def serial(value):
     if hasattr(value, 'tolist'):
@@ -61,7 +78,7 @@ def attest_instance(controller, proof):
     w.require(cls.__module__ == proof['module'] and cls.__name__ == proof['class'], 'controller class differs')
     path = Path(inspect.getfile(cls)).resolve()
     w.require({'path': str(path), 'sha256': w.sha(path)} == proof['source'], 'controller implementation differs')
-    values = {key: serial(getattr(controller, key)) for key in FIELDS}
+    values = {key: serial(getattr(controller, INSTANCE_ATTRIBUTES[key])) for key in FIELDS}
     w.require(values == proof['instance'], 'actual controller config/delta semantics differ')
     return {'source': proof['source'], 'module': cls.__module__, 'class': cls.__name__, 'instance': values}
 

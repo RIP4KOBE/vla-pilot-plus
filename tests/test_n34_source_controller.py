@@ -10,6 +10,11 @@ from scripts import qd_ed_n23_worker as w
 from test_n32_submodule_freeze import repo, git, commit, RDT
 
 
+# Independent fixture of the reviewed deployed storage, not the adapter table.
+DEPLOYED_ALIASES = {'control_delta': 'use_delta', 'control_ori': 'use_ori',
+                    'policy_freq': 'control_freq', 'uncouple_pos_ori': 'uncoupling'}
+
+
 def test_pinned_closure_roundtrip_and_foreign_model(repo, monkeypatch):
     root,path,_,pin,other=repo
     paths=source.rdt_paths(root)
@@ -53,7 +58,9 @@ def proof(tmp_path,monkeypatch):
     values=dict(control_delta=True,control_ori=True,control_dim=6,impedance_mode='fixed',
                 input_min=[-1]*6,input_max=[1]*6,output_min=[-.05]*3+[-.5]*3,output_max=[.05]*3+[.5]*3,
                 policy_freq=20,uncouple_pos_ori=True,interpolator_pos=None,interpolator_ori=None)
-    def init(self):self.__dict__.update(copy.deepcopy(values))
+    def init(self):
+        self.__dict__.update({DEPLOYED_ALIASES.get(key, key): copy.deepcopy(value)
+                              for key, value in values.items()})
     cls=type('OperationalSpaceController',(),{'__module__':module.__name__,'__init__':init})
     module.OperationalSpaceController=cls
     evidence=write(tmp_path/'review.json',{'kind':'deployed_source_review','runtime':runtime,'fixture_only':False})
@@ -74,8 +81,15 @@ def test_actual_instance_observed_without_changing_settings(proof,tmp_path):
     original=cls.__init__
     with controller.observe_instances(p) as records:
         obj=cls()
-        assert obj.control_delta is True
+        assert obj.use_delta is True and obj.use_ori is True
+        assert obj.control_freq == 20 and obj.uncoupling is True
+        assert all(not hasattr(obj, key) for key in DEPLOYED_ALIASES)
+        before = copy.deepcopy(obj.__dict__)
     assert len(records)==1 and cls.__init__ is original
+    assert obj.__dict__ == before
+    assert records[0] == {key: p[key] for key in ('source', 'module', 'class', 'instance')}
+    assert set(records[0]['instance']) == set(controller.FIELDS)
+    assert not set(DEPLOYED_ALIASES.values()) & set(records[0]['instance'])
     with pytest.raises(ValueError,match='no deployed'):
         with controller.observe_instances(p):pass
     assert cls.__init__ is original
@@ -95,10 +109,69 @@ def test_wrong_deployed_semantics_rejected(proof,tmp_path,fault):
     with pytest.raises(ValueError):controller.verify_semantics(write(tmp_path/'proof.json',p),rt,cl)
 
 
-def test_actual_instance_wrong_config_rejected(proof):
+@pytest.mark.parametrize('key,bad', [
+    ('control_delta', False), ('control_ori', False), ('policy_freq', 10),
+    ('uncouple_pos_ori', False), ('control_dim', 3), ('impedance_mode', 'variable'),
+    ('input_min', [0]*6), ('input_max', [2]*6), ('output_min', [-.1]*6),
+    ('output_max', [.1]*6), ('interpolator_pos', 'linear'), ('interpolator_ori', 'linear'),
+])
+def test_actual_instance_wrong_config_rejected(proof,key,bad):
     p,cls,_,_=proof
-    obj=cls();obj.control_delta=False
+    obj=cls()
+    setattr(obj, DEPLOYED_ALIASES.get(key, key), bad)
+    # Correct constructor-name decoys must never override wrong deployed values.
+    if key in DEPLOYED_ALIASES:
+        setattr(obj, key, p['instance'][key])
     with pytest.raises(ValueError,match='config/delta'):controller.attest_instance(obj,p)
+
+
+@pytest.mark.parametrize('key', controller.FIELDS)
+def test_actual_instance_missing_attribute_rejected(proof,key):
+    p,cls,_,_=proof
+    obj=cls()
+    attribute = DEPLOYED_ALIASES.get(key, key)
+    delattr(obj, attribute)
+    if key in DEPLOYED_ALIASES:
+        setattr(obj, key, p['instance'][key])
+    with pytest.raises(AttributeError, match=attribute):
+        controller.attest_instance(obj,p)
+
+
+@pytest.mark.parametrize('fault', ['module', 'class', 'source_path', 'source_hash', 'source_bytes'])
+def test_actual_instance_identity_rejected(proof,tmp_path,fault):
+    p,cls,_,_=proof
+    obj=cls()
+    if fault=='module':cls.__module__='foreign.controllers.osc'
+    elif fault=='class':cls.__name__='OtherController'
+    elif fault=='source_path':
+        other=tmp_path/'other_osc.py'
+        other.write_bytes(Path(p['source']['path']).read_bytes())
+        p['source']['path']=str(other)
+    elif fault=='source_hash':p['source']['sha256']='0'*64
+    elif fault=='source_bytes':Path(p['source']['path']).write_text('# changed source\n')
+    reason = 'class differs' if fault in ('module', 'class') else 'implementation differs'
+    with pytest.raises(ValueError,match=reason):controller.attest_instance(obj,p)
+
+
+@pytest.mark.parametrize('key', DEPLOYED_ALIASES)
+@pytest.mark.parametrize('mode', ['replace', 'extra'])
+def test_proof_requires_canonical_fields(proof,tmp_path,key,mode):
+    p,cls,rt,cl=proof
+    p['instance'][DEPLOYED_ALIASES[key]]=p['instance'][key]
+    if mode=='replace':del p['instance'][key]
+    with pytest.raises(ValueError,match='OSC normalized'):
+        controller.verify_semantics(write(tmp_path/'proof.json',p),rt,cl)
+    with pytest.raises(ValueError,match='config/delta'):controller.attest_instance(cls(),p)
+
+
+def test_observer_restores_constructor_after_attestation_failure(proof):
+    p,cls,_,_=proof
+    original=cls.__init__
+    p['instance']={**p['instance'], 'control_delta': False}
+    with pytest.raises(ValueError,match='config/delta'):
+        with controller.observe_instances(p) as records:
+            cls()
+    assert records == [] and cls.__init__ is original
 
 
 def test_full_external_module_inventory_not_just_known_prefixes(tmp_path,monkeypatch):
