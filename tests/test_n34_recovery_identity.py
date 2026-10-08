@@ -1,4 +1,4 @@
-"""Prospective N34R2 CPU contract tests; no owning data or release creation."""
+"""Prospective N34R3 CPU contract tests; no owning data or release creation."""
 import copy
 from collections import Counter
 import datetime as dt
@@ -15,8 +15,8 @@ from test_n34_production_integration import journal, allowance
 
 NOW = dt.datetime(2026, 10, 8, tzinfo=dt.timezone.utc)
 STALE_CLOSURE = {
-    'path': '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000610/terminal-closure-v1.json',
-    'sha256': '212ed90e3cb06c5797175cf772f5808d09f024fbe3f398e7ba079154e092bff1',
+    'path': '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000624/terminal-closure-v1.json',
+    'sha256': 'ed88e8a29c196be8bc37f7ca8d00a067bc346d213a7c28647fb89e456ff2fdfc',
 }
 
 
@@ -32,7 +32,7 @@ def test_fresh_matrix_identical_science_and_exact_mapping():
     assert Counter(x['budget_bucket'] for x in rows) == {'baseline': 9, 'development': 20, 'recovery': 1}
     for row in rows:
         assert all(row[k] == v for k, v in tasks[row['task_id']].items())
-        assert row['episode_key'] == f'n34r2_dev_t{row["task_id"]:02d}_{row["profile"].lower()}_20261008'
+        assert row['episode_key'] == f'n34r3_dev_t{row["task_id"]:02d}_{row["profile"].lower()}_20261008'
         assert row['iteration'] == c.COHORT
     assert rows[0]['replacement'] == c.REPLACEMENT
     assert all(row['replacement'] is None for row in rows[1:])
@@ -42,15 +42,21 @@ def test_fresh_matrix_identical_science_and_exact_mapping():
     assert c.expected_rows()[0]['replacement'] == c.REPLACEMENT
 
 
-def test_exact_second_recovery_authority_binding():
-    assert c.COHORT == 'N34R2_OBSERVED_JAW_APPROACH_DEV_20261008'
+def test_exact_third_recovery_authority_binding():
+    assert c.COHORT == 'N34R3_OBSERVED_JAW_APPROACH_DEV_20261008'
+    assert b.SCIENTIFIC_COMMIT == '71ffff1a0f70d9874b309db9ef1843c02bf17ebf'
+    assert c.INVALID_HISTORY == (
+        ('n34_dev_t00_c0_20261008', 'N34_OBSERVED_JAW_APPROACH_DEV_20261008', 'baseline'),
+        ('n34r1_dev_t00_c0_20261008', 'N34R1_OBSERVED_JAW_APPROACH_DEV_20261008', 'recovery'),
+        ('n34r2_dev_t00_c0_20261008', 'N34R2_OBSERVED_JAW_APPROACH_DEV_20261008', 'recovery'),
+    )
     assert c.REPLACEMENT == {
-        'old_episode_key': 'n34r1_dev_t00_c0_20261008',
-        'new_episode_key': 'n34r2_dev_t00_c0_20261008',
+        'old_episode_key': 'n34r2_dev_t00_c0_20261008',
+        'new_episode_key': 'n34r3_dev_t00_c0_20261008',
         'budget_bucket': 'recovery', 'automatic': False,
         'terminal_closure': {
-            'path': '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000624/terminal-closure-v1.json',
-            'sha256': 'ed88e8a29c196be8bc37f7ca8d00a067bc346d213a7c28647fb89e456ff2fdfc',
+            'path': '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000634/terminal-closure-v1.json',
+            'sha256': '91a166f8722ea380c8035d6e08d4de3ec4d20c23c9e275a791ee68142b15c399',
         },
     }
 
@@ -62,7 +68,7 @@ def test_stale_terminal_closure_rejected_by_rows_events_and_authority(tmp_path, 
         replacement['terminal_closure'][key] = STALE_CLOSURE[key]
     row = c.expected_rows()[0]
     row['replacement'] = replacement
-    with pytest.raises(ValueError, match='exact N34R2'):
+    with pytest.raises(ValueError, match='exact N34R3'):
         c.require_row(row)
     events = journal(c.expected_rows()[:1], True)
     events[-1]['replacement'] = replacement
@@ -76,19 +82,24 @@ def test_stale_terminal_closure_rejected_by_rows_events_and_authority(tmp_path, 
                           c.expected_rows()[0], now=NOW, gpu_idle=True)
 
 
+@pytest.mark.parametrize('prefix,cohort', [
+    ('n34', 'N34_OBSERVED_JAW_APPROACH_DEV_20261008'),
+    ('n34r1', 'N34R1_OBSERVED_JAW_APPROACH_DEV_20261008'),
+    ('n34r2', 'N34R2_OBSERVED_JAW_APPROACH_DEV_20261008'),
+])
 @pytest.mark.parametrize('index', range(30))
-def test_every_stale_n34r1_row_rejected(index):
+def test_every_stale_row_rejected(index, prefix, cohort):
     p = plan()
     row = p['episodes'][index]
-    row['episode_key'] = row['episode_key'].replace('n34r2_', 'n34r1_')
-    row['iteration'] = c.OLD_COHORT
-    with pytest.raises(ValueError, match='exact N34R2'):
+    row['episode_key'] = row['episode_key'].replace('n34r3_', prefix + '_')
+    row['iteration'] = cohort
+    with pytest.raises(ValueError, match='exact N34R3'):
         c.require_row(row)
     with pytest.raises(ValueError, match='exact task-major matrix'):
         s.reconcile(p, [], lambda *a: None)
 
 
-@pytest.mark.parametrize('history_index', [0, 1])
+@pytest.mark.parametrize('history_index', [0, 1, 2])
 @pytest.mark.parametrize('fault', ['missing', 'bucket', 'cohort', 'success', 'valid', 'telemetry', 'unknown_cost'])
 def test_each_invalid_history_is_required_and_never_repaired(history_index, fault):
     events = old_invalid(900.)
@@ -115,7 +126,7 @@ def test_each_invalid_history_is_required_and_never_repaired(history_index, faul
     ('context', 'terminal context binding'),
     ('none', 'process context/release binding'),
 ])
-def test_parent_terminal_rejects_stale_n34r1_bindings(tmp_path, monkeypatch, fault, reason):
+def test_parent_terminal_rejects_stale_n34r2_bindings(tmp_path, monkeypatch, fault, reason):
     from scripts import qd_ed_n34_worker as worker
     from test_n34_production_integration import write
     row = c.expected_rows()[0]
@@ -154,7 +165,7 @@ def test_admission_and_manifest_reject_noncontract_rows(tmp_path, fault):
     if fault == 'recovery': row['recovery_of'] = c.OLD_EPISODE
     if fault == 'replacement': row['replacement'] = None
     if fault == 'closure': row['replacement']['terminal_closure']['sha256'] = '0' * 64
-    with pytest.raises(ValueError, match='exact N34R2'):
+    with pytest.raises(ValueError, match='exact N34R3'):
         c.pre_dispatch(row, allowance(), now=NOW, stop_path=tmp_path / 'STOP')
     with pytest.raises(ValueError, match='exact fresh N34 matrix'):
         b.command({**plan(), 'episodes': [row]}, {}, row)
@@ -205,10 +216,10 @@ def test_exact_accounting_and_old_invalid_is_never_carried(tmp_path):
     assert fresh['dispatched'] == fresh['valid'] == 30
     assert fresh['by_bucket'] == dict(baseline=9, development=20, recovery=1, validation=0, formal=0)
     total = r.budget_snapshot(events)
-    assert total['dispatched'] == 32 and total['invalid'] == 2
-    assert total['by_bucket']['baseline'] == 10 and total['by_bucket']['recovery'] == 2
-    assert total['gpu_hours_consumed'] == pytest.approx(3630 / 3600)
-    assert old == before and events[:6] == before
+    assert total['dispatched'] == 33 and total['invalid'] == 3
+    assert total['by_bucket']['baseline'] == 10 and total['by_bucket']['recovery'] == 3
+    assert total['gpu_hours_consumed'] == pytest.approx(5430 / 3600)
+    assert old == before and events[:9] == before
     assert s.reconcile(plan(), old, lambda *a: None)['next_row'] == rows[0]
     result = s.reconcile(plan(), events, lambda *a: None)
     assert result['status'] == 'COMPLETE' and len(result['outcomes']) == 30
@@ -216,7 +227,7 @@ def test_exact_accounting_and_old_invalid_is_never_carried(tmp_path):
     assert report.summary(result, events)['charges_and_health_events_preserved'] == events
     p, authority, state, reservations = budget_fixture(tmp_path, old)
     snap = release.admission(p, authority, state, old, [], reservations, rows[0], now=NOW, gpu_idle=True)
-    assert snap['invalid'] == 2 and snap['gpu_hours_consumed'] == 1.
+    assert snap['invalid'] == 3 and snap['gpu_hours_consumed'] == 1.5
 
 
 @pytest.mark.parametrize('fault', ['missing_old', 'old_success', 'old_valid', 'old_bucket', 'authority', 'unauthorized', 'next', 'misbucket'])
@@ -289,7 +300,7 @@ def test_shared_runtime_gate_accepts_only_exact_recovery_and_keeps_seed_audit(tm
                                         {'artifacts': str(tmp_path)}, require_frozen=False)
     assert validate() == seeds
     p['episodes'][1]['budget_bucket'] = 'recovery'
-    with pytest.raises(ValueError, match='exact N34R2'): validate()
+    with pytest.raises(ValueError, match='exact N34R3'): validate()
     p['episodes'] = c.expected_rows()
     # The exception does not skip the subsequent frozen seed audit.
     seeds['blocks']['dev'][0]['policy_seed'] += 1
@@ -302,6 +313,7 @@ def test_shared_runtime_gate_accepts_only_exact_recovery_and_keeps_seed_audit(tm
 @pytest.mark.parametrize('cohort,kind', [
     ('N34_OBSERVED_JAW_APPROACH_DEV_20261008', 'n34_resource_preparation_v1'),
     ('N34R1_OBSERVED_JAW_APPROACH_DEV_20261008', 'n34r1_resource_preparation_v1'),
+    ('N34R2_OBSERVED_JAW_APPROACH_DEV_20261008', 'n34r2_resource_preparation_v1'),
 ])
 def test_historical_preparation_costs_global_but_not_new_cohort(tmp_path, cohort, kind):
     from test_n34_lifecycle import health
@@ -312,7 +324,7 @@ def test_historical_preparation_costs_global_but_not_new_cohort(tmp_path, cohort
     snap = release.admission(p, authority, state, old, resources, reservations,
                              c.expected_rows()[0], now=NOW, gpu_idle=True)
     assert snap['gpu_hours_consumed'] == 5.
-    for event in resources: event.update(cohort=c.COHORT, kind='n34r2_resource_preparation_v1')
+    for event in resources: event.update(cohort=c.COHORT, kind='n34r3_resource_preparation_v1')
     with pytest.raises(ValueError, match='cohort_seconds_remaining'):
         release.admission(p, authority, state, old, resources, reservations,
                           c.expected_rows()[0], now=NOW, gpu_idle=True)
@@ -325,11 +337,46 @@ def test_all_thirty_admissions_follow_exact_task_major_accounting(tmp_path):
         p, authority, state, reservations = budget_fixture(tmp_path, events)
         snap = release.admission(p, authority, state, events, [], reservations,
                                  row, now=NOW, gpu_idle=True)
-        assert snap['dispatched'] == index + 2  # both old invalids remain charged
+        assert snap['dispatched'] == index + 3  # all three old invalids remain charged
         events.extend(journal([row], True))
     p, authority, state, reservations = budget_fixture(tmp_path, events)
     with pytest.raises(ValueError, match='next fresh contiguous row'):
         release.admission(p, authority, state, events, [], reservations,
                           rows[0], now=NOW, gpu_idle=True)
     assert r.budget_snapshot(events)['by_bucket'] == dict(
-        baseline=10, development=20, recovery=2, validation=0, formal=0)
+        baseline=10, development=20, recovery=3, validation=0, formal=0)
+
+
+def test_computed_r2_control_remains_invalid_unknown_and_charged(tmp_path):
+    events = old_invalid(900.)
+    events[-1].update(
+        computed_success=True,
+        invalid_reason='missing dotenv parser runtime coverage',
+        http_counters='Unknown',
+    )
+    before = copy.deepcopy(events)
+    c.require_replacement_history(events)
+    result = s.reconcile(plan(), events, lambda *a: pytest.fail('historical result reused'))
+    summary = report.summary(result, events)
+    assert result['outcomes'] == [] and result['next_row'] == c.expected_rows()[0]
+    assert summary['matrix'][0] == {'task_id': 0, 'C0': 'Unknown', 'Q0': 'Unknown', 'N34': 'Unknown'}
+    assert summary['http_counters'] == 'Unknown'
+    assert summary['prospective_dev_necessary_gate_met'] is False
+    assert summary['charges_and_health_events_preserved'] == before
+    p, authority, state, reservations = budget_fixture(tmp_path, events)
+    snap = release.admission(p, authority, state, events, [], reservations,
+                             c.expected_rows()[0], now=NOW, gpu_idle=True)
+    assert snap['invalid'] == 3 and snap['valid'] == 0
+    assert snap['gpu_hours_consumed'] == .75
+    assert events == before
+
+
+@pytest.mark.parametrize('control', ['C0', 'Q0'])
+def test_promotion_must_match_each_control_independently(control):
+    events = journal(c.expected_rows(), True)
+    for event in events:
+        identity = event['identity']
+        event['success'] = identity['task_id'] < (6 if identity['profile'] == control else 5)
+    result = s.reconcile(plan(), events, lambda *a: None)
+    assert result['status'] == 'COMPLETE'
+    assert report.summary(result, events)['prospective_dev_necessary_gate_met'] is False
