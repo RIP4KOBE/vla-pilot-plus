@@ -35,6 +35,9 @@ from core.fkd_class import FKD
 from core.qd_archive_eligible_runtime import (
     MODE as ARCHIVE_ELIGIBLE_MODE, ArchiveEligibleDecision, validate_config as validate_archive_eligible_config,
 )
+from core.qd_observed_jaw_approach import (
+    MODE as OBSERVED_JAW_MODE, ObservedJawDecision, validate_config as validate_observed_jaw_config,
+)
 from core.qd_capture_dwell import (
     MODE as CAPTURE_DWELL_MODE, CaptureDwellDecision, validate_config as validate_capture_dwell_config,
 )
@@ -185,6 +188,8 @@ class _EDSConfig:
     chunk_population_mode: str = "fresh"
     archive_eligible_capture_mode: str = "off"
     n32_runtime_binding: dict | None = None
+    observed_jaw_approach_mode: str = "off"
+    n34_runtime_binding: dict | None = None
     capture_dwell_proposal_mode: str = "off"
     executed_progress_continuation_mode: str = "off"
     executed_progress_continuation_control: str = "none"
@@ -5128,6 +5133,11 @@ class RDTSteer:
             self._capture_dwell = ArchiveEligibleDecision(semantic, getattr(self, "_capture_dwell_context", None),
                 keypoints, episode=int(getattr(self, "_eds_episode_index", 0)),
                 stage=current_stage, step=global_step, action_mask=cond["action_mask"], config=cfg)
+        if cfg.observed_jaw_approach_mode == OBSERVED_JAW_MODE:
+            semantic, _ = recognize_executed_prefix_provider(guidance_fns, keypoints)
+            self._capture_dwell = ObservedJawDecision(semantic, getattr(self, "_capture_dwell_context", None),
+                keypoints, episode=int(getattr(self, "_eds_episode_index", 0)),
+                stage=current_stage, step=global_step, action_mask=cond["action_mask"], config=cfg)
         progress_mode = cfg.executed_progress_continuation_mode == PROGRESS_MODE
         progress_semantic = None
         if progress_mode:
@@ -8264,6 +8274,8 @@ class RDTSteer:
             ),
             chunk_population_mode=str(cfg.get("chunk_population_mode", "fresh")),
             archive_eligible_capture_mode=str(cfg.get("archive_eligible_capture_mode", "off")),
+            observed_jaw_approach_mode=str(cfg.get("observed_jaw_approach_mode", "off")),
+            n34_runtime_binding=(dict(cfg["n34_runtime_binding"]) if cfg.get("n34_runtime_binding") is not None else None),
             n32_runtime_binding=(dict(cfg["n32_runtime_binding"]) if cfg.get("n32_runtime_binding") is not None else None),
             capture_dwell_proposal_mode=str(cfg.get("capture_dwell_proposal_mode", "off")),
             executed_progress_continuation_mode=str(cfg.get("executed_progress_continuation_mode", "off")),
@@ -8780,6 +8792,7 @@ class RDTSteer:
                         "EDS grid_archive requires "
                         f"{field_name}={expected!r}"
                     )
+        validate_observed_jaw_config(resolved, self._action_chunk_horizon)
         validate_archive_eligible_config(resolved, self._action_chunk_horizon)
         validate_capture_dwell_config(resolved, self._action_chunk_horizon)
         validate_progress_config(resolved, self._action_chunk_horizon)
