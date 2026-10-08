@@ -114,7 +114,14 @@ def test_same_worker_native_audit_external_anchor(prospective, monkeypatch, stub
     plan,runtime,plan_ref=prospective
     row=next(x for x in plan['episodes'] if x['profile']==arm)
     manifest=w.read_ref(plan['expected_manifests'][row['episode_key']]);out=Path(manifest['output_dir'])
-    ref=write(out/'n34-worker-context.json',worker.context_for(plan_ref,row))
+    # This native-audit unit fixture has no release. Substitute context/dispatch
+    # setup explicitly; production consumers now reject every draft context.
+    context={'plan':plan_ref,'expected_manifest':plan['expected_manifests'][row['episode_key']],
+             'episode_key':row['episode_key'],'attempt_id':row['episode_key'],
+             'main_argv':manifest['argv'][1:]}
+    ref=write(out/'n34-worker-context.json',context)
+    monkeypatch.setattr(worker,'validate_context',lambda _: (context,plan,runtime,row,manifest))
+    monkeypatch.setattr(worker,'verify_dispatch_record',lambda *a: None)
     monkeypatch.setattr(synthetic,'runtime_cfg',lambda _: manifest['resolved_config'])
     index={x['path']:x['sha256'] for x in plan['source']['files']}
     inventory={p.removesuffix('.py').replace('/','.'): {'path':p,'sha256':h} for p,h in index.items() if p.endswith('.py')}
@@ -214,10 +221,10 @@ def test_admission_rejections(tmp_path,fault):
     with pytest.raises(ValueError):c.pre_dispatch(c.expected_rows()[0],a,now=now,stop_path=stop)
 
 
-def test_no_public_release(prospective):
+def test_drafts_remain_unreleased(prospective):
     plan,_,ref=prospective
     c.validate_draft(plan)
-    with pytest.raises(ValueError,match='draft only'):release.validate_release(ref,{'forged':True})
+    with pytest.raises(ValueError,match='released plan contract'):release.validate_release(ref,{'forged':True})
     with pytest.raises(ValueError,match='draft only'):supervisor.launch()
 
 
@@ -230,6 +237,6 @@ def test_candidates_are_fresh_unknown_and_unreleasable(tmp_path):
     assert plan['expected_manifests']=={} and plan['phase_authorization']=={'dev':False,'validation':False,'formal':False}
     protocol=w.read_ref(plan['protocol_candidate'])
     assert protocol['promotion']=={'all_valid_cells':30,'n34_min_successes':5,'at_least_both_controls':True,'matched_controls_required':True}
-    with pytest.raises(ValueError,match='draft only'):
+    with pytest.raises(ValueError,match='released plan contract'):
         release.validate_release(c.ref(tmp_path/'candidates/plan.CANDIDATE-v1.json'),{})
     with pytest.raises(ValueError,match='already exists'):prepare_candidates(tmp_path/'candidates')

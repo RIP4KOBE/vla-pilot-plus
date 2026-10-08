@@ -23,13 +23,15 @@ def validate_plan(plan):
 
 
 def validate_release(plan_ref, release_ref):
-    c.require_release(w.read_ref(plan_ref))
+    """Validate caller-anchored detached authority; never derive trusted hashes."""
+    return verify_prospective_release(plan_ref, release_ref)
 
 
 def verify_prospective_release(plan_ref, release_ref):
-    """Document/closure checks only; this does not enable the public runner."""
-    plan, release = w.read_ref(plan_ref), w.read_ref(release_ref)
+    """Full release closure; dispatch additionally requires locked admission."""
+    plan = w.read_ref(plan_ref)
     validate_plan(plan)
+    release = w.read_ref(release_ref)
     expected = {'schema': 'n34-execution-release-v1', 'approved': True, 'plan': plan_ref,
                 'authority': plan['authority'], 'protocol': plan['protocol'],
                 'source': plan['source'], 'scientific_source': plan['scientific_source'],

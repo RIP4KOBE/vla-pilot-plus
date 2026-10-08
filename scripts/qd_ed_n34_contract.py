@@ -1,4 +1,4 @@
-"""Draft-only N34 identity, finite admission and closed release boundary."""
+"""N34 identity, disabled drafts, finite admission and bare-plan rejection."""
 import datetime as dt
 import json
 import math
@@ -58,9 +58,9 @@ def validate_draft(plan):
 
 
 def require_release(plan):
-    # Deliberately no permissive interpretation of placeholder/root-like documents.
-    # Root must review source, freeze protocol and integrate exact owning arithmetic.
-    raise ValueError('N34 draft only: prospective root protocol/source/budget/release integration required')
+    # A bare plan can never confer authority. Consumers with caller-supplied
+    # plan/release references must use qd_ed_n34_release.validate_release.
+    raise ValueError('N34 draft only: explicit externally hashed plan and detached root release required')
 
 
 def finite(value, label):
