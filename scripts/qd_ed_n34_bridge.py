@@ -30,7 +30,7 @@ def source_paths(root=ROOT):
     for folder, pattern in (('scripts', '*.py'), ('tests', '*n34*.py'), ('docs/experiments', 'n34*.md')):
         paths.update(str(p.relative_to(root)) for p in (root / folder).glob(pattern))
     paths.add('configs/qd_ed_final/candidate_n34.json')
-    paths.update(closure.rdt_paths(root))
+    paths.update(closure.dependency_paths(root))
     return paths
 
 

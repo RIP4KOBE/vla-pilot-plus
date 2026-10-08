@@ -1,4 +1,4 @@
-"""N34 source closure, including all pinned RDT Python/config bytes and runtime origins.
+"""N34 source closure, including pinned dependency Python/config bytes and runtime origins.
 
 No fetch, model import, installation or candidate-receipt discovery is performed.
 """
@@ -9,29 +9,60 @@ import sys
 from scripts import qd_ed_n23_worker as w
 
 RDT = 'third_party/rdt'
+LEROBOT = 'third_party/lerobot'
+LIBERO = 'third_party/libero_pro'
+PINNED_SUBMODULES = {
+    RDT: 'scripts/maniskill_model.py',
+    LEROBOT: 'src/lerobot/__init__.py',
+}
+SOURCE_SUFFIXES = ('.py', '.yaml', '.yml', '.json')
 RUNTIME_PREFIXES = ('libero', 'robosuite', 'mujoco', 'transformers', 'diffusers',
                     'torch', 'numpy', 'scipy', 'safetensors', 'tokenizers', 'cv2',
                     'PIL', 'einops', 'timm', 'huggingface_hub', 'hydra', 'omegaconf')
 RDT_PREFIXES = ('models', 'configs', 'data', 'rdt')
 
 
-def rdt_pin(root, commit='HEAD'):
+def submodule_pin(root, submodule, commit='HEAD'):
+    w.require(submodule in PINNED_SUBMODULES, 'unapproved source submodule')
     root = Path(root).resolve()
-    mode, kind, pin = w._source_entry(root, commit, RDT)
-    w.require((mode, kind) == ('160000', 'commit'), 'RDT gitlink required')
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+    w.require((mode, kind) == ('160000', 'commit'), submodule + ' gitlink required')
     common = Path(w._source_git(root, 'rev-parse', '--git-common-dir').decode().strip())
-    database = (root / common / 'modules' / RDT).resolve()
-    w.require(database.is_dir(), 'pinned RDT object database unavailable')
-    w.require(w._source_git(root, 'cat-file', '-t', pin, database=database).strip() == b'commit', 'RDT pin not commit')
+    database = (root / common / 'modules' / submodule).resolve()
+    w.require(database.is_dir(), 'pinned ' + submodule + ' object database unavailable')
+    w.require(w._source_git(root, 'cat-file', '-t', pin, database=database).strip() == b'commit', submodule + ' pin not commit')
     return pin, database
 
 
-def rdt_paths(root, commit='HEAD'):
-    pin, database = rdt_pin(root, commit)
+def rdt_pin(root, commit='HEAD'):
+    return submodule_pin(root, RDT, commit)
+
+
+def submodule_paths(root, submodule, commit='HEAD'):
+    pin, database = submodule_pin(root, submodule, commit)
     raw = w._source_git(Path(root), 'ls-tree', '-r', '--name-only', '-z', pin, database=database)
-    paths = {RDT + '/' + name.decode() for name in raw.split(b'\0') if name
-             and Path(name.decode()).suffix in ('.py', '.yaml', '.yml', '.json')}
-    w.require(RDT + '/scripts/maniskill_model.py' in paths, 'pinned RDT scripts.maniskill_model missing')
+    paths = {submodule + '/' + name.decode() for name in raw.split(b'\0') if name
+             and Path(name.decode()).suffix in SOURCE_SUFFIXES}
+    w.require(submodule + '/' + PINNED_SUBMODULES[submodule] in paths,
+              'pinned dependency entrypoint missing: ' + submodule)
+    return paths
+
+
+def rdt_paths(root, commit='HEAD'):
+    return submodule_paths(root, RDT, commit)
+
+
+def dependency_paths(root, commit='HEAD'):
+    paths = set()
+    for submodule in PINNED_SUBMODULES:
+        paths.update(submodule_paths(root, submodule, commit))
+    # LIBERO is a regular superproject tree, despite its stale .gitmodules entry.
+    mode, kind, _ = w._source_entry(Path(root), commit, LIBERO)
+    w.require((mode, kind) == ('040000', 'tree'), 'LIBERO tracked tree required')
+    raw = w._source_git(Path(root), 'ls-tree', '-r', '--name-only', '-z', commit, '--', LIBERO)
+    paths.update(name.decode() for name in raw.split(b'\0') if name
+                 and Path(name.decode()).suffix in SOURCE_SUFFIXES)
+    w.require(LIBERO + '/libero/libero/__init__.py' in paths, 'pinned LIBERO entrypoint missing')
     return paths
 
 
@@ -44,10 +75,11 @@ def source_record(root, paths, *, commit=None):
         name = Path(relative); path = root / name
         w.require(not name.is_absolute() and '..' not in name.parts and str(name) == relative and name.parts, 'unsafe source path')
         w.require(path.is_file() and not any((root / Path(*name.parts[:i])).is_symlink() for i in range(1,len(name.parts)+1)), 'source path missing or linked')
-        if relative.startswith(RDT + '/'):
-            pin, database = rdt_pin(root, commit)
-            mode, kind, blob = w._source_entry(root, pin, relative[len(RDT)+1:], database)
-            w.require(mode in ('100644', '100755') and kind == 'blob', 'RDT source not regular')
+        submodule = next((s for s in PINNED_SUBMODULES if relative.startswith(s + '/')), None)
+        if submodule is not None:
+            pin, database = submodule_pin(root, submodule, commit)
+            mode, kind, blob = w._source_entry(root, pin, relative[len(submodule)+1:], database)
+            w.require(mode in ('100644', '100755') and kind == 'blob', 'dependency source not regular')
             committed = w._source_git(root, 'cat-file', 'blob', blob, database=database)
         else:
             committed = w._committed_source(root, commit, relative)
