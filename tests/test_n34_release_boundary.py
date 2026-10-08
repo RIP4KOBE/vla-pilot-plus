@@ -313,7 +313,7 @@ def test_recovery_requires_exact_detached_root_authority(fixture, fault):
         release.validate_release(f.plan_ref, f.release_ref)
 
 
-def test_stale_n34r2_release_matrix_rejected():
+def test_stale_n34r3_release_matrix_rejected():
     # Exercise the plan gate in memory, without generating an APPROVED release.
     plan = {'schema': 'n34-released-plan-v1', 'frozen': True, 'release_enabled': True,
             'worktree': str(c.ROOT), 'episodes': c.expected_rows(),
@@ -324,7 +324,7 @@ def test_stale_n34r2_release_matrix_rejected():
             'expected_manifests': {row['episode_key']: {} for row in c.expected_rows()}}
     release.validate_plan(plan)
     for row in plan['episodes']:
-        row['episode_key'] = row['episode_key'].replace('n34r3_', 'n34r2_')
+        row['episode_key'] = row['episode_key'].replace('n34r4_', 'n34r3_')
         row['iteration'] = c.OLD_COHORT
     with pytest.raises(ValueError, match='released plan contract'):
         release.validate_plan(plan)

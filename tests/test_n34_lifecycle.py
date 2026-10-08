@@ -73,7 +73,7 @@ def test_generic_historical_charges_and_health_preserved(tmp_path):
     assert snap['gpu_hours_by_bucket']['development'] == 1.
     assert snap['gpu_healthcheck_hours'] == .1
     assert snap['gpu_hours_by_bucket']['recovery'] == .1
-    assert snap['dispatched'] == 5 and snap['aborted'] == 1
+    assert snap['dispatched'] == 6 and snap['aborted'] == 1
 
 
 @pytest.mark.parametrize('kind', ['reserved', 'dispatched', 'health_reserved', 'health_dispatched', 'unknown_episode', 'unknown_health'])
