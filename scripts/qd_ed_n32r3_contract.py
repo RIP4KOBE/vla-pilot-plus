@@ -59,6 +59,8 @@ def commitments(plan, row):
     w.require(row in expected_rows(plan['worktree']), 'continuation row')
     return {**{k: plan[k] for k in ('parent_plan', 'parent_release', 'parent_review', 'carry_forward_map',
                                    'command_candidates', 'source_continuity', 'scientific_source', 'preparation_review')},
+            **({'command_path_amendment': plan['command_path_amendment']}
+               if 'command_path_amendment' in plan else {}),
             'semantic_row': {k: row[k] for k in SEMANTIC_FIELDS},
             'recovery_of': recovery_of(row), 'retry_of': None}
 

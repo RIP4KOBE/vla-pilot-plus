@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from scripts import qd_ed_n23_worker as w, qd_ed_n32_bridge as old
 from scripts import qd_ed_n32r3_contract as c
+from scripts import qd_ed_n32r3_paths as paths
 
 ROOT, profiles, attest_loaded = old.ROOT, old.profiles, old.attest_loaded
 RUNTIME_SOURCES, runner = old.RUNTIME_SOURCES, old.runner
@@ -22,14 +23,14 @@ def command(plan, runtime, row):
     matches = [x for x in candidates['commands'] if x['new_attempt_id'] == row['episode_key']]
     w.require(len(matches) == 1, 'exact command candidate')
     candidate = matches[0]
-    parent = c.read_ref(candidate['parent_expected_manifest'])
-    w.require(candidate['old_argv'] == parent['argv'] and len(argv) == len(parent['argv']), 'parent command anchor')
-    changes = [{'index': i, 'old': a, 'new': b} for i, (a,b) in enumerate(zip(parent['argv'], argv)) if a != b]
-    allowed = {'hydra.run.dir', 'main.eds_eval.output_dir', 'main.eds_eval.job_id',
-               'main.eds_mechanism_pretest.output_dir', 'main.eds_mechanism_pretest.run_id', 'main.eds_config.n32_runtime_binding'}
-    w.require(changes == candidate['exact_changes'] and argv == candidate['proposed_argv']
-              and str(output) == candidate['proposed_output_dir']
-              and all(x['old'].split('=',1)[0] == x['new'].split('=',1)[0] in allowed for x in changes), 'non-identity command change')
+    paths.verify_original(candidate)
+    expected_argv, expected_output = candidate['proposed_argv'], candidate['proposed_output_dir']
+    if 'command_path_amendment' in plan:
+        amendment = paths.verify_amendment(plan)
+        pair = next(x for x in amendment['pairs'] if x['new_attempt_id'] == row['episode_key'])
+        w.require(pair['row'] == row, 'amended command row')
+        expected_argv, expected_output = pair['amended_argv'], pair['amended_output_dir']
+    w.require(argv == expected_argv and str(output) == expected_output, 'non-identity command change')
     return argv, output
 
 
