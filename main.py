@@ -1536,7 +1536,12 @@ class Main:
 
             # Wrap entire episode execution in try-except
             try:
-                self._run_episode(episode, episode_dir, episode_seed)
+                try:
+                    self._run_episode(episode, episode_dir, episode_seed)
+                except BaseException:
+                    if getattr(self.policy, "_closure_intent", None) is not None:
+                        self.policy._closure_intent.reset("exception")
+                    raise
             except Exception as e:
                 log.error(f"Episode {episode+1} execution failed: {e}")
                 import traceback
@@ -1864,7 +1869,7 @@ class Main:
                 if continuation_enabled:
                     evidence.record("n30_observation_context", packet=select_kwargs["executed_progress_context"])
                 if capture_dwell_enabled:
-                    evidence.record("n34_observation_context" if (self.config.get("eds_config") or {}).get("observed_jaw_approach_mode") == "observed_jaw_approach_v1" else "n32_observation_context" if (self.config.get("eds_config") or {}).get("archive_eligible_capture_mode") == "archive_eligible_capture_v1" else "n31_observation_context", packet=select_kwargs["capture_dwell_context"])
+                    evidence.record("n35_observation_context" if (self.config.get("eds_config") or {}).get("closure_intent_mode") == "executed_closure_intent_v1" else "n34_observation_context" if (self.config.get("eds_config") or {}).get("observed_jaw_approach_mode") == "observed_jaw_approach_v1" else "n32_observation_context" if (self.config.get("eds_config") or {}).get("archive_eligible_capture_mode") == "archive_eligible_capture_v1" else "n31_observation_context", packet=select_kwargs["capture_dwell_context"])
             action_chunk = self.policy.select_action(**select_kwargs)
             select_action_latency_s = float(time.perf_counter() - select_action_start_s)
             self._append_phase_timing(episode=episode, global_step=global_steps,
@@ -1942,6 +1947,8 @@ class Main:
                         )
                     )
 
+            if generate_new_chunk and getattr(self.policy, "_closure_intent", None) is not None:
+                self.policy._closure_intent.commit(action_chunk, resolved_action_horizon, global_steps)
             if continuation_enabled and generate_new_chunk:
                 self.policy.commit_executed_progress(action_chunk, resolved_action_horizon, global_steps)
             if feedback_enabled and generate_new_chunk:
@@ -2156,7 +2163,12 @@ class Main:
             phase_started_s = time.perf_counter()
             if evidence is not None:
                 evidence.dispatch(global_step=global_steps, execution_index=action_executed + 1)
-            obs, reward, terminated, truncated, info = self.adapter.step(action_chunk[0][action_executed])
+            try:
+                obs, reward, terminated, truncated, info = self.adapter.step(action_chunk[0][action_executed])
+            except BaseException:
+                if getattr(self.policy, "_closure_intent", None) is not None:
+                    self.policy._closure_intent.reset("step_exception")
+                raise
             if physics_trace is not None:
                 physics_trace.record(self.adapter, self.keypoint_tracker,
                     global_step=global_steps, action=action_chunk[0][action_executed],
@@ -2173,6 +2185,9 @@ class Main:
             if evidence is not None:
                 evidence.step_returned(terminated=terminated, truncated=truncated,
                                        success=info.get("success", False))
+            if getattr(self.policy, "_closure_intent", None) is not None:
+                self.policy._closure_intent.acknowledge(action=action_chunk[0][action_executed],
+                    step=global_steps, index=action_executed + 1, terminated=terminated, truncated=truncated)
             self._append_phase_timing(episode=episode, global_step=global_steps,
                 name="adapter_step", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
             previous_executed_action = action_chunk[0][action_executed]

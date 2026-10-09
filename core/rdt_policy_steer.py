@@ -35,6 +35,8 @@ from core.fkd_class import FKD
 from core.qd_archive_eligible_runtime import (
     MODE as ARCHIVE_ELIGIBLE_MODE, ArchiveEligibleDecision, validate_config as validate_archive_eligible_config,
 )
+from core.qd_closure_intent import (ClosureIntentMemory, ClosureIntentDecision,
+    MODE as CLOSURE_INTENT_MODE, validate_config as validate_closure_intent_config, reset_on_failure)
 from core.qd_observed_jaw_approach import (
     MODE as OBSERVED_JAW_MODE, ObservedJawDecision, validate_config as validate_observed_jaw_config,
 )
@@ -188,6 +190,8 @@ class _EDSConfig:
     chunk_population_mode: str = "fresh"
     archive_eligible_capture_mode: str = "off"
     n32_runtime_binding: dict | None = None
+    closure_intent_mode: str = "off"
+    n35_runtime_binding: dict | None = None
     observed_jaw_approach_mode: str = "off"
     n34_runtime_binding: dict | None = None
     capture_dwell_proposal_mode: str = "off"
@@ -1482,6 +1486,10 @@ class RDTSteer:
         self._stage_init_reward = None
 
     def reset_eds_chunk_memory(self, reason: str, *, warn: bool = False) -> None:
+        if getattr(self, "_closure_intent", None) is not None:
+            if reason == "episode_reset":
+                self._closure_intent.evidence = None
+            self._closure_intent.reset(reason)
         self._capture_dwell = None
         self._capture_dwell_context = None
         self._eds_chunk_memory = None
@@ -1585,6 +1593,7 @@ class RDTSteer:
 
     # ── Inference entry point ─────────────────────────────────────────────────
 
+    @reset_on_failure
     def select_action(
         self,
         batch: dict,
@@ -1623,6 +1632,14 @@ class RDTSteer:
         )
 
         if should_sample:
+            closure_mode = (eds_config or {}).get("closure_intent_mode", "off") == CLOSURE_INTENT_MODE
+            if closure_mode and not hasattr(self, "_closure_intent"):
+                self._closure_intent = ClosureIntentMemory()
+            if hasattr(self, "_closure_intent") and (not closure_mode or not use_guidance):
+                self._closure_intent.evidence = getattr(self, "_decision_evidence", None)
+                self._closure_intent.reset("unguided_or_mode_off")
+                if not closure_mode:
+                    del self._closure_intent
             self._capture_dwell = None
             self._capture_dwell_context = capture_dwell_context
             self._execution_feedback_context = execution_feedback_context
@@ -1680,6 +1697,8 @@ class RDTSteer:
                 )
 
             self._cached_action_chunk = self._postprocess_actions(raw)
+            if closure_mode and use_guidance:
+                self._closure_intent.bind_decode(raw, self._cached_action_chunk)
             if progress_mode and hasattr(self, "_executed_progress"):
                 self._executed_progress.bind_decode(raw, self._cached_action_chunk)
                 self._record_progress_event("n30_decode_binding", actions=self._cached_action_chunk)
@@ -5133,11 +5152,17 @@ class RDTSteer:
             self._capture_dwell = ArchiveEligibleDecision(semantic, getattr(self, "_capture_dwell_context", None),
                 keypoints, episode=int(getattr(self, "_eds_episode_index", 0)),
                 stage=current_stage, step=global_step, action_mask=cond["action_mask"], config=cfg)
-        if cfg.observed_jaw_approach_mode == OBSERVED_JAW_MODE:
+        if cfg.observed_jaw_approach_mode == OBSERVED_JAW_MODE and cfg.closure_intent_mode == "off":
             semantic, _ = recognize_executed_prefix_provider(guidance_fns, keypoints)
             self._capture_dwell = ObservedJawDecision(semantic, getattr(self, "_capture_dwell_context", None),
                 keypoints, episode=int(getattr(self, "_eds_episode_index", 0)),
                 stage=current_stage, step=global_step, action_mask=cond["action_mask"], config=cfg)
+        if cfg.closure_intent_mode == CLOSURE_INTENT_MODE:
+            semantic, _ = recognize_executed_prefix_provider(guidance_fns, keypoints)
+            self._capture_dwell = ClosureIntentDecision(semantic, getattr(self, "_capture_dwell_context", None),
+                keypoints, episode=int(getattr(self, "_eds_episode_index", 0)),
+                stage=current_stage, step=global_step, action_mask=cond["action_mask"], config=cfg,
+                memory=self._closure_intent, evidence=getattr(self, "_decision_evidence", None))
         progress_mode = cfg.executed_progress_continuation_mode == PROGRESS_MODE
         progress_semantic = None
         if progress_mode:
@@ -5531,6 +5556,7 @@ class RDTSteer:
                 descriptors=initial_descriptors,
                 cell_ids=initial_cell_ids,
                 source_iter=-1,
+                **({"occurrence_ids": tuple(range(16))} if cfg.closure_intent_mode == CLOSURE_INTENT_MODE else {}),
                 **({"raw_rewards": original_rewards(population_info, population_rewards, population)} if quality_contract is not None else {}),
             )
             if self._capture_dwell is not None and getattr(self, "_decision_evidence", None) is not None:
@@ -6641,6 +6667,7 @@ class RDTSteer:
                     descriptors=child_descriptors,
                     cell_ids=child_cell_ids,
                     source_iter=i,
+                    **({"occurrence_ids": tuple(range((i+1)*16, (i+2)*16))} if cfg.closure_intent_mode == CLOSURE_INTENT_MODE else {}),
                     parent_cell_ids=qd_parent_cell_ids,
                     **({"raw_rewards": original_rewards(population_info, population_rewards, population)} if quality_contract is not None else {}),
                 )
@@ -7385,6 +7412,8 @@ class RDTSteer:
                 progress_semantic.validate(guidance_fns)
             progress_selected = self._executed_progress.select(selected)
             self._record_progress_event("n30_selected_native_plan", selected=progress_selected, native_plan=selected)
+        if cfg.closure_intent_mode == CLOSURE_INTENT_MODE:
+            self._closure_intent.select(self._capture_dwell, selected_entry, selected)
         if evidence is not None:
             evidence.record("final_selection", population=population, selected_latent=selected,
                             **({"gripper_rescue_mode": GRIPPER_RESCUE_MODE} if rescue_cache is not None else {}),
@@ -8274,6 +8303,8 @@ class RDTSteer:
             ),
             chunk_population_mode=str(cfg.get("chunk_population_mode", "fresh")),
             archive_eligible_capture_mode=str(cfg.get("archive_eligible_capture_mode", "off")),
+            closure_intent_mode=str(cfg.get("closure_intent_mode", "off")),
+            n35_runtime_binding=(dict(cfg["n35_runtime_binding"]) if cfg.get("n35_runtime_binding") is not None else None),
             observed_jaw_approach_mode=str(cfg.get("observed_jaw_approach_mode", "off")),
             n34_runtime_binding=(dict(cfg["n34_runtime_binding"]) if cfg.get("n34_runtime_binding") is not None else None),
             n32_runtime_binding=(dict(cfg["n32_runtime_binding"]) if cfg.get("n32_runtime_binding") is not None else None),
@@ -8792,6 +8823,7 @@ class RDTSteer:
                         "EDS grid_archive requires "
                         f"{field_name}={expected!r}"
                     )
+        validate_closure_intent_config(resolved, self._action_chunk_horizon)
         validate_observed_jaw_config(resolved, self._action_chunk_horizon)
         validate_archive_eligible_config(resolved, self._action_chunk_horizon)
         validate_capture_dwell_config(resolved, self._action_chunk_horizon)

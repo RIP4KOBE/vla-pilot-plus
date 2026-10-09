@@ -22,9 +22,13 @@ import uuid
 
 import yaml
 
-import qd_ed_final_runner as runner
-import qd_ed_gpu_probe as probe
-from qd_ed_runtime_setup import normalized_pci_bus_id
+if __package__:
+    from . import qd_ed_final_runner as runner, qd_ed_gpu_probe as probe
+    from .qd_ed_runtime_setup import normalized_pci_bus_id
+else:
+    import qd_ed_final_runner as runner
+    import qd_ed_gpu_probe as probe
+    from qd_ed_runtime_setup import normalized_pci_bus_id
 
 
 ROOT = Path(__file__).resolve().parents[1]

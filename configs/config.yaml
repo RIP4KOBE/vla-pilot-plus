@@ -117,6 +117,8 @@ main:
     chunk_population_mode: fresh
     archive_eligible_capture_mode: "off"
     n32_runtime_binding: null
+    closure_intent_mode: "off"
+    n35_runtime_binding: null
     observed_jaw_approach_mode: "off"
     n34_runtime_binding: null
     capture_dwell_proposal_mode: "off"

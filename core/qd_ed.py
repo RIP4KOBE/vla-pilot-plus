@@ -407,6 +407,7 @@ class QDArchiveEntry:
     parent_cell_id: int | None
     insert_sequence: int
     raw_reward: float | None = None
+    occurrence_id: int | None = None
 
 
 @dataclass(frozen=True)
@@ -497,11 +498,16 @@ class QDArchive:
         source_iter: int,
         parent_cell_ids: Tensor | None = None,
         raw_rewards: Tensor | None = None,
+        occurrence_ids: tuple[int, ...] | None = None,
     ) -> QDUpdateSummary:
         actions = _finite_tensor(actions, name="QD candidate actions")
         if actions.ndim < 2 or actions.shape[0] <= 0:
             raise ValueError("QD candidate actions must be a nonempty batch")
         candidate_count = int(actions.shape[0])
+        if occurrence_ids is not None and (len(occurrence_ids) != candidate_count
+                or any(type(x) is not int or x < 0 for x in occurrence_ids)
+                or len(set(occurrence_ids)) != candidate_count):
+            raise ValueError("QD occurrence identities malformed")
         rewards = _finite_tensor(rewards, name="QD candidate rewards").reshape(-1)
         costs = _finite_tensor(costs, name="QD candidate costs").reshape(-1)
         descriptors = _finite_tensor(
@@ -554,6 +560,7 @@ class QDArchive:
                     "descriptor": descriptor,
                     "fingerprint": fingerprint,
                     "parent_cell_id": parent_values[index],
+                    "occurrence_id": None if occurrence_ids is None else occurrence_ids[index],
                 }
             )
 
@@ -576,6 +583,7 @@ class QDArchive:
                             parent_cell_id=candidate["parent_cell_id"],
                             insert_sequence=-1,
                             raw_reward=candidate["raw_reward"],
+                            occurrence_id=candidate["occurrence_id"],
                         )
                     )
 
@@ -610,6 +618,7 @@ class QDArchive:
                     parent_cell_id=winner["parent_cell_id"],
                     insert_sequence=self._next_insert_sequence,
                     raw_reward=winner["raw_reward"],
+                    occurrence_id=winner["occurrence_id"],
                 )
                 self._next_insert_sequence += 1
                 rejections += len(candidates) - 1
@@ -802,6 +811,7 @@ class QDArchive:
                 "source_iter": entry.source_iter,
                 "parent_cell_id": entry.parent_cell_id,
                 "insert_sequence": entry.insert_sequence,
+                **({"occurrence_id": entry.occurrence_id} if entry.occurrence_id is not None else {}),
                 "lane": "secondary",
             }
             for cell, entry in sorted(self.secondary_entries.items())
@@ -840,6 +850,7 @@ class QDArchive:
                 "source_iter": entry.source_iter,
                 "parent_cell_id": entry.parent_cell_id,
                 "insert_sequence": entry.insert_sequence,
+                **({"occurrence_id": entry.occurrence_id} if entry.occurrence_id is not None else {}),
             }
             for cell, entry in sorted(self.entries.items())
         ]
