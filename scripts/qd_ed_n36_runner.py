@@ -1,4 +1,7 @@
 """Root-invoked N36 production adapter. No authority creation or automatic recovery."""
+import sys
+if __name__ == '__main__' and '_n36_source_bootstrap' not in sys.modules:
+    raise RuntimeError('Launch N36 runner through qd_ed_n36_bootstrap.py')
 import argparse
 import datetime as dt
 import hashlib
@@ -12,6 +15,7 @@ from scripts import qd_ed_final_runner as r, qd_ed_n23_worker as w
 from scripts import qd_ed_n36_contract as c, qd_ed_n36_bridge as b
 from scripts import qd_ed_n36_release as release, qd_ed_n36_supervise as supervisor
 from scripts import qd_ed_n36_worker as worker
+from scripts import qd_ed_n36_source as source_execution
 
 
 # Reuse process ownership, timeout, probe and device helpers unchanged.
@@ -58,8 +62,10 @@ def existing_handles(plan, events):
 
 def execute_one(plan_ref, release_ref):
     """One primary, or a read-only reconciled stop. All writes require release."""
+    source_execution.active()
     plan, runtime, authority = release.validate_release(plan_ref, release_ref)
     root = Path(plan['worktree']).resolve()
+    source_execution.attest(root, plan['source'], w.read_ref(plan['runtime_closure']))
     with r.locked(root / 'data/qd-ed-runner.lock', nonblocking=True):
         with r.locked(root / 'data/qd-ed-state.lock'):
             plan, runtime, authority = release.validate_release(plan_ref, release_ref)
@@ -100,7 +106,7 @@ def execute_one(plan_ref, release_ref):
             context_path = output / 'n36-worker-context.json'
             w.atomic_json(context_path, worker.context_for(plan_ref, row, release_ref))
             context_ref = c.ref(context_path)
-            command = [manifest['argv'][0], '-m', 'scripts.qd_ed_n36_worker', '--context', str(context_path), '--context-sha256', context_ref['sha256']]
+            command = worker_command(manifest['argv'][0], root, context_path, context_ref['sha256'])
             base = {'attempt_id': row['episode_key'], 'episode_key': row['episode_key'], 'identity': supervisor.c_identity(row),
                     'budget_bucket': row['budget_bucket'], 'replacement': row['replacement'], 'plan_sha256': plan_ref['sha256'], 'release': release_ref,
                     'source_commit': plan['source']['commit'], 'runtime_manifest_sha256': plan['runtime']['sha256'],
@@ -159,6 +165,11 @@ def execute_one(plan_ref, release_ref):
             r.append_event_locked(root, terminal)
             w.atomic_json(output / 'attempt-result.json', terminal)
         return {'status': 'VALID' if terminal['outcome_valid'] is True else 'INVALID_STOP', 'terminal': terminal}
+
+
+def worker_command(python, root, context_path, digest):
+    return source_execution.command(python, root, 'scripts.qd_ed_n36_worker',
+        '--context', str(context_path), '--context-sha256', digest)
 
 
 def launch(plan_ref, release_ref):

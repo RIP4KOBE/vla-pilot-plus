@@ -63,13 +63,40 @@ def verify_scores(events, *, device):
         'kind':'native_recomputation','gpu_attested':device.type=='cuda'}
 
 
-def verify_assignment(actions, keypoints, update, initial, *, device):
+def verify_assignment(actions, keypoints, update, initial, *, device,
+                      origin_events, canonical_event, update_event, observed_eef):
     device=torch.device(device)
     geometry=update['geometry']
     origins=geometry['source_origins'];require(len(origins)==16,'archive projection origins')
+    iteration=update['iter_idx']
+    require(geometry['iter_idx']==iteration and canonical_event['values']['iter_idx']==iteration,
+            'archive projection iteration')
+    sequences=geometry['projection_origin_sequences']
+    require(len(origin_events)==len(sequences)==len(geometry['cast_origins'])==16
+        and sequences==[e['sequence'] for e in origin_events]
+        and len(set(sequences))==16 and sequences==sorted(sequences), 'ordered archive projection origin coverage')
+    require(canonical_event['sequence']<sequences[0] and sequences[-1]<update_event['sequence'],
+            'archive projection origin timing')
+    for i,event in enumerate(origin_events):
+        values=event['values']
+        require(event['event']=='projection_origin' and all(event[k]==canonical_event[k]==update_event[k]
+            for k in ('episode','decision_id','global_step','reset_sequence')),
+            'archive projection decision identity')
+        require(values['n36_descriptor_identity']=={'iter_idx':iteration,'candidate_index':i,
+            'occurrence_id':(iteration+1)*16+i}, 'archive projection candidate identity')
+        require(same(origins[i],values['source_eef_position']), 'archive exact raw origin bytes')
+        # The boundary packet is independently joined to the preceding physical
+        # observation by the caller. Absence is not permission to invent an anchor.
+        require(observed_eef is not None and same(origins[i],observed_eef),
+                'archive raw origin cached physical observation')
+        require(same(values['action_sequence'],actions[i,:8,[39,40,41,42,43,44,10]])
+            and same(values['cast_eef_start'],geometry['cast_origins'][i])
+            and same(values['projected_xyz'],geometry['projected_xyz'][i]),
+            'archive actual action/cast/projection evidence')
     native=actions.to(device);projected=[]
     for i,origin in enumerate(origins):
         start=origin.to(device=device,dtype=native.dtype)
+        require(same(start.cpu(),geometry['cast_origins'][i]), 'archive native origin cast')
         projected.append(torch.cat((start[None],start+torch.cumsum(native[i,:8,39:42]*.01,dim=0))))
     xyz=torch.stack(projected);points=keypoints.to(device)
     require(same(xyz.cpu(),geometry['projected_xyz']),'actual archive projection recomputation')

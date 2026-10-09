@@ -236,7 +236,12 @@ def audit_events(profile, metrics, events, compute, *, expected_runtime=None, ar
             require(desc.dtype==lo.dtype==hi.dtype==torch.float32 and bool((hi>lo).all()),'native descriptor/bounds')
             if fixed_bounds is None:fixed_bounds=(lo,hi)
             require(same(lo,fixed_bounds[0]) and same(hi,fixed_bounds[1]),'fixed bounds')
-            verify_assignment(actions,packet['keypoints'].to(actions),u,it==-1,device=arithmetic_device)
+            descriptor_origins=[e for e in kinds['projection_origin']
+                if ca['sequence']<e['sequence']<ue['sequence']
+                and 'n36_descriptor_identity' in e['values']]
+            verify_assignment(actions,packet['keypoints'].to(actions),u,it==-1,device=arithmetic_device,
+                origin_events=descriptor_origins,canonical_event=ca,update_event=ue,
+                observed_eef=packet['observed_eef'])
             visits+=torch.bincount(cells,minlength=16)
             require(u['cumulative_visits'].dtype==torch.int64 and torch.equal(visits,u['cumulative_visits']),'actual archive cumulative visits')
             parent=u['parent_cell_ids']

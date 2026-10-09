@@ -5543,7 +5543,7 @@ class RDTSteer:
                 )
                 metrics.qd_degenerate_reward_value = reward_value
         if metrics.qd_archive_active_for_chunk:
-            n36_initial_geometry = {} if cfg.nonprogress_tangent_mode == NONPROGRESS_MODE else None
+            n36_initial_geometry = {"iter_idx": -1} if cfg.nonprogress_tangent_mode == NONPROGRESS_MODE else None
             initial_descriptors = describe_qd(population, projection_out=n36_initial_geometry)
             qd_bounds = self._eds_qd_freeze_bounds(initial_descriptors, cfg)
             qd_initial_bounds = qd_bounds
@@ -6607,7 +6607,7 @@ class RDTSteer:
                     raise RuntimeError("QD archive loop state is incomplete")
                 terminal_projection_out = {} if grasp_timing_mode and i == 9 else None
                 if cfg.nonprogress_tangent_mode == NONPROGRESS_MODE:
-                    terminal_projection_out = {}
+                    terminal_projection_out = {"iter_idx": i}
                 child_descriptors = describe_qd(population, projection_out=terminal_projection_out)
                 if terminal_projection_out is not None:
                     terminal_projected_xyz = terminal_projection_out["projected_xyz"]
@@ -7971,12 +7971,23 @@ class RDTSteer:
         trajs = []
         if origin_out is not None:
             origin_out["source_origins"] = []
+        descriptor = origin_out is not None and "iter_idx" in origin_out
+        if descriptor:
+            origin_out["projection_origin_sequences"] = []
+            origin_out["cast_origins"] = []
         for b in range(B):
             metadata = {} if origin_out is not None else None
+            if descriptor:
+                metadata["n36_descriptor_identity"] = {
+                    "iter_idx": origin_out["iter_idx"], "candidate_index": b,
+                    "occurrence_id": (origin_out["iter_idx"] + 1) * 16 + b}
             traj = self._adapter.delta_actions_to_ee_trajectory(actions[b],
                 **({"origin_out": metadata} if metadata is not None else {})).to(device=sample.device, dtype=sample.dtype)
             if origin_out is not None:
                 origin_out["source_origins"].append(metadata["source_origin"])
+            if descriptor:
+                origin_out["projection_origin_sequences"].append(metadata.get("projection_origin_sequence"))
+                origin_out["cast_origins"].append(metadata.get("cast_origin"))
             trajs.append(traj)
         return torch.stack(trajs, dim=0)
 

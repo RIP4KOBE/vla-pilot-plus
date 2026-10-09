@@ -1684,8 +1684,15 @@ class LiberoAdapter(BaseEnvAdapter):
 
         evidence = getattr(self, "_decision_evidence", None)
         if evidence is not None:
-            evidence.record("projection_origin", source_eef_position=start_position,
-                            cast_eef_start=start_pos)
+            descriptor_identity = (origin_out or {}).get("n36_descriptor_identity")
+            sequence = evidence.record("projection_origin", source_eef_position=start_position,
+                cast_eef_start=start_pos,
+                **({"n36_descriptor_identity": descriptor_identity,
+                    "action_sequence": action_sequence, "projected_xyz": trajectory}
+                   if descriptor_identity is not None else {}))
+            if descriptor_identity is not None:
+                origin_out["projection_origin_sequence"] = sequence
+                origin_out["cast_origin"] = start_pos.detach().clone()
 
         return trajectory
 

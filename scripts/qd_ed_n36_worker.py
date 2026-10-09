@@ -3,11 +3,12 @@
 The public launch requires a detached root release. Draft contexts remain closed.
 Every execution and receipt consumer requires the same detached release closure.
 """
+import sys
+if __name__ == '__main__' and '_n36_source_bootstrap' not in sys.modules:
+    raise RuntimeError('Launch N36 worker through qd_ed_n36_bootstrap.py')
 import os
 import json
 from pathlib import Path
-import runpy
-import sys
 import time
 
 # Emit before project imports so import/setup stalls leave phase evidence.
@@ -24,6 +25,7 @@ from scripts import audit_decision_evidence as generic
 from scripts import qd_ed_n34_source as closure, qd_ed_n34_controller as controller
 from scripts import qd_ed_n34_worker as n34_worker
 from scripts import qd_ed_n36_build as native_build
+from scripts import qd_ed_n36_source as source_execution
 from scripts.qd_ed_audit_backend import create_backend, assigned_cuda_identity, canonical_cuda_uuid
 
 if __name__ == '__main__':
@@ -39,7 +41,7 @@ def attest_worker_loaded(root, source):
 
     Do not import a second worker or register an alias: attest this function's
     actual module. Main's temporary __main__ is restored by runpy before the
-    post-run inventory. This is source attestation, not bytecode attestation.
+    post-run inventory. The separate source_execution receipt binds compilation.
     """
     loaded = b.attest_loaded(root, source)
     canonical = 'scripts.qd_ed_n36_worker'
@@ -198,6 +200,7 @@ def runtime_receipt_binding(context_ref, plan, process, phase):
 
 def _run_in_process(context_ref):
     """Internal implementation, to be called only by a root-released bounded runner."""
+    source_execution.active()
     context, plan, runtime, row, manifest = validate_context(context_ref)
     root, output = Path(plan['worktree']), Path(manifest['output_dir'])
     identity = w.process_identity()
@@ -220,11 +223,14 @@ def _run_in_process(context_ref):
             binding=runtime_receipt_binding(context_ref, plan, identity, 'runtime_before'))
         receipt['native_build_before']=native_build.attest(plan['native_build'])
         receipt['loaded_before'] = attest_worker_loaded(root, plan['source'])
+        receipt['execution_before'] = source_execution.attest(root, plan['source'], runtime_closure)
         sys.argv = context['main_argv']
         os.chdir(root)
         with controller.observe_instances(proof) as observed:
             try:
-                runpy.run_path(sys.argv[0], run_name='__main__')
+                # Use the same source-only loader as worker/auditor dependencies.
+                w.require(Path(sys.argv[0]).resolve() == root.resolve() / 'main.py', 'Main source entry')
+                source_execution.run_main(sys.argv[0])
             except SystemExit as exc:
                 w.require(exc.code is None or type(exc.code) is int and exc.code == 0, 'main nonzero exit')
         receipt['controller_instances'] = observed
@@ -250,6 +256,7 @@ def _run_in_process(context_ref):
         receipt['runtime_after'] = closure.attest_runtime_receipt(runtime_closure, plan['runtime'], after=True,
             binding=runtime_receipt_binding(context_ref, plan, identity, 'runtime_after'))
         receipt['native_build_after']=native_build.attest(plan['native_build'],after=True)
+        receipt['execution_after'] = source_execution.attest(root, plan['source'], runtime_closure)
         receipt.update(audit_seconds=time.perf_counter() - audit_started, native_counts=counts, auxiliary=auxiliary,
                        evidence=before, audit_backend=backend.report())
         w.atomic_json(report_path, report)
@@ -316,6 +323,13 @@ def verify_receipt(context_ref, receipt_ref, process_record):
               == receipt['loaded_after']['scripts.qd_ed_n36_worker'], 'worker source identity changed')
     w.require(receipt['audit_report']['path'] == str(output / 'eds_eval/decision-evidence-audit.json'), 'audit path')
     runtime_closure = closure.verify_runtime(w.read_ref(plan['runtime_closure']), plan['runtime'])
+    for phase in ('execution_before', 'execution_after'):
+        suffix = phase.removeprefix('execution_')
+        source_execution.verify_receipt(receipt[phase], plan['worktree'], plan['source'], runtime_closure,
+            loaded=receipt['loaded_' + suffix], runtime_receipt=receipt['runtime_' + suffix])
+    w.require(all(row in receipt['execution_after']['compiled'] for row in receipt['execution_before']['compiled']),
+              'N36 executable inventory changed')
+    w.require('main' in {r['module'] for r in receipt['execution_after']['compiled']}, 'N36 Main executable absent')
     proof = controller.verify_semantics(plan['controller_semantics'], plan['runtime'], runtime_closure)
     expected_controller = {k: proof[k] for k in ('source', 'module', 'class', 'instance')}
     w.require(receipt.get('controller_instances') and all(x == expected_controller for x in receipt['controller_instances']), 'deployed controller receipt differs')

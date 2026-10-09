@@ -127,6 +127,10 @@ def test_full_episode_weekly_and_protected_seconds(tmp_path, seconds, allowed):
 
 @pytest.fixture
 def lifecycle(tmp_path, monkeypatch):
+    # These synthetic journal/Popen tests do not claim interpreter attestation;
+    # test_n36_audit_repair exercises the real source-only subprocess entry.
+    monkeypatch.setattr(adapter.source_execution, 'active', lambda: None)
+    monkeypatch.setattr(adapter.source_execution, 'attest', lambda *args: None)
     tmp_path = tmp_path / 'study_worktree'
     tmp_path.mkdir()
     rows = c.expected_rows()
@@ -137,6 +141,7 @@ def lifecycle(tmp_path, monkeypatch):
     plan.update(schema='n36-released-plan-v1', worktree=str(tmp_path), artifact_root=str(tmp_path / 'artifacts/n36'), episodes=rows,
                 run_name='synthetic', source={'commit': 'a'*40}, runtime={'path': str(tmp_path / 'runtime'), 'sha256': 'b'*64},
                 runtime_inventory_sha256='c'*64, expected_manifests={})
+    plan['runtime_closure'] = write(tmp_path / 'runtime-closure.json', {'synthetic_only': True})
     for row in rows:
         output = Path(plan['artifact_root']) / 'attempts' / row['episode_key']
         plan['expected_manifests'][row['episode_key']] = write(tmp_path / 'manifests' / (row['episode_key'] + '.json'),
