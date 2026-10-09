@@ -1539,6 +1539,8 @@ class Main:
                 try:
                     self._run_episode(episode, episode_dir, episode_seed)
                 except BaseException:
+                    if getattr(self.policy, "_nonprogress_tangent", None) is not None:
+                        self.policy._nonprogress_tangent.reset("exception")
                     if getattr(self.policy, "_closure_intent", None) is not None:
                         self.policy._closure_intent.reset("exception")
                     raise
@@ -1869,7 +1871,7 @@ class Main:
                 if continuation_enabled:
                     evidence.record("n30_observation_context", packet=select_kwargs["executed_progress_context"])
                 if capture_dwell_enabled:
-                    evidence.record("n35_observation_context" if (self.config.get("eds_config") or {}).get("closure_intent_mode") == "executed_closure_intent_v1" else "n34_observation_context" if (self.config.get("eds_config") or {}).get("observed_jaw_approach_mode") == "observed_jaw_approach_v1" else "n32_observation_context" if (self.config.get("eds_config") or {}).get("archive_eligible_capture_mode") == "archive_eligible_capture_v1" else "n31_observation_context", packet=select_kwargs["capture_dwell_context"])
+                    evidence.record("n36_observation_context" if (self.config.get("eds_config") or {}).get("nonprogress_tangent_mode") == "nonprogress_tangent_v1" else "n35_observation_context" if (self.config.get("eds_config") or {}).get("closure_intent_mode") == "executed_closure_intent_v1" else "n34_observation_context" if (self.config.get("eds_config") or {}).get("observed_jaw_approach_mode") == "observed_jaw_approach_v1" else "n32_observation_context" if (self.config.get("eds_config") or {}).get("archive_eligible_capture_mode") == "archive_eligible_capture_v1" else "n31_observation_context", packet=select_kwargs["capture_dwell_context"])
             action_chunk = self.policy.select_action(**select_kwargs)
             select_action_latency_s = float(time.perf_counter() - select_action_start_s)
             self._append_phase_timing(episode=episode, global_step=global_steps,
@@ -1947,6 +1949,8 @@ class Main:
                         )
                     )
 
+            if generate_new_chunk and getattr(self.policy, "_nonprogress_tangent", None) is not None:
+                self.policy._nonprogress_tangent.commit(action_chunk, resolved_action_horizon, global_steps)
             if generate_new_chunk and getattr(self.policy, "_closure_intent", None) is not None:
                 self.policy._closure_intent.commit(action_chunk, resolved_action_horizon, global_steps)
             if continuation_enabled and generate_new_chunk:
@@ -2166,6 +2170,8 @@ class Main:
             try:
                 obs, reward, terminated, truncated, info = self.adapter.step(action_chunk[0][action_executed])
             except BaseException:
+                if getattr(self.policy, "_nonprogress_tangent", None) is not None:
+                    self.policy._nonprogress_tangent.reset("step_exception")
                 if getattr(self.policy, "_closure_intent", None) is not None:
                     self.policy._closure_intent.reset("step_exception")
                 raise
@@ -2185,6 +2191,9 @@ class Main:
             if evidence is not None:
                 evidence.step_returned(terminated=terminated, truncated=truncated,
                                        success=info.get("success", False))
+            if getattr(self.policy, "_nonprogress_tangent", None) is not None:
+                self.policy._nonprogress_tangent.acknowledge(action=action_chunk[0][action_executed],
+                    step=global_steps, index=action_executed + 1, terminated=terminated, truncated=truncated)
             if getattr(self.policy, "_closure_intent", None) is not None:
                 self.policy._closure_intent.acknowledge(action=action_chunk[0][action_executed],
                     step=global_steps, index=action_executed + 1, terminated=terminated, truncated=truncated)

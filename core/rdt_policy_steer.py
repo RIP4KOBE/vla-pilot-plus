@@ -35,6 +35,8 @@ from core.fkd_class import FKD
 from core.qd_archive_eligible_runtime import (
     MODE as ARCHIVE_ELIGIBLE_MODE, ArchiveEligibleDecision, validate_config as validate_archive_eligible_config,
 )
+from core.qd_nonprogress_tangent import (NonprogressMemory, NonprogressDecision,
+    MODE as NONPROGRESS_MODE, validate_config as validate_nonprogress_config, reset_on_failure as reset_nonprogress_on_failure)
 from core.qd_closure_intent import (ClosureIntentMemory, ClosureIntentDecision,
     MODE as CLOSURE_INTENT_MODE, validate_config as validate_closure_intent_config, reset_on_failure)
 from core.qd_observed_jaw_approach import (
@@ -190,6 +192,8 @@ class _EDSConfig:
     chunk_population_mode: str = "fresh"
     archive_eligible_capture_mode: str = "off"
     n32_runtime_binding: dict | None = None
+    nonprogress_tangent_mode: str = "off"
+    n36_runtime_binding: dict | None = None
     closure_intent_mode: str = "off"
     n35_runtime_binding: dict | None = None
     observed_jaw_approach_mode: str = "off"
@@ -1486,6 +1490,10 @@ class RDTSteer:
         self._stage_init_reward = None
 
     def reset_eds_chunk_memory(self, reason: str, *, warn: bool = False) -> None:
+        if getattr(self, "_nonprogress_tangent", None) is not None:
+            if reason == "episode_reset":
+                self._nonprogress_tangent.evidence = None
+            self._nonprogress_tangent.reset(reason)
         if getattr(self, "_closure_intent", None) is not None:
             if reason == "episode_reset":
                 self._closure_intent.evidence = None
@@ -1593,6 +1601,7 @@ class RDTSteer:
 
     # ── Inference entry point ─────────────────────────────────────────────────
 
+    @reset_nonprogress_on_failure
     @reset_on_failure
     def select_action(
         self,
@@ -1632,6 +1641,14 @@ class RDTSteer:
         )
 
         if should_sample:
+            nonprogress_mode = (eds_config or {}).get("nonprogress_tangent_mode", "off") == NONPROGRESS_MODE
+            if nonprogress_mode and not hasattr(self, "_nonprogress_tangent"):
+                self._nonprogress_tangent = NonprogressMemory()
+            if hasattr(self, "_nonprogress_tangent") and (not nonprogress_mode or not use_guidance):
+                self._nonprogress_tangent.evidence = getattr(self, "_decision_evidence", None)
+                self._nonprogress_tangent.reset("unguided_or_mode_off")
+                if not nonprogress_mode:
+                    del self._nonprogress_tangent
             closure_mode = (eds_config or {}).get("closure_intent_mode", "off") == CLOSURE_INTENT_MODE
             if closure_mode and not hasattr(self, "_closure_intent"):
                 self._closure_intent = ClosureIntentMemory()
@@ -1697,6 +1714,8 @@ class RDTSteer:
                 )
 
             self._cached_action_chunk = self._postprocess_actions(raw)
+            if nonprogress_mode and use_guidance:
+                self._nonprogress_tangent.bind_decode(raw, self._cached_action_chunk)
             if closure_mode and use_guidance:
                 self._closure_intent.bind_decode(raw, self._cached_action_chunk)
             if progress_mode and hasattr(self, "_executed_progress"):
@@ -5066,7 +5085,8 @@ class RDTSteer:
         descriptor_mode: str = "target_relative_endpoint_xy",
         projection_out: dict | None = None,
     ) -> Tensor:
-        trajectories = self._rdt_sample_to_trajectory_3d(population)
+        trajectories = self._rdt_sample_to_trajectory_3d(population,
+            **({"origin_out":projection_out} if projection_out is not None and getattr(getattr(self,"_capture_dwell",None),"event_prefix",None)=="n36" else {}))
         if projection_out is not None:
             projection_out["projected_xyz"] = trajectories.detach().clone()
         if descriptor_mode == EXECUTION_INTENT_DESCRIPTOR:
@@ -5152,7 +5172,7 @@ class RDTSteer:
             self._capture_dwell = ArchiveEligibleDecision(semantic, getattr(self, "_capture_dwell_context", None),
                 keypoints, episode=int(getattr(self, "_eds_episode_index", 0)),
                 stage=current_stage, step=global_step, action_mask=cond["action_mask"], config=cfg)
-        if cfg.observed_jaw_approach_mode == OBSERVED_JAW_MODE and cfg.closure_intent_mode == "off":
+        if cfg.observed_jaw_approach_mode == OBSERVED_JAW_MODE and cfg.closure_intent_mode == "off" and cfg.nonprogress_tangent_mode == "off":
             semantic, _ = recognize_executed_prefix_provider(guidance_fns, keypoints)
             self._capture_dwell = ObservedJawDecision(semantic, getattr(self, "_capture_dwell_context", None),
                 keypoints, episode=int(getattr(self, "_eds_episode_index", 0)),
@@ -5163,6 +5183,12 @@ class RDTSteer:
                 keypoints, episode=int(getattr(self, "_eds_episode_index", 0)),
                 stage=current_stage, step=global_step, action_mask=cond["action_mask"], config=cfg,
                 memory=self._closure_intent, evidence=getattr(self, "_decision_evidence", None))
+        if cfg.nonprogress_tangent_mode == NONPROGRESS_MODE:
+            semantic, _ = recognize_executed_prefix_provider(guidance_fns, keypoints)
+            self._capture_dwell = NonprogressDecision(semantic, getattr(self, "_capture_dwell_context", None),
+                keypoints, episode=int(getattr(self, "_eds_episode_index", 0)),
+                stage=current_stage, step=global_step, action_mask=cond["action_mask"], config=cfg,
+                memory=self._nonprogress_tangent, evidence=getattr(self, "_decision_evidence", None))
         progress_mode = cfg.executed_progress_continuation_mode == PROGRESS_MODE
         progress_semantic = None
         if progress_mode:
@@ -5517,7 +5543,8 @@ class RDTSteer:
                 )
                 metrics.qd_degenerate_reward_value = reward_value
         if metrics.qd_archive_active_for_chunk:
-            initial_descriptors = describe_qd(population)
+            n36_initial_geometry = {} if cfg.nonprogress_tangent_mode == NONPROGRESS_MODE else None
+            initial_descriptors = describe_qd(population, projection_out=n36_initial_geometry)
             qd_bounds = self._eds_qd_freeze_bounds(initial_descriptors, cfg)
             qd_initial_bounds = qd_bounds
             initial_cell_ids, initial_overflow = self._eds_qd_cell_ids(
@@ -5556,13 +5583,14 @@ class RDTSteer:
                 descriptors=initial_descriptors,
                 cell_ids=initial_cell_ids,
                 source_iter=-1,
-                **({"occurrence_ids": tuple(range(16))} if cfg.closure_intent_mode == CLOSURE_INTENT_MODE else {}),
+                **({"occurrence_ids": tuple(range(16))} if cfg.closure_intent_mode == CLOSURE_INTENT_MODE or cfg.nonprogress_tangent_mode == NONPROGRESS_MODE else {}),
                 **({"raw_rewards": original_rewards(population_info, population_rewards, population)} if quality_contract is not None else {}),
             )
             if self._capture_dwell is not None and getattr(self, "_decision_evidence", None) is not None:
                 self._decision_evidence.record(getattr(self._capture_dwell, "event_prefix", "n31") + "_archive_update", iter_idx=-1, cell_ids=initial_cell_ids,
                     descriptors=initial_descriptors, bounds_lo=qd_bounds.lo, bounds_hi=qd_bounds.hi,
-                    archive=qd_archive.snapshot(), parent_cell_ids=None)
+                    archive=qd_archive.snapshot(), parent_cell_ids=None,
+                    **({"cumulative_visits":qd_archive.cumulative_visits.clone(), "geometry":n36_initial_geometry} if cfg.nonprogress_tangent_mode == NONPROGRESS_MODE else {}))
             metrics.qd_archive_update_latency_s += float(
                 time.perf_counter() - qd_update_start
             )
@@ -6578,6 +6606,8 @@ class RDTSteer:
                 ):
                     raise RuntimeError("QD archive loop state is incomplete")
                 terminal_projection_out = {} if grasp_timing_mode and i == 9 else None
+                if cfg.nonprogress_tangent_mode == NONPROGRESS_MODE:
+                    terminal_projection_out = {}
                 child_descriptors = describe_qd(population, projection_out=terminal_projection_out)
                 if terminal_projection_out is not None:
                     terminal_projected_xyz = terminal_projection_out["projected_xyz"]
@@ -6667,14 +6697,15 @@ class RDTSteer:
                     descriptors=child_descriptors,
                     cell_ids=child_cell_ids,
                     source_iter=i,
-                    **({"occurrence_ids": tuple(range((i+1)*16, (i+2)*16))} if cfg.closure_intent_mode == CLOSURE_INTENT_MODE else {}),
+                    **({"occurrence_ids": tuple(range((i+1)*16, (i+2)*16))} if cfg.closure_intent_mode == CLOSURE_INTENT_MODE or cfg.nonprogress_tangent_mode == NONPROGRESS_MODE else {}),
                     parent_cell_ids=qd_parent_cell_ids,
                     **({"raw_rewards": original_rewards(population_info, population_rewards, population)} if quality_contract is not None else {}),
                 )
                 if self._capture_dwell is not None and evidence is not None:
                     evidence.record(getattr(self._capture_dwell, "event_prefix", "n31") + "_archive_update", iter_idx=i, cell_ids=child_cell_ids,
                         descriptors=child_descriptors, bounds_lo=qd_bounds.lo, bounds_hi=qd_bounds.hi,
-                        archive=qd_archive.snapshot(), parent_cell_ids=qd_parent_cell_ids)
+                        archive=qd_archive.snapshot(), parent_cell_ids=qd_parent_cell_ids,
+                        **({"cumulative_visits":qd_archive.cumulative_visits.clone(), "geometry":terminal_projection_out} if cfg.nonprogress_tangent_mode == NONPROGRESS_MODE else {}))
                 metrics.qd_archive_update_latency_s += float(
                     time.perf_counter() - qd_update_start
                 )
@@ -7412,6 +7443,8 @@ class RDTSteer:
                 progress_semantic.validate(guidance_fns)
             progress_selected = self._executed_progress.select(selected)
             self._record_progress_event("n30_selected_native_plan", selected=progress_selected, native_plan=selected)
+        if cfg.nonprogress_tangent_mode == NONPROGRESS_MODE:
+            self._nonprogress_tangent.select(self._capture_dwell, selected_entry, selected)
         if cfg.closure_intent_mode == CLOSURE_INTENT_MODE:
             self._closure_intent.select(self._capture_dwell, selected_entry, selected)
         if evidence is not None:
@@ -8303,6 +8336,8 @@ class RDTSteer:
             ),
             chunk_population_mode=str(cfg.get("chunk_population_mode", "fresh")),
             archive_eligible_capture_mode=str(cfg.get("archive_eligible_capture_mode", "off")),
+            nonprogress_tangent_mode=str(cfg.get("nonprogress_tangent_mode", "off")),
+            n36_runtime_binding=(dict(cfg["n36_runtime_binding"]) if cfg.get("n36_runtime_binding") is not None else None),
             closure_intent_mode=str(cfg.get("closure_intent_mode", "off")),
             n35_runtime_binding=(dict(cfg["n35_runtime_binding"]) if cfg.get("n35_runtime_binding") is not None else None),
             observed_jaw_approach_mode=str(cfg.get("observed_jaw_approach_mode", "off")),
@@ -8823,6 +8858,7 @@ class RDTSteer:
                         "EDS grid_archive requires "
                         f"{field_name}={expected!r}"
                     )
+        validate_nonprogress_config(resolved, self._action_chunk_horizon)
         validate_closure_intent_config(resolved, self._action_chunk_horizon)
         validate_observed_jaw_config(resolved, self._action_chunk_horizon)
         validate_archive_eligible_config(resolved, self._action_chunk_horizon)
