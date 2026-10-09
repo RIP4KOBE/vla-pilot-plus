@@ -88,7 +88,8 @@ def audit_events(profile, metrics, events, compute, *, expected_runtime=None):
         rows=groups[context['decision_id']];kinds=defaultdict(list)
         for e in rows:
             require(e['episode']==context['episode'],'episode mismatch')
-            if e['event'].startswith('n35_'):require(e['reset_sequence']==context['reset_sequence'],'reset mismatch')
+            # replay() validates every event against the ordered recorder epoch,
+            # which advances between automatic_reset_boundary and step_returned.
             kinds[e['event']].append(e)
         def one(k):
             require(len(kinds[k])==1,'missing/duplicate '+k);return kinds[k][0]

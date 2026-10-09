@@ -6,7 +6,7 @@ import pytest,torch,numpy as np
 from test_n31_capture_dwell_integration import make,packet,runtime_cfg,_patch_core_imports,stub_adapter,mock_batch
 
 
-def episode(tmp_path,monkeypatch,adapter,batch,arm='N35',dtype=torch.float32,providers_mode='normal',disk=False,nohit=False, fault=None,target=.01,positive_template=False):
+def episode(tmp_path,monkeypatch,adapter,batch,arm='N35',dtype=torch.float32,providers_mode='normal',disk=False,nohit=False, fault=None,target=.01,positive_template=False,terminal_kind='truncated',terminal_prefix=8):
     from core.decision_evidence import DecisionEvidence
     from scripts import audit_decision_evidence as generic
     p,provider,conf,_,_,_=make('on' if arm=='N35' else 'off',adapter,monkeypatch,dtype)
@@ -55,12 +55,16 @@ def episode(tmp_path,monkeypatch,adapter,batch,arm='N35',dtype=torch.float32,pro
         if guided:metrics.append(copy.deepcopy(p.get_last_eds_metrics()))
         p._closure_intent.commit(actions,8,step)
         rec.commit_decision(action_chunk=actions,execution_horizon=8)
-        for j in range(8):
+        final=index==len(modes)-1
+        for j in range(terminal_prefix if final else 8):
+            ended=final and j==terminal_prefix-1
+            terminated=ended and terminal_kind=='terminated'
+            truncated=ended and terminal_kind=='truncated'
             rec.dispatch(global_step=step+j,execution_index=j+1);rec.record('executed_action',action_numpy=actions[0,j].float())
             rec.pre_reset_outcome({'robot0_eef_pos':ctx['observed_eef'],'robot0_eef_quat':ctx['hand_quaternion_xyzw'],
-                'robot0_gripper_qpos':torch.tensor([.02-(index+1)*.001,-.02+(index+1)*.001],dtype=torch.float64) if j==7 else ctx['gripper_qpos']},reward=0.,terminated=False,success=False)
-            rec.step_returned(terminated=False,truncated=(index==len(modes)-1 and j==7),success=False)
-            p._closure_intent.acknowledge(action=actions[0,j],step=step+j,index=j+1,terminated=False,truncated=(index==len(modes)-1 and j==7))
+                'robot0_gripper_qpos':torch.tensor([.02-(index+1)*.001,-.02+(index+1)*.001],dtype=torch.float64) if j==7 else ctx['gripper_qpos']},reward=0.,terminated=terminated,success=terminated)
+            rec.step_returned(terminated=terminated,truncated=truncated,success=terminated)
+            p._closure_intent.acknowledge(action=actions[0,j],step=step+j,index=j+1,terminated=terminated,truncated=truncated)
     status=rec.finish();assert not rec.failed
     if disk:events=generic.load_events(root,status)
     else:

@@ -22,25 +22,72 @@ def jaw(packet):
     return d if bool(torch.isfinite(q).all()) and math.isfinite(d) else None
 
 
+def verify_reset_epochs(events):
+    """Replay recorder epochs, including the transition inside adapter.step.
+
+    The automatic-reset marker belongs to the old epoch; the returned outcome
+    and subsequent memory acknowledgement belong to the incremented epoch.
+    Truncation alone does not advance the recorder epoch.
+    """
+    epoch=0;sequence=0;outcome=None;reset_seen=False
+    identity=('episode','decision_id','global_step')
+    for event in events:
+        kind=event['event'];v=event['values']
+        require(type(event['sequence']) is int and event['sequence']>sequence,'N35 event order')
+        sequence=event['sequence']
+        require(type(event['reset_sequence']) is int and event['reset_sequence']==epoch,'N35 reset epoch mismatch')
+        if outcome is not None:
+            require(all(event[k]==outcome[k] for k in identity),'N35 outcome/reset identity')
+            if terminal_bool(outcome['values']['terminated']) and not reset_seen:
+                require(kind=='automatic_reset_boundary','N35 missing ordered automatic reset')
+            else:
+                require(kind=='step_returned','N35 missing ordered returned outcome')
+        if kind=='pre_reset_outcome':
+            outcome=event;reset_seen=False
+        elif kind=='automatic_reset_boundary':
+            require(outcome is not None and terminal_bool(outcome['values']['terminated']) and not reset_seen
+                and v=={'terminal_episode':event['episode'],'reset_will_follow':True,'reset_completed':None},
+                'N35 automatic reset binding')
+            reset_seen=True;epoch+=1
+        elif kind=='step_returned':
+            require(outcome is not None and terminal_bool(v['terminated'])==terminal_bool(outcome['values']['terminated'])
+                and terminal_bool(v['success'])==terminal_bool(outcome['values']['success']),
+                'N35 returned outcome binding')
+            outcome=None;reset_seen=False
+    require(outcome is None,'N35 unfinished returned outcome')
+
+
 def replay(events):
+    verify_reset_epochs(events)
     contexts={e['decision_id']:e for e in events if e['event']=='decision_context'}
     grouped={d:[e for e in events if e['decision_id']==d] for d in contexts}
     def one(d,k):
         found=[e for e in grouped[d] if e['event']==k]
         require(len(found)==1,'N35 mandatory '+k);return found[0]
-    pending=None;active=None;latch=False;eligible={};ack_count=0;complete_due=False
+    pending=None;active=None;latch=False;eligible={};ack_count=0;complete_due=False;terminal_due=None;returned_due=None
     counts={'eligible_boundaries':0,'exclusions':{},'consumptions':0,'expiries':0,'resets':[],
             'created_tokens':0,'direct_close_selections':0,'memory_selections':0,'acknowledgements':0}
     for event in events:
         kind=event['event'];v=event['values'];d=event['decision_id']
+        if returned_due is not None:
+            require(kind=='n35_step_acknowledged'
+                and all(event[k]==returned_due[k] for k in ('episode','decision_id','global_step','reset_sequence')),
+                'N35 mandatory ordered return acknowledgement')
+            returned_due=None
+        if terminal_due is not None:
+            require(kind=='n35_memory_reset' and v=={'reason':'terminal'}
+                and all(event[k]==terminal_due[k] for k in ('episode','decision_id','global_step','reset_sequence')),
+                'N35 mandatory identity-linked terminal reset after acknowledgement')
+        if kind=='step_returned' and contexts[d]['values']['use_guidance']:
+            returned_due=event
         if not kind.startswith('n35_'):continue
         if kind=='n35_memory_reset':
             reason=v['reason']
             require(reason in {'episode_reset','stage_change','unguided_or_mode_off','terminal','guidance_change'},'exception or unknown reset invalidates execution')
             if reason=='terminal':
-                returns=[e for e in grouped[d] if e['event']=='step_returned' and e['sequence']<event['sequence']]
-                require(pending is not None and returns and (terminal_bool(returns[-1]['values']['terminated'])
-                    or terminal_bool(returns[-1]['values']['truncated'])),'terminal reset needs actual terminal return')
+                require(pending is not None and terminal_due is not None,
+                    'terminal reset needs actual terminal acknowledgement')
+                terminal_due=None
             elif reason=='unguided_or_mode_off':
                 require(contexts[d]['values']['use_guidance'] is False,'unguided reset in guided boundary')
             elif pending is not None:
@@ -129,11 +176,13 @@ def replay(events):
             executed=[e for e in grouped[d] if e['event']=='executed_action'][ack_count]
             end=terminal_bool(returned['values']['terminated']) or terminal_bool(returned['values']['truncated'])
             require(returned['sequence']<event['sequence'] and v['step']==returned['global_step']==p['identity']['step']+ack_count
+                and all(event[k]==returned[k] for k in ('episode','decision_id','global_step','reset_sequence'))
                 and v['index']==ack_count+1 and v['occurrence']==p['occurrence'] and v['native_identity']==p['native_identity']
                 and v['ended']==end and same(v['action'],p['decoded'][0,ack_count])
                 and same(executed['values']['action_numpy'],v['action']),'actual step-return acknowledgement')
             ack_count+=1;p['acknowledged']=ack_count;counts['acknowledgements']+=1
             complete_due=ack_count==8 and not end
+            terminal_due=event if end else None
         elif kind=='n35_execution_complete':
             require(complete_due and pending is not None and v=={'occurrence':pending['occurrence'],
                 'origin':pending['origin'],'positive':bool((pending['decoded'][0,:,6]>0).all()),
@@ -145,7 +194,8 @@ def replay(events):
             complete_due=False
         elif kind not in {'n35_observation_context','n35_canonical_cache','n35_capture_dwell_opportunity','n35_archive_update'}:
             require(False,'unknown N35 event')
-    require(active is None and not complete_due,'unfinished N35 boundary/execution')
+    require(active is None and not complete_due and terminal_due is None and returned_due is None,
+        'unfinished N35 boundary/execution/terminal reset')
     for d,ctx in contexts.items():
         if ctx['values']['use_guidance']:
             require(d in eligible,'missing mandatory boundary')
