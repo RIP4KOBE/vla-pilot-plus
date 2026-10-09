@@ -8,9 +8,9 @@ from scripts import qd_ed_n23_worker as w
 
 ROOT = Path(__file__).resolve().parents[1]
 # Fresh matched primaries; all historical attempts remain globally charged.
-COHORT = 'N34R9_OBSERVED_JAW_APPROACH_DEV_20261008'
-OLD_COHORT = 'N34R8_OBSERVED_JAW_APPROACH_DEV_20261008'
-OLD_EPISODE = 'n34r8_dev_t00_c0_20261008'
+COHORT = 'N34R10_OBSERVED_JAW_APPROACH_DEV_20261008'
+OLD_COHORT = 'N34R9_OBSERVED_JAW_APPROACH_DEV_20261008'
+OLD_EPISODE = 'n34r9_dev_t00_c0_20261008'
 INVALID_HISTORY = (
     ('n34_dev_t00_c0_20261008', 'N34_OBSERVED_JAW_APPROACH_DEV_20261008', 'baseline'),
     ('n34r1_dev_t00_c0_20261008', 'N34R1_OBSERVED_JAW_APPROACH_DEV_20261008', 'recovery'),
@@ -20,16 +20,17 @@ INVALID_HISTORY = (
     ('n34r5_dev_t00_c0_20261008', 'N34R5_OBSERVED_JAW_APPROACH_DEV_20261008', 'recovery'),
     ('n34r6_dev_t00_c0_20261008', 'N34R6_OBSERVED_JAW_APPROACH_DEV_20261008', 'recovery'),
     ('n34r7_dev_t00_c0_20261008', 'N34R7_OBSERVED_JAW_APPROACH_DEV_20261008', 'recovery'),
+    ('n34r8_dev_t00_c0_20261008', 'N34R8_OBSERVED_JAW_APPROACH_DEV_20261008', 'recovery'),
     (OLD_EPISODE, OLD_COHORT, 'recovery'),
 )
-RECOVERY_EPISODE = 'n34r9_dev_t00_c0_20261008'
+RECOVERY_EPISODE = 'n34r10_dev_t00_c0_20261008'
 # Fixed prospective provenance, taken from authority-v1.json. This is not approval.
 REPLACEMENT = {
     'old_episode_key': OLD_EPISODE, 'new_episode_key': RECOVERY_EPISODE,
     'budget_bucket': 'recovery',
     'terminal_closure': {
-        'path': '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000694/terminal-closure-v1.json',
-        'sha256': 'cd6402fe26146565fbb6123888e5d73b2e65311e9c7d99da8a18aae51f23bbf4'},
+        'path': '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000704/terminal-closure-v1.json',
+        'sha256': 'c27a1d6c0a041f3bdd3218525907d6c2b523e84e80076b8b37521113fc62a2f1'},
     'automatic': False,
 }
 ARMS = ('C0', 'Q0', 'N34')
@@ -69,26 +70,26 @@ def expected_rows(root=ROOT):
     tasks = json.loads((Path(root) / 'configs/qd_ed_final/n31_dev_task_identities.json').read_text())['tasks']
     w.require([x['task_id'] for x in tasks] == list(range(10)) and all(x['split'] == 'dev' for x in tasks), 'ten exposed Dev tasks')
     return [{**task, 'iteration': COHORT, 'profile': arm, 'timeout_seconds': 1800,
-             'episode_key': f'n34r9_dev_t{task["task_id"]:02d}_{arm.lower()}_20261008',
+             'episode_key': f'n34r10_dev_t{task["task_id"]:02d}_{arm.lower()}_20261008',
              'budget_bucket': ('recovery' if task['task_id'] == 0 else 'baseline') if arm == 'C0' else 'development',
              'replacement': copy.deepcopy(REPLACEMENT) if task['task_id'] == 0 and arm == 'C0' else None} for task in tasks for arm in ARMS]
 
 
 def require_row(row, root=ROOT):
-    w.require(row in expected_rows(root), 'exact N34R9 identity/bucket/replacement')
+    w.require(row in expected_rows(root), 'exact N34R10 identity/bucket/replacement')
 
 
 def require_recovery_row(plan, row):
     """Narrow exception to the shared Dev/budget gate; grants no release."""
     w.require(plan['schema'] == 'n34-released-plan-v1'
               and plan['episodes'] == expected_rows(plan['worktree'])
-              and row == plan['episodes'][0], 'exact N34R9 explicit recovery')
+              and row == plan['episodes'][0], 'exact N34R10 explicit recovery')
 
 
 def event_binding(row, event):
     w.require(event.get('budget_bucket') == row['budget_bucket']
               and 'replacement' in event and event['replacement'] == row['replacement'],
-              'N34R9 accounting/replacement binding')
+              'N34R10 accounting/replacement binding')
     w.require(all(event.get(k) is None for k in ('retry_of', 'recovery_of')),
               'zero automatic recovery; arbitrary pointers forbidden')
 
@@ -106,14 +107,14 @@ def cohort_events(rows, events):
             w.require(row is not None and event.get('episode_key') == row['episode_key']
                       and identity == {k: row[k] for k in
                           ('split', 'iteration', 'profile', 'task_id', 'env_seed', 'policy_seed', 'init_index')},
-                      'exact N34R9 journal identity')
+                      'exact N34R10 journal identity')
             event_binding(row, event)
             local.append(event)
     return local
 
 
 def require_replacement_history(events):
-    """All nine prior invalids remain charged in their original buckets, never carried."""
+    """All ten prior invalids remain charged in their original buckets, never carried."""
     from scripts import qd_ed_final_runner as runner
     groups = runner.event_groups(events)
     for episode, cohort, bucket in INVALID_HISTORY:
