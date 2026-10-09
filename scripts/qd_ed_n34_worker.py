@@ -67,6 +67,16 @@ def attest_worker_loaded(root, source):
     return loaded
 
 
+def release_api(plan_ref):
+    """Select an explicit plan family; never validate retained R11 at new HEAD."""
+    schema = w.read_ref(plan_ref).get('schema')
+    if schema == 'n34-continuation-plan-v1':
+        from scripts import qd_ed_n34_continuation_release as release
+    else:
+        from scripts import qd_ed_n34_release as release
+    return release
+
+
 def validate_context(reference):
     with closure.verification_phase('context'):
         return _validate_context(reference)
@@ -76,7 +86,7 @@ def _validate_context(reference):
     context = w.read_ref(reference)
     w.require(set(context) == {'schema', 'plan', 'release', 'expected_manifest', 'episode_key', 'attempt_id', 'main_argv', 'worker_contract'}, 'worker context fields: explicit detached release required')
     w.require(context['schema'] == 'n34-worker-context-v1' and context['worker_contract'] == c.WORKER_CONTRACT, 'worker contract')
-    from scripts import qd_ed_n34_release as release
+    release = release_api(context['plan'])
     plan, runtime, _, manifests = release._verify_release_transaction(context['plan'], context['release'])
     rows = [r for r in plan['episodes'] if r['episode_key'] == context['episode_key']]
     w.require(len(rows) == 1 and context['attempt_id'] == context['episode_key'], 'exact primary attempt')
@@ -89,7 +99,7 @@ def _validate_context(reference):
 
 
 def context_for(plan_ref, row, release_ref=None):
-    from scripts import qd_ed_n34_release as release
+    release = release_api(plan_ref)
     plan, _, _ = release.validate_release(plan_ref, release_ref)
     manifest_ref = plan['expected_manifests'][row['episode_key']]
     manifest = w.read_ref(manifest_ref)
@@ -305,7 +315,7 @@ def verify_receipt(context_ref, receipt_ref, process_record):
 def verify_terminal(plan_ref, row, terminal, release_ref=None):
     """Parent binds generic terminal identity and telemetry to the metered receipt."""
     from scripts import qd_ed_n34_supervise as s
-    from scripts import qd_ed_n34_release as release
+    release = release_api(plan_ref)
     plan, _, _ = release.validate_release(plan_ref, release_ref)
     manifest = w.read_ref(plan['expected_manifests'][row['episode_key']])
     output = Path(manifest['output_dir'])
