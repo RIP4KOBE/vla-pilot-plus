@@ -118,7 +118,7 @@ def _verify_release_contents(plan_ref, release_ref):
 
 def validate_caps(caps):
     """Accept only explicit root caps, never copy a predecessor's stale balances."""
-    w.require(caps == c.CAPS, 'N34R7 unchanged root caps/protected reserves')
+    w.require(caps == c.CAPS, 'N34R8 unchanged root caps/protected reserves')
     buckets = caps['buckets']
     w.require(set(buckets) == {'baseline', 'development', 'validation', 'formal', 'recovery'}
               and all(type(v) is int and v >= 0 for v in buckets.values())
@@ -172,12 +172,12 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
     protected = sum(max(0., h - snap['gpu_hours_by_bucket'][k]) for k, h in caps['protected_gpu_hours'].items())
     local = c.cohort_events(rows, events)
     local_ids = {e['resource_id'] for e in resources if e.get('cohort') == c.COHORT
-                 or e.get('kind') == 'n34r7_resource_preparation_v1'}
+                 or e.get('kind') == 'n34r8_resource_preparation_v1'}
     local_resources = [e for e in resources if e['resource_id'] in local_ids]
     cohort = r.budget_snapshot(local, local_resources)
     w.require(all(cohort['by_bucket'][k] <= c.LIMITS[k] for k in ('baseline', 'development', 'recovery')),
-              'N34R7 bucket ceilings')
-    w.require(cohort['by_bucket'][row['budget_bucket']] < c.LIMITS[row['budget_bucket']], 'N34R7 bucket exhausted')
+              'N34R8 bucket ceilings')
+    w.require(cohort['by_bucket'][row['budget_bucket']] < c.LIMITS[row['budget_bucket']], 'N34R8 bucket exhausted')
     allowance = {'authority_starts_at': authority['starts_at'],
                  'authority_ends_at': min(authority['coordinator_ends_at'], window['ends_at']),
                  'private_budget': True, 'gpu_idle': gpu_idle, 'physical_gpu': 7, 'gpu_uuid': c.GPU_UUID,
