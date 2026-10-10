@@ -75,7 +75,8 @@ def release_api(plan_ref):
     """Use only the N36 detached release family, never a predecessor release."""
     plan = w.read_ref(plan_ref)
     if plan.get('schema') == 'n36-engineering-execution-plan-v1':
-        from scripts import qd_ed_n36_engineering as release
+        from scripts.qd_ed_n36_engineering_api import for_plan
+        release = for_plan(plan)
     else:
         w.require(plan.get('schema') == 'n36-released-plan-v1', 'unsupported worker release schema')
         from scripts import qd_ed_n36_release as release
@@ -131,7 +132,8 @@ def context_for(plan_ref, row, release_ref=None):
 
 def operational_binding(plan):
     if plan.get('schema') == 'n36-engineering-execution-plan-v1':
-        from scripts.qd_ed_n36_engineering import operational_binding as binding
+        from scripts.qd_ed_n36_engineering_api import for_plan
+        binding = for_plan(plan).operational_binding
         return binding(plan)
     return c.operational_binding(plan)
 
@@ -364,6 +366,9 @@ def verify_receipt(context_ref, receipt_ref, process_record):
             required |= {'scripts.qd_ed_n36_engineering', 'scripts.qd_ed_n36_release',
                          'scripts.qd_ed_n36_accounting', 'scripts.qd_ed_n36_stop',
                          'scripts.qd_ed_n36_source'}
+            from scripts.qd_ed_n36_engineering_api import for_plan
+            required.add('scripts.qd_ed_n36_engineering_api')
+            required.add(for_plan(plan).__name__)
         if phase == 'loaded_after' and row['profile']=='N36':
             required.add('scripts.qd_ed_n36_response')
         if phase == 'loaded_after':
@@ -375,7 +380,10 @@ def verify_receipt(context_ref, receipt_ref, process_record):
         if plan['schema'] == 'n36-engineering-execution-plan-v1':
             compiled = {(v['module'], v['path'], v['sha256'])
                         for v in receipt[phase.replace('loaded_', 'execution_')]['compiled']}
-            for name in ('engineering', 'release', 'accounting', 'stop'):
+            names = ['engineering', 'release', 'accounting', 'stop', 'engineering_api']
+            if for_plan(plan).__name__.endswith('_r1'):
+                names.append('engineering_r1')
+            for name in names:
                 module = 'scripts.qd_ed_n36_' + name
                 path = 'scripts/qd_ed_n36_' + name + '.py'
                 w.require(path in index and inventory[module] == {'path': path, 'sha256': index[path]},
@@ -438,7 +446,9 @@ def verify_terminal(plan_ref, row, terminal, release_ref=None):
               'generic terminal identity/cost differs')
     c.event_binding(row, terminal)
     if plan.get('schema') == 'n36-engineering-execution-plan-v1':
-        from scripts.qd_ed_n36_engineering import operational_binding as terminal_binding, require_row
+        from scripts.qd_ed_n36_engineering_api import for_plan
+        api = for_plan(plan)
+        terminal_binding, require_row = api.operational_binding, api.require_row
         require_row(row)
     else:
         terminal_binding = c.operational_binding

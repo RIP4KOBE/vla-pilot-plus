@@ -1,0 +1,198 @@
+{
+  "schema": "n36-engineering-r1-operational-spec-v1",
+  "status": "PREPARATION_ONLY_REQUIRES_INDEPENDENT_REVIEW",
+  "node_id": "15.6",
+  "source_base_commit": "b8d6b98164f24a599a9aa1fa6ce862b12cb2fcf6",
+  "release_enabled": false,
+  "root_adopted": false,
+  "gpu_authorized": false,
+  "not_a_released_plan": true,
+  "decision": "PROSPECTIVE_RECOVERY_EXECUTION_DISABLED",
+  "scope": {
+    "identity": "N36_ENGINEERING_R1_C0_TASK0_001616",
+    "purpose": "engineering_diagnostic_only",
+    "episode": {
+      "task_id": 0,
+      "env_seed": 1969522881,
+      "policy_seed": 1969522881,
+      "init_index": 0,
+      "init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
+      "init_file_sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+      "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+      "split": "dev",
+      "seed_block": "dev",
+      "iteration": "N36_ENGINEERING_R1_C0_TASK0_001616",
+      "profile": "C0",
+      "timeout_seconds": 1800,
+      "episode_key": "n36_engineering_r1_t00_c0_001616",
+      "budget_bucket": "baseline",
+      "replacement": null
+    },
+    "health_resource_id": "n36_healthcheck_engineering_r1_t00_c0_001616",
+    "health_kind": "n36_engineering_r1_resource_preparation_v1",
+    "max_attempts": 1,
+    "max_healthchecks": 1,
+    "scientific_eligible": false,
+    "matched_improvement_eligible": false,
+    "promotion_eligible": false,
+    "replace_or_truncate_full_cohort": false,
+    "pool_with_past_or_future_controls": false,
+    "automatic_continuation": false,
+    "deadline": "2026-10-11T11:13:13+00:00",
+    "future_output_requirement": "A new empty root explicitly bound by future engineering authority; it must be outside source and historical evidence. This preparation directory grants no execution write authority."
+  },
+  "full_audit_view": {
+    "immutable_original_plan": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001467/recovery-preparation/plan.draft.json",
+      "bytes": 424773,
+      "sha256": "64bb1abd42cf931e6622311f04914a8c1656e8f4957342152459745204233947"
+    },
+    "cohort": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+    "episodes": 40,
+    "expected_manifests_required": 40,
+    "extra_engineering_manifest_required": 1,
+    "original_expected_manifests_count": 0,
+    "original_prospective_manifest_count": 40,
+    "original_frozen": false,
+    "original_release_enabled": false,
+    "refresh_required": true,
+    "dispatch_authority": false,
+    "rules": "Retain full task-major C0,Q0,N34,N36 matrix, original scientific protocol review, thresholds, fixed dev seeds/init rows, timeouts, audit contract and stopping rules. Refresh source/runtime/native/manifests for the future reviewed adapter commit in new artifacts only; do not modify the original plan."
+  },
+  "accounting_proposal": {
+    "equation": "(1800+40)+(20+40)+200=2100",
+    "episode_timeout_seconds": 1800,
+    "episode_cleanup_seconds": 40,
+    "health_timeout_seconds": 20,
+    "health_cleanup_seconds": 40,
+    "root_overhead_seconds": 200,
+    "wall_seconds": 2100,
+    "gpu_reservation_seconds": 1900,
+    "gpu_reservation_hours_exact": "19/36",
+    "gpu_reservation_hours_decimal": "0.5277777777777777777777777777777777777778",
+    "root_overhead_is_not_gpu_reservation": true,
+    "retained_attempts": 507,
+    "new_attempts_max": 1,
+    "prospective_attempts_max": 508,
+    "global_attempt_cap": 1800,
+    "remaining_attempts_after_max": 1292,
+    "retained_gpu_hours": "75.64264702604362",
+    "retained_admission_margin_gpu_hours": "0.23357169027962",
+    "conservative_before_gpu_hours": "75.87621871632324",
+    "conservative_after_gpu_hours_exact": "75.87621871632324 + 19/36",
+    "conservative_after_gpu_hours_decimal": "76.40399649410101777777777777777777777778",
+    "absolute_cap_gpu_hours": "224",
+    "effective_weekly_cap_gpu_hours": "221.08404692669838",
+    "absolute_remaining_after_gpu_hours": "147.5960035058989822222222222222222222222",
+    "effective_remaining_after_gpu_hours": "144.6800504325973622222222222222222222222",
+    "protected_remaining_gpu_hours": {
+      "validation": "24.2408240024308155",
+      "formal": "12.0"
+    },
+    "unprotected_effective_remaining_after_gpu_hours": "108.4392264301665467222222222222222222222",
+    "bucket_additions": {
+      "baseline": 1,
+      "development": 0,
+      "validation": 0,
+      "formal": 0,
+      "recovery": 0
+    },
+    "baseline_before_after_cap": [
+      107,
+      108,
+      400
+    ],
+    "baseline_remaining_after": 292,
+    "automatic_recoveries": 0,
+    "health_invocations_max": 1,
+    "health_aggregate_seconds": 60,
+    "history_policy": "Retain all 507 attempts, all health charges, missing telemetry and admission margin. No protected reserves borrowed.",
+    "conservative_after_gpu_hours": "76.40399649410101777777777777777777777778",
+    "bucket_reason": "One explicitly authorized new C0 engineering diagnostic retains the parent baseline bucket; prior failed attempt remains charged. This is not an automatic retry or a scientific control.",
+    "wall_equation": "(1800+40)+(20+40)+200=2100"
+  },
+  "retained_ledger_prefixes": {
+    "attempt-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/attempt-ledger.jsonl",
+      "sha256": "501510963420bacc7b680044d040ca2ba0883a89c907646db70f947b2575d8af",
+      "bytes": 7572377
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-healthcheck-ledger.jsonl",
+      "sha256": "9dd949d47ffbc3549eaf0ee6638833ec7a6123f7ad71d895a73e45e1f753e793",
+      "bytes": 114767
+    },
+    "gpu-hour-reservation-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-hour-reservation-ledger.jsonl",
+      "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8",
+      "bytes": 401
+    }
+  },
+  "retained_snapshot_reference": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001616/retained-snapshot-v1.json",
+    "sha256": "67eff7abfa6e08e089ed671874ae1b1d52ef7584b7df33d04235068bb20250d9"
+  },
+  "binding_requirements": {
+    "schema_prefix": "n36-engineering",
+    "mandatory": [
+      "exact scope and accounting hashes",
+      "full audit-only plan hash and all 40 expected manifests",
+      "extra engineering manifest and exact audit-row mapping",
+      "final reviewed adapter source inventory and scientific-source equivalence",
+      "runtime and runtime closure",
+      "native build and controller semantics",
+      "strict lexical source/owner/output routing and both STOP entries",
+      "independent engineering B5 acceptance",
+      "root engineering protocol acceptance",
+      "root source adoption",
+      "owning accounting adoption with prefixes, whole snapshot and retained margin",
+      "distinct health root review/release and terminal readiness",
+      "distinct episode root review/release",
+      "official current-login codex_cli gpt-6-astra route",
+      "deadline and hard one-use resource caps"
+    ],
+    "dag": "disabled scope/accounting -> implementation and refreshed full audit view plus engineering manifest -> exact independent B5 -> root source/accounting/scope adoption -> bound engineering execution plan -> health root review/release -> fresh terminal health readiness -> episode root review/release -> single diagnostic context/receipt/terminal -> durable exhausted stop",
+    "forbidden": "No self-approved root/B5 records, no cyclic self-hash plan, no fake enabled plan, no blanket legacy release, no existing protocol digest replacement."
+  },
+  "unchanged_files_and_rules": "No scientific configs/core/controller thresholds, original full contract IDENTITIES/LIMITS/expected_rows, existing pinned protocol/accounting hashes, existing supervisor stopping logic, or DINO/native audit weakening. Any shared refactor must be behavior-preserving for existing full cohorts.",
+  "prospective_amendment": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001616/prospective-recovery-amendment-v1.json",
+    "sha256": "fe3c11c3a4be56f74149dc7e21a59eef59611478841d0fa8993bc79f8760e5ba"
+  },
+  "parent_specification": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001479/bounded-engineering-preparation/engineering-adapter-spec-v1.json",
+    "sha256": "9df1dbbbe985df1d02e88770356b59e47d346a9f546629e0d7262cb9e51ecd15"
+  },
+  "canonical_runtime": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001597/runtime.readiness-verified-v1.json",
+    "sha256": "d68870143e68008352710bec1f97db4fe1a3dae9c77ca2dd0ba6162262a5acfe"
+  },
+  "retained_snapshot": {
+    "dispatched": 507,
+    "aborted": 26,
+    "valid": 463,
+    "invalid": 18,
+    "completed": 481,
+    "running": 0,
+    "gpu_hours_consumed": 75.64264702604362,
+    "by_bucket": {
+      "baseline": 107,
+      "development": 313,
+      "validation": 60,
+      "formal": 0,
+      "recovery": 27
+    },
+    "reserved_attempts": 507,
+    "gpu_hours_by_bucket": {
+      "baseline": 15.785846603268592,
+      "development": 48.05656184449396,
+      "validation": 7.7591759975691845,
+      "formal": 0.0,
+      "recovery": 4.041062580711839
+    },
+    "gpu_healthcheck_hours": 0.24847032518900042,
+    "gpu_healthcheck_inflight": 0
+  },
+  "deployment_source_cwd": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+  "source_adoption_required": true
+}

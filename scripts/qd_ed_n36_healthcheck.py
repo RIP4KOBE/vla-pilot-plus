@@ -43,7 +43,8 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
     """One bounded probe, no retry, no episode attempt, no readiness mutation."""
     engineering = w.read_ref(plan_ref).get('schema') == 'n36-engineering-execution-plan-v1'
     if engineering:
-        from scripts import qd_ed_n36_engineering as api
+        from scripts.qd_ed_n36_engineering_api import for_plan
+        api = for_plan(w.read_ref(plan_ref))
         validate, reserve = api.validate_health_release, api.reserve_health_handoff
         owner, environment, guard = api.owner_root, api.child_environment, api.launch_guard
         n36r3 = True  # same separate-health process mechanics, distinct authority

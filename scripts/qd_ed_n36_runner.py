@@ -69,7 +69,8 @@ def execute_one(plan_ref, release_ref, *, _engineering=False):
     """
     engineering = _engineering
     if engineering:
-        from scripts import qd_ed_n36_engineering as api
+        from scripts.qd_ed_n36_engineering_api import for_plan
+        api = for_plan(w.read_ref(plan_ref))
         lifecycle = api
         get_owner, environment = api.owner_root, api.child_environment
         binding, guard = api.operational_binding, api.launch_guard

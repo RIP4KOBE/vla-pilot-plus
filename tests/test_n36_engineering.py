@@ -370,6 +370,14 @@ def test_live_suffixes_exact_and_no_foreign_accounting(prepared, tmp_path, mutat
     local = episode_fixture(plan)
     health = health_fixture(plan, tmp_path)
     for event in health: event['time_unix'] = 90
+    # The suffix validator also binds the detached plan and prospective time.
+    # This disabled fixture is never submitted to release/admission validators.
+    plan_ref = put(tmp_path, 'suffix-disabled-plan', plan)
+    release_ref = put(tmp_path, 'suffix-disabled-release', {
+        'schema': 'n36-engineering-episode-release-v1', 'plan': plan_ref,
+        'issued_at': '1970-01-01T00:01:35+00:00', 'release_enabled': False})
+    for event in local:
+        event.update(release=release_ref, plan_sha256=plan_ref['sha256'])
     events, resources, reservations = [old.copy(), *local], [old.copy(), *health], [old.copy()]
     if mutation == 'prefix': events[0]['event'] = 'rewritten'
     elif mutation == 'foreign_attempt': events.append({**local[0], 'attempt_id': 'foreign'})

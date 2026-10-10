@@ -167,7 +167,8 @@ def verify_audit_closure(plan):
     view remains disabled and cannot be passed through validate_plan.
     """
     if plan.get('schema') == 'n36-engineering-audit-view-v1':
-        from scripts.qd_ed_n36_engineering import validate_audit_view
+        from scripts.qd_ed_n36_engineering_api import for_plan
+        validate_audit_view = for_plan(plan).validate_audit_view
         validate_audit_view(plan)
     w.require(plan['episodes'] == c.plan_rows(plan)
               and len(plan['episodes']) == 40

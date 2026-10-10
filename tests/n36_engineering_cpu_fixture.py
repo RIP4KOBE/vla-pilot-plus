@@ -123,7 +123,7 @@ class Graph:
         required = set(r.REQUIRED_CODE) | set(b.RUNTIME_SOURCES)
         required |= {'scripts/qd_ed_n36_' + name + '.py' for name in
                      ('worker', 'bridge', 'contract', 'native', 'build', 'lifecycle', 'arithmetic',
-                      'reference', 'source', 'bootstrap', 'engineering', 'release', 'accounting', 'stop')}
+                      'reference', 'source', 'bootstrap', 'engineering', 'engineering_api', 'engineering_r1', 'release', 'accounting', 'stop')}
         required |= {'scripts/' + name + '.py' for name in
                      ('qd_ed_n23_worker', 'audit_decision_evidence', 'qd_ed_n31_native',
                       'qd_ed_n34_controller', 'qd_ed_n34_source', 'qd_ed_n34_worker', 'qd_ed_n34_native')}
@@ -604,7 +604,7 @@ class Graph:
         source_index = {v['path']: v['sha256'] for v in self.source_record['files']}
         names = {'scripts.qd_ed_n36_' + name for name in
                  ('worker', 'bridge', 'contract', 'native', 'build', 'lifecycle', 'arithmetic', 'reference',
-                  'source', 'engineering', 'release', 'accounting', 'stop')}
+                  'source', 'engineering', 'engineering_api', 'engineering_r1', 'release', 'accounting', 'stop')}
         names |= {'scripts.' + name for name in ('qd_ed_n23_worker', 'audit_decision_evidence',
                  'qd_ed_n31_native', 'qd_ed_n34_controller', 'qd_ed_n34_source', 'qd_ed_n34_worker', 'qd_ed_n34_native')}
         names |= {name.removesuffix('.py').replace('/', '.') for name in b.RUNTIME_SOURCES if name != 'main.py'}

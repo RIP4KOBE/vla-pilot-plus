@@ -146,7 +146,7 @@ def test_stop_after_worker_entry_prevents_main_and_retains_receipt(tmp_path,monk
     monkeypatch.setattr(stop,'STOP_PATHS',paths)
     root=tmp_path/'study_worktree'; root.mkdir()
     output=root/'output'; (output/'eds_eval').mkdir(parents=True)
-    plan={'worktree':str(root),'stop_path':c.stop_path(root),'stop_authority':stop.binding(),
+    plan={'schema':'n36-released-plan-v1','worktree':str(root),'stop_path':c.stop_path(root),'stop_authority':stop.binding(),
           'source':{},'scientific_source':{},'runtime_closure':{},'controller_semantics':{},'runtime':{},'native_build':{}}
     authority={'coordinator_ends_at':c.DEADLINE,'weekly_window':{'ends_at':c.DEADLINE}}
     context={'plan':{},'expected_manifest':{},'attempt_id':'cpu-fixture','main_argv':[str(root/'main.py')]}
@@ -159,7 +159,7 @@ def test_stop_after_worker_entry_prevents_main_and_retains_receipt(tmp_path,monk
         Path(stop.STOP_PATHS[location]).touch()
         return {}
     namespace=dict(Path=Path,c=c,sys=SimpleNamespace(argv=[]),os=os,time=time,validate_context=validate,
-        source_execution=SimpleNamespace(active=lambda:None,attest=lambda *a,**kw:{},
+        source_execution=SimpleNamespace(active=lambda:None,bind_dino=lambda _:None,attest=lambda *a,**kw:{},
                                          run_main=lambda *a:pytest.fail('STOP must prohibit Main')),
         verify_dispatch_record=lambda *a:None,
         w=SimpleNamespace(process_identity=lambda:{},require=w.require,atomic_json=w.atomic_json,read_ref=lambda _:{}),

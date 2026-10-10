@@ -50,7 +50,8 @@ def command(plan,runtime,row):
     from scripts import qd_ed_n36r4_admission as successor
     audit_only = plan.get('schema') == 'n36-engineering-audit-view-v1'
     if audit_only:
-        from scripts.qd_ed_n36_engineering import validate_audit_view
+        from scripts.qd_ed_n36_engineering_api import for_plan
+        validate_audit_view = for_plan(plan).validate_audit_view
         validate_audit_view(plan, require_manifests=False)
     if not audit_only and (c.cohort(plan) == c.DRAFT_N36R4_COHORT
             or (plan.get('protocol') or {}).get('sha256') == successor.PROTOCOL_SHA
@@ -140,7 +141,8 @@ _ENGINEERING_IDENTITIES = ('main.eds_eval.job_id', 'main.eds_mechanism_pretest.r
 
 def engineering_command(plan, runtime, row, *, audit=None):
     """Map the audited C0 command; only two identity and four output overrides."""
-    from scripts import qd_ed_n36_engineering as engineering
+    from scripts.qd_ed_n36_engineering_api import for_plan
+    engineering = for_plan(plan)
     audit = engineering.read(plan['audit_plan']) if audit is None else audit
     audited_row = engineering.audit_mapping(plan, audit, row)
     argv, _ = command(audit, runtime, audited_row)
@@ -156,7 +158,8 @@ def engineering_command(plan, runtime, row, *, audit=None):
 
 
 def engineering_manifest(plan, runtime, row, *, audit=None):
-    from scripts import qd_ed_n36_engineering as engineering
+    from scripts.qd_ed_n36_engineering_api import for_plan
+    engineering = for_plan(plan)
     audit = engineering.read(plan['audit_plan']) if audit is None else audit
     audited_row = engineering.audit_mapping(plan, audit, row)
     original = manifest(audit, runtime, audited_row)
