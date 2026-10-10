@@ -220,6 +220,9 @@ def validate_preparation_authority(ref, spec, release, *, now=None):
     e.exact(value['specification'], e.SPECIFICATION, 'preparation authority specification')
     e.exact(value['baseline'], spec['canonical_runtime'], 'preparation authority baseline')
     e.exact(value['stop_authority'], e.stop.binding(), 'preparation authority STOP')
+    closed(value['graph'], ('plan', 'runtime'), 'preparation accounting graph')
+    for graph_ref in value['graph'].values():
+        e.reference(graph_ref)
     e.w.require(value['source_cwd'] == str(e.SOURCE)
                 and value['owner']['canonical_worktree'] == str(e.OWNER), 'preparation authority routes')
     e.read(value['source_record'])
@@ -478,6 +481,7 @@ def preparation_budget(root, plan, authority, release):
     spec = e.specification()
     e.exact(authority, validate_preparation_authority(release['accounting_authority'], spec, release),
             'preparation accounting reference changed')
+    e.stop.check(ends_at=release['expires_at'], need=release['gpu_seconds'])
     state, events, resources, reservations = owner.snapshot(root, authority)
     validate_preparation_state(root, plan, authority, release, state)
     retained = {}

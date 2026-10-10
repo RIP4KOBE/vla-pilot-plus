@@ -1100,3 +1100,22 @@ def test_preparation_rebound_authority_still_checks_window_and_gpu(runner_cpu, f
     with pytest.raises((ValueError,e.r.GateError)):
         p.preparation_budget(f.root,f.plan,authority,f.release)
     assert not f.launches and not p.journal_rows(f.root)
+
+
+@pytest.mark.parametrize('fault', ['owner_stop','data_stop','remaining_window'])
+def test_preparation_pure_admission_stop_and_full_remaining_reservation(runner_cpu, monkeypatch, fault):
+    f = runner_cpu
+    if fault == 'remaining_window':
+        now = dt.datetime.fromtimestamp(p.timestamp(f.release['expires_at'])-59,dt.timezone.utc)
+        real = e.stop.check
+        monkeypatch.setattr(e.stop,'check',lambda **kw: real(now=now,**kw))
+    else:
+        paths = (f.root/'STOP',f.root/'data/STOP')
+        # Rebind both exact documents to the synthetic canonical STOP paths.
+        monkeypatch.setattr(e.stop,'STOP_PATHS',tuple(map(str,paths)))
+        f.release['stop_authority'] = e.stop.binding()
+        f.authority = preparation_authority(f.root,f.spec,f.release)
+        paths[fault == 'data_stop'].touch()
+    with pytest.raises(ValueError):
+        p.preparation_budget(f.root,f.plan,f.authority,f.release)
+    assert not f.launches and not p.journal_rows(f.root)
