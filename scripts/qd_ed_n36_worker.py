@@ -73,7 +73,12 @@ def attest_worker_loaded(root, source):
 
 def release_api(plan_ref):
     """Use only the N36 detached release family, never a predecessor release."""
-    from scripts import qd_ed_n36_release as release
+    plan = w.read_ref(plan_ref)
+    if plan.get('schema') == 'n36-engineering-execution-plan-v1':
+        from scripts import qd_ed_n36_engineering as release
+    else:
+        w.require(plan.get('schema') == 'n36-released-plan-v1', 'unsupported worker release schema')
+        from scripts import qd_ed_n36_release as release
     return release
 
 
@@ -84,10 +89,18 @@ def validate_context(reference, *, admission=False):
 
 def _validate_context(reference, *, admission=False):
     context = w.read_ref(reference)
-    w.require(set(context) == {'schema', 'plan', 'release', 'expected_manifest', 'episode_key', 'attempt_id', 'main_argv', 'worker_contract'}, 'worker context fields: explicit detached release required')
-    w.require(context['schema'] == 'n36-worker-context-v1' and context['worker_contract'] == c.WORKER_CONTRACT, 'worker contract')
+    engineering = context.get('schema') == 'n36-engineering-worker-context-v1'
+    fields = {'schema', 'plan', 'release', 'expected_manifest', 'episode_key', 'attempt_id', 'main_argv', 'worker_contract'}
+    if engineering:
+        fields |= {'purpose', 'scope', 'audit_plan'}
+    w.require(set(context) == fields, 'worker context fields: explicit detached release required')
+    w.require(context['schema'] in ('n36-worker-context-v1', 'n36-engineering-worker-context-v1')
+              and context['worker_contract'] == c.WORKER_CONTRACT, 'worker contract')
     release = release_api(context['plan'])
     plan, runtime, authority, manifests = release._verify_release_transaction(context['plan'], context['release'])
+    w.require(engineering == (plan['schema'] == 'n36-engineering-execution-plan-v1'), 'worker context/release family cross-use')
+    if engineering:
+        w.require(all(context[key] == plan[key] for key in ('purpose', 'scope', 'audit_plan')), 'engineering context bindings')
     rows = [r for r in plan['episodes'] if r['episode_key'] == context['episode_key']]
     w.require(len(rows) == 1 and context['attempt_id'] == context['episode_key'], 'exact primary attempt')
     row = rows[0]
@@ -96,7 +109,7 @@ def _validate_context(reference, *, admission=False):
     w.require(context['main_argv'] == manifest['argv'][1:], 'exact candidate command')
     w.require(runtime['gpu_mapping']['physical_gpu'] == 7 and runtime['gpu_mapping']['uuid'] == c.GPU_UUID, 'assigned GPU mapping')
     if admission:
-        c.launch_guard(plan, authority)
+        (release.launch_guard if engineering else c.launch_guard)(plan, authority)
     return context, plan, runtime, row, manifest
 
 
@@ -106,11 +119,21 @@ def context_for(plan_ref, row, release_ref=None):
     manifest_ref = plan['expected_manifests'][row['episode_key']]
     manifest = w.read_ref(manifest_ref)
     w.require(row in plan['episodes'] and manifest['row'] == row, 'context row')
-    return {'schema': 'n36-worker-context-v1', 'plan': plan_ref, 'expected_manifest': manifest_ref,
+    tags = ({'schema': 'n36-engineering-worker-context-v1',
+             **{key: plan[key] for key in ('purpose', 'scope', 'audit_plan')}}
+            if plan['schema'] == 'n36-engineering-execution-plan-v1' else {})
+    return {'schema': 'n36-worker-context-v1', **tags, 'plan': plan_ref, 'expected_manifest': manifest_ref,
             'episode_key': row['episode_key'], 'attempt_id': row['episode_key'],
             'main_argv': manifest['argv'][1:], 'worker_contract': c.WORKER_CONTRACT,
             'release': release_ref}
 
+
+
+def operational_binding(plan):
+    if plan.get('schema') == 'n36-engineering-execution-plan-v1':
+        from scripts.qd_ed_n36_engineering import operational_binding as binding
+        return binding(plan)
+    return c.operational_binding(plan)
 
 def native_counts(profile, output, report, expected, guided=None):
     """Parent verifies bound scalar/compute receipts; no tensor replay or CUDA."""
@@ -228,7 +251,7 @@ def _run_in_process(context_ref):
     report_path = output / 'eds_eval/decision-evidence-audit.json'
     w.require(not any(p.exists() for p in (receipt_path, start_path, report_path)), 'replay/duplicate worker artifacts')
     w.atomic_json(start_path, {'context': context_ref, 'process': identity})
-    receipt = {'schema': 'n36-worker-receipt-v2', 'context': context_ref, 'plan': context['plan'],
+    receipt = {**(operational_binding(plan) if plan['schema'] == 'n36-engineering-execution-plan-v1' else {}), 'schema': 'n36-worker-receipt-v2', 'context': context_ref, 'plan': context['plan'],
                'expected_manifest': context['expected_manifest'], 'source': plan['source'], 'scientific_source': plan['scientific_source'], 'row': row,
                'attempt_id': context['attempt_id'], 'process': identity, 'accepted': False,
                'main_exit_code': None, 'http_counters': 'Unknown'}
@@ -300,6 +323,9 @@ def verify_receipt(context_ref, receipt_ref, process_record):
     output = Path(manifest['output_dir'])
     receipt = w.read_ref(receipt_ref)
     w.require(receipt_ref['path'] == str(output / 'eds_eval/n36-worker-receipt.json'), 'receipt path')
+    if plan['schema'] == 'n36-engineering-execution-plan-v1':
+        w.require(all(receipt.get(key) == value for key, value in operational_binding(plan).items()),
+                  'engineering receipt scope binding')
     process = {key: process_record[key] for key in ('pid', 'proc_start_ticks', 'boot_id')}
     w.require(process_record['attempt_id'] == context['attempt_id'] and receipt.get('process') == process
               and receipt.get('process_unchanged') is True and receipt.get('accepted') is True
@@ -397,7 +423,12 @@ def verify_terminal(plan_ref, row, terminal, release_ref=None):
               and terminal['required_cost_telemetry_complete'] is True and type(terminal['success']) is bool,
               'generic terminal identity/cost differs')
     c.event_binding(row, terminal)
-    w.require(all(terminal.get(k) == v for k, v in c.operational_binding(plan).items()),
+    if plan.get('schema') == 'n36-engineering-execution-plan-v1':
+        from scripts.qd_ed_n36_engineering import operational_binding as terminal_binding, require_row
+        require_row(row)
+    else:
+        terminal_binding = c.operational_binding
+    w.require(all(terminal.get(k) == v for k, v in terminal_binding(plan).items()),
               'terminal protocol/accounting binding')
     c.finite(terminal['gpu_process_wall_seconds'], 'terminal charge')
     context_ref = c.ref(output / 'n36-worker-context.json')

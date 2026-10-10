@@ -122,6 +122,57 @@ def _verify_release_contents(plan_ref, release_ref, *, health=False):
         c.finite(authority['weekly_window'][name], name)
     w.require(authority['weekly_window']['increment_gpu_hours']==168.
         and authority['weekly_window']['origin_gpu_hours']==53.08404692669838, 'unchanged dual cumulative ceilings')
+    evidence = verify_audit_closure(plan)
+    runtime, manifests = evidence.runtime, evidence.manifests
+    if n36r3 and not health:
+        n3.validate_readiness(plan_ref, release)
+    return plan, runtime, authority, manifests
+
+
+
+class AuditEvidence:
+    """Immutable serialized evidence, never an admission token or shared cache.
+
+    Properties return independent JSON copies. Consumers must reverify closure
+    for each release transaction, including each worker and health entry.
+    """
+    __slots__ = ('_bytes',)
+
+    def __init__(self, runtime, manifests):
+        import json
+        object.__setattr__(self, '_bytes', json.dumps(
+            [runtime, manifests], sort_keys=True, allow_nan=False).encode())
+
+    def __setattr__(self, name, value):
+        raise AttributeError('immutable audit evidence')
+
+    def __delattr__(self, name):
+        raise AttributeError('immutable audit evidence')
+
+    @property
+    def runtime(self):
+        import json
+        return json.loads(self._bytes)[0]
+
+    @property
+    def manifests(self):
+        import json
+        return json.loads(self._bytes)[1]
+
+
+def verify_audit_closure(plan):
+    """Full source/runtime/native/all-manifest closure; grants no dispatch.
+
+    The caller separately verifies its authority family. The engineering audit
+    view remains disabled and cannot be passed through validate_plan.
+    """
+    if plan.get('schema') == 'n36-engineering-audit-view-v1':
+        from scripts.qd_ed_n36_engineering import validate_audit_view
+        validate_audit_view(plan)
+    w.require(plan['episodes'] == c.plan_rows(plan)
+              and len(plan['episodes']) == 40
+              and set(plan['expected_manifests']) == {row['episode_key'] for row in plan['episodes']},
+              'all40 audit manifest coverage')
     w.require(Path(plan['worktree']).resolve() == b.ROOT.resolve(), 'actual imported checkout differs')
     with b.closure.verification_phase('source_closure'):
         b.verify_sources(plan)
@@ -162,10 +213,7 @@ def _verify_release_contents(plan_ref, release_ref, *, health=False):
         for row in plan['episodes']:
             manifests[row['episode_key']] = b._verify_manifest_bound(
                 plan['expected_manifests'][row['episode_key']], plan, runtime, row)
-    if n36r3 and not health:
-        n3.validate_readiness(plan_ref, release)
-    return plan, runtime, authority, manifests
-
+    return AuditEvidence(runtime, manifests)
 
 def validate_caps(caps):
     """Accept only explicit root caps, never copy a predecessor's stale balances."""

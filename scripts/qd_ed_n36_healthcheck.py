@@ -41,8 +41,19 @@ def wait_probe(process, started, identity, timeout):
 
 def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
     """One bounded probe, no retry, no episode attempt, no readiness mutation."""
-    n36r3 = c.cohort(w.read_ref(plan_ref)) in c.SEPARATE_HEALTH_COHORTS
-    validate = release.validate_health_release if n36r3 else release.validate_release
+    engineering = w.read_ref(plan_ref).get('schema') == 'n36-engineering-execution-plan-v1'
+    if engineering:
+        from scripts import qd_ed_n36_engineering as api
+        api.require_dispatch_implementation()
+        validate, reserve = api.validate_health_release, api.reserve_health
+        owner, environment, guard = api.owner_root, api.child_environment, api.launch_guard
+        n36r3 = True  # same separate-health process mechanics, distinct authority
+    else:
+        from scripts.qd_ed_n36r2_admission import owner_root, child_environment
+        n36r3 = c.cohort(w.read_ref(plan_ref)) in c.SEPARATE_HEALTH_COHORTS
+        validate = release.validate_health_release if n36r3 else release.validate_release
+        reserve = accounting.reserve_healthcheck
+        owner, environment, guard = owner_root, child_environment, c.launch_guard
     if n36r3:
         adapter.source_execution.active()
         plan, _, _ = validate(plan_ref, release_ref)
@@ -50,11 +61,10 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
         # this attestation belongs to the live parent, not the probe child.
         adapter.source_execution.attest(Path(plan['worktree']), plan['source'], w.read_ref(plan['runtime_closure']),
             binding=adapter.worker.runtime_receipt_binding(release_ref, plan, w.process_identity(), 'runtime_before'))
-    record = accounting.reserve_healthcheck(plan_ref, release_ref, resource_id,
+    record = reserve(plan_ref, release_ref, resource_id,
                                             timeout_seconds=timeout_seconds)
     plan, runtime, authority = validate(plan_ref, release_ref)
-    from scripts.qd_ed_n36r2_admission import owner_root, child_environment
-    root = owner_root(plan)
+    root = owner(plan)
     # The durable in-flight resource blocks admissions during lock transfer.
     with r.locked(root/'data/qd-ed-runner.lock', nonblocking=True):
         plan, runtime, authority = validate(plan_ref, release_ref)
@@ -66,7 +76,7 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
         w.require(not output.exists() and not output.is_symlink(), 'healthcheck output exists')
         output.mkdir(parents=True)
         def before_start():
-            c.launch_guard(plan, authority, need=record['reserved_gpu_seconds'] if n36r3 else 1840 + record['reserved_gpu_seconds'])
+            guard(plan, authority, need=record['reserved_gpu_seconds'] if n36r3 else 1840 + record['reserved_gpu_seconds'])
         process = identity = None
         started = finished = None
         event, result = 'aborted', {}
@@ -76,7 +86,7 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
         try:
             before_start()
             adapter.device_check()
-            env=child_environment(plan, runtime)
+            env=environment(plan, runtime)
             if n36r3:
                 r.verify_provider(runtime, env, root=Path(plan['worktree']))
                 r.runtime_gpu(runtime, r.read_state(root/'research-state.yaml'))

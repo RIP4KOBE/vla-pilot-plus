@@ -3,6 +3,12 @@ from scripts import qd_ed_n36_contract as c
 
 
 def summary(reconciliation, events):
+    from scripts.qd_ed_n23_worker import require
+    require(reconciliation.get('purpose') != 'engineering_diagnostic_only'
+            and not any(event.get('purpose') == 'engineering_diagnostic_only'
+                        or str(event.get('cohort', '')).startswith('N36_ENGINEERING_')
+                        or str(event.get('identity', {}).get('iteration', '')).startswith('N36_ENGINEERING_')
+                        for event in events), 'engineering evidence is ineligible for scientific aggregation')
     outcomes=reconciliation['outcomes']
     cells={(x['task_id'],x['profile']):x['success'] for x in outcomes}
     totals={arm:sum(x['success'] for x in outcomes if x['profile']==arm) for arm in c.ARMS}
