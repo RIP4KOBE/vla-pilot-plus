@@ -147,7 +147,7 @@ def validate_release(ref, spec, source, source_ref, *, now=None):
             'sha256': e.w.sha(Path(sys.executable).resolve()), 'version': sys.version}, 'released interpreter')
     current = time.time() if now is None else now
     issued, expires = timestamp(value['issued_at']), timestamp(value['expires_at'])
-    e.w.require(timestamp(p['not_before']) < issued <= current < expires <= timestamp(p['deadline']),
+    e.w.require(max(timestamp(p['not_before']), timestamp(MEASUREMENT_CONTRACT['not_before'])) < issued <= current < expires <= timestamp(p['deadline']),
                 'fresh preparation release')
     seconds = number(value['gpu_seconds'], 'finite preparation reservation')
     e.w.require(MEASUREMENT_CONTRACT['cleanup_seconds'] < seconds <= expires - issued and type(value['provider_calls']) is int
@@ -304,6 +304,7 @@ def produce(proof_ref):
 # journal mirrors every transition so unchanged owner budget readers see costs
 # and inflight reservations. A torn two-journal write blocks, never repairs itself.
 MEASUREMENT_CONTRACT = {'schema': 'n36-preparation-measurement-envelope-v2',
+    'not_before': '2026-10-10T22:19:24.983319+00:00',
     'resource_kind': 'readiness_preparation', 'journal': 'readiness-preparation-ledger.jsonl',
     'global_accounting': 'gpu-healthcheck-ledger.jsonl', 'mirror_required': True,
     'unknown_blocks_reuse': True, 'cleanup_seconds': 40, 'provider_calls': 1}

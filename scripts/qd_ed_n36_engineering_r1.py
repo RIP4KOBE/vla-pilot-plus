@@ -34,7 +34,7 @@ OWNER_ROUTE_MAPPING = {
     'path': str(OWNER.parent / 'autonomy_20261004/turns/001352/owner-alias-repair/alias-evidence-v1.json'),
     'sha256': '70097b35181e55589df8bb053857b11840f08542fb8ed8bec57635ba493b22a2'}
 HISTORICAL_OWNER = '/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z'
-SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001661/readiness-runner-implementation/engineering-r1-spec.prospective-disabled-v3.json', 'sha256': '314affbd48f483ca30a7cc625c4bec2d2f3221545770cb2d703276806142204e'}
+SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001661/readiness-runner-implementation/engineering-r1-spec.prospective-disabled-v4.json', 'sha256': 'e04a6996e5a4aeeba7cfa795438ca3818927e19321751b3521eaf09a79f833c2'}
 AMENDMENT = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001616/prospective-recovery-amendment-v1.json', 'sha256': 'fe3c11c3a4be56f74149dc7e21a59eef59611478841d0fa8993bc79f8760e5ba'}
 IDENTITY = 'N36_ENGINEERING_R1_C0_TASK0_001616'
 EPISODE_KEY = 'n36_engineering_r1_t00_c0_001616'

@@ -244,7 +244,8 @@
       "mirror_required": true,
       "unknown_blocks_reuse": true,
       "cleanup_seconds": 40,
-      "provider_calls": 1
+      "provider_calls": 1,
+      "not_before": "2026-10-10T22:19:24.983319+00:00"
     }
   }
 }

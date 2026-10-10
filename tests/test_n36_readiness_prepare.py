@@ -49,7 +49,7 @@ def measured(tmp_path, monkeypatch):
     source = e.b.closure.source_record(e.b.ROOT, e.b.source_paths(e.b.ROOT))
     monkeypatch.setattr(e, 'SOURCE', e.b.ROOT)
     source_ref = put(root, 'source', source)
-    issued = p.timestamp(prep['not_before']) + 1
+    issued = max(p.timestamp(prep['not_before']), p.timestamp(p.MEASUREMENT_CONTRACT['not_before'])) + 1
     def iso(t): return dt.datetime.fromtimestamp(t, dt.timezone.utc).isoformat()
     release = dict(schema='n36-preparation-measurement-release-v1', approved=True,
         purpose='readiness_preparation_only', specification=e.SPECIFICATION, source_record=source_ref,
@@ -748,4 +748,17 @@ def test_preparation_release_has_independent_finite_reservation(measured):
     release['gpu_seconds'] = 3001
     ref = m['save'](m['prep']['release_path'],release)
     with pytest.raises(ValueError,match='finite preparation caps'):
+        p.validate_release(ref,m['spec'],m['source'],m['source_ref'],now=m['now'])
+
+
+def test_release_predating_runner_amendment_rejected(measured):
+    m = measured
+    release = copy.deepcopy(m['release'])
+    release['issued_at'] = dt.datetime.fromtimestamp(
+        p.timestamp(p.MEASUREMENT_CONTRACT['not_before'])-1,dt.timezone.utc).isoformat()
+    review = {k:v for k,v in release.items() if k!='root_review'}
+    review.update(schema='n36-preparation-root-measurement-review-v1',decision='APPROVED')
+    release['root_review'] = put(m['root'],'stale-amendment-review',review)
+    ref = m['save'](m['prep']['release_path'],release)
+    with pytest.raises(ValueError,match='fresh preparation release'):
         p.validate_release(ref,m['spec'],m['source'],m['source_ref'],now=m['now'])
