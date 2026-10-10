@@ -33,11 +33,16 @@ def prepare(directory, runtime_ref, *, runtime_closure_ref, controller_semantics
             'expected_manifests': {}, 'http_counters': 'Unknown'}
     if recovery_protocol_ref is not None:
         amendment = w.read_ref(recovery_protocol_ref)
-        plan.update(cohort=c.RECOVERY_COHORT, protocol=recovery_protocol_ref,
+        w.require(amendment['cohort'] in (c.RECOVERY_COHORT, c.DRAFT_RECOVERY_COHORT),
+                  'finite recovery draft cohort')
+        plan.update(cohort=amendment['cohort'], protocol=recovery_protocol_ref,
                     protocol_review=amendment['inherited_protocol_review'],
                     accounting=amendment['accounting'])
         plan['episodes'] = c.plan_rows(plan)
-        from scripts.qd_ed_n36_recovery import validate_protocol
+        if c.cohort(plan) == c.DRAFT_RECOVERY_COHORT:
+            from scripts.qd_ed_n36r2_draft import validate_protocol
+        else:
+            from scripts.qd_ed_n36_recovery import validate_protocol
         validate_protocol(plan)
     for row in plan['episodes']:
         path = directory / 'expected' / (row['episode_key'] + '.json')

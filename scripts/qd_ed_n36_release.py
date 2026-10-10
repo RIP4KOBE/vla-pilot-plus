@@ -12,6 +12,7 @@ COORDINATOR_END = '2026-10-11T11:13:13Z'
 
 
 def validate_plan(plan):
+    w.require(c.cohort(plan) != c.DRAFT_RECOVERY_COHORT, 'N36R2 draft only; release disabled')
     w.require(plan['schema'] == 'n36-released-plan-v1' and plan['frozen'] is True
               and plan['release_enabled'] is True and plan['episodes'] == c.plan_rows(plan)
               and plan['limits'] == c.LIMITS and plan['worker_contract'] == c.WORKER_CONTRACT

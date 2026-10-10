@@ -9,6 +9,9 @@ from scripts import qd_ed_n23_worker as w
 ROOT = Path(__file__).resolve().parents[1]
 COHORT = 'N36_NONPROGRESS_TANGENT_DEV_001147'
 RECOVERY_COHORT = 'N36R1_NONPROGRESS_TANGENT_DEV_001203'
+DRAFT_RECOVERY_COHORT = 'N36R2_NONPROGRESS_TANGENT_DEV_001250'
+IDENTITIES = {COHORT: ('n36', '001147'), RECOVERY_COHORT: ('n36r1', '001203'),
+              DRAFT_RECOVERY_COHORT: ('n36r2', '001250')}
 ARMS = ('C0', 'Q0', 'N34', 'N36')
 DEADLINE = '2026-10-11T11:13:13Z'
 GPU_UUID = 'GPU-48473162-9548-1a19-04aa-ea86c5349187'
@@ -47,8 +50,8 @@ def stop_path(root=ROOT):
 
 
 def expected_rows(root=ROOT, *, cohort=COHORT):
-    w.require(cohort in (COHORT, RECOVERY_COHORT), 'unsupported N36 cohort')
-    prefix, suffix = ('n36', '001147') if cohort == COHORT else ('n36r1', '001203')
+    w.require(cohort in IDENTITIES, 'unsupported N36 cohort')
+    prefix, suffix = IDENTITIES[cohort]
     tasks = json.loads((Path(root) / 'configs/qd_ed_final/n31_dev_task_identities.json').read_text())['tasks']
     w.require([x['task_id'] for x in tasks] == list(range(10)) and all(x['split'] == 'dev' for x in tasks), 'ten exposed Dev tasks')
     return [{**task, 'iteration':cohort, 'profile':arm, 'timeout_seconds':1800,
@@ -59,7 +62,7 @@ def expected_rows(root=ROOT, *, cohort=COHORT):
 
 def cohort(plan):
     value = plan.get('cohort', COHORT)
-    w.require(value in (COHORT, RECOVERY_COHORT), 'unsupported N36 cohort')
+    w.require(value in IDENTITIES, 'unsupported N36 cohort')
     return value
 
 
@@ -73,7 +76,7 @@ def operational_binding(plan):
     if cohort(plan) == COHORT:
         w.require('accounting' not in plan, 'original plan cannot claim recovery accounting')
         return {}
-    return {'cohort': RECOVERY_COHORT, **{k: plan[k] for k in
+    return {'cohort': cohort(plan), **{k: plan[k] for k in
             ('protocol', 'protocol_review', 'accounting')}}
 
 
@@ -93,9 +96,9 @@ def event_binding(row, event):
 def cohort_events(rows, events):
     """Select by either key or cohort, then reject spoofed identities/buckets."""
     cohorts = {row['iteration'] for row in rows}
-    w.require(len(cohorts) == 1 and cohorts <= {COHORT, RECOVERY_COHORT}, 'single supported event cohort')
+    w.require(len(cohorts) == 1 and cohorts <= set(IDENTITIES), 'single supported event cohort')
     selected = next(iter(cohorts))
-    prefix = 'n36r1_dev_' if selected == RECOVERY_COHORT else 'n36_dev_'
+    prefix = IDENTITIES[selected][0] + '_dev_'
     index = {row['episode_key']: row for row in rows}
     local = []
     for event in events:
@@ -121,11 +124,14 @@ def validate_draft(plan):
               and plan['deadline'] == DEADLINE and plan['stop_path'] == stop_path(plan['worktree'])
               and plan['phase_authorization'] == {'dev': False, 'validation': False, 'formal': False}
               and all(plan[k] is None for k in ('root_review', 'authority', 'execution_release'))
-              and (cohort(plan) == RECOVERY_COHORT or plan['protocol'] is None),
+              and (cohort(plan) != COHORT or plan['protocol'] is None),
               'draft cannot claim authority/release')
     operational_binding(plan)
     if cohort(plan) == RECOVERY_COHORT:
         from scripts.qd_ed_n36_recovery import validate_protocol
+        validate_protocol(plan)
+    if cohort(plan) == DRAFT_RECOVERY_COHORT:
+        from scripts.qd_ed_n36r2_draft import validate_protocol
         validate_protocol(plan)
     w.require(set(plan['expected_manifests']) == {r['episode_key'] for r in plan['episodes']}, 'manifest coverage')
 
@@ -147,6 +153,7 @@ def pre_dispatch(row, allowance, *, now, stop_path, cohort=COHORT):
     All *_remaining values must already include prior reservations, health costs
     and charges. Exact owning ledger-to-snapshot arithmetic is a root prerequisite.
     """
+    w.require(cohort != DRAFT_RECOVERY_COHORT, 'N36R2 draft only; admission disabled')
     w.require(not Path(stop_path).exists() and not Path(stop_path).is_symlink(), 'STOP pre-dispatch')
     w.require(now.tzinfo is not None, 'timezone-aware admission time')
     ends = dt.datetime.fromisoformat(allowance['authority_ends_at'].replace('Z', '+00:00'))
