@@ -9,6 +9,7 @@ from scripts import qd_ed_final_runner as r, qd_ed_n23_worker as w
 from scripts import qd_ed_n36_contract as c, qd_ed_n36_bridge as b
 
 COORDINATOR_END = '2026-10-11T11:13:13Z'
+N36R3_OWNER_ALIAS = '/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z'
 
 
 def validate_plan(plan):
@@ -282,7 +283,19 @@ def validate_state(plan, authority, state):
     """Shared owning state gate for independent health and episode transactions."""
     if c.cohort(plan) == c.DRAFT_N36R3_COHORT:
         from scripts.qd_ed_n36r3_admission import owner_root
-        w.require(state.get('worktree') == str(owner_root(plan)), 'N36R3 owning state worktree differs')
+        owner = owner_root(plan)
+        lexical = state.get('worktree')
+        w.require(state.get('canonical_worktree') == str(owner), 'N36R3 owning state canonical worktree differs')
+        w.require(lexical in (str(owner), N36R3_OWNER_ALIAS), 'N36R3 owning state worktree differs')
+        if lexical == N36R3_OWNER_ALIAS:
+            # Admit only the historical spelling, without rewriting state or routing.
+            # Recheck live identity each time; cached alias evidence is not authority.
+            alias = Path(lexical)
+            try:
+                matches = alias.resolve(strict=True) == owner and alias.is_dir() and alias.samefile(owner)
+            except (OSError, RuntimeError):
+                matches = False
+            w.require(matches, 'N36R3 owning state alias identity differs')
     caps, budget = authority['caps'], state['budget']
     validate_caps(caps)
     w.require(state.get('n36_budget_authority') == plan['authority'] and r.authorized_gpu(state) == 7
