@@ -478,6 +478,9 @@ def runner_cpu(tmp_path, monkeypatch):
     spec = e.specification()
     contract = e.read(spec['runtime_binding']['accounting_contract'])
     contract['owner'] = dict(canonical_worktree=str(root), run_name='SYNTHETIC', artifacts=str(root))
+    contract['margin_reference'] = put(root, 'SYNTHETIC-frozen-margin', dict(
+        ledger_prefixes=prefixes, cost_reconciliation=dict(retained_admission_margin_gpu_hours=.23357169027962)))
+    monkeypatch.setattr(e.c, 'ACCOUNTING_SHA', contract['margin_reference']['sha256'])
     spec['runtime_binding']['accounting_contract'] = put(root, 'SYNTHETIC-contract', contract)
     spec['retained_ledger_prefixes'] = prefixes
     spec['retained_snapshot'] = e.r.budget_snapshot([], [])
@@ -517,7 +520,6 @@ def runner_cpu(tmp_path, monkeypatch):
     monkeypatch.setattr(p, 'policy', lambda s: prep)
     monkeypatch.setattr(e, 'specification', lambda: spec)
     monkeypatch.setattr(e, 'owner_root', lambda plan: root)  # External deployed route only.
-    monkeypatch.setattr(e.accounting, 'retained_margin', lambda *a: .23357169027962)
     monkeypatch.setattr(e, 'child_environment', lambda *a: {})
     monkeypatch.setattr(e.r, 'gpu_admission', lambda **kw: {'SYNTHETIC':True})
     monkeypatch.setattr(p, 'provider_preflight', lambda *a: {'SYNTHETIC':True})
@@ -613,7 +615,9 @@ def test_preparation_budget_rejects_unsettled_and_private_caps(runner_cpu, fault
         p.preparation_budget(f.root, f.plan, f.authority, f.release)
 
 
-def test_real_preparation_graph_wiring_all41_synthetic(tmp_path, monkeypatch):
+@pytest.mark.parametrize('fault', ['audit_manifest','engineering_manifest','native_build',
+    'runtime_closure','controller_semantics','source','owner'])
+def test_real_preparation_graph_wiring_all41_synthetic(tmp_path, monkeypatch, fault):
     """Real verify_graph, source/closure/native/controller/input/all41 validators.
 
     Uses the existing inert graph and its parent schema adapter; the R1 exact
@@ -653,12 +657,18 @@ def test_real_preparation_graph_wiring_all41_synthetic(tmp_path, monkeypatch):
     monkeypatch.setattr(p,'e',proxy)
     release = {'graph':{'plan':f.doc('disabled-plan',plan),'runtime':runtime_ref}}
     assert REAL_VERIFY_GRAPH(release,f.source_record,runtime) == plan
-    # Corruption at the forty-row boundary is caught by the same real wiring.
-    bad = e.read(audit['expected_manifests'][audit['episodes'][-1]['episode_key']])
-    bad['argv'].append('unapproved=true')
-    ref = audit['expected_manifests'][audit['episodes'][-1]['episode_key']]
-    Path(ref['path']).write_text(json.dumps(bad))
-    with pytest.raises(ValueError): REAL_VERIFY_GRAPH(release,f.source_record,runtime)
+    # Pure graph validation has no reservation/provider/device boundary.
+    if fault in ('source','owner'):
+        if fault == 'source': plan['source']['commit'] = '0'*40
+        else: plan['worktree'] = str(tmp_path/'foreign-source')
+        release['graph']['plan'] = f.doc('changed-disabled-plan',plan)
+    else:
+        ref = (audit['expected_manifests'][audit['episodes'][-1]['episode_key']]
+               if fault == 'audit_manifest' else plan[fault])
+        Path(ref['path']).write_text('{}')
+    with pytest.raises((ValueError, e.r.GateError)):
+        REAL_VERIFY_GRAPH(release,f.source_record,runtime)
+
 
 
 @pytest.mark.parametrize('fault', ['none','login','version','provider','model','env','cli'])
@@ -1057,3 +1067,36 @@ def test_actual_disabled_plan_shape_preparation_adoption(runner_cpu):
     assert p.preparation_budget(f.root, plan, authority, f.release)['reserved_attempts'] == 0
     assert plan['authority'] is plan['b5_review'] is None
     assert plan['release_enabled'] is plan['frozen'] is False
+
+
+@pytest.mark.parametrize('fault', ['reserved_attempt','dispatched_attempt','prefix_bytes','reservation_prefix'])
+def test_preparation_unfinished_attempts_and_retained_prefixes(runner_cpu, fault):
+    f = runner_cpu
+    if fault.endswith('attempt'):
+        rows = [dict(event='reserved',attempt_id='unfinished',reserved_gpu_seconds=60)]
+        if fault == 'dispatched_attempt':
+            rows.append(dict(rows[0],event='dispatched',budget_bucket='recovery'))
+        (f.root/'data/attempt-ledger.jsonl').write_text(''.join(json.dumps(x)+'\n' for x in rows))
+    else:
+        path = f.root/'data/gpu-hour-reservation-ledger.jsonl'
+        path.write_bytes(path.read_bytes().replace(b'SYNTHETIC',b'CORRUPTED'))
+    with pytest.raises((ValueError,e.r.GateError)):
+        p.preparation_budget(f.root,f.plan,f.authority,f.release)
+    assert not f.launches and not p.journal_rows(f.root)
+
+
+@pytest.mark.parametrize('fault', ['expired','future','short','bool_seconds','wrong_gpu_runtime'])
+def test_preparation_rebound_authority_still_checks_window_and_gpu(runner_cpu, fault):
+    f = runner_cpu
+    if fault == 'expired': f.release['expires_at'] = f.release['issued_at']
+    elif fault == 'future': f.release['issued_at'] = '2099-01-01T00:00:00Z'
+    elif fault == 'short': f.release['gpu_seconds'] = 40
+    elif fault == 'bool_seconds': f.release['gpu_seconds'] = True
+    else:
+        runtime = e.read(f.plan['runtime']); runtime['gpu_mapping']['uuid'] = 'foreign'
+        f.plan['runtime'] = put(f.root,'foreign-runtime',runtime)
+        f.release['graph'] = dict(plan=put(f.root,'foreign-runtime-plan',f.plan),runtime=f.plan['runtime'])
+    authority = preparation_authority(f.root,f.spec,f.release)
+    with pytest.raises((ValueError,e.r.GateError)):
+        p.preparation_budget(f.root,f.plan,authority,f.release)
+    assert not f.launches and not p.journal_rows(f.root)

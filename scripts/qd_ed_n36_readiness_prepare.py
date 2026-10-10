@@ -267,6 +267,7 @@ def validate_preparation_state(root, plan, authority, release, state):
     e.w.require(state.get('n36_engineering_budget_authority') != release['accounting_authority'],
                 'preparation authority in production slot')
 
+
 def derive(spec, source, source_ref, proof_ref, *, now=None):
     """Validate approved observations; return exact prospective runtime in memory."""
     p = policy(spec)
@@ -474,10 +475,10 @@ def append_preparation(root, event):
 
 def preparation_budget(root, plan, authority, release):
     from scripts import qd_ed_n36_runner as owner
-    state, events, resources, reservations = owner.snapshot(root, authority)
     spec = e.specification()
     e.exact(authority, validate_preparation_authority(release['accounting_authority'], spec, release),
             'preparation accounting reference changed')
+    state, events, resources, reservations = owner.snapshot(root, authority)
     validate_preparation_state(root, plan, authority, release, state)
     retained = {}
     for name in e.JOURNALS:
@@ -499,6 +500,7 @@ def preparation_budget(root, plan, authority, release):
     e.w.require(all(g[-1]['event'] in e.r.TERMINAL for g in e.r.event_groups(events).values()),
                 'unfinished attempt reservation')
     snap = e.r.budget_snapshot(events, resources)
+    e.exact({k: state['budget'].get(k) for k in snap}, snap, 'preparation state/ledger snapshot')
     e.w.require(snap['gpu_healthcheck_inflight'] == 0, 'inflight resource reservation')
     # Do not borrow the engineering 1900-second or healthcheck 60-second cap.
     need = number(release['gpu_seconds'], 'preparation reservation')

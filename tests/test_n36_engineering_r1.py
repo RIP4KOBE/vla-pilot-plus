@@ -667,8 +667,10 @@ def test_preparation_history_health_handoff_uses_sole_reserved_health(preparatio
         e.validate_health_handoff(f.m['root'], f.plan_ref, record['release'], record, binding)
 
 
-def test_preparation_authority_cannot_authorize_production(documents):
-    plan, _, _ = copy.deepcopy(documents)
+def test_preparation_authority_cannot_authorize_production(tmp_path):
+    contract = e.read(e.specification()['runtime_binding']['accounting_contract'])
+    review = e.read(contract['independent_review'])
+    plan = e.read(review['actual_graph']['plan'])
     plan.update(authority=None, b5_review=None, frozen=False, release_enabled=False)
     authority = {'schema':'n36-preparation-accounting-authority-v1','approved':True}
     with pytest.raises(ValueError):
@@ -677,3 +679,8 @@ def test_preparation_authority_cannot_authorize_production(documents):
         e.validate_plan_shape(plan, released=True)
     with pytest.raises(ValueError):
         e.validate_state(plan, authority, {'n36_preparation_accounting_adoption':authority})
+    plan_ref = put(tmp_path, 'disabled-preparation-plan', plan)
+    authority_ref = put(tmp_path, 'preparation-authority', authority)
+    for validate in (e.validate_health_release, e.validate_release):
+        with pytest.raises(ValueError):
+            validate(plan_ref, authority_ref)
