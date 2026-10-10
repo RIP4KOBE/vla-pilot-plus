@@ -199,8 +199,12 @@ def main():
     for name in ('plan', 'plan-sha256', 'release', 'release-sha256'):
         parser.add_argument('--' + name, required=True)
     args = parser.parse_args()
-    result = launch({'path': str(Path(args.plan).resolve()), 'sha256': args.plan_sha256},
-                    {'path': str(Path(args.release).resolve()), 'sha256': args.release_sha256})
+    for name in ('plan', 'release'):
+        if not Path(getattr(args, name)).is_absolute():
+            parser.error('--' + name + ' must be an absolute path')
+    # Frozen references bind lexical paths, including symlinked parent directories.
+    result = launch({'path': args.plan, 'sha256': args.plan_sha256},
+                    {'path': args.release, 'sha256': args.release_sha256})
     print(result['status'])
 
 
