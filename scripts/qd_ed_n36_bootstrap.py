@@ -30,8 +30,10 @@ def source_code(self, fullname):
         validate_search()
     path = self.get_filename(fullname)
     data = self.get_data(path)
-    code = self.source_to_code(data, path)
     digest = _hashlib.openssl_sha256(data).hexdigest()
+    if 'validate_origin' in globals():
+        validate_origin(fullname, path, digest)
+    code = self.source_to_code(data, path)
     key = (fullname, path)
     if key in compiled and compiled[key] != digest:
         raise RuntimeError('N36 source changed during import: ' + fullname)
@@ -83,15 +85,51 @@ for directory in site.getsitepackages():
     if directory not in sys.path:
         sys.path.append(directory)
 
+# Load the validator before enabling search checks: it uses only engineering
+# code/stdlib and must not recursively import while validating Torch's path.
+from scripts.qd_ed_n36_generated import admit as admit_generated, CONTENT_SHA
+
 def validate_search():
     for entry in sys.path:
         path = os.path.realpath(entry)
         if not entry or not any(path == base or path.startswith(base + os.sep)
                                 for base in (root, os.path.realpath(sys.prefix))):
-            raise ImportError('N36 foreign import search path: ' + path)
+            try:
+                if entry != path:
+                    raise ValueError('noncanonical generated directory')
+                admit_generated(path, compiled)
+            except (ValueError, OSError, KeyError, TypeError) as exc:
+                raise ImportError('N36 foreign import search path: ' + path) from exc
+
+
+def validate_origin(fullname, filename, digest=None):
+    path = os.path.realpath(filename)
+    if any(path == base or path.startswith(base + os.sep)
+           for base in (root, os.path.realpath(sys.prefix))):
+        return
+    if (fullname != '_remote_module_non_scriptable' or filename != path
+            or os.path.basename(path) != fullname + '.py'
+            or (digest is not None and digest != CONTENT_SHA)):
+        raise ImportError('N36 foreign generated import origin: ' + filename)
+    admit_generated(os.path.dirname(path), compiled)
+
+
+class GeneratedSearchGuard:
+    """Check native/namespace discoveries too, before PathFinder can load them."""
+    @staticmethod
+    def find_spec(fullname, path=None, target=None):
+        validate_search()
+        spec = external.PathFinder.find_spec(fullname, path, target)
+        if spec is not None:
+            if spec.origin is not None:
+                validate_origin(fullname, spec.origin)
+            for directory in spec.submodule_search_locations or ():
+                validate_origin(fullname, directory)
+        return spec
 
 
 validate_search()
+sys.meta_path.insert(sys.meta_path.index(external.PathFinder), GeneratedSearchGuard)
 
 if len(sys.argv) < 2:
     raise SystemExit('usage: qd_ed_n36_bootstrap.py MODULE [ARGS...]')

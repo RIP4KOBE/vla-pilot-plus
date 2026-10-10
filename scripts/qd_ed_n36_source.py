@@ -38,16 +38,21 @@ def active():
         and zipimport.zipimporter.get_code is state.reject_bytecode
         and zipimport.zipimporter.exec_module is state.reject_bytecode
         and zipimport.zipimporter.load_module is state.reject_bytecode, 'N36 executable loader replaced')
-    validate_search_path(state.root, sys.path, sys.prefix)
+    require(state.GeneratedSearchGuard in sys.meta_path
+            and sys.meta_path.index(state.GeneratedSearchGuard)
+                < sys.meta_path.index(importlib.machinery.PathFinder),
+            'N36 generated search guard replaced')
+    state.validate_search()
     return state
 
 
-def validate_search_path(root, paths, prefix):
+def validate_search_path(root, paths, prefix, *, generated_directories=()):
     root, prefix = Path(root).resolve(), Path(prefix).resolve()
     for entry in paths:
         require(isinstance(entry, str) and bool(entry), 'N36 empty import search path')
         path = Path(entry).resolve()
-        require(path == root or root in path.parents or prefix in path.parents,
+        require(path == root or root in path.parents or prefix in path.parents
+                or (entry == str(path) and entry in generated_directories),
                 'N36 foreign import search path: ' + str(path))
 
 
@@ -142,11 +147,18 @@ def attest(root, source, runtime, *, binding=None):
     index = {str(root / row['path']): row['sha256'] for row in source['files']}
     index.update({row['path']: row['sha256'] for row in runtime['modules'].values()})
     generated = {name: rule['sha256'] for name, rule in runtime.get('generated_modules', {}).items()}
+    generated_inventory = {}
+    if generated:
+        from scripts import qd_ed_n34_source as closure
+        generated_inventory = closure._generated_runtime(runtime)
     records = []
     for (name, filename), digest in sorted(state.compiled.items()):
         path = str(Path(filename).resolve())
         require(index.get(path, generated.get(name)) == digest and sha(Path(path)) == digest,
                 'N36 compiled source not frozen: ' + name)
+        if name in generated:
+            require(generated_inventory.get(name) == {'path': path, 'sha256': digest},
+                    'N36 generated execution origin differs')
         records.append({'module': name, 'path': path, 'sha256': digest})
     bootstrap = str(root / 'scripts/qd_ed_n36_bootstrap.py')
     require(str(Path(state.__file__).resolve()) == bootstrap
@@ -203,7 +215,15 @@ def verify_receipt(receipt, root, source, runtime, *, loaded=None, runtime_recei
     require(receipt['schema'] == 'n36-source-execution-v2', 'N36 execution receipt schema')
     interpreter = Path(runtime['interpreter']['path']).resolve()
     require(receipt['search_prefix'] == str(interpreter.parent.parent), 'N36 interpreter search prefix')
-    validate_search_path(root, receipt['search_path'], receipt['search_prefix'])
+    generated_directories = set()
+    if runtime_receipt is not None:
+        from scripts import qd_ed_n34_source as closure
+        require(binding is not None, 'N36 external runtime binding required')
+        closure.verify_runtime_receipt(runtime, runtime_receipt, binding=binding, after=False)
+        generated_directories = {str(Path(e['record']['path']).parent)
+                                 for e in runtime_receipt['generated_modules'].values()}
+    validate_search_path(root, receipt['search_path'], receipt['search_prefix'],
+                         generated_directories=generated_directories)
     index = {str(Path(root).resolve() / row['path']): row['sha256'] for row in source['files']}
     index.update({row['path']: row['sha256'] for row in runtime['modules'].values()})
     generated = {name: rule['sha256'] for name, rule in runtime.get('generated_modules', {}).items()}
@@ -211,6 +231,10 @@ def verify_receipt(receipt, root, source, runtime, *, loaded=None, runtime_recei
         'sha256': index.get(str(Path(root).resolve() / 'scripts/qd_ed_n36_bootstrap.py'))}, 'N36 bootstrap receipt')
     for row in receipt['compiled'] + receipt['startup_source_only']:
         require(index.get(row['path'], generated.get(row['module'])) == row['sha256'], 'N36 executable receipt bytes')
+        if row['module'] in generated:
+            evidence = (runtime_receipt or {}).get('generated_modules', {}).get(row['module'], {})
+            require(evidence.get('record') == {'path': row['path'], 'sha256': row['sha256']},
+                    'N36 generated execution receipt origin differs')
     require({r['module'] for r in receipt['startup_source_only']} == {'encodings', 'encodings.aliases', 'encodings.utf_8'},
             'N36 startup receipt coverage')
     frozen = receipt['frozen_modules']

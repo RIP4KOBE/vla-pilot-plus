@@ -152,7 +152,7 @@ def _live_source(name, path):
     return module
 
 
-def _generated_runtime(closure):
+def _generated_runtime(closure, *, scan_loaded=True):
     """Validate a prospective rule and any live instance; never learn trust from it."""
     rules = closure.get('generated_modules', {})
     if closure.get('schema') != 'n34-runtime-source-closure-v2':
@@ -215,7 +215,10 @@ def _generated_runtime(closure):
         _runtime_file(record)
         _live_source(GENERATED_NAME, path)
         inventory[GENERATED_NAME] = record
-    for name, module in list(sys.modules.items()):
+    # The source bootstrap checks each discovery before execution. Its import
+    # gate needs the same fixed rule/owner checks without a quadratic full
+    # inventory scan; every runtime attestation retains that scan by default.
+    for name, module in list(sys.modules.items()) if scan_loaded else ():
         file = getattr(module, '__file__', None)
         in_directory = file is not None and directory is not None and Path(file).resolve().is_relative_to(directory)
         w.require(name == GENERATED_NAME or not (name.startswith('_remote_module_') or in_directory),
