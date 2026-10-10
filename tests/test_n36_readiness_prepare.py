@@ -1150,3 +1150,23 @@ def test_prospective_policy_uses_fresh_canonical_paths():
     assert all(str(Path(path).resolve()) == path and not Path(path).exists() for path in paths)
     assert all('/001694/preparation-accounting-repair/' in path for path in paths)
     assert spec['release_enabled'] is spec['root_adopted'] is spec['gpu_authorized'] is False
+
+
+@pytest.mark.parametrize('fault', ['missing_authority','null_authority','missing_review',
+    'altered_review','unapproved','provider_calls','production_health','production_episode'])
+def test_runner_real_release_authorization_precedes_effects(runner_cpu, fault):
+    f = runner_cpu
+    release = copy.deepcopy(f.release)
+    if fault == 'missing_authority': del release['accounting_authority']
+    elif fault == 'null_authority': release['accounting_authority'] = None
+    elif fault == 'missing_review': del release['root_review']
+    elif fault == 'altered_review': release['root_review']['sha256'] = '0'*64
+    elif fault == 'unapproved': release['approved'] = False
+    elif fault == 'provider_calls': release['provider_calls'] = 2
+    elif fault == 'production_health': release['health_authorized'] = True
+    else: release['episode_authorized'] = True
+    ref = put(f.root,'release',release)
+    with pytest.raises((ValueError,e.r.GateError)):
+        p.execute_preparation(ref)
+    assert not f.launches and not p.journal_rows(f.root)
+    assert not Path(f.prep['proof_path']).with_suffix('.measurement').exists()
