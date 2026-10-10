@@ -141,6 +141,85 @@ def verify_alias(receipt, runtime, runtime_receipt, binding):
     return {'os.path'}
 
 
+# Closed CPython pairs. These names are never added to frozen_modules.
+IMPORTLIB_FROZEN_PAIRS = (
+    ('importlib._bootstrap', '_frozen_importlib'),
+    ('importlib._bootstrap_external', '_frozen_importlib_external'),
+)
+
+
+def importlib_alias_claim(runtime, binding, alias, canonical):
+    require((alias, canonical) in IMPORTLIB_FROZEN_PAIRS,
+            'N36 importlib alias pair differs')
+    require(all(name in runtime['modules'] for name in (alias, canonical)),
+            'N36 importlib alias inventory incomplete')
+    # The standard-library location is bound to this interpreter, not discovered
+    # from a potentially substituted module or a matching source hash.
+    path = str(Path(sys.base_prefix).resolve() / 'lib' /
+               ('python%d.%d' % sys.version_info[:2]) / 'importlib' /
+               (alias.rsplit('.', 1)[1] + '.py'))
+    records = {name: copy.deepcopy(runtime['modules'][name]) for name in (alias, canonical)}
+    require(path == str(Path(path).resolve())
+            and records[alias] == records[canonical]
+            and records[alias] == {'path': path, 'sha256': sha(path)},
+            'N36 importlib alias inventory differs')
+    return {'rule': 'n36-frozen-importlib-alias-v1',
+            'binding': copy.deepcopy(binding), 'interpreter': copy.deepcopy(runtime['interpreter']),
+            'alias': alias, 'canonical': canonical, 'module_name': alias, 'package': 'importlib',
+            'file': path, 'spec_name': canonical, 'origin': 'frozen',
+            'loader': '_frozen_importlib.FrozenImporter', 'is_frozen': True,
+            'same_module_object': True, 'importlib_attribute_is_module': True,
+            'records': records}
+
+
+def live_importlib_aliases(runtime, binding):
+    # Reuse the existing live process/interpreter check as well as os.path's
+    # independent identity proof; retained hashes never stand in for identity.
+    require(isinstance(binding, dict), 'N36 importlib alias binding required')
+    live_alias(runtime, binding)
+    claims = {}
+    for alias, canonical in IMPORTLIB_FROZEN_PAIRS:
+        module = sys.modules.get(canonical)
+        spec = getattr(module, '__spec__', None)
+        require(module is not None and sys.modules.get(alias) is module
+                and getattr(importlib, alias.rsplit('.', 1)[1], None) is module
+                and getattr(module, '__name__', None) == alias
+                and getattr(module, '__package__', None) == 'importlib'
+                and getattr(spec, 'name', None) == canonical
+                and getattr(spec, 'origin', None) == 'frozen'
+                and getattr(spec, 'loader', None) is importlib.machinery.FrozenImporter
+                and getattr(module, '__loader__', None) is importlib.machinery.FrozenImporter
+                and _imp.is_frozen(canonical), 'N36 importlib alias live identity differs: ' + alias)
+        claim = importlib_alias_claim(runtime, binding, alias, canonical)
+        require(getattr(module, '__file__', None) == claim['file'],
+                'N36 importlib alias lexical file differs: ' + alias)
+        claims[alias] = claim
+    return claims
+
+
+def verify_importlib_aliases(receipt, runtime, runtime_receipt, binding):
+    # This also enforces the exact external context/runtime/process/phase shape,
+    # receipt binding and current interpreter identity before any exemption.
+    aliases = verify_alias(receipt, runtime, runtime_receipt, binding)
+    claims = receipt.get('frozen_importlib_aliases')
+    require(isinstance(claims, dict)
+            and set(claims) == {a for a, _ in IMPORTLIB_FROZEN_PAIRS},
+            'N36 importlib alias proof coverage differs')
+    for alias, canonical in IMPORTLIB_FROZEN_PAIRS:
+        claim = claims[alias]
+        require(claim == importlib_alias_claim(runtime, binding, alias, canonical)
+                and claim['same_module_object'] is True
+                and claim['importlib_attribute_is_module'] is True
+                and claim['is_frozen'] is True
+                and canonical in receipt['frozen_modules'] and _imp.is_frozen(canonical),
+                'N36 importlib alias proof differs: ' + alias)
+        for name in (alias, canonical):
+            require(runtime_receipt['modules'].get(name) == runtime['modules'][name],
+                    'N36 importlib alias canonical inventory evidence missing/differs: ' + name)
+        aliases.add(alias)
+    return aliases
+
+
 def attest(root, source, runtime, *, binding=None):
     state = active()
     root = Path(root).resolve()
@@ -203,7 +282,8 @@ def attest(root, source, runtime, *, binding=None):
         canonical = getattr(spec, 'name', name)
         require((canonical, path) in known, 'N36 unrecorded Python execution: ' + name)
     return {'schema': 'n36-source-execution-v2', 'binding': copy.deepcopy(binding),
-        'interpreter': copy.deepcopy(runtime['interpreter']), 'frozen_aliases': aliases, 'bootstrap': {'path': bootstrap, 'sha256': state.bootstrap_digest},
+        'interpreter': copy.deepcopy(runtime['interpreter']), 'frozen_aliases': aliases,
+        'frozen_importlib_aliases': live_importlib_aliases(runtime, binding), 'bootstrap': {'path': bootstrap, 'sha256': state.bootstrap_digest},
         'search_path': list(sys.path), 'search_prefix': str(Path(sys.prefix).resolve()),
         'compiled': records, 'startup_source_only': startup, 'frozen_modules': sorted(set(frozen)),
         'exceptions': ['interpreter-bound built-in/frozen modules', 'separately inventoried native extensions',
@@ -245,7 +325,7 @@ def verify_receipt(receipt, root, source, runtime, *, loaded=None, runtime_recei
         from scripts import qd_ed_n34_source as closure
         require(binding is not None, 'N36 external runtime binding required')
         closure.verify_runtime_receipt(runtime, runtime_receipt, binding=binding, after=False)
-        aliases = verify_alias(receipt, runtime, runtime_receipt, binding)
+        aliases = verify_importlib_aliases(receipt, runtime, runtime_receipt, binding)
         observed += [row for name, row in runtime_receipt['modules'].items() if name not in frozen and name not in aliases]
         observed += [e['record'] for e in runtime_receipt['generated_modules'].values()]
     for row in observed:

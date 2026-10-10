@@ -112,23 +112,12 @@ def child(output):
     source = {'files': [{'path': str(Path(p).relative_to(ROOT)), 'sha256': h} for p, h in files.items()]}
     observed = runtime.attest_runtime_receipt(closure, closure['runtime'], binding=binding, after=True)
     receipt = execution.attest(ROOT, source, closure, binding=binding)
-    # Preserve the full producer evidence. The focused consumer fixture includes
-    # only generated provenance and the existing mandatory os.path alias proof;
-    # it makes no claim about unrelated full-runtime alias compatibility.
-    full_observed = copy.deepcopy(observed)
-    full_error = None
-    try:
-        execution.verify_receipt(receipt, ROOT, source, closure, runtime_receipt=observed, binding=binding)
-    except ValueError as exc:
-        full_error = str(exc)
-    observed['modules'] = {name: observed['modules'][name] for name in
-                           (runtime.GENERATOR_NAME, runtime.TEMPLATE_NAME, 'os.path', 'posixpath')}
+    # Unsuppressed full CPU producer-consumer gate; retain every ordinary row.
     execution.verify_receipt(receipt, ROOT, source, closure, runtime_receipt=observed, binding=binding)
     output.write_text(json.dumps({'closure': closure, 'source': source, 'runtime': observed,
-                                 'full_runtime': full_observed, 'full_consumer_error': full_error,
                                  'execution': receipt, 'binding': binding, 'rejected': rejected}))
     print(json.dumps({'generated_path': str(path), 'sha256': execution.sha(path), 'rejected': rejected,
-                      'full_consumer_error': full_error}))
+                      'full_consumer_passed': True, 'ordinary_modules': len(observed['modules'])}))
 
 
 def test_real_bootstrap_and_retained_receipt(tmp_path, monkeypatch):
@@ -160,6 +149,39 @@ def test_real_bootstrap_and_retained_receipt(tmp_path, monkeypatch):
             next(r for r in bad['compiled'] if r['module'] == runtime.GENERATED_NAME)['path'] += '.wrong'
         with pytest.raises(ValueError):
             execution.verify_receipt(bad, ROOT, source, closure, runtime_receipt=bad_observed, binding=binding)
+    # Exercise each new proof through the complete consumer, preserving all
+    # ordinary rows (including unrelated Python execution coverage).
+    assert set(observed['modules']) >= {n for pair in execution.IMPORTLIB_FROZEN_PAIRS for n in pair}
+    for alias, canonical in execution.IMPORTLIB_FROZEN_PAIRS:
+        for fault in ('object', 'loader', 'spec', 'name', 'path', 'hash', 'interpreter',
+                      'context', 'runtime_closure', 'process', 'phase',
+                      'canonical_frozen', 'canonical_evidence', 'missing_proof', 'ordinary_execution'):
+            bad, bad_observed = copy.deepcopy(receipt), copy.deepcopy(observed)
+            claim = bad['frozen_importlib_aliases'][alias]
+            if fault == 'object': claim['same_module_object'] = False
+            elif fault == 'loader': claim['loader'] = 'wrong'
+            elif fault == 'spec': claim['spec_name'] = alias
+            elif fault == 'name': claim['module_name'] = canonical
+            elif fault in ('path', 'hash'):
+                claim['records'][alias]['path' if fault == 'path' else 'sha256'] = 'wrong'
+            elif fault == 'interpreter': claim['interpreter']['sha256'] = '0'*64
+            elif fault in ('context', 'runtime_closure'): claim['binding'][fault]['sha256'] = '0'*64
+            elif fault == 'process': claim['binding']['process']['pid'] += 1
+            elif fault == 'phase': claim['binding']['phase'] = 'runtime_after'
+            elif fault == 'canonical_frozen': bad['frozen_modules'].remove(canonical)
+            elif fault == 'canonical_evidence': del bad_observed['modules'][canonical]
+            elif fault == 'missing_proof': del bad['frozen_importlib_aliases'][alias]
+            else:
+                # Same-path aliases do not become a broad exemption.
+                bad['compiled'] = [r for r in bad['compiled'] if r['module'] != runtime.TEMPLATE_NAME]
+            with pytest.raises(ValueError):
+                execution.verify_receipt(bad, ROOT, source, closure, runtime_receipt=bad_observed, binding=binding)
+        bad_closure, bad_observed = copy.deepcopy(closure), copy.deepcopy(observed)
+        bad_closure['modules']['arbitrary_alias'] = copy.deepcopy(closure['modules'][alias])
+        bad_observed['modules']['arbitrary_alias'] = copy.deepcopy(observed['modules'][alias])
+        with pytest.raises(ValueError, match='N36 module missing executable receipt:'):
+            execution.verify_receipt(receipt, ROOT, source, bad_closure,
+                                     runtime_receipt=bad_observed, binding=binding)
     assert len(value['rejected']) == 11
 
 

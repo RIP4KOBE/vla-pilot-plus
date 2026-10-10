@@ -90,6 +90,17 @@ def test_parent_rejects_mismatched_receipts(proof, fault):
 
 def complete_fixture(root, proof):
     runtime,binding,receipt,observed = proof
+    for alias, canonical in execution.IMPORTLIB_FROZEN_PAIRS:
+        record = {'path': str(Path(sys.modules[canonical].__file__).resolve()),
+                  'sha256': execution.sha(sys.modules[canonical].__file__)}
+        for name in (alias, canonical):
+            runtime['modules'][name] = record.copy()
+            observed['modules'][name] = record.copy()
+        receipt['frozen_modules'].append(canonical)
+    receipt['frozen_modules'].sort()
+    receipt['frozen_importlib_aliases'] = execution.live_importlib_aliases(runtime, binding)
+    receipt['search_prefix'] = str(Path(sys.executable).resolve().parent.parent)
+    receipt['search_path'] = [str(root)]
     names = ['scripts.qd_ed_n36_worker','scripts.qd_ed_n36_native','scripts.qd_ed_n36_arithmetic',
              'scripts.audit_decision_evidence','scripts.qd_ed_n36_source', 'ordinary']
     files = [{'path':n.replace('.','/')+'.py', 'sha256':'c'*64} for n in names]
@@ -108,7 +119,7 @@ def complete_fixture(root, proof):
 
 
 @pytest.mark.parametrize('fault', [None,'ordinary_missing','arbitrary_same_path','equal_hash_substitution'])
-def test_full_parent_exemption_is_only_os_path(proof,tmp_path,fault):
+def test_full_parent_exemption_is_only_closed_aliases(proof,tmp_path,fault):
     runtime,binding,receipt,observed=proof
     source=complete_fixture(tmp_path,proof)
     if fault=='ordinary_missing': receipt['compiled']=[r for r in receipt['compiled'] if r['module']!='ordinary']
