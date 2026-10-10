@@ -150,7 +150,7 @@ def validate_release(ref, spec, source, source_ref, *, now=None):
     e.w.require(timestamp(p['not_before']) < issued <= current < expires <= timestamp(p['deadline']),
                 'fresh preparation release')
     seconds = number(value['gpu_seconds'], 'finite preparation reservation')
-    e.w.require(MEASUREMENT_CONTRACT['cleanup_seconds'] < seconds < e.LIMITS['gpu_seconds'] and type(value['provider_calls']) is int
+    e.w.require(MEASUREMENT_CONTRACT['cleanup_seconds'] < seconds <= expires - issued and type(value['provider_calls']) is int
                 and value['provider_calls'] == 1, 'separate finite preparation caps')
     closed(value['graph'], ('plan', 'runtime'), 'released graph')
     e.w.require(value['graph']['runtime']['path'] == p['disabled_runtime_path'],
@@ -519,6 +519,7 @@ def child_measure(context_ref):
     from scripts.qd_ed_n36_runner import process_identity
     execution.active()
     context = e.read(context_ref)
+    closed(context, ('release', 'parent', 'output'), 'preparation child context')
     spec, source_ref, source, release, plan = measurement_context(context['release'])
     output = Path(context['output'])
     expected_output = Path(policy(spec)['proof_path']).with_suffix('.measurement')
@@ -529,6 +530,7 @@ def child_measure(context_ref):
     dispatched = [x for x in rows if x['resource_id'] == release['resource_id']]
     e.w.require(len(dispatched) == 2 and dispatched[-1]['event'] == 'dispatched'
                 and dispatched[-1]['release'] == context['release'], 'child requires durable admission')
+    e.exact(dispatched[-1]['parent'], context['parent'], 'durably admitted parent binding')
     # Parent records exact handle before this gate opens; no measurement precedes it.
     admitted = output / 'child-admitted.json'
     until = time.monotonic() + 5

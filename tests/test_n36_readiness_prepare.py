@@ -701,7 +701,7 @@ def test_child_measurement_collects_receipts_after_observation_cpu_only(runner_c
     parent = process_identity(os.getppid())
     context = put(output,'context',dict(release=f.ref,parent=parent,output=str(output)))
     for kind in ('reserved','dispatched'):
-        p.append_preparation(f.root,dict(resource_event(kind,f.release['resource_id']),release=f.ref))
+        p.append_preparation(f.root,dict(resource_event(kind,f.release['resource_id']),release=f.ref,parent=parent))
     p.write_once(output/'child-admitted.json',process_identity(os.getpid()))
     steps = []
     def probe(manifest, dest, resource):
@@ -732,3 +732,20 @@ def test_child_measurement_collects_receipts_after_observation_cpu_only(runner_c
     envelope = e.read(ref)
     assert envelope['schema']==p.MEASUREMENT_CONTRACT['schema'] and envelope['parent']==parent
     assert Path(f.plan['runtime']['path']).read_bytes()==before
+
+
+def test_preparation_release_has_independent_finite_reservation(measured):
+    m = measured
+    release = copy.deepcopy(m['release'])
+    issued = p.timestamp(release['issued_at'])
+    release['gpu_seconds'] = 2000  # Separate from the engineering 1900s slot.
+    release['expires_at'] = dt.datetime.fromtimestamp(issued+3000,dt.timezone.utc).isoformat()
+    review = {k:v for k,v in release.items() if k!='root_review'}
+    review.update(schema='n36-preparation-root-measurement-review-v1',decision='APPROVED')
+    release['root_review'] = put(m['root'],'independent-preparation-review',review)
+    ref = m['save'](m['prep']['release_path'],release)
+    assert p.validate_release(ref,m['spec'],m['source'],m['source_ref'],now=m['now'])['gpu_seconds']==2000
+    release['gpu_seconds'] = 3001
+    ref = m['save'](m['prep']['release_path'],release)
+    with pytest.raises(ValueError,match='finite preparation caps'):
+        p.validate_release(ref,m['spec'],m['source'],m['source_ref'],now=m['now'])
