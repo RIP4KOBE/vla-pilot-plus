@@ -44,7 +44,6 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
     engineering = w.read_ref(plan_ref).get('schema') == 'n36-engineering-execution-plan-v1'
     if engineering:
         from scripts import qd_ed_n36_engineering as api
-        api.require_dispatch_implementation()
         validate, reserve = api.validate_health_release, api.reserve_health_handoff
         owner, environment, guard = api.owner_root, api.child_environment, api.launch_guard
         n36r3 = True  # same separate-health process mechanics, distinct authority
@@ -129,7 +128,12 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
                 raise
             result={'reason':str(exc) if isinstance(exc,(ValueError,r.GateError)) else type(exc).__name__}
         elapsed=0. if started is None else (finished or time.monotonic())-started
-        w.require(elapsed<=record['reserved_gpu_seconds'],'healthcheck exceeded reservation; root reconciliation required')
+        if engineering and c.finite(elapsed, 'engineering health charge') > record['reserved_gpu_seconds']:
+            # An exited probe's actual cost must survive even an overrun.
+            # It cannot supply readiness or be retrospectively capped to 60s.
+            event, result = 'aborted', {'reason': 'engineering health exceeds reservation; root reconciliation required'}
+        else:
+            w.require(elapsed<=record['reserved_gpu_seconds'],'healthcheck exceeded reservation; root reconciliation required')
         # Probe time_unix remains in probe-evidence.json as observation time;
         # the terminal/journal time_unix denotes completion, after validation.
         terminal={**result,**base,'event':event,'time_unix':time.time(),

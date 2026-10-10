@@ -3,14 +3,15 @@
 This module consumes external, hash-bound approvals. It never creates an
 approval, adopts source/accounting, or supplies a continuation/retry entrypoint.
 Disabled scope/accounting and the full audit view do not authorize execution.
-Dispatch is also hard-disabled in this partial implementation: the complete
-released engineering lifecycle still needs CPU integration verification. There
-is no plan flag, approval field, environment variable or retry that lifts it.
+Dispatch requires the complete detached release, source/runtime closure,
+owning-state adoption and bounded one-use admission below. CPU verification
+does not create those authorities or establish scientific success.
 """
 import datetime as dt
 import json
 from pathlib import Path
 import subprocess
+import time
 from decimal import Decimal
 
 from scripts import qd_ed_n23_worker as w, qd_ed_final_runner as r
@@ -355,7 +356,9 @@ def _verify_release_transaction(plan_ref, release_ref, *, health=False):
         manifest = b.verify_engineering_manifest(plan['engineering_manifest'], plan, runtime, row(), audit=audit)
         w.require(evidence.manifests[mapping['episode_key']]['row'] == mapping, 'verified audit row binding')
         if not health:
-            validate_readiness(plan_ref, release)
+            terminal = validate_readiness(plan_ref, release)
+            w.require(terminal['time_unix'] <= issued.timestamp(),
+                      'engineering episode release predates settled health')
         return plan, runtime, authority, {EPISODE_KEY: manifest}
 
 
@@ -461,6 +464,18 @@ def _journal_suffixes(plan, baseline, events, resources, reservations):
         w.require(health and health[-1]['event'] == 'completed'
                   and health[-1]['time_unix'] <= local[0]['time_unix'],
                   'engineering health must finish before sole episode reservation')
+        release = read(local[0]['release'])
+        w.require(release['schema'] == 'n36-engineering-episode-release-v1'
+                  and read(release['plan']) == plan
+                  and local[0]['plan_sha256'] == release['plan']['sha256'],
+                  'engineering episode journal release/plan binding')
+        issued = dt.datetime.fromisoformat(release['issued_at'].replace('Z', '+00:00'))
+        times = [c.finite(event['time_unix'], 'engineering episode event time') for event in local]
+        end = dt.datetime.fromisoformat(c.DEADLINE.replace('Z', '+00:00'))
+        w.require(issued.tzinfo is not None and health[-1]['time_unix'] <= issued.timestamp()
+                  <= times[0] and times == sorted(times)
+                  and times[-1] <= min(end.timestamp(), dt.datetime.now(dt.timezone.utc).timestamp()),
+                  'engineering episode prospective lifecycle timestamps')
     return local, health
 
 
@@ -492,16 +507,8 @@ def reconcile(plan, events, verify_terminal, *, live_handles=()):
 
 
 
-def require_dispatch_implementation():
-    """A code-level veto, not an authority that root records can override.
-
-    Remove only in a subsequent reviewed implementation after the remaining
-    released-lifecycle and deep-closure CPU verification gaps are addressed.
-    """
-    raise RuntimeError('engineering dispatch disabled: released lifecycle and deep-closure verification incomplete')
-
 def launch_guard(plan, authority, *, need=1840, now=None):
-    require_dispatch_implementation()
+    validate_plan_shape(plan, released=True)
     owner_root(plan)
     c.validate_stop_binding(plan)
     now = now or dt.datetime.now(dt.timezone.utc)
@@ -646,9 +653,7 @@ def validate_health_handoff(root, plan_ref, release_ref, record, binding):
 def reserve_health_handoff(plan_ref, release_ref, resource_id, *, timeout_seconds):
     """Consume the sole health slot durably under both existing runner locks."""
     import os
-    import time
     from scripts import qd_ed_n36_runner as runner
-    require_dispatch_implementation()
     w.require(resource_id == HEALTH_ID and type(timeout_seconds) is int and timeout_seconds == 20,
               'engineering sole 20-second health probe')
     runner.source_execution.active()
@@ -730,7 +735,9 @@ def validate_readiness(plan_ref, release_record, *, resources=None):
     starts = dt.datetime.fromisoformat(authority['starts_at'].replace('Z', '+00:00')).timestamp()
     end = dt.datetime.fromisoformat(c.DEADLINE.replace('Z', '+00:00')).timestamp()
     dispatched = c.finite(group[1]['time_unix'], 'engineering health dispatch time')
-    w.require(starts <= group[0]['time_unix'] <= dispatched <= observed <= completed <= min(end, dt.datetime.now(dt.timezone.utc).timestamp()),
+    reserved = c.finite(group[0]['time_unix'], 'engineering health reservation time')
+    issued = dt.datetime.fromisoformat(read(ready['health_release'])['issued_at'].replace('Z', '+00:00')).timestamp()
+    w.require(starts <= issued <= reserved <= dispatched <= observed <= completed <= min(end, dt.datetime.now(dt.timezone.utc).timestamp()),
               'engineering fresh health authority timestamps')
     w.require(evidence['resource_id'] == HEALTH_ID and w.sha(output / 'probe-frame.png') == evidence['frame_png_sha256']
               and all(terminal.get(key) == value for key, value in evidence.items() if key != 'time_unix'),
@@ -740,7 +747,6 @@ def validate_readiness(plan_ref, release_record, *, resources=None):
 
 
 def execute_one(plan_ref, release_ref):
-    require_dispatch_implementation()
     from scripts.qd_ed_n36_runner import execute_one as run_reserved_episode
     return run_reserved_episode(plan_ref, release_ref, _engineering=True)
 

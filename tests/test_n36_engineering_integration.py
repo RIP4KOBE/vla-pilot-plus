@@ -43,11 +43,14 @@ def test_accepted_health_reservation_readiness_episode_release(f, monkeypatch):
         with pytest.raises(ValueError):
             e.validate_readiness(f.plan_ref, {'readiness': f.readiness()}, resources=bad)
     episode = f.release('episode', f.readiness())
-    monkeypatch.setattr(runner, 'wait_worker', f.episode_child)
-    # Private copy observes only a dead synthetic PID on restart.
+    monkeypatch.setattr(runner, 'wait_worker', f.worker_child)
+    # The real runner observes a simulated process identity.
     monkeypatch.setattr(runner, 'process_identity', lambda pid: {'pid': pid, 'boot_id': 'CPU_FIXTURE', 'proc_start_ticks': '1'})
     result = f.episode_run(f.plan_ref, episode, _engineering=True)
-    assert result['status'] == 'PAUSED_FOR_ROOT_G3', result
+    assert result['status'] == 'PAUSED_FOR_ROOT_G3', (getattr(f, 'worker_error', None), getattr(f, 'last_failure', None))
+    assert f.worker_calls == ['runtime_before', 'execution_before', 'controller_observation',
+                              'main', 'runtime_after', 'generic_audit', 'native_audit_simulated',
+                              'runtime_after', 'execution_after']
     assert len(f.launches) == 2
     def exited(pid):
         raise FileNotFoundError('CPU simulated child exited')
@@ -68,14 +71,19 @@ def test_accepted_health_reservation_readiness_episode_release(f, monkeypatch):
     f.completed_episode_ref = episode
 
 
-def test_public_dispatch_veto_still_unconditional(f):
-    for call in (lambda: e.require_dispatch_implementation(),
-                 lambda: e.execute_one(f.plan_ref, f.health_ref),
-                 lambda: runner.execute_one(f.plan_ref, f.health_ref, _engineering=True),
-                 lambda: health.run_healthcheck(f.plan_ref, f.health_ref, e.HEALTH_ID, timeout_seconds=20)):
-        with pytest.raises(RuntimeError, match='engineering dispatch disabled'):
+def test_public_dispatch_rejects_disabled_graph_before_any_work(f):
+    plan = copy.deepcopy(f.plan)
+    plan.update(frozen=False, release_enabled=False)
+    plan['phase_authorization']['engineering'] = False
+    reference = f.doc('fixture-disabled-plan', plan)
+    for call in (lambda: e.execute_one(reference, f.health_ref),
+                 lambda: runner.execute_one(reference, f.health_ref, _engineering=True),
+                 lambda: health.run_healthcheck(reference, f.health_ref, e.HEALTH_ID, timeout_seconds=20),
+                 lambda: e.launch_guard(plan, f.authority)):
+        with pytest.raises(ValueError, match='distinct released engineering plan'):
             call()
     assert not f.launches
+    assert r.read_events(f.owner / 'data/gpu-healthcheck-ledger.jsonl') == []
 
 
 def test_fresh_episode_predispatch_abort_and_exhaustion(f):
@@ -140,8 +148,6 @@ def test_fresh_episode_predispatch_abort_and_exhaustion(f):
         assert not f.launches
         assert before == {path: path.read_bytes() for parent in (f.owner, f.output)
                           for path in parent.rglob('*') if path.is_file()}
-    with pytest.raises(RuntimeError, match='engineering dispatch disabled'):
-        e.require_dispatch_implementation()
 
 
 def test_accepted_context_cross_family_rejection(f):
@@ -149,9 +155,11 @@ def test_accepted_context_cross_family_rejection(f):
     context = worker.context_for(f.plan_ref, e.row(), episode)
     reference = f.doc('fixture-accepted-context', context)
     assert worker.validate_context(reference)[0] == context
-    # No launch admission is certified: its public veto remains unconditional.
-    with pytest.raises(RuntimeError, match='engineering dispatch disabled'):
+    assert worker.validate_context(reference, admission=True)[0] == context
+    Path(c.stop.STOP_PATHS[0]).touch()
+    with pytest.raises(ValueError, match='STOP'):
         worker.validate_context(reference, admission=True)
+    Path(c.stop.STOP_PATHS[0]).unlink()
     before = {path: path.read_bytes() for parent in (f.owner, f.output)
               for path in parent.rglob('*') if path.is_file()}
     launches = list(f.launches)
@@ -248,9 +256,10 @@ def test_deep_closure_corruption_both_release_families(f):
     # Rehash only fixture document DAGs so semantic mutations get past outer
     # reference equality. Never rehash corrupted source/native/runtime bytes.
     import json
-    originals = {p: p.read_bytes() for p in f.docs.glob('*.json')}
     episode = f.release('episode', {'health_release': f.health_ref, 'terminal': f.health_ref})
-    originals.update({p: p.read_bytes() for p in f.docs.glob('*.json') if p not in originals})
+    # Snapshot after issuance: fixture release paths may already exist from a
+    # preceding test, while each new release now has its actual fixture time.
+    originals = {p: p.read_bytes() for p in f.docs.glob('*.json')}
     targets = {
         'NON_C0': Path(f.audit['expected_manifests'][f.audit['episodes'][1]['episode_key']]['path']),
         'source': f.source / 'main.py',
@@ -387,11 +396,15 @@ def test_authority_adoption_and_full_snapshot_mutations(f):
             e.validate_authority(f.plan, authority)
 
 
-def test_public_reservation_and_guard_veto(f):
+def test_public_entries_reject_missing_live_source_attestation(f, monkeypatch):
+    def absent(*args, **kwargs):
+        raise RuntimeError('CPU simulated missing source-only startup')
+    monkeypatch.setattr(runner.source_execution, 'active', absent)
     for call in (lambda: e.reserve_health(f.plan_ref, f.health_ref, e.HEALTH_ID, timeout_seconds=20),
                  lambda: e.reserve_health_handoff(f.plan_ref, f.health_ref, e.HEALTH_ID, timeout_seconds=20),
-                 lambda: e.launch_guard(f.plan, f.authority)):
-        with pytest.raises(RuntimeError, match='engineering dispatch disabled'):
+                 lambda: e.execute_one(f.plan_ref, f.health_ref),
+                 lambda: health.run_healthcheck(f.plan_ref, f.health_ref, e.HEALTH_ID, timeout_seconds=20)):
+        with pytest.raises(RuntimeError, match='missing source-only startup'):
             call()
     assert not f.launches
     assert r.read_events(f.owner / 'data/gpu-healthcheck-ledger.jsonl') == []
@@ -441,3 +454,126 @@ def test_predispatch_health_abort_cross_release_and_issuance_edges(f, monkeypatc
         f.clock = previous
         for path, data in saved.items():
             path.write_bytes(data)
+
+
+def test_prospective_release_and_journal_times(f, monkeypatch):
+    import datetime as dt
+    episode = f.accepted_episode()
+    completed = f.clock
+    saved = {p: p.read_bytes() for p in f.docs.glob('*.json')}
+    try:
+        earlier = dt.datetime.fromtimestamp(completed - .001, dt.timezone.utc).isoformat()
+        bad = f.release('episode', f.readiness(), issued_at=earlier)
+        with pytest.raises(ValueError, match='release predates settled health'):
+            e.validate_release(f.plan_ref, bad)
+    finally:
+        for path, data in saved.items():
+            path.write_bytes(data)
+    resources = r.read_events(f.owner / 'data/gpu-healthcheck-ledger.jsonl')
+    resources[0]['time_unix'] -= .001
+    with pytest.raises(ValueError, match='fresh health authority timestamps'):
+        e.validate_readiness(f.plan_ref, {'readiness': f.readiness()}, resources=resources)
+    monkeypatch.setattr(runner, 'wait_worker', f.episode_child)
+    assert f.episode_run(f.plan_ref, episode, _engineering=True)['status'] == 'PAUSED_FOR_ROOT_G3'
+    state, events, resources, reservations = runner.snapshot(f.owner, f.authority)
+    for fault in ('before_release', 'backwards', 'future', 'nan', 'wrong_plan_hash'):
+        bad = copy.deepcopy(events)
+        if fault == 'before_release': bad[-3]['time_unix'] = completed - .001
+        elif fault == 'backwards': bad[-2]['time_unix'] = bad[-3]['time_unix'] - 1
+        elif fault == 'future': bad[-1]['time_unix'] = f.clock + 1
+        elif fault == 'nan': bad[-1]['time_unix'] = float('nan')
+        else:
+            for event in bad[-3:]: event['plan_sha256'] = '0' * 64
+        with pytest.raises(ValueError, match='engineering|nonfinite'):
+            e.live_journals(f.plan, f.authority, bad, resources, reservations)
+
+
+@pytest.mark.parametrize('fault', ['main_failure', 'audit_failure', 'overrun'])
+def test_worker_failure_and_overrun_are_charged_invalid_without_retry(f, monkeypatch, fault):
+    episode = f.accepted_episode()
+    def child(process, started, identity):
+        code = f.worker_child(process, started, identity, fault=None if fault == 'overrun' else fault)
+        if fault == 'overrun':
+            f.clock += 1840
+            f.monotonic += 1840
+        return code
+    monkeypatch.setattr(runner, 'wait_worker', child)
+    result = f.episode_run(f.plan_ref, episode, _engineering=True)
+    assert result['status'] == 'INVALID_STOP'
+    terminal = result['terminal']
+    assert terminal['event'] == 'aborted' and terminal['success'] is None
+    assert terminal['outcome_valid'] is False and terminal['retryable_infrastructure'] is False
+    assert terminal['gpu_process_wall_seconds'] == (1841 if fault == 'overrun' else 1)
+    events = r.read_events(f.owner / 'data/attempt-ledger.jsonl')
+    assert [v['event'] for v in events[-3:]] == ['reserved', 'dispatched', 'aborted']
+    assert events[-1] == terminal == w.read_ref(c.ref(f.output / 'attempts' / e.EPISODE_KEY / 'attempt-result.json'))
+    assert len(f.launches) == 2 and result['next_row'] is None
+    # Over-reservation cost remains in the append-only journal and blocks
+    # reconciliation. It is never truncated to make the scope look valid.
+    if fault == 'overrun':
+        with pytest.raises(ValueError, match='exceeds reservation'):
+            f.episode_run(f.plan_ref, episode, _engineering=True)
+    else:
+        assert f.episode_run(f.plan_ref, episode, _engineering=True)['status'] == 'LIVE_OR_UNSETTLED'
+    assert len(f.launches) == 2
+
+
+def test_worker_receipt_deep_bindings_cannot_be_replaced_by_rehashed_claims(f):
+    # Reuse the actual worker-body lifecycle above, never produce another
+    # receipt-shaped success. All edits below are disposable negative fixtures.
+    assert hasattr(f, 'completed_episode'), 'run the positive lifecycle first'
+    for path, data in f.completed_episode.items():
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+    f.clock = max(event.get('time_unix', 0) for name in e.JOURNALS[:2]
+                  for event in r.read_events(f.owner / 'data' / name)) + 1
+    output = f.output / 'attempts' / e.EPISODE_KEY
+    context_ref = c.ref(output / 'n36-worker-context.json')
+    process = r.read_json(output / 'process.json')
+    receipt_path = output / 'eds_eval/n36-worker-receipt.json'
+    original = r.read_json(receipt_path)
+    for fault in ('missing_engineering_source', 'runtime_process', 'compiled_source',
+                  'native_after', 'controller_instance', 'native_arithmetic'):
+        value = copy.deepcopy(original)
+        if fault == 'missing_engineering_source':
+            value['loaded_before'].pop('scripts.qd_ed_n36_engineering')
+        elif fault == 'runtime_process': value['runtime_after']['binding']['process']['pid'] += 1
+        elif fault == 'compiled_source': value['execution_after']['compiled'][0]['sha256'] = '0' * 64
+        elif fault == 'native_after': value['native_build_after']['libraries'] = []
+        elif fault == 'controller_instance': value['controller_instances'][0]['instance']['control_delta'] = False
+        else:
+            report = w.read_ref(original['audit_report'])
+            report['n36_control_arithmetic']['device'] = 'cpu'
+            value['audit_report'] = put(Path(original['audit_report']['path']), report)
+        # Outer receipt/observation hashes are correct: rejection must come
+        # from the actual bound source/runtime/native/instance predicates.
+        for phase in ('before', 'after'):
+            path = output / 'eds_eval' / ('n36-runtime-' + phase + '.json')
+            value['observation_' + phase] = put(path, {key: value[key] for key in
+                ('runtime_' + phase, 'execution_' + phase, 'loaded_' + phase, 'native_build_' + phase)})
+        with pytest.raises(ValueError):
+            worker.verify_receipt(context_ref, put(receipt_path, value), process)
+        for path, data in f.completed_episode.items():
+            path.write_bytes(data)
+    assert not f.launches
+
+
+def test_health_overrun_retains_entire_charge_and_never_becomes_readiness(f, monkeypatch):
+    def overrun(process, started, identity, timeout):
+        code = f.probe_child(process, started, identity, timeout)
+        f.clock += 60
+        f.monotonic += 60
+        return code
+    monkeypatch.setattr(health, 'wait_probe', overrun)
+    result = f.health()
+    assert result['status'] == 'INVALID_STOP'
+    assert result['terminal']['event'] == 'aborted'
+    assert result['terminal']['gpu_process_wall_seconds'] == 61
+    resources = r.read_events(f.owner / 'data/gpu-healthcheck-ledger.jsonl')
+    assert [event['event'] for event in resources] == ['reserved', 'dispatched', 'aborted']
+    assert resources[-1] == result['terminal']
+    with pytest.raises(ValueError, match='terminal readiness binding'):
+        e.validate_readiness(f.plan_ref, {'readiness': f.readiness()})
+    with pytest.raises(ValueError, match='exceeds reservation'):
+        f.reserve(f.plan_ref, f.health_ref, e.HEALTH_ID, timeout_seconds=20)
+    assert len(f.launches) == 1

@@ -70,7 +70,6 @@ def execute_one(plan_ref, release_ref, *, _engineering=False):
     engineering = _engineering
     if engineering:
         from scripts import qd_ed_n36_engineering as api
-        api.require_dispatch_implementation()
         lifecycle = api
         get_owner, environment = api.owner_root, api.child_environment
         binding, guard = api.operational_binding, api.launch_guard
@@ -171,6 +170,11 @@ def execute_one(plan_ref, release_ref, *, _engineering=False):
             outcome['n36_worker_receipt'] = c.ref(output / 'eds_eval/n36-worker-receipt.json')
             terminal = {**base, **outcome, 'event': 'valid', 'time_unix': time.time(),
                         'gpu_process_wall_seconds': (process_finished or time.monotonic()) - started}
+            if engineering:
+                # Keep the full measured charge on failure; never clamp an
+                # overrun to its reservation or briefly publish a valid result.
+                w.require(c.finite(terminal['gpu_process_wall_seconds'], 'engineering episode charge') <= 1840,
+                          'engineering episode exceeds reservation')
             worker.verify_terminal(plan_ref, row, terminal, release_ref)
         except BaseException as exc:
             # A rejected final handoff remains unsettled for root reconciliation;

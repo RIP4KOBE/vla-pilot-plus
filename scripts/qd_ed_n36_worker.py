@@ -360,6 +360,10 @@ def verify_receipt(context_ref, receipt_ref, process_record):
                     'scripts.qd_ed_n36_native', 'scripts.qd_ed_n31_native',
                     'scripts.qd_ed_n34_controller', 'scripts.qd_ed_n34_source',
                     'scripts.qd_ed_n36_build','scripts.qd_ed_n36_lifecycle','scripts.qd_ed_n36_arithmetic','scripts.qd_ed_n36_reference', 'scripts.qd_ed_n34_worker', 'scripts.qd_ed_n34_native'}
+        if plan['schema'] == 'n36-engineering-execution-plan-v1':
+            required |= {'scripts.qd_ed_n36_engineering', 'scripts.qd_ed_n36_release',
+                         'scripts.qd_ed_n36_accounting', 'scripts.qd_ed_n36_stop',
+                         'scripts.qd_ed_n36_source'}
         if phase == 'loaded_after' and row['profile']=='N36':
             required.add('scripts.qd_ed_n36_response')
         if phase == 'loaded_after':

@@ -499,7 +499,7 @@ def test_explicit_audit_argument_cannot_replace_hash_anchor(prepared):
         b.engineering_command(plan, runtime, e.row(), audit=audit)
 
 
-def test_partial_implementation_dispatch_veto_has_no_artifact_override(prepared, tmp_path):
+def test_disabled_artifacts_cannot_override_source_startup_or_released_schema(prepared, tmp_path):
     from scripts import qd_ed_n36_runner as runner, qd_ed_n36_healthcheck as healthcheck
     plan, _, _, _ = prepared
     plan['root_G3_approved'] = True
@@ -510,7 +510,7 @@ def test_partial_implementation_dispatch_veto_has_no_artifact_override(prepared,
                  lambda: e.reserve_health(reference, reference, e.HEALTH_ID, timeout_seconds=20),
                  lambda: healthcheck.run_healthcheck(reference, reference, e.HEALTH_ID, timeout_seconds=20),
                  lambda: e.launch_guard(plan, {})):
-        with pytest.raises(RuntimeError, match='engineering dispatch disabled'):
+        with pytest.raises((RuntimeError, ValueError), match='source-only startup absent|distinct released engineering plan required'):
             call()
 
 
@@ -656,7 +656,7 @@ def test_owner_route_preserves_state_gates(owner_route_state, fault):
         check_owner_route(owner_route_state)
 
 
-def test_owner_route_admission_does_not_lift_dispatch_veto(owner_route_state):
+def test_owner_route_admission_does_not_supply_released_plan(owner_route_state):
     check_owner_route(owner_route_state)
-    with pytest.raises(RuntimeError, match='engineering dispatch disabled'):
+    with pytest.raises((RuntimeError, ValueError), match='source-only startup absent|distinct released engineering plan required'):
         e.launch_guard(owner_route_state[0], owner_route_state[1])

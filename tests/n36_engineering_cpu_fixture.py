@@ -5,14 +5,12 @@ Source and runtime files are inert fixture bytes; Hydra/constructor source is
 copied for real composition. Git/source, schema, closure, native/controller,
 accounting, readiness and receipt validators are not replaced. Process import
 observations and child/device/provider observations are simulated explicitly.
-The production dispatch veto is removed ONLY from private function copies used
-by the orchestration harness; public module functions keep their veto.
+Public released lifecycle functions are executed directly. Only process/device/
+provider observations and content-keyed fixture composition are simulated.
 """
-import ast
 import copy
 import datetime as dt
 import importlib.metadata
-import inspect
 import io
 import json
 import os
@@ -60,27 +58,6 @@ def git(root, *args):
         stderr=subprocess.DEVNULL, text=True).strip()
 
 
-def orchestration_copy(function, replacements):
-    """Remove only explicit veto call statements from a test-local function.
-
-    No patched production veto and no production bypass flag. All other code,
-    including exception handling, lock/append/fsync boundaries, is unchanged.
-    """
-    tree = ast.parse(inspect.getsource(function))
-    class VetoOnly(ast.NodeTransformer):
-        def visit_Expr(self, node):
-            call = node.value
-            if isinstance(call, ast.Call):
-                name = call.func.id if isinstance(call.func, ast.Name) else getattr(call.func, 'attr', '')
-                if name == 'require_dispatch_implementation':
-                    return None
-            return self.generic_visit(node)
-    tree = ast.fix_missing_locations(VetoOnly().visit(tree))
-    namespace = {**function.__globals__, **replacements}
-    exec(compile(tree, '<CPU fixture orchestration: ' + function.__name__ + '>', 'exec'), namespace)
-    return namespace[function.__name__]
-
-
 class Graph:
     def __init__(self, root, patch):
         self.root, self.patch = root, patch
@@ -103,6 +80,7 @@ class Graph:
         paths = (str(self.owner / 'STOP'), str(self.session / 'autonomy_20261004/STOP'))
         patch.setattr(c.stop, 'STOP_PATHS', paths)
         self._source_tree()
+        self._composition_cache()
         self._journals()
         self._runtime()
         self._documents()
@@ -111,6 +89,27 @@ class Graph:
 
     def doc(self, name, value):
         return put(self.docs / (name + '.json'), value)
+
+    def _composition_cache(self):
+        """Memoize only deterministic fixture composition by complete inputs.
+
+        Every distinct argv/config/constructor byte sequence executes the real
+        composer. Every release still runs all source/runtime/native/manifest
+        validators. No acceptance result, hash check or release is cached.
+        """
+        compose = b.compose_launch
+        cache = {}
+        def composed(argv, root):
+            assert Path(root) == self.source
+            inputs = tuple((str(p.relative_to(self.source)), w.sha(p))
+                           for folder in ('configs', 'core')
+                           for p in sorted((self.source / folder).rglob('*'))
+                           if p.is_file() and p.suffix in ('.py', '.yaml', '.yml', '.json'))
+            key = (tuple(argv), inputs)
+            if key not in cache:
+                cache[key] = compose(argv, root)
+            return copy.deepcopy(cache[key])
+        self.patch.setattr(b, 'compose_launch', composed)
 
     def _source_tree(self):
         # No production inventory is built. Only this disposable source tree is
@@ -124,7 +123,7 @@ class Graph:
         required = set(r.REQUIRED_CODE) | set(b.RUNTIME_SOURCES)
         required |= {'scripts/qd_ed_n36_' + name + '.py' for name in
                      ('worker', 'bridge', 'contract', 'native', 'build', 'lifecycle', 'arithmetic',
-                      'reference', 'source', 'bootstrap')}
+                      'reference', 'source', 'bootstrap', 'engineering', 'release', 'accounting', 'stop')}
         required |= {'scripts/' + name + '.py' for name in
                      ('qd_ed_n23_worker', 'audit_decision_evidence', 'qd_ed_n31_native',
                       'qd_ed_n34_controller', 'qd_ed_n34_source', 'qd_ed_n34_worker', 'qd_ed_n34_native')}
@@ -340,15 +339,20 @@ class Graph:
             'budget': {**self.retained, 'max_episode_attempts': c.CAPS['attempts'], 'max_gpu_hours': c.CAPS['gpu_hours'],
                 'reserved': c.CAPS['buckets'], 'gpu_hour_reservations': c.CAPS['protected_gpu_hours'], 'amendment': amendment}}
 
-    def release(self, kind, readiness=None, issued_at='2026-10-10T01:00:00Z'):
+    def release(self, kind, readiness=None, issued_at=None):
+        if issued_at is None:
+            issued_at = dt.datetime.fromtimestamp(self.clock, dt.timezone.utc).isoformat()
         value = {'schema': f'n36-engineering-{kind}-release-v1', 'approved': True,
             'plan': self.plan_ref, 'authority': self.plan['authority'], 'b5_review': self.plan['b5_review'],
             **e.review_bindings(self.plan), 'limits': e.LIMITS, 'purpose': e.PURPOSE, 'issued_at': issued_at}
         if kind == 'episode':
             value['readiness'] = readiness
-        review = self.doc('fixture-root-' + kind + '-review-shape',
+        # A later fixture release must not rewrite evidence used by restart
+        # tests. Content-addressed names keep every detached binding immutable.
+        tag = w.canonical_sha(value)
+        review = self.doc('fixture-root-' + kind + '-review-shape-' + tag,
             {**value, 'schema': f'n36-engineering-root-{kind}-review-v1', 'decision': 'APPROVED'})
-        return self.doc('fixture-' + kind + '-release-shape', {**value, 'root_review': review})
+        return self.doc('fixture-' + kind + '-release-shape-' + tag, {**value, 'root_review': review})
 
     def reset(self):
         shutil.rmtree(self.output, ignore_errors=True)
@@ -392,32 +396,22 @@ class Graph:
         self.patch.setattr(health, 'subprocess', SimpleNamespace(**{**vars(subprocess), 'Popen': Child}))
         self.patch.setattr(runner, 'subprocess', SimpleNamespace(**{**vars(subprocess), 'Popen': Child}))
         self.patch.setattr(health, 'wait_probe', self.probe_child)
-        self.guard = orchestration_copy(e.launch_guard, {})
-        # reserve imports time locally: provide an explicit private module view
-        # through function-local import interception, never globally patch time.
-        import builtins
-        builtin_dict = dict(vars(builtins))
-        real_import = builtins.__import__
-        builtin_dict['__import__'] = lambda name, *a, **kw: (
-            SimpleNamespace(time=lambda: graph.clock) if name == 'time' else real_import(name, *a, **kw))
-        self.reserve = orchestration_copy(e.reserve_health_handoff, {'launch_guard': self.guard, '__builtins__': builtin_dict})
-        self.api = SimpleNamespace(**{**vars(e), 'reserve_health_handoff': self.reserve, 'launch_guard': self.guard,
-            'admission': orchestration_copy(e.admission, {'launch_guard': self.guard})})
-        orchestration_builtins = dict(vars(builtins))
-        def imports(name, globals=None, locals=None, fromlist=(), level=0):
-            if name == 'scripts' and fromlist == ('qd_ed_n36_engineering',):
-                return SimpleNamespace(qd_ed_n36_engineering=self.api)
-            return real_import(name, globals, locals, fromlist, level)
-        orchestration_builtins['__import__'] = imports
-        self.health_run = orchestration_copy(health.run_healthcheck, {'__builtins__': orchestration_builtins})
-        self.episode_run = orchestration_copy(runner.execute_one, {'__builtins__': orchestration_builtins,
-            'wait_worker': lambda *args: runner.wait_worker(*args),
-            'process_identity': lambda pid: runner.process_identity(pid)})
+        self.patch.setattr(e, 'time', SimpleNamespace(time=lambda: graph.clock))
+        self.guard = e.launch_guard
+        self.reserve = e.reserve_health_handoff
+        self.api = e
+        self.health_run = health.run_healthcheck
+        self.episode_run = runner.execute_one
 
     def orchestration(self, patch):
-        # Pure orchestration isolation only. Production public veto remains.
+        # Restore direct public entrypoints between disposable scenarios.
         self.api.reserve_health_handoff = self.reserve
         self.api.launch_guard = self.guard
+        failed_outcome = r.failed_outcome
+        def observed_failure(exc, *args, **kwargs):
+            self.last_failure = (type(exc).__name__, str(exc))
+            return failed_outcome(exc, *args, **kwargs)
+        patch.setattr(r, 'failed_outcome', observed_failure)
 
     def probe_child(self, process, started, identity, timeout):
         assert timeout == 20
@@ -470,6 +464,85 @@ class Graph:
                 path.write_bytes(data)
             self.clock, self.monotonic = clock, monotonic
         return restore
+
+    def worker_child(self, process, started, identity, *, fault=None):
+        """Execute the real worker body with CPU-only observation providers.
+
+        The older receipt fixture supplies inert Main outputs and observation
+        templates, then is removed. Only run_worker writes the new start,
+        immutable observations, audit report and final receipt. No native
+        arithmetic, CUDA, model, provider or controller is executed.
+        """
+        from contextlib import contextmanager
+        import pytest
+        context_path = Path(process.command[process.command.index('--context') + 1])
+        context_ref = c.ref(context_path)
+        output = context_path.parent
+        parent_files = {p for p in output.rglob('*') if p.is_file()}
+        clock, monotonic = self.clock, self.monotonic
+        self.episode_child(process, started, identity)
+        receipt = r.read_json(output / 'eds_eval/n36-worker-receipt.json')
+        report = w.read_ref(receipt['audit_report'])
+        generated = {p: p.read_bytes() for p in output.rglob('*') if p.is_file() and p not in parent_files}
+        worker_names = {'n36-worker-start.json', 'n36-worker-receipt.json',
+                        'n36-runtime-before.json', 'n36-runtime-after.json', 'decision-evidence-audit.json'}
+        for path in generated:
+            path.unlink()
+        self.clock, self.monotonic = clock, monotonic
+        process.returncode = None
+        self.worker_calls = []
+        def main(path):
+            self.worker_calls.append('main')
+            assert path == str(self.source / 'main.py')
+            for dest, data in generated.items():
+                if dest.name not in worker_names:
+                    dest.parent.mkdir(parents=True, exist_ok=True)
+                    dest.write_bytes(data)
+            if fault == 'main_failure':
+                raise RuntimeError('CPU simulated Main failure')
+        @contextmanager
+        def observe(proof):
+            self.worker_calls.append('controller_observation')
+            yield receipt['controller_instances']
+        def execution(root, source, runtime, *, binding):
+            phase = binding['phase'].removeprefix('runtime_')
+            self.worker_calls.append('execution_' + phase)
+            return copy.deepcopy(receipt['execution_' + phase])
+        def runtime_observation(closure, runtime_ref, *, binding, after=False):
+            phase = 'after' if after else 'before'
+            self.worker_calls.append('runtime_' + phase)
+            return copy.deepcopy(receipt['runtime_' + phase])
+        def generic_audit(*args, **kwargs):
+            self.worker_calls.append('generic_audit')
+            return {**copy.deepcopy(report), 'n23_arithmetic_backend': kwargs['arithmetic_backend'].report()}
+        def native_audit(*args, **kwargs):
+            self.worker_calls.append('native_audit_simulated')
+            if fault == 'audit_failure':
+                raise ValueError('CPU simulated native audit failure')
+            return copy.deepcopy(args[2])
+        with pytest.MonkeyPatch.context() as patch:
+            patch.setattr(w, 'process_identity', lambda: identity)
+            patch.setattr(worker.source_execution, 'bind_dino', lambda ref: None)
+            patch.setattr(worker.source_execution, 'run_main', main)
+            patch.setattr(worker.source_execution, 'attest', execution)
+            patch.setattr(worker.closure, 'attest_runtime_receipt', runtime_observation)
+            patch.setattr(worker.native_build, 'attest', lambda ref, after=False:
+                          copy.deepcopy(receipt['native_build_after' if after else 'native_build_before']))
+            patch.setattr(worker, 'attest_worker_loaded', lambda *a: copy.deepcopy(receipt['loaded_before']))
+            patch.setattr(worker.controller, 'observe_instances', observe)
+            patch.setattr(w, 'cuda_binding', lambda runtime: {'fixture_only': True})
+            patch.setattr(worker, 'assigned_cuda_identity', lambda binding: copy.deepcopy(receipt['worker_cuda']))
+            patch.setattr(worker.generic, 'audit_episode', generic_audit)
+            patch.setattr(worker, 'audit_native', native_audit)
+            code = worker.run_worker(context_ref)
+        actual = r.read_json(output / 'eds_eval/n36-worker-receipt.json')
+        self.worker_error = actual.get('error')
+        assert actual['process'] == identity and actual['process_unchanged'] is True
+        assert actual['accepted'] is (fault is None), self.worker_error
+        self.clock += 1
+        self.monotonic += 1
+        process.returncode = code
+        return code
 
     def episode_child(self, process, started, identity):
         """Simulated child artifacts; every consuming validator stays real."""
@@ -530,7 +603,8 @@ class Graph:
         counts, auxiliary = worker.native_counts('C0', output, report, None)
         source_index = {v['path']: v['sha256'] for v in self.source_record['files']}
         names = {'scripts.qd_ed_n36_' + name for name in
-                 ('worker', 'bridge', 'contract', 'native', 'build', 'lifecycle', 'arithmetic', 'reference', 'source')}
+                 ('worker', 'bridge', 'contract', 'native', 'build', 'lifecycle', 'arithmetic', 'reference',
+                  'source', 'engineering', 'release', 'accounting', 'stop')}
         names |= {'scripts.' + name for name in ('qd_ed_n23_worker', 'audit_decision_evidence',
                  'qd_ed_n31_native', 'qd_ed_n34_controller', 'qd_ed_n34_source', 'qd_ed_n34_worker', 'qd_ed_n34_native')}
         names |= {name.removesuffix('.py').replace('/', '.') for name in b.RUNTIME_SOURCES if name != 'main.py'}
