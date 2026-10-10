@@ -8,6 +8,7 @@ from scripts import qd_ed_n23_worker as w
 
 ROOT = Path(__file__).resolve().parents[1]
 COHORT = 'N36_NONPROGRESS_TANGENT_DEV_001147'
+RECOVERY_COHORT = 'N36R1_NONPROGRESS_TANGENT_DEV_001203'
 ARMS = ('C0', 'Q0', 'N34', 'N36')
 DEADLINE = '2026-10-11T11:13:13Z'
 GPU_UUID = 'GPU-48473162-9548-1a19-04aa-ea86c5349187'
@@ -45,17 +46,40 @@ def stop_path(root=ROOT):
     return str(session / 'autonomy_20261004/STOP')
 
 
-def expected_rows(root=ROOT):
+def expected_rows(root=ROOT, *, cohort=COHORT):
+    w.require(cohort in (COHORT, RECOVERY_COHORT), 'unsupported N36 cohort')
+    prefix, suffix = ('n36', '001147') if cohort == COHORT else ('n36r1', '001203')
     tasks = json.loads((Path(root) / 'configs/qd_ed_final/n31_dev_task_identities.json').read_text())['tasks']
     w.require([x['task_id'] for x in tasks] == list(range(10)) and all(x['split'] == 'dev' for x in tasks), 'ten exposed Dev tasks')
-    return [{**task, 'iteration':COHORT, 'profile':arm, 'timeout_seconds':1800,
-             'episode_key':f'n36_dev_t{task["task_id"]:02d}_{arm.lower()}_001147',
+    return [{**task, 'iteration':cohort, 'profile':arm, 'timeout_seconds':1800,
+             'episode_key':f'{prefix}_dev_t{task["task_id"]:02d}_{arm.lower()}_{suffix}',
              'budget_bucket':'baseline' if arm=='C0' else 'development', 'replacement':None}
             for task in tasks for arm in ARMS]
 
 
-def require_row(row, root=ROOT):
-    w.require(row in expected_rows(root), 'exact N36 identity/bucket/replacement')
+def cohort(plan):
+    value = plan.get('cohort', COHORT)
+    w.require(value in (COHORT, RECOVERY_COHORT), 'unsupported N36 cohort')
+    return value
+
+
+def plan_rows(plan):
+    value = cohort(plan)
+    root = plan.get('worktree', ROOT)
+    return expected_rows(root) if value == COHORT else expected_rows(root, cohort=value)
+
+
+def operational_binding(plan):
+    if cohort(plan) == COHORT:
+        w.require('accounting' not in plan, 'original plan cannot claim recovery accounting')
+        return {}
+    return {'cohort': RECOVERY_COHORT, **{k: plan[k] for k in
+            ('protocol', 'protocol_review', 'accounting')}}
+
+
+def require_row(row, root=ROOT, *, cohort=COHORT):
+    rows = expected_rows(root) if cohort == COHORT else expected_rows(root, cohort=cohort)
+    w.require(row in rows, 'exact N36 identity/bucket/replacement')
 
 
 def event_binding(row, event):
@@ -68,13 +92,18 @@ def event_binding(row, event):
 
 def cohort_events(rows, events):
     """Select by either key or cohort, then reject spoofed identities/buckets."""
+    cohorts = {row['iteration'] for row in rows}
+    w.require(len(cohorts) == 1 and cohorts <= {COHORT, RECOVERY_COHORT}, 'single supported event cohort')
+    selected = next(iter(cohorts))
+    prefix = 'n36r1_dev_' if selected == RECOVERY_COHORT else 'n36_dev_'
     index = {row['episode_key']: row for row in rows}
     local = []
     for event in events:
         identity = event.get('identity', {})
         w.require(isinstance(identity, dict), 'malformed journal identity')
-        if (identity.get('iteration') == COHORT or event.get('attempt_id') in index
-                or event.get('episode_key') in index):
+        if (identity.get('iteration') == selected or event.get('attempt_id') in index
+                or event.get('episode_key') in index
+                or any(str(event.get(k, '')).startswith(prefix) for k in ('attempt_id', 'episode_key'))):
             row = index.get(event.get('attempt_id'))
             w.require(row is not None and event.get('episode_key') == row['episode_key']
                       and identity == {k: row[k] for k in
@@ -87,12 +116,17 @@ def cohort_events(rows, events):
 
 def validate_draft(plan):
     w.require(plan['schema'] == 'n36-release-draft-v1' and plan['frozen'] is False
-              and plan['release_enabled'] is False and plan['episodes'] == expected_rows(plan['worktree'])
+              and plan['release_enabled'] is False and plan['episodes'] == plan_rows(plan)
               and plan['limits'] == LIMITS and plan['worker_contract'] == WORKER_CONTRACT
               and plan['deadline'] == DEADLINE and plan['stop_path'] == stop_path(plan['worktree'])
               and plan['phase_authorization'] == {'dev': False, 'validation': False, 'formal': False}
-              and all(plan[k] is None for k in ('root_review', 'protocol', 'authority', 'execution_release')),
+              and all(plan[k] is None for k in ('root_review', 'authority', 'execution_release'))
+              and (cohort(plan) == RECOVERY_COHORT or plan['protocol'] is None),
               'draft cannot claim authority/release')
+    operational_binding(plan)
+    if cohort(plan) == RECOVERY_COHORT:
+        from scripts.qd_ed_n36_recovery import validate_protocol
+        validate_protocol(plan)
     w.require(set(plan['expected_manifests']) == {r['episode_key'] for r in plan['episodes']}, 'manifest coverage')
 
 
@@ -107,7 +141,7 @@ def finite(value, label):
     return value
 
 
-def pre_dispatch(row, allowance, *, now, stop_path):
+def pre_dispatch(row, allowance, *, now, stop_path, cohort=COHORT):
     """Pure guard over an authoritative snapshot; never changes charges/reserves.
 
     All *_remaining values must already include prior reservations, health costs
@@ -124,7 +158,7 @@ def pre_dispatch(row, allowance, *, now, stop_path):
               and allowance['physical_gpu'] == 7 and allowance['gpu_uuid'] == GPU_UUID
               and allowance['live_handles'] == [] and allowance['unsettled_reservations'] == 0,
               'private GPU/settled snapshot required')
-    require_row(row)
+    require_row(row, cohort=cohort)
     for name in ('global_seconds_remaining', 'private_seconds_remaining', 'cohort_seconds_remaining'):
         w.require(finite(allowance[name], name) >= need, name + ' insufficient')
     protected = finite(allowance['protected_seconds_remaining'], 'protected seconds')

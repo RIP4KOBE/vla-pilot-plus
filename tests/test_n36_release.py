@@ -68,6 +68,7 @@ def boundary(tmp_path,monkeypatch):
 def freeze(f):
     ref=write(f.root/'plan.json',f.plan)
     expected={'schema':'n36-execution-release-v1','approved':True,'plan':ref,
+        **({k:f.plan[k] for k in ('cohort','accounting')} if f.plan.get('cohort')==c.RECOVERY_COHORT else {}),
         **{k:f.plan[k] for k in ('native_build','authority','protocol','protocol_review','source','scientific_source','runtime_closure','controller_semantics','runtime','limits','phase_authorization')}}
     review=write(f.root/'review.json',{**expected,'schema':'n36-root-production-review-v1','decision':'APPROVED'})
     return ref,write(f.root/'release.json',{**expected,'root_review':review})

@@ -107,7 +107,7 @@ def execute_one(plan_ref, release_ref):
             w.atomic_json(context_path, worker.context_for(plan_ref, row, release_ref))
             context_ref = c.ref(context_path)
             command = worker_command(manifest['argv'][0], root, context_path, context_ref['sha256'])
-            base = {'attempt_id': row['episode_key'], 'episode_key': row['episode_key'], 'identity': supervisor.c_identity(row),
+            base = {**c.operational_binding(plan), 'attempt_id': row['episode_key'], 'episode_key': row['episode_key'], 'identity': supervisor.c_identity(row),
                     'budget_bucket': row['budget_bucket'], 'replacement': row['replacement'], 'plan_sha256': plan_ref['sha256'], 'release': release_ref,
                     'source_commit': plan['source']['commit'], 'runtime_manifest_sha256': plan['runtime']['sha256'],
                     'runtime_inventory_sha256': plan['runtime_inventory_sha256'], 'init_row_sha256': row['init_row_sha256'],

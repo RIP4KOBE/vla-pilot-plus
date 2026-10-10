@@ -5,8 +5,12 @@ from scripts import qd_ed_n23_worker as w, qd_ed_n36_contract as c
 def reconcile(plan, events, verify_terminal, *, live_handles=()):
     """Reverify the unique contiguous prefix; never select/retry a duplicate cell."""
     rows = plan['episodes']
-    w.require(rows == c.expected_rows(plan['worktree']), 'exact task-major matrix')
+    w.require(rows == c.plan_rows(plan), 'exact task-major matrix')
     local = c.cohort_events(rows, events)
+    if c.cohort(plan) == c.RECOVERY_COHORT:
+        binding = c.operational_binding(plan)
+        w.require(all(all(e.get(k) == v for k, v in binding.items()) for e in local),
+                  'N36R1 event protocol/accounting binding')
     groups = []
     for event in local:
         w.require(all(event.get(k) is None for k in ('retry_of', 'recovery_of')), 'zero automatic recovery')
@@ -74,5 +78,5 @@ def next_dispatch(plan, events, verify_terminal, allowance, *, now, live_handles
     c.validate_draft(plan)
     result = reconcile(plan, events, verify_terminal, live_handles=live_handles)
     if result['next_row'] is not None:
-        c.pre_dispatch(result['next_row'], allowance, now=now, stop_path=plan['stop_path'])
+        c.pre_dispatch(result['next_row'], allowance, now=now, stop_path=plan['stop_path'], cohort=c.cohort(plan))
     return result

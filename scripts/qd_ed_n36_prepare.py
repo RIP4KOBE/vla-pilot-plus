@@ -9,7 +9,7 @@ if str(ROOT) not in sys.path:
 from scripts import qd_ed_n36_bridge as b, qd_ed_n36_contract as c, qd_ed_n23_worker as w
 
 
-def prepare(directory, runtime_ref, *, runtime_closure_ref, controller_semantics_ref, native_build_ref, root=ROOT):
+def prepare(directory, runtime_ref, *, runtime_closure_ref, controller_semantics_ref, native_build_ref, root=ROOT, recovery_protocol_ref=None):
     root, directory = Path(root).resolve(), Path(directory).resolve()
     w.require(not directory.exists(), 'immutable draft directory already exists')
     from scripts.qd_ed_n36_build import manifest as validate_native_build
@@ -31,6 +31,14 @@ def prepare(directory, runtime_ref, *, runtime_closure_ref, controller_semantics
             'root_review': None, 'protocol': None, 'authority': None, 'execution_release': None,
             'phase_authorization': {'dev': False, 'validation': False, 'formal': False},
             'expected_manifests': {}, 'http_counters': 'Unknown'}
+    if recovery_protocol_ref is not None:
+        amendment = w.read_ref(recovery_protocol_ref)
+        plan.update(cohort=c.RECOVERY_COHORT, protocol=recovery_protocol_ref,
+                    protocol_review=amendment['inherited_protocol_review'],
+                    accounting=amendment['accounting'])
+        plan['episodes'] = c.plan_rows(plan)
+        from scripts.qd_ed_n36_recovery import validate_protocol
+        validate_protocol(plan)
     for row in plan['episodes']:
         path = directory / 'expected' / (row['episode_key'] + '.json')
         w.atomic_json(path, b.manifest(plan, runtime, row))
@@ -49,9 +57,15 @@ def main():
     parser.add_argument('--controller-semantics', required=True, type=Path)
     parser.add_argument('--native-build',required=True,type=Path)
     parser.add_argument('--native-build-sha256',required=True)
+    parser.add_argument('--recovery-protocol', type=Path)
+    parser.add_argument('--recovery-protocol-sha256')
     args = parser.parse_args()
+    w.require(bool(args.recovery_protocol) == bool(args.recovery_protocol_sha256),
+              'paired recovery protocol path/hash required')
+    recovery = None if args.recovery_protocol is None else {
+        'path': str(args.recovery_protocol.resolve()), 'sha256': args.recovery_protocol_sha256}
     plan = prepare(args.output, {'path': str(args.runtime.resolve()), 'sha256': args.runtime_sha256},
-                   runtime_closure_ref=c.ref(args.runtime_closure), controller_semantics_ref=c.ref(args.controller_semantics),native_build_ref={'path':str(args.native_build.resolve()),'sha256':args.native_build_sha256})
+                   runtime_closure_ref=c.ref(args.runtime_closure), controller_semantics_ref=c.ref(args.controller_semantics),native_build_ref={'path':str(args.native_build.resolve()),'sha256':args.native_build_sha256}, recovery_protocol_ref=recovery)
     print(json.dumps({'draft': str(args.output / 'plan.draft.json'), 'source_commit': plan['source']['commit'], 'release_enabled': False}))
 
 

@@ -13,12 +13,13 @@ COORDINATOR_END = '2026-10-11T11:13:13Z'
 
 def validate_plan(plan):
     w.require(plan['schema'] == 'n36-released-plan-v1' and plan['frozen'] is True
-              and plan['release_enabled'] is True and plan['episodes'] == c.expected_rows(plan['worktree'])
+              and plan['release_enabled'] is True and plan['episodes'] == c.plan_rows(plan)
               and plan['limits'] == c.LIMITS and plan['worker_contract'] == c.WORKER_CONTRACT
               and plan['deadline'] == c.DEADLINE and plan['stop_path'] == c.stop_path(plan['worktree'])
               and plan['phase_authorization'] == {'dev': True, 'validation': False, 'formal': False}
               and not any(k in plan for k in ('root_review', 'execution_release'))
               and plan['attempt_identity'] == 'episode_key', 'released plan contract')
+    c.operational_binding(plan)
     w.require(set(plan['expected_manifests']) == {x['episode_key'] for x in plan['episodes']}, 'all40 manifests')
 
 
@@ -48,27 +49,34 @@ def _verify_release_contents(plan_ref, release_ref):
                 'source': plan['source'], 'scientific_source': plan['scientific_source'],
                 'runtime_closure': plan['runtime_closure'], 'controller_semantics': plan['controller_semantics'],
                 'runtime': plan['runtime'], 'limits': c.LIMITS,
-                'phase_authorization': plan['phase_authorization']}
+                'phase_authorization': plan['phase_authorization'], **c.operational_binding(plan)}
     w.require(set(release) == set(expected) | {'root_review'} and all(release[k] == v for k, v in expected.items()), 'external release differs')
     review = w.read_ref(release['root_review'])
     w.require(review == {**expected, 'schema': 'n36-root-production-review-v1', 'decision': 'APPROVED'}, 'root review differs')
-    w.require(plan['protocol']['sha256']==c.PROTOCOL_SHA, 'frozen protocol v2 only')
-    protocol=w.read_ref(plan['protocol'])
-    w.require(protocol['episodes']==plan['episodes'] and protocol['accounting']['sha256']==c.ACCOUNTING_SHA,'reviewed protocol identities/accounting')
-    w.require(plan['protocol_review']['sha256']==c.PROTOCOL_REVIEW_SHA,'exact root protocol review')
-    protocol_review=w.read_ref(plan['protocol_review'])
-    w.require(protocol_review['protocol']==plan['protocol'] and protocol_review['source']==protocol['base_source']
-        and protocol_review['status']=='PASS_PROTOCOL_DESIGN_FOR_ISOLATED_CPU_IMPLEMENTATION_ONLY','root protocol review binding')
-    w.read_ref(protocol['accounting'])
+    if c.cohort(plan) == c.RECOVERY_COHORT:
+        from scripts.qd_ed_n36_recovery import validate_protocol
+        protocol = validate_protocol(plan)
+    else:
+        w.require(plan['protocol']['sha256']==c.PROTOCOL_SHA, 'frozen protocol v2 only')
+        protocol=w.read_ref(plan['protocol'])
+        w.require(protocol['episodes']==plan['episodes'] and protocol['accounting']['sha256']==c.ACCOUNTING_SHA,'reviewed protocol identities/accounting')
+        w.require(plan['protocol_review']['sha256']==c.PROTOCOL_REVIEW_SHA,'exact root protocol review')
+        protocol_review=w.read_ref(plan['protocol_review'])
+        w.require(protocol_review['protocol']==plan['protocol'] and protocol_review['source']==protocol['base_source']
+            and protocol_review['status']=='PASS_PROTOCOL_DESIGN_FOR_ISOLATED_CPU_IMPLEMENTATION_ONLY','root protocol review binding')
+        w.read_ref(protocol['accounting'])
     authority = w.read_ref(plan['authority'])
     caps = authority['caps']
     w.require(authority['schema'] == 'n36-budget-authority-v1' and authority['approved'] is True
-              and authority['cohort'] == c.COHORT and authority['limits'] == c.LIMITS
+              and authority['cohort'] == c.cohort(plan) and authority['limits'] == c.LIMITS
               and authority['validation_authorized'] is False and authority['formal_authorized'] is False
               and authority['coordinator_ends_at'] == COORDINATOR_END
               and caps['protected_gpu_hours'] == {'validation': 32., 'formal': 12.}, 'finite root budget authority')
     w.require(authority.get('automatic_recoveries')==0 and authority.get('protocol')==plan['protocol']
         and authority.get('accounting')==protocol['accounting'], 'no recovery authority; exact protocol')
+    if c.cohort(plan) == c.RECOVERY_COHORT:
+        from scripts.qd_ed_n36_recovery import validate_authority
+        validate_authority(plan, authority)
     validate_caps(caps)
     window_end = dt.datetime.fromisoformat(authority['weekly_window']['ends_at'].replace('Z', '+00:00'))
     w.require(window_end.tzinfo is not None and window_end <= dt.datetime.fromisoformat(c.DEADLINE.replace('Z', '+00:00')), 'weekly authorization deadline')
@@ -144,14 +152,21 @@ def prefix(path, expected):
 
 def admission(plan, authority, state, events, resources, reservations, row, *, now, gpu_idle):
     """Caller holds normal runner/state locks; all balances come from journals."""
-    c.require_row(row)
+    selected = c.cohort(plan)
+    c.require_row(row, plan.get('worktree', c.ROOT), cohort=selected)
+    if selected == c.RECOVERY_COHORT:
+        from scripts.qd_ed_n36_recovery import validate_authority, preserve_charge
+        validate_authority(plan, authority)
+        preserve_charge(events)
     w.require(authority.get('automatic_recoveries')==0, 'zero automatic recoveries')
     w.require(authority['weekly_window']['origin_gpu_hours']==53.08404692669838
         and authority['weekly_window']['increment_gpu_hours']==168., 'exact dual cumulative caps')
     from scripts import qd_ed_n36_supervise as supervisor
-    rows = c.expected_rows()
+    rows = c.plan_rows(plan)
+    w.require(plan.get('episodes', rows) == rows, 'admission exact cohort rows')
     # Accounting continuity only; runner separately reverifies native terminals.
-    reconciled = supervisor.reconcile({'episodes': rows, 'worktree': str(c.ROOT)}, events, lambda *args: None)
+    reconciled = supervisor.reconcile({**c.operational_binding(plan), 'episodes': rows,
+        'worktree': str(plan.get('worktree', c.ROOT))}, events, lambda *args: None)
     w.require(reconciled['next_row'] == row, 'accounting requires next fresh contiguous row')
     caps, budget = authority['caps'], state['budget']
     validate_caps(caps)
@@ -177,9 +192,12 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
               bucket_caps=caps['buckets'], amendment=budget['amendment']) == 1800, 'weekly full1840s admission')
     protected = sum(max(0., h - snap['gpu_hours_by_bucket'][k]) for k, h in caps['protected_gpu_hours'].items())
     local = c.cohort_events(rows, events)
-    local_ids = {e['resource_id'] for e in resources if e.get('cohort') == c.COHORT
-                 or e.get('kind') == 'n36_resource_preparation_v1'}
+    local_ids = {e['resource_id'] for e in resources if e.get('cohort') == selected
+                 or (selected == c.COHORT and e.get('kind') == 'n36_resource_preparation_v1')}
     local_resources = [e for e in resources if e['resource_id'] in local_ids]
+    if selected == c.RECOVERY_COHORT:
+        from scripts.qd_ed_n36_recovery import resource_events
+        local_resources = resource_events(plan, resources)
     w.require(not any(e['event']=='aborted' for e in local_resources),
               'N36 healthcheck invalidity stop; no automatic replay')
     cohort = r.budget_snapshot(local, local_resources)
@@ -187,7 +205,8 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
               'N36 bucket ceilings')
     w.require(cohort['by_bucket'][row['budget_bucket']] < c.LIMITS[row['budget_bucket']], 'N36 bucket exhausted')
     from scripts import qd_ed_n36_accounting as accounting
-    margin=accounting.retained_margin(c.ROOT,authority['accounting'])
+    margin=accounting.retained_margin(c.ROOT,authority['accounting']) if selected == c.COHORT else accounting.retained_margin(
+        c.ROOT, w.read_ref(authority['accounting'])['inherited_accounting'])
     reservation=accounting.headroom(snap,cohort,retained_margin_hours=margin,protected_hours=protected)
     allowance = {'authority_starts_at': authority['starts_at'],
                  'authority_ends_at': min(authority['coordinator_ends_at'], window['ends_at']),
@@ -202,5 +221,5 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
                  'protected_attempts_remaining': sum(max(0, caps['buckets'][k] - snap['by_bucket'][k]) for k in ('validation', 'formal')),
                  'cohort_attempts_remaining': 40 - cohort['reserved_attempts']}
     w.require(cohort['gpu_healthcheck_hours']*3600 <= c.LIMITS['healthcheck_seconds'], 'bounded cumulative healthcheck allowance')
-    c.pre_dispatch(row, allowance, now=now, stop_path=plan['stop_path'])
+    c.pre_dispatch(row, allowance, now=now, stop_path=plan['stop_path'], cohort=selected)
     return {**snap, "n36_reservation":reservation}

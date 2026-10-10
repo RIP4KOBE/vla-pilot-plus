@@ -83,11 +83,16 @@ def reserve_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds):
             # future episode attempt is consumed by this independent resource.
             snap=release.admission(plan,authority,state,events,resources,reservations,
                 reconciled['next_row'],now=dt.datetime.now(dt.timezone.utc),gpu_idle=True)
-            selected={e['resource_id'] for e in resources if e.get('cohort')==c.COHORT
-                      or e.get('kind')=='n36_resource_preparation_v1'}
+            selected={e['resource_id'] for e in resources if e.get('cohort')==c.cohort(plan)
+                      or (c.cohort(plan)==c.COHORT and e.get('kind')=='n36_resource_preparation_v1')}
+            if c.cohort(plan)==c.RECOVERY_COHORT:
+                from scripts.qd_ed_n36_recovery import resource_events
+                selected = {e['resource_id'] for e in resource_events(plan, resources)}
             w.require(len(selected)<41,'healthcheck invocation ceiling')
             permitted={'n36_healthcheck_'+reconciled['next_row']['episode_key']}
-            if not reconciled['outcomes']:permitted.add('n36_healthcheck_preparation')
+            if not reconciled['outcomes']:
+                permitted.add('n36_healthcheck_preparation' if c.cohort(plan)==c.COHORT
+                              else 'n36_healthcheck_n36r1_preparation_001203')
             w.require(resource_id in permitted,'one preparation plus one check per primary cell')
             cohort=r.budget_snapshot(c.cohort_events(plan['episodes'],events),
                                     [e for e in resources if e['resource_id'] in selected])
@@ -100,8 +105,8 @@ def reserve_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds):
                     (c.DEADLINE,authority['coordinator_ends_at'],authority['weekly_window']['ends_at']))
             stop=Path(plan['stop_path'])
             w.require(not stop.exists() and not stop.is_symlink() and (end-now).total_seconds()>=1840+need,'STOP/deadline before healthcheck reservation')
-            record={'resource_id':resource_id,'event':'reserved','cohort':c.COHORT,
-                'kind':'n36_resource_preparation_v1','plan':plan_ref,'release':release_ref,
+            record={**c.operational_binding(plan), 'resource_id':resource_id,'event':'reserved','cohort':c.cohort(plan),
+                'kind':('n36_resource_preparation_v1' if c.cohort(plan)==c.COHORT else 'n36r1_resource_preparation_v1'),'plan':plan_ref,'release':release_ref,
                 'source_commit':plan['source']['commit'],'runtime':plan['runtime'],
                 'physical_gpu':7,'gpu_uuid':c.GPU_UUID,'timeout_seconds':timeout_seconds,
                 'cleanup_seconds':40,'reserved_gpu_seconds':need,'accounting_admission':reservation,

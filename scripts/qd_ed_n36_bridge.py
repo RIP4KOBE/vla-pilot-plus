@@ -47,7 +47,7 @@ def profiles(root=ROOT):
 
 
 def command(plan,runtime,row):
-    w.require(row in plan['episodes'] and row in c.expected_rows(plan['worktree']),'exact fresh N36 matrix row')
+    w.require(row in plan['episodes'] and row in c.plan_rows(plan),'exact fresh N36 matrix row')
     argv,output=runner.build_command(plan,profiles(plan['worktree']),runtime,row,row['episode_key'])
     if row['profile'] in ('N34','N36'):
         binding={'task_id':row['task_id'],'source_commit':plan['source']['commit'],'run_id':row['episode_key']}
@@ -77,7 +77,7 @@ def manifest(plan,runtime,row):
         expected={'binding':binding,'config_sha256':hashlib.sha256(json.dumps(resolved,sort_keys=True,allow_nan=False).encode()).hexdigest(),
             'source_hashes':{name:index[name] for name in names}}
     else:w.require(resolved['n34_runtime_binding'] is None and resolved['n36_runtime_binding'] is None,'control binding')
-    return {'schema':'n36-external-runtime-v1','row':row,'source':plan['source'],'scientific_source':plan['scientific_source'],
+    return {**c.operational_binding(plan), 'schema':'n36-external-runtime-v1','row':row,'source':plan['source'],'scientific_source':plan['scientific_source'],
         'native_build':plan['native_build'],'runtime':plan['runtime'],'runtime_closure':plan['runtime_closure'],'controller_semantics':plan['controller_semantics'],
         'argv':argv,'output_dir':str(output),'composed_config_sha256':w.canonical_sha(config),
         'resolved_config':resolved,'expected_runtime':expected}
