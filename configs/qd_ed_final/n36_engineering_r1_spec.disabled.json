@@ -196,34 +196,44 @@
   "deployment_source_cwd": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
   "source_adoption_required": true,
   "runtime_binding": {
-    "schema": "n36-r1-authority-bound-runtime-derivation-v1",
+    "schema": "n36-r1-evidence-runtime-derivation-v2",
     "repair_authority": {
-      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001635/canonical-runtime-repair/authority-v1.json",
-      "sha256": "579d1b44f8a501e9aad152d0b2f53eb014a0682494873002c31ba306b9438593"
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001651/readiness-implementation/authority-v1.json",
+      "sha256": "1da564c70827ed7acfc47e121f67e015b17f86e018c67a3c0c6ac35d5cb45692"
     },
     "amendment": {
-      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../autonomy_20261004/turns/001630/prospective-runtime-binding-amendment-v1.json",
-      "sha256": "b1243b2db16f59b4d3f834acd5bedc270e8e1398413831aafe71f29d9230f6e8"
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001650/prospective-readiness-amendment-v1.json",
+      "sha256": "98d150c38fb8dd23fedcc1c8b711d2615ce978638d7e6222e8a36c2c79d4d0a8"
     },
     "preparation": {
-      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../autonomy_20261004/turns/001631/runtime-binding-preparation-v1.json",
-      "sha256": "fb59d74f5e1f48e923b2408ab02b39f598a259f856c56ab9d90765993bc5c113"
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001651/readiness-implementation/preparation-policy-v1.json",
+      "sha256": "dbecc6d52b42f161706a391867932617a1316c844788a92f0bcd9fd7777c0f45"
     },
     "historical_specification": {
       "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001617/recovery-implementation/engineering-r1-spec.disabled-v1.json",
       "sha256": "ccd1991b59cdc30043d6b7061cf4ad73f0ae6c867dd6ae0a9f3e72b1d71d6162"
     },
-    "runtime_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001635/canonical-runtime-repair/runtime.source-bound.disabled-v1.json",
-    "source_record_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001635/canonical-runtime-repair/source-inventory.disabled-v1.json",
-    "source_base": "f256fecedbcf0d47b807aeaa196407cb24933a41",
+    "runtime_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001651/readiness-implementation/prospective-measurement/runtime.measured-preparation-v1.json",
+    "source_record_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001651/readiness-implementation/prospective-measurement/final-source-v1.json",
+    "source_base": "bd5dd4dabcb5a1f7823a9e2f51c849cd67767cb6",
     "source_change_allowlist": [
       "configs/qd_ed_final/n36_engineering_r1_spec.disabled.json",
       "scripts/qd_ed_n36_engineering_r1.py",
-      "tests/test_n36_engineering_r1.py"
+      "tests/test_n36_engineering_r1.py",
+      "scripts/qd_ed_n36_readiness_prepare.py",
+      "tests/test_n36_readiness_prepare.py"
     ],
     "mutable_runtime_fields": [
       "preparation.source",
-      "preparation.source_record"
+      "preparation.source_record",
+      "cuda_egl_verified",
+      "gpu_mapping.cuda_egl_verified",
+      "cuda_egl_probe",
+      "provider_ready",
+      "provider_evidence",
+      "preparation.runtime_ready",
+      "preparation.status",
+      "preparation.readiness_proof"
     ],
     "technical_justification": "A static final runtime digest in source would bind a runtime whose source inventory includes that same source digest and commit, creating a cycle. Pin the exact 001631 template and repair authority instead; permit only a complete verified current committed source inventory at fixed prospective paths. Runtime file records are unchanged because these three repair paths are absent from the template files. All non-source preparation fields, dependencies, model/native bytes and false readiness remain exact. This is disabled preparation only; review, B5, adoption and separately released fresh health/episode gates remain required."
   }

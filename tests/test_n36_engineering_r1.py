@@ -14,6 +14,32 @@ from scripts.qd_ed_n36_dino import DinoSources
 from test_n36_engineering import documents as parent_documents, put
 
 
+PINNED_SPECIFICATION = dict(e.SPECIFICATION)
+
+
+@pytest.fixture(scope='module', autouse=True)
+def prospective_paths(tmp_path_factory):
+    """Synthetic paths only; real committed-source checks remain active."""
+    from scripts import qd_ed_n36_readiness_prepare as preparation
+    root = tmp_path_factory.mktemp('SYNTHETIC-readiness-paths')
+    spec = e.read(PINNED_SPECIFICATION)
+    policy = spec['runtime_binding']
+    prep = e.read(policy['preparation'])
+    prep['disabled_runtime_path'] = str(root / 'runtime.json')
+    policy['runtime_path'] = str(root / 'ready.json')
+    policy['source_record_path'] = str(root / 'source.json')
+    policy['preparation'] = put(root, 'preparation', prep)
+    source = b.closure.source_record(b.ROOT, b.source_paths(b.ROOT))
+    source_ref = put(root, 'source', source)
+    runtime = e.read(spec['canonical_runtime'])
+    runtime['preparation'].update(source=source['commit'], source_record=source_ref)
+    put(root, 'runtime', runtime)
+    patch = pytest.MonkeyPatch()
+    patch.setattr(e, 'SPECIFICATION', put(root, 'spec', spec))
+    yield
+    patch.undo()
+
+
 @pytest.fixture(scope='module')
 def baseline():
     return e.terminal_parent_prefix()
@@ -27,7 +53,8 @@ def documents(tmp_path_factory):
     route = e.read(plan['deployment'])
     route.update(source_cwd=str(e.SOURCE), output_root=str(e.SESSION / 'engineering-executions' / e.EPISODE_KEY))
     policy = e.specification()['runtime_binding']
-    runtime_ref = {'path': policy['runtime_path'], 'sha256': e.w.sha(policy['runtime_path'])}
+    runtime_path = e.read(policy['preparation'])['disabled_runtime_path']
+    runtime_ref = {'path': runtime_path, 'sha256': e.w.sha(runtime_path)}
     source = e.read({'path': policy['source_record_path'], 'sha256': e.w.sha(policy['source_record_path'])})
     common = dict(worktree=str(e.SOURCE), runtime=runtime_ref, source=source, scientific_source=source,
                   deployment=put(root, 'route', route), scope=put(root, 'scope', e.disabled_scope()))
@@ -321,6 +348,10 @@ def test_prospective_runtime_mutations_rejected(documents, tmp_path, monkeypatch
     # Test-only fixed paths: production authority/template validators stay active.
     policy['runtime_path'] = str(tmp_path / 'runtime.json')
     policy['source_record_path'] = str(tmp_path / 'source.json')
+    preparation = e.read(policy['preparation'])
+    preparation['disabled_runtime_path'] = str(tmp_path / 'runtime.json')
+    policy['runtime_path'] = str(tmp_path / 'ready.json')
+    policy['preparation'] = put(tmp_path, 'preparation', preparation)
     source = copy.deepcopy(plan['source'])
     if mutation == 'source_commit': source['commit'] = '0' * 40
     if mutation == 'source_file_hash': source['files'][0]['sha256'] = '0' * 64
@@ -347,7 +378,7 @@ def test_prospective_runtime_mutations_rejected(documents, tmp_path, monkeypatch
 
 
 def test_prospective_spec_preserves_all_other_contract_fields():
-    new = e.specification()
+    new = e.read(PINNED_SPECIFICATION)
     old = e.read(new['runtime_binding']['historical_specification'])
     assert {k: v for k, v in new.items() if k not in ('runtime_binding', 'canonical_runtime')} == {
         k: v for k, v in old.items() if k != 'canonical_runtime'}

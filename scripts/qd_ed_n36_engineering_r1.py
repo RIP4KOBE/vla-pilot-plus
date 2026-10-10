@@ -34,7 +34,7 @@ OWNER_ROUTE_MAPPING = {
     'path': str(OWNER.parent / 'autonomy_20261004/turns/001352/owner-alias-repair/alias-evidence-v1.json'),
     'sha256': '70097b35181e55589df8bb053857b11840f08542fb8ed8bec57635ba493b22a2'}
 HISTORICAL_OWNER = '/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z'
-SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001635/canonical-runtime-repair/engineering-r1-spec.prospective-disabled-v1.json', 'sha256': 'f240a88296a6dd3808dbcc78028784edbdc66bf7506f0af4270d6c8e22dd01e4'}
+SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001651/readiness-implementation/engineering-r1-spec.prospective-disabled-v2.json', 'sha256': 'ffe7e00adc09850c70303a003c1333647ee4e140c24dea6483e32f399bab2177'}
 AMENDMENT = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001616/prospective-recovery-amendment-v1.json', 'sha256': 'fe3c11c3a4be56f74149dc7e21a59eef59611478841d0fa8993bc79f8760e5ba'}
 IDENTITY = 'N36_ENGINEERING_R1_C0_TASK0_001616'
 EPISODE_KEY = 'n36_engineering_r1_t00_c0_001616'
@@ -90,26 +90,18 @@ def specification():
 
 
 def validate_runtime_binding(plan):
-    """Exact disabled template plus two source fields; no self-hash cycle.
+    """Exact baseline projection or externally accepted measured preparation.
 
-    The fixed prospective paths and template are pinned by SPECIFICATION.
-    Source must equal the complete, committed checkout executing this validator.
-    This check grants neither source adoption nor runtime/dispatch readiness.
+    Neither branch grants health/episode authority. Readiness proof references
+    the immutable baseline/final source, never its own derived runtime hash.
     """
+    from scripts import qd_ed_n36_readiness_prepare as preparation_api
     spec = specification()
     policy = spec['runtime_binding']
-    authority = read(policy['repair_authority'])
-    exact(authority['runtime_amendment'], policy['amendment'], 'R1 runtime amendment authority')
-    exact(authority['runtime_preparation'], policy['preparation'], 'R1 runtime preparation authority')
-    amendment = read(policy['amendment'])
-    preparation = read(policy['preparation'])
-    exact(spec['canonical_runtime'], {k: preparation['runtime'][k] for k in ('path', 'sha256')},
-          'R1 canonical runtime template')
-    exact(policy['source_base'], authority['source_base'], 'R1 runtime source base')
-    exact(amendment['source'], policy['source_base'], 'R1 amended source base')
+    preparation = preparation_api.policy(spec)
     reference(plan['runtime'])
-    w.require(plan['runtime']['path'] == policy['runtime_path']
-              and str(Path(policy['runtime_path']).resolve()) == policy['runtime_path'],
+    w.require(plan['runtime']['path'] in (policy['runtime_path'], preparation['disabled_runtime_path'])
+              and str(Path(plan['runtime']['path']).resolve()) == plan['runtime']['path'],
               'R1 canonical runtime reference path')
     runtime = read(plan['runtime'])
     template = read(spec['canonical_runtime'])
@@ -128,12 +120,16 @@ def validate_runtime_binding(plan):
               'R1 runtime source ancestry')
     changed = subprocess.check_output(['git', '--no-replace-objects', '-C', str(root),
         'diff', '--name-only', policy['source_base'], source['commit'], '--'], text=True).splitlines()
-    w.require(set(changed) <= set(policy['source_change_allowlist']) <= OPERATIONAL_FILES,
+    w.require(set(changed) <= set(policy['source_change_allowlist']) <= (OPERATIONAL_FILES | preparation_api.NEW_FILES),
               'R1 runtime repair source allowlist')
-    # Exact whole-document equality rejects all other changes, including inherited
-    # readiness, file records, provider, model, task, native and preparation fields.
     template['preparation']['source'] = source['commit']
     template['preparation']['source_record'] = source_ref
+    if plan['runtime']['path'] == policy['runtime_path']:
+        w.require(plan['worktree'] == str(SOURCE) == str(root), 'R1 measured deployed checkout')
+        b.attest_loaded(root, source)
+        proof_ref = runtime['preparation'].get('readiness_proof')
+        template = preparation_api.derive(spec, source, source_ref, proof_ref)
+        preparation_api.accepted(spec, proof_ref, plan['runtime'])
     exact(runtime, template, 'R1 exact prospective runtime derivation')
     r.verify_files(runtime['files'], allowed_roots=(runtime['worktree'], runtime['artifact_root']))
     return runtime
