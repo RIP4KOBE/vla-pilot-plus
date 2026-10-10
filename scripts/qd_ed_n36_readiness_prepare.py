@@ -1,9 +1,8 @@
 """Preparation-only evidence validator and immutable runtime producer.
 
-This command consumes separately released, independently accepted observations.
-It does not measure, launch a provider/device/episode, approve evidence, write an
-owning journal, or weaken production audit. The measurement runner is a separate
-unreleased dependency. All CPU fixtures must be explicitly synthetic.
+The measurement command requires a separate finite root release and committed
+source bootstrap. Artifact production requires separate root acceptance. Neither
+route grants health or episode authority. CPU fixtures are never live evidence.
 
 DAG: disabled baseline -> source-bound disabled graph -> measurement release ->
 observations/accounting -> proof -> derived runtime -> detached root acceptance.
@@ -53,6 +52,7 @@ def pinned(ref, path):
 
 def policy(spec):
     binding = spec['runtime_binding']
+    e.exact(binding.get('measurement_contract'), MEASUREMENT_CONTRACT, 'preparation measurement schema')
     e.w.require(binding['schema'] == SCHEMA, 'readiness policy version')
     authority = e.read(binding['repair_authority'])
     amendment = e.read(binding['amendment'])
@@ -150,7 +150,7 @@ def validate_release(ref, spec, source, source_ref, *, now=None):
     e.w.require(timestamp(p['not_before']) < issued <= current < expires <= timestamp(p['deadline']),
                 'fresh preparation release')
     seconds = number(value['gpu_seconds'], 'finite preparation reservation')
-    e.w.require(0 < seconds < e.LIMITS['gpu_seconds'] and type(value['provider_calls']) is int
+    e.w.require(MEASUREMENT_CONTRACT['cleanup_seconds'] < seconds < e.LIMITS['gpu_seconds'] and type(value['provider_calls']) is int
                 and value['provider_calls'] == 1, 'separate finite preparation caps')
     closed(value['graph'], ('plan', 'runtime'), 'released graph')
     e.w.require(value['graph']['runtime']['path'] == p['disabled_runtime_path'],
@@ -175,8 +175,8 @@ def derive(spec, source, source_ref, proof_ref, *, now=None):
                 'immutable disabled baseline required')
     proof = pinned(proof_ref, p['proof_path'])
     closed(proof, ('schema', 'release', 'baseline', 'source_record', 'gpu', 'provider',
-                   'accounting', 'native_receipt', 'runtime_receipt', 'runtime_receipt_binding'), 'readiness proof')
-    e.w.require(proof['schema'] == 'n36-measured-preparation-proof-v1', 'readiness proof version')
+                   'accounting', 'native_receipt', 'runtime_receipt', 'runtime_receipt_binding', 'measurement_envelope'), 'readiness proof')
+    e.w.require(proof['schema'] == 'n36-measured-preparation-proof-v2', 'readiness proof version')
     e.exact(proof['baseline'], spec['canonical_runtime'], 'proof immutable baseline')
     e.exact(proof['source_record'], source_ref, 'proof final source')
     release = validate_release(proof['release'], spec, source, source_ref, now=now)
@@ -184,7 +184,8 @@ def derive(spec, source, source_ref, proof_ref, *, now=None):
     from scripts.qd_ed_n36_build import verify_receipt
     verify_receipt(plan['native_build'], e.read(proof['native_receipt']), after=True)
     receipt_binding = {'release': proof['release'], 'source_record': source_ref,
-                       'resource_id': p['resource_id'], 'phase': 'preparation_after'}
+                       'resource_id': p['resource_id'], 'phase': 'preparation_after',
+                       'process': e.read(proof['measurement_envelope'])['process']}
     e.exact(proof['runtime_receipt_binding'], receipt_binding, 'measured runtime receipt binding')
     e.b.closure.verify_runtime_receipt(e.read(plan['runtime_closure']), e.read(proof['runtime_receipt']),
                                       binding=receipt_binding, after=True)
@@ -229,9 +230,11 @@ def derive(spec, source, source_ref, proof_ref, *, now=None):
     last = timestamp(release['issued_at'])
     for event, kind in zip(events, ('reserved', 'dispatched', 'completed')):
         closed(event, (*common, 'event', 'time_unix', 'reserved_gpu_seconds', 'gpu_process_wall_seconds',
-                       'provider_calls', 'exclusive', 'telemetry_complete', 'gpu', 'provider'), 'accounting event')
+                       'provider_calls', 'exclusive', 'telemetry_complete', 'gpu', 'provider',
+                       'kind', 'envelope', 'process', 'parent', *(['error'] if kind == 'completed' else [])), 'accounting event')
         e.exact({k: event[k] for k in common}, common, 'accounted release/source binding')
-        e.w.require(event['event'] == kind and event['exclusive'] is True
+        e.w.require(event['kind'] == 'readiness_preparation'
+                    and event['event'] == kind and event['exclusive'] is True
                     and event['telemetry_complete'] is True, 'terminal successful exclusive accounting')
         when = number(event['time_unix'], 'accounting timestamp')
         e.w.require(last < when < timestamp(release['expires_at']), 'accounting ordered timestamps')
@@ -249,6 +252,7 @@ def derive(spec, source, source_ref, proof_ref, *, now=None):
     e.exact([terminal['gpu'], terminal['provider']], [proof['gpu'], proof['provider']], 'terminal evidence hashes')
     e.w.require(all(events[1]['time_unix'] < x['observed_at'] < terminal['time_unix'] for x in (gpu, provider))
                 and terminal['time_unix'] <= (time.time() if now is None else now), 'observations within dispatch')
+    verify_envelope(proof, plan, common, events)
     result = copy.deepcopy(baseline)
     result['cuda_egl_verified'] = result['provider_ready'] = True
     result['gpu_mapping']['cuda_egl_verified'] = True
@@ -296,13 +300,481 @@ def produce(proof_ref):
     return runtime_ref
 
 
+# The journal is authoritative for preparation identity. The existing resource
+# journal mirrors every transition so unchanged owner budget readers see costs
+# and inflight reservations. A torn two-journal write blocks, never repairs itself.
+MEASUREMENT_CONTRACT = {'schema': 'n36-preparation-measurement-envelope-v2',
+    'resource_kind': 'readiness_preparation', 'journal': 'readiness-preparation-ledger.jsonl',
+    'global_accounting': 'gpu-healthcheck-ledger.jsonl', 'mirror_required': True,
+    'unknown_blocks_reuse': True, 'cleanup_seconds': 40, 'provider_calls': 1}
+
+
+def write_once(path, value):
+    import os
+    path = Path(path)
+    e.w.require(not path.is_symlink() and str(path.resolve()) == str(path), 'immutable output path')
+    with path.open('xb') as stream:
+        stream.write(json.dumps(value, sort_keys=True, allow_nan=False).encode())
+        stream.flush()
+        os.fsync(stream.fileno())
+    return {'path': str(path), 'sha256': e.w.sha(path)}
+
+
+def journal_rows(root):
+    path = Path(root) / 'data' / MEASUREMENT_CONTRACT['journal']
+    e.w.require(not path.is_symlink(), 'preparation journal symlink')
+    rows = e.r.read_events(path)
+    e.r.budget_snapshot([], rows)  # Legal one-use transitions and finite charges.
+    for row in rows:
+        e.w.require(row.get('kind') == 'readiness_preparation', 'preparation resource kind')
+    return rows
+
+
+def append_preparation(root, event):
+    """Caller holds operation lock. Journal-first terminals, mirror-first reserve.
+
+    Existing owner append primitive performs state sync under the state lock.
+    A crash between writes is deliberately not auto-reconciled.
+    """
+    import os
+    root = Path(root)
+    def own_append():
+        with e.r.locked(root / 'data/qd-ed-state.lock', nonblocking=False):
+            rows = journal_rows(root)
+            e.r.budget_snapshot([], [*rows, event])
+            path = root / 'data' / MEASUREMENT_CONTRACT['journal']
+            with path.open('a') as stream:
+                stream.write(json.dumps(event, sort_keys=True, allow_nan=False) + '\n')
+                stream.flush()
+                os.fsync(stream.fileno())
+    if event['event'] == 'reserved':
+        e.r.append_healthcheck_event(root, event)
+        own_append()
+    else:
+        own_append()
+        e.r.append_healthcheck_event(root, event)
+
+
+def preparation_budget(root, plan, authority, release):
+    from scripts import qd_ed_n36_runner as owner
+    state, events, resources, reservations = owner.snapshot(root, authority)
+    e.validate_state(plan, authority, state)
+    e.exact(authority['ledger_prefixes'], e.specification()['retained_ledger_prefixes'],
+            'preparation exact retained accounting prefixes')
+    own = journal_rows(root)
+    mirrors = [x for x in resources if x.get('kind') == 'readiness_preparation']
+    e.exact(own, mirrors, 'torn preparation accounting requires root reconciliation')
+    identity = release['resource_id']
+    e.w.require(not any(identity in (x.get('resource_id'), x.get('attempt_id'), x.get('episode_key'))
+                        for x in [*events, *resources, *own]), 'global preparation identity replay')
+    e.w.require(all(g[-1]['event'] in e.r.TERMINAL for g in e.r.event_groups(events).values()),
+                'unfinished attempt reservation')
+    snap = e.r.budget_snapshot(events, resources)
+    e.w.require(snap['gpu_healthcheck_inflight'] == 0, 'inflight resource reservation')
+    # Do not borrow the engineering 1900-second or healthcheck 60-second cap.
+    need = number(release['gpu_seconds'], 'preparation reservation')
+    e.w.require(need > MEASUREMENT_CONTRACT['cleanup_seconds'], 'preparation cleanup headroom')
+    selected = {'budget_bucket': 'recovery',
+                'timeout_seconds': need - MEASUREMENT_CONTRACT['cleanup_seconds']}
+    for cap in (state['budget']['max_gpu_hours'], float(e.accounting.ABSOLUTE_HOURS),
+                float(e.accounting.WEEKLY_HOURS)):
+        effective = {**state, 'budget': {**state['budget'], 'max_gpu_hours': cap}}
+        available = e.r.check_budget_limits(effective, snap, selected, reservations,
+            bucket_caps=authority['caps']['buckets'], amendment=authority['amendment'])
+        e.w.require(available >= selected['timeout_seconds'], 'preparation full finite reservation')
+    protected = sum(max(0., hours - snap['gpu_hours_by_bucket'][key])
+                    for key, hours in authority['caps']['protected_gpu_hours'].items())
+    margin = e.accounting.retained_margin(root, authority['margin_reference'])
+    cap = min(state['budget']['max_gpu_hours'], float(e.accounting.ABSOLUTE_HOURS),
+              float(e.accounting.WEEKLY_HOURS))
+    e.w.require((snap['gpu_hours_consumed'] + protected + margin) * 3600 + need <= cap * 3600,
+                'preparation charged plus inflight plus new/protected cap')
+    return snap
+
+
+def provider_preflight(runtime, env, *, run=None):
+    """Public CLI status only; bootstrap does not require provider_ready=True."""
+    import os
+    import subprocess
+    run = run or subprocess.run
+    frozen = runtime['frozen_stage_provider']
+    e.w.require(frozen['backend'] == 'codex_cli' and frozen['auth_mode'] == 'chatgpt'
+                and frozen['model'] == 'gpt-6-astra', 'preparation official provider')
+    e.r.stage_overrides(runtime)
+    e.w.require(env.get('HOME') and not any(env.get(x) for x in e.r.codex_removed_environment()),
+                'preparation current login environment')
+    installed = e.r.codex_policy_module().discover_disabled_skill_paths(
+        codex_home=env.get('CODEX_HOME') or Path(env['HOME']) / '.codex', user_home=env['HOME'])
+    e.exact(installed, frozen['disabled_skill_paths'], 'preparation installed CLI policy')
+    cli = Path(frozen['cli_path'])
+    e.w.require(cli.is_file() and os.access(cli, os.X_OK) and e.w.sha(cli) == frozen['cli_sha256'],
+                'preparation CLI bytes')
+    version = run([str(cli), '--version'], capture_output=True, text=True, timeout=15, env=env)
+    login = run([str(cli), 'login', 'status'], capture_output=True, text=True, timeout=15, env=env)
+    e.w.require(version.returncode == 0 and version.stdout.strip() == 'codex-cli ' + frozen['cli_version'],
+                'preparation CLI version')
+    e.w.require(login.returncode == 0 and (login.stdout + login.stderr).strip().lower() ==
+                'logged in using chatgpt', 'preparation current official login')
+    return {'cli_sha256': frozen['cli_sha256'], 'cli_version': frozen['cli_version'],
+            'login_mode': 'current_official_chatgpt_login'}
+
+
+def measure_provider(runtime, env, output, frame, guard):
+    """One CLI child, frozen command/parser, durable raw bytes and lifecycle.
+
+    Transport is preparation-specific to retain raw event bytes that the frozen
+    scientific recognizer intentionally deletes with its temporary directory.
+    """
+    import subprocess
+    from core.codex_stage import CodexStageRecognizer
+    from core.codex_stage_lifecycle import LifecycleTelemetry, StageLifecycle
+    from scripts.qd_ed_n36_runner import process_identity, cleanup_owned
+    frozen = runtime['frozen_stage_provider']
+    status = provider_preflight(runtime, env)
+    client = CodexStageRecognizer.__new__(CodexStageRecognizer)
+    client._configure_transport(frozen)
+    e.exact(client.public_policy, e.r.codex_public_config(frozen), 'preparation frozen public invocation')
+    output = Path(output)
+    request = b'Current Image. Describe this static preparation image. Return exactly three short lines.'
+    request_path = output / 'request.txt'
+    with request_path.open('xb') as stream:
+        stream.write(request)
+    guard()
+    lifecycle = LifecycleTelemetry(StageLifecycle, client.public_policy['maximum_event_bytes'])
+    process = None
+    identity = None
+    with (output / 'response.jsonl').open('x+b') as stdout, (output / 'provider-stderr.txt').open('x+b') as stderr:
+        try:
+            write_once(output / 'provider-launch-intent.json', {'calls_reserved': 1,
+                'parent': process_identity(__import__('os').getpid()), 'time_unix': time.time()})
+            lifecycle.mark('spawn_started_at')
+            process = subprocess.Popen(client._command(output, [frame]), stdin=subprocess.PIPE,
+                stdout=stdout, stderr=stderr, cwd=output, env=env, start_new_session=False)
+            identity = process_identity(process.pid)
+            write_once(output / 'provider-process.json', identity)
+            lifecycle.mark('spawn_returned_at')
+            lifecycle.start(stdout)
+            client.api_request_counter.values['logical_call_attempts'] += 1
+            lifecycle.mark('communicate_started_at')
+            process.communicate(input=request, timeout=client.timeout_seconds)
+            lifecycle.mark('communicate_returned_at')
+            stdout.seek(0)
+            raw = stdout.read(client.public_policy['maximum_event_bytes'] + 1)
+            e.w.require(len(raw) <= client.public_policy['maximum_event_bytes'], 'provider event byte bound')
+            client._parse_events(raw)
+            e.w.require(process.returncode == 0, 'preparation provider exit')
+        except BaseException:
+            if process is not None and process.poll() is None and identity is not None:
+                cleanup_owned(process, identity)
+            raise
+        finally:
+            lifecycle.finish(process)
+            write_once(output / 'provider-transport.json', {'process': identity,
+                'calls': client.api_request_counter.values['logical_call_attempts'],
+                'returncode': None if process is None else process.returncode,
+                'lifecycle': lifecycle.data, 'preflight': status,
+                'parent': process_identity(__import__('os').getpid()),
+                'request': {'path': str(request_path), 'sha256': e.w.sha(request_path)},
+                'response': {'path': str(output / 'response.jsonl'), 'sha256': e.w.sha(output / 'response.jsonl')},
+                'public_policy': client.public_policy})
+    e.w.require(lifecycle.data.get('observation_complete') is True
+                and lifecycle.data.get('complete_usage_observed') is True, 'provider telemetry incomplete')
+    guard()
+    ref = lambda name: {'path': str(output / name), 'sha256': e.w.sha(output / name)}
+    return ref('request.txt'), ref('response.jsonl'), ref('provider-transport.json')
+
+
+def measurement_context(release_ref):
+    spec = e.specification()
+    e.exact(spec['runtime_binding']['measurement_contract'], MEASUREMENT_CONTRACT, 'measurement contract')
+    path = spec['runtime_binding']['source_record_path']
+    source_ref = {'path': path, 'sha256': e.w.sha(path)}
+    source = e.read(source_ref)
+    release = validate_release(release_ref, spec, source, source_ref)
+    plan = verify_graph(release, source, e.read(spec['canonical_runtime']))
+    return spec, source_ref, source, release, plan
+
+
+def boundary(release_ref, spec, source_ref, source, release, plan):
+    e.exact(validate_release(release_ref, spec, source, source_ref), release, 'release changed at boundary')
+    e.b.closure.verify_source(Path(plan['worktree']), source)
+    e.b.attest_loaded(plan['worktree'], source)
+    e.read(plan['runtime'])
+
+
+def child_measure(context_ref):
+    import os
+    from scripts import qd_ed_n36_source as execution
+    from scripts import qd_ed_n36_build as native
+    from scripts.qd_ed_n36_runner import process_identity
+    execution.active()
+    context = e.read(context_ref)
+    spec, source_ref, source, release, plan = measurement_context(context['release'])
+    output = Path(context['output'])
+    expected_output = Path(policy(spec)['proof_path']).with_suffix('.measurement')
+    e.w.require(output == expected_output, 'fixed child measurement output')
+    e.exact(process_identity(os.getppid()), context['parent'], 'admitted parent identity')
+    root = e.owner_root(plan)
+    rows = journal_rows(root)
+    dispatched = [x for x in rows if x['resource_id'] == release['resource_id']]
+    e.w.require(len(dispatched) == 2 and dispatched[-1]['event'] == 'dispatched'
+                and dispatched[-1]['release'] == context['release'], 'child requires durable admission')
+    # Parent records exact handle before this gate opens; no measurement precedes it.
+    admitted = output / 'child-admitted.json'
+    until = time.monotonic() + 5
+    while not admitted.exists() and time.monotonic() < until:
+        time.sleep(.01)
+    identity = process_identity(os.getpid())
+    e.exact(e.r.read_json(admitted), identity, 'admitted child process')
+    guard = lambda: boundary(context['release'], spec, source_ref, source, release, plan)
+    guard()
+    started = time.time()
+    common = {k: release[k] for k in ('source_record', 'baseline', 'resource_id', 'source_cwd', 'interpreter')}
+    common['release'] = context['release']
+    runtime = e.read(plan['runtime'])
+    observation = probe.child_probe(plan['runtime']['path'], output, release['resource_id'])
+    probe.validate_probe_evidence(observation, runtime['gpu_mapping'])
+    frame = {'path': str(output / 'probe-frame.png'), 'sha256': e.w.sha(output / 'probe-frame.png')}
+    gpu = write_once(policy(spec)['gpu_path'], dict(common, schema='n36-preparation-gpu-v1',
+        observed_at=observation['time_unix'], simulation_steps=0, observation=observation, frame=frame))
+    guard()
+    request, response, transport = measure_provider(runtime, dict(os.environ), output, frame['path'], guard)
+    response_ref = write_once(output / 'provider-response.json', {'schema': 'n36-preparation-provider-response-v1',
+        'resource_id': release['resource_id'], 'model': 'gpt-6-astra', 'status': 'completed',
+        'request': request, 'response': response})
+    provider = write_once(policy(spec)['provider_path'], dict(common, schema='n36-preparation-provider-v1',
+        observed_at=time.time(), simulation_steps=0, provider=runtime['frozen_stage_provider'],
+        login_mode='current_official_chatgpt_login', response=response_ref, calls=1, success=True))
+    closure = e.read(plan['runtime_closure'])
+    # Import only the required modules already admitted by the closure. No Main,
+    # controller instance, environment reset or episode entrypoint is invoked.
+    import importlib
+    for name in closure['required_after']:
+        if name not in sys.modules:
+            importlib.import_module(name)
+    binding = {'release': context['release'], 'source_record': source_ref, 'resource_id': release['resource_id'],
+               'phase': 'preparation_after', 'process': identity}
+    native_ref = write_once(output / 'native-receipt.json', native.attest(plan['native_build'], after=True))
+    runtime_ref = write_once(output / 'runtime-receipt.json', e.b.closure.attest_runtime_receipt(
+        closure, plan['runtime'], binding=binding, after=True))
+    source_receipt = write_once(output / 'source-receipt.json', execution.attest(
+        Path(plan['worktree']), source, closure, binding=binding))
+    guard()
+    return write_once(output / 'envelope.json', dict(common, schema=MEASUREMENT_CONTRACT['schema'],
+        process=identity, parent=context['parent'], started_at=started, finished_at=time.time(),
+        gpu=gpu, provider=provider, native_receipt=native_ref, runtime_receipt=runtime_ref,
+        runtime_receipt_binding=binding, source_receipt=source_receipt, transport=transport))
+
+
+def supervise_measurement(process, identity, timeout, physical_gpu):
+    """Monitor through deadline. STOP vetoes acceptance, never signals a child."""
+    import subprocess
+    from scripts.qd_ed_n36_runner import cleanup_owned
+    deadline = time.monotonic() + timeout
+    error = None
+    while process.poll() is None:
+        left = deadline - time.monotonic()
+        if left <= 0:
+            cleanup_owned(process, identity)
+            raise TimeoutError('preparation timeout; retain actual charge')
+        try:
+            def bounded_run(argv, **kwargs):
+                kwargs['timeout'] = min(kwargs.get('timeout', left), max(.001, deadline-time.monotonic()))
+                return subprocess.run(argv, **kwargs)
+            e.r.check_exclusive_gpu(process, run=bounded_run, physical_gpu=physical_gpu)
+        except Exception as exc:
+            error = exc
+        try:
+            process.wait(timeout=min(.25, max(.001, deadline-time.monotonic())))
+        except subprocess.TimeoutExpired:
+            pass
+    if error is not None:
+        raise RuntimeError('preparation exclusivity telemetry lost') from error
+    e.w.require(process.returncode == 0, 'preparation child failure')
+
+
+def execute_preparation(release_ref):
+    """Future root-released runner. Never called by CPU implementation tests live."""
+    import os
+    import subprocess
+    from scripts import qd_ed_n36_source as execution
+    from scripts.qd_ed_n36_runner import process_identity
+    execution.active()
+    spec, source_ref, source, release, plan = measurement_context(release_ref)
+    root = e.owner_root(plan)
+    runtime = e.read(plan['runtime'])
+    output = Path(policy(spec)['proof_path']).with_suffix('.measurement')
+    guard = lambda: boundary(release_ref, spec, source_ref, source, release, plan)
+    with e.r.locked(root / 'data/qd-ed-runner.lock', nonblocking=False):
+        guard()
+        e.stop.check(ends_at=release['expires_at'], need=release['gpu_seconds'])
+        with e.r.locked(root / 'data/qd-ed-state.lock', nonblocking=False):
+            preparation_budget(root, plan, e.read(plan['authority']), release)
+        execution.attest(Path(plan['worktree']), source, e.read(plan['runtime_closure']),
+            binding={'release': release_ref, 'source_record': source_ref, 'resource_id': release['resource_id'],
+                     'process': process_identity(os.getpid()), 'phase': 'preparation_before'})
+        env = e.child_environment(plan, runtime)
+        provider_preflight(runtime, env)
+        physical = e.r.runtime_gpu(runtime)
+        e.r.gpu_admission(physical_gpu=physical, expected_uuid=runtime['gpu_mapping']['uuid'])
+        guard()
+        e.w.require(not output.exists() and not output.is_symlink(), 'preparation output replay')
+        output.mkdir()
+        parent = process_identity(os.getpid())
+        common = {k: release[k] for k in ('source_record', 'baseline', 'resource_id', 'source_cwd', 'interpreter')}
+        common['release'] = release_ref
+        base = dict(common, kind='readiness_preparation', reserved_gpu_seconds=release['gpu_seconds'],
+            gpu_process_wall_seconds=0, provider_calls=0, exclusive=True, telemetry_complete=True,
+            gpu=None, provider=None, envelope=None, process=None, parent=parent)
+        records = []
+        def append(kind, **changes):
+            event = dict(base, event=kind, time_unix=time.time(), **changes)
+            append_preparation(root, event)
+            records.append(event)
+        append('reserved')
+        process = None
+        identity = None
+        dispatched_at = None
+        error = None
+        envelope_ref = None
+        envelope = None
+        try:
+            guard()
+            e.stop.check(ends_at=release['expires_at'], need=release['gpu_seconds'])
+            context_ref = write_once(output / 'context.json', {'release': release_ref, 'parent': parent, 'output': str(output)})
+            command = execution.command(sys.executable, Path(plan['worktree']), 'scripts.qd_ed_n36_readiness_prepare',
+                '--child-context', context_ref['path'], '--child-context-sha256', context_ref['sha256'])
+            env.update(QD_ED_GPU_PROBE_PARENT_PID=str(os.getpid()), QD_ED_GPU_PROBE_RESOURCE_ID=release['resource_id'])
+            append('dispatched')
+            dispatched_at = records[-1]['time_unix']
+            with (output / 'child.log').open('xb') as log:
+                process = subprocess.Popen(command, cwd=plan['worktree'], env=env, stdout=log,
+                                           stderr=subprocess.STDOUT, start_new_session=True)
+                identity = process_identity(process.pid)
+                write_once(output / 'child-admitted.json', identity)
+                supervise_measurement(process, identity, release['gpu_seconds'] - 40, physical)
+            # Check no descendant remains on the GPU after parent exit.
+            e.r.gpu_admission(physical_gpu=physical, expected_uuid=runtime['gpu_mapping']['uuid'])
+            guard()
+            envelope_ref = {'path': str(output / 'envelope.json'), 'sha256': e.w.sha(output / 'envelope.json')}
+            envelope = e.read(envelope_ref)
+            e.exact(envelope['process'], identity, 'terminal child identity')
+            e.exact(envelope['parent'], parent, 'terminal parent identity')
+            e.exact({k: envelope[k] for k in common}, common, 'terminal measurement binding')
+        except BaseException as exc:
+            error = type(exc).__name__
+        # Unknown/live handles remain inflight. No unowned handle is signalled.
+        if process is not None and (identity is None or process.poll() is None):
+            raise RuntimeError('unknown/live preparation child; retain reservation for root reconciliation')
+        # A provider descendant may outlive a killed child. Missing transport
+        # is not proof of its exit; retain inflight instead of hiding its cost.
+        provider_handle = output / 'provider-process.json'
+        if (output / 'provider-launch-intent.json').exists() and not provider_handle.exists():
+            raise RuntimeError('unknown provider launch; retain preparation reservation')
+        if provider_handle.exists():
+            handle = e.r.read_json(provider_handle)
+            try:
+                live = process_identity(handle['pid'])
+            except FileNotFoundError:
+                live = None
+            except Exception:
+                raise RuntimeError('unknown provider handle; retain preparation reservation')
+            if live == handle:
+                raise RuntimeError('live provider handle; retain preparation reservation')
+        if process is not None:
+            try:
+                e.r.gpu_admission(physical_gpu=physical, expected_uuid=runtime['gpu_mapping']['uuid'])
+            except Exception as exc:
+                raise RuntimeError('GPU quiescence unknown; retain preparation reservation') from exc
+        try:
+            guard()
+        except Exception as exc:
+            error = type(exc).__name__
+        charge = 0 if dispatched_at is None else max(0., time.time() - dispatched_at)
+        success = error is None and envelope is not None and charge <= release['gpu_seconds']
+        # At least the reserved provider call is retained on telemetry loss.
+        calls = 0 if dispatched_at is None else 1
+        terminal_time = time.time()
+        charge = max(charge, 0 if dispatched_at is None else terminal_time-dispatched_at)
+        terminal = dict(base, event='completed' if success else 'aborted', time_unix=terminal_time,
+            gpu_process_wall_seconds=charge, provider_calls=calls, exclusive=success,
+            telemetry_complete=success, gpu=envelope['gpu'] if success else None,
+            provider=envelope['provider'] if success else None, envelope=envelope_ref if success else None,
+            process=identity, error=error)
+        append_preparation(root, terminal)
+        records.append(terminal)
+        e.w.require(success, 'preparation failed; charges retained')
+        accounting_ref = write_once(policy(spec)['accounting_path'], records)
+        proof = {k: envelope[k] for k in ('native_receipt', 'runtime_receipt', 'runtime_receipt_binding', 'gpu', 'provider')}
+        proof.update(schema='n36-measured-preparation-proof-v2', release=release_ref, baseline=spec['canonical_runtime'],
+            source_record=source_ref, accounting=accounting_ref, measurement_envelope=envelope_ref)
+        guard()
+        return write_once(policy(spec)['proof_path'], proof)
+
+
+def verify_envelope(proof, plan, common, events):
+    envelope = e.read(proof['measurement_envelope'])
+    closed(envelope, (*common, 'schema', 'process', 'parent', 'started_at', 'finished_at', 'gpu', 'provider',
+        'native_receipt', 'runtime_receipt', 'runtime_receipt_binding', 'source_receipt', 'transport'), 'measurement envelope')
+    e.w.require(envelope['schema'] == MEASUREMENT_CONTRACT['schema'], 'measurement envelope version')
+    e.exact({k: envelope[k] for k in common}, common, 'fresh measurement envelope identity')
+    for name in ('gpu', 'provider', 'native_receipt', 'runtime_receipt', 'runtime_receipt_binding'):
+        e.exact(envelope[name], proof[name], 'measurement envelope ' + name)
+    for name in ('process', 'parent'):
+        closed(envelope[name], ('pid', 'proc_start_ticks', 'boot_id'), 'owned process identity')
+        e.w.require(type(envelope[name]['pid']) is int and envelope[name]['pid'] > 0
+                    and envelope[name]['proc_start_ticks'] and envelope[name]['boot_id'], 'owned process identity values')
+        e.exact(events[-1][name], envelope[name], 'terminal envelope ' + name)
+    e.w.require(events[-1]['error'] is None, 'terminal measurement error')
+    e.exact(events[-1]['envelope'], proof['measurement_envelope'], 'terminal native/runtime envelope hashes')
+    e.w.require(events[1]['time_unix'] < number(envelope['started_at'], 'measurement start')
+                <= number(envelope['finished_at'], 'measurement finish') < events[-1]['time_unix'],
+                'stale measurement envelope')
+    root = e.owner_root(plan)
+    rows = journal_rows(root)
+    selected = [x for x in rows if x['resource_id'] == common['resource_id']]
+    e.exact(selected, events, 'durable one-use owning accounting')
+    mirrors = [x for x in e.r.read_events(root / 'data/gpu-healthcheck-ledger.jsonl')
+               if x.get('resource_id') == common['resource_id']]
+    e.exact(mirrors, selected, 'durable global preparation charges')
+    transport = e.read(envelope['transport'])
+    e.w.require(transport['returncode'] == 0 and type(transport['calls']) is int and transport['calls'] == 1
+                and transport['lifecycle']['observation_complete'] is True
+                and transport['lifecycle']['complete_usage_observed'] is True
+                and transport['preflight']['login_mode'] == 'current_official_chatgpt_login', 'measured provider lifecycle')
+    e.exact(transport['parent'], envelope['process'], 'provider owned by admitted measurement child')
+    provider_response = e.read(e.read(proof['provider'])['response'])
+    for key in ('request', 'response'):
+        e.exact(transport[key], provider_response[key], 'provider actual transport bytes')
+    frozen = e.read(proof['provider'])['provider']
+    e.exact(transport['public_policy'], e.r.codex_public_config(frozen), 'provider transport policy')
+    e.exact(transport['preflight'], {'cli_sha256': frozen['cli_sha256'], 'cli_version': frozen['cli_version'],
+        'login_mode': 'current_official_chatgpt_login'}, 'provider actual preflight binding')
+    from scripts import qd_ed_n36_source as execution
+    execution.verify_receipt(e.read(envelope['source_receipt']), Path(plan['worktree']), plan['source'],
+        e.read(plan['runtime_closure']), runtime_receipt=e.read(proof['runtime_receipt']),
+        binding=proof['runtime_receipt_binding'])
+    return envelope
+
+
 def main():
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--proof', required=True)
-    parser.add_argument('--proof-sha256', required=True)
+    parser.add_argument('--proof')
+    parser.add_argument('--release')
+    parser.add_argument('--release-sha256')
+    parser.add_argument('--child-context')
+    parser.add_argument('--child-context-sha256')
+    parser.add_argument('--proof-sha256')
     args = parser.parse_args()
-    print(json.dumps(produce({'path': args.proof, 'sha256': args.proof_sha256}), sort_keys=True))
+    e.w.require(sum(bool(x) for x in (args.proof, args.release, args.child_context)) == 1, 'one preparation operation')
+    if args.child_context:
+        result = child_measure({'path': args.child_context, 'sha256': args.child_context_sha256})
+    elif args.release:
+        result = execute_preparation({'path': args.release, 'sha256': args.release_sha256})
+    else:
+        result = produce({'path': args.proof, 'sha256': args.proof_sha256})
+    print(json.dumps(result, sort_keys=True))
 
 
 if __name__ == '__main__':

@@ -423,3 +423,44 @@ def test_stale_readiness_source_rejected(documents, tmp_path, monkeypatch):
     monkeypatch.setattr(e, 'read', lambda ref: terminal if ref == terminal_ref else original_read(ref))
     with pytest.raises(ValueError, match='terminal readiness binding'):
         e.validate_readiness(plan_ref, {'readiness': {'health_release': health_ref, 'terminal': terminal_ref}}, resources=[])
+
+
+def test_preparation_exact_two_operational_additions():
+    import ast
+    import subprocess
+    old = ast.parse(subprocess.check_output(['git', 'show',
+        'fd75477b84211707afd86bf32b8411403cbf0a1e:scripts/qd_ed_n36_engineering_r1.py'], text=True))
+    node = next(n for n in old.body if isinstance(n, ast.Assign)
+                and any(isinstance(t, ast.Name) and t.id == 'OPERATIONAL_FILES' for t in n.targets))
+    previous = ast.literal_eval(node.value.args[0])
+    assert e.OPERATIONAL_FILES - previous == {'scripts/qd_ed_n36_readiness_prepare.py',
+                                             'tests/test_n36_readiness_prepare.py'}
+    assert previous <= e.OPERATIONAL_FILES
+
+
+@pytest.mark.parametrize('foreign', [False, True])
+def test_preparation_scientific_equivalence_gate(tmp_path, monkeypatch, foreign):
+    paths = ['scripts/qd_ed_n36_readiness_prepare.py', 'tests/test_n36_readiness_prepare.py']
+    if foreign:
+        paths.append('core/codex_stage.py')
+    source = {'commit': 'SYNTHETIC'}
+    ref = put(tmp_path, 'equivalence', dict(schema='n36-engineering-scientific-equivalence-v1',
+        base_commit=e.BASE, source=source, changed_paths=sorted(paths), scientific_changes=False))
+    monkeypatch.setattr(e.subprocess, 'check_output', lambda *a, **kw: '\n'.join(paths))
+    from types import SimpleNamespace
+    monkeypatch.setattr(e.subprocess, 'run', lambda *a, **kw: SimpleNamespace(returncode=0))
+    if foreign:
+        with pytest.raises(ValueError, match='outside operational'):
+            e.scientific_equivalence(dict(source=source, scientific_equivalence=ref))
+    else:
+        e.scientific_equivalence(dict(source=source, scientific_equivalence=ref))
+
+
+def test_preparation_spec_amendment_only_schema_field():
+    import subprocess
+    before = json.loads(subprocess.check_output(['git','show',
+        'fd75477b84211707afd86bf32b8411403cbf0a1e:configs/qd_ed_final/n36_engineering_r1_spec.disabled.json'], text=True))
+    after = e.read(PINNED_SPECIFICATION)
+    from scripts.qd_ed_n36_readiness_prepare import MEASUREMENT_CONTRACT
+    assert after['runtime_binding'].pop('measurement_contract') == MEASUREMENT_CONTRACT
+    assert after == before

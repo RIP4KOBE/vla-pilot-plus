@@ -34,7 +34,7 @@ OWNER_ROUTE_MAPPING = {
     'path': str(OWNER.parent / 'autonomy_20261004/turns/001352/owner-alias-repair/alias-evidence-v1.json'),
     'sha256': '70097b35181e55589df8bb053857b11840f08542fb8ed8bec57635ba493b22a2'}
 HISTORICAL_OWNER = '/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z'
-SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001651/readiness-implementation/engineering-r1-spec.prospective-disabled-v2.json', 'sha256': 'ffe7e00adc09850c70303a003c1333647ee4e140c24dea6483e32f399bab2177'}
+SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001661/readiness-runner-implementation/engineering-r1-spec.prospective-disabled-v3.json', 'sha256': '314affbd48f483ca30a7cc625c4bec2d2f3221545770cb2d703276806142204e'}
 AMENDMENT = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001616/prospective-recovery-amendment-v1.json', 'sha256': 'fe3c11c3a4be56f74149dc7e21a59eef59611478841d0fa8993bc79f8760e5ba'}
 IDENTITY = 'N36_ENGINEERING_R1_C0_TASK0_001616'
 EPISODE_KEY = 'n36_engineering_r1_t00_c0_001616'
@@ -56,6 +56,7 @@ RUNTIME_INPUTS = ('run_name', 'runtime_inventory_path', 'runtime_inventory_sha25
                   'seed_plan_path', 'seed_plan_sha256', 'input_contract_label')
 # Changes outside these operational files require a different specification.
 OPERATIONAL_FILES = frozenset({
+    'scripts/qd_ed_n36_readiness_prepare.py', 'tests/test_n36_readiness_prepare.py',
     'scripts/qd_ed_n36_engineering_r1.py', 'scripts/qd_ed_n36_engineering_api.py',
     'configs/qd_ed_final/n36_engineering_r1_spec.disabled.json', 'tests/test_n36_engineering_r1.py', 'scripts/qd_ed_n36_release.py',
     'scripts/qd_ed_n36_bridge.py', 'scripts/qd_ed_n36_worker.py',
