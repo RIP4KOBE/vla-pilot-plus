@@ -100,8 +100,8 @@ def measured(tmp_path, monkeypatch):
     # Artifact-unit fixture only; real source guard gets separate negative tests.
     monkeypatch.setattr(execution, 'verify_receipt', lambda *a, **kw: None)
     (root / 'data').mkdir()
-    process = {'pid': 42, 'proc_start_ticks': 'SYNTHETIC', 'boot_id': 'SYNTHETIC'}
-    parent = {'pid': 41, 'proc_start_ticks': 'SYNTHETIC', 'boot_id': 'SYNTHETIC'}
+    process = {'pid': 42, 'proc_start_ticks': '100', 'boot_id': '00000000-0000-0000-0000-000000000001'}
+    parent = dict(process, pid=41, proc_start_ticks='99')
     verified=[]
     monkeypatch.setattr(p,'verify_graph',lambda *args: (verified.append(args) or graph))
     receipt_binding={'release':release_ref,'source_record':source_ref,'resource_id':prep['resource_id'],'phase':'preparation_after','process':process}
@@ -114,8 +114,19 @@ def measured(tmp_path, monkeypatch):
         proof['provider']=save_path(prep['provider_path'],provider)
         frozen = provider['provider']
         response = e.read(provider['response'])
+        output = Path(prep['proof_path']).with_suffix('.measurement')
+        output.mkdir(exist_ok=True)
+        launch = put(output, 'provider-launch-intent', dict(calls_reserved=1, parent=process,
+            time_unix=issued+4.1, monotonic=100.1))
+        provider_process = dict(process, pid=43, proc_start_ticks='101')
+        handle = put(output, 'provider-process', dict(process=provider_process, parent=process,
+            launch_intent=launch, time_unix=issued+4.2, monotonic=100.3))
         transport = put(root, 'synthetic-transport', dict(returncode=0, calls=1,
-            lifecycle=dict(observation_complete=True, complete_usage_observed=True),
+            process=provider_process, launch_intent=launch, process_handle=handle,
+            lifecycle=dict(observation_complete=True, complete_usage_observed=True,
+                clock='monotonic_seconds', spawn_started_at=100.2, spawn_returned_at=100.4,
+                communicate_started_at=100.5, communicate_returned_at=100.6,
+                process_exit_observed_at=100.7, observer_finished_at=100.8, returncode=0),
             preflight=dict(cli_sha256=frozen['cli_sha256'], cli_version=frozen['cli_version'],
                            login_mode='current_official_chatgpt_login'), parent=process,
             request=response['request'], response=response['response'], public_policy=e.r.codex_public_config(frozen)))
@@ -762,3 +773,114 @@ def test_release_predating_runner_amendment_rejected(measured):
     ref = m['save'](m['prep']['release_path'],release)
     with pytest.raises(ValueError,match='fresh preparation release'):
         p.validate_release(ref,m['spec'],m['source'],m['source_ref'],now=m['now'])
+
+
+def rebind_envelope(m, envelope):
+    """Rebind every synthetic reference so negative tests reach semantic checks."""
+    ref = m['save'](m['proof']['measurement_envelope']['path'], envelope)
+    m['proof']['measurement_envelope'] = ref
+    events = e.read(m['proof']['accounting'])
+    events[-1]['envelope'] = ref
+    m['proof']['accounting'] = m['save'](m['prep']['accounting_path'], events)
+    for name in ('readiness-preparation-ledger.jsonl', 'gpu-healthcheck-ledger.jsonl'):
+        (m['root']/'data'/name).write_text(''.join(json.dumps(v)+'\n' for v in events))
+    m['proof_ref'] = m['save'](m['prep']['proof_path'], m['proof'])
+
+
+@pytest.mark.parametrize('fault', ['missing', 'null', 'pid_type', 'ticks_type', 'boot_type',
+    'pid', 'ticks', 'boot', 'launch_parent', 'handle_parent', 'stale_launch', 'late_handle',
+    'reordered_lifecycle', 'missing_exit', 'extra_transport', 'request', 'response'])
+def test_provider_handle_chain_semantic_rejection(measured, fault):
+    m = measured
+    envelope = e.read(m['proof']['measurement_envelope'])
+    transport = e.read(envelope['transport'])
+    handle = e.read(transport['process_handle'])
+    launch = e.read(transport['launch_intent'])
+    if fault == 'missing': transport.pop('process')
+    elif fault == 'null': transport['process'] = None
+    elif fault == 'pid_type': transport['process']['pid'] = True
+    elif fault == 'ticks_type': transport['process']['proc_start_ticks'] = []
+    elif fault == 'boot_type': transport['process']['boot_id'] = 'malformed'
+    elif fault == 'pid': transport['process']['pid'] += 1
+    elif fault == 'ticks': transport['process']['proc_start_ticks'] = '999'
+    elif fault == 'boot': transport['process']['boot_id'] = '00000000-0000-0000-0000-000000000002'
+    elif fault == 'launch_parent': launch['parent']['pid'] += 1
+    elif fault == 'handle_parent': handle['parent']['pid'] += 1
+    elif fault == 'stale_launch': launch['time_unix'] = envelope['started_at'] - 1
+    elif fault == 'late_handle': handle['time_unix'] = envelope['finished_at'] + 1
+    elif fault == 'reordered_lifecycle': transport['lifecycle']['spawn_returned_at'] = 99
+    elif fault == 'missing_exit': transport['lifecycle']['process_exit_observed_at'] = None
+    elif fault == 'extra_transport': transport['unbound'] = True
+    else: transport[fault]['sha256'] = '0'*64
+    transport['launch_intent'] = m['save'](transport['launch_intent']['path'], launch)
+    handle['launch_intent'] = transport['launch_intent']
+    transport['process_handle'] = m['save'](transport['process_handle']['path'], handle)
+    envelope['transport'] = m['save'](envelope['transport']['path'], transport)
+    rebind_envelope(m, envelope)
+    with pytest.raises((ValueError, e.r.GateError)):
+        derive(m)
+
+
+def test_constructor_interrupted_after_inert_cpu_spawn_keeps_inflight(runner_cpu, monkeypatch):
+    import subprocess
+    f = runner_cpu
+    # No measurement command is invoked: spawn only an inert CPU sleeping child.
+    real_popen = subprocess.Popen.__module__  # fixture has already replaced Popen
+    assert real_popen == __name__
+    import importlib
+    # Save the real constructor from a fresh module without changing global state.
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('synthetic_subprocess', subprocess.__file__)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    owned = []
+    def interrupt(*args, **kwargs):
+        owned.append(module.Popen([sys.executable, '-I', '-S', '-c', 'import time; time.sleep(30)']))
+        raise KeyboardInterrupt('SYNTHETIC interruption after inert spawn')
+    monkeypatch.setattr(subprocess, 'Popen', interrupt)
+    try:
+        with pytest.raises(RuntimeError, match='unknown/live'):
+            p.execute_preparation(f.ref)
+        assert owned[0].poll() is None
+        rows = p.journal_rows(f.root)
+        assert [x['event'] for x in rows] == ['reserved', 'dispatched']
+        assert rows == e.r.read_events(f.root/'data/gpu-healthcheck-ledger.jsonl')
+        assert e.r.budget_snapshot([], rows)['gpu_healthcheck_inflight'] == 1
+        assert not Path(f.prep['proof_path']).exists()
+        other = dict(f.release, resource_id='second_SYNTHETIC')
+        with pytest.raises((ValueError, e.r.GateError), match='inflight'):
+            p.preparation_budget(f.root, f.plan, f.authority, other)
+    finally:
+        for child in owned:
+            child.terminate()
+            child.wait(timeout=5)
+
+
+@pytest.mark.parametrize('fault', ['before_intent', 'identity', 'admission_file'])
+def test_launch_boundary_failure_ownership(runner_cpu, monkeypatch, fault):
+    from scripts import qd_ed_n36_runner as runner, qd_ed_n36_source as execution
+    f = runner_cpu
+    if fault == 'before_intent':
+        monkeypatch.setattr(execution, 'command', lambda *a: (_ for _ in ()).throw(RuntimeError('before launch')))
+    elif fault == 'identity':
+        identify = runner.process_identity
+        def broken(pid):
+            if pid == 424242: raise RuntimeError('unknown child identity')
+            return identify(pid)
+        monkeypatch.setattr(runner, 'process_identity', broken)
+    else:
+        write = p.write_once
+        def broken(path, value):
+            if Path(path).name == 'child-admitted.json': raise OSError('admission failure')
+            return write(path, value)
+        monkeypatch.setattr(p, 'write_once', broken)
+    with pytest.raises((ValueError, RuntimeError)):
+        p.execute_preparation(f.ref)
+    rows = p.journal_rows(f.root)
+    assert not Path(f.prep['proof_path']).exists()
+    if fault == 'before_intent':
+        assert not f.launches
+        assert rows[-1]['event'] == 'aborted' and rows[-1]['gpu_process_wall_seconds'] == 0
+    else:
+        assert rows[-1]['event'] == 'dispatched'
+        assert e.r.budget_snapshot([], rows)['gpu_healthcheck_inflight'] == 1

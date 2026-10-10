@@ -237,7 +237,8 @@
     ],
     "technical_justification": "A static final runtime digest in source would bind a runtime whose source inventory includes that same source digest and commit, creating a cycle. Pin the exact 001631 template and repair authority instead; permit only a complete verified current committed source inventory at fixed prospective paths. Runtime file records are unchanged because these three repair paths are absent from the template files. All non-source preparation fields, dependencies, model/native bytes and false readiness remain exact. This is disabled preparation only; review, B5, adoption and separately released fresh health/episode gates remain required.",
     "measurement_contract": {
-      "schema": "n36-preparation-measurement-envelope-v2",
+      "schema": "n36-preparation-measurement-envelope-v3",
+      "not_before": "2026-10-10T22:45:08+00:00",
       "resource_kind": "readiness_preparation",
       "journal": "readiness-preparation-ledger.jsonl",
       "global_accounting": "gpu-healthcheck-ledger.jsonl",
@@ -245,7 +246,9 @@
       "unknown_blocks_reuse": true,
       "cleanup_seconds": 40,
       "provider_calls": 1,
-      "not_before": "2026-10-10T22:19:24.983319+00:00"
+      "child_launch_intent_required": true,
+      "provider_handle_chain_required": true,
+      "suffix_partition": "strict_preparation_then_sole_health_v1"
     }
   }
 }

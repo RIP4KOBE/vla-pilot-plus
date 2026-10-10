@@ -464,3 +464,173 @@ def test_preparation_spec_amendment_only_schema_field():
     from scripts.qd_ed_n36_readiness_prepare import MEASUREMENT_CONTRACT
     assert after['runtime_binding'].pop('measurement_contract') == MEASUREMENT_CONTRACT
     assert after == before
+
+
+# Reuse the complete synthetic measured chain, including real byte/hash validation.
+from test_n36_readiness_prepare import measured as measured_preparation
+
+
+@pytest.fixture
+def preparation_history(measured_preparation, baseline, monkeypatch):
+    import datetime as dt
+    from types import SimpleNamespace
+    from scripts import qd_ed_n36_readiness_prepare as preparation
+    m = measured_preparation
+    monkeypatch.setattr(preparation.time, 'time', lambda: m['now'] + 20)
+    runtime = preparation.derive(m['spec'], m['source'], m['source_ref'], m['proof_ref'])
+    runtime_ref = m['save'](m['spec']['runtime_binding']['runtime_path'], runtime)
+    m['save'](m['prep']['acceptance_path'], dict(schema='n36-preparation-root-acceptance-v1',
+        approved=True, specification=e.SPECIFICATION, proof=m['proof_ref'], runtime=runtime_ref,
+        release_enabled=False, health_authorized=False, episode_authorized=False))
+    inert = put(m['root'], 'inert-binding', {'SYNTHETIC':True})
+    plan = dict(schema=e.PLAN_SCHEMA, cohort=e.IDENTITY, purpose=e.PURPOSE,
+        source=m['source'], scientific_source=m['source'], worktree=str(e.SOURCE), runtime=runtime_ref,
+        runtime_inventory_sha256='0'*64, artifact_root=str(m['root']/'diagnostic'),
+        **{key:inert for key in ('scope','accounting','audit_plan','engineering_manifest','deployment')})
+    plan_ref = put(m['root'], 'engineering-plan', plan)
+    issued = preparation.timestamp(m['release']['issued_at'])
+    iso = lambda t: dt.datetime.fromtimestamp(t, dt.timezone.utc).isoformat()
+    release_ref = put(m['root'], 'health-release', dict(issued_at=iso(issued+7)))
+    output = Path(plan['artifact_root'])/'healthchecks'/e.HEALTH_ID
+    output.mkdir(parents=True)
+    (output/'probe-frame.png').write_bytes(Path(m['gpu']['frame']['path']).read_bytes())
+    evidence = dict(m['gpu']['observation'], resource_id=e.HEALTH_ID, time_unix=issued+10)
+    put(output, 'probe-evidence', evidence)
+    common = dict(e.operational_binding(plan), resource_id=e.HEALTH_ID, kind=e.HEALTH_KIND,
+        plan=plan_ref, release=release_ref, runtime=runtime_ref, source_commit=plan['source']['commit'],
+        timeout_seconds=20, cleanup_seconds=40, reserved_gpu_seconds=60, physical_gpu=7,
+        gpu_uuid=e.c.GPU_UUID, accounting_admission={'reserved_gpu_seconds':60},
+        output_dir=str(output), source_script_sha256=e.w.sha(e.SOURCE/'scripts/qd_ed_gpu_probe.py'),
+        provider_verified=True)
+    health = [dict(common, event=kind, time_unix=issued+offset,
+                   gpu_process_wall_seconds=2 if kind=='completed' else 0)
+              for kind,offset in [('reserved',8),('dispatched',9),('completed',11)]]
+    health[-1].update({k:v for k,v in evidence.items() if k != 'time_unix'})
+    terminal_ref = put(output, 'healthcheck-result', health[-1])
+    readiness = dict(readiness=dict(health_release=release_ref, terminal=terminal_ref))
+    authority = dict(starts_at=iso(issued))
+    # Detached approval/graph fixtures only; the new partition, proof derivation,
+    # resource lifecycle, exact terminal, probe fields and arithmetic stay real.
+    monkeypatch.setattr(e, 'validate_authority', lambda *args: baseline)
+    monkeypatch.setattr(e, 'validate_health_release', lambda *args: (plan,runtime,authority))
+    prep = e.read(m['proof']['accounting'])
+    current = copy.deepcopy(baseline)
+    current[e.JOURNALS[1]] += prep + health
+    attempts = episode(plan)
+    episode_release = put(m['root'], 'episode-release', dict(schema='n36-engineering-episode-release-v1',
+        plan=plan_ref, issued_at=iso(issued+12)))
+    for event, offset in zip(attempts,(13,14,15)):
+        event.update(release=episode_release, plan_sha256=plan_ref['sha256'], time_unix=issued+offset)
+    def sync():
+        (m['root']/'data/gpu-healthcheck-ledger.jsonl').write_text(
+            ''.join(json.dumps(v)+'\n' for v in current[e.JOURNALS[1]]))
+        (m['root']/'data/readiness-preparation-ledger.jsonl').write_text(
+            ''.join(json.dumps(v)+'\n' for v in prep))
+    sync()
+    return SimpleNamespace(m=m, plan=plan, plan_ref=plan_ref, baseline=baseline, current=current,
+        prep=prep, health=health, attempts=attempts, readiness=readiness, sync=sync)
+
+
+def test_shared_partition_live_and_terminal_with_episode(preparation_history):
+    f = preparation_history
+    f.current[e.JOURNALS[0]] += f.attempts
+    local, health = e.live_journals(f.plan, {}, *(f.current[n] for n in e.JOURNALS))
+    assert local == f.attempts and health == f.health
+    assert e.validate_readiness(f.plan_ref, f.readiness, resources=f.current[e.JOURNALS[1]]) == health[-1]
+    global_snap = e.r.budget_snapshot(f.current[e.JOURNALS[0]], f.current[e.JOURNALS[1]])
+    without_prep = e.r.budget_snapshot(f.current[e.JOURNALS[0]], f.baseline[e.JOURNALS[1]] + health)
+    diagnostic = e.r.budget_snapshot(local, health)
+    assert global_snap['gpu_hours_consumed'] - without_prep['gpu_hours_consumed'] == pytest.approx(3/3600)
+    assert global_snap['gpu_hours_by_bucket']['recovery'] - without_prep['gpu_hours_by_bucket']['recovery'] == pytest.approx(3/3600)
+    assert global_snap['reserved_attempts'] == without_prep['reserved_attempts'] == 508
+    assert diagnostic['gpu_healthcheck_hours'] == 2/3600
+    assert diagnostic['gpu_hours_consumed'] == 14/3600
+    # Successful health permits only the first episode reservation.
+    before_episode = e.r.budget_snapshot([], health)
+    assert e.headroom(without_prep, before_episode, health=False,
+        margin=.23357169027962, protected=36.2408240024308155)['reserved_gpu_seconds'] == 1840
+    with pytest.raises(ValueError, match='slot consumed'):
+        e.headroom(global_snap, diagnostic, health=False, margin=.23357169027962, protected=0)
+
+
+def test_preparation_only_is_not_health_readiness(preparation_history):
+    f = preparation_history
+    f.current[e.JOURNALS[1]] = f.baseline[e.JOURNALS[1]] + f.prep
+    f.sync()
+    assert e.live_journals(f.plan, {}, *(f.current[n] for n in e.JOURNALS)) == ([], [])
+    with pytest.raises(ValueError, match='not durably settled'):
+        e.validate_readiness(f.plan_ref, f.readiness, resources=f.current[e.JOURNALS[1]])
+
+
+@pytest.mark.parametrize('fault', ['pending', 'unknown', 'aborted', 'overrun', 'torn', 'missing_mirror',
+    'missing_journal', 'reordered', 'foreign_identity', 'foreign_kind', 'collision', 'mixed_kind',
+    'replay', 'prefix', 'release', 'source', 'baseline', 'parent', 'proof', 'after_health',
+    'late_time', 'extra_reservation', 'health_replay', 'terminal_substitution', 'expired'])
+def test_shared_partition_rejects_bad_histories_at_both_gates(preparation_history, monkeypatch, fault):
+    from scripts import qd_ed_n36_readiness_prepare as preparation
+    f = preparation_history
+    if fault == 'pending': f.prep.pop()
+    elif fault == 'unknown': f.prep[-1]['event'] = 'unknown'
+    elif fault in ('aborted','overrun'):
+        f.prep[-1].update(event='aborted', gpu_process_wall_seconds=90 if fault=='overrun' else 3,
+            error='SYNTHETIC failure', exclusive=False, telemetry_complete=False,
+            gpu=None, provider=None, envelope=None)
+    elif fault == 'reordered': f.prep[0],f.prep[1] = f.prep[1],f.prep[0]
+    elif fault == 'foreign_identity':
+        for row in f.prep: row['resource_id'] = 'foreign'
+    elif fault in ('foreign_kind','mixed_kind'): f.prep[1]['kind'] = e.HEALTH_KIND
+    elif fault == 'collision':
+        for row in f.prep: row['resource_id'] = e.HEALTH_ID
+    elif fault == 'replay': f.prep.extend(copy.deepcopy(f.prep))
+    elif fault in ('release','source','baseline'):
+        key = 'source_record' if fault=='source' else fault
+        f.prep[-1][key] = dict(f.prep[-1][key], sha256='0'*64)
+    elif fault == 'parent': f.prep[-1]['parent'] = dict(f.prep[-1]['parent'], pid=999)
+    elif fault == 'proof':
+        proof = e.read(f.m['proof_ref']); proof['accounting']['sha256'] = '0'*64
+        f.m['save'](f.m['proof_ref']['path'], proof)
+    elif fault == 'late_time': f.health[0]['time_unix'] = f.prep[-1]['time_unix'] - 1
+    elif fault == 'health_replay': f.health.extend(copy.deepcopy(f.health))
+    elif fault == 'terminal_substitution': f.health[-1]['gpu_process_wall_seconds'] += 1
+    elif fault == 'expired':
+        monkeypatch.setattr(preparation.time, 'time', lambda: preparation.timestamp(f.m['release']['expires_at'])+1)
+    f.current[e.JOURNALS[1]] = copy.deepcopy(f.baseline[e.JOURNALS[1]]) + f.prep + f.health
+    if fault == 'prefix': f.current[e.JOURNALS[1]][0]['time_unix'] += 1
+    if fault == 'extra_reservation': f.current[e.JOURNALS[2]].append({'event':'foreign'})
+    if fault == 'after_health': f.current[e.JOURNALS[1]] = f.baseline[e.JOURNALS[1]] + f.health + f.prep
+    f.sync()
+    if fault in ('torn','missing_mirror'): f.current[e.JOURNALS[1]].pop(len(f.baseline[e.JOURNALS[1]]) + (1 if fault=='torn' else 2))
+    if fault == 'missing_journal': (f.m['root']/'data/readiness-preparation-ledger.jsonl').write_text('')
+    before = copy.deepcopy(f.current)
+    if fault in ('aborted','overrun'):
+        snapshot = e.r.budget_snapshot([], f.prep)
+        assert snapshot['gpu_hours_consumed'] == (90 if fault=='overrun' else 3)/3600
+        assert snapshot['gpu_healthcheck_inflight'] == 0
+    if fault != 'terminal_substitution':
+        with pytest.raises((ValueError,e.r.GateError,KeyError)):
+            e.live_journals(f.plan, {}, *(f.current[n] for n in e.JOURNALS))
+    if fault != 'extra_reservation':  # This independent reservation veto belongs to live_journals.
+        with pytest.raises((ValueError,e.r.GateError,KeyError)):
+            e.validate_readiness(f.plan_ref, f.readiness, resources=f.current[e.JOURNALS[1]])
+    assert f.current == before  # Validation never repairs or truncates accounting.
+
+
+@pytest.mark.parametrize('cap_kind', ['absolute','weekly','protected'])
+def test_preparation_cost_reduces_global_headroom_not_diagnostic(preparation_history, cap_kind):
+    from decimal import Decimal
+    f = preparation_history
+    _, health = e.live_journals(f.plan, {}, *(f.current[n] for n in e.JOURNALS))
+    local = e.r.budget_snapshot([], health)
+    margin = .23357169027962
+    protected = 36.2408240024308155 if cap_kind=='protected' else 0
+    cap = e.accounting.ABSOLUTE_HOURS if cap_kind=='absolute' else e.accounting.WEEKLY_HOURS
+    # An absolute-boundary case also remains subject to the stricter weekly cap.
+    snapshot = e.r.budget_snapshot([], [])
+    snapshot['gpu_hours_consumed'] = float(cap - Decimal(str(margin)) - Decimal(str(protected)) - Decimal(1841)/3600)
+    if cap_kind != 'absolute':
+        e.headroom(snapshot, local, health=False, margin=margin, protected=protected)
+    charged = e.r.budget_snapshot([], f.prep)['gpu_hours_consumed']
+    snapshot['gpu_hours_consumed'] += charged
+    with pytest.raises(ValueError, match='cap/protected reserves'):
+        e.headroom(snapshot, local, health=False, margin=margin, protected=protected)
+    assert local['gpu_healthcheck_hours'] == 2/3600 and local['reserved_attempts'] == 0

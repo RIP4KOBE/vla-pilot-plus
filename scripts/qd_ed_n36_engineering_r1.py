@@ -34,7 +34,7 @@ OWNER_ROUTE_MAPPING = {
     'path': str(OWNER.parent / 'autonomy_20261004/turns/001352/owner-alias-repair/alias-evidence-v1.json'),
     'sha256': '70097b35181e55589df8bb053857b11840f08542fb8ed8bec57635ba493b22a2'}
 HISTORICAL_OWNER = '/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z'
-SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001661/readiness-runner-implementation/engineering-r1-spec.prospective-disabled-v4.json', 'sha256': 'e04a6996e5a4aeeba7cfa795438ca3818927e19321751b3521eaf09a79f833c2'}
+SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001672/runner-repair/engineering-r1-spec.prospective-disabled-v5.json', 'sha256': 'f01c8bc9c7f7472c8f449e8fae3379ef9fc513f204c167693e8eb30d230db269'}
 AMENDMENT = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001616/prospective-recovery-amendment-v1.json', 'sha256': 'fe3c11c3a4be56f74149dc7e21a59eef59611478841d0fa8993bc79f8760e5ba'}
 IDENTITY = 'N36_ENGINEERING_R1_C0_TASK0_001616'
 EPISODE_KEY = 'n36_engineering_r1_t00_c0_001616'
@@ -551,6 +551,100 @@ def resource_events(plan, events):
     return events
 
 
+def preparation_health_suffix(plan, baseline, resources):
+    """One strict partition for admission and terminal readiness; never rebases costs.
+
+    Only health rows leave this gate. Callers still charge the original complete
+    resources to global snapshots. Failed/pending preparation is a consumed
+    identity and a veto, never an implicit recovery or readiness certificate.
+    """
+    from scripts import qd_ed_n36_readiness_prepare as preparation
+    spec = specification()
+    policy = preparation.policy(spec)
+    identity = policy['resource_id']
+    old = baseline[JOURNALS[1]]
+    exact(resources[:len(old)], old, 'R1 readiness terminal parent prefix')
+    historical = [*baseline[JOURNALS[0]], *old]
+    w.require(identity not in (HEALTH_ID, EPISODE_KEY)
+              and not any(identity in (x.get('resource_id'), x.get('attempt_id'), x.get('episode_key'))
+                          for x in historical), 'preparation identity collision with retained history')
+    prep, health = [], []
+    for event in resources[len(old):]:
+        pair = (event.get('resource_id'), event.get('kind'))
+        if pair == (identity, 'readiness_preparation'):
+            w.require(not health, 'preparation must precede health reservation')
+            prep.append(event)
+        elif pair == (HEALTH_ID, HEALTH_KIND):
+            health.append(event)
+        else:
+            raise ValueError('foreign resource identity/kind in strict suffix')
+    own = preparation.journal_rows(owner_root(plan))
+    exact(own, prep, 'exact preparation journal/mirror suffix equality')
+    if not prep:
+        w.require(not health, 'health requires accepted preparation history')
+        return resource_events(plan, health)
+    kinds = [event.get('event') for event in prep]
+    w.require(kinds in (['reserved', 'aborted'], ['reserved', 'dispatched', 'aborted'],
+                         ['reserved', 'dispatched', 'completed']),
+              'unsettled/unknown/replayed preparation lifecycle')
+    source_ref = prep[0]['source_record']
+    exact(read(source_ref), plan['source'], 'preparation current source')
+    w.require(source_ref['path'] == spec['runtime_binding']['source_record_path'], 'preparation source path')
+    # Historical release validity is evidence only. Successful readiness below
+    # rechecks present freshness through derive; this call never grants dispatch.
+    release = preparation.validate_release(prep[0]['release'], spec, plan['source'], source_ref,
+                                           now=prep[0]['time_unix'])
+    common = {key: release[key] for key in
+              ('source_record', 'baseline', 'resource_id', 'source_cwd', 'interpreter')}
+    common['release'] = prep[0]['release']
+    parent = preparation.owned_identity(prep[0]['parent'])
+    last = preparation.timestamp(release['issued_at'])
+    for event in prep:
+        terminal = event['event'] in ('completed', 'aborted')
+        preparation.closed(event, (*common, 'event', 'time_unix', 'reserved_gpu_seconds',
+            'gpu_process_wall_seconds', 'provider_calls', 'exclusive', 'telemetry_complete',
+            'gpu', 'provider', 'kind', 'envelope', 'process', 'parent',
+            *(['error'] if terminal else [])), 'strict preparation event')
+        exact({key: event[key] for key in common}, common, 'immutable preparation release/source/baseline')
+        exact(event['parent'], parent, 'immutable preparation parent')
+        exact(event['reserved_gpu_seconds'], release['gpu_seconds'], 'preparation finite reservation')
+        when = preparation.number(event['time_unix'], 'preparation event time')
+        w.require(last < when <= time.time(), 'ordered preparation timestamps')
+        if not terminal or event['event'] == 'completed':
+            w.require(when < preparation.timestamp(release['expires_at']), 'preparation release event expiry')
+        last = when
+        charge = preparation.number(event['gpu_process_wall_seconds'], 'full actual preparation charge')
+        w.require(type(event['provider_calls']) is int and 0 <= event['provider_calls'] <= 1,
+                  'preparation one provider call')
+        if not terminal:
+            exact([charge, event['provider_calls'], event['gpu'], event['provider'], event['envelope'], event['process']],
+                  [0, 0, None, None, None, None], 'preparation preterminal evidence')
+            w.require(event['exclusive'] is True and event['telemetry_complete'] is True,
+                      'preparation admission telemetry')
+    terminal = prep[-1]
+    if kinds[-1] == 'aborted':
+        # Full finite overrun remains in the generic global snapshot. There is
+        # intentionally no cap/truncation, identity reset, or retry branch here.
+        if 'dispatched' in kinds:
+            w.require(terminal['gpu_process_wall_seconds'] >= terminal['time_unix'] - prep[1]['time_unix'],
+                      'failed preparation full elapsed charge')
+        else:
+            exact(terminal['gpu_process_wall_seconds'], 0, 'no-dispatch preparation charge')
+        raise ValueError('failed preparation requires separate bounded root reconciliation; no readiness')
+    runtime = read(plan['runtime'])
+    proof_ref = runtime['preparation']['readiness_proof']
+    proof = preparation.pinned(proof_ref, policy['proof_path'])
+    exact(read(proof['accounting']), prep, 'accepted proof exact preparation accounting')
+    exact(proof['release'], common['release'], 'accepted proof release')
+    expected = preparation.derive(spec, plan['source'], source_ref, proof_ref)
+    exact(runtime, expected, 'accepted preparation exact runtime')
+    preparation.accepted(spec, proof_ref, plan['runtime'])
+    if health:
+        w.require(terminal['time_unix'] < preparation.number(health[0]['time_unix'], 'health reservation time'),
+                  'preparation must finish before health reservation')
+    return resource_events(plan, health)
+
+
 def live_journals(plan, authority, events, resources, reservations):
     baseline = validate_authority(plan, authority)
     return _journal_suffixes(plan, baseline, events, resources, reservations)
@@ -566,7 +660,7 @@ def _journal_suffixes(plan, baseline, events, resources, reservations):
         suffix[name] = current[len(old):]
     w.require(not suffix[JOURNALS[2]], 'engineering foreign reservation suffix')
     local = episode_events(plan, suffix[JOURNALS[0]])
-    health = resource_events(plan, suffix[JOURNALS[1]])
+    health = preparation_health_suffix(plan, baseline, resources)
     if local:
         w.require(health and health[-1]['event'] == 'completed'
                   and health[-1]['time_unix'] <= local[0]['time_unix'],
@@ -831,10 +925,8 @@ def validate_readiness(plan_ref, release_record, *, resources=None):
     # the real durable sequence, never a synthetic prefix, is mandatory here.
     if resources is None:
         resources = r.read_events(OWNER / 'data/gpu-healthcheck-ledger.jsonl')
-    baseline = terminal_parent_prefix()[JOURNALS[1]]
-    exact(resources[:len(baseline)], baseline, 'R1 readiness terminal parent prefix')
-    group = resources[len(baseline):]
-    resource_events(plan, group)
+    baseline = terminal_parent_prefix()
+    group = preparation_health_suffix(plan, baseline, resources)
     w.require([event['event'] for event in group] == ['reserved', 'dispatched', 'completed']
               and group[-1] == terminal, 'engineering health not durably settled')
     evidence = r.read_json(output / 'probe-evidence.json')

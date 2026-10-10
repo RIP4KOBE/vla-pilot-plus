@@ -303,11 +303,13 @@ def produce(proof_ref):
 # The journal is authoritative for preparation identity. The existing resource
 # journal mirrors every transition so unchanged owner budget readers see costs
 # and inflight reservations. A torn two-journal write blocks, never repairs itself.
-MEASUREMENT_CONTRACT = {'schema': 'n36-preparation-measurement-envelope-v2',
-    'not_before': '2026-10-10T22:19:24.983319+00:00',
+MEASUREMENT_CONTRACT = {'schema': 'n36-preparation-measurement-envelope-v3',
+    'not_before': '2026-10-10T22:45:08+00:00',
     'resource_kind': 'readiness_preparation', 'journal': 'readiness-preparation-ledger.jsonl',
     'global_accounting': 'gpu-healthcheck-ledger.jsonl', 'mirror_required': True,
-    'unknown_blocks_reuse': True, 'cleanup_seconds': 40, 'provider_calls': 1}
+    'unknown_blocks_reuse': True, 'cleanup_seconds': 40, 'provider_calls': 1,
+    'child_launch_intent_required': True, 'provider_handle_chain_required': True,
+    'suffix_partition': 'strict_preparation_then_sole_health_v1'}
 
 
 def write_once(path, value):
@@ -454,15 +456,19 @@ def measure_provider(runtime, env, output, frame, guard):
     lifecycle = LifecycleTelemetry(StageLifecycle, client.public_policy['maximum_event_bytes'])
     process = None
     identity = None
+    launch_ref = handle_ref = None
     with (output / 'response.jsonl').open('x+b') as stdout, (output / 'provider-stderr.txt').open('x+b') as stderr:
         try:
-            write_once(output / 'provider-launch-intent.json', {'calls_reserved': 1,
-                'parent': process_identity(__import__('os').getpid()), 'time_unix': time.time()})
+            launch_ref = write_once(output / 'provider-launch-intent.json', {'calls_reserved': 1,
+                'parent': process_identity(__import__('os').getpid()), 'time_unix': time.time(),
+                'monotonic': time.monotonic()})
             lifecycle.mark('spawn_started_at')
             process = subprocess.Popen(client._command(output, [frame]), stdin=subprocess.PIPE,
                 stdout=stdout, stderr=stderr, cwd=output, env=env, start_new_session=False)
             identity = process_identity(process.pid)
-            write_once(output / 'provider-process.json', identity)
+            handle_ref = write_once(output / 'provider-process.json', {'process': identity,
+                'parent': process_identity(__import__('os').getpid()), 'launch_intent': launch_ref,
+                'time_unix': time.time(), 'monotonic': time.monotonic()})
             lifecycle.mark('spawn_returned_at')
             lifecycle.start(stdout)
             client.api_request_counter.values['logical_call_attempts'] += 1
@@ -481,6 +487,7 @@ def measure_provider(runtime, env, output, frame, guard):
         finally:
             lifecycle.finish(process)
             write_once(output / 'provider-transport.json', {'process': identity,
+                'launch_intent': launch_ref, 'process_handle': handle_ref,
                 'calls': client.api_request_counter.values['logical_call_attempts'],
                 'returncode': None if process is None else process.returncode,
                 'lifecycle': lifecycle.data, 'preflight': status,
@@ -648,6 +655,7 @@ def execute_preparation(release_ref):
         process = None
         identity = None
         dispatched_at = None
+        child_admitted = False
         error = None
         envelope_ref = None
         envelope = None
@@ -661,10 +669,13 @@ def execute_preparation(release_ref):
             append('dispatched')
             dispatched_at = records[-1]['time_unix']
             with (output / 'child.log').open('xb') as log:
+                write_once(output / 'child-launch-intent.json', {'release': release_ref,
+                    'context': context_ref, 'parent': parent, 'time_unix': time.time()})
                 process = subprocess.Popen(command, cwd=plan['worktree'], env=env, stdout=log,
                                            stderr=subprocess.STDOUT, start_new_session=True)
                 identity = process_identity(process.pid)
                 write_once(output / 'child-admitted.json', identity)
+                child_admitted = True
                 supervise_measurement(process, identity, release['gpu_seconds'] - 40, physical)
             # Check no descendant remains on the GPU after parent exit.
             e.r.gpu_admission(physical_gpu=physical, expected_uuid=runtime['gpu_mapping']['uuid'])
@@ -677,7 +688,8 @@ def execute_preparation(release_ref):
         except BaseException as exc:
             error = type(exc).__name__
         # Unknown/live handles remain inflight. No unowned handle is signalled.
-        if process is not None and (identity is None or process.poll() is None):
+        if (output / 'child-launch-intent.json').exists() and (
+                process is None or identity is None or not child_admitted or process.poll() is None):
             raise RuntimeError('unknown/live preparation child; retain reservation for root reconciliation')
         # A provider descendant may outlive a killed child. Missing transport
         # is not proof of its exit; retain inflight instead of hiding its cost.
@@ -685,7 +697,8 @@ def execute_preparation(release_ref):
         if (output / 'provider-launch-intent.json').exists() and not provider_handle.exists():
             raise RuntimeError('unknown provider launch; retain preparation reservation')
         if provider_handle.exists():
-            handle = e.r.read_json(provider_handle)
+            handle = e.r.read_json(provider_handle)['process']
+            owned_identity(handle)
             try:
                 live = process_identity(handle['pid'])
             except FileNotFoundError:
@@ -725,6 +738,17 @@ def execute_preparation(release_ref):
         return write_once(policy(spec)['proof_path'], proof)
 
 
+def owned_identity(value):
+    import uuid
+    closed(value, ('pid', 'proc_start_ticks', 'boot_id'), 'owned process identity')
+    e.w.require(type(value['pid']) is int and value['pid'] > 0
+                and isinstance(value['proc_start_ticks'], str) and value['proc_start_ticks'].isascii()
+                and value['proc_start_ticks'].isdigit() and int(value['proc_start_ticks']) > 0
+                and isinstance(value['boot_id'], str), 'owned process identity values')
+    e.w.require(str(uuid.UUID(value['boot_id'])) == value['boot_id'], 'owned process boot identity')
+    return value
+
+
 def verify_envelope(proof, plan, common, events):
     envelope = e.read(proof['measurement_envelope'])
     closed(envelope, (*common, 'schema', 'process', 'parent', 'started_at', 'finished_at', 'gpu', 'provider',
@@ -734,9 +758,7 @@ def verify_envelope(proof, plan, common, events):
     for name in ('gpu', 'provider', 'native_receipt', 'runtime_receipt', 'runtime_receipt_binding'):
         e.exact(envelope[name], proof[name], 'measurement envelope ' + name)
     for name in ('process', 'parent'):
-        closed(envelope[name], ('pid', 'proc_start_ticks', 'boot_id'), 'owned process identity')
-        e.w.require(type(envelope[name]['pid']) is int and envelope[name]['pid'] > 0
-                    and envelope[name]['proc_start_ticks'] and envelope[name]['boot_id'], 'owned process identity values')
+        owned_identity(envelope[name])
         e.exact(events[-1][name], envelope[name], 'terminal envelope ' + name)
     e.w.require(events[-1]['error'] is None, 'terminal measurement error')
     e.exact(events[-1]['envelope'], proof['measurement_envelope'], 'terminal native/runtime envelope hashes')
@@ -751,6 +773,39 @@ def verify_envelope(proof, plan, common, events):
                if x.get('resource_id') == common['resource_id']]
     e.exact(mirrors, selected, 'durable global preparation charges')
     transport = e.read(envelope['transport'])
+    closed(transport, ('process', 'parent', 'launch_intent', 'process_handle', 'calls',
+        'returncode', 'lifecycle', 'preflight', 'request', 'response', 'public_policy'), 'provider transport')
+    owned_identity(transport['process'])
+    output = Path(policy(e.specification())['proof_path']).with_suffix('.measurement')
+    launch = pinned(transport['launch_intent'], str(output / 'provider-launch-intent.json'))
+    handle = pinned(transport['process_handle'], str(output / 'provider-process.json'))
+    closed(launch, ('calls_reserved', 'parent', 'time_unix', 'monotonic'), 'provider launch intent')
+    closed(handle, ('process', 'parent', 'launch_intent', 'time_unix', 'monotonic'), 'provider handle')
+    e.exact(launch['calls_reserved'], 1, 'provider one launch intent')
+    e.exact(handle['launch_intent'], transport['launch_intent'], 'provider handle launch binding')
+    e.exact(handle['process'], transport['process'], 'provider durable process binding')
+    for record in (launch, handle):
+        e.exact(record['parent'], envelope['process'], 'provider launch parent')
+    e.w.require(transport['process']['pid'] not in (envelope['process']['pid'], envelope['parent']['pid'])
+                and transport['process']['boot_id'] == envelope['process']['boot_id']
+                and int(transport['process']['proc_start_ticks']) >= int(envelope['process']['proc_start_ticks']),
+                'provider distinct child identity')
+    lifecycle = transport['lifecycle']
+    e.w.require(lifecycle['clock'] == 'monotonic_seconds', 'provider lifecycle clock')
+    times = [number(launch['monotonic'], 'provider launch clock')]
+    for key in ('spawn_started_at',):
+        times.append(number(lifecycle[key], 'provider ' + key))
+    times.append(number(handle['monotonic'], 'provider handle clock'))
+    for key in ('spawn_returned_at', 'communicate_started_at', 'communicate_returned_at',
+                'process_exit_observed_at', 'observer_finished_at'):
+        times.append(number(lifecycle[key], 'provider ' + key))
+    e.w.require(times == sorted(times), 'provider ordered lifecycle')
+    e.exact(lifecycle['returncode'], 0, 'provider observed terminal exit')
+    e.w.require(envelope['started_at'] <= number(launch['time_unix'], 'provider launch time')
+                <= number(handle['time_unix'], 'provider handle time')
+                <= e.read(proof['provider'])['observed_at'] <= envelope['finished_at']
+                and times[-1] - times[0] <= envelope['finished_at'] - envelope['started_at'],
+                'provider launch within measurement')
     e.w.require(transport['returncode'] == 0 and type(transport['calls']) is int and transport['calls'] == 1
                 and transport['lifecycle']['observation_complete'] is True
                 and transport['lifecycle']['complete_usage_observed'] is True
