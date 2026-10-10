@@ -22,6 +22,13 @@ from scripts.qd_ed_n36r2_admission import OWNER, SESSION
 BASE = '813f25bc89a3920149739a2bf957b2e1b3db29c4'
 SOURCE = SESSION / 'variants/n36_engineering_adapter_001482/implementation_worktree'
 PREPARATION = OWNER.parent / 'autonomy_20261004/turns/001479/bounded-engineering-preparation'
+# Existing lexical mapping bound by the 001352 owner-alias repair authority
+# (ae1cf552f52c9083fff2b0bb98c076d86d03b12993725e08ae2812e5d6084a78).
+# This is route provenance only, never engineering adoption or dispatch authority.
+OWNER_ROUTE_MAPPING = {
+    'path': str(OWNER.parent / 'autonomy_20261004/turns/001352/owner-alias-repair/alias-evidence-v1.json'),
+    'sha256': '70097b35181e55589df8bb053857b11840f08542fb8ed8bec57635ba493b22a2'}
+HISTORICAL_OWNER = '/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z'
 SPECIFICATION = {'path': str(PREPARATION / 'engineering-adapter-spec-v1.json'),
                  'sha256': '9df1dbbbe985df1d02e88770356b59e47d346a9f546629e0d7262cb9e51ecd15'}
 IDENTITY = 'N36_ENGINEERING_C0_TASK0_001479'
@@ -503,9 +510,32 @@ def launch_guard(plan, authority, *, need=1840, now=None):
     stop.check(now=now, ends_at=authority['weekly_window']['ends_at'], need=need)
 
 
+def validate_owner_route(state):
+    """Preserve historical spelling; neither resolution nor state grants a route."""
+    w.require(state.get('canonical_worktree') == str(OWNER),
+              'engineering owning state canonical worktree differs')
+    lexical = state.get('worktree')
+    w.require(lexical in (str(OWNER), HISTORICAL_OWNER),
+              'engineering owning state lexical worktree differs')
+    if lexical == HISTORICAL_OWNER:
+        mapping = read(OWNER_ROUTE_MAPPING)
+        w.require(mapping.get('schema') == 'n36r3-owner-alias-evidence-v1'
+                  and mapping.get('lexical_worktree') == HISTORICAL_OWNER
+                  and mapping.get('canonical_worktree') == str(OWNER)
+                  and mapping.get('resolved_worktree') == str(OWNER)
+                  and mapping.get('samefile') is True,
+                  'engineering authorized owner mapping differs')
+        alias = Path(lexical)
+        try:
+            matches = (alias.resolve(strict=True) == OWNER
+                       and alias.is_dir() and alias.samefile(OWNER))
+        except (OSError, RuntimeError):
+            matches = False
+        w.require(matches, 'engineering owning state alias identity differs')
+
+
 def validate_state(plan, authority, state):
-    w.require(state.get('canonical_worktree') == str(OWNER) and state.get('worktree') == str(OWNER),
-              'engineering exact owning state route')
+    validate_owner_route(state)
     w.require(state.get('n36_engineering_budget_authority') == plan['authority'],
               'engineering state adoption missing')
     caps, budget = authority['caps'], state['budget']

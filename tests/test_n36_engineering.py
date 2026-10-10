@@ -512,3 +512,151 @@ def test_partial_implementation_dispatch_veto_has_no_artifact_override(prepared,
                  lambda: e.launch_guard(plan, {})):
         with pytest.raises(RuntimeError, match='engineering dispatch disabled'):
             call()
+
+
+# G1 fixtures exercise only route/state gates, without production plans or journals.
+ACTUAL_HISTORICAL_OWNER = '/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z'
+ACTUAL_CANONICAL_OWNER = ('/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/'
+    'eds-qd-autoresearch-libero-swap-ood/research_sessions/'
+    'rdt-qd-ed-final-20260921T093925Z/study_worktree')
+
+
+@pytest.fixture
+def owner_route_state():
+    caps = copy.deepcopy(c.CAPS)
+    plan = {'authority': {'path': '/synthetic/not-an-approval.json', 'sha256': '0' * 64}}
+    authority = {'caps': caps, 'amendment': {'synthetic': True}}
+    state = {'worktree': ACTUAL_HISTORICAL_OWNER, 'canonical_worktree': ACTUAL_CANONICAL_OWNER,
+             'n36_engineering_budget_authority': copy.deepcopy(plan['authority']),
+             'gpu_pool': [7], 'max_concurrent_gpu_workers': 1,
+             'budget': {'max_episode_attempts': caps['attempts'], 'max_gpu_hours': caps['gpu_hours'],
+                        'reserved': copy.deepcopy(caps['buckets']),
+                        'gpu_hour_reservations': copy.deepcopy(caps['protected_gpu_hours']),
+                        'amendment': copy.deepcopy(authority['amendment'])},
+             'resource_isolation': {'status': 'ACTIVE', 'validation_status': 'PASS', 'private_budget': True}}
+    return plan, authority, state
+
+
+def check_owner_route(fixture):
+    before = copy.deepcopy(fixture)
+    try:
+        return e.validate_state(*fixture)
+    finally:
+        assert fixture == before
+
+
+@pytest.mark.parametrize('spelling', ['historical', 'canonical'])
+def test_owner_route_actual_strings_and_pinned_mapping(owner_route_state, spelling):
+    assert str(e.OWNER) == ACTUAL_CANONICAL_OWNER
+    assert e.HISTORICAL_OWNER == ACTUAL_HISTORICAL_OWNER
+    assert e.OWNER_ROUTE_MAPPING == {
+        'path': str(e.OWNER.parent / 'autonomy_20261004/turns/001352/owner-alias-repair/alias-evidence-v1.json'),
+        'sha256': '70097b35181e55589df8bb053857b11840f08542fb8ed8bec57635ba493b22a2'}
+    if spelling == 'canonical':
+        owner_route_state[2]['worktree'] = ACTUAL_CANONICAL_OWNER
+    assert check_owner_route(owner_route_state) is None
+
+
+@pytest.mark.parametrize('field', ['worktree', 'canonical_worktree'])
+@pytest.mark.parametrize('fault', ['absent', 'null', 'foreign', 'normalized', 'other-alias'])
+def test_owner_route_rejects_foreign_lexical_strings(owner_route_state, tmp_path, field, fault):
+    state = owner_route_state[2]
+    other = tmp_path / 'unlisted-alias'
+    other.symlink_to(e.OWNER, target_is_directory=True)
+    if fault == 'absent':
+        del state[field]
+    else:
+        state[field] = {'null': None, 'foreign': str(e.SOURCE),
+                        'normalized': state[field] + '/.', 'other-alias': str(other)}[fault]
+    with pytest.raises(ValueError, match='owning state .* worktree differs'):
+        check_owner_route(owner_route_state)
+
+
+@pytest.mark.parametrize('fault', ['absent', 'tampered', 'foreign-lexical', 'foreign-canonical',
+                                  'foreign-resolved', 'samefile', 'schema', 'malformed-reference'])
+def test_owner_route_mapping_rejections(owner_route_state, tmp_path, monkeypatch, fault):
+    # Synthetic mapping only: no production binding or authority is created.
+    mapping = {'schema': 'n36r3-owner-alias-evidence-v1',
+               'lexical_worktree': ACTUAL_HISTORICAL_OWNER,
+               'canonical_worktree': ACTUAL_CANONICAL_OWNER,
+               'resolved_worktree': ACTUAL_CANONICAL_OWNER, 'samefile': True}
+    if fault.startswith('foreign-'):
+        field = {'foreign-lexical': 'lexical_worktree', 'foreign-canonical': 'canonical_worktree',
+                 'foreign-resolved': 'resolved_worktree'}[fault]
+        mapping[field] = str(e.SOURCE)
+    elif fault == 'samefile':
+        mapping['samefile'] = 1
+    elif fault == 'schema':
+        mapping['schema'] = 'foreign-schema'
+    binding = put(tmp_path, 'synthetic-owner-mapping', mapping)
+    if fault == 'absent':
+        Path(binding['path']).unlink()
+    elif fault == 'tampered':
+        Path(binding['path']).write_text('{}')
+    elif fault == 'malformed-reference':
+        del binding['sha256']
+    monkeypatch.setattr(e, 'OWNER_ROUTE_MAPPING', binding)
+    with pytest.raises(ValueError, match='reference|authorized owner mapping differs'):
+        check_owner_route(owner_route_state)
+
+
+@pytest.mark.parametrize('fault', ['dangling', 'retargeted', 'regular-file', 'loop', 'samefile-error'])
+def test_owner_route_live_identity_rechecked(owner_route_state, tmp_path, monkeypatch, fault):
+    owner = tmp_path / 'owner'
+    owner.mkdir()
+    alias = tmp_path / 'historical-alias'
+    alias.symlink_to(owner, target_is_directory=True)
+    monkeypatch.setattr(e, 'OWNER', owner)
+    monkeypatch.setattr(e, 'HISTORICAL_OWNER', str(alias))
+    mapping = {'schema': 'n36r3-owner-alias-evidence-v1', 'lexical_worktree': str(alias),
+               'canonical_worktree': str(owner), 'resolved_worktree': str(owner), 'samefile': True}
+    monkeypatch.setattr(e, 'OWNER_ROUTE_MAPPING', put(tmp_path, 'synthetic-owner-mapping', mapping))
+    owner_route_state[2].update(worktree=str(alias), canonical_worktree=str(owner))
+    check_owner_route(owner_route_state)
+    alias.unlink()
+    if fault == 'dangling':
+        alias.symlink_to(tmp_path / 'absent')
+    elif fault == 'retargeted':
+        alias.symlink_to(tmp_path, target_is_directory=True)
+    elif fault == 'regular-file':
+        alias.write_text('not a directory')
+    elif fault == 'loop':
+        alias.symlink_to(alias)
+    else:
+        alias.symlink_to(owner, target_is_directory=True)
+        def stat_error(*args):
+            raise OSError('synthetic identity error')
+        monkeypatch.setattr(Path, 'samefile', stat_error)
+    with pytest.raises(ValueError, match='alias identity differs'):
+        check_owner_route(owner_route_state)
+
+
+@pytest.mark.parametrize('fault', ['adoption', 'caps', 'gpu', 'workers', 'attempts', 'hours',
+                                  'reserved', 'protected', 'amendment', 'isolation', 'hold'])
+def test_owner_route_preserves_state_gates(owner_route_state, fault):
+    plan, authority, state = owner_route_state
+    if fault == 'adoption':
+        del state['n36_engineering_budget_authority']
+    elif fault == 'caps':
+        authority['caps']['attempts'] += 1
+    elif fault == 'gpu':
+        state['gpu_pool'] = [0]
+    elif fault == 'workers':
+        state['max_concurrent_gpu_workers'] = 2
+    elif fault in ('attempts', 'hours'):
+        state['budget'][{'attempts': 'max_episode_attempts', 'hours': 'max_gpu_hours'}[fault]] += 1
+    elif fault in ('reserved', 'protected', 'amendment'):
+        state['budget'][{'reserved': 'reserved', 'protected': 'gpu_hour_reservations',
+                         'amendment': 'amendment'}[fault]] = {}
+    elif fault == 'isolation':
+        state['resource_isolation']['private_budget'] = False
+    else:
+        state['external_resource_hold'] = {'do_not_auto_resume': True}
+    with pytest.raises((ValueError, r.GateError)):
+        check_owner_route(owner_route_state)
+
+
+def test_owner_route_admission_does_not_lift_dispatch_veto(owner_route_state):
+    check_owner_route(owner_route_state)
+    with pytest.raises(RuntimeError, match='engineering dispatch disabled'):
+        e.launch_guard(owner_route_state[0], owner_route_state[1])
