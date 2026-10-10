@@ -41,7 +41,7 @@ def setup(tmp_path, monkeypatch):
         key = saved['attempt_id'] if saved else 'historical_'+str(i)
         seconds = saved['gpu_seconds'] if saved else 0.
         if i == 504:
-            seconds = (75.52725286641478-r.budget_snapshot(events)['gpu_hours_consumed'])*3600
+            seconds = (75.53335346582918-r.budget_snapshot(events)['gpu_hours_consumed'])*3600
         bucket = 'baseline' if i < 105 else 'development' if i < 418 else 'validation' if i < 478 else 'recovery'
         base = {'attempt_id':key, 'episode_key':key, 'budget_bucket':bucket}
         events.extend([{**base,'event':'reserved'}, {**base,'event':'dispatched'},
@@ -54,7 +54,7 @@ def setup(tmp_path, monkeypatch):
         p = owner/'data'/name; p.write_text(''.join(json.dumps(e)+'\n' for e in rows))
         anchors[name] = {**c.ref(p), 'bytes':p.stat().st_size}
     snap = r.budget_snapshot(events, [])
-    assert snap['gpu_hours_consumed'] == 75.52725286641478
+    assert snap['gpu_hours_consumed'] == 75.53335346582918
     original = put('original-accounting', {'ledger_prefixes':anchors,
         'cost_reconciliation':{'retained_admission_margin_gpu_hours':.23357169027962}})
     monkeypatch.setattr(c, 'ACCOUNTING_SHA', original['sha256'])
@@ -463,3 +463,13 @@ def test_readiness_timestamp_fix_preserves_non_time_checks(readiness_case, fault
     elif fault == 'journal': x.resources[-1]['time_unix'] -= 1
     with pytest.raises(ValueError):
         x.check(sync_journal=fault != 'journal')
+
+
+def test_reconciled_retained_snapshot_authority_only(setup):
+    """CPU admission fixture only; do not execute even the synthetic health runner."""
+    f = setup
+    rows = gate.validate_authority(f.plan, f.authority)
+    assert rows['attempt-ledger.jsonl'] == f.events
+    assert f.snap['dispatched'] == f.snap['reserved_attempts'] == 505
+    assert f.snap['gpu_hours_consumed'] == 75.53335346582918
+    assert gate.PREPARATION_ID == 'n36_healthcheck_n36r3_preparation_001445'

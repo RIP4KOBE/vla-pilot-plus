@@ -72,13 +72,13 @@ def test_launch_stops_on_pause_without_second_call(monkeypatch):
 
 
 def test_exact_finite_arithmetic_and_unchanged_reserves():
-    snap = {'gpu_hours_consumed': 75.52725286641478,
+    snap = {'gpu_hours_consumed': 75.53335346582918,
             'by_bucket': {'baseline': 100, 'development': 400, 'recovery': 5,
                           'validation': 0, 'formal': 0}}
     result = p.arithmetic(snap)
-    assert result['hours']['conservative_before'] == '75.76082455669440'
-    assert result['hours']['conservative_after'] == '96.76082455669440'
-    assert result['hours']['unprotected_effective_after'] == '80.32322237000398'
+    assert result['hours']['conservative_before'] == '75.76692515610880'
+    assert result['hours']['conservative_after'] == '96.76692515610880'
+    assert result['hours']['unprotected_effective_after'] == '80.31712177058958'
     assert result['seconds']['episodes_total'] + result['seconds']['health_total'] + 200 == 75600
     assert result['health']['maximum_full_reservations'] == 30
     assert result['prospective_attempts'] == 545 and result['remaining_attempts'] == 1255
@@ -107,7 +107,7 @@ def test_snapshot_binds_all_current_bytes_and_rejects_cost_drift(tmp_path, monke
     review = {'ledger_prefix': p.bound(data/'attempt-ledger.jsonl'),
               'health_ledger_prefix': p.bound(data/'gpu-healthcheck-ledger.jsonl')}
     snapshot = {'dispatched': 505, 'reserved_attempts': 505,
-                'gpu_hours_consumed': 75.52725286641478, 'running': 0, 'gpu_healthcheck_inflight': 0}
+                'gpu_hours_consumed': 75.53335346582918, 'running': 0, 'gpu_healthcheck_inflight': 0}
     monkeypatch.setattr(p.r, 'budget_snapshot', lambda *a: copy.deepcopy(snapshot))
     result = p.ledger_snapshot(tmp_path, review)
     assert len(result['ledger_prefixes']) == 3

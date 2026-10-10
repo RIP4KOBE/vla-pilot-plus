@@ -11,8 +11,8 @@ from scripts import qd_ed_n36r2_admission as previous
 
 OWNER = previous.OWNER
 SOURCE = previous.SESSION / 'variants/n36r3_generated_import_001299/implementation_worktree'
-# Fixed successor authorized by node 15.6 / turn 001426; old health stays charged.
-PREPARATION_ID = 'n36_healthcheck_n36r3_preparation_001426'
+# Fixed successor authorized by node 15.6 / turn 001445; old health stays charged.
+PREPARATION_ID = 'n36_healthcheck_n36r3_preparation_001445'
 KIND = 'n36r3_resource_preparation_v1'
 HEALTH = {**previous.HEALTH, 'preparation_id': PREPARATION_ID}
 JOURNALS = {'attempt-ledger.jsonl', 'gpu-healthcheck-ledger.jsonl',
@@ -78,7 +78,7 @@ def validate_authority(plan, authority):
             prefix_rows[name] = [json.loads(line) for line in stream.read(anchor['bytes']).splitlines() if line.strip()]
     snap = r.budget_snapshot(prefix_rows['attempt-ledger.jsonl'], prefix_rows['gpu-healthcheck-ledger.jsonl'])
     w.require(snap == accounting['snapshot'] and snap['dispatched'] == snap['reserved_attempts'] == 505
-              and snap['gpu_hours_consumed'] == 75.53031173955723
+              and snap['gpu_hours_consumed'] == 75.53335346582918
               and snap['running'] == snap['gpu_healthcheck_inflight'] == 0
               and all(g[-1]['event'] in r.TERMINAL for g in r.event_groups(prefix_rows['attempt-ledger.jsonl']).values()),
               'N36R3 retained 505 attempts and exact costs required')
