@@ -73,7 +73,7 @@ Root sequence (separate transactions, none performed by this executor):
    flags in these artifacts or relabel N36R2 authority. Then bind a fresh released
    plan, independent exact-source review and detached release by external hashes.
 5. Only after those gates, the existing launch form is:
-   `"$PYTHON" -B -S "$ADOPTED_SOURCE/scripts/qd_ed_n36_bootstrap.py" scripts.qd_ed_n36_runner --plan "$PLAN" --plan-sha256 "$PLAN_SHA256" --release "$RELEASE" --release-sha256 "$RELEASE_SHA256"`.
+   `"$PYTHON" -I -S -B -X pycache_prefix=/dev/null "$ADOPTED_SOURCE/scripts/qd_ed_n36_bootstrap.py" scripts.qd_ed_n36_runner --plan "$PLAN" --plan-sha256 "$PLAN_SHA256" --release "$RELEASE" --release-sha256 "$RELEASE_SHA256"`.
    This is a future command template, not an executable release supplied here.
 6. The first production C0 terminal is charged once before returning
    PAUSED_FOR_ROOT_G3 (or INVALID_STOP). Journal reconciliation also pauses on
@@ -86,3 +86,17 @@ Root sequence (separate transactions, none performed by this executor):
 
 An invalid C0 retains failure/partial evidence and stops the cohort. A passing
 CPU test, preparation package or C0 task outcome is not G3 or scientific acceptance.
+
+Readiness API template for root's separate transaction (not run here): after
+hash-verifying the newly adopted runtime and plan, call
+`qd_ed_n36_runner.device_check()`,
+`qd_ed_final_runner.verify_provider(runtime, qd_ed_n36r2_admission.child_environment(plan, runtime), root=source_root)`,
+and `qd_ed_final_runner.runtime_gpu(runtime, owning_state)` under the normal
+owning locks and reviewed N36R3 routing. These checks do not prove CUDA/EGL or
+execute a task. The separately metered health transaction uses
+`qd_ed_n36_healthcheck.run_healthcheck(plan_ref, release_ref, resource_id, timeout_seconds=20)`
+only after its own valid root release/finite reservation authority exists. Its
+current N36R3 rejection is a blocker, not a reason to bypass the release gate.
+Root must resolve the preparation-health authority versus fresh episode-release
+ordering explicitly; a historic provider_ready/cuda_egl_verified flag is not
+fresh readiness evidence.
