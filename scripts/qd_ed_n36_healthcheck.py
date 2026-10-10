@@ -46,7 +46,10 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
     if n36r3:
         adapter.source_execution.active()
         plan, _, _ = validate(plan_ref, release_ref)
-        adapter.source_execution.attest(Path(plan['worktree']), plan['source'], w.read_ref(plan['runtime_closure']))
+        # The verified health release binds the plan before resource admission;
+        # this attestation belongs to the live parent, not the probe child.
+        adapter.source_execution.attest(Path(plan['worktree']), plan['source'], w.read_ref(plan['runtime_closure']),
+            binding=adapter.worker.runtime_receipt_binding(release_ref, plan, w.process_identity(), 'runtime_before'))
     record = accounting.reserve_healthcheck(plan_ref, release_ref, resource_id,
                                             timeout_seconds=timeout_seconds)
     plan, runtime, authority = validate(plan_ref, release_ref)

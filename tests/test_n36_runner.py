@@ -140,7 +140,7 @@ def lifecycle(tmp_path, monkeypatch):
     # These synthetic journal/Popen tests do not claim interpreter attestation;
     # test_n36_audit_repair exercises the real source-only subprocess entry.
     monkeypatch.setattr(adapter.source_execution, 'active', lambda: None)
-    monkeypatch.setattr(adapter.source_execution, 'attest', lambda *args: None)
+    monkeypatch.setattr(adapter.source_execution, 'attest', lambda *args, **kwargs: None)
     tmp_path = tmp_path / 'study_worktree'
     tmp_path.mkdir()
     rows = c.expected_rows()

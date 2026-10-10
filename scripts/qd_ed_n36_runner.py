@@ -67,7 +67,10 @@ def execute_one(plan_ref, release_ref):
     plan, runtime, authority = release.validate_release(plan_ref, release_ref)
     source_root = Path(plan['worktree']).resolve()
     root = owner_root(plan)
-    source_execution.attest(source_root, plan['source'], w.read_ref(plan['runtime_closure']))
+    # The verified detached release binds this parent invocation to its plan.
+    # Use the live parent identity, not a future episode child's identity.
+    source_execution.attest(source_root, plan['source'], w.read_ref(plan['runtime_closure']),
+        binding=worker.runtime_receipt_binding(release_ref, plan, w.process_identity(), 'runtime_before'))
     with r.locked(root / 'data/qd-ed-runner.lock', nonblocking=True):
         with r.locked(root / 'data/qd-ed-state.lock'):
             plan, runtime, authority = release.validate_release(plan_ref, release_ref)
