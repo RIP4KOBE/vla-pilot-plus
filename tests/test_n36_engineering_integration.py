@@ -532,6 +532,54 @@ def test_worker_receipt_deep_bindings_cannot_be_replaced_by_rehashed_claims(f):
     process = r.read_json(output / 'process.json')
     receipt_path = output / 'eds_eval/n36-worker-receipt.json'
     original = r.read_json(receipt_path)
+    required_modules = ['scripts.qd_ed_n36_' + name
+                        for name in ('engineering', 'release', 'accounting', 'stop')]
+    identity_cases = [(fault, phase, module)
+                      for fault in ('substituted_source', 'omitted_compiled',
+                                    'substituted_compiled', 'renamed_compiled')
+                      for phase in ('before', 'after') for module in required_modules]
+    identity_cases += [('combined_substitution', None, None), ('worker_main_identity', None, None)]
+    for fault, phase, module in identity_cases:
+        value = copy.deepcopy(original)
+        expected_error = 'engineering executable source identity absent'
+        if fault == 'substituted_source':
+            value['loaded_' + phase][module] = copy.deepcopy(value['loaded_' + phase]['scripts.qd_ed_n36_contract'])
+            expected_error = 'engineering loaded source identity differs'
+        elif fault == 'combined_substitution':
+            # Exact prior independent acceptance defect: both observations are
+            # rehashed after all four loaded identities and compiled rows change.
+            for suffix in ('before', 'after'):
+                for name in required_modules:
+                    value['loaded_' + suffix][name] = copy.deepcopy(value['loaded_' + suffix]['scripts.qd_ed_n36_contract'])
+                value['execution_' + suffix]['compiled'] = [row for row in value['execution_' + suffix]['compiled']
+                                                            if row['module'] not in required_modules]
+            expected_error = 'engineering loaded source identity differs'
+        elif fault == 'worker_main_identity':
+            for suffix in ('before', 'after'):
+                value['loaded_' + suffix]['scripts.qd_ed_n36_worker']['module_name'] = '__main__'
+        else:
+            compiled = value['execution_' + phase]['compiled']
+            if fault == 'omitted_compiled':
+                value['execution_' + phase]['compiled'] = [row for row in compiled if row['module'] != module]
+            else:
+                target = next(row for row in compiled if row['module'] == module)
+                if fault == 'renamed_compiled':
+                    target['module'] = 'scripts.qd_ed_n36_contract'
+                else:
+                    contract = next(row for row in compiled if row['module'] == 'scripts.qd_ed_n36_contract')
+                    target.update(path=contract['path'], sha256=contract['sha256'])
+        for suffix in ('before', 'after'):
+            value['observation_' + suffix] = put(output / 'eds_eval' / ('n36-runtime-' + suffix + '.json'),
+                {key: value[key] for key in ('runtime_' + suffix, 'execution_' + suffix,
+                                             'loaded_' + suffix, 'native_build_' + suffix)})
+        receipt_ref = put(receipt_path, value)
+        if fault == 'worker_main_identity':
+            worker.verify_receipt(context_ref, receipt_ref, process)
+        else:
+            with pytest.raises(ValueError, match=expected_error):
+                worker.verify_receipt(context_ref, receipt_ref, process)
+        for path, data in f.completed_episode.items():
+            path.write_bytes(data)
     for fault in ('missing_engineering_source', 'runtime_process', 'compiled_source',
                   'native_after', 'controller_instance', 'native_arithmetic'):
         value = copy.deepcopy(original)

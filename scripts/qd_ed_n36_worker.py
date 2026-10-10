@@ -372,6 +372,16 @@ def verify_receipt(context_ref, receipt_ref, process_record):
         w.require(isinstance(inventory, dict) and required <= set(inventory), 'loaded source attestation absent')
         index = {v['path']: v['sha256'] for v in plan['source']['files']}
         w.require(all(index.get(v['path']) == v['sha256'] for v in inventory.values()), 'loaded source receipt mismatch')
+        if plan['schema'] == 'n36-engineering-execution-plan-v1':
+            compiled = {(v['module'], v['path'], v['sha256'])
+                        for v in receipt[phase.replace('loaded_', 'execution_')]['compiled']}
+            for name in ('engineering', 'release', 'accounting', 'stop'):
+                module = 'scripts.qd_ed_n36_' + name
+                path = 'scripts/qd_ed_n36_' + name + '.py'
+                w.require(path in index and inventory[module] == {'path': path, 'sha256': index[path]},
+                          'engineering loaded source identity differs: ' + module)
+                w.require((module, str(Path(plan['worktree']).resolve() / path), index[path]) in compiled,
+                          'engineering executable source identity absent: ' + module)
         worker = inventory['scripts.qd_ed_n36_worker']
         w.require(worker == {'path': 'scripts/qd_ed_n36_worker.py',
                             'sha256': index.get('scripts/qd_ed_n36_worker.py'),
