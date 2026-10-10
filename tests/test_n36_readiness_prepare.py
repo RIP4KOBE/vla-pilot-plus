@@ -491,17 +491,29 @@ def runner_cpu(tmp_path, monkeypatch):
                    frozen_stage_provider={'SYNTHETIC':True}, provider_ready=False, cuda_egl_verified=False)
     runtime_ref = put(root, 'runtime', runtime)
     spec['canonical_runtime'] = runtime_ref
+    prep = e.read(spec['runtime_binding']['preparation'])
+    previous = e.read(prep['previous_specification'])
+    previous['canonical_runtime'] = runtime_ref
+    prep['previous_specification'] = put(root,'SYNTHETIC-previous-spec',previous)
+    prep['baseline'] = runtime_ref
+    for key in prep:
+        if key.endswith('_path'): prep[key] = str(root/(key+'.json'))
+    prep['disabled_runtime_path'] = runtime_ref['path']
+    prep['release_path'] = str(root/'release.json')
+    prep['resource_id'] = 'readiness_preparation_SYNTHETIC'
+    spec['runtime_binding'].update(preparation=put(root,'SYNTHETIC-policy',prep),
+        source_record_path=source_ref['path'],runtime_path=str(root/'ready.json'))
     monkeypatch.setattr(e, 'SOURCE', root)
     monkeypatch.setattr(e, 'OWNER', root)
     monkeypatch.setattr(e, 'SPECIFICATION', put(root, 'SYNTHETIC-spec', spec))
     plan = dict(worktree=str(root), authority=None, b5_review=None, frozen=False, release_enabled=False,
                 phase_authorization=dict(engineering=False,dev=False,validation=False,formal=False),
                 source=source, runtime=runtime_ref, runtime_closure=put(root,'closure',{'SYNTHETIC':True}))
-    prep = {k:str(root/(k+'.json')) for k in ('proof_path','accounting_path','gpu_path','provider_path')}
-    prep['resource_id'] = 'readiness_preparation_SYNTHETIC'
-    release = dict(resource_id=prep['resource_id'], gpu_seconds=60, provider_calls=1,
+    release = dict(schema='n36-preparation-measurement-release-v1',approved=True,
+        purpose='readiness_preparation_only',resource_id=prep['resource_id'], gpu_seconds=60, provider_calls=1,
         specification=e.SPECIFICATION, source_record=source_ref, baseline=runtime_ref,
-        source_cwd=str(root), interpreter={'SYNTHETIC':True}, issued_at=contract['not_before'],
+        source_cwd=str(root), interpreter={'path':str(Path(sys.executable).resolve()),
+            'sha256':e.w.sha(Path(sys.executable).resolve()),'version':sys.version}, issued_at=contract['not_before'],
         expires_at=e.stop.DEADLINE, episode_authorized=False, health_authorized=False,
         stop_authority=e.stop.binding(), graph=dict(plan=put(root,'disabled-plan',plan),runtime=runtime_ref))
     release['issued_at'] = dt.datetime.fromtimestamp(p.timestamp(contract['not_before'])+1,dt.timezone.utc).isoformat()
@@ -515,10 +527,13 @@ def runner_cpu(tmp_path, monkeypatch):
         accounting_authority=release['accounting_authority'],owner_root=str(root),
         resource_id=release['resource_id'],production_adoption=False)
     (root/'research-state.yaml').write_text(yaml.safe_dump(state))
+    release['root_review'] = put(root,'SYNTHETIC-release-review',dict(release,
+        schema='n36-preparation-root-measurement-review-v1',decision='APPROVED'))
     ref = put(root,'release',release)
-    monkeypatch.setattr(p, 'measurement_context', lambda r: (spec,source_ref,source,release,plan))
-    monkeypatch.setattr(p, 'policy', lambda s: prep)
-    monkeypatch.setattr(e, 'specification', lambda: spec)
+    # Only deployed graph execution is substituted; release/accounting/state
+    # authorization and policy validation all execute normally.
+    monkeypatch.setattr(p, 'measurement_context', lambda r: (spec,source_ref,source,
+        p.validate_release(r,spec,source,source_ref),plan))
     monkeypatch.setattr(e, 'owner_root', lambda plan: root)  # External deployed route only.
     monkeypatch.setattr(e, 'child_environment', lambda *a: {})
     monkeypatch.setattr(e.r, 'gpu_admission', lambda **kw: {'SYNTHETIC':True})
@@ -527,7 +542,10 @@ def runner_cpu(tmp_path, monkeypatch):
     monkeypatch.setattr(execution, 'attest', lambda *a, **kw: {'SYNTHETIC':True})
     monkeypatch.setattr(runner, 'process_identity', lambda pid: dict(pid=pid,boot_id='SYNTHETIC',proc_start_ticks='1'))
     boundaries = []
-    monkeypatch.setattr(p, 'boundary', lambda *a: boundaries.append(len(boundaries)))
+    def boundary(*args):
+        e.exact(p.validate_release(ref,spec,source,source_ref),release,'CPU release boundary')
+        boundaries.append(len(boundaries))
+    monkeypatch.setattr(p, 'boundary', boundary)
     launches = []
     class Child:
         pid = 424242
@@ -1132,4 +1150,3 @@ def test_prospective_policy_uses_fresh_canonical_paths():
     assert all(str(Path(path).resolve()) == path and not Path(path).exists() for path in paths)
     assert all('/001694/preparation-accounting-repair/' in path for path in paths)
     assert spec['release_enabled'] is spec['root_adopted'] is spec['gpu_authorized'] is False
-
