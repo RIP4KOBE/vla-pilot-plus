@@ -377,8 +377,8 @@ def verify_terminal(plan_ref, row, terminal, release_ref=None):
     record = w.read_ref(c.ref(output / 'process.json'))
     w.require(record.get('context') == context_ref and record.get('release') == release_ref, 'process context/release binding')
     command = w.read_ref(c.ref(output / 'command.json'))
-    w.require(command == {'argv': [manifest['argv'][0], '-m', 'scripts.qd_ed_n36_worker',
-              '--context', context_ref['path'], '--context-sha256', context_ref['sha256']],
+    w.require(command == {'argv': source_execution.command(manifest['argv'][0], plan['worktree'],
+              'scripts.qd_ed_n36_worker', '--context', context_ref['path'], '--context-sha256', context_ref['sha256']),
               'main_argv': manifest['argv'], 'context': context_ref}, 'worker command receipt differs')
     report = verify_receipt(context_ref, terminal['n36_worker_receipt'], w.read_ref(c.ref(output / 'process.json')))
     native_counts(row['profile'], output, report, manifest['expected_runtime'], guided=terminal['guided_chunks'])

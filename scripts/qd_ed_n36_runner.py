@@ -121,17 +121,21 @@ def execute_one(plan_ref, release_ref):
             w.require(not Path(plan['stop_path']).exists() and not Path(plan['stop_path']).is_symlink(), 'STOP after reservation')
             end = min(dt.datetime.fromisoformat(value.replace('Z', '+00:00')) for value in
                       (c.DEADLINE, authority['coordinator_ends_at'], authority['weekly_window']['ends_at']))
-            w.require(dt.datetime.now(dt.timezone.utc) < end, 'deadline after reservation')
+            w.require((end - dt.datetime.now(dt.timezone.utc)).total_seconds() >= 1840,
+                      'deadline after reservation: full attempt unavailable')
             r.append_event_locked(root, {**base, 'event': 'dispatched', 'time_unix': time.time(), 'timeout_seconds': 1800})
         started = time.monotonic()
         process = None
         process_finished = None
         identity = None
         outcome = None
+        start_admitted = False
         try:
             with (output / 'runner.log').open('w') as log:
                 w.require(not Path(plan['stop_path']).exists() and not Path(plan['stop_path']).is_symlink(), 'STOP before worker start')
-                w.require(dt.datetime.now(dt.timezone.utc)<end, 'deadline before worker start')
+                w.require((end - dt.datetime.now(dt.timezone.utc)).total_seconds() >= 1840,
+                          'deadline before worker start: full attempt unavailable')
+                start_admitted = True
                 process = subprocess.Popen(command, cwd=root, env=env, stdin=subprocess.PIPE, stdout=log,
                                            stderr=subprocess.STDOUT, start_new_session=True)
                 identity = process_identity(process.pid)
@@ -147,6 +151,10 @@ def execute_one(plan_ref, release_ref):
                         'gpu_process_wall_seconds': (process_finished or time.monotonic()) - started}
             worker.verify_terminal(plan_ref, row, terminal, release_ref)
         except BaseException as exc:
+            # A rejected final handoff remains unsettled for root reconciliation;
+            # it is not a completed, zero-worker-cost synthetic attempt.
+            if not start_admitted:
+                raise
             if isinstance(exc, subprocess.TimeoutExpired) and exc.cmd == 'owned episode' and process is not None:
                 w.require(identity is not None, 'missing owned child identity; leave unsettled')
                 cleanup_owned(process, identity)
