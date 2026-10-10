@@ -808,7 +808,7 @@ def verify_envelope(proof, plan, common, events):
                 <= e.read(proof['provider'])['observed_at'] <= envelope['finished_at']
                 and times[-1] - times[0] <= envelope['finished_at'] - envelope['started_at'],
                 'provider launch within measurement')
-    e.w.require(transport['returncode'] == 0 and type(transport['calls']) is int and transport['calls'] == 1
+    e.w.require(type(transport['returncode']) is int and transport['returncode'] == 0 and type(transport['calls']) is int and transport['calls'] == 1
                 and transport['lifecycle']['observation_complete'] is True
                 and transport['lifecycle']['complete_usage_observed'] is True
                 and transport['preflight']['login_mode'] == 'current_official_chatgpt_login', 'measured provider lifecycle')

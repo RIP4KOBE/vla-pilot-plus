@@ -261,7 +261,7 @@ def test_parent_source_and_shared_safety_predicates_unchanged():
     old, new = functions(parent_path), functions(e.__file__)
     intentional = {'specification', 'validate_audit_view', 'validate_plan_shape', 'validate_authority',
                    '_journal_suffixes', 'reconcile', 'validate_readiness'}
-    assert set(old) == set(new) - {'terminal_parent_prefix', 'validate_runtime_binding'}
+    assert set(old) == set(new) - {'terminal_parent_prefix', 'validate_runtime_binding', 'preparation_health_suffix'}
     for name in old.keys() - intentional:
         assert new[name] == old[name], name
     assert e.LIMITS == parent.LIMITS
@@ -471,11 +471,19 @@ from test_n36_readiness_prepare import measured as measured_preparation
 
 
 @pytest.fixture
-def preparation_history(measured_preparation, baseline, monkeypatch):
+def preparation_history(measured_preparation, baseline, monkeypatch, request):
     import datetime as dt
     from types import SimpleNamespace
     from scripts import qd_ed_n36_readiness_prepare as preparation
     m = measured_preparation
+    charge = getattr(request, 'param', 3)
+    if charge != 3:
+        events = e.read(m['proof']['accounting'])
+        events[-1]['gpu_process_wall_seconds'] = charge
+        m['proof']['accounting'] = m['save'](m['prep']['accounting_path'], events)
+        m['proof_ref'] = m['save'](m['prep']['proof_path'], m['proof'])
+        for name in ('readiness-preparation-ledger.jsonl', 'gpu-healthcheck-ledger.jsonl'):
+            (m['root']/'data'/name).write_text(''.join(json.dumps(v)+'\n' for v in events))
     monkeypatch.setattr(preparation.time, 'time', lambda: m['now'] + 20)
     runtime = preparation.derive(m['spec'], m['source'], m['source_ref'], m['proof_ref'])
     runtime_ref = m['save'](m['spec']['runtime_binding']['runtime_path'], runtime)
@@ -483,7 +491,7 @@ def preparation_history(measured_preparation, baseline, monkeypatch):
         approved=True, specification=e.SPECIFICATION, proof=m['proof_ref'], runtime=runtime_ref,
         release_enabled=False, health_authorized=False, episode_authorized=False))
     inert = put(m['root'], 'inert-binding', {'SYNTHETIC':True})
-    plan = dict(schema=e.PLAN_SCHEMA, cohort=e.IDENTITY, purpose=e.PURPOSE,
+    plan = dict(schema=e.PLAN_SCHEMA, cohort=e.IDENTITY, purpose=e.PURPOSE, run_name='SYNTHETIC',
         source=m['source'], scientific_source=m['source'], worktree=str(e.SOURCE), runtime=runtime_ref,
         runtime_inventory_sha256='0'*64, artifact_root=str(m['root']/'diagnostic'),
         **{key:inert for key in ('scope','accounting','audit_plan','engineering_manifest','deployment')})
@@ -531,6 +539,7 @@ def preparation_history(measured_preparation, baseline, monkeypatch):
         prep=prep, health=health, attempts=attempts, readiness=readiness, sync=sync)
 
 
+@pytest.mark.parametrize('preparation_history', [3, 59], indirect=True)
 def test_shared_partition_live_and_terminal_with_episode(preparation_history):
     f = preparation_history
     f.current[e.JOURNALS[0]] += f.attempts
@@ -540,11 +549,11 @@ def test_shared_partition_live_and_terminal_with_episode(preparation_history):
     global_snap = e.r.budget_snapshot(f.current[e.JOURNALS[0]], f.current[e.JOURNALS[1]])
     without_prep = e.r.budget_snapshot(f.current[e.JOURNALS[0]], f.baseline[e.JOURNALS[1]] + health)
     diagnostic = e.r.budget_snapshot(local, health)
-    assert global_snap['gpu_hours_consumed'] - without_prep['gpu_hours_consumed'] == pytest.approx(3/3600)
-    assert global_snap['gpu_hours_by_bucket']['recovery'] - without_prep['gpu_hours_by_bucket']['recovery'] == pytest.approx(3/3600)
+    assert global_snap['gpu_hours_consumed'] - without_prep['gpu_hours_consumed'] == pytest.approx(f.prep[-1]['gpu_process_wall_seconds']/3600)
+    assert global_snap['gpu_hours_by_bucket']['recovery'] - without_prep['gpu_hours_by_bucket']['recovery'] == pytest.approx(f.prep[-1]['gpu_process_wall_seconds']/3600)
     assert global_snap['reserved_attempts'] == without_prep['reserved_attempts'] == 508
     assert diagnostic['gpu_healthcheck_hours'] == 2/3600
-    assert diagnostic['gpu_hours_consumed'] == 14/3600
+    assert diagnostic['gpu_hours_consumed'] == pytest.approx(14/3600)
     # Successful health permits only the first episode reservation.
     before_episode = e.r.budget_snapshot([], health)
     assert e.headroom(without_prep, before_episode, health=False,
@@ -565,11 +574,12 @@ def test_preparation_only_is_not_health_readiness(preparation_history):
 @pytest.mark.parametrize('fault', ['pending', 'unknown', 'aborted', 'overrun', 'torn', 'missing_mirror',
     'missing_journal', 'reordered', 'foreign_identity', 'foreign_kind', 'collision', 'mixed_kind',
     'replay', 'prefix', 'release', 'source', 'baseline', 'parent', 'proof', 'after_health',
-    'late_time', 'extra_reservation', 'health_replay', 'terminal_substitution', 'expired'])
+    'late_time', 'extra_reservation', 'health_replay', 'terminal_substitution', 'expired', 'missing_both'])
 def test_shared_partition_rejects_bad_histories_at_both_gates(preparation_history, monkeypatch, fault):
     from scripts import qd_ed_n36_readiness_prepare as preparation
     f = preparation_history
-    if fault == 'pending': f.prep.pop()
+    if fault == 'missing_both': f.prep.clear()
+    elif fault == 'pending': f.prep.pop()
     elif fault == 'unknown': f.prep[-1]['event'] = 'unknown'
     elif fault in ('aborted','overrun'):
         f.prep[-1].update(event='aborted', gpu_process_wall_seconds=90 if fault=='overrun' else 3,
@@ -634,3 +644,24 @@ def test_preparation_cost_reduces_global_headroom_not_diagnostic(preparation_his
     with pytest.raises(ValueError, match='cap/protected reserves'):
         e.headroom(snapshot, local, health=False, margin=margin, protected=protected)
     assert local['gpu_healthcheck_hours'] == 2/3600 and local['reserved_attempts'] == 0
+
+
+def test_preparation_history_health_handoff_uses_sole_reserved_health(preparation_history, monkeypatch):
+    from scripts import qd_ed_n36_runner as runner
+    f = preparation_history
+    f.health[:] = f.health[:1]
+    f.current[e.JOURNALS[1]] = f.baseline[e.JOURNALS[1]] + f.prep + f.health
+    f.sync()
+    runtime = e.read(f.plan['runtime'])
+    authority = {'starts_at': f.m['release']['issued_at']}
+    state = {'run_name': f.plan['run_name'], 'artifacts': runtime['artifact_root']}
+    monkeypatch.setattr(e, 'validate_state', lambda *args: None)
+    monkeypatch.setattr(e.r, 'runtime_gpu', lambda *args: 7)
+    monkeypatch.setattr(runner, 'snapshot', lambda *args: (state, *(f.current[n] for n in e.JOURNALS)))
+    binding = e.health_handoff_binding(f.plan, runtime, authority, state)
+    record = f.health[0]
+    result = e.validate_health_handoff(f.m['root'], f.plan_ref, record['release'], record, binding)
+    assert result == (f.plan, runtime, authority)
+    f.current[e.JOURNALS[1]].append(dict(record, resource_id='foreign'))
+    with pytest.raises(ValueError, match='foreign resource'):
+        e.validate_health_handoff(f.m['root'], f.plan_ref, record['release'], record, binding)

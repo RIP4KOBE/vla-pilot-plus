@@ -789,7 +789,7 @@ def rebind_envelope(m, envelope):
 
 @pytest.mark.parametrize('fault', ['missing', 'null', 'pid_type', 'ticks_type', 'boot_type',
     'pid', 'ticks', 'boot', 'launch_parent', 'handle_parent', 'stale_launch', 'late_handle',
-    'reordered_lifecycle', 'missing_exit', 'extra_transport', 'request', 'response'])
+    'reordered_lifecycle', 'missing_exit', 'extra_transport', 'request', 'response', 'boolean_exit'])
 def test_provider_handle_chain_semantic_rejection(measured, fault):
     m = measured
     envelope = e.read(m['proof']['measurement_envelope'])
@@ -811,6 +811,7 @@ def test_provider_handle_chain_semantic_rejection(measured, fault):
     elif fault == 'reordered_lifecycle': transport['lifecycle']['spawn_returned_at'] = 99
     elif fault == 'missing_exit': transport['lifecycle']['process_exit_observed_at'] = None
     elif fault == 'extra_transport': transport['unbound'] = True
+    elif fault == 'boolean_exit': transport['returncode'] = False
     else: transport[fault]['sha256'] = '0'*64
     transport['launch_intent'] = m['save'](transport['launch_intent']['path'], launch)
     handle['launch_intent'] = transport['launch_intent']
