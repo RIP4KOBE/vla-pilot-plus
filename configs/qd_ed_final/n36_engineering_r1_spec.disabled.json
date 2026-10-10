@@ -206,15 +206,15 @@
       "sha256": "98d150c38fb8dd23fedcc1c8b711d2615ce978638d7e6222e8a36c2c79d4d0a8"
     },
     "preparation": {
-      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001651/readiness-implementation/preparation-policy-v1.json",
-      "sha256": "dbecc6d52b42f161706a391867932617a1316c844788a92f0bcd9fd7777c0f45"
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001694/preparation-accounting-repair/preparation-policy.prospective-disabled-v2.json",
+      "sha256": "df24b4319407825e4dd31550fdf4f8e79b256c2ff7137b698151164e5edebc80"
     },
     "historical_specification": {
       "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001617/recovery-implementation/engineering-r1-spec.disabled-v1.json",
       "sha256": "ccd1991b59cdc30043d6b7061cf4ad73f0ae6c867dd6ae0a9f3e72b1d71d6162"
     },
-    "runtime_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001651/readiness-implementation/prospective-measurement/runtime.measured-preparation-v1.json",
-    "source_record_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001651/readiness-implementation/prospective-measurement/final-source-v1.json",
+    "runtime_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001694/preparation-accounting-repair/prospective-runtime.measured-v1.json",
+    "source_record_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001694/preparation-accounting-repair/prospective-final-source-v1.json",
     "source_base": "bd5dd4dabcb5a1f7823a9e2f51c849cd67767cb6",
     "source_change_allowlist": [
       "configs/qd_ed_final/n36_engineering_r1_spec.disabled.json",

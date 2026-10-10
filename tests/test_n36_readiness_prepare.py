@@ -1119,3 +1119,17 @@ def test_preparation_pure_admission_stop_and_full_remaining_reservation(runner_c
     with pytest.raises(ValueError):
         p.preparation_budget(f.root,f.plan,f.authority,f.release)
     assert not f.launches and not p.journal_rows(f.root)
+
+
+def test_prospective_policy_uses_fresh_canonical_paths():
+    spec = e.specification()
+    assert spec == json.loads((e.b.ROOT/'configs/qd_ed_final/n36_engineering_r1_spec.disabled.json').read_text())
+    policy = p.policy(spec)
+    binding = spec['runtime_binding']
+    paths = [v for k,v in policy.items() if k.endswith('_path')]
+    paths += [binding['runtime_path'],binding['source_record_path']]
+    assert len(set(paths)) == len(paths)
+    assert all(str(Path(path).resolve()) == path and not Path(path).exists() for path in paths)
+    assert all('/001694/preparation-accounting-repair/' in path for path in paths)
+    assert spec['release_enabled'] is spec['root_adopted'] is spec['gpu_authorized'] is False
+
