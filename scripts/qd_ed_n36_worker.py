@@ -263,6 +263,8 @@ def _run_in_process(context_ref):
         receipt.update(audit_report=c.ref(report_path), accepted=True)
     except BaseException as exc:
         receipt.update(accepted=False, classification='INVALID', error_type=type(exc).__name__, error=str(exc))
+        if isinstance(exc, closure.RuntimeOriginError):
+            receipt['runtime_failure_origin'] = exc.runtime_failure_origin
     finally:
         sys.argv = old_argv
         os.chdir(old_cwd)

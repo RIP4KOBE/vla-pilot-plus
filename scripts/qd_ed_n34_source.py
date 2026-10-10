@@ -39,6 +39,87 @@ GENERATED_RULE = 'torch-remote-non-scriptable-v1'
 GENERATOR_SHA = '567d1314ee27ff0b3bd22e7c4d1157246469de25e7a3183d96debe167b193615'
 TEMPLATE_SHA = '0ff1856bbd031b5298d46c06c0502abc20bd804f42c1949ed4127e8c773660cc'
 
+CYUTILITY_TARGETS = ('pandas._libs._cyutility', 'scipy._cyutility', 'sklearn._cyutility')
+CYUTILITY_RULE = 'cyutility-qualified-native-identity-v1'
+
+
+class RuntimeOriginError(ValueError):
+    """A rejection with observations, never a successful attestation."""
+
+    def __init__(self, message, diagnostic):
+        self.runtime_failure_origin = diagnostic
+        super().__init__(message + '; origin=' + json.dumps(diagnostic, sort_keys=True))
+
+
+def _failure_origin(name, expected):
+    module = sys.modules.get(name)
+    spec = getattr(module, '__spec__', None)
+    file = getattr(module, '__file__', None)
+    result = {'name': name, 'expected': expected, 'file': str(file) if file is not None else None,
+              'spec_origin': str(getattr(spec, 'origin', None)),
+              'module_name': str(getattr(module, '__name__', None)),
+              'qualified_identity': {target: module is not None and module is sys.modules.get(target)
+                                     for target in CYUTILITY_TARGETS}}
+    try:
+        path = Path(file).resolve()
+        result.update(resolved_path=str(path), sha256=w.sha(path))
+    except (OSError, TypeError, ValueError) as exc:
+        result['observation_error'] = type(exc).__name__ + ': ' + str(exc)
+    return result
+
+
+def build_cyutility_alias_rule(modules):
+    """Build a prospective rule ONLY from supplied frozen qualified records.
+
+    This neither discovers imports nor updates any closure/release on disk.
+    """
+    targets = {name: dict(modules[name]) for name in CYUTILITY_TARGETS if name in modules}
+    w.require(bool(targets), 'cyutility qualified targets absent')
+    for record in targets.values():
+        path = _runtime_file(record)
+        w.require(any(path.name == '_cyutility' + suffix
+                      for suffix in importlib.machinery.EXTENSION_SUFFIXES),
+                  'cyutility target is not qualified native binary')
+    return {'_cyutility': {'rule': CYUTILITY_RULE, 'targets': targets}}
+
+
+def _alias_rules(closure):
+    if 'module_aliases' not in closure:
+        return {}
+    rules = closure['module_aliases']
+    w.require(closure.get('schema') == 'n34-runtime-source-closure-v2'
+              and isinstance(rules, dict) and set(rules) == {'_cyutility'},
+              'runtime alias schema/names differ')
+    rule = rules['_cyutility']
+    w.require(isinstance(rule, dict) and set(rule) == {'rule', 'targets'}
+              and rule['rule'] == CYUTILITY_RULE and isinstance(rule['targets'], dict)
+              and bool(rule['targets']) and set(rule['targets']) <= set(CYUTILITY_TARGETS),
+              'runtime alias rule differs')
+    for name, record in rule['targets'].items():
+        w.require(name in closure['modules'] and record == closure['modules'][name],
+                  'runtime alias target not frozen: ' + name)
+    # Validate only declared targets; never expand authority from observed imports.
+    w.require(build_cyutility_alias_rule(rule['targets']) == rules, 'runtime alias targets differ')
+    return rules
+
+
+def _live_alias(name, module, rule):
+    w.require(module is not None and module is sys.modules.get(name),
+              'runtime alias binding changed: ' + name)
+    file = getattr(module, '__file__', None)
+    w.require(file is not None, 'runtime alias file absent: ' + name)
+    record = {'path': str(Path(file).resolve()), 'sha256': w.sha(Path(file).resolve())}
+    targets = [target for target, frozen in rule['targets'].items()
+               if frozen == record and module is sys.modules.get(target)]
+    w.require(len(targets) == 1, 'runtime alias origin/identity differs: ' + name)
+    target = targets[0]
+    spec = getattr(module, '__spec__', None)
+    w.require(getattr(module, '__name__', None) == target and file == record['path']
+              and getattr(spec, 'name', None) == target
+              and getattr(spec, 'origin', None) == record['path'],
+              'runtime alias qualified origin differs: ' + name)
+    return record, {'target': target, 'record': record, 'same_module_object': True}
+
 
 def _runtime_file(record):
     w.require(isinstance(record, dict) and set(record) == {'path', 'sha256'},
@@ -321,11 +402,16 @@ def verify_runtime(closure, runtime_ref):
               and closure['runtime'] == runtime_ref,
               'runtime closure binding')
     modules = closure['modules']
-    w.require(isinstance(modules, dict) and modules and closure['required_after']
-              and set(closure['required_after']) <= set(modules) | set(closure.get('generated_modules', {})),
+    w.require(isinstance(modules, dict) and modules, 'runtime modules required')
+    for name, record in modules.items():
+        try:
+            _runtime_file(record)
+        except (ValueError, OSError) as exc:
+            raise RuntimeOriginError(str(exc), _failure_origin(name, record)) from exc
+    aliases = _alias_rules(closure)
+    w.require(closure['required_after'] and set(closure['required_after'])
+              <= set(modules) | set(closure.get('generated_modules', {})) | set(aliases),
               'runtime modules required')
-    for record in modules.values():
-        _runtime_file(record)
     _generated_runtime(closure)
     w.require(closure['interpreter'] == {'path': str(Path(sys.executable).resolve()),
               'sha256': w.sha(Path(sys.executable).resolve()), 'version': sys.version}, 'runtime interpreter differs')
@@ -339,7 +425,14 @@ def verify_runtime(closure, runtime_ref):
 def attest_runtime(closure, runtime_ref, *, after=False):
     verify_runtime(closure, runtime_ref)
     inventory = _generated_runtime(closure)
+    aliases = _alias_rules(closure)
     for name, module in list(sys.modules.items()):
+        if name in aliases:
+            try:
+                inventory[name], _ = _live_alias(name, module, aliases[name])
+            except (ValueError, OSError) as exc:
+                raise RuntimeOriginError(str(exc), _failure_origin(name, aliases[name])) from exc
+            continue
         if name in inventory:
             continue  # already attested against the explicit prospective rule
         if name in ('torch.ops', 'torch.classes'):
@@ -350,8 +443,11 @@ def attest_runtime(closure, runtime_ref, *, after=False):
         path = Path(file).resolve()
         if path.is_relative_to(Path(__file__).resolve().parents[1]):
             continue  # separately bound to operational/scientific Git sources
-        record = {'path': str(path), 'sha256': w.sha(path)}
-        w.require(closure['modules'].get(name) == record, 'loaded runtime not frozen: ' + name)
+        try:
+            record = {'path': str(path), 'sha256': w.sha(path)}
+            w.require(closure['modules'].get(name) == record, 'loaded runtime not frozen: ' + name)
+        except (ValueError, OSError) as exc:
+            raise RuntimeOriginError(str(exc), _failure_origin(name, closure['modules'].get(name))) from exc
         inventory[name] = record
     if after:
         w.require(set(closure['required_after']) <= set(inventory), 'required runtime modules not loaded')
@@ -396,15 +492,34 @@ def attest_runtime_receipt(closure, runtime_ref, *, binding, after=False):
                                      'finalizer_owner_identity': True,
                                      'finalizer_args': [str(path.parent)],
                                      'canonical_directory': True, 'regular_source': True}}
-    return {'schema': 'n34-runtime-receipt-v2', 'binding': binding,
-            'modules': inventory, 'generated_modules': generated}
+    receipt = {'schema': 'n34-runtime-receipt-v2', 'binding': binding,
+               'modules': inventory, 'generated_modules': generated}
+    if 'module_aliases' in closure:
+        aliases = {}
+        for name, rule in _alias_rules(closure).items():
+            if name in inventory:
+                try:
+                    record, aliases[name] = _live_alias(name, sys.modules.get(name), rule)
+                    w.require(record == inventory[name], 'runtime alias changed during receipt')
+                except (ValueError, OSError) as exc:
+                    raise RuntimeOriginError(str(exc), _failure_origin(name, rule)) from exc
+        receipt.update(schema='n34-runtime-receipt-v3', module_aliases=aliases)
+    return receipt
 
 
 def verify_runtime_receipt(closure, receipt, *, binding, after=False):
-    """Parent consumption after process exit: never reopen worker temp paths."""
-    w.require(isinstance(receipt, dict) and set(receipt) == {
-        'schema', 'binding', 'modules', 'generated_modules'}
-        and receipt['schema'] == 'n34-runtime-receipt-v2'
+    """Parent consumption after process exit: never reopen worker temp paths.
+
+    Alias identity is a process-bound worker claim, not a parent-side object
+    comparison. Require its exact frozen target and the qualified inventory row.
+    """
+    aliases = _alias_rules(closure)
+    alias_enabled = 'module_aliases' in closure
+    keys = {'schema', 'binding', 'modules', 'generated_modules'}
+    if alias_enabled:
+        keys.add('module_aliases')
+    w.require(isinstance(receipt, dict) and set(receipt) == keys
+        and receipt['schema'] == ('n34-runtime-receipt-v3' if alias_enabled else 'n34-runtime-receipt-v2')
         and receipt['binding'] == binding, 'runtime receipt schema/binding differs')
     ordinary, generated = receipt['modules'], receipt['generated_modules']
     rules = closure.get('generated_modules', {})
@@ -412,7 +527,19 @@ def verify_runtime_receipt(closure, receipt, *, binding, after=False):
               and not set(ordinary) & set(rules) and set(generated) <= set(rules),
               'runtime receipt names differ')
     w.require(all(name in closure['modules'] and closure['modules'][name] == record
-                  for name, record in ordinary.items()), 'runtime receipt source differs')
+                  for name, record in ordinary.items() if name not in aliases), 'runtime receipt source differs')
+    if alias_enabled:
+        evidence = receipt['module_aliases']
+        w.require(isinstance(evidence, dict) and set(evidence) == set(ordinary) & set(aliases),
+                  'runtime alias receipt names differ')
+        for name, claim in evidence.items():
+            w.require(isinstance(claim, dict) and isinstance(claim.get('target'), str),
+                      'runtime alias receipt schema')
+            target = claim['target']
+            record = aliases[name]['targets'].get(target)
+            w.require(record is not None and ordinary[name] == record and ordinary.get(target) == record
+                      and claim == {'target': target, 'record': record, 'same_module_object': True}
+                      and claim['same_module_object'] is True, 'runtime alias receipt origin/identity differs')
     for name, evidence in generated.items():
         rule = rules[name]
         w.require(isinstance(evidence, dict) and isinstance(evidence.get('record'), dict)
