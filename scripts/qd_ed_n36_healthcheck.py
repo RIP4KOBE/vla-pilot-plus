@@ -41,14 +41,20 @@ def wait_probe(process, started, identity, timeout):
 
 def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
     """One bounded probe, no retry, no episode attempt, no readiness mutation."""
+    n36r3 = c.cohort(w.read_ref(plan_ref)) == c.DRAFT_N36R3_COHORT
+    validate = release.validate_health_release if n36r3 else release.validate_release
+    if n36r3:
+        adapter.source_execution.active()
+        plan, _, _ = validate(plan_ref, release_ref)
+        adapter.source_execution.attest(Path(plan['worktree']), plan['source'], w.read_ref(plan['runtime_closure']))
     record = accounting.reserve_healthcheck(plan_ref, release_ref, resource_id,
                                             timeout_seconds=timeout_seconds)
-    plan, runtime, authority = release.validate_release(plan_ref, release_ref)
+    plan, runtime, authority = validate(plan_ref, release_ref)
     from scripts.qd_ed_n36r2_admission import owner_root, child_environment
     root = owner_root(plan)
     # The durable in-flight resource blocks admissions during lock transfer.
     with r.locked(root/'data/qd-ed-runner.lock', nonblocking=True):
-        plan, runtime, authority = release.validate_release(plan_ref, release_ref)
+        plan, runtime, authority = validate(plan_ref, release_ref)
         resources = r.read_events(root/'data/gpu-healthcheck-ledger.jsonl')
         w.require([e for e in resources if e['resource_id']==resource_id]==[record],
                   'healthcheck reservation changed; no replay')
@@ -57,7 +63,7 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
         w.require(not output.exists() and not output.is_symlink(), 'healthcheck output exists')
         output.mkdir(parents=True)
         def before_start():
-            c.launch_guard(plan, authority, need=1840 + record['reserved_gpu_seconds'])
+            c.launch_guard(plan, authority, need=record['reserved_gpu_seconds'] if n36r3 else 1840 + record['reserved_gpu_seconds'])
         process = identity = None
         started = finished = None
         event, result = 'aborted', {}
@@ -68,6 +74,10 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
             before_start()
             adapter.device_check()
             env=child_environment(plan, runtime)
+            if n36r3:
+                r.verify_provider(runtime, env, root=Path(plan['worktree']))
+                r.runtime_gpu(runtime, r.read_state(root/'research-state.yaml'))
+                base['provider_verified'] = True
             env.update(QD_ED_GPU_PROBE_PARENT_PID=str(os.getpid()), QD_ED_GPU_PROBE_RESOURCE_ID=resource_id)
             command=[str(r.PYTHON),str(Path(probe.__file__).resolve()),'_child',
                      '--manifest',plan['runtime']['path'],'--output',str(output),'--resource-id',resource_id]
@@ -89,6 +99,8 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
             probe.validate_probe_evidence(result,runtime['gpu_mapping'])
             w.require(w.sha(output/'probe-frame.png')==result['frame_png_sha256'],'healthcheck frame fingerprint')
             w.require(w.sha(plan['runtime']['path'])==plan['runtime']['sha256'],'runtime changed during healthcheck')
+            if n36r3:
+                validate(plan_ref, release_ref)
             event='completed'
         except BaseException as exc:
             # Never settle an unknown/live handle or kill on STOP/interrupt.
@@ -105,3 +117,22 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
         r.append_healthcheck_event(root,terminal)
         w.atomic_json(output/'healthcheck-result.json',terminal)
         return {'status':'VALID' if event=='completed' else 'INVALID_STOP','terminal':terminal}
+
+
+def main():
+    import argparse
+    import sys
+    if '_n36_source_bootstrap' not in sys.modules:
+        raise RuntimeError('Launch N36 healthcheck through qd_ed_n36_bootstrap.py')
+    parser = argparse.ArgumentParser(description=__doc__)
+    for key in ('plan', 'plan-sha256', 'release', 'release-sha256', 'resource-id'):
+        parser.add_argument('--'+key, required=True)
+    args = parser.parse_args()
+    result = run_healthcheck({'path': args.plan, 'sha256': args.plan_sha256},
+        {'path': args.release, 'sha256': args.release_sha256}, args.resource_id, timeout_seconds=20)
+    print(result['status'])
+    return 0 if result['status'] == 'VALID' else 1
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

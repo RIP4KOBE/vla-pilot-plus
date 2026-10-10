@@ -2,6 +2,7 @@
 import copy
 import datetime as dt
 from decimal import Decimal
+from pathlib import Path
 import hashlib
 import json
 import pytest
@@ -102,7 +103,7 @@ def test_retained_prefix_margin_never_rewrites_or_forgets_cost(tmp_path,monkeypa
     with pytest.raises(ValueError,match='prefix differs'):a.retained_margin(tmp_path,ref)
 
 
-def test_full1840_deadline_and_stop(tmp_path):
+def test_full1840_deadline_and_stop(tmp_path, monkeypatch):
     allowance={'authority_starts_at':'2026-10-09T00:00:00Z','authority_ends_at':c.DEADLINE,
         'private_budget':True,'gpu_idle':True,'physical_gpu':7,'gpu_uuid':c.GPU_UUID,
         'live_handles':[],'unsettled_reservations':0,'global_seconds_remaining':1000000,
@@ -110,10 +111,11 @@ def test_full1840_deadline_and_stop(tmp_path):
         'bucket_attempts_remaining':{'baseline':10,'development':30},'global_attempts_remaining':100,
         'cohort_attempts_remaining':40,'protected_attempts_remaining':0}
     deadline=dt.datetime.fromisoformat(c.DEADLINE.replace('Z','+00:00'))
-    stop=tmp_path/'STOP'
+    stop=str(tmp_path/'STOP')
+    monkeypatch.setattr(c.stop, 'STOP_PATHS', (stop,))
     assert c.pre_dispatch(c.expected_rows()[0],allowance,now=deadline-dt.timedelta(seconds=1840),stop_path=stop)==1840
     with pytest.raises(ValueError):c.pre_dispatch(c.expected_rows()[0],allowance,now=deadline-dt.timedelta(seconds=1839),stop_path=stop)
-    stop.symlink_to(tmp_path/'absent')
+    Path(stop).symlink_to(tmp_path/'absent')
     with pytest.raises(ValueError,match='STOP'):c.pre_dispatch(c.expected_rows()[0],allowance,now=deadline-dt.timedelta(seconds=1900),stop_path=stop)
 
 

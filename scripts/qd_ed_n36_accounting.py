@@ -60,6 +60,9 @@ def reserve_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds):
     and the existing 40-second owned cleanup bound, then settles the journal.
     An unsettled reservation prevents every episode and probe admission.
     """
+    if c.cohort(w.read_ref(plan_ref)) == c.DRAFT_N36R3_COHORT:
+        from scripts.qd_ed_n36r3_health import reserve
+        return reserve(plan_ref, release_ref, resource_id, timeout_seconds=timeout_seconds)
     import datetime as dt
     import os
     import re

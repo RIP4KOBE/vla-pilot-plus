@@ -87,7 +87,11 @@ def execute_one(plan_ref, release_ref):
             # STOP/time/accounting checked before even probing the device.
             release.admission(plan, authority, state, events, resources, reservations, row,
                               now=dt.datetime.now(dt.timezone.utc), gpu_idle=True, release_refs=(plan_ref, release_ref))
-            check_probe(runtime, resources, root)
+            if c.cohort(plan) == c.DRAFT_N36R3_COHORT:
+                from scripts.qd_ed_n36r3_admission import validate_readiness
+                validate_readiness(plan_ref, w.read_ref(release_ref), resources=resources)
+            else:
+                check_probe(runtime, resources, source_root)
             admission = device_check()
             env = child_environment(plan, runtime)
             r.verify_provider(runtime, env, root=source_root)

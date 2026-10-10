@@ -221,6 +221,10 @@ def test_healthcheck_history_uses_fresh_identity_and_refs(fresh, fault):
 @pytest.mark.parametrize('fault', [None, 'old_row', 'missing_charge', 'changed_charge', 'amendment',
                                   'protected', 'recovery', 'STOP', 'deadline'])
 def test_fresh_admission_preserves_failed_charge_and_gates(fresh, tmp_path, monkeypatch, fault):
+    # Never let this fixture create the production session STOP.
+    paths = (str(tmp_path/'owner_STOP'), str(tmp_path/'STOP'))
+    monkeypatch.setattr(c.stop, 'STOP_PATHS', paths)
+    monkeypatch.setattr(c, 'stop_path', lambda root=c.ROOT: paths[1])
     old = historical(recovery.PRESERVED_ATTEMPT['gpu_seconds'], 'baseline',
                      recovery.PRESERVED_ATTEMPT['attempt_id'], c.COHORT, 'aborted')
     plan, authority, state, reservations = budget_fixture(tmp_path, old)

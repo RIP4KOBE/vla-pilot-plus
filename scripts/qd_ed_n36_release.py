@@ -12,6 +12,10 @@ COORDINATOR_END = '2026-10-11T11:13:13Z'
 
 
 def validate_plan(plan):
+    if c.cohort(plan) == c.DRAFT_N36R3_COHORT:
+        w.require(all(plan.get(k) is not None for k in ('authority', 'b5_review', 'resource_routing')),
+                  'N36R3 draft only; separate root bindings required')
+        c.validate_n36r3_protocol(plan)
     w.require(plan['schema'] == 'n36-released-plan-v1' and plan['frozen'] is True
               and plan['release_enabled'] is True and plan['episodes'] == c.plan_rows(plan)
               and plan['limits'] == c.LIMITS and plan['worker_contract'] == c.WORKER_CONTRACT
@@ -38,15 +42,24 @@ def verify_prospective_release(plan_ref, release_ref):
     return plan, runtime, authority
 
 
-def _verify_release_transaction(plan_ref, release_ref):
+def validate_health_release(plan_ref, release_ref):
+    return _verify_release_transaction(plan_ref, release_ref, health=True)[:3]
+
+
+def _verify_release_transaction(plan_ref, release_ref, *, health=False):
     # No reusable token/cache escapes: each caller starts a new full transaction.
     with b.closure.verification_phase('release'):
-        return _verify_release_contents(plan_ref, release_ref)
+        return _verify_release_contents(plan_ref, release_ref, health=health)
 
 
-def _verify_release_contents(plan_ref, release_ref):
+def _verify_release_contents(plan_ref, release_ref, *, health=False):
     plan = w.read_ref(plan_ref)
     validate_plan(plan)
+    n36r3 = c.cohort(plan) == c.DRAFT_N36R3_COHORT
+    w.require(not health or n36r3, 'separate health authority is N36R3 only')
+    if n36r3:
+        from scripts import qd_ed_n36r3_admission as n3
+        n3.independent_review(plan)
     if c.cohort(plan) == c.DRAFT_RECOVERY_COHORT:
         from scripts.qd_ed_n36r2_admission import independent_review
         independent_review(plan)
@@ -57,10 +70,17 @@ def _verify_release_contents(plan_ref, release_ref):
                 'runtime_closure': plan['runtime_closure'], 'controller_semantics': plan['controller_semantics'],
                 'runtime': plan['runtime'], 'limits': c.LIMITS,
                 'phase_authorization': plan['phase_authorization'], **c.operational_binding(plan)}
+    if health:
+        expected['schema'] = 'n36r3-health-release-v1'
+        expected['healthchecks'] = n3.HEALTH
+    elif n36r3:
+        expected['readiness'] = release['readiness']
     w.require(set(release) == set(expected) | {'root_review'} and all(release[k] == v for k, v in expected.items()), 'external release differs')
     review = w.read_ref(release['root_review'])
-    w.require(review == {**expected, 'schema': 'n36-root-production-review-v1', 'decision': 'APPROVED'}, 'root review differs')
-    if c.cohort(plan) == c.RECOVERY_COHORT:
+    w.require(review == {**expected, 'schema': ('n36r3-root-health-review-v1' if health else 'n36-root-production-review-v1'), 'decision': 'APPROVED'}, 'root review differs')
+    if n36r3:
+        protocol = c.validate_n36r3_protocol(plan)
+    elif c.cohort(plan) == c.RECOVERY_COHORT:
         from scripts.qd_ed_n36_recovery import validate_protocol
         protocol = validate_protocol(plan)
     elif c.cohort(plan) == c.DRAFT_RECOVERY_COHORT:
@@ -90,6 +110,8 @@ def _verify_release_contents(plan_ref, release_ref):
     if c.cohort(plan) == c.DRAFT_RECOVERY_COHORT:
         from scripts.qd_ed_n36r2_admission import validate_authority
         validate_authority(plan, authority)
+    if n36r3:
+        n3.validate_authority(plan, authority)
     validate_caps(caps)
     window_end = dt.datetime.fromisoformat(authority['weekly_window']['ends_at'].replace('Z', '+00:00'))
     w.require(window_end.tzinfo is not None and window_end <= dt.datetime.fromisoformat(c.DEADLINE.replace('Z', '+00:00')), 'weekly authorization deadline')
@@ -139,6 +161,8 @@ def _verify_release_contents(plan_ref, release_ref):
         for row in plan['episodes']:
             manifests[row['episode_key']] = b._verify_manifest_bound(
                 plan['expected_manifests'][row['episode_key']], plan, runtime, row)
+    if n36r3 and not health:
+        n3.validate_readiness(plan_ref, release)
     return plan, runtime, authority, manifests
 
 
@@ -167,6 +191,11 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
     """Caller holds normal runner/state locks; all balances come from journals."""
     selected = c.cohort(plan)
     c.require_row(row, plan.get('worktree', c.ROOT), cohort=selected)
+    if selected == c.DRAFT_N36R3_COHORT:
+        from scripts import qd_ed_n36r3_admission as n3
+        n3.live_journals(plan, authority, events, resources, reservations)
+        w.require(release_refs is not None, 'N36R3 detached release required')
+        n3.validate_readiness(release_refs[0], w.read_ref(release_refs[1]), resources=resources)
     if selected == c.RECOVERY_COHORT:
         from scripts.qd_ed_n36_recovery import validate_authority, preserve_charge
         validate_authority(plan, authority)
@@ -182,19 +211,12 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
     rows = c.plan_rows(plan)
     w.require(plan.get('episodes', rows) == rows, 'admission exact cohort rows')
     # Accounting continuity only; runner separately reverifies native terminals.
-    reconciled = supervisor.reconcile({**c.operational_binding(plan), 'episodes': rows,
-        'worktree': str(plan.get('worktree', c.ROOT))}, events, lambda *args: None)
+    reconciliation_plan = plan if selected == c.DRAFT_N36R3_COHORT else {
+        **c.operational_binding(plan), 'episodes': rows, 'worktree': str(plan.get('worktree', c.ROOT))}
+    reconciled = supervisor.reconcile(reconciliation_plan, events, lambda *args: None)
     w.require(reconciled['next_row'] == row, 'accounting requires next fresh contiguous row')
+    validate_state(plan, authority, state)
     caps, budget = authority['caps'], state['budget']
-    validate_caps(caps)
-    w.require(state.get('n36_budget_authority') == plan['authority'] and r.authorized_gpu(state) == 7
-              and budget['max_episode_attempts'] == caps['attempts'] and budget['max_gpu_hours'] == caps['gpu_hours']
-              and budget['reserved'] == caps['buckets'] and budget['gpu_hour_reservations'] == caps['protected_gpu_hours']
-              and budget['amendment'] == authority['amendment'], 'adopted state authority differs')
-    isolation = state.get('resource_isolation', {})
-    w.require(isolation.get('status') == 'ACTIVE' and isolation.get('validation_status') == 'PASS'
-              and isolation.get('private_budget') is True
-              and not state.get('external_resource_hold', {}).get('do_not_auto_resume', False), 'private resource admission')
     # Generic accounting deliberately preserves unknown durations as errors.
     snap = r.budget_snapshot(events, resources)
     groups = r.event_groups(events)
@@ -215,6 +237,8 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
     if selected == c.RECOVERY_COHORT:
         from scripts.qd_ed_n36_recovery import resource_events
         local_resources = resource_events(plan, resources)
+    if selected == c.DRAFT_N36R3_COHORT:
+        local_resources = n3.resource_events(plan, resources)
     if selected == c.DRAFT_RECOVERY_COHORT:
         from scripts.qd_ed_n36r2_admission import resource_events
         local_resources = resource_events(plan, resources)
@@ -227,8 +251,10 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
     from scripts import qd_ed_n36_accounting as accounting
     from scripts.qd_ed_n36r2_admission import owner_root
     accounting_root = owner_root(plan)
-    margin=accounting.retained_margin(accounting_root,authority['accounting']) if selected == c.COHORT else accounting.retained_margin(
-        accounting_root, w.read_ref(authority['accounting'])['inherited_accounting'])
+    margin_ref = (authority['accounting'] if selected == c.COHORT else
+                  n3.margin_reference(plan) if selected == c.DRAFT_N36R3_COHORT else
+                  w.read_ref(authority['accounting'])['inherited_accounting'])
+    margin = accounting.retained_margin(accounting_root, margin_ref)
     reservation=accounting.headroom(snap,cohort,retained_margin_hours=margin,protected_hours=protected)
     allowance = {'authority_starts_at': authority['starts_at'],
                  'authority_ends_at': min(authority['coordinator_ends_at'], window['ends_at']),
@@ -246,5 +272,24 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
     c.validate_stop_binding(plan)
     if selected == c.DRAFT_RECOVERY_COHORT:
         allowance.update(n36r2_plan=plan, n36r2_authority=authority, n36r2_release_refs=release_refs)
+    if selected == c.DRAFT_N36R3_COHORT:
+        allowance.update(n36r3_plan=plan, n36r3_authority=authority, n36r3_release_refs=release_refs)
     c.pre_dispatch(row, allowance, now=now, stop_path=plan['stop_path'], cohort=selected)
     return {**snap, "n36_reservation":reservation}
+
+
+def validate_state(plan, authority, state):
+    """Shared owning state gate for independent health and episode transactions."""
+    if c.cohort(plan) == c.DRAFT_N36R3_COHORT:
+        from scripts.qd_ed_n36r3_admission import owner_root
+        w.require(state.get('worktree') == str(owner_root(plan)), 'N36R3 owning state worktree differs')
+    caps, budget = authority['caps'], state['budget']
+    validate_caps(caps)
+    w.require(state.get('n36_budget_authority') == plan['authority'] and r.authorized_gpu(state) == 7
+              and budget['max_episode_attempts'] == caps['attempts'] and budget['max_gpu_hours'] == caps['gpu_hours']
+              and budget['reserved'] == caps['buckets'] and budget['gpu_hour_reservations'] == caps['protected_gpu_hours']
+              and budget['amendment'] == authority['amendment'], 'adopted state authority differs')
+    isolation = state.get('resource_isolation', {})
+    w.require(isolation.get('status') == 'ACTIVE' and isolation.get('validation_status') == 'PASS'
+              and isolation.get('private_budget') is True
+              and not state.get('external_resource_hold', {}).get('do_not_auto_resume', False), 'private resource admission')

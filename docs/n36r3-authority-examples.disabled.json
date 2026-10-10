@@ -1,0 +1,52 @@
+{
+  "schema": "n36r3-authority-examples-disabled-v1",
+  "release_enabled": false,
+  "gpu_authorized": false,
+  "production_accepted": false,
+  "score": null,
+  "source_adopted": false,
+  "note": "Review-only shapes. Null references and approved=false prohibit execution. Root must independently create exact bindings.",
+  "source_adoption": {
+    "schema": "n36r3-source-adoption-v1",
+    "approved": false,
+    "owner_root": null,
+    "source_cwd": null,
+    "source": null,
+    "independent_review": null
+  },
+  "owning_accounting": {
+    "schema": "n36r3-owning-accounting-v1",
+    "source_adoption": null,
+    "accounting": null,
+    "ledger_prefixes": null,
+    "snapshot": null,
+    "arithmetic": null,
+    "automatic_recoveries": 0
+  },
+  "health_release": {
+    "schema": "n36r3-health-release-v1",
+    "approved": false,
+    "plan": null,
+    "authority": null,
+    "root_review": null,
+    "healthchecks": {
+      "preparation_id": "n36_healthcheck_n36r3_preparation_001314",
+      "max_invocations": 41,
+      "timeout_seconds": 20,
+      "cleanup_seconds": 40,
+      "per_invocation_seconds": 60,
+      "aggregate_seconds": 1800
+    }
+  },
+  "episode_release": {
+    "schema": "n36-execution-release-v1",
+    "approved": false,
+    "plan": null,
+    "authority": null,
+    "root_review": null,
+    "readiness": {
+      "health_release": null,
+      "terminal": null
+    }
+  }
+}

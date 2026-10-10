@@ -79,10 +79,6 @@ def expected_rows(root=ROOT, *, cohort=COHORT):
 def cohort(plan):
     value = plan.get('cohort', COHORT)
     w.require(value in IDENTITIES, 'unsupported N36 cohort')
-    if value == DRAFT_N36R3_COHORT:
-        w.require(plan.get('schema') == 'n36-release-draft-v1'
-                  and plan.get('frozen') is False and plan.get('release_enabled') is False,
-                  'N36R3 draft only; separate root bindings required')
     return value
 
 
@@ -96,7 +92,7 @@ def operational_binding(plan):
     if cohort(plan) == COHORT:
         w.require('accounting' not in plan, 'original plan cannot claim recovery accounting')
         return {}
-    return {**({'resource_routing': plan['resource_routing']} if cohort(plan) == DRAFT_RECOVERY_COHORT and 'resource_routing' in plan else {}), 'cohort': cohort(plan), **{k: plan[k] for k in
+    return {**({'resource_routing': plan['resource_routing']} if cohort(plan) in (DRAFT_RECOVERY_COHORT, DRAFT_N36R3_COHORT) and 'resource_routing' in plan else {}), 'cohort': cohort(plan), **{k: plan[k] for k in
             ('protocol', 'protocol_review', 'accounting')}}
 
 
@@ -230,8 +226,13 @@ def pre_dispatch(row, allowance, *, now, stop_path, cohort=COHORT):
     All *_remaining values must already include prior reservations, health costs
     and charges. Exact owning ledger-to-snapshot arithmetic is a root prerequisite.
     """
-    w.require(cohort != DRAFT_N36R3_COHORT,
-              'N36R3 draft only; separate root bindings required')
+    if cohort == DRAFT_N36R3_COHORT:
+        w.require(allowance.get('n36r3_release_refs') is not None,
+                  'N36R3 draft only; separate root bindings required')
+        from scripts.qd_ed_n36_release import validate_release
+        plan, _, authority = validate_release(*allowance['n36r3_release_refs'])
+        w.require(plan == allowance['n36r3_plan'] and authority == allowance['n36r3_authority'],
+                  'N36R3 admission detached release differs')
     if cohort == DRAFT_RECOVERY_COHORT:
         from scripts.qd_ed_n36_release import validate_release
         plan, _, authority = validate_release(*allowance['n36r2_release_refs'])
