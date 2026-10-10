@@ -224,10 +224,12 @@ assert torch.equal(decode(SimpleNamespace(_action_chunk_horizon=8),samples),samp
 # Synthetic inventory for checking the binding mechanism, not a release anchor.
 state=source.active()
 frozen={'files':[{'path':str(p.relative_to(root)),'sha256':source.sha(p)} for p in root.rglob('*.py')]}
-runtime={'modules':{},'generated_modules':{}}
+runtime={'modules':{},'generated_modules':{},'interpreter':source.interpreter_identity()}
 for name,path in list(state.compiled)+[(n,p) for n,(p,h) in state.startup_sources.items()]:
     if not Path(path).resolve().is_relative_to(root):
         runtime['modules'][name]={'path':str(Path(path).resolve()),'sha256':source.sha(path)}
+for name in ('os.path','posixpath'):
+    runtime['modules'][name]={'path':str(Path(sys.modules[name].__file__).resolve()),'sha256':source.sha(sys.modules[name].__file__)}
 receipt=source.attest(root,frozen,runtime)
 loaded={'reference':{'path':'scripts/qd_ed_n31_reference.py','sha256':source.sha(root/'scripts/qd_ed_n31_reference.py')}}
 source.verify_receipt(receipt,root,frozen,runtime,loaded=loaded)
@@ -256,13 +258,15 @@ state=source.active()
 # Explicitly synthetic inventories; this does not attest the installed runtime.
 def inventories():
     files=[{'path':str(p.relative_to(root)),'sha256':source.sha(p)} for p in root.rglob('*.py')]
-    runtime={'modules':{},'generated_modules':{}}
+    runtime={'modules':{},'generated_modules':{},'interpreter':source.interpreter_identity()}
     for name,module in list(sys.modules.items()):
         path=getattr(module,'__file__',None)
         if path and Path(path).is_file() and not Path(path).resolve().is_relative_to(root):
             runtime['modules'][name]={'path':str(Path(path).resolve()),'sha256':source.sha(path)}
     return {'files':files},runtime
 frozen,runtime=inventories()
+for name in ('os.path','posixpath'):
+    runtime['modules'][name]={'path':str(Path(sys.modules[name].__file__).resolve()),'sha256':source.sha(sys.modules[name].__file__)}
 receipt=source.attest(root,frozen,runtime)
 assert any(r['module']=='fixture' for r in receipt['compiled'])
 (root/'fixture.py').write_text('value = "other!"\\n')

@@ -39,7 +39,7 @@ def boundary(tmp_path,monkeypatch):
         'approval_basis':write(tmp_path/'basis.json',{'synthetic_only':True})}
     plan={'native_build':native_build,'protocol_review':protocol_review,'schema':'n36-released-plan-v1','frozen':True,'release_enabled':True,'worktree':str(b.ROOT),
         'artifact_root':str(tmp_path/'artifacts'),'episodes':c.expected_rows(),'limits':copy.deepcopy(c.LIMITS),
-        'worker_contract':c.WORKER_CONTRACT,'deadline':c.DEADLINE,'stop_path':c.stop_path(),
+        'worker_contract':c.WORKER_CONTRACT,'deadline':c.DEADLINE,'stop_path':c.stop_path(), 'stop_authority':c.stop.binding(),
         'phase_authorization':{'dev':True,'validation':False,'formal':False},'attempt_identity':'episode_key',
         'source':source,'scientific_source':copy.deepcopy(source),'runtime':runtime_ref,
         'runtime_closure':write(tmp_path/'closure.json',{'synthetic_only':True}),

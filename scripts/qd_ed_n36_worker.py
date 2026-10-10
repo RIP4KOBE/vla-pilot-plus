@@ -77,17 +77,17 @@ def release_api(plan_ref):
     return release
 
 
-def validate_context(reference):
+def validate_context(reference, *, admission=False):
     with closure.verification_phase('context'):
-        return _validate_context(reference)
+        return _validate_context(reference, admission=admission)
 
 
-def _validate_context(reference):
+def _validate_context(reference, *, admission=False):
     context = w.read_ref(reference)
     w.require(set(context) == {'schema', 'plan', 'release', 'expected_manifest', 'episode_key', 'attempt_id', 'main_argv', 'worker_contract'}, 'worker context fields: explicit detached release required')
     w.require(context['schema'] == 'n36-worker-context-v1' and context['worker_contract'] == c.WORKER_CONTRACT, 'worker contract')
     release = release_api(context['plan'])
-    plan, runtime, _, manifests = release._verify_release_transaction(context['plan'], context['release'])
+    plan, runtime, authority, manifests = release._verify_release_transaction(context['plan'], context['release'])
     rows = [r for r in plan['episodes'] if r['episode_key'] == context['episode_key']]
     w.require(len(rows) == 1 and context['attempt_id'] == context['episode_key'], 'exact primary attempt')
     row = rows[0]
@@ -95,6 +95,8 @@ def _validate_context(reference):
     manifest = manifests[row['episode_key']]
     w.require(context['main_argv'] == manifest['argv'][1:], 'exact candidate command')
     w.require(runtime['gpu_mapping']['physical_gpu'] == 7 and runtime['gpu_mapping']['uuid'] == c.GPU_UUID, 'assigned GPU mapping')
+    if admission:
+        c.launch_guard(plan, authority)
     return context, plan, runtime, row, manifest
 
 
@@ -201,7 +203,7 @@ def runtime_receipt_binding(context_ref, plan, process, phase):
 def _run_in_process(context_ref):
     """Internal implementation, to be called only by a root-released bounded runner."""
     source_execution.active()
-    context, plan, runtime, row, manifest = validate_context(context_ref)
+    context, plan, runtime, row, manifest = validate_context(context_ref, admission=True)
     root, output = Path(plan['worktree']), Path(manifest['output_dir'])
     identity = w.process_identity()
     verify_dispatch_record(context_ref, context, output, identity)
@@ -223,13 +225,15 @@ def _run_in_process(context_ref):
             binding=runtime_receipt_binding(context_ref, plan, identity, 'runtime_before'))
         receipt['native_build_before']=native_build.attest(plan['native_build'])
         receipt['loaded_before'] = attest_worker_loaded(root, plan['source'])
-        receipt['execution_before'] = source_execution.attest(root, plan['source'], runtime_closure)
+        receipt['execution_before'] = source_execution.attest(root, plan['source'], runtime_closure,
+            binding=runtime_receipt_binding(context_ref, plan, identity, 'runtime_before'))
         sys.argv = context['main_argv']
         os.chdir(root)
         with controller.observe_instances(proof) as observed:
             try:
                 # Use the same source-only loader as worker/auditor dependencies.
                 w.require(Path(sys.argv[0]).resolve() == root.resolve() / 'main.py', 'Main source entry')
+                validate_context(context_ref, admission=True)
                 source_execution.run_main(sys.argv[0])
             except SystemExit as exc:
                 w.require(exc.code is None or type(exc.code) is int and exc.code == 0, 'main nonzero exit')
@@ -256,7 +260,8 @@ def _run_in_process(context_ref):
         receipt['runtime_after'] = closure.attest_runtime_receipt(runtime_closure, plan['runtime'], after=True,
             binding=runtime_receipt_binding(context_ref, plan, identity, 'runtime_after'))
         receipt['native_build_after']=native_build.attest(plan['native_build'],after=True)
-        receipt['execution_after'] = source_execution.attest(root, plan['source'], runtime_closure)
+        receipt['execution_after'] = source_execution.attest(root, plan['source'], runtime_closure,
+            binding=runtime_receipt_binding(context_ref, plan, identity, 'runtime_after'))
         receipt.update(audit_seconds=time.perf_counter() - audit_started, native_counts=counts, auxiliary=auxiliary,
                        evidence=before, audit_backend=backend.report())
         w.atomic_json(report_path, report)
@@ -328,7 +333,8 @@ def verify_receipt(context_ref, receipt_ref, process_record):
     for phase in ('execution_before', 'execution_after'):
         suffix = phase.removeprefix('execution_')
         source_execution.verify_receipt(receipt[phase], plan['worktree'], plan['source'], runtime_closure,
-            loaded=receipt['loaded_' + suffix], runtime_receipt=receipt['runtime_' + suffix])
+            loaded=receipt['loaded_' + suffix], runtime_receipt=receipt['runtime_' + suffix],
+            binding=runtime_receipt_binding(context_ref, plan, process, 'runtime_' + suffix))
     w.require(all(row in receipt['execution_after']['compiled'] for row in receipt['execution_before']['compiled']),
               'N36 executable inventory changed')
     w.require('main' in {r['module'] for r in receipt['execution_after']['compiled']}, 'N36 Main executable absent')

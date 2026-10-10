@@ -20,6 +20,7 @@ def validate_plan(plan):
               and plan['phase_authorization'] == {'dev': True, 'validation': False, 'formal': False}
               and not any(k in plan for k in ('root_review', 'execution_release'))
               and plan['attempt_identity'] == 'episode_key', 'released plan contract')
+    c.validate_stop_binding(plan)
     c.operational_binding(plan)
     w.require(set(plan['expected_manifests']) == {x['episode_key'] for x in plan['episodes']}, 'all40 manifests')
 
@@ -222,5 +223,6 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
                  'protected_attempts_remaining': sum(max(0, caps['buckets'][k] - snap['by_bucket'][k]) for k in ('validation', 'formal')),
                  'cohort_attempts_remaining': 40 - cohort['reserved_attempts']}
     w.require(cohort['gpu_healthcheck_hours']*3600 <= c.LIMITS['healthcheck_seconds'], 'bounded cumulative healthcheck allowance')
+    c.validate_stop_binding(plan)
     c.pre_dispatch(row, allowance, now=now, stop_path=plan['stop_path'], cohort=selected)
     return {**snap, "n36_reservation":reservation}

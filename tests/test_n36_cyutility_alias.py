@@ -254,8 +254,8 @@ def test_worker_persists_rejection_origin(tmp_path, phase):
         path.write_text(json.dumps(value))
 
     namespace = dict(Path=Path, sys=SimpleNamespace(argv=[]), os=os, time=time,
-                     source_execution=SimpleNamespace(active=lambda: None, attest=lambda *a: {}, run_main=lambda *a: None),
-                     validate_context=lambda _: (context, plan, {}, {}, {'output_dir': str(output)}),
+                     source_execution=SimpleNamespace(active=lambda: None, attest=lambda *a, **kw: {}, run_main=lambda *a: None),
+                     validate_context=lambda _, **kw: (context, plan, {}, {}, {'output_dir': str(output)}),
                      verify_dispatch_record=lambda *a: None,
                      w=SimpleNamespace(process_identity=lambda: {}, require=source.w.require,
                                        atomic_json=atomic_json, read_ref=lambda _: {}),

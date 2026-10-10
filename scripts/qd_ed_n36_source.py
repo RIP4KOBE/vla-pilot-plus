@@ -6,6 +6,8 @@ import importlib.machinery
 import hashlib
 import _imp
 import runpy
+import os
+import copy
 from pathlib import Path
 import sys
 import zipimport
@@ -51,7 +53,80 @@ def run_main(path):
     return runpy._run_module_code(code, mod_name='__main__', pkg_name='', script_name=path)
 
 
-def attest(root, source, runtime):
+def interpreter_identity():
+    path = str(Path(sys.executable).resolve())
+    return {'path': path, 'sha256': sha(path), 'version': sys.version}
+
+
+def alias_claim(runtime, binding):
+    # This fixed rule has no extensible names, paths or hash-only fallback.
+    require(all(name in runtime['modules'] for name in ('os.path', 'posixpath')),
+            'N36 alias inventory incomplete')
+    return {'rule': 'n36-frozen-os.path-posixpath-v1',
+            'binding': copy.deepcopy(binding), 'interpreter': copy.deepcopy(runtime['interpreter']),
+            'alias': 'os.path', 'canonical': 'posixpath',
+            'spec_name': 'posixpath', 'origin': 'frozen',
+            'loader': '_frozen_importlib.FrozenImporter', 'is_frozen': True,
+            'same_module_object': True,
+            'records': {name: copy.deepcopy(runtime['modules'][name]) for name in ('os.path', 'posixpath')}}
+
+
+def live_alias(runtime, binding):
+    if binding is not None:
+        process = {'pid': os.getpid(),
+                   'proc_start_ticks': Path('/proc/self/stat').read_text().rsplit(')', 1)[1].split()[19],
+                   'boot_id': Path('/proc/sys/kernel/random/boot_id').read_text().strip()}
+        require(binding.get('process') == process, 'N36 alias live process differs')
+    alias, canonical = sys.modules.get('os.path'), sys.modules.get('posixpath')
+    spec = getattr(canonical, '__spec__', None)
+    require(alias is not None and alias is canonical is os.path
+            and canonical.__name__ == 'posixpath'
+            and getattr(spec, 'name', None) == 'posixpath'
+            and getattr(spec, 'origin', None) == 'frozen'
+            and spec.loader is importlib.machinery.FrozenImporter
+            and getattr(canonical, '__loader__', None) is importlib.machinery.FrozenImporter
+            and _imp.is_frozen('posixpath'), 'N36 frozen alias live identity differs')
+    require(runtime['interpreter'] == interpreter_identity(), 'N36 alias interpreter differs')
+    for name, module in (('os.path', alias), ('posixpath', canonical)):
+        path = str(Path(module.__file__).resolve())
+        require(module.__file__ == path
+                and runtime['modules'].get(name) == {'path': path, 'sha256': sha(path)},
+                'N36 frozen alias inventory differs: ' + name)
+    return alias_claim(runtime, binding)
+
+
+def verify_alias(receipt, runtime, runtime_receipt, binding):
+    require(receipt.get('schema') == 'n36-source-execution-v2', 'N36 alias receipt schema')
+    require(isinstance(binding, dict) and set(binding) == {'context', 'runtime_closure', 'process', 'phase'}
+            and binding['phase'] in ('runtime_before', 'runtime_after')
+            and all(isinstance(binding[k], dict) and set(binding[k]) == {'path', 'sha256'}
+                    for k in ('context', 'runtime_closure'))
+            and isinstance(binding['process'], dict)
+            and set(binding['process']) == {'pid', 'proc_start_ticks', 'boot_id'}
+            and type(binding['process']['pid']) is int and binding['process']['pid'] > 0
+            and isinstance(binding['process']['proc_start_ticks'], str)
+            and binding['process']['proc_start_ticks'].isdigit()
+            and isinstance(binding['process']['boot_id'], str) and bool(binding['process']['boot_id']),
+            'N36 alias external binding required')
+    require(receipt.get('binding') == binding == runtime_receipt.get('binding'),
+            'N36 alias context/process/phase differs')
+    require(receipt.get('interpreter') == runtime['interpreter'] == interpreter_identity(),
+            'N36 alias interpreter differs')
+    claim = receipt.get('frozen_aliases', {}).get('os.path')
+    require(set(receipt.get('frozen_aliases', {})) == {'os.path'}
+            and claim == alias_claim(runtime, binding)
+            and claim['same_module_object'] is True and claim['is_frozen'] is True
+            and 'posixpath' in receipt['frozen_modules'] and _imp.is_frozen('posixpath'),
+            'N36 frozen alias proof differs')
+    for name in ('os.path', 'posixpath'):
+        require(runtime_receipt['modules'].get(name) == runtime['modules'][name],
+                'N36 alias canonical inventory evidence missing/differs')
+    require(runtime['modules']['os.path'] == runtime['modules']['posixpath'],
+            'N36 alias inventory paths/hashes differ')
+    return {'os.path'}
+
+
+def attest(root, source, runtime, *, binding=None):
     state = active()
     root = Path(root).resolve()
     index = {str(root / row['path']): row['sha256'] for row in source['files']}
@@ -74,6 +149,7 @@ def attest(root, source, runtime):
     # No unrecorded custom Python loader may slip through the module inventory.
     known = {(r['module'], r['path']) for r in records + startup}
     frozen = []
+    aliases = {}
     for name, module in list(sys.modules.items()):
         if name in ('torch.ops', 'torch.classes'):
             # Same two virtual namespaces explicitly excepted by the existing
@@ -88,6 +164,8 @@ def attest(root, source, runtime):
             continue
         spec = getattr(module, '__spec__', None)
         filename = getattr(module, '__file__', None)
+        if name == 'os.path':
+            aliases[name] = live_alias(runtime, binding)
         if getattr(spec, 'origin', None) == 'frozen':
             require(_imp.is_frozen(spec.name) and spec.loader is importlib.machinery.FrozenImporter,
                     'N36 unbound frozen module: ' + name)
@@ -102,15 +180,16 @@ def attest(root, source, runtime):
             continue
         canonical = getattr(spec, 'name', name)
         require((canonical, path) in known, 'N36 unrecorded Python execution: ' + name)
-    return {'schema': 'n36-source-execution-v1', 'bootstrap': {'path': bootstrap, 'sha256': state.bootstrap_digest},
+    return {'schema': 'n36-source-execution-v2', 'binding': copy.deepcopy(binding),
+        'interpreter': copy.deepcopy(runtime['interpreter']), 'frozen_aliases': aliases, 'bootstrap': {'path': bootstrap, 'sha256': state.bootstrap_digest},
         'compiled': records, 'startup_source_only': startup, 'frozen_modules': sorted(set(frozen)),
         'exceptions': ['interpreter-bound built-in/frozen modules', 'separately inventoried native extensions',
                        'existing independently validated generated-runtime rules',
                        'torch.ops/classes instances of inventoried owner classes']}
 
 
-def verify_receipt(receipt, root, source, runtime, *, loaded=None, runtime_receipt=None):
-    require(receipt['schema'] == 'n36-source-execution-v1', 'N36 execution receipt schema')
+def verify_receipt(receipt, root, source, runtime, *, loaded=None, runtime_receipt=None, binding=None):
+    require(receipt['schema'] == 'n36-source-execution-v2', 'N36 execution receipt schema')
     index = {str(Path(root).resolve() / row['path']): row['sha256'] for row in source['files']}
     index.update({row['path']: row['sha256'] for row in runtime['modules'].values()})
     generated = {name: rule['sha256'] for name, rule in runtime.get('generated_modules', {}).items()}
@@ -125,7 +204,11 @@ def verify_receipt(receipt, root, source, runtime, *, loaded=None, runtime_recei
     known = {(r['path'], r['sha256']) for r in receipt['compiled'] + receipt['startup_source_only']}
     observed = list((loaded or {}).values())
     if runtime_receipt is not None:
-        observed += [row for name, row in runtime_receipt['modules'].items() if name not in frozen]
+        from scripts import qd_ed_n34_source as closure
+        require(binding is not None, 'N36 external runtime binding required')
+        closure.verify_runtime_receipt(runtime, runtime_receipt, binding=binding, after=False)
+        aliases = verify_alias(receipt, runtime, runtime_receipt, binding)
+        observed += [row for name, row in runtime_receipt['modules'].items() if name not in frozen and name not in aliases]
         observed += [e['record'] for e in runtime_receipt['generated_modules'].values()]
     for row in observed:
         path = Path(row['path'])

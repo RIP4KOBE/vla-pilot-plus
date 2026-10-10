@@ -12,6 +12,7 @@ import sys
 
 def main():
     from scripts import qd_ed_n23_worker as w
+    from scripts import qd_ed_n36_stop as stop
     context_ref = {'path': sys.argv[1], 'sha256': sys.argv[2]}
     context = w.read_ref(context_ref)
 
@@ -19,10 +20,9 @@ def main():
         w.require(os.environ.get('CUDA_VISIBLE_DEVICES') == ''
                   and len(os.sched_getaffinity(0)) <= 2, 'bounded CPU diagnostic only')
         w.require(context['release_enabled'] is False, 'diagnostic has no release')
-        w.require(len(context['stop_paths']) == 2
-                  and all(not os.path.lexists(p) for p in context['stop_paths']), 'STOP diagnostic')
-        w.require(dt.datetime.now(dt.timezone.utc) < dt.datetime.fromisoformat(
-            context['deadline'].replace('Z', '+00:00')), 'diagnostic deadline')
+        w.require(context['stop_paths'] == list(stop.STOP_PATHS)
+                  and context['deadline'] == stop.DEADLINE, 'canonical diagnostic STOP/deadline')
+        stop.check()
 
     guard()
     from scripts import qd_ed_n36_worker as worker, qd_ed_n36_source as execution
@@ -33,7 +33,7 @@ def main():
     guard()
     # Only native CPU package imports. No simulator construction or model call.
     process = {'pid': os.getpid(),
-               'proc_start_ticks': int(Path('/proc/self/stat').read_text().rsplit(')', 1)[1].split()[19]),
+               'proc_start_ticks': Path('/proc/self/stat').read_text().rsplit(')', 1)[1].split()[19],
                'boot_id': Path('/proc/sys/kernel/random/boot_id').read_text().strip()}
     frozen = w.read_ref(context['runtime_closure'])
     source = w.read_ref(context['source'])
@@ -45,7 +45,7 @@ def main():
         result[phase] = closure.attest_runtime_receipt(frozen, frozen['runtime'],
                                                       binding=binding, after=False)
         result['loaded_' + phase] = worker.attest_worker_loaded(context['worktree'], source)
-        result['execution_' + phase] = execution.attest(context['worktree'], source, frozen)
+        result['execution_' + phase] = execution.attest(context['worktree'], source, frozen, binding=binding)
     guard()
     destination = Path(context['output'])
     w.require(not destination.exists(), 'immutable CPU diagnostic output')

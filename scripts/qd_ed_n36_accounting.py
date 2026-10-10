@@ -100,11 +100,7 @@ def reserve_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds):
             reservation=headroom(snap,cohort,retained_margin_hours=snap['n36_reservation']['retained_margin_gpu_hours'],
                 protected_hours=snap['n36_reservation']['protected_gpu_hours'],healthcheck=True,need=need)
             admission=adapter.device_check()
-            now=dt.datetime.now(dt.timezone.utc)
-            end=min(dt.datetime.fromisoformat(x.replace('Z','+00:00')) for x in
-                    (c.DEADLINE,authority['coordinator_ends_at'],authority['weekly_window']['ends_at']))
-            stop=Path(plan['stop_path'])
-            w.require(not stop.exists() and not stop.is_symlink() and (end-now).total_seconds()>=1840+need,'STOP/deadline before healthcheck reservation')
+            c.launch_guard(plan, authority, need=1840+need)
             record={**c.operational_binding(plan), 'resource_id':resource_id,'event':'reserved','cohort':c.cohort(plan),
                 'kind':('n36_resource_preparation_v1' if c.cohort(plan)==c.COHORT else 'n36r1_resource_preparation_v1'),'plan':plan_ref,'release':release_ref,
                 'source_commit':plan['source']['commit'],'runtime':plan['runtime'],

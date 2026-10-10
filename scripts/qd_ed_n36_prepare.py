@@ -27,7 +27,7 @@ def prepare(directory, runtime_ref, *, runtime_closure_ref, controller_semantics
             'worktree': str(root), 'artifact_root': str(directory / 'prospective-artifacts'),
             'source': source, 'scientific_source': scientific_source, 'runtime': runtime_ref,
             'native_build':native_build_ref,'runtime_closure': runtime_closure_ref, 'controller_semantics': controller_semantics_ref, 'episodes': c.expected_rows(root),
-            'limits': c.LIMITS, 'worker_contract': c.WORKER_CONTRACT, 'deadline': c.DEADLINE, 'stop_path': c.stop_path(root),
+            'limits': c.LIMITS, 'worker_contract': c.WORKER_CONTRACT, 'deadline': c.DEADLINE, 'stop_path': c.stop_path(root), 'stop_authority': c.stop.binding(),
             'root_review': None, 'protocol': None, 'authority': None, 'execution_release': None,
             'phase_authorization': {'dev': False, 'validation': False, 'formal': False},
             'expected_manifests': {}, 'http_counters': 'Unknown'}

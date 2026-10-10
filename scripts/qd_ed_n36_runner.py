@@ -118,11 +118,7 @@ def execute_one(plan_ref, release_ref):
             w.atomic_json(output / 'command.json', {'argv': command, 'main_argv': manifest['argv'], 'context': context_ref})
             # Recheck STOP after durable reservation. Rejection leaves an unsettled
             # primary for root review, never a retryable/zero-charge synthetic outcome.
-            w.require(not Path(plan['stop_path']).exists() and not Path(plan['stop_path']).is_symlink(), 'STOP after reservation')
-            end = min(dt.datetime.fromisoformat(value.replace('Z', '+00:00')) for value in
-                      (c.DEADLINE, authority['coordinator_ends_at'], authority['weekly_window']['ends_at']))
-            w.require((end - dt.datetime.now(dt.timezone.utc)).total_seconds() >= 1840,
-                      'deadline after reservation: full attempt unavailable')
+            c.launch_guard(plan, authority)
             r.append_event_locked(root, {**base, 'event': 'dispatched', 'time_unix': time.time(), 'timeout_seconds': 1800})
         started = time.monotonic()
         process = None
@@ -132,9 +128,7 @@ def execute_one(plan_ref, release_ref):
         start_admitted = False
         try:
             with (output / 'runner.log').open('w') as log:
-                w.require(not Path(plan['stop_path']).exists() and not Path(plan['stop_path']).is_symlink(), 'STOP before worker start')
-                w.require((end - dt.datetime.now(dt.timezone.utc)).total_seconds() >= 1840,
-                          'deadline before worker start: full attempt unavailable')
+                c.launch_guard(plan, authority)
                 start_admitted = True
                 process = subprocess.Popen(command, cwd=root, env=env, stdin=subprocess.PIPE, stdout=log,
                                            stderr=subprocess.STDOUT, start_new_session=True)

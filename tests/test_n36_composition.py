@@ -55,7 +55,7 @@ def prospective_base(tmp_path_factory):
             'runtime_closure': write(tmp_path / 'closure.json', {'synthetic_only': True}),
             'controller_semantics': write(tmp_path / 'controller.json', {'synthetic_only': True}),
             'episodes': c.expected_rows(), 'limits': c.LIMITS, 'worker_contract': c.WORKER_CONTRACT,
-            'deadline': c.DEADLINE, 'stop_path': c.stop_path(), 'root_review': None, 'protocol': None,
+            'deadline': c.DEADLINE, 'stop_path': c.stop_path(), 'stop_authority': c.stop.binding(), 'root_review': None, 'protocol': None,
             'authority': None, 'execution_release': None,
             'phase_authorization': {'dev': False, 'validation': False, 'formal': False}, 'expected_manifests': {}}
     # Freeze all prospective configs BEFORE any candidate evidence exists.

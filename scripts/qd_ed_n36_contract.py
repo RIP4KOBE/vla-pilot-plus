@@ -5,6 +5,7 @@ import json
 import math
 from pathlib import Path
 from scripts import qd_ed_n23_worker as w
+from scripts import qd_ed_n36_stop as stop
 
 ROOT = Path(__file__).resolve().parents[1]
 COHORT = 'N36_NONPROGRESS_TANGENT_DEV_001147'
@@ -47,6 +48,19 @@ def stop_path(root=ROOT):
         raise ValueError('unsupported N36 worktree layout: ' + str(root))
     # Do not resolve STOP itself: even a dangling symlink must stop admission.
     return str(session / 'autonomy_20261004/STOP')
+
+
+def validate_stop_binding(plan):
+    w.require(plan.get('stop_authority') == stop.binding(), 'canonical STOP authority differs')
+    w.require(plan['stop_path'] == stop_path(plan['worktree'])
+              and plan['stop_path'] in stop.STOP_PATHS, 'canonical STOP layout differs')
+
+
+def launch_guard(plan, authority, *, need=1840, now=None):
+    validate_stop_binding(plan)
+    end = min(dt.datetime.fromisoformat(value.replace('Z', '+00:00')) for value in
+              (authority['coordinator_ends_at'], authority['weekly_window']['ends_at'])).isoformat()
+    stop.check(now=now, ends_at=end, need=need)
 
 
 def expected_rows(root=ROOT, *, cohort=COHORT):
@@ -126,6 +140,7 @@ def validate_draft(plan):
               and all(plan[k] is None for k in ('root_review', 'authority', 'execution_release'))
               and (cohort(plan) != COHORT or plan['protocol'] is None),
               'draft cannot claim authority/release')
+    validate_stop_binding(plan)
     operational_binding(plan)
     if cohort(plan) == RECOVERY_COHORT:
         from scripts.qd_ed_n36_recovery import validate_protocol
@@ -154,7 +169,8 @@ def pre_dispatch(row, allowance, *, now, stop_path, cohort=COHORT):
     and charges. Exact owning ledger-to-snapshot arithmetic is a root prerequisite.
     """
     w.require(cohort != DRAFT_RECOVERY_COHORT, 'N36R2 draft only; admission disabled')
-    w.require(not Path(stop_path).exists() and not Path(stop_path).is_symlink(), 'STOP pre-dispatch')
+    w.require(stop_path in stop.STOP_PATHS, 'canonical STOP path differs')
+    stop.check(now=now, ends_at=allowance['authority_ends_at'], need=1840)
     w.require(now.tzinfo is not None, 'timezone-aware admission time')
     ends = dt.datetime.fromisoformat(allowance['authority_ends_at'].replace('Z', '+00:00'))
     starts = dt.datetime.fromisoformat(allowance['authority_starts_at'].replace('Z', '+00:00'))

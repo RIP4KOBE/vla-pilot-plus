@@ -17,10 +17,18 @@ from scripts import qd_ed_n36_runner as adapter, qd_ed_n36_supervise as supervis
 from test_n36_composition import write
 from scripts import qd_ed_n36_accounting as accounting
 
-@pytest.fixture(autouse=True)
-def synthetic_accounting_margin(monkeypatch):
+pytestmark = pytest.mark.usefixtures('synthetic_accounting_margin')
+
+
+@pytest.fixture
+def synthetic_accounting_margin(monkeypatch, tmp_path):
     # Exact prefix reconciliation has its own bounded synthetic test.
     monkeypatch.setattr(accounting,'retained_margin',lambda *args:0.)
+    paths = (str(tmp_path/'owner/STOP'), str(tmp_path/'autonomy_20261004/STOP'))
+    for path in paths: Path(path).parent.mkdir(parents=True, exist_ok=True)
+    monkeypatch.setattr(c.stop, 'STOP_PATHS', paths)
+    expected_rows = c.expected_rows
+    monkeypatch.setattr(c, 'expected_rows', lambda root=None, **kw: expected_rows(c.ROOT, **kw))
 
 NOW = dt.datetime(2026, 10, 8, tzinfo=dt.timezone.utc)
 
@@ -33,7 +41,9 @@ def budget_fixture(tmp_path, events=(), resources=()):
                  'coordinator_ends_at': release.COORDINATOR_END,
                  'weekly_window': {'origin_gpu_hours': 53.08404692669838, 'increment_gpu_hours': 168., 'ends_at': c.DEADLINE}}
     reference = write(tmp_path / 'authority.json', authority)
-    plan = {'authority': reference, 'stop_path': str(tmp_path / 'STOP')}
+    plan = {'authority': reference, 'stop_path': c.stop.STOP_PATHS[1],
+            'stop_authority': c.stop.binding(),
+            'worktree': str(tmp_path if tmp_path.name == 'study_worktree' else tmp_path/'study_worktree')}
     snap = r.budget_snapshot(events, resources)
     state = {'gpu_pool': [7], 'max_concurrent_gpu_workers': 1, 'n36_budget_authority': reference,
              'resource_isolation': {'status': 'ACTIVE', 'validation_status': 'PASS', 'private_budget': True},
@@ -137,7 +147,7 @@ def lifecycle(tmp_path, monkeypatch):
     monkeypatch.setattr(c, 'expected_rows', lambda root=None: rows)
     plan, authority, state, reservations = budget_fixture(tmp_path, old_invalid())
     plan['stop_path'] = c.stop_path(tmp_path)
-    Path(plan['stop_path']).parent.mkdir()
+    Path(plan['stop_path']).parent.mkdir(exist_ok=True)
     plan.update(schema='n36-released-plan-v1', worktree=str(tmp_path), artifact_root=str(tmp_path / 'artifacts/n36'), episodes=rows,
                 run_name='synthetic', source={'commit': 'a'*40}, runtime={'path': str(tmp_path / 'runtime'), 'sha256': 'b'*64},
                 runtime_inventory_sha256='c'*64, expected_manifests={})
@@ -308,7 +318,7 @@ def test_stop_arrives_after_reservation_no_worker_started(lifecycle,monkeypatch)
         if event['event']=='reserved':Path(plan['stop_path']).touch()
     monkeypatch.setattr(r,'append_event_locked',stopped)
     monkeypatch.setattr(adapter.subprocess,'Popen',lambda *a,**kw:pytest.fail('STOP must prohibit new worker'))
-    with pytest.raises(ValueError,match='STOP after reservation'):adapter.execute_one(plan_ref,release_ref)
+    with pytest.raises(ValueError,match='STOP present'):adapter.execute_one(plan_ref,release_ref)
     events=r.read_events(root/'data/attempt-ledger.jsonl')
     assert len(events)==1 and events[0]['event']=='reserved' and events[0]['reserved_gpu_seconds']==1840
     assert adapter.execute_one(plan_ref,release_ref)['status']=='LIVE_OR_UNSETTLED'

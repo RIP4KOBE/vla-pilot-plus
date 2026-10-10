@@ -55,12 +55,8 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
         r.owned(output, plan['artifact_root'])
         w.require(not output.exists() and not output.is_symlink(), 'healthcheck output exists')
         output.mkdir(parents=True)
-        end = min(dt.datetime.fromisoformat(x.replace('Z','+00:00')) for x in
-                  (c.DEADLINE, authority['coordinator_ends_at'], authority['weekly_window']['ends_at']))
         def before_start():
-            stop=Path(plan['stop_path'])
-            w.require(not stop.exists() and not stop.is_symlink()
-                      and dt.datetime.now(dt.timezone.utc)<end, 'STOP/deadline before healthcheck start')
+            c.launch_guard(plan, authority, need=1840 + record['reserved_gpu_seconds'])
         process = identity = None
         started = finished = None
         event, result = 'aborted', {}
