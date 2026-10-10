@@ -18,7 +18,12 @@ def prepare(directory, runtime_ref, *, runtime_closure_ref, controller_semantics
     scientific_source = source
     b.closure.verify_runtime(w.read_ref(runtime_closure_ref), runtime_ref)
     from scripts.qd_ed_n34_controller import verify_semantics
-    verify_semantics(controller_semantics_ref, runtime_ref, w.read_ref(runtime_closure_ref))
+    amendment = None if recovery_protocol_ref is None else w.read_ref(recovery_protocol_ref)
+    if amendment is not None and amendment.get('cohort') == c.DRAFT_N36R3_COHORT:
+        verify_disabled_n36r3_controller(controller_semantics_ref, runtime_ref,
+                                         w.read_ref(runtime_closure_ref), amendment)
+    else:
+        verify_semantics(controller_semantics_ref, runtime_ref, w.read_ref(runtime_closure_ref))
     runtime = w.read_ref(runtime_ref)
     w.require(runtime['stage_recovered_error_condition'] == b.runner.E2_STAGE_CONDITION
               and runtime['frozen_stage_provider']['backend'] == 'codex_cli', 'official recovered Codex runtime only')
@@ -33,13 +38,15 @@ def prepare(directory, runtime_ref, *, runtime_closure_ref, controller_semantics
             'expected_manifests': {}, 'http_counters': 'Unknown'}
     if recovery_protocol_ref is not None:
         amendment = w.read_ref(recovery_protocol_ref)
-        w.require(amendment['cohort'] in (c.RECOVERY_COHORT, c.DRAFT_RECOVERY_COHORT),
+        w.require(amendment['cohort'] in (c.RECOVERY_COHORT, c.DRAFT_RECOVERY_COHORT, c.DRAFT_N36R3_COHORT),
                   'finite recovery draft cohort')
         plan.update(cohort=amendment['cohort'], protocol=recovery_protocol_ref,
                     protocol_review=amendment['inherited_protocol_review'],
                     accounting=amendment['accounting'])
         plan['episodes'] = c.plan_rows(plan)
-        if c.cohort(plan) == c.DRAFT_RECOVERY_COHORT:
+        if c.cohort(plan) == c.DRAFT_N36R3_COHORT:
+            validate_protocol = c.validate_n36r3_protocol
+        elif c.cohort(plan) == c.DRAFT_RECOVERY_COHORT:
             from scripts.qd_ed_n36r2_draft import validate_protocol
         else:
             from scripts.qd_ed_n36_recovery import validate_protocol
@@ -51,6 +58,25 @@ def prepare(directory, runtime_ref, *, runtime_closure_ref, controller_semantics
     c.validate_draft(plan)
     w.atomic_json(directory / 'plan.draft.json', plan)
     return plan
+
+
+def verify_disabled_n36r3_controller(reference, runtime_ref, closure, protocol):
+    """Reuse a historical review without pretending it approves a new runtime."""
+    from scripts.qd_ed_n34_controller import verify_semantics
+    previous = w.read_ref(protocol['previous_plan'])
+    historical = verify_semantics(previous['controller_semantics'], previous['runtime'],
+                                  w.read_ref(previous['runtime_closure']))
+    candidate = w.read_ref(reference)
+    w.require(candidate == {'schema': 'n36r3-controller-semantics-draft-v1',
+              'status': 'DISABLED_PENDING_ROOT_REVIEW', 'release_enabled': False,
+              'runtime': runtime_ref, 'inherited_review': previous['controller_semantics'],
+              'module': historical['module'], 'source': historical['source'],
+              'instance': historical['instance'], 'semantics': historical['semantics']},
+              'exact disabled controller review inheritance')
+    w.require(closure['modules'][historical['module']] == historical['source']
+              and historical['module'] in closure['required_after'],
+              'reviewed controller source unchanged')
+    return candidate
 
 
 def main():

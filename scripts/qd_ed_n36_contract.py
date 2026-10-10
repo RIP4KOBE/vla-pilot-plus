@@ -11,8 +11,10 @@ ROOT = Path(__file__).resolve().parents[1]
 COHORT = 'N36_NONPROGRESS_TANGENT_DEV_001147'
 RECOVERY_COHORT = 'N36R1_NONPROGRESS_TANGENT_DEV_001203'
 DRAFT_RECOVERY_COHORT = 'N36R2_NONPROGRESS_TANGENT_DEV_001250'
+DRAFT_N36R3_COHORT = 'N36R3_NONPROGRESS_TANGENT_DEV_001314'
 IDENTITIES = {COHORT: ('n36', '001147'), RECOVERY_COHORT: ('n36r1', '001203'),
-              DRAFT_RECOVERY_COHORT: ('n36r2', '001250')}
+              DRAFT_RECOVERY_COHORT: ('n36r2', '001250'),
+              DRAFT_N36R3_COHORT: ('n36r3', '001314')}
 ARMS = ('C0', 'Q0', 'N34', 'N36')
 DEADLINE = '2026-10-11T11:13:13Z'
 GPU_UUID = 'GPU-48473162-9548-1a19-04aa-ea86c5349187'
@@ -77,6 +79,10 @@ def expected_rows(root=ROOT, *, cohort=COHORT):
 def cohort(plan):
     value = plan.get('cohort', COHORT)
     w.require(value in IDENTITIES, 'unsupported N36 cohort')
+    if value == DRAFT_N36R3_COHORT:
+        w.require(plan.get('schema') == 'n36-release-draft-v1'
+                  and plan.get('frozen') is False and plan.get('release_enabled') is False,
+                  'N36R3 draft only; separate root bindings required')
     return value
 
 
@@ -142,6 +148,8 @@ def validate_draft(plan):
               'draft cannot claim authority/release')
     validate_stop_binding(plan)
     operational_binding(plan)
+    if cohort(plan) == DRAFT_N36R3_COHORT:
+        validate_n36r3_protocol(plan)
     if cohort(plan) == RECOVERY_COHORT:
         from scripts.qd_ed_n36_recovery import validate_protocol
         validate_protocol(plan)
@@ -152,6 +160,57 @@ def validate_draft(plan):
             from scripts.qd_ed_n36r2_draft import validate_protocol
         validate_protocol(plan)
     w.require(set(plan['expected_manifests']) == {r['episode_key'] for r in plan['episodes']}, 'manifest coverage')
+
+
+def validate_n36r3_protocol(plan):
+    """Finite preparation only. Preserve historical charges without a new allowance.
+
+    The terminal reconciliation binds the retained ledger prefix; this function
+    never reads the owning ledger or turns that prefix into current headroom.
+    """
+    w.require(cohort(plan) == DRAFT_N36R3_COHORT, 'finite N36R3 draft cohort')
+    protocol = w.read_ref(plan['protocol'])
+    ledger = w.read_ref(plan['accounting'])
+    previous = w.read_ref(protocol['previous_plan'])
+    w.require(previous['cohort'] == DRAFT_RECOVERY_COHORT
+              and previous['episodes'] == expected_rows(plan['worktree'], cohort=DRAFT_RECOVERY_COHORT)
+              and previous['limits'] == LIMITS and previous['worker_contract'] == WORKER_CONTRACT,
+              'exact inherited N36R2 science')
+    inherited = w.read_ref(previous['protocol'])
+    w.read_ref(previous['accounting'])
+    w.require(plan['protocol_review'] == previous['protocol_review']
+              and plan['protocol_review']['sha256'] == PROTOCOL_REVIEW_SHA,
+              'inherited scientific review only')
+    w.read_ref(plan['protocol_review'])
+    terminal = w.read_ref(ledger['terminal_reconciliation'])
+    w.require(terminal['schema'] == 'n36r3-production-closure-terminal-reconciliation-v1'
+              and terminal['release_enabled'] is False, 'retained terminal reconciliation')
+    allocation = w.read_ref(ledger['allocation'])
+    w.require(allocation == {'schema': 'n36r3-allocation-draft-v1',
+              'cohort': DRAFT_N36R3_COHORT, 'episodes': plan_rows(plan),
+              'automatic_recoveries': 0, 'allocation_is_not_authority': True,
+              'release_enabled': False}, 'exact finite N36R3 allocation')
+    w.require(ledger == {'schema': 'n36r3-accounting-draft-v1',
+              'cohort': DRAFT_N36R3_COHORT, 'inherited_accounting': previous['accounting'],
+              'terminal_reconciliation': ledger['terminal_reconciliation'],
+              'retained_ledger_prefix': terminal['ledger_prefix'],
+              'retained_health_ledger_prefix': terminal['health_ledger_prefix'],
+              'allocation': ledger['allocation'], 'all_prior_charges_retained': True,
+              'N36R2_status': 'INVALID', 'N36R2_charges_retained': True,
+              'protected_gpu_hours': CAPS['protected_gpu_hours'],
+              'automatic_recoveries': 0, 'new_budget_authority': False,
+              'current_headroom': None, 'release_enabled': False},
+              'N36R3 retains all charges; root accounting still required')
+    w.require(protocol == {'schema': 'n36r3-operational-protocol-draft-v1',
+              'cohort': DRAFT_N36R3_COHORT, 'previous_plan': protocol['previous_plan'],
+              'inherited_protocol': previous['protocol'],
+              'inherited_protocol_review': plan['protocol_review'],
+              'accounting': plan['accounting'], 'allocation': ledger['allocation'],
+              'episodes': plan_rows(plan), 'automatic_recoveries': 0,
+              'scientific_changes': False, 'release_enabled': False}
+              and inherited['episodes'] == previous['episodes'],
+              'exact structural N36R3 draft; science immutable')
+    return protocol
 
 
 def require_release(plan):
@@ -171,6 +230,8 @@ def pre_dispatch(row, allowance, *, now, stop_path, cohort=COHORT):
     All *_remaining values must already include prior reservations, health costs
     and charges. Exact owning ledger-to-snapshot arithmetic is a root prerequisite.
     """
+    w.require(cohort != DRAFT_N36R3_COHORT,
+              'N36R3 draft only; separate root bindings required')
     if cohort == DRAFT_RECOVERY_COHORT:
         from scripts.qd_ed_n36_release import validate_release
         plan, _, authority = validate_release(*allowance['n36r2_release_refs'])
