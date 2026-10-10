@@ -884,3 +884,23 @@ def test_launch_boundary_failure_ownership(runner_cpu, monkeypatch, fault):
     else:
         assert rows[-1]['event'] == 'dispatched'
         assert e.r.budget_snapshot([], rows)['gpu_healthcheck_inflight'] == 1
+
+
+def test_preparation_actual_cost_reduces_private_headroom(runner_cpu):
+    import yaml
+    f = runner_cpu
+    margin = .23357169027962
+    protected = sum(e.c.CAPS['protected_gpu_hours'].values())
+    state = e.r.read_state(f.root/'research-state.yaml')
+    state['budget']['max_gpu_hours'] = protected + margin + 61/3600
+    (f.root/'research-state.yaml').write_text(yaml.safe_dump(state))
+    assert p.preparation_budget(f.root, f.plan, f.authority, f.release)['gpu_hours_consumed'] == 0
+    # An earlier failed, distinct synthetic resource keeps the full 90-second
+    # overrun. This read-only budget test does not create a release or a retry.
+    for kind in ('reserved','dispatched','aborted'):
+        p.append_preparation(f.root, resource_event(kind, 'prior_SYNTHETIC', 90 if kind=='aborted' else 0))
+    before = (f.root/'data/gpu-healthcheck-ledger.jsonl').read_bytes()
+    with pytest.raises((ValueError,e.r.GateError)):
+        p.preparation_budget(f.root, f.plan, f.authority, f.release)
+    assert (f.root/'data/gpu-healthcheck-ledger.jsonl').read_bytes() == before
+    assert e.r.budget_snapshot([], p.journal_rows(f.root))['gpu_hours_consumed'] == 90/3600

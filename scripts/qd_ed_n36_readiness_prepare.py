@@ -656,6 +656,7 @@ def execute_preparation(release_ref):
         identity = None
         dispatched_at = None
         child_admitted = False
+        launch_attempted = False
         error = None
         envelope_ref = None
         envelope = None
@@ -671,6 +672,7 @@ def execute_preparation(release_ref):
             with (output / 'child.log').open('xb') as log:
                 write_once(output / 'child-launch-intent.json', {'release': release_ref,
                     'context': context_ref, 'parent': parent, 'time_unix': time.time()})
+                launch_attempted = True
                 process = subprocess.Popen(command, cwd=plan['worktree'], env=env, stdout=log,
                                            stderr=subprocess.STDOUT, start_new_session=True)
                 identity = process_identity(process.pid)
@@ -688,7 +690,7 @@ def execute_preparation(release_ref):
         except BaseException as exc:
             error = type(exc).__name__
         # Unknown/live handles remain inflight. No unowned handle is signalled.
-        if (output / 'child-launch-intent.json').exists() and (
+        if (launch_attempted or process is not None or (output / 'child-launch-intent.json').exists()) and (
                 process is None or identity is None or not child_admitted or process.poll() is None):
             raise RuntimeError('unknown/live preparation child; retain reservation for root reconciliation')
         # A provider descendant may outlive a killed child. Missing transport
