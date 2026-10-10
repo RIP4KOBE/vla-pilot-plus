@@ -249,6 +249,10 @@
       "child_launch_intent_required": true,
       "provider_handle_chain_required": true,
       "suffix_partition": "strict_preparation_then_sole_health_v1"
+    },
+    "accounting_contract": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001694/preparation-accounting-repair/preparation-accounting-contract.prospective-disabled-v1.json",
+      "sha256": "9337934043ee489a2a6925fbf69a3befaa8882236899d4ebecd20371511edba9"
     }
   }
 }

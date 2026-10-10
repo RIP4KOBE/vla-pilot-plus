@@ -92,6 +92,7 @@ def verify_graph(release, source, baseline):
     closed(graph, ('plan', 'runtime'), 'preparation graph')
     plan = e.read(graph['plan'])
     e.w.require(plan.get('release_enabled') is False and plan.get('frozen') is False
+                and plan.get('authority') is None and plan.get('b5_review') is None
                 and plan.get('phase_authorization') == {'engineering': False, 'dev': False,
                                                        'validation': False, 'formal': False},
                 'preparation graph cannot carry episode authority')
@@ -132,7 +133,7 @@ def validate_release(ref, spec, source, source_ref, *, now=None):
     closed(value, ('schema', 'approved', 'purpose', 'specification', 'source_record', 'baseline',
                    'resource_id', 'source_cwd', 'interpreter', 'issued_at', 'expires_at',
                    'gpu_seconds', 'provider_calls', 'episode_authorized', 'health_authorized',
-                   'stop_authority', 'graph', 'root_review'), 'preparation release')
+                   'stop_authority', 'graph', 'accounting_authority', 'root_review'), 'preparation release')
     e.w.require(value['schema'] == 'n36-preparation-measurement-release-v1'
                 and value['approved'] is True and value['purpose'] == 'readiness_preparation_only'
                 and value['episode_authorized'] is False and value['health_authorized'] is False,
@@ -155,6 +156,7 @@ def validate_release(ref, spec, source, source_ref, *, now=None):
     closed(value['graph'], ('plan', 'runtime'), 'released graph')
     e.w.require(value['graph']['runtime']['path'] == p['disabled_runtime_path'],
                 'released bootstrap graph must be disabled and acyclic')
+    validate_preparation_authority(value['accounting_authority'], spec, value, now=current)
     review = e.read(value['root_review'])
     e.exact(review, {**{k: v for k, v in value.items() if k != 'root_review'},
             'schema': 'n36-preparation-root-measurement-review-v1', 'decision': 'APPROVED'},
@@ -162,6 +164,108 @@ def validate_release(ref, spec, source, source_ref, *, now=None):
     e.stop.check(now=dt.datetime.fromtimestamp(current, dt.timezone.utc), ends_at=value['expires_at'])
     return value
 
+
+
+AUTHORITY_BINDINGS = ('specification', 'source_record', 'baseline', 'graph', 'source_cwd',
+    'interpreter', 'stop_authority', 'resource_id', 'issued_at', 'expires_at', 'gpu_seconds',
+    'provider_calls', 'episode_authorized', 'health_authorized')
+ADOPTION_SLOT = 'n36_preparation_accounting_adoption'
+
+
+def validate_preparation_authority(ref, spec, release, *, now=None):
+    """Closed preparation approval; never accepts production or CPU task authority.
+
+    The detached review precedes authority, which precedes state adoption and the
+    separately reviewed release. No document hashes itself or a downstream node.
+    """
+    contract_ref = spec['runtime_binding']['accounting_contract']
+    contract = e.read(contract_ref)
+    closed(contract, ('schema', 'release_enabled', 'root_adopted', 'repair_authority',
+        'independent_review', 'standing_authority', 'not_before', 'deadline', 'owner',
+        'amendment', 'margin_reference', 'adoption_slot', 'authority_schema', 'review_schema'),
+        'preparation accounting contract')
+    e.w.require(contract['schema'] == 'n36-preparation-accounting-contract-v1'
+                and contract['release_enabled'] is False and contract['root_adopted'] is False
+                and contract['adoption_slot'] == ADOPTION_SLOT
+                and contract['authority_schema'] == 'n36-preparation-accounting-authority-v1'
+                and contract['review_schema'] == 'n36-preparation-accounting-root-review-v1',
+                'pinned preparation-only contract')
+    # Hash-check the exact prospective policy basis; do not recurse old provenance.
+    repair = e.read(contract['repair_authority'])
+    e.read(contract['independent_review'])
+    e.exact({k: repair['standing_authority'][k] for k in ('path', 'sha256')},
+            contract['standing_authority'], 'preparation standing basis')
+    e.exact({k: repair['review'][k] for k in ('path', 'sha256')},
+            contract['independent_review'], 'preparation independent policy review')
+    standing = e.read(contract['standing_authority'])
+    e.w.require(standing.get('approved') is True, 'approved standing preparation authority')
+    value = e.read(ref)
+    fixed = dict(schema=contract['authority_schema'], approved=True,
+        purpose='readiness_preparation_only', contract=contract_ref,
+        approval_basis=contract['standing_authority'], independent_review=contract['independent_review'],
+        owner=contract['owner'], gpu_mapping=e.read(spec['canonical_runtime'])['gpu_mapping'], caps=e.c.CAPS, amendment=contract['amendment'],
+        margin_reference=contract['margin_reference'], ledger_prefixes=spec['retained_ledger_prefixes'],
+        retained_snapshot=spec['retained_snapshot'], retained_snapshot_reference=spec['retained_snapshot_reference'],
+        retained_margin_gpu_hours='0.23357169027962', absolute_gpu_hours='224',
+        weekly_window=dict(origin_gpu_hours=53.08404692669838, increment_gpu_hours=168.,
+                           ends_at=e.c.DEADLINE),
+        cleanup_seconds=MEASUREMENT_CONTRACT['cleanup_seconds'], max_episode_attempts=0,
+        max_health_invocations=0, automatic_recoveries=0, adoption_slot=ADOPTION_SLOT,
+        **{k: release[k] for k in AUTHORITY_BINDINGS})
+    closed(value, (*fixed, 'root_review'), 'preparation accounting authority')
+    e.exact({k: value[k] for k in fixed}, fixed, 'exact preparation accounting authority')
+    e.w.require(value['episode_authorized'] is False and value['health_authorized'] is False
+                and type(value['provider_calls']) is int and value['provider_calls'] == 1,
+                'preparation-only resource authority')
+    e.exact(value['specification'], e.SPECIFICATION, 'preparation authority specification')
+    e.exact(value['baseline'], spec['canonical_runtime'], 'preparation authority baseline')
+    e.exact(value['stop_authority'], e.stop.binding(), 'preparation authority STOP')
+    e.w.require(value['source_cwd'] == str(e.SOURCE)
+                and value['owner']['canonical_worktree'] == str(e.OWNER), 'preparation authority routes')
+    e.read(value['source_record'])
+    e.read(value['retained_snapshot_reference'])
+    e.read(value['amendment'])
+    e.w.require(value['margin_reference']['sha256'] == e.c.ACCOUNTING_SHA, 'preparation frozen margin')
+    current = time.time() if now is None else now
+    issued, expires = timestamp(value['issued_at']), timestamp(value['expires_at'])
+    e.w.require(max(timestamp(contract['not_before']), timestamp(standing['continuous_window']['start_utc']))
+                < issued <= current < expires <= min(timestamp(contract['deadline']),
+                timestamp(standing['continuous_window']['end_utc']), timestamp(e.c.DEADLINE)),
+                'preparation accounting authority window')
+    need = number(value['gpu_seconds'], 'preparation authority finite seconds')
+    e.w.require(MEASUREMENT_CONTRACT['cleanup_seconds'] < need <= expires - issued,
+                'preparation authority finite reservation')
+    e.w.require(value['resource_id'] == policy(spec)['resource_id']
+                and value['resource_id'] not in (e.HEALTH_ID, e.EPISODE_KEY), 'separate preparation resource')
+    e.exact(e.read(value['root_review']),
+        {**{k: v for k, v in value.items() if k != 'root_review'},
+         'schema': contract['review_schema'], 'decision': 'APPROVED'}, 'detached preparation accounting root review')
+    return value
+
+
+def validate_preparation_state(root, plan, authority, release, state):
+    """Read-only adoption check using the real disabled plan shape."""
+    e.w.require(plan.get('authority') is None and plan.get('b5_review') is None
+                and plan.get('frozen') is False and plan.get('release_enabled') is False
+                and plan.get('phase_authorization') == dict(engineering=False, dev=False, validation=False, formal=False),
+                'preparation requires null production authority and disabled graph')
+    e.exact(e.read(release['graph']['plan']), plan, 'preparation adopted graph')
+    e.exact(plan['runtime'], release['graph']['runtime'], 'preparation adopted runtime')
+    e.exact(plan['source'], e.read(authority['source_record']), 'preparation adopted source')
+    e.w.require(Path(root) == e.owner_root(plan), 'preparation owning route')
+    e.validate_owner_route(state)
+    for key in ('canonical_worktree', 'run_name', 'artifacts'):
+        e.exact(state.get(key), authority['owner'][key], 'preparation owner ' + key)
+    e.validate_private_budget(authority, state)
+    runtime = e.read(plan['runtime'])
+    e.exact(runtime['gpu_mapping'], e.read(authority['baseline'])['gpu_mapping'], 'preparation exact GPU binding')
+    e.w.require(e.r.runtime_gpu(runtime, state) == 7, 'preparation physical GPU')
+    e.exact(state.get(ADOPTION_SLOT), dict(schema='n36-preparation-accounting-adoption-v1',
+        approved=True, accounting_authority=release['accounting_authority'],
+        owner_root=str(root), resource_id=release['resource_id'], production_adoption=False),
+        'preparation dedicated owning adoption missing')
+    e.w.require(state.get('n36_engineering_budget_authority') != release['accounting_authority'],
+                'preparation authority in production slot')
 
 def derive(spec, source, source_ref, proof_ref, *, now=None):
     """Validate approved observations; return exact prospective runtime in memory."""
@@ -371,7 +475,19 @@ def append_preparation(root, event):
 def preparation_budget(root, plan, authority, release):
     from scripts import qd_ed_n36_runner as owner
     state, events, resources, reservations = owner.snapshot(root, authority)
-    e.validate_state(plan, authority, state)
+    spec = e.specification()
+    e.exact(authority, validate_preparation_authority(release['accounting_authority'], spec, release),
+            'preparation accounting reference changed')
+    validate_preparation_state(root, plan, authority, release, state)
+    retained = {}
+    for name in e.JOURNALS:
+        anchor = authority['ledger_prefixes'][name]
+        path = Path(root) / 'data' / name
+        e.w.require(anchor['path'] == str(path), 'preparation owner prefix route')
+        with path.open('rb') as stream:
+            retained[name] = [json.loads(line) for line in stream.read(anchor['bytes']).splitlines() if line.strip()]
+    e.exact(e.r.budget_snapshot(retained[e.JOURNALS[0]], retained[e.JOURNALS[1]]),
+            authority['retained_snapshot'], 'preparation whole retained snapshot')
     e.exact(authority['ledger_prefixes'], e.specification()['retained_ledger_prefixes'],
             'preparation exact retained accounting prefixes')
     own = journal_rows(root)
@@ -629,7 +745,7 @@ def execute_preparation(release_ref):
         guard()
         e.stop.check(ends_at=release['expires_at'], need=release['gpu_seconds'])
         with e.r.locked(root / 'data/qd-ed-state.lock', nonblocking=False):
-            preparation_budget(root, plan, e.read(plan['authority']), release)
+            preparation_budget(root, plan, e.read(release['accounting_authority']), release)
         execution.attest(Path(plan['worktree']), source, e.read(plan['runtime_closure']),
             binding={'release': release_ref, 'source_record': source_ref, 'resource_id': release['resource_id'],
                      'process': process_identity(os.getpid()), 'phase': 'preparation_before'})

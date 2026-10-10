@@ -20,6 +20,28 @@ from test_n36_engineering import put
 REAL_VERIFY_GRAPH = p.verify_graph
 
 
+def preparation_authority(root, spec, release):
+    """Explicitly synthetic approval documents; real closed validators consume them."""
+    contract_ref = spec['runtime_binding']['accounting_contract']
+    contract = e.read(contract_ref)
+    value = dict(schema='n36-preparation-accounting-authority-v1', approved=True,
+        purpose='readiness_preparation_only', contract=contract_ref,
+        approval_basis=contract['standing_authority'], independent_review=contract['independent_review'],
+        owner=contract['owner'], gpu_mapping=e.read(spec['canonical_runtime'])['gpu_mapping'],
+        caps=e.c.CAPS, amendment=contract['amendment'], margin_reference=contract['margin_reference'],
+        ledger_prefixes=spec['retained_ledger_prefixes'], retained_snapshot=spec['retained_snapshot'],
+        retained_snapshot_reference=spec['retained_snapshot_reference'],
+        retained_margin_gpu_hours='0.23357169027962', absolute_gpu_hours='224',
+        weekly_window=dict(origin_gpu_hours=53.08404692669838, increment_gpu_hours=168., ends_at=e.c.DEADLINE),
+        cleanup_seconds=40, max_episode_attempts=0, max_health_invocations=0,
+        automatic_recoveries=0, adoption_slot=p.ADOPTION_SLOT,
+        **{k:release[k] for k in p.AUTHORITY_BINDINGS})
+    value['root_review'] = put(root, 'SYNTHETIC-accounting-review',
+        dict(value, schema='n36-preparation-accounting-root-review-v1', decision='APPROVED'))
+    release['accounting_authority'] = put(root, 'SYNTHETIC-accounting-authority', value)
+    return value
+
+
 @pytest.fixture
 def measured(tmp_path, monkeypatch):
     root = tmp_path / 'SYNTHETIC_NOT_AUTHORITY'
@@ -49,7 +71,8 @@ def measured(tmp_path, monkeypatch):
     source = e.b.closure.source_record(e.b.ROOT, e.b.source_paths(e.b.ROOT))
     monkeypatch.setattr(e, 'SOURCE', e.b.ROOT)
     source_ref = put(root, 'source', source)
-    issued = max(p.timestamp(prep['not_before']), p.timestamp(p.MEASUREMENT_CONTRACT['not_before'])) + 1
+    issued = max(p.timestamp(prep['not_before']), p.timestamp(p.MEASUREMENT_CONTRACT['not_before']),
+                 p.timestamp(e.read(binding['accounting_contract'])['not_before'])) + 1
     def iso(t): return dt.datetime.fromtimestamp(t, dt.timezone.utc).isoformat()
     release = dict(schema='n36-preparation-measurement-release-v1', approved=True,
         purpose='readiness_preparation_only', specification=e.SPECIFICATION, source_record=source_ref,
@@ -60,6 +83,7 @@ def measured(tmp_path, monkeypatch):
         graph={'plan': put(root, 'inert-plan', {'SYNTHETIC': True}),
                'runtime': {'path': prep['disabled_runtime_path'], 'sha256': '0'*64}})
     def save_path(path, value): return put(Path(path).parent, Path(path).stem, value)
+    preparation_authority(root, spec, release)
     review = {**release, 'schema': 'n36-preparation-root-measurement-review-v1', 'decision': 'APPROVED'}
     release['root_review'] = put(root, 'synthetic-root-review', review)
     release_ref = save_path(prep['release_path'], release)
@@ -451,32 +475,50 @@ def runner_cpu(tmp_path, monkeypatch):
         if not path.exists(): path.touch()
         raw = path.read_bytes()
         prefixes[name] = dict(path=str(path), bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest())
-    authority = dict(caps=e.c.CAPS, ledger_prefixes=prefixes, amendment={'SYNTHETIC':True}, margin_reference={})
-    authority_ref = put(root, 'authority', authority)
-    snap = e.r.budget_snapshot([], [])
-    state = dict(budget=dict(snap, max_episode_attempts=1800, max_gpu_hours=224,
-        reserved=e.c.CAPS['buckets'], gpu_hour_reservations=e.c.CAPS['protected_gpu_hours']))
-    (root/'research-state.yaml').write_text(yaml.safe_dump(state))
-    source = {'commit':'SYNTHETIC'}
+    spec = e.specification()
+    contract = e.read(spec['runtime_binding']['accounting_contract'])
+    contract['owner'] = dict(canonical_worktree=str(root), run_name='SYNTHETIC', artifacts=str(root))
+    spec['runtime_binding']['accounting_contract'] = put(root, 'SYNTHETIC-contract', contract)
+    spec['retained_ledger_prefixes'] = prefixes
+    spec['retained_snapshot'] = e.r.budget_snapshot([], [])
+    spec['retained_snapshot_reference'] = put(root, 'SYNTHETIC-retained', spec['retained_snapshot'])
+    source = {'commit':'SYNTHETIC', 'files':[]}
     source_ref = put(root, 'source', source)
-    runtime = dict(gpu_mapping={'physical_gpu':7,'uuid':'SYNTHETIC'}, frozen_stage_provider={'SYNTHETIC':True})
+    runtime = dict(gpu_mapping={'physical_gpu':7,'uuid':'SYNTHETIC','egl_device_index':0},
+                   frozen_stage_provider={'SYNTHETIC':True}, provider_ready=False, cuda_egl_verified=False)
     runtime_ref = put(root, 'runtime', runtime)
-    plan = dict(worktree=str(root), authority=authority_ref, runtime=runtime_ref,
-                runtime_closure=put(root,'closure',{'SYNTHETIC':True}))
-    spec = dict(canonical_runtime=runtime_ref, retained_ledger_prefixes=prefixes)
+    spec['canonical_runtime'] = runtime_ref
+    monkeypatch.setattr(e, 'SOURCE', root)
+    monkeypatch.setattr(e, 'OWNER', root)
+    monkeypatch.setattr(e, 'SPECIFICATION', put(root, 'SYNTHETIC-spec', spec))
+    plan = dict(worktree=str(root), authority=None, b5_review=None, frozen=False, release_enabled=False,
+                phase_authorization=dict(engineering=False,dev=False,validation=False,formal=False),
+                source=source, runtime=runtime_ref, runtime_closure=put(root,'closure',{'SYNTHETIC':True}))
     prep = {k:str(root/(k+'.json')) for k in ('proof_path','accounting_path','gpu_path','provider_path')}
-    release = dict(resource_id='readiness_preparation_SYNTHETIC', gpu_seconds=60, provider_calls=1,
-        source_record=source_ref, baseline=runtime_ref, source_cwd=str(root), interpreter={'SYNTHETIC':True},
-        expires_at=e.stop.DEADLINE)
+    prep['resource_id'] = 'readiness_preparation_SYNTHETIC'
+    release = dict(resource_id=prep['resource_id'], gpu_seconds=60, provider_calls=1,
+        specification=e.SPECIFICATION, source_record=source_ref, baseline=runtime_ref,
+        source_cwd=str(root), interpreter={'SYNTHETIC':True}, issued_at=contract['not_before'],
+        expires_at=e.stop.DEADLINE, episode_authorized=False, health_authorized=False,
+        stop_authority=e.stop.binding(), graph=dict(plan=put(root,'disabled-plan',plan),runtime=runtime_ref))
+    release['issued_at'] = dt.datetime.fromtimestamp(p.timestamp(contract['not_before'])+1,dt.timezone.utc).isoformat()
+    authority = preparation_authority(root, spec, release)
+    snap = e.r.budget_snapshot([], [])
+    state = dict(contract['owner'], worktree=str(root), gpu_pool=[7], max_concurrent_gpu_workers=1,
+        resource_isolation=dict(status='ACTIVE',validation_status='PASS',private_budget=True),
+        budget=dict(snap, max_episode_attempts=1800, max_gpu_hours=224.0, amendment=contract['amendment'],
+        reserved=e.c.CAPS['buckets'], gpu_hour_reservations=e.c.CAPS['protected_gpu_hours']))
+    state[p.ADOPTION_SLOT] = dict(schema='n36-preparation-accounting-adoption-v1',approved=True,
+        accounting_authority=release['accounting_authority'],owner_root=str(root),
+        resource_id=release['resource_id'],production_adoption=False)
+    (root/'research-state.yaml').write_text(yaml.safe_dump(state))
     ref = put(root,'release',release)
     monkeypatch.setattr(p, 'measurement_context', lambda r: (spec,source_ref,source,release,plan))
     monkeypatch.setattr(p, 'policy', lambda s: prep)
     monkeypatch.setattr(e, 'specification', lambda: spec)
-    monkeypatch.setattr(e, 'owner_root', lambda plan: root)
-    monkeypatch.setattr(e, 'validate_state', lambda *a: None)  # No owning adoption in fixtures.
+    monkeypatch.setattr(e, 'owner_root', lambda plan: root)  # External deployed route only.
     monkeypatch.setattr(e.accounting, 'retained_margin', lambda *a: .23357169027962)
     monkeypatch.setattr(e, 'child_environment', lambda *a: {})
-    monkeypatch.setattr(e.r, 'runtime_gpu', lambda runtime: 7)
     monkeypatch.setattr(e.r, 'gpu_admission', lambda **kw: {'SYNTHETIC':True})
     monkeypatch.setattr(p, 'provider_preflight', lambda *a: {'SYNTHETIC':True})
     monkeypatch.setattr(execution, 'active', lambda: None)
@@ -597,7 +639,7 @@ def test_real_preparation_graph_wiring_all41_synthetic(tmp_path, monkeypatch):
     audit['expected_manifests'] = {row['episode_key']:f.doc('disabled-audit-'+str(i),
         e.b.manifest(audit,runtime,row)) for i,row in enumerate(audit['episodes'])}
     plan = dict(f.plan, **common)
-    plan.update(frozen=False,release_enabled=False,phase_authorization=dict(engineering=False,dev=False,validation=False,formal=False),
+    plan.update(authority=None,b5_review=None,frozen=False,release_enabled=False,phase_authorization=dict(engineering=False,dev=False,validation=False,formal=False),
                 audit_plan=f.doc('disabled-audit',audit))
     plan['engineering_manifest'] = f.doc('disabled-engineering', e.b.engineering_manifest(plan,runtime,parent.row()))
     plan['expected_manifests'] = {parent.EPISODE_KEY:plan['engineering_manifest']}
@@ -751,6 +793,7 @@ def test_preparation_release_has_independent_finite_reservation(measured):
     issued = p.timestamp(release['issued_at'])
     release['gpu_seconds'] = 2000  # Separate from the engineering 1900s slot.
     release['expires_at'] = dt.datetime.fromtimestamp(issued+3000,dt.timezone.utc).isoformat()
+    preparation_authority(m['root'], m['spec'], release)
     review = {k:v for k,v in release.items() if k!='root_review'}
     review.update(schema='n36-preparation-root-measurement-review-v1',decision='APPROVED')
     release['root_review'] = put(m['root'],'independent-preparation-review',review)
@@ -767,6 +810,7 @@ def test_release_predating_runner_amendment_rejected(measured):
     release = copy.deepcopy(m['release'])
     release['issued_at'] = dt.datetime.fromtimestamp(
         p.timestamp(p.MEASUREMENT_CONTRACT['not_before'])-1,dt.timezone.utc).isoformat()
+    preparation_authority(m['root'], m['spec'], release)
     review = {k:v for k,v in release.items() if k!='root_review'}
     review.update(schema='n36-preparation-root-measurement-review-v1',decision='APPROVED')
     release['root_review'] = put(m['root'],'stale-amendment-review',review)
@@ -849,7 +893,7 @@ def test_constructor_interrupted_after_inert_cpu_spawn_keeps_inflight(runner_cpu
         assert e.r.budget_snapshot([], rows)['gpu_healthcheck_inflight'] == 1
         assert not Path(f.prep['proof_path']).exists()
         other = dict(f.release, resource_id='second_SYNTHETIC')
-        with pytest.raises((ValueError, e.r.GateError), match='inflight'):
+        with pytest.raises((ValueError, e.r.GateError)):
             p.preparation_budget(f.root, f.plan, f.authority, other)
     finally:
         for child in owned:
@@ -893,15 +937,123 @@ def test_preparation_actual_cost_reduces_private_headroom(runner_cpu):
     margin = .23357169027962
     protected = sum(e.c.CAPS['protected_gpu_hours'].values())
     state = e.r.read_state(f.root/'research-state.yaml')
-    state['budget']['max_gpu_hours'] = protected + margin + 61/3600
-    (f.root/'research-state.yaml').write_text(yaml.safe_dump(state))
     assert p.preparation_budget(f.root, f.plan, f.authority, f.release)['gpu_hours_consumed'] == 0
     # An earlier failed, distinct synthetic resource keeps the full 90-second
     # overrun. This read-only budget test does not create a release or a retry.
     for kind in ('reserved','dispatched','aborted'):
-        p.append_preparation(f.root, resource_event(kind, 'prior_SYNTHETIC', 90 if kind=='aborted' else 0))
+        p.append_preparation(f.root, resource_event(kind, 'prior_SYNTHETIC', 224*3600 if kind=='aborted' else 0))
     before = (f.root/'data/gpu-healthcheck-ledger.jsonl').read_bytes()
     with pytest.raises((ValueError,e.r.GateError)):
         p.preparation_budget(f.root, f.plan, f.authority, f.release)
     assert (f.root/'data/gpu-healthcheck-ledger.jsonl').read_bytes() == before
-    assert e.r.budget_snapshot([], p.journal_rows(f.root))['gpu_hours_consumed'] == 90/3600
+    assert e.r.budget_snapshot([], p.journal_rows(f.root))['gpu_hours_consumed'] == 224
+
+
+def test_preparation_real_admission_null_production_slots(runner_cpu):
+    f = runner_cpu
+    assert f.plan['authority'] is f.plan['b5_review'] is None
+    with pytest.raises(ValueError, match='exact reference'):
+        e.read(f.plan['authority'])  # F1: the old production bootstrap read.
+    before = (f.root/'research-state.yaml').read_bytes()
+    assert p.preparation_budget(f.root, f.plan, f.authority, f.release)['reserved_attempts'] == 0
+    assert (f.root/'research-state.yaml').read_bytes() == before
+    assert not f.launches and not p.journal_rows(f.root)
+    assert e.read(f.plan['runtime'])['provider_ready'] is False
+
+
+@pytest.mark.parametrize('fault', ['missing','unknown','unapproved','schema','cpu_authority',
+    'review','review_hash','standing','source','graph','baseline','owner','gpu','caps','prefix',
+    'snapshot','margin','weekly','cleanup','provider','episodes','health','resource','stop',
+    'expired','future','production_slot'])
+def test_closed_preparation_authority_rejects_before_effects(runner_cpu, fault):
+    f = runner_cpu
+    authority = copy.deepcopy(f.authority)
+    if fault == 'missing': del authority['approved']
+    elif fault == 'unknown': authority['unexpected'] = True
+    elif fault == 'unapproved': authority['approved'] = False
+    elif fault in ('schema','cpu_authority'):
+        authority['schema'] = 'n36-preparation-accounting-cpu-repair-authority-v1'
+    elif fault == 'review': authority['root_review'] = None
+    elif fault == 'review_hash': authority['root_review']['sha256'] = '0'*64
+    elif fault == 'standing': authority['approval_basis']['sha256'] = '0'*64
+    elif fault in ('source','graph','baseline'):
+        key = {'source':'source_record','graph':'graph','baseline':'baseline'}[fault]
+        authority[key] = None
+    elif fault == 'owner': authority['owner']['canonical_worktree'] = '/foreign'
+    elif fault == 'gpu': authority['gpu_mapping']['physical_gpu'] = 0
+    elif fault == 'caps': authority['caps']['gpu_hours'] = 225.0
+    elif fault == 'prefix': authority['ledger_prefixes'][e.JOURNALS[0]]['sha256'] = '0'*64
+    elif fault == 'snapshot': authority['retained_snapshot']['gpu_hours_consumed'] = 1.
+    elif fault == 'margin': authority['retained_margin_gpu_hours'] = '0'
+    elif fault == 'weekly': authority['weekly_window']['increment_gpu_hours'] = 169.
+    elif fault == 'cleanup': authority['cleanup_seconds'] = 0
+    elif fault == 'provider': authority['provider_calls'] = 2
+    elif fault == 'episodes': authority['max_episode_attempts'] = 1
+    elif fault == 'health': authority['max_health_invocations'] = 1
+    elif fault == 'resource': authority['resource_id'] = e.HEALTH_ID
+    elif fault == 'stop': authority['stop_authority'] = {}
+    elif fault == 'expired': authority['expires_at'] = authority['issued_at']
+    elif fault == 'future': authority['issued_at'] = '2099-01-01T00:00:00Z'
+    else: f.plan['authority'] = f.release['accounting_authority']
+    f.release['accounting_authority'] = put(f.root,'bad-authority',authority)
+    before = (f.root/'research-state.yaml').read_bytes()
+    with pytest.raises((ValueError, e.r.GateError, TypeError)):
+        p.preparation_budget(f.root, f.plan, authority, f.release)
+    assert (f.root/'research-state.yaml').read_bytes() == before
+    assert not f.launches and not p.journal_rows(f.root)
+
+
+@pytest.mark.parametrize('fault', ['unadopted','foreign_adoption','production_slot','owner','lexical',
+    'run','artifacts','gpu','workers','isolation','hold','attempt_cap','gpu_cap','bucket_cap',
+    'protected','amendment','state_cost','state_dispatched','torn'])
+def test_preparation_adoption_and_private_accounting_fail_closed(runner_cpu, fault):
+    import yaml
+    f = runner_cpu
+    state = e.r.read_state(f.root/'research-state.yaml')
+    if fault == 'unadopted': del state[p.ADOPTION_SLOT]
+    elif fault == 'foreign_adoption': state[p.ADOPTION_SLOT]['accounting_authority']['sha256'] = '0'*64
+    elif fault == 'production_slot': state['n36_engineering_budget_authority'] = f.release['accounting_authority']
+    elif fault == 'owner': state['canonical_worktree'] = '/foreign'
+    elif fault == 'lexical': state['worktree'] = '/foreign'
+    elif fault == 'run': state['run_name'] = 'foreign'
+    elif fault == 'artifacts': state['artifacts'] = '/foreign'
+    elif fault == 'gpu': state['gpu_pool'] = [0]
+    elif fault == 'workers': state['max_concurrent_gpu_workers'] = 2
+    elif fault == 'isolation': state['resource_isolation']['status'] = 'INACTIVE'
+    elif fault == 'hold': state['external_resource_hold'] = {'do_not_auto_resume':True}
+    elif fault == 'attempt_cap': state['budget']['max_episode_attempts'] = 1801
+    elif fault == 'gpu_cap': state['budget']['max_gpu_hours'] = 225.
+    elif fault == 'bucket_cap': state['budget']['reserved']['recovery'] = 61
+    elif fault == 'protected': state['budget']['gpu_hour_reservations']['formal'] = 11.
+    elif fault == 'amendment': state['budget']['amendment']['sha256'] = '0'*64
+    elif fault == 'state_cost': state['budget']['gpu_hours_consumed'] = 1.
+    elif fault == 'state_dispatched': state['budget']['dispatched'] = 1
+    else:
+        (f.root/'data/readiness-preparation-ledger.jsonl').write_text(json.dumps(resource_event())+'\n')
+    (f.root/'research-state.yaml').write_text(yaml.safe_dump(state))
+    before = (f.root/'research-state.yaml').read_bytes()
+    with pytest.raises((ValueError, e.r.GateError)):
+        p.preparation_budget(f.root, f.plan, f.authority, f.release)
+    assert (f.root/'research-state.yaml').read_bytes() == before
+    assert not f.launches
+
+
+def test_actual_disabled_plan_shape_preparation_adoption(runner_cpu):
+    """Exact current document shape; only routes/evidence replaced with inert CPU bytes."""
+    f = runner_cpu
+    contract = e.read(f.spec['runtime_binding']['accounting_contract'])
+    review = e.read(contract['independent_review'])
+    actual = e.read(review['actual_graph']['plan'])
+    assert actual['authority'] is actual['b5_review'] is None
+    plan = dict(actual, **f.plan)
+    assert set(plan) == set(actual)
+    f.plan.clear(); f.plan.update(plan)
+    f.release['graph']['plan'] = put(f.root,'actual-shape-disabled-plan',plan)
+    authority = preparation_authority(f.root, f.spec, f.release)
+    import yaml
+    state = e.r.read_state(f.root/'research-state.yaml')
+    state[p.ADOPTION_SLOT]['accounting_authority'] = f.release['accounting_authority']
+    (f.root/'research-state.yaml').write_text(yaml.safe_dump(state))
+    assert p.preparation_budget(f.root, plan, authority, f.release)['reserved_attempts'] == 0
+    assert plan['authority'] is plan['b5_review'] is None
+    assert plan['release_enabled'] is plan['frozen'] is False

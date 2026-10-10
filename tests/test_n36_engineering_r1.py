@@ -665,3 +665,15 @@ def test_preparation_history_health_handoff_uses_sole_reserved_health(preparatio
     f.current[e.JOURNALS[1]].append(dict(record, resource_id='foreign'))
     with pytest.raises(ValueError, match='foreign resource'):
         e.validate_health_handoff(f.m['root'], f.plan_ref, record['release'], record, binding)
+
+
+def test_preparation_authority_cannot_authorize_production(documents):
+    plan, _, _ = copy.deepcopy(documents)
+    plan.update(authority=None, b5_review=None, frozen=False, release_enabled=False)
+    authority = {'schema':'n36-preparation-accounting-authority-v1','approved':True}
+    with pytest.raises(ValueError):
+        e.validate_authority(plan, authority)
+    with pytest.raises(ValueError):
+        e.validate_plan_shape(plan, released=True)
+    with pytest.raises(ValueError):
+        e.validate_state(plan, authority, {'n36_preparation_accounting_adoption':authority})
