@@ -317,6 +317,11 @@ def write_once(path, value):
         stream.write(json.dumps(value, sort_keys=True, allow_nan=False).encode())
         stream.flush()
         os.fsync(stream.fileno())
+    directory = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        os.fsync(directory)
+    finally:
+        os.close(directory)
     return {'path': str(path), 'sha256': e.w.sha(path)}
 
 
@@ -347,6 +352,11 @@ def append_preparation(root, event):
                 stream.write(json.dumps(event, sort_keys=True, allow_nan=False) + '\n')
                 stream.flush()
                 os.fsync(stream.fileno())
+            directory = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
+            try:
+                os.fsync(directory)
+            finally:
+                os.close(directory)
     if event['event'] == 'reserved':
         e.r.append_healthcheck_event(root, event)
         own_append()

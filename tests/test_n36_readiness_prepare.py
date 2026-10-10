@@ -448,7 +448,7 @@ def runner_cpu(tmp_path, monkeypatch):
     (root/'research-state.yaml').write_text(yaml.safe_dump(state))
     source = {'commit':'SYNTHETIC'}
     source_ref = put(root, 'source', source)
-    runtime = dict(gpu_mapping={'physical_gpu':7,'uuid':'SYNTHETIC'})
+    runtime = dict(gpu_mapping={'physical_gpu':7,'uuid':'SYNTHETIC'}, frozen_stage_provider={'SYNTHETIC':True})
     runtime_ref = put(root, 'runtime', runtime)
     plan = dict(worktree=str(root), authority=authority_ref, runtime=runtime_ref,
                 runtime_closure=put(root,'closure',{'SYNTHETIC':True}))
@@ -635,14 +635,11 @@ def test_preparation_public_preflight_cpu_only(tmp_path, monkeypatch, fault):
         with pytest.raises((ValueError,e.r.GateError)): p.provider_preflight(runtime,env,run=run)
 
 
-def test_real_source_boundary_rejects_wrong_commit(runner_cpu, monkeypatch):
-    f = runner_cpu
-    from scripts.qd_ed_n36_readiness_prepare import boundary
-    # runner_cpu substitutes the expensive outer release only. Restore the real
-    # source boundary using its original function captured from module source.
+def test_real_source_boundary_rejects_wrong_commit():
+    import subprocess
     source = e.b.closure.source_record(e.b.ROOT, e.b.source_paths(e.b.ROOT))
     source['commit'] = '0'*40
-    with pytest.raises((ValueError, e.r.GateError, __import__('subprocess').CalledProcessError)):
+    with pytest.raises((ValueError, e.r.GateError, subprocess.CalledProcessError)):
         e.b.closure.verify_source(e.b.ROOT, source)
 
 
@@ -691,3 +688,47 @@ def test_preparation_transport_real_parser_retains_bytes(tmp_path, monkeypatch, 
     assert len(launches)==1
     assert (output/'provider-transport.json').exists() and (output/'provider-process.json').exists()
     assert (output/'response.jsonl').read_bytes()==raw
+
+
+def test_child_measurement_collects_receipts_after_observation_cpu_only(runner_cpu, monkeypatch):
+    import os
+    from scripts import qd_ed_n36_build as native, qd_ed_n36_source as execution
+    from scripts.qd_ed_n36_runner import process_identity
+    f = runner_cpu
+    output = Path(f.prep['proof_path']).with_suffix('.measurement');output.mkdir()
+    f.plan['native_build'] = put(f.root,'native',{'SYNTHETIC':True})
+    f.plan['runtime_closure'] = put(f.root,'child-closure',{'required_after':[]})
+    parent = process_identity(os.getppid())
+    context = put(output,'context',dict(release=f.ref,parent=parent,output=str(output)))
+    for kind in ('reserved','dispatched'):
+        p.append_preparation(f.root,dict(resource_event(kind,f.release['resource_id']),release=f.ref))
+    p.write_once(output/'child-admitted.json',process_identity(os.getpid()))
+    steps = []
+    def probe(manifest, dest, resource):
+        steps.append('gpu')
+        assert manifest == f.plan['runtime']['path'] and resource==f.release['resource_id']
+        (dest/'probe-frame.png').write_bytes(b'SYNTHETIC')
+        return {'time_unix':1,'simulation_steps':0}
+    monkeypatch.setattr(p.probe,'child_probe',probe)
+    monkeypatch.setattr(p.probe,'validate_probe_evidence',lambda *a:steps.append('validate_gpu'))
+    inert = put(output,'inert',{'SYNTHETIC':True})
+    def provider(*args):
+        steps.append('provider');return inert,inert,inert
+    monkeypatch.setattr(p,'measure_provider',provider)
+    def native_after(ref,*,after):
+        assert after is True;steps.append('native_after');return {'SYNTHETIC':True}
+    def runtime_after(closure,ref,*,binding,after):
+        assert after is True and binding['process']==process_identity(os.getpid())
+        steps.append('runtime_after');return {'SYNTHETIC':True}
+    def source_after(*args,**kwargs):
+        assert kwargs['binding']['phase']=='preparation_after'
+        steps.append('source_after');return {'SYNTHETIC':True}
+    monkeypatch.setattr(native,'attest',native_after)
+    monkeypatch.setattr(e.b.closure,'attest_runtime_receipt',runtime_after)
+    monkeypatch.setattr(execution,'attest',source_after)
+    before = Path(f.plan['runtime']['path']).read_bytes()
+    ref = p.child_measure(context)
+    assert steps==['gpu','validate_gpu','provider','native_after','runtime_after','source_after']
+    envelope = e.read(ref)
+    assert envelope['schema']==p.MEASUREMENT_CONTRACT['schema'] and envelope['parent']==parent
+    assert Path(f.plan['runtime']['path']).read_bytes()==before
