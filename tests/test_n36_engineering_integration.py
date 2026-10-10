@@ -78,6 +78,104 @@ def test_public_dispatch_veto_still_unconditional(f):
     assert not f.launches
 
 
+def test_fresh_episode_predispatch_abort_and_exhaustion(f):
+    # Health/device/import evidence is simulated; admission, runner, accounting,
+    # durable writes and reconciliation are the real integrated implementations.
+    episode = f.accepted_episode()
+    restore = f.saved_cpu_state()
+    ledger = f.owner / 'data/attempt-ledger.jsonl'
+    output = f.output / 'attempts' / e.EPISODE_KEY
+    for fault in ('stop_after_reserved', 'stop_after_dispatched', 'popen_failure'):
+        restore()
+        calls = []
+        original_append = r.append_event_locked
+        def append_then_stop(root, event):
+            original_append(root, event)
+            if event['event'] == {'stop_after_reserved': 'reserved',
+                                  'stop_after_dispatched': 'dispatched'}.get(fault):
+                Path(c.stop.STOP_PATHS[0]).touch()
+        def fail_before_child(*args, **kwargs):
+            calls.append('simulated Popen failure; no child created')
+            raise OSError('CPU simulated pre-child launch failure')
+        with pytest.MonkeyPatch.context() as patch:
+            patch.setattr(r, 'append_event_locked', append_then_stop)
+            patch.setattr(runner.subprocess, 'Popen', fail_before_child)
+            if fault == 'popen_failure':
+                result = f.episode_run(f.plan_ref, episode, _engineering=True)
+                assert result['status'] == 'INVALID_STOP'
+                terminal = result['terminal']
+                assert terminal['event'] == 'aborted'
+                assert terminal['outcome_valid'] is False and terminal['success'] is None
+                assert terminal['retryable_infrastructure'] is False
+                assert terminal['required_cost_telemetry_complete'] is False
+                assert terminal['gpu_process_wall_seconds'] == 0.  # simulated clock
+                assert w.read_ref(c.ref(output / 'attempt-result.json')) == terminal
+                assert calls == ['simulated Popen failure; no child created']
+            else:
+                with pytest.raises(ValueError, match='STOP'):
+                    f.episode_run(f.plan_ref, episode, _engineering=True)
+                assert calls == []
+                assert not (output / 'attempt-result.json').exists()
+        events = r.read_events(ledger)
+        local = events[len(f.baseline[e.JOURNALS[0]]):]
+        expected = {'stop_after_reserved': ['reserved'],
+                    'stop_after_dispatched': ['reserved', 'dispatched'],
+                    'popen_failure': ['reserved', 'dispatched', 'aborted']}[fault]
+        assert [event['event'] for event in local] == expected
+        assert local[0]['reserved_gpu_seconds'] == 1840
+        assert local[0]['accounting_admission']['reserved_gpu_seconds'] == 1840
+        assert not f.launches and not (output / 'process.json').exists()
+        # Remove the triggering STOP: exhaustion must survive independently.
+        Path(c.stop.STOP_PATHS[0]).unlink(missing_ok=True)
+        before = {path: path.read_bytes() for parent in (f.owner, f.output)
+                  for path in parent.rglob('*') if path.is_file()}
+        restarted = f.episode_run(f.plan_ref, episode, _engineering=True)
+        # Even an aborted pre-child launch has no process identity artifact;
+        # existing_handles conservatively classifies it UNKNOWN on restart.
+        assert restarted['status'] == 'LIVE_OR_UNSETTLED'
+        assert restarted['scope_exhausted'] is True
+        assert restarted['continuation_authorized'] is False
+        assert restarted['scientific_eligible'] is False
+        assert restarted['next_row'] is None and restarted['outcomes'] == []
+        assert not f.launches
+        assert before == {path: path.read_bytes() for parent in (f.owner, f.output)
+                          for path in parent.rglob('*') if path.is_file()}
+    with pytest.raises(RuntimeError, match='engineering dispatch disabled'):
+        e.require_dispatch_implementation()
+
+
+def test_accepted_context_cross_family_rejection(f):
+    episode = f.accepted_episode()
+    context = worker.context_for(f.plan_ref, e.row(), episode)
+    reference = f.doc('fixture-accepted-context', context)
+    assert worker.validate_context(reference)[0] == context
+    # No launch admission is certified: its public veto remains unconditional.
+    with pytest.raises(RuntimeError, match='engineering dispatch disabled'):
+        worker.validate_context(reference, admission=True)
+    before = {path: path.read_bytes() for parent in (f.owner, f.output)
+              for path in parent.rglob('*') if path.is_file()}
+    launches = list(f.launches)
+    cases = []
+    ordinary = {key: value for key, value in context.items()
+                if key not in ('purpose', 'scope', 'audit_plan')}
+    ordinary['schema'] = 'n36-worker-context-v1'
+    cases.append(('ordinary-context-engineering-release', ordinary, 'worker context/release family cross-use'))
+    cases.append(('health-release-in-episode-context', {**context, 'release': f.health_ref}, 'release fields'))
+    cases.append(('audit-plan-in-operational-context', {**context, 'plan': f.plan['audit_plan']},
+                  'unsupported worker release schema'))
+    for key in ('purpose', 'scope', 'audit_plan'):
+        value = copy.deepcopy(context)
+        value[key] = 'CPU_FOREIGN_FAMILY' if key != 'audit_plan' else f.plan_ref
+        cases.append(('foreign-' + key, value, 'engineering context bindings'))
+    for name, value, reason in cases:
+        with pytest.raises(ValueError, match=reason):
+            worker.validate_context(f.doc('fixture-cross-family-' + name, value))
+        assert f.launches == launches
+        assert before == {path: path.read_bytes() for parent in (f.owner, f.output)
+                          for path in parent.rglob('*') if path.is_file()}
+    assert worker.validate_context(reference)[0] == context
+
+
 def test_f1_reacquired_handoff_rejects_foreign_resource_before_output(f, monkeypatch):
     def reserve_then_corrupt(*args, **kwargs):
         result = f.reserve(*args, **kwargs)

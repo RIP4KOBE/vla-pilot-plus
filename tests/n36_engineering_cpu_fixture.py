@@ -447,6 +447,30 @@ class Graph:
         return {'health_release': self.health_ref,
                 'terminal': c.ref(self.output / 'healthchecks' / e.HEALTH_ID / 'healthcheck-result.json')}
 
+    def accepted_episode(self):
+        """Real health/release validation with simulated device/import evidence.
+
+        No episode child, native execution, or production approval is involved.
+        """
+        result = self.health()
+        assert result['status'] == 'VALID', result
+        reference = self.release('episode', self.readiness())
+        assert e.validate_release(self.plan_ref, reference)[0] == self.plan
+        return reference
+
+    def saved_cpu_state(self):
+        """Restore disposable health evidence between fresh negative episodes."""
+        saved = {path: path.read_bytes() for parent in (self.output, self.owner)
+                 for path in parent.rglob('*') if path.is_file()}
+        clock, monotonic = self.clock, self.monotonic
+        def restore():
+            self.reset()
+            for path, data in saved.items():
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(data)
+            self.clock, self.monotonic = clock, monotonic
+        return restore
+
     def episode_child(self, process, started, identity):
         """Simulated child artifacts; every consuming validator stays real."""
         from hydra import compose, initialize_config_dir
