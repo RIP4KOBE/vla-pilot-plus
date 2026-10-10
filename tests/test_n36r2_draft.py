@@ -34,9 +34,10 @@ def test_identity_mutations_fail(field, value):
 
 
 def test_new_identity_cannot_release_or_admit():
-    with pytest.raises(ValueError, match='N36R2 draft only'):
+    # An identity alone is malformed; it grants no release or admission.
+    with pytest.raises(KeyError, match='schema'):
         release.validate_plan({'cohort': c.DRAFT_RECOVERY_COHORT})
-    with pytest.raises(ValueError, match='N36R2 draft only'):
+    with pytest.raises(KeyError, match='n36r2_release_refs'):
         c.pre_dispatch({}, {}, now=None, stop_path='/nonexistent', cohort=c.DRAFT_RECOVERY_COHORT)
 
 

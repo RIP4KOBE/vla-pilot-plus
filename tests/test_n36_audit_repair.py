@@ -132,9 +132,33 @@ def poison(path, frozen, stale):
 
 def bootstrap_tree(tmp_path):
     scripts = tmp_path / 'scripts'; scripts.mkdir()
-    for name in ('qd_ed_n36_bootstrap.py', 'qd_ed_n36_source.py'):
+    for name in ('qd_ed_n36_bootstrap.py', 'qd_ed_n36_source.py',
+                 'qd_ed_n36_generated.py', 'qd_ed_n34_source.py',
+                 'qd_ed_n23_worker.py', 'audit_decision_evidence.py',
+                 'qd_ed_audit_backend.py'):
         shutil.copyfile(ROOT / 'scripts' / name, scripts / name)
     return tmp_path
+
+
+
+SYNTHETIC_BINDING = """
+# Fixture-only references: actual bytes under this temporary source tree.
+from scripts import qd_ed_n23_worker as binding_worker
+for alias,canonical in source.IMPORTLIB_FROZEN_PAIRS:
+    path=Path(sys.modules[canonical].__file__).resolve()
+    record={'path':str(path),'sha256':source.sha(path)}
+    runtime['modules'][alias]=record
+    runtime['modules'][canonical]=dict(record)
+import json
+(root/'synthetic-runtime.json').write_text(json.dumps(runtime,sort_keys=True))
+binding={
+    'context':{'path':str(Path(__file__).resolve()),'sha256':source.sha(__file__)},
+    'runtime_closure':{'path':str(root/'synthetic-runtime.json'),
+                       'sha256':source.sha(root/'synthetic-runtime.json')},
+    'process':binding_worker.process_identity(), 'phase':'runtime_before'}
+runtime_receipt={'schema':'n34-runtime-receipt-v2','binding':binding,
+                 'modules':dict(runtime['modules']),'generated_modules':{}}
+"""
 
 
 def run(argv, root):
@@ -230,15 +254,18 @@ for name,path in list(state.compiled)+[(n,p) for n,(p,h) in state.startup_source
         runtime['modules'][name]={'path':str(Path(path).resolve()),'sha256':source.sha(path)}
 for name in ('os.path','posixpath'):
     runtime['modules'][name]={'path':str(Path(sys.modules[name].__file__).resolve()),'sha256':source.sha(sys.modules[name].__file__)}
-receipt=source.attest(root,frozen,runtime)
+__SYNTHETIC_BINDING__
+receipt=source.attest(root,frozen,runtime,binding=binding)
 loaded={'reference':{'path':'scripts/qd_ed_n31_reference.py','sha256':source.sha(root/'scripts/qd_ed_n31_reference.py')}}
-source.verify_receipt(receipt,root,frozen,runtime,loaded=loaded)
+source.verify_receipt(receipt,root,frozen,runtime,loaded=loaded,
+                      runtime_receipt=runtime_receipt,binding=binding)
 receipt['compiled']=[r for r in receipt['compiled'] if r['module']!='scripts.qd_ed_n31_reference']
-try: source.verify_receipt(receipt,root,frozen,runtime,loaded=loaded)
+try: source.verify_receipt(receipt,root,frozen,runtime,loaded=loaded,
+                      runtime_receipt=runtime_receipt,binding=binding)
 except ValueError as e: assert 'missing executable receipt' in str(e)
 else: raise AssertionError('missing dependency executable receipt accepted')
 print('actual runner-to-worker source entry verified')
-''')
+'''.replace('__SYNTHETIC_BINDING__',SYNTHETIC_BINDING))
     result = run(command(sys.executable, root, 'entry_check'), root)
     assert result.returncode == 0, result.stderr
     assert 'actual runner-to-worker source entry verified' in result.stdout
@@ -263,15 +290,21 @@ def inventories():
         path=getattr(module,'__file__',None)
         if path and Path(path).is_file() and not Path(path).resolve().is_relative_to(root):
             runtime['modules'][name]={'path':str(Path(path).resolve()),'sha256':source.sha(path)}
+    # Torch exposes virtual module objects whose __file__ is not the compiled
+    # implementation path. Include the real loader's complete execution log.
+    for name,path in list(state.compiled)+[(n,p) for n,(p,h) in state.startup_sources.items()]:
+        if not Path(path).resolve().is_relative_to(root):
+            runtime['modules'][name]={'path':str(Path(path).resolve()),'sha256':source.sha(path)}
     return {'files':files},runtime
 frozen,runtime=inventories()
 for name in ('os.path','posixpath'):
     runtime['modules'][name]={'path':str(Path(sys.modules[name].__file__).resolve()),'sha256':source.sha(sys.modules[name].__file__)}
-receipt=source.attest(root,frozen,runtime)
+__SYNTHETIC_BINDING__
+receipt=source.attest(root,frozen,runtime,binding=binding)
 assert any(r['module']=='fixture' for r in receipt['compiled'])
 (root/'fixture.py').write_text('value = "other!"\\n')
 new,_=inventories()
-try: source.attest(root,new,runtime)
+try: source.attest(root,new,runtime,binding=binding)
 except ValueError as e: assert 'compiled source not frozen' in str(e)
 else: raise AssertionError('live compiled bytes not checked')
 import importlib.machinery
@@ -280,7 +313,7 @@ try: source.active()
 except ValueError as e: assert 'loader replaced' in str(e)
 else: raise AssertionError('loader replacement accepted')
 print('compiled source joins verified')
-''')
+'''.replace('__SYNTHETIC_BINDING__',SYNTHETIC_BINDING))
     result = run(command(sys.executable, root, 'attest_check'), root)
     assert result.returncode == 0, result.stderr
     assert 'compiled source joins verified' in result.stdout

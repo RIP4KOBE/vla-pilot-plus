@@ -126,7 +126,7 @@ def test_worker_context_checks_entry_but_allows_settlement(lifecycle,monkeypatch
 
 
 @pytest.mark.parametrize('location',[0,1])
-def test_stop_after_worker_entry_prevents_main_and_retains_receipt(tmp_path,location):
+def test_stop_after_worker_entry_prevents_main_and_retains_receipt(tmp_path,monkeypatch,location):
     import ast
     from contextlib import nullcontext
     import json
@@ -136,7 +136,14 @@ def test_stop_after_worker_entry_prevents_main_and_retains_receipt(tmp_path,loca
     from types import SimpleNamespace
     from scripts import qd_ed_n23_worker as w
     path=c.ROOT/'scripts/qd_ed_n36_worker.py'
-    function=next(n for n in ast.parse(path.read_text()).body if isinstance(n,ast.FunctionDef) and n.name=='_run_in_process')
+    names={'_run_in_process', 'persist_runtime_observation'}
+    functions=[n for n in ast.parse(path.read_text()).body
+               if isinstance(n,ast.FunctionDef) and n.name in names]
+    assert {n.name for n in functions} == names
+    # Explicit local containment, independent of the imported accounting fixture.
+    paths=tuple(str(tmp_path/name/'STOP') for name in ('owner', 'autonomy_20261004'))
+    for entry in paths: Path(entry).parent.mkdir(parents=True,exist_ok=True)
+    monkeypatch.setattr(stop,'STOP_PATHS',paths)
     root=tmp_path/'study_worktree'; root.mkdir()
     output=root/'output'; (output/'eds_eval').mkdir(parents=True)
     plan={'worktree':str(root),'stop_path':c.stop_path(root),'stop_authority':stop.binding(),
@@ -151,7 +158,7 @@ def test_stop_after_worker_entry_prevents_main_and_retains_receipt(tmp_path,loca
     def attest(*args,**kw):
         Path(stop.STOP_PATHS[location]).touch()
         return {}
-    namespace=dict(Path=Path,sys=SimpleNamespace(argv=[]),os=os,time=time,validate_context=validate,
+    namespace=dict(Path=Path,c=c,sys=SimpleNamespace(argv=[]),os=os,time=time,validate_context=validate,
         source_execution=SimpleNamespace(active=lambda:None,attest=lambda *a,**kw:{},
                                          run_main=lambda *a:pytest.fail('STOP must prohibit Main')),
         verify_dispatch_record=lambda *a:None,
@@ -159,9 +166,17 @@ def test_stop_after_worker_entry_prevents_main_and_retains_receipt(tmp_path,loca
         closure=SimpleNamespace(attest_runtime_receipt=attest,RuntimeOriginError=type('OriginError',(ValueError,),{})),
         controller=SimpleNamespace(verify_semantics=lambda *a:{},observe_instances=lambda _:nullcontext([])),
         native_build=SimpleNamespace(attest=lambda _:{}),attest_worker_loaded=lambda *a:{},runtime_receipt_binding=lambda *a:{})
-    exec(compile(ast.Module(body=[function],type_ignores=[]),str(path),'exec'),namespace)
+    exec(compile(ast.Module(body=functions,type_ignores=[]),str(path),'exec'),namespace)
     assert namespace['_run_in_process']({})==2
     receipt=json.loads((output/'eds_eval/n36-worker-receipt.json').read_text())
+    observation=output/'eds_eval/n36-runtime-before.json'
+    assert receipt['observation_before']==c.ref(observation)
+    assert json.loads(observation.read_text())=={
+        'runtime_before':{},'execution_before':{},'loaded_before':{},'native_build_before':{}}
+    assert observation.stat().st_mode & 0o777 == 0o444
+    assert receipt['error_type']=='ValueError'
+    assert Path(paths[location]).is_file()
+    assert not Path(paths[1-location]).exists()
     assert calls==[True,True]
     assert receipt['accepted'] is False and receipt['classification']=='INVALID'
     assert receipt['main_exit_code'] is None and 'STOP' in receipt['error']
