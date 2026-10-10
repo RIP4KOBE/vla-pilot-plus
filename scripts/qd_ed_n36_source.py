@@ -43,14 +43,36 @@ def active():
                 < sys.meta_path.index(importlib.machinery.PathFinder),
             'N36 generated search guard replaced')
     state.validate_search()
+    if state.dino_sources is not None:
+        state.dino_sources.audit(state.compiled)
     return state
 
 
-def validate_search_path(root, paths, prefix, *, generated_directories=()):
+def bind_dino(runtime_ref):
+    """Called only after the worker has verified its context/release transaction."""
+    from scripts.qd_ed_n36_dino import DinoSources
+    state = active()
+    sources = DinoSources(runtime_ref)
+    require(state.dino_sources is None or state.dino_sources.reference == runtime_ref,
+            'N36 DINO runtime rebinding forbidden')
+    sources.audit(state.compiled)  # reject preloaded/unrecorded cache entries
+    state.dino_sources = sources
+    return sources
+
+
+def dino_inventory(runtime):
+    from scripts.qd_ed_n36_dino import DinoSources
+    return DinoSources(runtime['runtime'])
+
+
+def validate_search_path(root, paths, prefix, *, generated_directories=(), dino=None):
     root, prefix = Path(root).resolve(), Path(prefix).resolve()
     for entry in paths:
         require(isinstance(entry, str) and bool(entry), 'N36 empty import search path')
         path = Path(entry).resolve()
+        if dino is not None and (dino.contains(entry) or dino.contains(str(path))):
+            dino.check_search(entry)
+            continue
         require(path == root or root in path.parents or prefix in path.parents
                 or (entry == str(path) and entry in generated_directories),
                 'N36 foreign import search path: ' + str(path))
@@ -230,9 +252,15 @@ def attest(root, source, runtime, *, binding=None):
     if generated:
         from scripts import qd_ed_n34_source as closure
         generated_inventory = closure._generated_runtime(runtime)
+    dino = dino_inventory(runtime) if state.dino_sources is not None else None
+    if dino is not None:
+        require(state.dino_sources.reference == runtime['runtime'], 'N36 DINO runtime binding differs')
+        index.update({path: row['sha256'] for path, row in dino.files.items()})
     records = []
     for (name, filename), digest in sorted(state.compiled.items()):
         path = str(Path(filename).resolve())
+        if dino is not None and dino.contains(path):
+            dino.check_file(name, filename, digest)
         require(index.get(path, generated.get(name)) == digest and sha(Path(path)) == digest,
                 'N36 compiled source not frozen: ' + name)
         if name in generated:
@@ -282,6 +310,7 @@ def attest(root, source, runtime, *, binding=None):
         canonical = getattr(spec, 'name', name)
         require((canonical, path) in known, 'N36 unrecorded Python execution: ' + name)
     return {'schema': 'n36-source-execution-v2', 'binding': copy.deepcopy(binding),
+        **({'dino_sources': dino.audit(state.compiled)} if dino is not None else {}),
         'interpreter': copy.deepcopy(runtime['interpreter']), 'frozen_aliases': aliases,
         'frozen_importlib_aliases': live_importlib_aliases(runtime, binding), 'bootstrap': {'path': bootstrap, 'sha256': state.bootstrap_digest},
         'search_path': list(sys.path), 'search_prefix': str(Path(sys.prefix).resolve()),
@@ -291,7 +320,7 @@ def attest(root, source, runtime, *, binding=None):
                        'torch.ops/classes instances of inventoried owner classes']}
 
 
-def verify_receipt(receipt, root, source, runtime, *, loaded=None, runtime_receipt=None, binding=None):
+def verify_receipt(receipt, root, source, runtime, *, loaded=None, runtime_receipt=None, binding=None, dino_required=False):
     require(receipt['schema'] == 'n36-source-execution-v2', 'N36 execution receipt schema')
     interpreter = Path(runtime['interpreter']['path']).resolve()
     require(receipt['search_prefix'] == str(interpreter.parent.parent), 'N36 interpreter search prefix')
@@ -302,10 +331,19 @@ def verify_receipt(receipt, root, source, runtime, *, loaded=None, runtime_recei
         closure.verify_runtime_receipt(runtime, runtime_receipt, binding=binding, after=False)
         generated_directories = {str(Path(e['record']['path']).parent)
                                  for e in runtime_receipt['generated_modules'].values()}
+    require(not dino_required or 'dino_sources' in receipt, 'N36 DINO execution receipt missing')
+    dino = dino_inventory(runtime) if 'dino_sources' in receipt else None
+    if dino is not None:
+        dino.verify(receipt['dino_sources'], receipt['compiled'])
+        if dino_required and (binding or {}).get('phase') == 'runtime_after':
+            require(any(row['module'] == 'hubconf.py' for row in receipt['dino_sources']['compiled']),
+                    'N36 DINO hubconf execution missing')
     validate_search_path(root, receipt['search_path'], receipt['search_prefix'],
-                         generated_directories=generated_directories)
+                         generated_directories=generated_directories, dino=dino)
     index = {str(Path(root).resolve() / row['path']): row['sha256'] for row in source['files']}
     index.update({row['path']: row['sha256'] for row in runtime['modules'].values()})
+    if dino is not None:
+        index.update({path: row['sha256'] for path, row in dino.files.items()})
     generated = {name: rule['sha256'] for name, rule in runtime.get('generated_modules', {}).items()}
     require(receipt['bootstrap'] == {'path': str(Path(root).resolve() / 'scripts/qd_ed_n36_bootstrap.py'),
         'sha256': index.get(str(Path(root).resolve() / 'scripts/qd_ed_n36_bootstrap.py'))}, 'N36 bootstrap receipt')

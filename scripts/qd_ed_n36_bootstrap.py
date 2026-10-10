@@ -23,11 +23,14 @@ if posix.stat('/dev/null').st_mode & 0o170000 != 0o020000:
     raise RuntimeError('N36 cache prefix must be the /dev/null character device')
 
 compiled = {}
+dino_sources = None
 
 
 def source_code(self, fullname):
     if 'validate_search' in globals():
         validate_search()
+    if dino_sources is not None and fullname == 'hubconf.py':
+        dino_sources.audit(compiled)
     path = self.get_filename(fullname)
     data = self.get_data(path)
     digest = _hashlib.openssl_sha256(data).hexdigest()
@@ -92,6 +95,9 @@ from scripts.qd_ed_n36_generated import admit as admit_generated, CONTENT_SHA
 def validate_search():
     for entry in sys.path:
         path = os.path.realpath(entry)
+        if dino_sources is not None and (dino_sources.contains(entry) or dino_sources.contains(path)):
+            dino_sources.check_search(entry)
+            continue
         if not entry or not any(path == base or path.startswith(base + os.sep)
                                 for base in (root, os.path.realpath(sys.prefix))):
             try:
@@ -104,6 +110,10 @@ def validate_search():
 
 def validate_origin(fullname, filename, digest=None):
     path = os.path.realpath(filename)
+    if dino_sources is not None and (dino_sources.contains(filename) or dino_sources.contains(path)
+            or fullname in ('dinov2', 'hubconf.py') or fullname.startswith('dinov2.')):
+        dino_sources.check_origin(fullname, filename, digest)
+        return
     if any(path == base or path.startswith(base + os.sep)
            for base in (root, os.path.realpath(sys.prefix))):
         return

@@ -221,6 +221,7 @@ def _run_in_process(context_ref):
     root, output = Path(plan['worktree']), Path(manifest['output_dir'])
     identity = w.process_identity()
     verify_dispatch_record(context_ref, context, output, identity)
+    source_execution.bind_dino(plan['runtime'])
     started = time.perf_counter()
     receipt_path = output / 'eds_eval/n36-worker-receipt.json'
     start_path = output / 'eds_eval/n36-worker-start.json'
@@ -356,7 +357,7 @@ def verify_receipt(context_ref, receipt_ref, process_record):
     for phase in ('execution_before', 'execution_after'):
         suffix = phase.removeprefix('execution_')
         source_execution.verify_receipt(receipt[phase], plan['worktree'], plan['source'], runtime_closure,
-            loaded=receipt['loaded_' + suffix], runtime_receipt=receipt['runtime_' + suffix],
+            loaded=receipt['loaded_' + suffix], runtime_receipt=receipt['runtime_' + suffix], dino_required=True,
             binding=runtime_receipt_binding(context_ref, plan, process, 'runtime_' + suffix))
     w.require(all(row in receipt['execution_after']['compiled'] for row in receipt['execution_before']['compiled']),
               'N36 executable inventory changed')
