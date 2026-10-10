@@ -194,7 +194,7 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
     c.require_row(row, plan.get('worktree', c.ROOT), cohort=selected)
     if selected == c.DRAFT_N36R3_COHORT:
         from scripts import qd_ed_n36r3_admission as n3
-        n3.live_journals(plan, authority, events, resources, reservations)
+        n3_local, n3_health = n3.live_journals(plan, authority, events, resources, reservations)
         w.require(release_refs is not None, 'N36R3 detached release required')
         n3.validate_readiness(release_refs[0], w.read_ref(release_refs[1]), resources=resources)
     if selected == c.RECOVERY_COHORT:
@@ -239,7 +239,9 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
         from scripts.qd_ed_n36_recovery import resource_events
         local_resources = resource_events(plan, resources)
     if selected == c.DRAFT_N36R3_COHORT:
-        local_resources = n3.resource_events(plan, resources)
+        # Retained health remains globally charged; only the verified suffix
+        # belongs to this newly authorized finite cohort.
+        local, local_resources = n3_local, n3_health
     if selected == c.DRAFT_RECOVERY_COHORT:
         from scripts.qd_ed_n36r2_admission import resource_events
         local_resources = resource_events(plan, resources)

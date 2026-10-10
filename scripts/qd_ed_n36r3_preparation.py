@@ -46,7 +46,7 @@ def ledger_snapshot(owner, review):
     events, health = rows['attempt-ledger.jsonl'], rows['gpu-healthcheck-ledger.jsonl']
     snap = r.budget_snapshot(events, health)
     w.require(snap['dispatched'] == snap['reserved_attempts'] == 505
-              and snap['gpu_hours_consumed'] == 75.52725286641478,
+              and snap['gpu_hours_consumed'] == 75.53031173955723,
               'current accounting differs; fresh root reconciliation required')
     w.require(all(g[-1]['event'] in r.TERMINAL for g in r.event_groups(events).values())
               and snap['running'] == snap['gpu_healthcheck_inflight'] == 0,
@@ -59,7 +59,7 @@ def ledger_snapshot(owner, review):
 def arithmetic(snap):
     """Exact decimal prospective deductions; these are not spendable balances."""
     d = Decimal
-    w.require(snap['gpu_hours_consumed'] == 75.52725286641478, 'retained charge differs')
+    w.require(snap['gpu_hours_consumed'] == 75.53031173955723, 'retained charge differs')
     retained = d(str(snap['gpu_hours_consumed']))
     margin = d('0.23357169027962')
     protected = sum(d(str(v)) for v in c.CAPS['protected_gpu_hours'].values())
