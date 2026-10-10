@@ -47,6 +47,13 @@ def reconcile(plan, events, verify_terminal, *, live_handles=()):
             return {'status': 'INVALID_STOP', 'next_row': None, 'outcomes': outcomes, 'charged_events': local, 'reason': str(exc)}
         outcomes.append({'task_id': row['task_id'], 'profile': row['profile'], 'success': final['success'],
                          'episode_key': row['episode_key'], 'attempt_id': final['attempt_id']})
+        if first_c0_boundary(row):
+            # This veto survives restarts and cannot be waived by a plan field.
+            # Root must reconcile real production evidence and separately review
+            # continuation plumbing; CPU fixtures cannot close G3.
+            w.require(len(groups) == 1, 'dispatch after first C0 root boundary')
+            return {'status': 'PAUSED_FOR_ROOT_G3', 'next_row': None,
+                    'outcomes': outcomes, 'terminal': final}
         if len(outcomes) % 4 == 0:
             totals={arm:sum(x['success'] for x in outcomes if x['profile']==arm) for arm in c.ARMS}
             upper=totals['N36']+10-len(outcomes)//4
@@ -55,6 +62,11 @@ def reconcile(plan, events, verify_terminal, *, live_handles=()):
                 return {'status':'NUMERIC_FUTILITY','next_row':None,'outcomes':outcomes}
     return {'status': 'LIVE_OR_UNSETTLED' if live_handles else ('COMPLETE' if len(outcomes) == 40 else 'READY_FOR_ROOT_RELEASE'),
             'next_row': None if live_handles or len(outcomes) == 40 else rows[len(outcomes)], 'outcomes': outcomes}
+
+
+def first_c0_boundary(row):
+    return (row.get('iteration') == c.DRAFT_N36R3_COHORT
+            and row.get('task_id') == 0 and row.get('profile') == 'C0')
 
 
 def c_identity(row):

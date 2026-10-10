@@ -168,7 +168,11 @@ def execute_one(plan_ref, release_ref):
         with r.locked(root / 'data/qd-ed-state.lock'):
             r.append_event_locked(root, terminal)
             w.atomic_json(output / 'attempt-result.json', terminal)
-        return {'status': 'VALID' if terminal['outcome_valid'] is True else 'INVALID_STOP', 'terminal': terminal}
+        # Terminal is durably charged once before pausing. Invalidity keeps the
+        # existing stop semantics; no later row or automatic recovery is allowed.
+        status = 'INVALID_STOP' if terminal['outcome_valid'] is not True else (
+            'PAUSED_FOR_ROOT_G3' if supervisor.first_c0_boundary(row) else 'VALID')
+        return {'status': status, 'terminal': terminal}
 
 
 def worker_command(python, root, context_path, digest):
