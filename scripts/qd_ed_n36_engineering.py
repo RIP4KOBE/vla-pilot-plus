@@ -47,7 +47,8 @@ OPERATIONAL_FILES = frozenset({
     'scripts/qd_ed_n36_engineering.py', 'scripts/qd_ed_n36_release.py',
     'scripts/qd_ed_n36_bridge.py', 'scripts/qd_ed_n36_worker.py',
     'scripts/qd_ed_n36_runner.py', 'scripts/qd_ed_n36_healthcheck.py',
-    'scripts/qd_ed_n36_report.py', 'tests/test_n36_engineering.py'})
+    'scripts/qd_ed_n36_report.py', 'tests/test_n36_engineering.py',
+    'tests/test_n36_engineering_integration.py', 'tests/n36_engineering_cpu_fixture.py'})
 
 
 def exact(actual, expected, label):
@@ -577,6 +578,42 @@ def child_environment(plan, runtime):
 
 
 def reserve_health(plan_ref, release_ref, resource_id, *, timeout_seconds):
+    return reserve_health_handoff(plan_ref, release_ref, resource_id,
+                                  timeout_seconds=timeout_seconds)[0]
+
+
+def health_handoff_binding(plan, runtime, authority, state):
+    """Local comparison digest, never a dispatch or reusable admission token."""
+    return w.canonical_sha([plan, runtime, authority, state])
+
+
+def validate_health_handoff(root, plan_ref, release_ref, record, binding):
+    """Caller holds runner lock; recheck the spent admission under state lock.
+
+    Failure leaves the original reservation unsettled. No output, second
+    reservation, device observation or child work belongs in this check.
+    """
+    from scripts import qd_ed_n36_runner as runner
+    with r.locked(root / 'data/qd-ed-state.lock'):
+        plan, runtime, authority = validate_health_release(plan_ref, release_ref)
+        w.require(owner_root(plan) == root, 'engineering health owner changed')
+        state, events, resources, reservations = runner.snapshot(root, authority)
+        local, health = live_journals(plan, authority, events, resources, reservations)
+        validate_state(plan, authority, state)
+        w.require(not local and len(health) == 1 and record['event'] == 'reserved',
+                  'engineering health handoff requires sole original reservation')
+        exact(health, [record], 'engineering health handoff reservation changed')
+        w.require(state['run_name'] == plan['run_name'] and state['artifacts'] == runtime['artifact_root'],
+                  'engineering owning run identity')
+        w.require(health_handoff_binding(plan, runtime, authority, state) == binding,
+                  'engineering health handoff bindings/state changed')
+        w.require(all(group[-1]['event'] in r.TERMINAL for group in r.event_groups(events).values()),
+                  'engineering health global unsettled attempt')
+        r.runtime_gpu(runtime, state)
+        return plan, runtime, authority
+
+
+def reserve_health_handoff(plan_ref, release_ref, resource_id, *, timeout_seconds):
     """Consume the sole health slot durably under both existing runner locks."""
     import os
     import time
@@ -628,7 +665,11 @@ def reserve_health(plan_ref, release_ref, resource_id, *, timeout_seconds):
                 stream.write(json.dumps(record, sort_keys=True, allow_nan=False) + '\n')
                 stream.flush(); os.fsync(stream.fileno())
             r.sync_state_from_journal(root, events)
-            return record
+            # Bind the post-sync state, including accounting updates made by
+            # this reservation, before releasing either lock.
+            binding = health_handoff_binding(plan, runtime, authority,
+                                            r.read_state(root / 'research-state.yaml'))
+            return record, binding
 
 
 def validate_readiness(plan_ref, release_record, *, resources=None):
@@ -658,7 +699,8 @@ def validate_readiness(plan_ref, release_record, *, resources=None):
     completed = c.finite(terminal['time_unix'], 'engineering health completion time')
     starts = dt.datetime.fromisoformat(authority['starts_at'].replace('Z', '+00:00')).timestamp()
     end = dt.datetime.fromisoformat(c.DEADLINE.replace('Z', '+00:00')).timestamp()
-    w.require(starts <= group[0]['time_unix'] <= observed <= completed <= min(end, dt.datetime.now(dt.timezone.utc).timestamp()),
+    dispatched = c.finite(group[1]['time_unix'], 'engineering health dispatch time')
+    w.require(starts <= group[0]['time_unix'] <= dispatched <= observed <= completed <= min(end, dt.datetime.now(dt.timezone.utc).timestamp()),
               'engineering fresh health authority timestamps')
     w.require(evidence['resource_id'] == HEALTH_ID and w.sha(output / 'probe-frame.png') == evidence['frame_png_sha256']
               and all(terminal.get(key) == value for key, value in evidence.items() if key != 'time_unix'),

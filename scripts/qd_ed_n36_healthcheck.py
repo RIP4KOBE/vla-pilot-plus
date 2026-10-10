@@ -45,7 +45,7 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
     if engineering:
         from scripts import qd_ed_n36_engineering as api
         api.require_dispatch_implementation()
-        validate, reserve = api.validate_health_release, api.reserve_health
+        validate, reserve = api.validate_health_release, api.reserve_health_handoff
         owner, environment, guard = api.owner_root, api.child_environment, api.launch_guard
         n36r3 = True  # same separate-health process mechanics, distinct authority
     else:
@@ -63,11 +63,17 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
             binding=adapter.worker.runtime_receipt_binding(release_ref, plan, w.process_identity(), 'runtime_before'))
     record = reserve(plan_ref, release_ref, resource_id,
                                             timeout_seconds=timeout_seconds)
+    if engineering:
+        record, handoff_binding = record
     plan, runtime, authority = validate(plan_ref, release_ref)
     root = owner(plan)
     # The durable in-flight resource blocks admissions during lock transfer.
     with r.locked(root/'data/qd-ed-runner.lock', nonblocking=True):
-        plan, runtime, authority = validate(plan_ref, release_ref)
+        if engineering:
+            plan, runtime, authority = api.validate_health_handoff(
+                root, plan_ref, release_ref, record, handoff_binding)
+        else:
+            plan, runtime, authority = validate(plan_ref, release_ref)
         resources = r.read_events(root/'data/gpu-healthcheck-ledger.jsonl')
         w.require([e for e in resources if e['resource_id']==resource_id]==[record],
                   'healthcheck reservation changed; no replay')
