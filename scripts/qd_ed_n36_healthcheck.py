@@ -114,6 +114,8 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
             result={'reason':str(exc) if isinstance(exc,(ValueError,r.GateError)) else type(exc).__name__}
         elapsed=0. if started is None else (finished or time.monotonic())-started
         w.require(elapsed<=record['reserved_gpu_seconds'],'healthcheck exceeded reservation; root reconciliation required')
+        # Probe time_unix remains in probe-evidence.json as observation time;
+        # the terminal/journal time_unix denotes completion, after validation.
         terminal={**result,**base,'event':event,'time_unix':time.time(),
                   'gpu_process_wall_seconds':elapsed,
                   'measurement':'exclusive GPU7 child wall time including owned timeout cleanup'}

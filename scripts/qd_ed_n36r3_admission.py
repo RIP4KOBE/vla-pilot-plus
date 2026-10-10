@@ -165,12 +165,19 @@ def validate_readiness(plan_ref, release_record, *, resources=None):
         'N36R3 fresh readiness binding required')
     resource_events(plan, [terminal])
     starts = dt.datetime.fromisoformat(authority['starts_at'].replace('Z', '+00:00')).timestamp()
-    w.require(starts <= c.finite(terminal['time_unix'], 'readiness time') <= dt.datetime.now(dt.timezone.utc).timestamp(),
-              'N36R3 readiness outside authority window')
+    ends = min(dt.datetime.fromisoformat(value.replace('Z', '+00:00')).timestamp()
+               for value in (authority['coordinator_ends_at'], authority['weekly_window']['ends_at']))
     evidence = r.read_json(output / 'probe-evidence.json')
+    # The child records observation; the parent records completion after validation.
+    # Keep both original timestamps and validate their relationship, not equality.
+    observed = c.finite(evidence['time_unix'], 'readiness probe observation time')
+    completed = c.finite(terminal['time_unix'], 'readiness terminal completion time')
+    w.require(starts <= observed <= completed <= min(ends, dt.datetime.now(dt.timezone.utc).timestamp()),
+              'N36R3 readiness outside authority window or timestamps reversed')
     w.require(evidence['resource_id'] == terminal['resource_id']
               and w.sha(output / 'probe-frame.png') == evidence['frame_png_sha256']
-              and all(terminal.get(k) == v for k, v in evidence.items()), 'N36R3 readiness evidence differs')
+              and all(terminal.get(k) == v for k, v in evidence.items() if k != 'time_unix'),
+              'N36R3 readiness evidence differs')
     probe.validate_probe_evidence(evidence, runtime['gpu_mapping'])
     if resources is not None:
         group = [e for e in resources if e['resource_id'] == terminal['resource_id']]

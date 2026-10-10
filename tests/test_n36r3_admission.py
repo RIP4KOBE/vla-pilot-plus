@@ -132,6 +132,7 @@ def setup(tmp_path, monkeypatch):
         return put('health-release' if health_only else 'release', {**expected,'root_review':rr})
     health_ref = detached(health_only=True)
     state = {'run_name':'cpu-only','worktree':str(owner),'artifacts':runtime['artifact_root'],
+        'canonical_worktree':str(owner),
         'gpu_pool':[7], 'max_concurrent_gpu_workers':1, 'n36_budget_authority':plan['authority'],
         'resource_isolation':{'status':'ACTIVE','validation_status':'PASS','private_budget':True},
         'budget':{'max_episode_attempts':1800,'max_gpu_hours':224.,'reserved':c.CAPS['buckets'],
@@ -140,7 +141,7 @@ def setup(tmp_path, monkeypatch):
     (owner/'research-state.yaml').write_text(yaml.safe_dump(state))
     seen = []
     monkeypatch.setattr(runner.source_execution, 'active', lambda: seen.append('bootstrap'))
-    monkeypatch.setattr(runner.source_execution, 'attest', lambda *a: seen.append('source-only'))
+    monkeypatch.setattr(runner.source_execution, 'attest', lambda *a, **kw: seen.append('source-only'))
     def sources(p):
         assert p['worktree'] == str(source)
         for item in p['source']['files']:
@@ -175,7 +176,8 @@ def setup(tmp_path, monkeypatch):
             'cuda_kernel_result':2.,'display_egl_device_index':4,'display_cuda_ordinal':0,
             'cuda_associated_egl_devices':[{'egl_device_index':4,'cuda_ordinal':0}], 'gl_vendor':'NVIDIA fixture',
             'gl_renderer':'CPU fixture','gl_version':'fixture','frame_shape':[64,64,3], 'frame_dtype':'uint8',
-            'frame_nonzero_values':1,'frame_std':1,'simulation_steps':0,'frame_png_sha256':w.sha(output/'probe-frame.png')}
+            'frame_nonzero_values':1,'frame_std':1,'simulation_steps':0,'frame_png_sha256':w.sha(output/'probe-frame.png'),
+            'time_unix':dt.datetime.now(dt.timezone.utc).timestamp()}
         (output/'probe-evidence.json').write_text(json.dumps(evidence))
         return Process()
     monkeypatch.setattr(health.subprocess,'Popen',popen)
@@ -362,3 +364,102 @@ def test_actual_health_aggregate_reservation_cannot_borrow_unused_seconds(setup)
     with pytest.raises(ValueError,match='healthcheck bound'):
         accounting.reserve_healthcheck(f.plan_ref,f.health_ref,gate.PREPARATION_ID,timeout_seconds=20)
     assert path.read_text()==''.join(json.dumps(e)+'\n' for e in history)
+
+
+@pytest.fixture
+def readiness_case(setup, monkeypatch):
+    """Only temporary CPU evidence is edited; no production evidence is read."""
+    f = setup
+    rr = ready(f)
+    record = w.read_ref(rr)
+    terminal_path = Path(record['readiness']['terminal']['path'])
+    terminal = r.read_json(terminal_path)
+    evidence_path = terminal_path.parent/'probe-evidence.json'
+    evidence = r.read_json(evidence_path)
+    resources = r.read_events(f.owner/'data/gpu-healthcheck-ledger.jsonl')
+    completed = terminal['time_unix']
+    now = completed + 60
+    class Clock(dt.datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return cls.fromtimestamp(now, tz)
+    monkeypatch.setattr(gate.dt, 'datetime', Clock)
+    authority = copy.deepcopy(f.authority)
+    validate = release.validate_health_release
+    def health_release(*args):
+        plan, runtime, _ = validate(*args)
+        return plan, runtime, authority
+    monkeypatch.setattr(release, 'validate_health_release', health_release)
+    def check(*, sync_journal=True):
+        evidence_path.write_text(json.dumps(evidence))
+        terminal_path.write_text(json.dumps(terminal))
+        record['readiness']['terminal'] = c.ref(terminal_path)
+        if sync_journal:
+            resources[-1] = copy.deepcopy(terminal)
+        return gate.validate_readiness(f.plan_ref, record, resources=resources)
+    return SimpleNamespace(**locals())
+
+
+@pytest.mark.parametrize('equal', [False, True])
+def test_readiness_observation_and_completion_are_distinct(readiness_case, equal):
+    x = readiness_case
+    assert x.evidence['time_unix'] < x.terminal['time_unix']
+    x.evidence['time_unix'] = x.completed if equal else x.completed - 20
+    assert x.check() == x.terminal
+
+
+@pytest.mark.parametrize('field', ['probe', 'terminal'])
+@pytest.mark.parametrize('bad', ['nan', 'inf', '-inf', 'future', 'before-start', 'missing', 'bool', 'string'])
+def test_readiness_rejects_invalid_times(readiness_case, field, bad):
+    x = readiness_case
+    target = x.evidence if field == 'probe' else x.terminal
+    starts = dt.datetime.fromisoformat(x.authority['starts_at'].replace('Z', '+00:00')).timestamp()
+    values = {'nan':float('nan'), 'inf':float('inf'), '-inf':float('-inf'),
+              'future':x.now + 1, 'before-start':starts - 1, 'bool':True, 'string':str(x.completed)}
+    if bad == 'missing':
+        del target['time_unix']
+    else:
+        target['time_unix'] = values[bad]
+    with pytest.raises((ValueError, KeyError, r.GateError), match='time|nonfinite'):
+        x.check()
+
+
+def test_readiness_rejects_reversed_past_times(readiness_case):
+    x = readiness_case
+    x.evidence['time_unix'] = x.completed - 10
+    x.terminal['time_unix'] = x.completed - 20
+    with pytest.raises(ValueError, match='timestamps reversed'):
+        x.check()
+
+
+@pytest.mark.parametrize('limit', ['coordinator', 'weekly'])
+def test_readiness_rejects_completion_after_authorized_end(readiness_case, limit):
+    x = readiness_case
+    x.evidence['time_unix'] = x.completed - 20
+    end = dt.datetime.fromtimestamp(x.completed - 10, dt.timezone.utc).isoformat()
+    # Isolate each window check after the real synthetic health release validation.
+    if limit == 'coordinator':
+        x.authority['coordinator_ends_at'] = end
+    else:
+        x.authority['weekly_window']['ends_at'] = end
+    with pytest.raises(ValueError, match='outside authority window'):
+        x.check()
+
+
+@pytest.mark.parametrize('fault', ['resource', 'source', 'runtime', 'event', 'provider',
+                                  'script', 'plan', 'release', 'frame', 'evidence', 'journal'])
+def test_readiness_timestamp_fix_preserves_non_time_checks(readiness_case, fault):
+    x = readiness_case
+    if fault == 'resource': x.evidence['resource_id'] = 'foreign-resource'
+    elif fault == 'source': x.terminal['source_commit'] = 'foreign-source'
+    elif fault == 'runtime': x.terminal['runtime'] = {}
+    elif fault == 'event': x.terminal['event'] = 'aborted'
+    elif fault == 'provider': x.terminal['provider_verified'] = False
+    elif fault == 'script': x.terminal['source_script_sha256'] = '0'*64
+    elif fault == 'plan': x.terminal['plan'] = {}
+    elif fault == 'release': x.terminal['release'] = {}
+    elif fault == 'frame': (x.terminal_path.parent/'probe-frame.png').write_bytes(b'tampered')
+    elif fault == 'evidence': x.evidence['gl_renderer'] = 'tampered'
+    elif fault == 'journal': x.resources[-1]['time_unix'] -= 1
+    with pytest.raises(ValueError):
+        x.check(sync_journal=fault != 'journal')
