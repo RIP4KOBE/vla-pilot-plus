@@ -34,7 +34,7 @@ OWNER_ROUTE_MAPPING = {
     'path': str(OWNER.parent / 'autonomy_20261004/turns/001352/owner-alias-repair/alias-evidence-v1.json'),
     'sha256': '70097b35181e55589df8bb053857b11840f08542fb8ed8bec57635ba493b22a2'}
 HISTORICAL_OWNER = '/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z'
-SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001617/recovery-implementation/engineering-r1-spec.disabled-v1.json', 'sha256': 'ccd1991b59cdc30043d6b7061cf4ad73f0ae6c867dd6ae0a9f3e72b1d71d6162'}
+SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001635/canonical-runtime-repair/engineering-r1-spec.prospective-disabled-v1.json', 'sha256': 'f240a88296a6dd3808dbcc78028784edbdc66bf7506f0af4270d6c8e22dd01e4'}
 AMENDMENT = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001616/prospective-recovery-amendment-v1.json', 'sha256': 'fe3c11c3a4be56f74149dc7e21a59eef59611478841d0fa8993bc79f8760e5ba'}
 IDENTITY = 'N36_ENGINEERING_R1_C0_TASK0_001616'
 EPISODE_KEY = 'n36_engineering_r1_t00_c0_001616'
@@ -87,6 +87,56 @@ def specification():
     exact(spec['prospective_amendment'], AMENDMENT, 'R1 pinned amendment')
     read(AMENDMENT)
     return spec
+
+
+def validate_runtime_binding(plan):
+    """Exact disabled template plus two source fields; no self-hash cycle.
+
+    The fixed prospective paths and template are pinned by SPECIFICATION.
+    Source must equal the complete, committed checkout executing this validator.
+    This check grants neither source adoption nor runtime/dispatch readiness.
+    """
+    spec = specification()
+    policy = spec['runtime_binding']
+    authority = read(policy['repair_authority'])
+    exact(authority['runtime_amendment'], policy['amendment'], 'R1 runtime amendment authority')
+    exact(authority['runtime_preparation'], policy['preparation'], 'R1 runtime preparation authority')
+    amendment = read(policy['amendment'])
+    preparation = read(policy['preparation'])
+    exact(spec['canonical_runtime'], {k: preparation['runtime'][k] for k in ('path', 'sha256')},
+          'R1 canonical runtime template')
+    exact(policy['source_base'], authority['source_base'], 'R1 runtime source base')
+    exact(amendment['source'], policy['source_base'], 'R1 amended source base')
+    reference(plan['runtime'])
+    w.require(plan['runtime']['path'] == policy['runtime_path']
+              and str(Path(policy['runtime_path']).resolve()) == policy['runtime_path'],
+              'R1 canonical runtime reference path')
+    runtime = read(plan['runtime'])
+    template = read(spec['canonical_runtime'])
+    source_ref = reference(runtime['preparation']['source_record'])
+    w.require(source_ref['path'] == policy['source_record_path'], 'R1 exact source record path')
+    source = read(source_ref)
+    exact(source, plan['source'], 'R1 runtime source record binding')
+    exact(source, plan['scientific_source'], 'R1 runtime scientific source binding')
+    root = Path(__file__).resolve().parents[1]
+    exact(sorted(x['path'] for x in source['files']), sorted(b.source_paths(root)),
+          'R1 complete runtime source inventory')
+    b.closure.verify_source(root, source)
+    w.require(subprocess.run(['git', '--no-replace-objects', '-C', str(root),
+                             'merge-base', '--is-ancestor', policy['source_base'], source['commit']],
+                            check=False, capture_output=True).returncode == 0,
+              'R1 runtime source ancestry')
+    changed = subprocess.check_output(['git', '--no-replace-objects', '-C', str(root),
+        'diff', '--name-only', policy['source_base'], source['commit'], '--'], text=True).splitlines()
+    w.require(set(changed) <= set(policy['source_change_allowlist']) <= OPERATIONAL_FILES,
+              'R1 runtime repair source allowlist')
+    # Exact whole-document equality rejects all other changes, including inherited
+    # readiness, file records, provider, model, task, native and preparation fields.
+    template['preparation']['source'] = source['commit']
+    template['preparation']['source_record'] = source_ref
+    exact(runtime, template, 'R1 exact prospective runtime derivation')
+    r.verify_files(runtime['files'], allowed_roots=(runtime['worktree'], runtime['artifact_root']))
+    return runtime
 
 
 def terminal_parent_prefix():
@@ -219,7 +269,7 @@ def operational_binding(plan):
 def validate_audit_view(plan, *, require_manifests=True):
     """Keep all forty scientific rows and gates in a disabled audit-only view."""
     spec = specification()
-    exact(plan['runtime'], spec['canonical_runtime'], 'R1 canonical runtime reference')
+    validate_runtime_binding(plan)
     original_ref = {k: spec['full_audit_view']['immutable_original_plan'][k] for k in ('path', 'sha256')}
     original = read(original_ref)
     fields = {'schema', 'original_plan', 'dispatch_authority', 'frozen', 'release_enabled',
@@ -283,7 +333,7 @@ def validate_plan_shape(plan, *, released=False):
               and (not released or plan['release_enabled'] is True)
               and plan['cohort'] == IDENTITY and plan['purpose'] == PURPOSE,
               'distinct released engineering plan required')
-    exact(plan['runtime'], specification()['canonical_runtime'], 'R1 canonical runtime reference')
+    validate_runtime_binding(plan)
     exact(plan['limits'], LIMITS, 'engineering finite limits')
     exact(plan['episodes'], [row()], 'one engineering episode')
     exact(plan['worker_contract'], c.WORKER_CONTRACT, 'unchanged worker gates')

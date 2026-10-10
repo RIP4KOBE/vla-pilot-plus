@@ -26,7 +26,10 @@ def documents(tmp_path_factory):
     root = tmp_path_factory.mktemp('r1-disabled')
     route = e.read(plan['deployment'])
     route.update(source_cwd=str(e.SOURCE), output_root=str(e.SESSION / 'engineering-executions' / e.EPISODE_KEY))
-    common = dict(worktree=str(e.SOURCE), runtime=e.specification()['canonical_runtime'],
+    policy = e.specification()['runtime_binding']
+    runtime_ref = {'path': policy['runtime_path'], 'sha256': e.w.sha(policy['runtime_path'])}
+    source = e.read({'path': policy['source_record_path'], 'sha256': e.w.sha(policy['source_record_path'])})
+    common = dict(worktree=str(e.SOURCE), runtime=runtime_ref, source=source, scientific_source=source,
                   deployment=put(root, 'route', route), scope=put(root, 'scope', e.disabled_scope()))
     audit.update(common, artifact_root=route['output_root'] + '/audit-only', expected_manifests={})
     runtime = e.read(audit['runtime'])
@@ -183,7 +186,7 @@ def test_disabled_and_cross_family_plans_rejected(documents, tmp_path):
 
 
 def test_real_dino_consumer_canonical_reference_and_unchanged_bytes():
-    reference = e.specification()['canonical_runtime']
+    reference = e.read(e.specification()['runtime_binding']['historical_specification'])['canonical_runtime']
     before = Path(reference['path']).read_bytes()
     consumer = DinoSources(reference)
     assert len(consumer.files) == 157
@@ -231,7 +234,7 @@ def test_parent_source_and_shared_safety_predicates_unchanged():
     old, new = functions(parent_path), functions(e.__file__)
     intentional = {'specification', 'validate_audit_view', 'validate_plan_shape', 'validate_authority',
                    '_journal_suffixes', 'reconcile', 'validate_readiness'}
-    assert set(old) == set(new) - {'terminal_parent_prefix'}
+    assert set(old) == set(new) - {'terminal_parent_prefix', 'validate_runtime_binding'}
     for name in old.keys() - intentional:
         assert new[name] == old[name], name
     assert e.LIMITS == parent.LIMITS
@@ -291,3 +294,101 @@ def test_health_alone_does_not_remove_retained_cost_or_allow_second_use(baseline
     with pytest.raises(ValueError): e.headroom(snap, local, health=True, **kw)
     with pytest.raises(ValueError): e.headroom(snap, {**local, 'reserved_attempts': 1}, health=False, **kw)
     with pytest.raises(ValueError): e.headroom(snap, local, health=False, margin=0, protected=kw['protected'])
+
+
+def test_prospective_binding_accepts_exact_committed_source(documents):
+    plan, audit, runtime = documents
+    assert e.validate_runtime_binding(plan) == runtime
+    e.validate_plan_shape(plan)
+    e.validate_audit_view(audit)
+    template = e.read(e.specification()['canonical_runtime'])
+    expected = copy.deepcopy(runtime)
+    for name in ('source', 'source_record'):
+        expected['preparation'][name] = template['preparation'][name]
+    assert expected == template
+    assert runtime['cuda_egl_verified'] is runtime['provider_ready'] is False
+    assert runtime['preparation']['runtime_ready'] is False
+
+
+@pytest.mark.parametrize('mutation', ['runtime_hash', 'unapproved_path', 'source_ref_hash',
+    'source_ref_path', 'source_commit', 'source_file_hash', 'source_file_missing',
+    'runtime_file_hash', 'readiness', 'provider_readiness', 'mapping_readiness',
+    'preparation_readiness', 'extra_field', 'provider', 'authority_hash'])
+def test_prospective_runtime_mutations_rejected(documents, tmp_path, monkeypatch, mutation):
+    plan, _, runtime = copy.deepcopy(documents)
+    spec = e.specification()
+    policy = spec['runtime_binding']
+    # Test-only fixed paths: production authority/template validators stay active.
+    policy['runtime_path'] = str(tmp_path / 'runtime.json')
+    policy['source_record_path'] = str(tmp_path / 'source.json')
+    source = copy.deepcopy(plan['source'])
+    if mutation == 'source_commit': source['commit'] = '0' * 40
+    if mutation == 'source_file_hash': source['files'][0]['sha256'] = '0' * 64
+    if mutation == 'source_file_missing': source['files'].pop()
+    source_ref = put(tmp_path, 'source', source)
+    plan['source'] = plan['scientific_source'] = source
+    runtime['preparation']['source'] = source['commit']
+    runtime['preparation']['source_record'] = source_ref
+    if mutation == 'source_ref_hash': source_ref['sha256'] = '0' * 64
+    if mutation == 'source_ref_path': source_ref['path'] = '/unapproved-source.json'
+    if mutation == 'runtime_file_hash': runtime['files'][0]['sha256'] = '0' * 64
+    if mutation == 'readiness': runtime['cuda_egl_verified'] = True
+    if mutation == 'provider_readiness': runtime['provider_ready'] = True
+    if mutation == 'mapping_readiness': runtime['gpu_mapping']['cuda_egl_verified'] = True
+    if mutation == 'preparation_readiness': runtime['preparation']['runtime_ready'] = True
+    if mutation == 'extra_field': runtime['unapproved'] = True
+    if mutation == 'provider': runtime['frozen_stage_provider']['backend'] = 'unapproved'
+    if mutation == 'authority_hash': policy['repair_authority']['sha256'] = '0' * 64
+    plan['runtime'] = put(tmp_path, 'runtime', runtime)
+    if mutation == 'runtime_hash': plan['runtime']['sha256'] = '0' * 64
+    if mutation == 'unapproved_path': plan['runtime'] = put(tmp_path, 'other', runtime)
+    monkeypatch.setattr(e, 'SPECIFICATION', put(tmp_path, 'spec', spec))
+    with pytest.raises(ValueError): e.validate_runtime_binding(plan)
+
+
+def test_prospective_spec_preserves_all_other_contract_fields():
+    new = e.specification()
+    old = e.read(new['runtime_binding']['historical_specification'])
+    assert {k: v for k, v in new.items() if k not in ('runtime_binding', 'canonical_runtime')} == {
+        k: v for k, v in old.items() if k != 'canonical_runtime'}
+    assert json.loads(Path('configs/qd_ed_final/n36_engineering_r1_spec.disabled.json').read_text()) == new
+
+
+def test_altered_local_source_file_rejected(documents):
+    path = Path(e.__file__).resolve().parents[1] / 'configs/qd_ed_final/n36_engineering_r1_spec.disabled.json'
+    before = path.read_bytes()
+    try:
+        path.write_bytes(before + b'\n')
+        with pytest.raises(ValueError, match='uncommitted source bytes'):
+            e.validate_runtime_binding(documents[0])
+    finally:
+        path.write_bytes(before)
+
+
+def test_enabled_prospective_plan_without_separate_gates_fails(documents, tmp_path):
+    plan, _, _ = copy.deepcopy(documents)
+    plan.update(frozen=True, release_enabled=True)
+    plan['phase_authorization']['engineering'] = True
+    # Shape alone is not approval. Both real release entrypoints must reject it.
+    e.validate_plan_shape(plan, released=True)
+    plan_ref = put(tmp_path, 'enabled-without-authority', plan)
+    missing_release = put(tmp_path, 'no-release', {'approved': False})
+    for validator in (e.validate_health_release, e.validate_release):
+        with pytest.raises(ValueError, match='independent engineering B5'):
+            validator(plan_ref, missing_release)
+
+
+def test_stale_readiness_source_rejected(documents, tmp_path, monkeypatch):
+    plan, _, runtime = documents
+    plan_ref = put(tmp_path, 'readiness-plan', plan)
+    health_ref = put(tmp_path, 'health-release-fixture', {'disabled_fixture': True})
+    output = Path(plan['artifact_root']) / 'healthchecks' / e.HEALTH_ID
+    terminal = dict(output_dir=str(output), plan=plan_ref, release=health_ref,
+                    source_commit='0' * 40, runtime=plan['runtime'], event='completed',
+                    provider_verified=True)
+    terminal_ref = {'path': str(output / 'healthcheck-result.json'), 'sha256': '0' * 64}
+    original_read = e.read
+    monkeypatch.setattr(e, 'validate_health_release', lambda *a: (plan, runtime, {}))
+    monkeypatch.setattr(e, 'read', lambda ref: terminal if ref == terminal_ref else original_read(ref))
+    with pytest.raises(ValueError, match='terminal readiness binding'):
+        e.validate_readiness(plan_ref, {'readiness': {'health_release': health_ref, 'terminal': terminal_ref}}, resources=[])
