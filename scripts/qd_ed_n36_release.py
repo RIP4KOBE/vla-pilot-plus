@@ -12,7 +12,6 @@ COORDINATOR_END = '2026-10-11T11:13:13Z'
 
 
 def validate_plan(plan):
-    w.require(c.cohort(plan) != c.DRAFT_RECOVERY_COHORT, 'N36R2 draft only; release disabled')
     w.require(plan['schema'] == 'n36-released-plan-v1' and plan['frozen'] is True
               and plan['release_enabled'] is True and plan['episodes'] == c.plan_rows(plan)
               and plan['limits'] == c.LIMITS and plan['worker_contract'] == c.WORKER_CONTRACT
@@ -22,6 +21,9 @@ def validate_plan(plan):
               and plan['attempt_identity'] == 'episode_key', 'released plan contract')
     c.validate_stop_binding(plan)
     c.operational_binding(plan)
+    if c.cohort(plan) == c.DRAFT_RECOVERY_COHORT:
+        from scripts.qd_ed_n36r2_admission import validate_protocol
+        validate_protocol(plan)
     w.require(set(plan['expected_manifests']) == {x['episode_key'] for x in plan['episodes']}, 'all40 manifests')
 
 
@@ -45,6 +47,9 @@ def _verify_release_transaction(plan_ref, release_ref):
 def _verify_release_contents(plan_ref, release_ref):
     plan = w.read_ref(plan_ref)
     validate_plan(plan)
+    if c.cohort(plan) == c.DRAFT_RECOVERY_COHORT:
+        from scripts.qd_ed_n36r2_admission import independent_review
+        independent_review(plan)
     release = w.read_ref(release_ref)
     expected = {'schema': 'n36-execution-release-v1', 'approved': True, 'plan': plan_ref,
                 'native_build':plan['native_build'], 'authority': plan['authority'], 'protocol': plan['protocol'], 'protocol_review':plan['protocol_review'],
@@ -57,6 +62,9 @@ def _verify_release_contents(plan_ref, release_ref):
     w.require(review == {**expected, 'schema': 'n36-root-production-review-v1', 'decision': 'APPROVED'}, 'root review differs')
     if c.cohort(plan) == c.RECOVERY_COHORT:
         from scripts.qd_ed_n36_recovery import validate_protocol
+        protocol = validate_protocol(plan)
+    elif c.cohort(plan) == c.DRAFT_RECOVERY_COHORT:
+        from scripts.qd_ed_n36r2_admission import validate_protocol
         protocol = validate_protocol(plan)
     else:
         w.require(plan['protocol']['sha256']==c.PROTOCOL_SHA, 'frozen protocol v2 only')
@@ -78,6 +86,9 @@ def _verify_release_contents(plan_ref, release_ref):
         and authority.get('accounting')==protocol['accounting'], 'no recovery authority; exact protocol')
     if c.cohort(plan) == c.RECOVERY_COHORT:
         from scripts.qd_ed_n36_recovery import validate_authority
+        validate_authority(plan, authority)
+    if c.cohort(plan) == c.DRAFT_RECOVERY_COHORT:
+        from scripts.qd_ed_n36r2_admission import validate_authority
         validate_authority(plan, authority)
     validate_caps(caps)
     window_end = dt.datetime.fromisoformat(authority['weekly_window']['ends_at'].replace('Z', '+00:00'))
@@ -152,7 +163,7 @@ def prefix(path, expected):
     w.require(len(data) == expected['bytes'] and hashlib.sha256(data).hexdigest() == expected['sha256'], 'historical ledger prefix changed')
 
 
-def admission(plan, authority, state, events, resources, reservations, row, *, now, gpu_idle):
+def admission(plan, authority, state, events, resources, reservations, row, *, now, gpu_idle, release_refs=None):
     """Caller holds normal runner/state locks; all balances come from journals."""
     selected = c.cohort(plan)
     c.require_row(row, plan.get('worktree', c.ROOT), cohort=selected)
@@ -160,6 +171,10 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
         from scripts.qd_ed_n36_recovery import validate_authority, preserve_charge
         validate_authority(plan, authority)
         preserve_charge(events)
+    if selected == c.DRAFT_RECOVERY_COHORT:
+        from scripts.qd_ed_n36r2_admission import validate_authority, preserve_charges
+        validate_authority(plan, authority)
+        preserve_charges(events)
     w.require(authority.get('automatic_recoveries')==0, 'zero automatic recoveries')
     w.require(authority['weekly_window']['origin_gpu_hours']==53.08404692669838
         and authority['weekly_window']['increment_gpu_hours']==168., 'exact dual cumulative caps')
@@ -200,6 +215,9 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
     if selected == c.RECOVERY_COHORT:
         from scripts.qd_ed_n36_recovery import resource_events
         local_resources = resource_events(plan, resources)
+    if selected == c.DRAFT_RECOVERY_COHORT:
+        from scripts.qd_ed_n36r2_admission import resource_events
+        local_resources = resource_events(plan, resources)
     w.require(not any(e['event']=='aborted' for e in local_resources),
               'N36 healthcheck invalidity stop; no automatic replay')
     cohort = r.budget_snapshot(local, local_resources)
@@ -207,8 +225,10 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
               'N36 bucket ceilings')
     w.require(cohort['by_bucket'][row['budget_bucket']] < c.LIMITS[row['budget_bucket']], 'N36 bucket exhausted')
     from scripts import qd_ed_n36_accounting as accounting
-    margin=accounting.retained_margin(c.ROOT,authority['accounting']) if selected == c.COHORT else accounting.retained_margin(
-        c.ROOT, w.read_ref(authority['accounting'])['inherited_accounting'])
+    from scripts.qd_ed_n36r2_admission import owner_root
+    accounting_root = owner_root(plan)
+    margin=accounting.retained_margin(accounting_root,authority['accounting']) if selected == c.COHORT else accounting.retained_margin(
+        accounting_root, w.read_ref(authority['accounting'])['inherited_accounting'])
     reservation=accounting.headroom(snap,cohort,retained_margin_hours=margin,protected_hours=protected)
     allowance = {'authority_starts_at': authority['starts_at'],
                  'authority_ends_at': min(authority['coordinator_ends_at'], window['ends_at']),
@@ -224,5 +244,7 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
                  'cohort_attempts_remaining': 40 - cohort['reserved_attempts']}
     w.require(cohort['gpu_healthcheck_hours']*3600 <= c.LIMITS['healthcheck_seconds'], 'bounded cumulative healthcheck allowance')
     c.validate_stop_binding(plan)
+    if selected == c.DRAFT_RECOVERY_COHORT:
+        allowance.update(n36r2_plan=plan, n36r2_authority=authority, n36r2_release_refs=release_refs)
     c.pre_dispatch(row, allowance, now=now, stop_path=plan['stop_path'], cohort=selected)
     return {**snap, "n36_reservation":reservation}

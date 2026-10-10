@@ -16,6 +16,7 @@ from scripts import qd_ed_n36_contract as c, qd_ed_n36_bridge as b
 from scripts import qd_ed_n36_release as release, qd_ed_n36_supervise as supervisor
 from scripts import qd_ed_n36_worker as worker
 from scripts import qd_ed_n36_source as source_execution
+from scripts.qd_ed_n36r2_admission import owner_root, child_environment
 
 
 # Reuse process ownership, timeout, probe and device helpers unchanged.
@@ -64,8 +65,9 @@ def execute_one(plan_ref, release_ref):
     """One primary, or a read-only reconciled stop. All writes require release."""
     source_execution.active()
     plan, runtime, authority = release.validate_release(plan_ref, release_ref)
-    root = Path(plan['worktree']).resolve()
-    source_execution.attest(root, plan['source'], w.read_ref(plan['runtime_closure']))
+    source_root = Path(plan['worktree']).resolve()
+    root = owner_root(plan)
+    source_execution.attest(source_root, plan['source'], w.read_ref(plan['runtime_closure']))
     with r.locked(root / 'data/qd-ed-runner.lock', nonblocking=True):
         with r.locked(root / 'data/qd-ed-state.lock'):
             plan, runtime, authority = release.validate_release(plan_ref, release_ref)
@@ -84,18 +86,18 @@ def execute_one(plan_ref, release_ref):
             w.require(all(g[-1]['event'] in r.TERMINAL for g in r.event_groups(events).values()), 'unsettled/live ledger')
             # STOP/time/accounting checked before even probing the device.
             release.admission(plan, authority, state, events, resources, reservations, row,
-                              now=dt.datetime.now(dt.timezone.utc), gpu_idle=True)
+                              now=dt.datetime.now(dt.timezone.utc), gpu_idle=True, release_refs=(plan_ref, release_ref))
             check_probe(runtime, resources, root)
             admission = device_check()
-            env = r.child_environment(runtime)
-            r.verify_provider(runtime, env, root=root)
+            env = child_environment(plan, runtime)
+            r.verify_provider(runtime, env, root=source_root)
             r.runtime_gpu(runtime, state)
             plan, runtime, authority = release.validate_release(plan_ref, release_ref)
             state, current, resources, reservations = snapshot(root, authority)
             w.require(current == events, 'ledger changed under locks')
             admission = device_check()
             accounting = release.admission(plan, authority, state, current, resources, reservations, row,
-                              now=dt.datetime.now(dt.timezone.utc), gpu_idle=True)
+                              now=dt.datetime.now(dt.timezone.utc), gpu_idle=True, release_refs=(plan_ref, release_ref))
             manifest = w.read_ref(plan['expected_manifests'][row['episode_key']])
             output = Path(manifest['output_dir'])
             r.owned(output, plan['artifact_root'])
@@ -106,7 +108,7 @@ def execute_one(plan_ref, release_ref):
             context_path = output / 'n36-worker-context.json'
             w.atomic_json(context_path, worker.context_for(plan_ref, row, release_ref))
             context_ref = c.ref(context_path)
-            command = worker_command(manifest['argv'][0], root, context_path, context_ref['sha256'])
+            command = worker_command(manifest['argv'][0], source_root, context_path, context_ref['sha256'])
             base = {**c.operational_binding(plan), 'attempt_id': row['episode_key'], 'episode_key': row['episode_key'], 'identity': supervisor.c_identity(row),
                     'budget_bucket': row['budget_bucket'], 'replacement': row['replacement'], 'plan_sha256': plan_ref['sha256'], 'release': release_ref,
                     'source_commit': plan['source']['commit'], 'runtime_manifest_sha256': plan['runtime']['sha256'],
@@ -130,7 +132,7 @@ def execute_one(plan_ref, release_ref):
             with (output / 'runner.log').open('w') as log:
                 c.launch_guard(plan, authority)
                 start_admitted = True
-                process = subprocess.Popen(command, cwd=root, env=env, stdin=subprocess.PIPE, stdout=log,
+                process = subprocess.Popen(command, cwd=source_root, env=env, stdin=subprocess.PIPE, stdout=log,
                                            stderr=subprocess.STDOUT, start_new_session=True)
                 identity = process_identity(process.pid)
                 record = {**identity, 'attempt_id': row['episode_key'], 'context': context_ref, 'release': release_ref}
@@ -139,7 +141,7 @@ def execute_one(plan_ref, release_ref):
                 code = wait_worker(process, started, identity)
                 process_finished = time.monotonic()
                 w.require(code == 0, 'worker exit not zero')
-            outcome = r.validate_result(output, row, b.profiles(root)['profiles'][row['profile']], runtime)
+            outcome = r.validate_result(output, row, b.profiles(source_root)['profiles'][row['profile']], runtime)
             outcome['n36_worker_receipt'] = c.ref(output / 'eds_eval/n36-worker-receipt.json')
             terminal = {**base, **outcome, 'event': 'valid', 'time_unix': time.time(),
                         'gpu_process_wall_seconds': (process_finished or time.monotonic()) - started}

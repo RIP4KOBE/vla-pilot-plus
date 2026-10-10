@@ -38,7 +38,17 @@ def active():
         and zipimport.zipimporter.get_code is state.reject_bytecode
         and zipimport.zipimporter.exec_module is state.reject_bytecode
         and zipimport.zipimporter.load_module is state.reject_bytecode, 'N36 executable loader replaced')
+    validate_search_path(state.root, sys.path, sys.prefix)
     return state
+
+
+def validate_search_path(root, paths, prefix):
+    root, prefix = Path(root).resolve(), Path(prefix).resolve()
+    for entry in paths:
+        require(isinstance(entry, str) and bool(entry), 'N36 empty import search path')
+        path = Path(entry).resolve()
+        require(path == root or root in path.parents or prefix in path.parents,
+                'N36 foreign import search path: ' + str(path))
 
 
 def run_main(path):
@@ -182,6 +192,7 @@ def attest(root, source, runtime, *, binding=None):
         require((canonical, path) in known, 'N36 unrecorded Python execution: ' + name)
     return {'schema': 'n36-source-execution-v2', 'binding': copy.deepcopy(binding),
         'interpreter': copy.deepcopy(runtime['interpreter']), 'frozen_aliases': aliases, 'bootstrap': {'path': bootstrap, 'sha256': state.bootstrap_digest},
+        'search_path': list(sys.path), 'search_prefix': str(Path(sys.prefix).resolve()),
         'compiled': records, 'startup_source_only': startup, 'frozen_modules': sorted(set(frozen)),
         'exceptions': ['interpreter-bound built-in/frozen modules', 'separately inventoried native extensions',
                        'existing independently validated generated-runtime rules',
@@ -190,6 +201,9 @@ def attest(root, source, runtime, *, binding=None):
 
 def verify_receipt(receipt, root, source, runtime, *, loaded=None, runtime_receipt=None, binding=None):
     require(receipt['schema'] == 'n36-source-execution-v2', 'N36 execution receipt schema')
+    interpreter = Path(runtime['interpreter']['path']).resolve()
+    require(receipt['search_prefix'] == str(interpreter.parent.parent), 'N36 interpreter search prefix')
+    validate_search_path(root, receipt['search_path'], receipt['search_prefix'])
     index = {str(Path(root).resolve() / row['path']): row['sha256'] for row in source['files']}
     index.update({row['path']: row['sha256'] for row in runtime['modules'].values()})
     generated = {name: rule['sha256'] for name, rule in runtime.get('generated_modules', {}).items()}

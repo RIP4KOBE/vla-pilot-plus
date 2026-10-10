@@ -69,7 +69,10 @@ def reserve_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds):
     w.require(isinstance(resource_id,str) and re.fullmatch(r'n36_healthcheck_[a-zA-Z0-9_-]+',resource_id), 'N36 healthcheck identity')
     w.require(type(timeout_seconds) is int and 0<timeout_seconds<=60,'healthcheck timeout including full cleanup')
     plan,_,_=release.validate_release(plan_ref,release_ref)
-    root=Path(plan['worktree'])
+    from scripts.qd_ed_n36r2_admission import owner_root, PREPARATION_ID, KIND
+    root=owner_root(plan)
+    if c.cohort(plan)==c.DRAFT_RECOVERY_COHORT:
+        w.require(timeout_seconds<=20, 'N36R2 60s including cleanup ceiling')
     with r.locked(root/'data/qd-ed-runner.lock',nonblocking=True):
         with r.locked(root/'data/qd-ed-state.lock'):
             plan,runtime,authority=release.validate_release(plan_ref,release_ref)
@@ -82,16 +85,20 @@ def reserve_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds):
             # Episode admission is at least as strict as the <=1800s probe. No
             # future episode attempt is consumed by this independent resource.
             snap=release.admission(plan,authority,state,events,resources,reservations,
-                reconciled['next_row'],now=dt.datetime.now(dt.timezone.utc),gpu_idle=True)
+                reconciled['next_row'],now=dt.datetime.now(dt.timezone.utc),gpu_idle=True,release_refs=(plan_ref,release_ref))
             selected={e['resource_id'] for e in resources if e.get('cohort')==c.cohort(plan)
                       or (c.cohort(plan)==c.COHORT and e.get('kind')=='n36_resource_preparation_v1')}
             if c.cohort(plan)==c.RECOVERY_COHORT:
                 from scripts.qd_ed_n36_recovery import resource_events
                 selected = {e['resource_id'] for e in resource_events(plan, resources)}
+            if c.cohort(plan)==c.DRAFT_RECOVERY_COHORT:
+                from scripts.qd_ed_n36r2_admission import resource_events
+                selected = {e['resource_id'] for e in resource_events(plan, resources)}
             w.require(len(selected)<41,'healthcheck invocation ceiling')
             permitted={'n36_healthcheck_'+reconciled['next_row']['episode_key']}
             if not reconciled['outcomes']:
                 permitted.add('n36_healthcheck_preparation' if c.cohort(plan)==c.COHORT
+                              else PREPARATION_ID if c.cohort(plan)==c.DRAFT_RECOVERY_COHORT
                               else 'n36_healthcheck_n36r1_preparation_001203')
             w.require(resource_id in permitted,'one preparation plus one check per primary cell')
             cohort=r.budget_snapshot(c.cohort_events(plan['episodes'],events),
@@ -102,7 +109,7 @@ def reserve_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds):
             admission=adapter.device_check()
             c.launch_guard(plan, authority, need=1840+need)
             record={**c.operational_binding(plan), 'resource_id':resource_id,'event':'reserved','cohort':c.cohort(plan),
-                'kind':('n36_resource_preparation_v1' if c.cohort(plan)==c.COHORT else 'n36r1_resource_preparation_v1'),'plan':plan_ref,'release':release_ref,
+                'kind':('n36_resource_preparation_v1' if c.cohort(plan)==c.COHORT else KIND if c.cohort(plan)==c.DRAFT_RECOVERY_COHORT else 'n36r1_resource_preparation_v1'),'plan':plan_ref,'release':release_ref,
                 'source_commit':plan['source']['commit'],'runtime':plan['runtime'],
                 'physical_gpu':7,'gpu_uuid':c.GPU_UUID,'timeout_seconds':timeout_seconds,
                 'cleanup_seconds':40,'reserved_gpu_seconds':need,'accounting_admission':reservation,

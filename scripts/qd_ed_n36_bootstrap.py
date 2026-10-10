@@ -26,6 +26,8 @@ compiled = {}
 
 
 def source_code(self, fullname):
+    if 'validate_search' in globals():
+        validate_search()
     path = self.get_filename(fullname)
     data = self.get_data(path)
     code = self.source_to_code(data, path)
@@ -74,10 +76,22 @@ import runpy
 # Restore only explicit search directories, without executing arbitrary .pth or
 # sitecustomize code. Every imported path is still checked by runtime attestation.
 root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-sys.path[:0] = [root] + [os.path.abspath(p) for p in os.environ.get('PYTHONPATH', '').split(os.pathsep) if p]
+# Never inherit adjacent checkouts or arbitrary PYTHONPATH entries.
+sys.path[:0] = [root] + [os.path.join(root, p) for p in
+    ('third_party/lerobot/src', 'third_party/rdt', 'third_party/libero_pro')]
 for directory in site.getsitepackages():
     if directory not in sys.path:
         sys.path.append(directory)
+
+def validate_search():
+    for entry in sys.path:
+        path = os.path.realpath(entry)
+        if not entry or not any(path == base or path.startswith(base + os.sep)
+                                for base in (root, os.path.realpath(sys.prefix))):
+            raise ImportError('N36 foreign import search path: ' + path)
+
+
+validate_search()
 
 if len(sys.argv) < 2:
     raise SystemExit('usage: qd_ed_n36_bootstrap.py MODULE [ARGS...]')

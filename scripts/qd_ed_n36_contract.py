@@ -90,7 +90,7 @@ def operational_binding(plan):
     if cohort(plan) == COHORT:
         w.require('accounting' not in plan, 'original plan cannot claim recovery accounting')
         return {}
-    return {'cohort': cohort(plan), **{k: plan[k] for k in
+    return {**({'resource_routing': plan['resource_routing']} if cohort(plan) == DRAFT_RECOVERY_COHORT and 'resource_routing' in plan else {}), 'cohort': cohort(plan), **{k: plan[k] for k in
             ('protocol', 'protocol_review', 'accounting')}}
 
 
@@ -146,7 +146,10 @@ def validate_draft(plan):
         from scripts.qd_ed_n36_recovery import validate_protocol
         validate_protocol(plan)
     if cohort(plan) == DRAFT_RECOVERY_COHORT:
-        from scripts.qd_ed_n36r2_draft import validate_protocol
+        if w.read_ref(plan['protocol']).get('schema') == 'n36r2-prospective-protocol-v1':
+            from scripts.qd_ed_n36r2_admission import validate_protocol
+        else:
+            from scripts.qd_ed_n36r2_draft import validate_protocol
         validate_protocol(plan)
     w.require(set(plan['expected_manifests']) == {r['episode_key'] for r in plan['episodes']}, 'manifest coverage')
 
@@ -168,7 +171,11 @@ def pre_dispatch(row, allowance, *, now, stop_path, cohort=COHORT):
     All *_remaining values must already include prior reservations, health costs
     and charges. Exact owning ledger-to-snapshot arithmetic is a root prerequisite.
     """
-    w.require(cohort != DRAFT_RECOVERY_COHORT, 'N36R2 draft only; admission disabled')
+    if cohort == DRAFT_RECOVERY_COHORT:
+        from scripts.qd_ed_n36_release import validate_release
+        plan, _, authority = validate_release(*allowance['n36r2_release_refs'])
+        w.require(plan == allowance['n36r2_plan'] and authority == allowance['n36r2_authority'],
+                  'N36R2 admission detached release differs')
     w.require(stop_path in stop.STOP_PATHS, 'canonical STOP path differs')
     stop.check(now=now, ends_at=allowance['authority_ends_at'], need=1840)
     w.require(now.tzinfo is not None, 'timezone-aware admission time')

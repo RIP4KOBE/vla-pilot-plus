@@ -44,7 +44,8 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
     record = accounting.reserve_healthcheck(plan_ref, release_ref, resource_id,
                                             timeout_seconds=timeout_seconds)
     plan, runtime, authority = release.validate_release(plan_ref, release_ref)
-    root = Path(plan['worktree'])
+    from scripts.qd_ed_n36r2_admission import owner_root, child_environment
+    root = owner_root(plan)
     # The durable in-flight resource blocks admissions during lock transfer.
     with r.locked(root/'data/qd-ed-runner.lock', nonblocking=True):
         plan, runtime, authority = release.validate_release(plan_ref, release_ref)
@@ -66,7 +67,7 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
         try:
             before_start()
             adapter.device_check()
-            env=r.child_environment(runtime)
+            env=child_environment(plan, runtime)
             env.update(QD_ED_GPU_PROBE_PARENT_PID=str(os.getpid()), QD_ED_GPU_PROBE_RESOURCE_ID=resource_id)
             command=[str(r.PYTHON),str(Path(probe.__file__).resolve()),'_child',
                      '--manifest',plan['runtime']['path'],'--output',str(output),'--resource-id',resource_id]
@@ -76,7 +77,7 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
             with (output/'probe.log').open('w') as log:
                 before_start()
                 started=time.monotonic()
-                process=subprocess.Popen(command,cwd=root,env=env,stdout=log,
+                process=subprocess.Popen(command,cwd=Path(plan['worktree']),env=env,stdout=log,
                                          stderr=subprocess.STDOUT,start_new_session=True)
                 identity=adapter.process_identity(process.pid)
                 w.atomic_json(output/'process.json',{**identity,'resource_id':resource_id,'release':release_ref})

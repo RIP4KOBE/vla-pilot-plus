@@ -200,6 +200,20 @@ def runtime_receipt_binding(context_ref, plan, process, phase):
             'process': process, 'phase': phase}
 
 
+def persist_runtime_observation(output, phase, receipt):
+    """Create once; parent hashes verify retained bytes after process exit."""
+    import json
+    path = Path(output) / 'eds_eval' / ('n36-runtime-' + phase + '.json')
+    value = {key: receipt[key] for key in
+             ('runtime_' + phase, 'execution_' + phase, 'loaded_' + phase, 'native_build_' + phase)}
+    # No overwrite, including symlink aliases. Final receipt binds these bytes.
+    with path.open('x') as stream:
+        json.dump(value, stream, sort_keys=True, allow_nan=False)
+        stream.write('\n'); stream.flush(); os.fsync(stream.fileno())
+    path.chmod(0o444)
+    return c.ref(path)
+
+
 def _run_in_process(context_ref):
     """Internal implementation, to be called only by a root-released bounded runner."""
     source_execution.active()
@@ -227,6 +241,7 @@ def _run_in_process(context_ref):
         receipt['loaded_before'] = attest_worker_loaded(root, plan['source'])
         receipt['execution_before'] = source_execution.attest(root, plan['source'], runtime_closure,
             binding=runtime_receipt_binding(context_ref, plan, identity, 'runtime_before'))
+        receipt['observation_before'] = persist_runtime_observation(output, 'before', receipt)
         sys.argv = context['main_argv']
         os.chdir(root)
         with controller.observe_instances(proof) as observed:
@@ -262,6 +277,7 @@ def _run_in_process(context_ref):
         receipt['native_build_after']=native_build.attest(plan['native_build'],after=True)
         receipt['execution_after'] = source_execution.attest(root, plan['source'], runtime_closure,
             binding=runtime_receipt_binding(context_ref, plan, identity, 'runtime_after'))
+        receipt['observation_after'] = persist_runtime_observation(output, 'after', receipt)
         receipt.update(audit_seconds=time.perf_counter() - audit_started, native_counts=counts, auxiliary=auxiliary,
                        evidence=before, audit_backend=backend.report())
         w.atomic_json(report_path, report)
@@ -300,6 +316,13 @@ def verify_receipt(context_ref, receipt_ref, process_record):
               or (cuda.get('actual_uuid_type') == 'torch._C._CUuuid' and cuda.get('actual_uuid_bytes_hex') == expected_hex),
               'native UUID serialization')
     w.require(receipt['audit_backend']['kind'] == 'cpu' and receipt['audit_backend']['logical_device'] == 'cpu', 'CPU audit backend')
+    for phase in ('before', 'after'):
+        reference = receipt['observation_' + phase]
+        w.require(reference['path'] == str(output / 'eds_eval' / ('n36-runtime-' + phase + '.json')),
+                  'immutable runtime observation path')
+        w.require(w.read_ref(reference) == {key: receipt[key] for key in
+            ('runtime_' + phase, 'execution_' + phase, 'loaded_' + phase, 'native_build_' + phase)},
+            'immutable runtime observation differs')
     native_build.verify_receipt(plan['native_build'],receipt['native_build_before'])
     native_build.verify_receipt(plan['native_build'],receipt['native_build_after'],after=True)
     w.require(all(row in receipt['native_build_after']['libraries'] for row in receipt['native_build_before']['libraries']), 'native library unloaded/replaced')
