@@ -47,8 +47,27 @@ def profiles(root=ROOT):
 
 
 def command(plan,runtime,row):
+    from scripts import qd_ed_n36r4_admission as successor
+    if (c.cohort(plan) == c.DRAFT_N36R4_COHORT
+            or (plan.get('protocol') or {}).get('sha256') == successor.PROTOCOL_SHA
+            or (plan.get('accounting') or {}).get('sha256') == successor.ACCOUNTING_SHA):
+        successor.validate_protocol(plan)
     w.require(row in plan['episodes'] and row in c.plan_rows(plan),'exact fresh N36 matrix row')
     argv,output=runner.build_command(plan,profiles(plan['worktree']),runtime,row,row['episode_key'])
+    if c.cohort(plan) == c.DRAFT_N36R4_COHORT:
+        # Preserve the exact prospective owner spelling and keep reports out of
+        # source/historical evidence directories. validate_protocol pins both
+        # the lexical artifact root and its physical session destination.
+        output = Path(plan['artifact_root']) / 'attempts' / row['episode_key']
+        routes = {'hydra.run.dir': output,
+                  'main.eds_eval.output_dir': output / 'eds_eval',
+                  'main.eds_eval.report_dir': Path(plan['artifact_root']).parent / 'prospective-reports-001467',
+                  'main.eds_mechanism_pretest.output_dir': output / 'mechanism'}
+        for key, destination in routes.items():
+            w.require(sum(arg.startswith(key + '=') for arg in argv) == 1,
+                      'N36R4 exact output override coverage')
+            argv = [key + '=' + str(destination) if arg.startswith(key + '=') else arg
+                    for arg in argv]
     if row['profile'] in ('N34','N36'):
         binding={'task_id':row['task_id'],'source_commit':plan['source']['commit'],'run_id':row['episode_key']}
         for name in (('n34','n36') if row['profile']=='N36' else ('n34',)):

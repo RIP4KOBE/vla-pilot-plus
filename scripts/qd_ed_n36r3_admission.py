@@ -21,6 +21,17 @@ BINDINGS = ('source', 'scientific_source', 'protocol', 'protocol_review', 'accou
             'runtime', 'runtime_closure', 'native_build', 'controller_semantics', 'resource_routing')
 
 
+def identity_contract(plan):
+    selected = c.cohort(plan)
+    w.require(selected in c.SEPARATE_HEALTH_COHORTS, 'exact successor cohort required')
+    if selected == c.DRAFT_N36R4_COHORT:
+        from scripts import qd_ed_n36r4_admission as successor
+        return {'prefix': 'n36r4', 'health': successor.HEALTH,
+                'kind': successor.KIND, 'attempts': 506, 'hours': 75.60616276674473}
+    return {'prefix': 'n36r3', 'health': HEALTH, 'kind': KIND,
+            'attempts': 505, 'hours': 75.53335346582918}
+
+
 def owner_root(plan):
     # Preserve the lexical owner: resolving a path is not authority to reroute it.
     expected = {'source_cwd': str(SOURCE), 'owner_root': str(OWNER),
@@ -34,7 +45,7 @@ def owner_root(plan):
 def independent_review(plan):
     owner_root(plan)
     w.require(w.read_ref(plan['b5_review']) == {
-        'schema': 'n36r3-independent-b5-review-v1',
+        'schema': identity_contract(plan)['prefix'] + '-independent-b5-review-v1',
         'decision': 'PASS_PREPARATION_REQUIRES_ROOT_RELEASE',
         **{k: plan[k] for k in BINDINGS},
         'worker_receipts_are_future': True, 'release_enabled': False},
@@ -42,32 +53,33 @@ def independent_review(plan):
 
 
 def validate_authority(plan, authority):
-    protocol = c.validate_n36r3_protocol(plan)
+    spec = identity_contract(plan)
+    protocol = c.validate_successor_protocol(plan)
     root = owner_root(plan)
     independent_review(plan)
-    w.require(authority['cohort'] == c.DRAFT_N36R3_COHORT
+    w.require(authority['cohort'] == c.cohort(plan)
               and authority['protocol'] == plan['protocol']
               and authority['accounting'] == protocol['accounting']
-              and authority['healthchecks'] == HEALTH,
+              and authority['healthchecks'] == spec['health'],
               'N36R3 distinct finite authority required')
     adoption = w.read_ref(authority['source_adoption'])
-    w.require(adoption == {'schema': 'n36r3-source-adoption-v1', 'approved': True,
+    w.require(adoption == {'schema': spec['prefix'] + '-source-adoption-v1', 'approved': True,
         'owner_root': str(root), 'source_cwd': str(SOURCE),
         **{k: plan[k] for k in BINDINGS}, 'independent_review': plan['b5_review']},
         'N36R3 exact root source adoption required')
     accounting = w.read_ref(authority['amendment'])
-    w.require(accounting['schema'] == 'n36r3-owning-accounting-v1'
-              and accounting['cohort'] == c.DRAFT_N36R3_COHORT
+    w.require(accounting['schema'] == spec['prefix'] + '-owning-accounting-v1'
+              and accounting['cohort'] == c.cohort(plan)
               and accounting['accounting'] == plan['accounting']
               and accounting['source_adoption'] == authority['source_adoption']
               and accounting['caps'] == c.CAPS and accounting['limits'] == c.LIMITS
-              and accounting['healthchecks'] == HEALTH
+              and accounting['healthchecks'] == spec['health']
               and accounting['automatic_recoveries'] == 0
               and accounting['ledger_prefixes'] == authority['ledger_prefixes']
               and set(authority['ledger_prefixes']) == JOURNALS,
               'N36R3 root accounting bindings differ')
-    # This is the accepted current 505-attempt baseline, not a reconstructed
-    # historical attestation or a relabelled N36R2 allowance.
+    # Each supported identity keeps its own exact retained baseline.
+    # A successor cannot relabel its predecessor accounting as new headroom.
     prefix_rows = {}
     from scripts import qd_ed_n36_release as release
     for name, anchor in authority['ledger_prefixes'].items():
@@ -77,15 +89,19 @@ def validate_authority(plan, authority):
         with path.open('rb') as stream:
             prefix_rows[name] = [json.loads(line) for line in stream.read(anchor['bytes']).splitlines() if line.strip()]
     snap = r.budget_snapshot(prefix_rows['attempt-ledger.jsonl'], prefix_rows['gpu-healthcheck-ledger.jsonl'])
-    w.require(snap == accounting['snapshot'] and snap['dispatched'] == snap['reserved_attempts'] == 505
-              and snap['gpu_hours_consumed'] == 75.53335346582918
+    w.require(snap == accounting['snapshot'] and snap['dispatched'] == snap['reserved_attempts'] == spec['attempts']
+              and snap['gpu_hours_consumed'] == spec['hours']
               and snap['running'] == snap['gpu_healthcheck_inflight'] == 0
               and all(g[-1]['event'] in r.TERMINAL for g in r.event_groups(prefix_rows['attempt-ledger.jsonl']).values()),
-              'N36R3 retained 505 attempts and exact costs required')
+              spec['prefix'] + ' retained attempts and exact costs required')
     previous.preserve_charges(prefix_rows['attempt-ledger.jsonl'])
+    ledger = w.read_ref(plan['accounting'])
+    if c.cohort(plan) == c.DRAFT_N36R4_COHORT:
+        from scripts.qd_ed_n36r4_admission import validate_accounting
+        validate_accounting(plan, authority, accounting, snap)
+        return prefix_rows
     from scripts.qd_ed_n36r3_preparation import arithmetic
     w.require(accounting['arithmetic'] == arithmetic(snap), 'N36R3 finite arithmetic differs')
-    ledger = w.read_ref(plan['accounting'])
     for key, name in (('retained_ledger_prefix', 'attempt-ledger.jsonl'),
                       ('retained_health_ledger_prefix', 'gpu-healthcheck-ledger.jsonl')):
         release.prefix(root / 'data' / name, ledger[key])
@@ -112,12 +128,13 @@ def live_journals(plan, authority, events, resources, reservations):
 
 
 def resource_events(plan, resources):
-    permitted = {PREPARATION_ID} | {'n36_healthcheck_' + row['episode_key'] for row in c.plan_rows(plan)}
-    ids = {e['resource_id'] for e in resources if e.get('cohort') == c.DRAFT_N36R3_COHORT
-           or e.get('kind') == KIND or str(e.get('resource_id', '')).startswith('n36_healthcheck_n36r3')}
+    spec = identity_contract(plan)
+    permitted = {spec['health']['preparation_id']} | {'n36_healthcheck_' + row['episode_key'] for row in c.plan_rows(plan)}
+    ids = {e['resource_id'] for e in resources if e.get('cohort') == c.cohort(plan)
+           or e.get('kind') == spec['kind'] or str(e.get('resource_id', '')).startswith('n36_healthcheck_' + spec['prefix'])}
     local = [e for e in resources if e['resource_id'] in ids]
     binding = c.operational_binding(plan)
-    w.require(all(e['resource_id'] in permitted and e.get('kind') == KIND
+    w.require(all(e['resource_id'] in permitted and e.get('kind') == spec['kind']
         and all(e.get(k) == v for k, v in binding.items())
         and type(e.get('timeout_seconds')) is int and e['timeout_seconds'] == 20
         and e.get('cleanup_seconds') == 40 and e.get('reserved_gpu_seconds') == 60
@@ -141,6 +158,9 @@ def resource_events(plan, resources):
 
 
 def margin_reference(plan):
+    if c.cohort(plan) == c.DRAFT_N36R4_COHORT:
+        from scripts.qd_ed_n36r4_admission import margin_reference as successor_margin
+        return successor_margin(plan)
     ledger = w.read_ref(plan['accounting'])
     inherited = w.read_ref(ledger['inherited_accounting'])
     return inherited['inherited_accounting']
@@ -158,13 +178,18 @@ def validate_readiness(plan_ref, release_record, *, resources=None):
     terminal = w.read_ref(ready['terminal'])
     output = Path(terminal['output_dir'])
     r.owned(output, plan['artifact_root'])
+    if c.cohort(plan) == c.DRAFT_N36R4_COHORT:
+        w.require(output == Path(plan['artifact_root']) / 'healthchecks' / terminal['resource_id'],
+                  'N36R4 exact health output routing')
     w.require(Path(ready['terminal']['path']) == output / 'healthcheck-result.json'
         and terminal['plan'] == plan_ref and terminal['release'] == ready['health_release']
         and terminal['source_commit'] == plan['source']['commit'] and terminal['runtime'] == plan['runtime']
         and terminal['event'] == 'completed' and terminal.get('provider_verified') is True
         and terminal['source_script_sha256'] == w.sha(SOURCE / 'scripts/qd_ed_gpu_probe.py'),
         'N36R3 fresh readiness binding required')
-    resource_events(plan, [terminal])
+    selected_health = resource_events(plan, [terminal])
+    if c.cohort(plan) == c.DRAFT_N36R4_COHORT:
+        w.require(selected_health == [terminal], 'N36R4 fresh health identity required')
     starts = dt.datetime.fromisoformat(authority['starts_at'].replace('Z', '+00:00')).timestamp()
     ends = min(dt.datetime.fromisoformat(value.replace('Z', '+00:00')).timestamp()
                for value in (authority['coordinator_ends_at'], authority['weekly_window']['ends_at']))

@@ -13,6 +13,7 @@ def reserve(plan_ref, health_release_ref, resource_id, *, timeout_seconds):
     w.require(type(timeout_seconds) is int and timeout_seconds == 20,
               'N36R3 exactly 20 probe plus 40 cleanup seconds')
     plan, runtime, authority = release.validate_health_release(plan_ref, health_release_ref)
+    spec = gate.identity_contract(plan)
     root = gate.owner_root(plan)
     with r.locked(root/'data/qd-ed-runner.lock', nonblocking=True):
         with r.locked(root/'data/qd-ed-state.lock'):
@@ -31,7 +32,7 @@ def reserve(plan_ref, health_release_ref, resource_id, *, timeout_seconds):
             w.require(not any(e['resource_id'] == resource_id for e in resources), 'health replay forbidden')
             permitted = {'n36_healthcheck_' + result['next_row']['episode_key']}
             if not result['outcomes']:
-                permitted.add(gate.PREPARATION_ID)
+                permitted.add(spec['health']['preparation_id'])
             w.require(resource_id in permitted, 'one preparation plus one check per primary cell')
             w.require(len({e['resource_id'] for e in health}) < 41
                       and not any(e['event'] == 'aborted' for e in health),
@@ -55,7 +56,7 @@ def reserve(plan_ref, health_release_ref, resource_id, *, timeout_seconds):
             admission = adapter.device_check()
             c.launch_guard(plan, authority, need=60)
             record = {**c.operational_binding(plan), 'resource_id': resource_id,
-                'event': 'reserved', 'kind': gate.KIND, 'plan': plan_ref, 'release': health_release_ref,
+                'event': 'reserved', 'kind': spec['kind'], 'plan': plan_ref, 'release': health_release_ref,
                 'source_commit': plan['source']['commit'], 'runtime': plan['runtime'],
                 'physical_gpu': 7, 'gpu_uuid': c.GPU_UUID, 'timeout_seconds': 20,
                 'cleanup_seconds': 40, 'reserved_gpu_seconds': 60,

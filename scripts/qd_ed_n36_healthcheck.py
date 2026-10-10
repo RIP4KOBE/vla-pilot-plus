@@ -41,7 +41,7 @@ def wait_probe(process, started, identity, timeout):
 
 def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
     """One bounded probe, no retry, no episode attempt, no readiness mutation."""
-    n36r3 = c.cohort(w.read_ref(plan_ref)) == c.DRAFT_N36R3_COHORT
+    n36r3 = c.cohort(w.read_ref(plan_ref)) in c.SEPARATE_HEALTH_COHORTS
     validate = release.validate_health_release if n36r3 else release.validate_release
     if n36r3:
         adapter.source_execution.active()

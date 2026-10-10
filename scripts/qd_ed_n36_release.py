@@ -13,10 +13,10 @@ N36R3_OWNER_ALIAS = '/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260
 
 
 def validate_plan(plan):
-    if c.cohort(plan) == c.DRAFT_N36R3_COHORT:
+    if c.cohort(plan) in c.SEPARATE_HEALTH_COHORTS:
         w.require(all(plan.get(k) is not None for k in ('authority', 'b5_review', 'resource_routing')),
                   'N36R3 draft only; separate root bindings required')
-        c.validate_n36r3_protocol(plan)
+        c.validate_successor_protocol(plan)
     w.require(plan['schema'] == 'n36-released-plan-v1' and plan['frozen'] is True
               and plan['release_enabled'] is True and plan['episodes'] == c.plan_rows(plan)
               and plan['limits'] == c.LIMITS and plan['worker_contract'] == c.WORKER_CONTRACT
@@ -56,7 +56,7 @@ def _verify_release_transaction(plan_ref, release_ref, *, health=False):
 def _verify_release_contents(plan_ref, release_ref, *, health=False):
     plan = w.read_ref(plan_ref)
     validate_plan(plan)
-    n36r3 = c.cohort(plan) == c.DRAFT_N36R3_COHORT
+    n36r3 = c.cohort(plan) in c.SEPARATE_HEALTH_COHORTS
     w.require(not health or n36r3, 'separate health authority is N36R3 only')
     if n36r3:
         from scripts import qd_ed_n36r3_admission as n3
@@ -72,15 +72,15 @@ def _verify_release_contents(plan_ref, release_ref, *, health=False):
                 'runtime': plan['runtime'], 'limits': c.LIMITS,
                 'phase_authorization': plan['phase_authorization'], **c.operational_binding(plan)}
     if health:
-        expected['schema'] = 'n36r3-health-release-v1'
-        expected['healthchecks'] = n3.HEALTH
+        expected['schema'] = n3.identity_contract(plan)['prefix'] + '-health-release-v1'
+        expected['healthchecks'] = n3.identity_contract(plan)['health']
     elif n36r3:
         expected['readiness'] = release['readiness']
     w.require(set(release) == set(expected) | {'root_review'} and all(release[k] == v for k, v in expected.items()), 'external release differs')
     review = w.read_ref(release['root_review'])
-    w.require(review == {**expected, 'schema': ('n36r3-root-health-review-v1' if health else 'n36-root-production-review-v1'), 'decision': 'APPROVED'}, 'root review differs')
+    w.require(review == {**expected, 'schema': (n3.identity_contract(plan)['prefix'] + '-root-health-review-v1' if health else 'n36-root-production-review-v1'), 'decision': 'APPROVED'}, 'root review differs')
     if n36r3:
-        protocol = c.validate_n36r3_protocol(plan)
+        protocol = c.validate_successor_protocol(plan)
     elif c.cohort(plan) == c.RECOVERY_COHORT:
         from scripts.qd_ed_n36_recovery import validate_protocol
         protocol = validate_protocol(plan)
@@ -192,7 +192,7 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
     """Caller holds normal runner/state locks; all balances come from journals."""
     selected = c.cohort(plan)
     c.require_row(row, plan.get('worktree', c.ROOT), cohort=selected)
-    if selected == c.DRAFT_N36R3_COHORT:
+    if selected in c.SEPARATE_HEALTH_COHORTS:
         from scripts import qd_ed_n36r3_admission as n3
         n3_local, n3_health = n3.live_journals(plan, authority, events, resources, reservations)
         w.require(release_refs is not None, 'N36R3 detached release required')
@@ -212,7 +212,7 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
     rows = c.plan_rows(plan)
     w.require(plan.get('episodes', rows) == rows, 'admission exact cohort rows')
     # Accounting continuity only; runner separately reverifies native terminals.
-    reconciliation_plan = plan if selected == c.DRAFT_N36R3_COHORT else {
+    reconciliation_plan = plan if selected in c.SEPARATE_HEALTH_COHORTS else {
         **c.operational_binding(plan), 'episodes': rows, 'worktree': str(plan.get('worktree', c.ROOT))}
     reconciled = supervisor.reconcile(reconciliation_plan, events, lambda *args: None)
     w.require(reconciled['next_row'] == row, 'accounting requires next fresh contiguous row')
@@ -238,7 +238,7 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
     if selected == c.RECOVERY_COHORT:
         from scripts.qd_ed_n36_recovery import resource_events
         local_resources = resource_events(plan, resources)
-    if selected == c.DRAFT_N36R3_COHORT:
+    if selected in c.SEPARATE_HEALTH_COHORTS:
         # Retained health remains globally charged; only the verified suffix
         # belongs to this newly authorized finite cohort.
         local, local_resources = n3_local, n3_health
@@ -255,7 +255,7 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
     from scripts.qd_ed_n36r2_admission import owner_root
     accounting_root = owner_root(plan)
     margin_ref = (authority['accounting'] if selected == c.COHORT else
-                  n3.margin_reference(plan) if selected == c.DRAFT_N36R3_COHORT else
+                  n3.margin_reference(plan) if selected in c.SEPARATE_HEALTH_COHORTS else
                   w.read_ref(authority['accounting'])['inherited_accounting'])
     margin = accounting.retained_margin(accounting_root, margin_ref)
     reservation=accounting.headroom(snap,cohort,retained_margin_hours=margin,protected_hours=protected)
@@ -275,15 +275,17 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
     c.validate_stop_binding(plan)
     if selected == c.DRAFT_RECOVERY_COHORT:
         allowance.update(n36r2_plan=plan, n36r2_authority=authority, n36r2_release_refs=release_refs)
-    if selected == c.DRAFT_N36R3_COHORT:
-        allowance.update(n36r3_plan=plan, n36r3_authority=authority, n36r3_release_refs=release_refs)
+    if selected in c.SEPARATE_HEALTH_COHORTS:
+        key = c.IDENTITIES[selected][0]
+        allowance.update({key + '_plan': plan, key + '_authority': authority,
+                          key + '_release_refs': release_refs})
     c.pre_dispatch(row, allowance, now=now, stop_path=plan['stop_path'], cohort=selected)
     return {**snap, "n36_reservation":reservation}
 
 
 def validate_state(plan, authority, state):
     """Shared owning state gate for independent health and episode transactions."""
-    if c.cohort(plan) == c.DRAFT_N36R3_COHORT:
+    if c.cohort(plan) in c.SEPARATE_HEALTH_COHORTS:
         from scripts.qd_ed_n36r3_admission import owner_root
         owner = owner_root(plan)
         lexical = state.get('worktree')

@@ -65,7 +65,7 @@ def reconcile(plan, events, verify_terminal, *, live_handles=()):
 
 
 def first_c0_boundary(row):
-    return (row.get('iteration') == c.DRAFT_N36R3_COHORT
+    return (row.get('iteration') in c.SEPARATE_HEALTH_COHORTS
             and row.get('task_id') == 0 and row.get('profile') == 'C0')
 
 

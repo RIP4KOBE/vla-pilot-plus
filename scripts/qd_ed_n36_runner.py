@@ -90,7 +90,7 @@ def execute_one(plan_ref, release_ref):
             # STOP/time/accounting checked before even probing the device.
             release.admission(plan, authority, state, events, resources, reservations, row,
                               now=dt.datetime.now(dt.timezone.utc), gpu_idle=True, release_refs=(plan_ref, release_ref))
-            if c.cohort(plan) == c.DRAFT_N36R3_COHORT:
+            if c.cohort(plan) in c.SEPARATE_HEALTH_COHORTS:
                 from scripts.qd_ed_n36r3_admission import validate_readiness
                 validate_readiness(plan_ref, w.read_ref(release_ref), resources=resources)
             else:

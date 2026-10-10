@@ -12,9 +12,12 @@ COHORT = 'N36_NONPROGRESS_TANGENT_DEV_001147'
 RECOVERY_COHORT = 'N36R1_NONPROGRESS_TANGENT_DEV_001203'
 DRAFT_RECOVERY_COHORT = 'N36R2_NONPROGRESS_TANGENT_DEV_001250'
 DRAFT_N36R3_COHORT = 'N36R3_NONPROGRESS_TANGENT_DEV_001314'
+DRAFT_N36R4_COHORT = 'N36R4_NONPROGRESS_TANGENT_DEV_001467'
+SEPARATE_HEALTH_COHORTS = (DRAFT_N36R3_COHORT, DRAFT_N36R4_COHORT)
 IDENTITIES = {COHORT: ('n36', '001147'), RECOVERY_COHORT: ('n36r1', '001203'),
               DRAFT_RECOVERY_COHORT: ('n36r2', '001250'),
-              DRAFT_N36R3_COHORT: ('n36r3', '001314')}
+              DRAFT_N36R3_COHORT: ('n36r3', '001314'),
+              DRAFT_N36R4_COHORT: ('n36r4', '001467')}
 ARMS = ('C0', 'Q0', 'N34', 'N36')
 DEADLINE = '2026-10-11T11:13:13Z'
 GPU_UUID = 'GPU-48473162-9548-1a19-04aa-ea86c5349187'
@@ -92,7 +95,7 @@ def operational_binding(plan):
     if cohort(plan) == COHORT:
         w.require('accounting' not in plan, 'original plan cannot claim recovery accounting')
         return {}
-    return {**({'resource_routing': plan['resource_routing']} if cohort(plan) in (DRAFT_RECOVERY_COHORT, DRAFT_N36R3_COHORT) and 'resource_routing' in plan else {}), 'cohort': cohort(plan), **{k: plan[k] for k in
+    return {**({'resource_routing': plan['resource_routing']} if cohort(plan) in (DRAFT_RECOVERY_COHORT, *SEPARATE_HEALTH_COHORTS) and 'resource_routing' in plan else {}), 'cohort': cohort(plan), **{k: plan[k] for k in
             ('protocol', 'protocol_review', 'accounting')}}
 
 
@@ -144,8 +147,8 @@ def validate_draft(plan):
               'draft cannot claim authority/release')
     validate_stop_binding(plan)
     operational_binding(plan)
-    if cohort(plan) == DRAFT_N36R3_COHORT:
-        validate_n36r3_protocol(plan)
+    if cohort(plan) in SEPARATE_HEALTH_COHORTS:
+        validate_successor_protocol(plan)
     if cohort(plan) == RECOVERY_COHORT:
         from scripts.qd_ed_n36_recovery import validate_protocol
         validate_protocol(plan)
@@ -156,6 +159,13 @@ def validate_draft(plan):
             from scripts.qd_ed_n36r2_draft import validate_protocol
         validate_protocol(plan)
     w.require(set(plan['expected_manifests']) == {r['episode_key'] for r in plan['episodes']}, 'manifest coverage')
+
+
+def validate_successor_protocol(plan):
+    if cohort(plan) == DRAFT_N36R4_COHORT:
+        from scripts.qd_ed_n36r4_admission import validate_protocol
+        return validate_protocol(plan)
+    return validate_n36r3_protocol(plan)
 
 
 def validate_n36r3_protocol(plan):
@@ -226,12 +236,15 @@ def pre_dispatch(row, allowance, *, now, stop_path, cohort=COHORT):
     All *_remaining values must already include prior reservations, health costs
     and charges. Exact owning ledger-to-snapshot arithmetic is a root prerequisite.
     """
-    if cohort == DRAFT_N36R3_COHORT:
-        w.require(allowance.get('n36r3_release_refs') is not None,
+    if cohort in SEPARATE_HEALTH_COHORTS:
+        key = IDENTITIES[cohort][0]
+        w.require(allowance.get(key + '_release_refs') is not None,
                   'N36R3 draft only; separate root bindings required')
         from scripts.qd_ed_n36_release import validate_release
-        plan, _, authority = validate_release(*allowance['n36r3_release_refs'])
-        w.require(plan == allowance['n36r3_plan'] and authority == allowance['n36r3_authority'],
+        plan, _, authority = validate_release(*allowance[key + '_release_refs'])
+        w.require(plan == allowance[key + '_plan'] and authority == allowance[key + '_authority']
+                  and plan.get('cohort', COHORT) == authority['cohort'] == cohort
+                  and row in plan['episodes'],
                   'N36R3 admission detached release differs')
     if cohort == DRAFT_RECOVERY_COHORT:
         from scripts.qd_ed_n36_release import validate_release

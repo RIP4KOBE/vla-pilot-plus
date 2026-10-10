@@ -14,7 +14,7 @@ HEALTH = {'preparation_id': PREPARATION_ID, 'max_invocations': 41,
 
 
 def owner_root(plan):
-    if c.cohort(plan) == c.DRAFT_N36R3_COHORT:
+    if c.cohort(plan) in c.SEPARATE_HEALTH_COHORTS:
         from scripts.qd_ed_n36r3_admission import owner_root as n36r3_owner
         return n36r3_owner(plan)
     if c.cohort(plan) != c.DRAFT_RECOVERY_COHORT:
@@ -100,7 +100,7 @@ def resource_events(plan, resources):
 def child_environment(plan, runtime):
     from scripts import qd_ed_final_runner as r
     env = r.child_environment(runtime)
-    if c.cohort(plan) in (c.DRAFT_RECOVERY_COHORT, c.DRAFT_N36R3_COHORT):
+    if c.cohort(plan) in (c.DRAFT_RECOVERY_COHORT, *c.SEPARATE_HEALTH_COHORTS):
         owner_root(plan)
         source = Path(plan['worktree'])
         env['PYTHONPATH'] = ':'.join(str(source / p) for p in
