@@ -608,6 +608,19 @@ def _recovery_specification(spec):
         projected[key] = historical[key]
     for key in ('preparation', 'runtime_path', 'source_record_path'):
         projected['runtime_binding'][key] = historical['runtime_binding'][key]
+    if spec['runtime_binding'].get('amendment') != historical['runtime_binding'].get('amendment'):
+        from scripts import qd_ed_n36_readiness_prepare as preparation_api
+        # Validate the owning scope and its exact composition before projecting
+        # only these two operational fields. All scientific/accounting fields,
+        # repair authority, base, limits and recovery checks remain immutable.
+        preparation_api.policy(spec)
+        amendment = _recovery_json(_recovery_read(spec['runtime_binding']['amendment']))
+        exact(amendment['schema'], 'n36-disabled-source-scope-composition-v1',
+              'prospective scope composition required')
+        exact(amendment['previous_runtime_amendment'], historical['runtime_binding']['amendment'],
+              'historical scope amendment lineage')
+        for key in ('amendment', 'source_change_allowlist'):
+            projected['runtime_binding'][key] = historical['runtime_binding'][key]
     exact(projected, historical, 'immutable scientific and accounting specification')
     w.require(spec['runtime_binding']['preparation']['path'] !=
               historical['runtime_binding']['preparation']['path'], 'fresh preparation policy path')

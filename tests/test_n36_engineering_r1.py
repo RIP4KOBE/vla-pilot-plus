@@ -1211,3 +1211,105 @@ def test_recovery_prospective_cpu_process_selection(recovery_cpu):
         SOURCE=f.root, SPECIFICATION=selected, reference=f.e.reference, json=json)
     exec(compile(ast.Module(body=[child], type_ignores=[]), str(source), 'exec'), env)
     assert json.loads(env['child_environment']({}, {})['QD_ED_N36_R1_SPECIFICATION']) == selected
+
+
+PROPOSED_SCOPE_SPECIFICATION = {
+    'path': '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/specification.prospective-disabled-v1.json',
+    'sha256': 'd983afb6285c19f7b720b0313316cfb6fc686c5c53dcfe94bac852c09f6d2e6a'}
+
+
+def test_exact_proposed_scope_policy_retains_unassigned_recovery_block(monkeypatch):
+    from scripts import qd_ed_n36_readiness_prepare as preparation
+    spec = e.read(PROPOSED_SCOPE_SPECIFICATION)
+    # Actual proposed bytes and owning approvals, no policy/allowlist mocks.
+    assert preparation.policy(spec)['resource_id'] is None
+    monkeypatch.setattr(e, 'SPECIFICATION', PROPOSED_SCOPE_SPECIFICATION)
+    monkeypatch.setattr(e, 'HISTORICAL_SPECIFICATION', PINNED_SPECIFICATION)
+    with pytest.raises(ValueError, match='prospective specification lineage'):
+        e._recovery_specification(spec)
+
+
+@pytest.fixture
+def prospective_scope_cpu(recovery_multi_cpu):
+    """Real 001808 composition + isolated synthetic recovery, never live proof.
+
+    The exact proposed specification/authority path is exercised by both real
+    admission functions. Only recovery/accounting fixture bytes are substituted,
+    identically in both projections, to avoid reading any owning journal.
+    """
+    from scripts import qd_ed_n36_readiness_prepare as preparation
+    f = recovery_multi_cpu
+    synthetic = copy.deepcopy(f.spec)
+    f.spec.clear()
+    f.spec.update(e.read(PROPOSED_SCOPE_SPECIFICATION))
+    historical = e.read(PINNED_SPECIFICATION)
+    for key in ('prospective_amendment', 'retained_ledger_prefixes', 'retained_snapshot_reference'):
+        historical[key] = f.spec[key] = synthetic[key]
+    for key in ('readiness_recovery', 'recovery_prefix_contract'):
+        f.spec[key] = synthetic[key]
+    f.historical = f.put('SYNTHETIC-scope-historical-spec', historical)
+    prep = e.read(f.spec['runtime_binding']['preparation'])
+    prep.update(resource_id='new', previous_specification=f.historical)
+    f.spec['runtime_binding']['preparation'] = f.put('SYNTHETIC-scope-preparation', prep)
+    f.repin()
+    f.env['HISTORICAL_SPECIFICATION'] = f.historical
+    # AST fixture removes imports; route to the actual production policy body.
+    f.env['preparation_api'] = preparation
+    return f
+
+
+@pytest.mark.parametrize('fault', [None, 'extra_path', 'omitted_path', 'duplicate_path',
+    'expanded_amendment', 'extra_amendment_key', 'scope_authority', 'repair_authority',
+    'wrapper_hash', 'scope_hash', 'old_amendment', 'source_path', 'source_hash',
+    'science', 'accounting', 'measurement_limits', 'release', 'old_resource',
+    'historical_proof', 'policy_deadline'])
+def test_prospective_scope_actual_composition_admission(prospective_scope_cpu, fault):
+    f = prospective_scope_cpu
+    binding = f.spec['runtime_binding']
+    amendment = f.e.read(binding['amendment'])
+    if fault == 'extra_path': binding['source_change_allowlist'].append('scripts/unapproved.py')
+    elif fault == 'omitted_path': binding['source_change_allowlist'].remove('scripts/qd_ed_n36_source.py')
+    elif fault == 'duplicate_path': binding['source_change_allowlist'].append(binding['source_change_allowlist'][0])
+    elif fault == 'expanded_amendment':
+        for key in ('new_allowed_entrypoints', 'exact_source_change_allowlist'):
+            amendment[key].append('scripts/unapproved.py')
+        binding['source_change_allowlist'].append('scripts/unapproved.py')
+    elif fault == 'extra_amendment_key': amendment['approved'] = True
+    elif fault == 'scope_authority':
+        scope = f.e.read(amendment['approved_prospective_scope'])
+        scope['additional_allowed_source_paths'].append('scripts/unapproved.py')
+        amendment['approved_prospective_scope'] = f.put('SYNTHETIC-forged-scope', scope)
+    elif fault == 'repair_authority':
+        authority = f.e.read(binding['repair_authority'])
+        authority['source_base'] = '0' * 40
+        binding['repair_authority'] = f.put('SYNTHETIC-forged-authority', authority)
+    elif fault == 'scope_hash': amendment['approved_prospective_scope']['sha256'] = '0' * 64
+    elif fault == 'source_path': amendment['source']['path'] = '/synthetic/foreign-source.json'
+    elif fault == 'source_hash': amendment['source']['sha256'] = '0' * 64
+    elif fault == 'science': f.spec['scope']['episode']['policy_seed'] += 1
+    elif fault == 'accounting': f.spec['retained_snapshot']['gpu_hours_consumed'] = 0
+    elif fault == 'measurement_limits': binding['measurement_contract']['provider_calls'] = 2
+    elif fault == 'release': f.spec['release_enabled'] = True
+    if fault in ('old_resource', 'historical_proof', 'policy_deadline'):
+        prep = f.e.read(binding['preparation'])
+        historical = f.e.read(f.historical)
+        old_prep = f.e.read(historical['runtime_binding']['preparation'])
+        if fault == 'old_resource': prep['resource_id'] = old_prep['resource_id']
+        elif fault == 'historical_proof': prep['proof_path'] = old_prep['proof_path']
+        else: prep['deadline'] = '2099-01-01T00:00:00Z'
+        binding['preparation'] = f.put('SYNTHETIC-mutated-preparation', prep)
+    binding['amendment'] = f.put('SYNTHETIC-scope-composition', amendment)
+    if fault == 'wrapper_hash': binding['amendment']['sha256'] = '0' * 64
+    elif fault == 'old_amendment': binding['amendment'] = amendment['previous_runtime_amendment']
+    f.repin()
+    f.env['HISTORICAL_SPECIFICATION'] = f.historical
+    before = {path: path.read_bytes() for path in f.data.iterdir()}
+    if fault is None:
+        assert f.e.specification() == f.spec
+        assert not f.spec['scope']['scientific_eligible']
+        assert not f.spec['release_enabled']
+        assert f.old[-1]['provider_calls'] is None
+    else:
+        with pytest.raises((ValueError, FileNotFoundError)):
+            f.e.specification()
+    assert {path: path.read_bytes() for path in f.data.iterdir()} == before

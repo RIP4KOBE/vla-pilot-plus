@@ -57,11 +57,55 @@ def policy(spec):
     e.w.require(binding['schema'] == SCHEMA, 'readiness policy version')
     authority = e.read(binding['repair_authority'])
     amendment = e.read(binding['amendment'])
-    e.exact(authority['amendment'], binding['amendment'], 'readiness amendment authority')
+    prospective = amendment.get('schema') == 'n36-disabled-source-scope-composition-v1'
+    if prospective:
+        # This wrapper is a composition, never a replacement repair authority.
+        # Pin the owning approval, not the source-bound wrapper (which would
+        # introduce a source/commit hash cycle when this implementation changes).
+        turns = '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/'
+        scope_ref = {'path': turns + '001804/source-scope-amendment-v1.json',
+                     'sha256': '6f08e5fb20b9a863ae90fee725a90ad4d8d90699162c148d2d129fda53660178'}
+        e.exact(amendment['approved_prospective_scope'], scope_ref, 'pinned prospective scope authority')
+        scope = e.read(scope_ref)
+        owner_turns = '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/'
+        e.exact(binding['repair_authority'], {
+            'path': owner_turns + '001651/readiness-implementation/authority-v1.json',
+            'sha256': '1da564c70827ed7acfc47e121f67e015b17f86e018c67a3c0c6ac35d5cb45692'},
+            'pinned historical readiness authority')
+        e.exact(amendment['previous_runtime_amendment'], authority['amendment'],
+                'prospective amendment lineage')
+        previous = e.read(authority['amendment'])
+        e.exact(scope['authority'], previous['authority'], 'same owning scope authority')
+        e.read({k: scope['authority'][k] for k in ('path', 'sha256')})
+        delta = ['scripts/qd_ed_n36_source.py', 'tests/test_n36_preparation_binding.py']
+        e.exact(scope['additional_allowed_source_paths'], delta, 'exact prospective scope delta')
+        expected = {x['file'] for x in previous['code_change_scope'][:3]} | set(previous['new_allowed_entrypoints']) | set(delta)
+        # All composition fields are closed; only the final source reference is
+        # rebound by the graph builder. Source adoption/review remains separate.
+        e.read(amendment['source'])
+        e.exact(amendment['source']['path'], binding['source_record_path'], 'prospective source record path')
+        e.exact(amendment, dict(
+            schema='n36-disabled-source-scope-composition-v1', node_id='15.6',
+            approved_prospective_scope=scope_ref,
+            previous_runtime_amendment=authority['amendment'],
+            code_change_scope=previous['code_change_scope'][:3],
+            new_allowed_entrypoints=sorted(set(previous['new_allowed_entrypoints']) | set(delta)),
+            exact_source_change_allowlist=sorted(expected), source_base=authority['source_base'],
+            source=amendment['source'], scientific_source_anchor='1065f38122379a515b60a9a424f574330405b66f',
+            implementation_review={
+                'path': turns + '001807/scoped-root-review-v1.json',
+                'sha256': 'c0abe1ad8f42bdb3e421f8148e1b0c8187ba4c44e9f9ba113bc90066e3fe463c'},
+            new_repair_authority=None, status='DISABLED_PENDING_POLICY_ADMISSION',
+            limitation='Prospective composition only. Existing repair authority pins the old amendment; this document is not a replacement approval.',
+            deployment_authorized=False, gpu_authorized=False, provider_measurement_authorized=False,
+            release_enabled=False, scientific_changes_authorized=False, source_adopted=False),
+            'exact prospective amendment composition')
+    else:
+        e.exact(authority['amendment'], binding['amendment'], 'readiness amendment authority')
+        expected = {x['file'] for x in amendment['code_change_scope'][:3]} | set(amendment['new_allowed_entrypoints'])
     e.exact(authority['source_base'], binding['source_base'], 'readiness source authority')
     e.exact(amendment['source_base'], binding['source_base'], 'readiness amendment base')
     e.exact(binding['mutable_runtime_fields'], FIELDS, 'readiness exact mutable fields')
-    expected = {x['file'] for x in amendment['code_change_scope'][:3]} | set(amendment['new_allowed_entrypoints'])
     e.exact(sorted(binding['source_change_allowlist']), sorted(expected), 'readiness scoped changes')
     value = e.read(binding['preparation'])
     closed(value, ('schema', 'baseline', 'previous_specification', 'disabled_runtime_path',
