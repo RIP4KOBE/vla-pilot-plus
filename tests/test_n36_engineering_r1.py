@@ -256,21 +256,8 @@ def test_plan_runtime_alias_rejected_before_dispatch(documents):
 
 
 def test_parent_source_and_shared_safety_predicates_unchanged():
-    import ast
-    parent_path = Path(parent.__file__)
-    assert e.w.sha(parent_path) == 'd93eed25e93fb4a211180cc9abdc76d767ca278a7663dbedd1f29aee53874af1'
-    def functions(path):
-        return {node.name: ast.dump(node, include_attributes=False)
-                for node in ast.parse(Path(path).read_text()).body if isinstance(node, ast.FunctionDef)}
-    old, new = functions(parent_path), functions(e.__file__)
-    intentional = {'specification', 'validate_audit_view', 'validate_plan_shape', 'validate_authority',
-                   '_journal_suffixes', 'reconcile', 'validate_readiness', 'child_environment'}
-    assert set(old) == set(new) - {'terminal_parent_prefix', 'validate_runtime_binding', 'preparation_health_suffix',
-        '_recovery_json', '_recovery_rows', '_recovery_read', '_recovery_contract',
-        '_recovery_capture', '_recovery_partition', '_recovery_specification', '_recovery_predecessors',
-        '_recovery_inventory', '_recovery_inventory_previous'}
-    for name in old.keys() - intentional:
-        assert new[name] == old[name], name
+    from test_n36_engineering_parity import assert_parent_parity
+    assert_parent_parity(parent.__file__, e.__file__)
     assert e.LIMITS == parent.LIMITS
     assert e.c.WORKER_CONTRACT == parent.c.WORKER_CONTRACT
 
