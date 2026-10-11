@@ -133,7 +133,11 @@ def live_alias(runtime, binding):
 
 
 def verify_alias(receipt, runtime, runtime_receipt, binding):
-    require(receipt.get('schema') == 'n36-source-execution-v2', 'N36 alias receipt schema')
+    _episode_binding(binding)
+    return _verify_alias(receipt, runtime, runtime_receipt, binding)
+
+
+def _episode_binding(binding):
     require(isinstance(binding, dict) and set(binding) == {'context', 'runtime_closure', 'process', 'phase'}
             and binding['phase'] in ('runtime_before', 'runtime_after')
             and all(isinstance(binding[k], dict) and set(binding[k]) == {'path', 'sha256'}
@@ -145,6 +149,10 @@ def verify_alias(receipt, runtime, runtime_receipt, binding):
             and binding['process']['proc_start_ticks'].isdigit()
             and isinstance(binding['process']['boot_id'], str) and bool(binding['process']['boot_id']),
             'N36 alias external binding required')
+
+
+def _verify_alias(receipt, runtime, runtime_receipt, binding):
+    require(receipt.get('schema') == 'n36-source-execution-v2', 'N36 alias receipt schema')
     require(receipt.get('binding') == binding == runtime_receipt.get('binding'),
             'N36 alias context/process/phase differs')
     require(receipt.get('interpreter') == runtime['interpreter'] == interpreter_identity(),
@@ -222,7 +230,12 @@ def live_importlib_aliases(runtime, binding):
 def verify_importlib_aliases(receipt, runtime, runtime_receipt, binding):
     # This also enforces the exact external context/runtime/process/phase shape,
     # receipt binding and current interpreter identity before any exemption.
-    aliases = verify_alias(receipt, runtime, runtime_receipt, binding)
+    _episode_binding(binding)
+    return _verify_importlib_aliases(receipt, runtime, runtime_receipt, binding)
+
+
+def _verify_importlib_aliases(receipt, runtime, runtime_receipt, binding):
+    aliases = _verify_alias(receipt, runtime, runtime_receipt, binding)
     claims = receipt.get('frozen_importlib_aliases')
     require(isinstance(claims, dict)
             and set(claims) == {a for a, _ in IMPORTLIB_FROZEN_PAIRS},
@@ -321,6 +334,95 @@ def attest(root, source, runtime, *, binding=None):
 
 
 def verify_receipt(receipt, root, source, runtime, *, loaded=None, runtime_receipt=None, binding=None, dino_required=False):
+    if runtime_receipt is not None:
+        _episode_binding(binding)
+    return _verify_receipt(receipt, root, source, runtime, loaded=loaded,
+        runtime_receipt=runtime_receipt, binding=binding, dino_required=dino_required,
+        required={'scripts.qd_ed_n36_worker', 'scripts.qd_ed_n36_native',
+                  'scripts.qd_ed_n36_arithmetic', 'scripts.audit_decision_evidence',
+                  'scripts.qd_ed_n36_source'})
+
+
+PREPARATION_MODULES = frozenset({
+    'scripts.qd_ed_n36_readiness_prepare', 'scripts.qd_ed_n36_source',
+    'scripts.qd_ed_n34_source', 'scripts.qd_ed_n36_build',
+    'scripts.qd_ed_n36_engineering_r1', 'scripts.qd_ed_gpu_probe',
+})
+
+
+def _preparation_reference(reference):
+    """Read only externally supplied pins, never infer anchors from receipts."""
+    import json
+    require(isinstance(reference, dict) and set(reference) == {'path', 'sha256'}
+            and isinstance(reference['path'], str) and isinstance(reference['sha256'], str),
+            'N36 preparation reference required')
+    path = Path(reference['path'])
+    require(path.is_absolute() and str(path.resolve()) == str(path) and not path.is_symlink(),
+            'N36 preparation reference path differs')
+    data = path.read_bytes()
+    require(hashlib.sha256(data).hexdigest() == reference['sha256'],
+            'N36 preparation reference bytes differ')
+    return json.loads(data)
+
+
+def verify_preparation_receipt(receipt, root, source, runtime, *, runtime_receipt,
+        native_receipt, release, source_record, runtime_closure, runtime_reference,
+        resource_id, process):
+    """Preparation-only consumption under independently validated release/graph
+    and terminal accounting anchors. This verifies execution evidence, not release
+    authority or acceptance. Historical producer bytes remain historical bytes.
+    """
+    from scripts import qd_ed_n34_source as closure
+    from scripts import qd_ed_n36_build as native
+    from scripts.qd_ed_n36_readiness_prepare import owned_identity
+    owned_identity(process)
+    require(isinstance(resource_id, str) and bool(resource_id),
+            'N36 preparation resource identity required')
+    released = _preparation_reference(release)
+    require(released.get('schema') == 'n36-preparation-measurement-release-v1'
+            and released.get('purpose') == 'readiness_preparation_only'
+            and released.get('approved') is True
+            and released.get('episode_authorized') is False
+            and released.get('health_authorized') is False,
+            'N36 preparation release scope differs')
+    require(released['source_record'] == source_record
+            and released['resource_id'] == resource_id
+            and released['source_cwd'] == str(Path(root).resolve())
+            and released['interpreter'] == runtime['interpreter'],
+            'N36 preparation release anchors differ')
+    require(_preparation_reference(source_record) == source
+            and _preparation_reference(runtime_closure) == runtime,
+            'N36 preparation source/runtime anchors differ')
+    plan = _preparation_reference(released['graph']['plan'])
+    require(plan['source'] == source and plan['worktree'] == str(Path(root).resolve())
+            and plan['runtime_closure'] == runtime_closure
+            and plan['runtime'] == released['graph']['runtime'] == runtime_reference
+            and runtime['runtime'] == runtime_reference,
+            'N36 preparation graph anchors differ')
+    _preparation_reference(runtime_reference)
+    binding = {'release': release, 'source_record': source_record,
+               'resource_id': resource_id, 'process': process, 'phase': 'preparation_after'}
+    for evidence in (receipt, runtime_receipt):
+        require(isinstance(evidence, dict) and isinstance(evidence.get('binding'), dict)
+                and evidence['binding'] == binding, 'N36 preparation receipt binding differs')
+        owned_identity(evidence['binding']['process'])
+    closure.verify_runtime_receipt(runtime, runtime_receipt, binding=binding, after=True)
+    native.verify_receipt(plan['native_build'], native_receipt, after=True)
+    _verify_receipt(receipt, root, source, runtime, runtime_receipt=runtime_receipt,
+                    binding=binding, required=PREPARATION_MODULES)
+    # Names alone do not identify the producer: require its exact source path and
+    # frozen bytes, including every source/native/alias attestor used by it.
+    index = {row['path']: row['sha256'] for row in source['files']}
+    for name in PREPARATION_MODULES:
+        relative = name.replace('.', '/') + '.py'
+        expected = {'module': name, 'path': str(Path(root).resolve() / relative),
+                    'sha256': index.get(relative)}
+        require(expected['sha256'] is not None and expected in receipt['compiled'],
+                'N36 preparation producer identity differs: ' + name)
+
+
+def _verify_receipt(receipt, root, source, runtime, *, required, loaded=None,
+        runtime_receipt=None, binding=None, dino_required=False):
     require(receipt['schema'] == 'n36-source-execution-v2', 'N36 execution receipt schema')
     interpreter = Path(runtime['interpreter']['path']).resolve()
     require(receipt['search_prefix'] == str(interpreter.parent.parent), 'N36 interpreter search prefix')
@@ -363,7 +465,7 @@ def verify_receipt(receipt, root, source, runtime, *, loaded=None, runtime_recei
         from scripts import qd_ed_n34_source as closure
         require(binding is not None, 'N36 external runtime binding required')
         closure.verify_runtime_receipt(runtime, runtime_receipt, binding=binding, after=False)
-        aliases = verify_importlib_aliases(receipt, runtime, runtime_receipt, binding)
+        aliases = _verify_importlib_aliases(receipt, runtime, runtime_receipt, binding)
         observed += [row for name, row in runtime_receipt['modules'].items() if name not in frozen and name not in aliases]
         observed += [e['record'] for e in runtime_receipt['generated_modules'].values()]
     for row in observed:
@@ -373,6 +475,4 @@ def verify_receipt(receipt, root, source, runtime, *, loaded=None, runtime_recei
             continue
         if path.endswith('.py'):
             require((path, row['sha256']) in known, 'N36 module missing executable receipt: ' + path)
-    required = {'scripts.qd_ed_n36_worker', 'scripts.qd_ed_n36_native', 'scripts.qd_ed_n36_arithmetic',
-                'scripts.audit_decision_evidence', 'scripts.qd_ed_n36_source'}
     require(required <= {r['module'] for r in receipt['compiled']}, 'N36 executable receipt coverage')

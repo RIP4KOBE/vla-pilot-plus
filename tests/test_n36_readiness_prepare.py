@@ -74,14 +74,24 @@ def measured(tmp_path, monkeypatch):
     issued = max(p.timestamp(prep['not_before']), p.timestamp(p.MEASUREMENT_CONTRACT['not_before']),
                  p.timestamp(e.read(binding['accounting_contract'])['not_before'])) + 1
     def iso(t): return dt.datetime.fromtimestamp(t, dt.timezone.utc).isoformat()
+    from test_n36_preparation_binding import preparation_evidence
+    from scripts import qd_ed_n36_source as execution
+    source_receipt, _, _, closure, execution_args = preparation_evidence(root / 'execution-fixture')
+    native_ref = execution_args['native_receipt']['manifest']
+    libs = execution_args['native_receipt']['libraries']
+    # Keep the prescribed disabled path while supplying full inert execution evidence.
+    runtime_ref = put(Path(prep['disabled_runtime_path']).parent,
+                      Path(prep['disabled_runtime_path']).stem, {'SYNTHETIC': True})
+    closure['runtime'] = runtime_ref
+    graph = {'native_build': native_ref, 'runtime_closure': put(root, 'closure', closure),
+             'runtime': runtime_ref, 'worktree': str(e.SOURCE), 'source': source}
     release = dict(schema='n36-preparation-measurement-release-v1', approved=True,
         purpose='readiness_preparation_only', specification=e.SPECIFICATION, source_record=source_ref,
         baseline=spec['canonical_runtime'], resource_id=prep['resource_id'], source_cwd=str(e.SOURCE),
         interpreter={'path': str(Path(sys.executable).resolve()), 'sha256': e.w.sha(Path(sys.executable).resolve()),
                      'version': sys.version}, issued_at=iso(issued), expires_at=iso(issued+300), gpu_seconds=60,
         provider_calls=1, episode_authorized=False, health_authorized=False, stop_authority=e.stop.binding(),
-        graph={'plan': put(root, 'inert-plan', {'SYNTHETIC': True}),
-               'runtime': {'path': prep['disabled_runtime_path'], 'sha256': '0'*64}})
+        graph={'plan': put(root, 'inert-plan', graph), 'runtime': runtime_ref})
     def save_path(path, value): return put(Path(path).parent, Path(path).stem, value)
     preparation_authority(root, spec, release)
     review = {**release, 'schema': 'n36-preparation-root-measurement-review-v1', 'decision': 'APPROVED'}
@@ -108,27 +118,18 @@ def measured(tmp_path, monkeypatch):
             'resource_id':prep['resource_id'],'model':'gpt-6-astra','status':'completed',
             'request':put(root, 'synthetic-request-bytes', {'SYNTHETIC':'request'}),
             'response':put(root, 'synthetic-response-bytes', {'SYNTHETIC':'response'})}))
-    from scripts import qd_ed_n36_build as native
-    libs = []
-    for name in (*native.REQUIRED, 'libcuda.so.1'):
-        path=root/name; path.write_bytes(b'SYNTHETIC inert native fixture')
-        libs.append({'path':str(path),'sha256':e.w.sha(path)})
-    libs.sort(key=lambda x:x['path'])
-    native_ref=put(root,'native',dict(schema='n36-native-build-v1',torch_version='SYNTHETIC',cuda_version='SYNTHETIC',torch_build='SYNTHETIC',libraries=libs))
-    module=put(root,'synthetic-module',{'SYNTHETIC':True})
-    closure={'modules':{'synthetic':module},'required_after':['synthetic']}
-    graph={'native_build':native_ref,'runtime_closure':put(root,'closure',closure),
-           'worktree':str(e.SOURCE), 'source':source}
     monkeypatch.setattr(e, 'owner_root', lambda plan: root)
-    from scripts import qd_ed_n36_source as execution
-    # Artifact-unit fixture only; real source guard gets separate negative tests.
-    monkeypatch.setattr(execution, 'verify_receipt', lambda *a, **kw: None)
     (root / 'data').mkdir()
     process = {'pid': 42, 'proc_start_ticks': '100', 'boot_id': '00000000-0000-0000-0000-000000000001'}
     parent = dict(process, pid=41, proc_start_ticks='99')
     verified=[]
     monkeypatch.setattr(p,'verify_graph',lambda *args: (verified.append(args) or graph))
     receipt_binding={'release':release_ref,'source_record':source_ref,'resource_id':prep['resource_id'],'phase':'preparation_after','process':process}
+    source_receipt['binding'] = copy.deepcopy(receipt_binding)
+    source_receipt['frozen_aliases'] = {'os.path': execution.alias_claim(closure, receipt_binding)}
+    source_receipt['frozen_importlib_aliases'] = {
+        alias: execution.importlib_alias_claim(closure, receipt_binding, alias, canonical)
+        for alias, canonical in execution.IMPORTLIB_FROZEN_PAIRS}
     proof=dict(schema='n36-measured-preparation-proof-v2', release=release_ref, baseline=spec['canonical_runtime'],
         source_record=source_ref, native_receipt=put(root,'native-receipt',dict(schema='n36-loaded-native-build-v1',manifest=native_ref,libraries=libs)),
         runtime_receipt=put(root,'runtime-receipt',dict(schema='n34-runtime-receipt-v2',binding=receipt_binding,modules=closure['modules'],generated_modules={})),
@@ -156,7 +157,7 @@ def measured(tmp_path, monkeypatch):
             request=response['request'], response=response['response'], public_policy=e.r.codex_public_config(frozen)))
         envelope = dict(common, schema=p.MEASUREMENT_CONTRACT['schema'], process=process, parent=parent,
             started_at=issued+3.5, finished_at=issued+5.5, transport=transport,
-            source_receipt=put(root, 'synthetic-source-receipt', {'SYNTHETIC':True}),
+            source_receipt=put(root, 'synthetic-source-receipt', source_receipt),
             **{k:proof[k] for k in ('gpu','provider','native_receipt','runtime_receipt','runtime_receipt_binding')})
         proof['measurement_envelope'] = put(root, 'synthetic-envelope', envelope)
         events=[]

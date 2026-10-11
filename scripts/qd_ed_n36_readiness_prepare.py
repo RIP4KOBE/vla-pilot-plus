@@ -973,11 +973,27 @@ def verify_envelope(proof, plan, common, events):
     e.exact(transport['public_policy'], e.r.codex_public_config(frozen), 'provider transport policy')
     e.exact(transport['preflight'], {'cli_sha256': frozen['cli_sha256'], 'cli_version': frozen['cli_version'],
         'login_mode': 'current_official_chatgpt_login'}, 'provider actual preflight binding')
-    from scripts import qd_ed_n36_source as execution
-    execution.verify_receipt(e.read(envelope['source_receipt']), Path(plan['worktree']), plan['source'],
-        e.read(plan['runtime_closure']), runtime_receipt=e.read(proof['runtime_receipt']),
-        binding=proof['runtime_receipt_binding'])
+    verify_execution_receipts(envelope, proof, plan, common, events[-1]['process'])
     return envelope
+
+
+def verify_execution_receipts(envelope, proof, plan, common, process):
+    """Join the three retained receipts to externally checked terminal anchors."""
+    from scripts import qd_ed_n36_source as execution
+    expected = {'release': common['release'], 'source_record': common['source_record'],
+                'resource_id': common['resource_id'], 'phase': 'preparation_after', 'process': process}
+    for name in ('native_receipt', 'runtime_receipt'):
+        e.exact(envelope[name], proof[name], 'preparation receipt linkage ' + name)
+    e.exact(envelope['process'], process, 'preparation terminal process')
+    e.exact(envelope['runtime_receipt_binding'], expected, 'preparation envelope binding')
+    e.exact(proof['runtime_receipt_binding'], expected, 'preparation proof binding')
+    execution.verify_preparation_receipt(
+        e.read(envelope['source_receipt']), Path(plan['worktree']), plan['source'],
+        e.read(plan['runtime_closure']), runtime_receipt=e.read(proof['runtime_receipt']),
+        native_receipt=e.read(proof['native_receipt']), release=common['release'],
+        source_record=common['source_record'], runtime_closure=plan['runtime_closure'],
+        runtime_reference=plan['runtime'], resource_id=common['resource_id'],
+        process=process)
 
 
 def main():
