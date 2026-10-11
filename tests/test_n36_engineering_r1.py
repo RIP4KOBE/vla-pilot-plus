@@ -1253,8 +1253,6 @@ def prospective_scope_cpu(recovery_multi_cpu):
     f.spec['runtime_binding']['preparation'] = f.put('SYNTHETIC-scope-preparation', prep)
     f.repin()
     f.env['HISTORICAL_SPECIFICATION'] = f.historical
-    # AST fixture removes imports; route to the actual production policy body.
-    f.env['preparation_api'] = preparation
     return f
 
 
@@ -1263,7 +1261,7 @@ def prospective_scope_cpu(recovery_multi_cpu):
     'wrapper_hash', 'scope_hash', 'old_amendment', 'source_path', 'source_hash',
     'science', 'accounting', 'measurement_limits', 'release', 'old_resource',
     'historical_proof', 'policy_deadline'])
-def test_prospective_scope_actual_composition_admission(prospective_scope_cpu, fault):
+def test_prospective_scope_actual_composition_admission(prospective_scope_cpu, monkeypatch, fault):
     f = prospective_scope_cpu
     binding = f.spec['runtime_binding']
     amendment = f.e.read(binding['amendment'])
@@ -1303,13 +1301,16 @@ def test_prospective_scope_actual_composition_admission(prospective_scope_cpu, f
     elif fault == 'old_amendment': binding['amendment'] = amendment['previous_runtime_amendment']
     f.repin()
     f.env['HISTORICAL_SPECIFICATION'] = f.historical
+    monkeypatch.setattr(e, 'SPECIFICATION', f.env['SPECIFICATION'])
+    monkeypatch.setattr(e, 'HISTORICAL_SPECIFICATION', f.historical)
+    monkeypatch.setattr(e, 'AMENDMENT', f.env['AMENDMENT'])
     before = {path: path.read_bytes() for path in f.data.iterdir()}
     if fault is None:
-        assert f.e.specification() == f.spec
+        assert e.specification() == f.spec
         assert not f.spec['scope']['scientific_eligible']
         assert not f.spec['release_enabled']
         assert f.old[-1]['provider_calls'] is None
     else:
         with pytest.raises((ValueError, FileNotFoundError)):
-            f.e.specification()
+            e.specification()
     assert {path: path.read_bytes() for path in f.data.iterdir()} == before
