@@ -7,6 +7,7 @@ No device, provider, model, credential or owner-journal access occurs.
 """
 import copy
 import datetime as dt
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -18,6 +19,86 @@ from scripts import qd_ed_n36_engineering_r1 as e
 from test_n36_engineering import put
 
 REAL_VERIFY_GRAPH = p.verify_graph
+
+
+def measured_specification(root, monkeypatch):
+    """Pin fixture data before validation; never select the live owner partition.
+
+    The committed disabled template supplies immutable policy references. A local
+    retained failed preparation and its successor exercise the real recovery
+    validators, including charges, byte offsets and complete journal captures.
+    These synthetic documents are not operational recovery/adoption authority.
+    """
+    template = Path(__file__).resolve().parents[1] / 'configs/qd_ed_final/n36_engineering_r1_spec.disabled.json'
+    spec = e.read({'path': str(template),
+                   'sha256': 'faa00c491bf16f655bcbd7b15bc1ce5a80f23e351ce8834fa5c47ba923037363'})
+    data = root / 'data'
+    data.mkdir()
+    empty_sha = hashlib.sha256(b'').hexdigest()
+    prefixes = {}
+    for name in e.JOURNALS:
+        path = data / name
+        path.write_bytes(b'')
+        prefixes[name] = dict(path=str(path), bytes=0, sha256=empty_sha)
+    old_id = 'SYNTHETIC-consumed-preparation'
+    rows = [dict(resource_id=old_id, kind='readiness_preparation', event=event,
+                 telemetry_complete=event != 'aborted', provider_calls=1 if event == 'aborted' else 0,
+                 gpu_process_wall_seconds=162.0 if event == 'aborted' else 0)
+            for event in ('reserved', 'dispatched', 'aborted')]
+    raw = ''.join(json.dumps(row, sort_keys=True) + '\n' for row in rows).encode()
+    retained = root / 'SYNTHETIC-retained-preparation.jsonl'
+    retained.write_bytes(raw)
+    raw_ref = dict(path=str(retained), sha256=e.w.sha(retained))
+    own = data / 'readiness-preparation-ledger.jsonl'
+    own.write_bytes(raw)
+    (data / e.JOURNALS[1]).write_bytes(raw)
+    observed = {name: dict(path=str(data / name), bytes=(data / name).stat().st_size,
+                           sha256=e.w.sha(data / name)) for name in e.JOURNALS}
+    segments, offset = [], 0
+    for row, line in zip(rows, raw.splitlines(keepends=True)):
+        segments.append(dict(event=row['event'], bytes=len(line),
+            global_start_inclusive=offset, global_end_exclusive=offset + len(line),
+            own_start_inclusive=offset, own_end_exclusive=offset + len(line),
+            sha256=hashlib.sha256(line).hexdigest()))
+        offset += len(line)
+    amendment = put(root, 'SYNTHETIC-partition-amendment', dict(ledger_prefixes=prefixes))
+    snapshot = e.r.budget_snapshot([], [])
+    snapshot_ref = put(root, 'SYNTHETIC-retained-snapshot', snapshot)
+    resource_id = e.read(spec['runtime_binding']['preparation'])['resource_id']
+    identity = put(root, 'SYNTHETIC-recovery-identity', dict(resource_id=resource_id,
+        recovery_of=[old_id], retained_charge_gpu_hours=162.0 / 3600))
+    review = put(root, 'SYNTHETIC-partition-review', dict(SYNTHETIC_NOT_AUTHORITY=True))
+    reconciliation = put(root, 'SYNTHETIC-partition-reconciliation', dict(
+        schema='n36-recovery-binding-review-terminal-reconciliation-v1', review=review,
+        live_handles=[], root_accepts_blocking_findings=True, ledger_prefixes=observed))
+    def segment(path):
+        return dict(path=str(path), start_inclusive=0, end_exclusive=len(raw), sha256=raw_ref['sha256'])
+    contract = dict(schema='n36-failed-readiness-recovery-prefix-contract-v2',
+        accepted_review=review, amendment=amendment, drafting_authority=review,
+        full_ledgers_required_for_budget_snapshots=True, gpu_authorized=False,
+        identity=identity, original_ledger_prefixes=prefixes,
+        own_journal_at_draft=dict(path=str(own), bytes=len(raw), sha256=raw_ref['sha256']),
+        predecessors=[dict(consumed=True, events=['reserved', 'dispatched', 'aborted'],
+            global_health_segment=segment(data / e.JOURNALS[1]), kind='readiness_preparation',
+            own_journal=segment(own), provider_calls_retained=1, raw_bytes=len(raw), raw_sequence=raw_ref,
+            resource_id=old_id, retained_charge_gpu_hours=162.0 / 3600, retained_charge_gpu_seconds=162.0,
+            row_segments=segments, rows=rows, telemetry_complete=False)],
+        production_authority=False, provider_measurement_authorized=False, read_semantics=[],
+        release_enabled=False, retained_snapshot_reference=snapshot_ref,
+        root_observed_ledger_prefixes=observed, root_terminal_reconciliation=reconciliation,
+        scientific_success=False, status='SYNTHETIC_NOT_AUTHORITY',
+        successor=dict(automatic_retry=False, kind='readiness_preparation',
+            occurrences_in_complete_ledgers={name: 0 for name in (*e.JOURNALS, own.name)},
+            resource_id=resource_id, unconsumed_at_draft=True))
+    spec.update(prospective_amendment=amendment, readiness_recovery=identity,
+        retained_ledger_prefixes=prefixes, retained_snapshot=snapshot,
+        retained_snapshot_reference=snapshot_ref,
+        recovery_prefix_contract=put(root, 'SYNTHETIC-partition-contract', contract))
+    selected = put(root, 'SYNTHETIC-selected-spec', spec)
+    monkeypatch.setattr(e, 'AMENDMENT', amendment)
+    monkeypatch.setattr(e, 'SPECIFICATION', selected)
+    monkeypatch.setattr(e, 'HISTORICAL_SPECIFICATION', selected)
+    return e.specification(), raw
 
 
 def preparation_authority(root, spec, release):
@@ -46,7 +127,7 @@ def preparation_authority(root, spec, release):
 def measured(tmp_path, monkeypatch):
     root = tmp_path / 'SYNTHETIC_NOT_AUTHORITY'
     root.mkdir()
-    spec = e.specification()
+    spec, retained_raw = measured_specification(root, monkeypatch)
     binding = spec['runtime_binding']
     prep = e.read(binding['preparation'])
     baseline = e.read(spec['canonical_runtime'])
@@ -68,6 +149,7 @@ def measured(tmp_path, monkeypatch):
     binding['source_record_path'] = str(root / 'source.json')
     binding['preparation'] = put(root, 'policy', prep)
     monkeypatch.setattr(e, 'SPECIFICATION', put(root, 'spec', spec))
+    monkeypatch.setattr(e, 'HISTORICAL_SPECIFICATION', e.SPECIFICATION)
     source = e.b.closure.source_record(e.b.ROOT, e.b.source_paths(e.b.ROOT))
     monkeypatch.setattr(e, 'SOURCE', e.b.ROOT)
     source_ref = put(root, 'source', source)
@@ -119,7 +201,6 @@ def measured(tmp_path, monkeypatch):
             'request':put(root, 'synthetic-request-bytes', {'SYNTHETIC':'request'}),
             'response':put(root, 'synthetic-response-bytes', {'SYNTHETIC':'response'})}))
     monkeypatch.setattr(e, 'owner_root', lambda plan: root)
-    (root / 'data').mkdir()
     process = {'pid': 42, 'proc_start_ticks': '100', 'boot_id': '00000000-0000-0000-0000-000000000001'}
     parent = dict(process, pid=41, proc_start_ticks='99')
     verified=[]
@@ -171,11 +252,12 @@ def measured(tmp_path, monkeypatch):
                 process=process if terminal else None, parent=parent, **({'error':None} if terminal else {})))
         proof['accounting']=save_path(prep['accounting_path'],events)
         for name in ('readiness-preparation-ledger.jsonl','gpu-healthcheck-ledger.jsonl'):
-            (root/'data'/name).write_text(''.join(json.dumps(v)+'\n' for v in events))
+            (root/'data'/name).write_bytes(retained_raw + ''.join(json.dumps(v)+'\n' for v in events).encode())
         return save_path(prep['proof_path'],proof)
     proof_ref=bind()
     return dict(root=root,spec=spec,prep=prep,source=source,source_ref=source_ref,proof=proof,proof_ref=proof_ref,
-                gpu=gpu,provider=provider,bind=bind,save=save_path,now=issued+10,verified=verified,release=release)
+                gpu=gpu,provider=provider,bind=bind,save=save_path,now=issued+10,verified=verified,release=release,
+                source_receipt=source_receipt,retained_raw=retained_raw)
 
 
 def derive(m):
@@ -193,9 +275,39 @@ def test_exact_measured_derivation_and_disabled_baseline(measured):
     assert ready['preparation']['readiness_proof']==m['proof_ref']
     assert Path(m['spec']['canonical_runtime']['path']).read_bytes()==before
     assert json.loads(before)['provider_ready'] is False
+    for name in ('readiness-preparation-ledger.jsonl', 'gpu-healthcheck-ledger.jsonl'):
+        assert (m['root'] / 'data' / name).read_bytes().startswith(m['retained_raw'])
+    rows = p.journal_rows(m['root'])
+    assert rows[2]['event'] == 'aborted' and rows[2]['telemetry_complete'] is False
+    assert e.r.budget_snapshot([], rows)['gpu_healthcheck_hours'] == (162.0 + 3.0) / 3600
     baseline=json.loads(before)
     for key in ('files','tasks','environment','frozen_stage_provider','stage_condition'):
         assert ready[key]==baseline[key]
+
+
+@pytest.mark.parametrize('fault', ['binding', 'producer'])
+def test_measured_derivation_reaches_real_receipt_verifier(measured, fault):
+    m = measured
+    if fault == 'binding':
+        m['source_receipt']['binding']['resource_id'] = 'SYNTHETIC-foreign'
+        reason = 'N36 preparation receipt binding differs'
+    else:
+        m['source_receipt']['compiled'] = [row for row in m['source_receipt']['compiled']
+            if row['module'] != 'scripts.qd_ed_n36_readiness_prepare']
+        reason = 'N36 executable receipt coverage'
+    m['proof_ref'] = m['bind']()
+    with pytest.raises(ValueError, match=reason):
+        derive(m)
+    assert m['verified']
+
+
+def test_measured_partition_rejects_foreign_journal_row(tmp_path, monkeypatch):
+    spec, retained_raw = measured_specification(tmp_path, monkeypatch)
+    assert e.specification() == spec
+    path = tmp_path / 'data/gpu-healthcheck-ledger.jsonl'
+    path.write_bytes(retained_raw + b'{"resource_id":"SYNTHETIC-foreign","kind":"readiness_preparation"}\n')
+    with pytest.raises(ValueError, match='foreign resource identity outside retained recovery partition'):
+        e.specification()
 
 
 @pytest.mark.parametrize('mutation',['stale','future','source','gpu','ordinal','egl','provider','auth','model',
