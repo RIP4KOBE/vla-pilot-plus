@@ -124,7 +124,7 @@ def preparation_authority(root, spec, release):
 
 
 @pytest.fixture
-def measured(tmp_path, monkeypatch):
+def measured(tmp_path, monkeypatch, request):
     root = tmp_path / 'SYNTHETIC_NOT_AUTHORITY'
     root.mkdir()
     spec, retained_raw = measured_specification(root, monkeypatch)
@@ -153,6 +153,17 @@ def measured(tmp_path, monkeypatch):
     source = e.b.closure.source_record(e.b.ROOT, e.b.source_paths(e.b.ROOT))
     monkeypatch.setattr(e, 'SOURCE', e.b.ROOT)
     source_ref = put(root, 'source', source)
+    if getattr(request, 'param', None) == 'prospective_scope':
+        # Current source requires the actual owning prospective scope approval;
+        # the historical allowlist correctly cannot admit its two extra paths.
+        from test_n36_engineering_r1 import PROPOSED_SCOPE_SPECIFICATION
+        proposed = e.read(PROPOSED_SCOPE_SPECIFICATION)['runtime_binding']
+        composition = e.read(proposed['amendment'])
+        composition['source'] = source_ref
+        binding['amendment'] = put(root, 'SYNTHETIC-prospective-composition', composition)
+        binding['source_change_allowlist'] = proposed['source_change_allowlist']
+        monkeypatch.setattr(e, 'SPECIFICATION', put(root, 'spec', spec))
+        monkeypatch.setattr(e, 'HISTORICAL_SPECIFICATION', e.SPECIFICATION)
     issued = max(p.timestamp(prep['not_before']), p.timestamp(p.MEASUREMENT_CONTRACT['not_before']),
                  p.timestamp(e.read(binding['accounting_contract'])['not_before'])) + 1
     def iso(t): return dt.datetime.fromtimestamp(t, dt.timezone.utc).isoformat()
@@ -397,6 +408,7 @@ def test_missing_real_graph_fails_without_devices(measured,monkeypatch):
         p.verify_graph(measured['release'],measured['source'],e.read(measured['spec']['canonical_runtime']))
 
 
+@pytest.mark.parametrize('measured', ['prospective_scope'], indirect=True)
 @pytest.mark.parametrize('mutation', ['valid', 'unlisted', 'boolean_only', 'gpu_mapping', 'provider', 'wrong_source'])
 def test_engineering_admission_of_exact_measured_projection(measured, monkeypatch, mutation):
     m = measured
