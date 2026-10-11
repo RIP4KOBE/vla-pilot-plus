@@ -34,7 +34,7 @@ OWNER_ROUTE_MAPPING = {
     'path': str(OWNER.parent / 'autonomy_20261004/turns/001352/owner-alias-repair/alias-evidence-v1.json'),
     'sha256': '70097b35181e55589df8bb053857b11840f08542fb8ed8bec57635ba493b22a2'}
 HISTORICAL_OWNER = '/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z'
-SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001694/preparation-accounting-repair/engineering-r1-spec.prospective-disabled-v7.json', 'sha256': 'faa00c491bf16f655bcbd7b15bc1ce5a80f23e351ce8834fa5c47ba923037363'}
+SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001730/recovery-prefix-contract/engineering-r1-spec.canonical-prospective-disabled-v2.json', 'sha256': '6eab17b8f8701ccea6cb5e9eb21f787873ec1d79d6612d775446ceb570e8dce1'}
 AMENDMENT = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001616/prospective-recovery-amendment-v1.json', 'sha256': 'fe3c11c3a4be56f74149dc7e21a59eef59611478841d0fa8993bc79f8760e5ba'}
 IDENTITY = 'N36_ENGINEERING_R1_C0_TASK0_001616'
 EPISODE_KEY = 'n36_engineering_r1_t00_c0_001616'
@@ -87,6 +87,13 @@ def specification():
     spec = read(SPECIFICATION)
     exact(spec['prospective_amendment'], AMENDMENT, 'R1 pinned amendment')
     read(AMENDMENT)
+    recovery = _recovery_contract(spec)
+    if recovery is not None:
+        # Preparation admission also reads this specification under its operation
+        # lock. Validate retained bytes before spending; successor absence in the
+        # attempt/health/own journals remains the existing initial-use gate.
+        root = Path(recovery['predecessor']['own_journal']['path']).parent
+        _recovery_capture(recovery, root)
     return spec
 
 
@@ -551,6 +558,181 @@ def resource_events(plan, events):
     return events
 
 
+def _recovery_json(data):
+    """Strict JSON for captured recovery evidence, including nested duplicate keys."""
+    def pairs(items):
+        result = {}
+        for key, value in items:
+            w.require(key not in result, 'duplicate recovery JSON key')
+            result[key] = value
+        return result
+    value = json.loads(data, object_pairs_hook=pairs)
+    w.canonical_sha(value)  # Reject nonfinite numbers, including exponent overflow.
+    return value
+
+
+def _recovery_rows(data):
+    w.require(not data or data.endswith(b'\n'), 'torn recovery journal')
+    rows = [_recovery_json(line) for line in data.splitlines()]
+    w.require(all(isinstance(row, dict) for row in rows), 'malformed recovery row')
+    return rows
+
+
+def _recovery_read(ref):
+    reference(ref)
+    path = Path(ref['path'])
+    w.require(path.is_file() and not path.is_symlink(), 'recovery reference path')
+    data = path.read_bytes()
+    w.require(hashlib.sha256(data).hexdigest() == ref['sha256'], 'recovery reference hash')
+    return data
+
+
+def _recovery_contract(spec):
+    if 'recovery_prefix_contract' not in spec:
+        return None
+    contract = _recovery_json(_recovery_read(spec['recovery_prefix_contract']))
+    keys = ('accepted_review amendment drafting_authority full_ledgers_required_for_budget_snapshots '
+            'gpu_authorized identity original_ledger_prefixes own_journal_at_draft predecessor '
+            'production_authority provider_measurement_authorized read_semantics release_enabled '
+            'retained_snapshot_reference root_observed_ledger_prefixes root_terminal_reconciliation '
+            'schema scientific_success status successor').split()
+    w.require(isinstance(contract, dict) and set(contract) == set(keys), 'closed recovery contract')
+    exact(contract['schema'], 'n36-failed-readiness-recovery-prefix-contract-v1', 'recovery schema')
+    for key in ('gpu_authorized', 'production_authority', 'provider_measurement_authorized',
+                'release_enabled', 'scientific_success'):
+        exact(contract[key], False, 'historical recovery is not authority')
+    exact(contract['full_ledgers_required_for_budget_snapshots'], True, 'complete recovery budgets')
+    exact(contract['amendment'], AMENDMENT, 'original recovery amendment')
+    exact(contract['identity'], spec['readiness_recovery'], 'bound recovery identity')
+    exact(contract['original_ledger_prefixes'], spec['retained_ledger_prefixes'], 'original recovery offsets')
+    amendment = _recovery_json(_recovery_read(AMENDMENT))
+    exact(contract['original_ledger_prefixes'], amendment['ledger_prefixes'], 'unchanged amendment offsets')
+    exact(contract['retained_snapshot_reference'], spec['retained_snapshot_reference'], 'original recovery snapshot')
+    identity = _recovery_json(_recovery_read(contract['identity']))
+    reconciliation = _recovery_json(_recovery_read(contract['root_terminal_reconciliation']))
+    exact(reconciliation['schema'], 'n36-recovery-binding-review-terminal-reconciliation-v1',
+          'root recovery reconciliation schema')
+    exact({k: reconciliation['review'][k] for k in ('path', 'sha256')},
+          contract['accepted_review'], 'root accepted recovery review')
+    _recovery_read(contract['accepted_review'])
+    exact(reconciliation['live_handles'], [], 'historically reconciled handles')
+    exact(reconciliation['root_accepts_blocking_findings'], True, 'root recovery findings')
+    exact(reconciliation['ledger_prefixes'], contract['root_observed_ledger_prefixes'], 'root recovery anchors')
+    predecessor, successor = contract['predecessor'], contract['successor']
+    w.require(set(predecessor) == set(('consumed events global_health_segment kind own_journal '
+        'provider_calls_retained raw_bytes raw_sequence resource_id retained_charge_gpu_hours '
+        'retained_charge_gpu_seconds row_segments rows telemetry_complete').split()), 'closed predecessor')
+    exact(successor, dict(automatic_retry=False, kind='readiness_preparation',
+        occurrences_in_complete_ledgers={name: 0 for name in (*JOURNALS, 'readiness-preparation-ledger.jsonl')},
+        resource_id=identity['resource_id'], unconsumed_at_draft=True), 'explicit recovery successor')
+    w.require(predecessor['resource_id'] == identity['recovery_of'] != successor['resource_id'],
+              'explicit recovery predecessor')
+    exact(predecessor['kind'], 'readiness_preparation', 'predecessor kind')
+    exact(predecessor['events'], ['reserved', 'dispatched', 'aborted'], 'terminal predecessor order')
+    exact(predecessor['consumed'], True, 'consumed predecessor')
+    exact(predecessor['telemetry_complete'], False, 'retained unknown telemetry')
+    exact(predecessor['retained_charge_gpu_hours'], identity['retained_charge_gpu_hours'], 'retained identity charge')
+    policy = _recovery_json(_recovery_read(spec['runtime_binding']['preparation']))
+    exact(policy['resource_id'], successor['resource_id'], 'bound recovery policy successor')
+    # identity.source is historical provenance. Current source is validated later.
+    return contract
+
+
+def _recovery_capture(contract, root):
+    """Capture and authenticate raw journals; caller holds owner operation lock.
+
+    Recheck captures before returning. This does not grant readiness or require
+    the successor to stay absent after its separately authorized initial use.
+    """
+    predecessor = contract['predecessor']
+    identity = contract['successor']['resource_id']
+    captures = {}
+    for name in (*JOURNALS, 'readiness-preparation-ledger.jsonl'):
+        path = root / name
+        w.require(path.is_file() and not path.is_symlink(), 'recovery journal path')
+        captures[name] = path.read_bytes()
+    for name in JOURNALS:
+        data = captures[name]
+        for anchors in (contract['original_ledger_prefixes'], contract['root_observed_ledger_prefixes']):
+            anchor = anchors[name]
+            w.require(anchor['path'] == str(root / name) and type(anchor['bytes']) is int
+                      and 0 <= anchor['bytes'] <= len(data), 'recovery anchor route/offset')
+            prefix = data[:anchor['bytes']]
+            w.require(hashlib.sha256(prefix).hexdigest() == anchor['sha256'], 'recovery anchor bytes')
+            w.require(not prefix or prefix.endswith(b'\n'), 'torn recovery anchor')
+    raw = _recovery_read(predecessor['raw_sequence'])
+    w.require(type(predecessor['raw_bytes']) is int and len(raw) == predecessor['raw_bytes'],
+              'recovery retained raw length')
+    own = captures['readiness-preparation-ledger.jsonl']
+    global_raw = captures[JOURNALS[1]]
+    offset = contract['original_ledger_prefixes'][JOURNALS[1]]['bytes']
+    for segment, name, begin in ((predecessor['own_journal'], 'readiness-preparation-ledger.jsonl', 0),
+                                (predecessor['global_health_segment'], JOURNALS[1], offset)):
+        exact(segment, dict(path=str(root / name), start_inclusive=begin,
+              end_exclusive=begin + len(raw), sha256=predecessor['raw_sequence']['sha256']),
+              'exact predecessor segment')
+        w.require(captures[name][begin:begin+len(raw)] == raw, 'exact retained predecessor bytes')
+    exact(contract['own_journal_at_draft'], dict(path=str(root / 'readiness-preparation-ledger.jsonl'),
+          bytes=len(raw), sha256=predecessor['raw_sequence']['sha256']), 'historical own anchor')
+    lines = raw.splitlines(keepends=True)
+    w.require(len(lines) == len(predecessor['row_segments']) == 3, 'three retained raw rows')
+    cursor = 0
+    for line, event, segment in zip(lines, predecessor['events'], predecessor['row_segments']):
+        exact(segment, dict(bytes=len(line), event=event, global_end_exclusive=offset+cursor+len(line),
+            global_start_inclusive=offset+cursor, own_end_exclusive=cursor+len(line),
+            own_start_inclusive=cursor, sha256=hashlib.sha256(line).hexdigest()), 'retained row offsets/hash')
+        cursor += len(line)
+    retained = _recovery_rows(raw)
+    exact(retained, predecessor['rows'], 'typed retained predecessor rows')
+    exact([row['event'] for row in retained], predecessor['events'], 'retained event sequence')
+    w.require(all(row['resource_id'] == predecessor['resource_id'] and
+                  row['kind'] == predecessor['kind'] for row in retained), 'retained row identity')
+    terminal = retained[-1]
+    exact(terminal['telemetry_complete'], False, 'retained terminal telemetry')
+    exact(terminal['provider_calls'], predecessor['provider_calls_retained'], 'retained provider calls')
+    exact(terminal['gpu_process_wall_seconds'], predecessor['retained_charge_gpu_seconds'], 'retained seconds')
+    exact(terminal['gpu_process_wall_seconds'] / 3600, predecessor['retained_charge_gpu_hours'], 'retained hours')
+    parsed = {name: _recovery_rows(data) for name, data in captures.items()}
+    for name in (JOURNALS[0], JOURNALS[2]):
+        w.require(not any(value in (row.get('resource_id'), row.get('attempt_id'), row.get('episode_key'))
+                          for row in parsed[name] for value in (identity, predecessor['resource_id'])),
+                  'recovery identity outside resource journals')
+    current_raw = own[len(raw):]
+    tail = global_raw[offset+len(raw):]
+    w.require(tail[:len(current_raw)] == current_raw, 'raw current preparation mirror equality')
+    current = _recovery_rows(current_raw)
+    current_mirror, health = [], []
+    for row in _recovery_rows(tail):
+        pair = (row.get('resource_id'), row.get('kind'))
+        if pair == (identity, 'readiness_preparation'):
+            w.require(not health, 'recovery preparation before health')
+            current_mirror.append(row)
+        elif pair == (HEALTH_ID, HEALTH_KIND):
+            health.append(row)
+        else:
+            raise ValueError('foreign resource identity outside retained recovery partition')
+    exact(current, current_mirror, 'complete current preparation mirror')
+    exact(parsed['readiness-preparation-ledger.jsonl'], retained + current, 'complete own partition')
+    for name, data in captures.items():
+        w.require((root / name).read_bytes() == data, 'recovery journal changed during capture')
+    return parsed, _recovery_rows(tail), current
+
+
+def _recovery_partition(plan, spec, policy, baseline, resources):
+    """Partition authenticated bytes without changing any budget ledger input."""
+    contract = _recovery_contract(spec)
+    if contract is None:
+        return resources[len(baseline[JOURNALS[1]]):], None
+    exact(baseline, terminal_parent_prefix(), 'recovery original terminal baseline')
+    exact(policy['resource_id'], contract['successor']['resource_id'], 'recovery policy successor')
+    root = owner_root(plan) / 'data'
+    parsed, tail, current = _recovery_capture(contract, root)
+    exact(resources, parsed[JOURNALS[1]], 'complete resource capture equality')
+    for name in JOURNALS:
+        exact(parsed[name][:len(baseline[name])], baseline[name], 'recovery baseline capture')
+    return tail, (parsed['readiness-preparation-ledger.jsonl'], current)
+
+
 def preparation_health_suffix(plan, baseline, resources):
     """One strict partition for admission and terminal readiness; never rebases costs.
 
@@ -568,8 +750,9 @@ def preparation_health_suffix(plan, baseline, resources):
     w.require(identity not in (HEALTH_ID, EPISODE_KEY)
               and not any(identity in (x.get('resource_id'), x.get('attempt_id'), x.get('episode_key'))
                           for x in historical), 'preparation identity collision with retained history')
+    suffix, captured_own = _recovery_partition(plan, spec, policy, baseline, resources)
     prep, health = [], []
-    for event in resources[len(old):]:
+    for event in suffix:
         pair = (event.get('resource_id'), event.get('kind'))
         if pair == (identity, 'readiness_preparation'):
             w.require(not health, 'preparation must precede health reservation')
@@ -579,6 +762,11 @@ def preparation_health_suffix(plan, baseline, resources):
         else:
             raise ValueError('foreign resource identity/kind in strict suffix')
     own = preparation.journal_rows(owner_root(plan))
+    if captured_own is not None:
+        # Keep the existing whole-own lifecycle/budget validator active, then
+        # compare its read to the authenticated capture before partitioning.
+        exact(own, captured_own[0], 'complete preparation journal capture equality')
+        own = captured_own[1]
     exact(own, prep, 'exact preparation journal/mirror suffix equality')
     if not prep:
         w.require(not health, 'health requires accepted preparation history')
