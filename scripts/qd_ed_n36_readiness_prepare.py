@@ -642,6 +642,40 @@ def boundary(release_ref, spec, source_ref, source, release, plan):
     e.read(plan['runtime'])
 
 
+def import_required_after(closure):
+    """Initialize admitted producers before requiring their generated modules.
+
+    This is import preparation, not attestation. The caller must still collect
+    the unchanged native, runtime and source receipts before accepting evidence.
+    No import failure is deferred or suppressed, including transitive failures.
+    """
+    import importlib
+    audit = e.b.closure
+    audit._generated_runtime(closure)
+    aliases = audit._alias_rules(closure)
+    generated = closure.get('generated_modules', {})
+    required = closure['required_after']
+    e.w.require(set(required) <= set(closure['modules']) | set(generated) | set(aliases),
+                'unknown required runtime module')
+    # The existing generated rule admits exactly this Torch implementation.
+    # Its instantiator import alone does not call the template generator; the
+    # remote_module module's initialization does. Never infer a producer from
+    # an untrusted module name or add its bytes to the closure here.
+    if audit.GENERATED_NAME in generated:
+        producer = 'torch.distributed.nn.api.remote_module'
+        e.w.require(producer in closure['modules'], 'generated producer not frozen')
+        path = audit._runtime_file(closure['modules'][producer])
+        importlib.import_module(producer)
+        audit._live_source(producer, path)
+        inventory = audit._generated_runtime(closure)
+        e.w.require(audit.GENERATED_NAME in inventory,
+                    'required generated runtime module not loaded')
+    for name in required:
+        # import_module also rejects a None entry in sys.modules. Presence of
+        # an entry alone cannot establish that a required module was loaded.
+        importlib.import_module(name)
+
+
 def child_measure(context_ref):
     import os
     from scripts import qd_ed_n36_source as execution
@@ -688,12 +722,9 @@ def child_measure(context_ref):
         observed_at=time.time(), simulation_steps=0, provider=runtime['frozen_stage_provider'],
         login_mode='current_official_chatgpt_login', response=response_ref, calls=1, success=True))
     closure = e.read(plan['runtime_closure'])
-    # Import only the required modules already admitted by the closure. No Main,
-    # controller instance, environment reset or episode entrypoint is invoked.
-    import importlib
-    for name in closure['required_after']:
-        if name not in sys.modules:
-            importlib.import_module(name)
+    # Import required modules and their admitted producers. No Main, controller
+    # instance, environment reset or episode entrypoint is invoked.
+    import_required_after(closure)
     binding = {'release': context['release'], 'source_record': source_ref, 'resource_id': release['resource_id'],
                'phase': 'preparation_after', 'process': identity}
     native_ref = write_once(output / 'native-receipt.json', native.attest(plan['native_build'], after=True))
