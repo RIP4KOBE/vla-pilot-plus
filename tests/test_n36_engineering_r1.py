@@ -39,6 +39,7 @@ def prospective_paths(tmp_path_factory):
     put(root, 'runtime', runtime)
     patch = pytest.MonkeyPatch()
     patch.setattr(e, 'SPECIFICATION', put(root, 'spec', spec))
+    patch.setattr(e, 'HISTORICAL_SPECIFICATION', e.SPECIFICATION)
     yield
     patch.undo()
 
@@ -263,10 +264,10 @@ def test_parent_source_and_shared_safety_predicates_unchanged():
                 for node in ast.parse(Path(path).read_text()).body if isinstance(node, ast.FunctionDef)}
     old, new = functions(parent_path), functions(e.__file__)
     intentional = {'specification', 'validate_audit_view', 'validate_plan_shape', 'validate_authority',
-                   '_journal_suffixes', 'reconcile', 'validate_readiness'}
+                   '_journal_suffixes', 'reconcile', 'validate_readiness', 'child_environment'}
     assert set(old) == set(new) - {'terminal_parent_prefix', 'validate_runtime_binding', 'preparation_health_suffix',
         '_recovery_json', '_recovery_rows', '_recovery_read', '_recovery_contract',
-        '_recovery_capture', '_recovery_partition'}
+        '_recovery_capture', '_recovery_partition', '_recovery_specification', '_recovery_predecessors'}
     for name in old.keys() - intentional:
         assert new[name] == old[name], name
     assert e.LIMITS == parent.LIMITS
@@ -856,6 +857,8 @@ def recovery_cpu(tmp_path):
     def repin():
         spec['recovery_prefix_contract']=put_doc('contract',contract)
         env['SPECIFICATION']=put_doc('spec',spec)
+        env['HISTORICAL_SPECIFICATION']=env['SPECIFICATION']
+    env['HISTORICAL_SPECIFICATION'] = env['SPECIFICATION']
     sync()
     return types.SimpleNamespace(e=e,env=env,root=tmp_path,data=data,baseline=baseline,resources=resources,
         contract=contract,spec=spec,old=old,current=current,health=health,own=own_path,raw=raw,
@@ -969,6 +972,7 @@ def test_recovery_cpu_preserves_current_lifecycle_rejections(recovery_cpu,fault)
 def test_recovery_cpu_absence_keeps_old_behavior(recovery_cpu):
     f=recovery_cpu
     del f.spec['recovery_prefix_contract']; f.env['SPECIFICATION']=f.put('spec',f.spec)
+    f.env['HISTORICAL_SPECIFICATION']=f.env['SPECIFICATION']
     with pytest.raises(ValueError,match='foreign resource'):
         f.e.preparation_health_suffix(f.plan,f.baseline,f.resources)
     f.resources[:]=f.baseline[f.env['JOURNALS'][1]]+f.current+f.health
@@ -991,9 +995,10 @@ def test_recovery_cpu_complete_budget_and_initial_replay(recovery_cpu):
     exec(compile(ast.Module(body=[n for n in runner.body if isinstance(n,ast.FunctionDef)
         and n.name in names],type_ignores=[]),str(source.parent/'qd_ed_final_runner.py'),'exec'),budget_env)
     snapshot=budget_env['budget_snapshot']
+    retained_seconds=sum(x['gpu_process_wall_seconds'] for x in f.old)
     full=snapshot(f.baseline[f.env['JOURNALS'][0]],f.resources)
-    assert full['gpu_hours_consumed']==pytest.approx((7+9+162+2+1)/3600)
-    assert full['gpu_hours_by_bucket']['recovery']==pytest.approx((9+162+2+1)/3600)
+    assert full['gpu_hours_consumed']==pytest.approx((7+9+retained_seconds+2+1)/3600)
+    assert full['gpu_hours_by_bucket']['recovery']==pytest.approx((9+retained_seconds+2+1)/3600)
     assert snapshot([],f.health)['gpu_hours_consumed']==pytest.approx(1/3600)
     before=copy.deepcopy(f.resources)
     f.e.preparation_health_suffix(f.plan,f.baseline,f.resources)
@@ -1025,10 +1030,184 @@ def test_recovery_cpu_complete_budget_and_initial_replay(recovery_cpu):
         initial_env['preparation_budget'](f.root,f.plan,authority,release)
     f.current.clear(); f.health.clear(); f.sync()
     initial=initial_env['preparation_budget'](f.root,f.plan,authority,release)
-    assert initial['gpu_hours_consumed']==pytest.approx((7+9+162)/3600)
+    assert initial['gpu_hours_consumed']==pytest.approx((7+9+retained_seconds)/3600)
     # Each complete journal rejects preexisting successor use before reservation.
     for name in (*f.env['JOURNALS'],'readiness-preparation-ledger.jsonl'):
         path=f.data/name; saved=path.read_bytes()
         path.write_bytes(saved+f.raw([{'resource_id':'new','kind':'readiness_preparation','event':'reserved'}]))
         with pytest.raises(ValueError): initial_env['preparation_budget'](f.root,f.plan,authority,release)
         path.write_bytes(saved)
+
+
+@pytest.fixture
+def recovery_multi_cpu(recovery_cpu):
+    """Two charged aborted lifecycles, immutable bytes, no real evidence reads."""
+    f = recovery_cpu
+    first = copy.deepcopy(f.contract.pop('predecessor'))
+    second = copy.deepcopy(first)
+    second['resource_id'] = 'old-two'
+    for row in second['rows']:
+        row['resource_id'] = 'old-two'
+    second['rows'][-1].update(gpu_process_wall_seconds=81.0, provider_calls=None)
+    second.update(retained_charge_gpu_seconds=81.0, retained_charge_gpu_hours=81.0/3600,
+                  provider_calls_retained=None)
+    payload = f.raw(second['rows'])
+    path = f.root / 'second-retained.jsonl'; path.write_bytes(payload)
+    second['raw_sequence'] = dict(path=str(path), sha256=hashlib.sha256(payload).hexdigest())
+    second['raw_bytes'] = len(payload)
+    start = len(f.retained_raw)
+    offset = f.contract['original_ledger_prefixes'][f.env['JOURNALS'][1]]['bytes']
+    for key, begin in [('own_journal', start), ('global_health_segment', offset+start)]:
+        second[key].update(start_inclusive=begin, end_exclusive=begin+len(payload),
+                           sha256=second['raw_sequence']['sha256'])
+    second['row_segments'] = []
+    cursor = start
+    for row, line in zip(second['rows'], payload.splitlines(keepends=True)):
+        second['row_segments'].append(dict(bytes=len(line), event=row['event'],
+            global_start_inclusive=offset+cursor, global_end_exclusive=offset+cursor+len(line),
+            own_start_inclusive=cursor, own_end_exclusive=cursor+len(line),
+            sha256=hashlib.sha256(line).hexdigest()))
+        cursor += len(line)
+    f.contract.update(schema='n36-failed-readiness-recovery-prefix-contract-v2',
+                      predecessors=[first, second])
+    identity = f.e.read(f.contract['identity'])
+    identity.update(recovery_of=['old', 'old-two'], retained_charge_gpu_hours=162.0/3600+81.0/3600)
+    f.contract['identity'] = f.spec['readiness_recovery'] = f.put('multi-identity', identity)
+    f.retained_raw += payload
+    f.old.extend(second['rows'])
+    f.contract['own_journal_at_draft'].update(bytes=len(f.retained_raw),
+        sha256=hashlib.sha256(f.retained_raw).hexdigest())
+    observed = f.contract['root_observed_ledger_prefixes']
+    prefix = f.raw(f.baseline[f.env['JOURNALS'][1]])+f.retained_raw
+    observed[f.env['JOURNALS'][1]].update(bytes=len(prefix), sha256=hashlib.sha256(prefix).hexdigest())
+    reconciliation = f.e.read(f.contract['root_terminal_reconciliation'])
+    reconciliation['ledger_prefixes'] = observed
+    f.contract['root_terminal_reconciliation'] = f.put('multi-reconciliation', reconciliation)
+    def sync():
+        f.resources[:] = copy.deepcopy(f.baseline[f.env['JOURNALS'][1]]+f.old+f.current+f.health)
+        f.own.write_bytes(f.retained_raw+f.raw(f.current))
+        (f.data/f.env['JOURNALS'][1]).write_bytes(prefix+f.raw(f.current)+f.raw(f.health))
+    f.sync = sync
+    f.sync(); f.repin()
+    return f
+
+
+def test_recovery_multi_cpu_preserves_both_costs_and_unknowns(recovery_multi_cpu):
+    f = recovery_multi_cpu
+    before = {p: p.read_bytes() for p in f.data.iterdir()}
+    assert f.e.specification() == f.spec
+    assert f.e.preparation_health_suffix(f.plan, f.baseline, f.resources) == f.health
+    snap = f.e.r.budget_snapshot(f.baseline[f.env['JOURNALS'][0]], f.resources)
+    assert snap['gpu_hours_consumed'] == pytest.approx((7+9+162+81+2+1)/3600)
+    assert f.old[-1]['provider_calls'] is None
+    assert f.old[-1]['telemetry_complete'] is False
+    assert {p: p.read_bytes() for p in f.data.iterdir()} == before
+    # The unchanged initial-use gate still rejects replay and retains both costs.
+    test_recovery_cpu_complete_budget_and_initial_replay(f)
+
+
+@pytest.mark.parametrize('fault', ['missing_first', 'missing_second', 'reverse', 'duplicate',
+    'second_bytes', 'second_own_offset', 'second_global_offset', 'second_row_offset', 'second_row_hash',
+    'second_charge', 'aggregate_charge', 'telemetry', 'provider_unknown', 'consumed_successor',
+    'foreign', 'first_replay', 'second_replay', 'truncated_own', 'original_offset', 'observed_offset',
+    'identity_order', 'raw_hash'])
+def test_recovery_multi_cpu_rejects_faults(recovery_multi_cpu, fault):
+    f = recovery_multi_cpu
+    predecessors = f.contract['predecessors']
+    second = predecessors[1]
+    if fault == 'missing_first': predecessors.pop(0)
+    elif fault == 'missing_second': predecessors.pop()
+    elif fault == 'reverse': predecessors.reverse()
+    elif fault == 'duplicate': predecessors.append(copy.deepcopy(second))
+    elif fault == 'second_bytes':
+        f.own.write_bytes(f.own.read_bytes().replace(b'81.0', b'82.0'))
+    elif fault == 'second_own_offset': second['own_journal']['start_inclusive'] = 0
+    elif fault == 'second_global_offset': second['global_health_segment']['start_inclusive'] += 1
+    elif fault == 'second_row_offset': second['row_segments'][0]['own_start_inclusive'] = 0
+    elif fault == 'second_row_hash': second['row_segments'][0]['sha256'] = '0'*64
+    elif fault == 'second_charge': second['retained_charge_gpu_seconds'] = 0
+    elif fault in ('aggregate_charge', 'identity_order'):
+        identity = f.e.read(f.contract['identity'])
+        if fault == 'aggregate_charge': identity['retained_charge_gpu_hours'] = 81.0/3600
+        else: identity['recovery_of'].reverse()
+        f.spec['readiness_recovery'] = f.contract['identity'] = f.put('multi-identity', identity)
+    elif fault == 'telemetry': second['telemetry_complete'] = True
+    elif fault == 'provider_unknown': second['provider_calls_retained'] = 0
+    elif fault == 'consumed_successor': f.contract['successor']['resource_id'] = 'old-two'
+    elif fault in ('foreign', 'first_replay', 'second_replay'):
+        f.current[0]['resource_id'] = {'foreign':'foreign', 'first_replay':'old', 'second_replay':'old-two'}[fault]
+        f.sync()
+    elif fault == 'truncated_own': f.own.write_bytes(f.own.read_bytes()[:len(f.retained_raw)-1])
+    elif fault == 'original_offset': f.contract['original_ledger_prefixes'][f.env['JOURNALS'][1]]['bytes'] += 1
+    elif fault == 'observed_offset': f.contract['root_observed_ledger_prefixes'][f.env['JOURNALS'][1]]['bytes'] -= 1
+    elif fault == 'raw_hash': second['raw_sequence']['sha256'] = '0'*64
+    f.repin()
+    with pytest.raises((ValueError, KeyError, TypeError)):
+        f.e.preparation_health_suffix(f.plan, f.baseline, f.resources)
+
+
+@pytest.mark.parametrize('fault', [None, 'science', 'limits', 'amendment', 'old_identity',
+    'lineage', 'spec_hash', 'policy_hash', 'old_path', 'extra_key', 'v1'])
+def test_recovery_prospective_cpu_specification(recovery_multi_cpu, fault):
+    f = recovery_multi_cpu
+    # Synthetic immutable historical specification; only operational references may move.
+    historical = copy.deepcopy(f.spec)
+    historical['scope'] = {'threshold': 0.7}
+    historical['runtime_binding'].update(runtime_path='/synthetic/old-runtime', source_record_path='/synthetic/old-source')
+    historical['runtime_binding']['preparation'] = f.put('historical-policy',
+        {'resource_id':'old-two', 'proof_path':'/synthetic/old-proof', 'previous_specification':{}, 'deadline':'unchanged'})
+    historical['readiness_recovery'] = f.put('historical-identity', {'resource_id':'old-two'})
+    historical['recovery_prefix_contract'] = f.put('historical-contract', {'historical':True})
+    historical_ref = f.put('historical-spec', historical)
+    f.spec['scope'] = historical['scope'].copy()
+    f.spec['runtime_binding']['runtime_path'] = '/synthetic/new-runtime'
+    policy = f.e.read(f.spec['runtime_binding']['preparation'])
+    policy['previous_specification'] = historical_ref
+    policy['deadline'] = 'unchanged'
+    if fault == 'science': f.spec['scope']['threshold'] = 0.8
+    elif fault == 'limits': f.spec['runtime_binding']['measurement_contract'] = {'cleanup_seconds':0}
+    elif fault == 'amendment': f.spec['prospective_amendment'] = f.put('foreign-amendment', {})
+    elif fault == 'old_identity': policy['resource_id'] = 'old-two'
+    elif fault == 'lineage': policy['previous_specification'] = f.put('foreign-spec', {})
+    elif fault == 'extra_key': f.spec['approval'] = True
+    elif fault == 'v1':
+        f.contract['schema'] = 'n36-failed-readiness-recovery-prefix-contract-v1'
+        f.contract['predecessor'] = f.contract.pop('predecessors')[0]
+    f.spec['runtime_binding']['preparation'] = f.put('fresh-policy', policy)
+    f.repin()
+    f.env['HISTORICAL_SPECIFICATION'] = historical_ref
+    if fault == 'spec_hash': f.env['SPECIFICATION']['sha256'] = '0'*64
+    elif fault == 'policy_hash': Path(f.spec['runtime_binding']['preparation']['path']).write_text('{}')
+    elif fault == 'old_path': f.env['SPECIFICATION']['path'] = historical_ref['path']
+    if fault is None:
+        before = Path(historical_ref['path']).read_bytes()
+        assert f.e.specification() == f.spec
+        assert Path(historical_ref['path']).read_bytes() == before
+    else:
+        with pytest.raises((ValueError, KeyError, TypeError)):
+            f.e.specification()
+
+
+def test_recovery_prospective_cpu_process_selection(recovery_cpu):
+    import ast
+    import types
+    f = recovery_cpu
+    source = Path(globals().get('RECOVERY_CPU_SOURCE',
+        Path(__file__).resolve().parents[1]/'scripts/qd_ed_n36_engineering_r1.py'))
+    tree = ast.parse(source.read_text())
+    assignment = next(n for n in tree.body if isinstance(n, ast.Assign)
+                      and any(isinstance(t, ast.Name) and t.id == 'SPECIFICATION' for t in n.targets))
+    historical = f.env['SPECIFICATION']
+    selected = {'path':'/synthetic/fresh.json', 'sha256':'1'*64}
+    for environ, expected in [({}, historical),
+            ({'QD_ED_N36_R1_SPECIFICATION':json.dumps(selected)}, selected)]:
+        env = dict(os=types.SimpleNamespace(environ=environ), json=json,
+                   HISTORICAL_SPECIFICATION=historical)
+        exec(compile(ast.Module(body=[assignment], type_ignores=[]), str(source), 'exec'), env)
+        assert env['SPECIFICATION'] == expected
+    child = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == 'child_environment')
+    env = dict(owner_root=lambda plan:None, r=types.SimpleNamespace(child_environment=lambda rt:
+        {'QD_ED_N36_R1_SPECIFICATION':'foreign environment mutation'}),
+        SOURCE=f.root, SPECIFICATION=selected, reference=f.e.reference, json=json)
+    exec(compile(ast.Module(body=[child], type_ignores=[]), str(source), 'exec'), env)
+    assert json.loads(env['child_environment']({}, {})['QD_ED_N36_R1_SPECIFICATION']) == selected

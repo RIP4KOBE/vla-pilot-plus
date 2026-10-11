@@ -13,6 +13,7 @@ does not create those authorities or establish scientific success.
 import datetime as dt
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import time
@@ -34,7 +35,12 @@ OWNER_ROUTE_MAPPING = {
     'path': str(OWNER.parent / 'autonomy_20261004/turns/001352/owner-alias-repair/alias-evidence-v1.json'),
     'sha256': '70097b35181e55589df8bb053857b11840f08542fb8ed8bec57635ba493b22a2'}
 HISTORICAL_OWNER = '/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z'
-SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001730/recovery-prefix-contract/engineering-r1-spec.canonical-prospective-disabled-v2.json', 'sha256': '6eab17b8f8701ccea6cb5e9eb21f787873ec1d79d6612d775446ceb570e8dce1'}
+HISTORICAL_SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001730/recovery-prefix-contract/engineering-r1-spec.canonical-prospective-disabled-v2.json', 'sha256': '6eab17b8f8701ccea6cb5e9eb21f787873ec1d79d6612d775446ceb570e8dce1'}
+# Selection is process-stable and inherited by children; it is never authority.
+# Every release/scope/accounting reference must bind this exact selected digest.
+SPECIFICATION = json.loads(os.environ.get('QD_ED_N36_R1_SPECIFICATION',
+                                         json.dumps(HISTORICAL_SPECIFICATION)))
+
 AMENDMENT = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001616/prospective-recovery-amendment-v1.json', 'sha256': 'fe3c11c3a4be56f74149dc7e21a59eef59611478841d0fa8993bc79f8760e5ba'}
 IDENTITY = 'N36_ENGINEERING_R1_C0_TASK0_001616'
 EPISODE_KEY = 'n36_engineering_r1_t00_c0_001616'
@@ -84,7 +90,8 @@ def read(reference_value):
 
 
 def specification():
-    spec = read(SPECIFICATION)
+    spec = _recovery_json(_recovery_read(SPECIFICATION))
+    _recovery_specification(spec)
     exact(spec['prospective_amendment'], AMENDMENT, 'R1 pinned amendment')
     read(AMENDMENT)
     recovery = _recovery_contract(spec)
@@ -92,7 +99,7 @@ def specification():
         # Preparation admission also reads this specification under its operation
         # lock. Validate retained bytes before spending; successor absence in the
         # attempt/health/own journals remains the existing initial-use gate.
-        root = Path(recovery['predecessor']['own_journal']['path']).parent
+        root = Path(_recovery_predecessors(recovery)[0]['own_journal']['path']).parent
         _recovery_capture(recovery, root)
     return spec
 
@@ -587,6 +594,47 @@ def _recovery_read(ref):
     return data
 
 
+def _recovery_specification(spec):
+    """Allow only prospective operational rebinding of the immutable old spec."""
+    if SPECIFICATION == HISTORICAL_SPECIFICATION:
+        return
+    w.require(SPECIFICATION['path'] != HISTORICAL_SPECIFICATION['path'],
+              'prospective specification must use new evidence path')
+    historical = _recovery_json(_recovery_read(HISTORICAL_SPECIFICATION))
+    projected = json.loads(json.dumps(spec))
+    for key in ('readiness_recovery', 'recovery_prefix_contract'):
+        reference(spec[key])
+        w.require(spec[key]['path'] != historical[key]['path'], 'fresh recovery evidence path')
+        projected[key] = historical[key]
+    for key in ('preparation', 'runtime_path', 'source_record_path'):
+        projected['runtime_binding'][key] = historical['runtime_binding'][key]
+    exact(projected, historical, 'immutable scientific and accounting specification')
+    w.require(spec['runtime_binding']['preparation']['path'] !=
+              historical['runtime_binding']['preparation']['path'], 'fresh preparation policy path')
+    policy = _recovery_json(_recovery_read(spec['runtime_binding']['preparation']))
+    old_policy = _recovery_json(_recovery_read(historical['runtime_binding']['preparation']))
+    for key in ('runtime_path', 'source_record_path'):
+        w.require(spec['runtime_binding'][key] != historical['runtime_binding'][key],
+                  'fresh runtime evidence path')
+    projected_policy = dict(policy)
+    for key in old_policy:
+        if key.endswith('_path'):
+            w.require(policy[key] != old_policy[key], 'fresh preparation output path')
+        if key.endswith('_path') or key in ('previous_specification', 'resource_id'):
+            projected_policy[key] = old_policy[key]
+    exact(projected_policy, old_policy, 'immutable preparation policy limits')
+    exact(policy['previous_specification'], HISTORICAL_SPECIFICATION, 'prospective specification lineage')
+    w.require(policy['resource_id'] != old_policy['resource_id'], 'consumed pinned preparation identity')
+    contract = _recovery_contract(spec)
+    exact(contract['schema'], 'n36-failed-readiness-recovery-prefix-contract-v2',
+          'prospective multi-predecessor contract required')
+
+
+def _recovery_predecessors(contract):
+    return (contract['predecessors'] if contract['schema'].endswith('-v2')
+            else [contract['predecessor']])
+
+
 def _recovery_contract(spec):
     if 'recovery_prefix_contract' not in spec:
         return None
@@ -596,8 +644,13 @@ def _recovery_contract(spec):
             'production_authority provider_measurement_authorized read_semantics release_enabled '
             'retained_snapshot_reference root_observed_ledger_prefixes root_terminal_reconciliation '
             'schema scientific_success status successor').split()
+    w.require(isinstance(contract, dict), 'recovery contract object')
+    multi = contract.get('schema') == 'n36-failed-readiness-recovery-prefix-contract-v2'
+    if multi:
+        keys[keys.index('predecessor')] = 'predecessors'
     w.require(isinstance(contract, dict) and set(contract) == set(keys), 'closed recovery contract')
-    exact(contract['schema'], 'n36-failed-readiness-recovery-prefix-contract-v1', 'recovery schema')
+    exact(contract['schema'], 'n36-failed-readiness-recovery-prefix-contract-v2' if multi else
+          'n36-failed-readiness-recovery-prefix-contract-v1', 'recovery schema')
     for key in ('gpu_authorized', 'production_authority', 'provider_measurement_authorized',
                 'release_enabled', 'scientific_success'):
         exact(contract[key], False, 'historical recovery is not authority')
@@ -618,20 +671,32 @@ def _recovery_contract(spec):
     exact(reconciliation['live_handles'], [], 'historically reconciled handles')
     exact(reconciliation['root_accepts_blocking_findings'], True, 'root recovery findings')
     exact(reconciliation['ledger_prefixes'], contract['root_observed_ledger_prefixes'], 'root recovery anchors')
-    predecessor, successor = contract['predecessor'], contract['successor']
-    w.require(set(predecessor) == set(('consumed events global_health_segment kind own_journal '
-        'provider_calls_retained raw_bytes raw_sequence resource_id retained_charge_gpu_hours '
-        'retained_charge_gpu_seconds row_segments rows telemetry_complete').split()), 'closed predecessor')
+    predecessors, successor = _recovery_predecessors(contract), contract['successor']
+    w.require(isinstance(predecessors, list) and predecessors, 'nonempty retained predecessors')
+    ids = []
+    for predecessor in predecessors:
+        w.require(isinstance(predecessor, dict) and set(predecessor) == set((
+            'consumed events global_health_segment kind own_journal provider_calls_retained '
+            'raw_bytes raw_sequence resource_id retained_charge_gpu_hours '
+            'retained_charge_gpu_seconds row_segments rows telemetry_complete').split()), 'closed predecessor')
+        rid = predecessor['resource_id']
+        w.require(isinstance(rid, str) and rid and rid not in ids
+                  and rid not in (successor['resource_id'], HEALTH_ID, EPISODE_KEY),
+                  'distinct consumed predecessor identities')
+        ids.append(rid)
+        exact(predecessor['kind'], 'readiness_preparation', 'predecessor kind')
+        exact(predecessor['events'], ['reserved', 'dispatched', 'aborted'], 'terminal predecessor order')
+        exact(predecessor['consumed'], True, 'consumed predecessor')
+        exact(predecessor['telemetry_complete'], False, 'retained unknown telemetry')
     exact(successor, dict(automatic_retry=False, kind='readiness_preparation',
         occurrences_in_complete_ledgers={name: 0 for name in (*JOURNALS, 'readiness-preparation-ledger.jsonl')},
         resource_id=identity['resource_id'], unconsumed_at_draft=True), 'explicit recovery successor')
-    w.require(predecessor['resource_id'] == identity['recovery_of'] != successor['resource_id'],
-              'explicit recovery predecessor')
-    exact(predecessor['kind'], 'readiness_preparation', 'predecessor kind')
-    exact(predecessor['events'], ['reserved', 'dispatched', 'aborted'], 'terminal predecessor order')
-    exact(predecessor['consumed'], True, 'consumed predecessor')
-    exact(predecessor['telemetry_complete'], False, 'retained unknown telemetry')
-    exact(predecessor['retained_charge_gpu_hours'], identity['retained_charge_gpu_hours'], 'retained identity charge')
+    w.require(isinstance(successor['resource_id'], str) and successor['resource_id']
+              and successor['resource_id'] not in (HEALTH_ID, EPISODE_KEY), 'separate successor identity')
+    exact(identity['recovery_of'], ids if multi else ids[0], 'explicit recovery predecessors')
+    exact(identity['retained_charge_gpu_hours'],
+          sum(p['retained_charge_gpu_hours'] for p in predecessors) if multi else
+          predecessors[0]['retained_charge_gpu_hours'], 'retained identity charge')
     policy = _recovery_json(_recovery_read(spec['runtime_binding']['preparation']))
     exact(policy['resource_id'], successor['resource_id'], 'bound recovery policy successor')
     # identity.source is historical provenance. Current source is validated later.
@@ -644,7 +709,7 @@ def _recovery_capture(contract, root):
     Recheck captures before returning. This does not grant readiness or require
     the successor to stay absent after its separately authorized initial use.
     """
-    predecessor = contract['predecessor']
+    predecessors = _recovery_predecessors(contract)
     identity = contract['successor']['resource_id']
     captures = {}
     for name in (*JOURNALS, 'readiness-preparation-ledger.jsonl'):
@@ -660,45 +725,60 @@ def _recovery_capture(contract, root):
             prefix = data[:anchor['bytes']]
             w.require(hashlib.sha256(prefix).hexdigest() == anchor['sha256'], 'recovery anchor bytes')
             w.require(not prefix or prefix.endswith(b'\n'), 'torn recovery anchor')
-    raw = _recovery_read(predecessor['raw_sequence'])
-    w.require(type(predecessor['raw_bytes']) is int and len(raw) == predecessor['raw_bytes'],
-              'recovery retained raw length')
     own = captures['readiness-preparation-ledger.jsonl']
     global_raw = captures[JOURNALS[1]]
     offset = contract['original_ledger_prefixes'][JOURNALS[1]]['bytes']
-    for segment, name, begin in ((predecessor['own_journal'], 'readiness-preparation-ledger.jsonl', 0),
-                                (predecessor['global_health_segment'], JOURNALS[1], offset)):
-        exact(segment, dict(path=str(root / name), start_inclusive=begin,
-              end_exclusive=begin + len(raw), sha256=predecessor['raw_sequence']['sha256']),
-              'exact predecessor segment')
-        w.require(captures[name][begin:begin+len(raw)] == raw, 'exact retained predecessor bytes')
+    own_offset, retained_all = 0, []
+    for predecessor in predecessors:
+        raw = _recovery_read(predecessor['raw_sequence'])
+        w.require(type(predecessor['raw_bytes']) is int and len(raw) == predecessor['raw_bytes'],
+                  'recovery retained raw length')
+        for segment, name, begin in ((predecessor['own_journal'], 'readiness-preparation-ledger.jsonl', own_offset),
+                                    (predecessor['global_health_segment'], JOURNALS[1], offset)):
+            exact(segment, dict(path=str(root / name), start_inclusive=begin,
+                  end_exclusive=begin + len(raw), sha256=predecessor['raw_sequence']['sha256']),
+                  'exact predecessor segment')
+            w.require(captures[name][begin:begin+len(raw)] == raw, 'exact retained predecessor bytes')
+        lines = raw.splitlines(keepends=True)
+        w.require(len(lines) == len(predecessor['row_segments']) == 3, 'three retained raw rows')
+        cursor = 0
+        for line, event, segment in zip(lines, predecessor['events'], predecessor['row_segments']):
+            exact(segment, dict(bytes=len(line), event=event, global_end_exclusive=offset+cursor+len(line),
+                global_start_inclusive=offset+cursor, own_end_exclusive=own_offset+cursor+len(line),
+                own_start_inclusive=own_offset+cursor, sha256=hashlib.sha256(line).hexdigest()), 'retained row offsets/hash')
+            cursor += len(line)
+        retained = _recovery_rows(raw)
+        exact(retained, predecessor['rows'], 'typed retained predecessor rows')
+        exact([row['event'] for row in retained], predecessor['events'], 'retained event sequence')
+        w.require(all(row['resource_id'] == predecessor['resource_id'] and
+                      row['kind'] == predecessor['kind'] for row in retained), 'retained row identity')
+        terminal = retained[-1]
+        exact(terminal['telemetry_complete'], False, 'retained terminal telemetry')
+        exact(terminal['provider_calls'], predecessor['provider_calls_retained'], 'retained provider calls')
+        exact(terminal['gpu_process_wall_seconds'], predecessor['retained_charge_gpu_seconds'], 'retained seconds')
+        exact(terminal['gpu_process_wall_seconds'] / 3600, predecessor['retained_charge_gpu_hours'], 'retained hours')
+        w.require(type(terminal['gpu_process_wall_seconds']) in (int, float)
+                  and terminal['gpu_process_wall_seconds'] > 0, 'positive retained charge')
+        retained_all.extend(retained)
+        own_offset += len(raw)
+        offset += len(raw)
     exact(contract['own_journal_at_draft'], dict(path=str(root / 'readiness-preparation-ledger.jsonl'),
-          bytes=len(raw), sha256=predecessor['raw_sequence']['sha256']), 'historical own anchor')
-    lines = raw.splitlines(keepends=True)
-    w.require(len(lines) == len(predecessor['row_segments']) == 3, 'three retained raw rows')
-    cursor = 0
-    for line, event, segment in zip(lines, predecessor['events'], predecessor['row_segments']):
-        exact(segment, dict(bytes=len(line), event=event, global_end_exclusive=offset+cursor+len(line),
-            global_start_inclusive=offset+cursor, own_end_exclusive=cursor+len(line),
-            own_start_inclusive=cursor, sha256=hashlib.sha256(line).hexdigest()), 'retained row offsets/hash')
-        cursor += len(line)
-    retained = _recovery_rows(raw)
-    exact(retained, predecessor['rows'], 'typed retained predecessor rows')
-    exact([row['event'] for row in retained], predecessor['events'], 'retained event sequence')
-    w.require(all(row['resource_id'] == predecessor['resource_id'] and
-                  row['kind'] == predecessor['kind'] for row in retained), 'retained row identity')
-    terminal = retained[-1]
-    exact(terminal['telemetry_complete'], False, 'retained terminal telemetry')
-    exact(terminal['provider_calls'], predecessor['provider_calls_retained'], 'retained provider calls')
-    exact(terminal['gpu_process_wall_seconds'], predecessor['retained_charge_gpu_seconds'], 'retained seconds')
-    exact(terminal['gpu_process_wall_seconds'] / 3600, predecessor['retained_charge_gpu_hours'], 'retained hours')
+          bytes=own_offset, sha256=hashlib.sha256(own[:own_offset]).hexdigest()), 'historical own anchor')
+    # The observed health anchor must end exactly after every retained lifecycle.
+    exact(contract['root_observed_ledger_prefixes'][JOURNALS[1]]['bytes'], offset,
+          'complete observed predecessor prefix')
     parsed = {name: _recovery_rows(data) for name, data in captures.items()}
     for name in (JOURNALS[0], JOURNALS[2]):
         w.require(not any(value in (row.get('resource_id'), row.get('attempt_id'), row.get('episode_key'))
-                          for row in parsed[name] for value in (identity, predecessor['resource_id'])),
+                          for row in parsed[name] for value in [identity, *(p['resource_id'] for p in predecessors)]),
                   'recovery identity outside resource journals')
-    current_raw = own[len(raw):]
-    tail = global_raw[offset+len(raw):]
+    historical = _recovery_rows(global_raw[:contract['original_ledger_prefixes'][JOURNALS[1]]['bytes']])
+    w.require(not any(value in (row.get('resource_id'), row.get('attempt_id'), row.get('episode_key'))
+                      for row in historical
+                      for value in [identity, *(p['resource_id'] for p in predecessors)]),
+              'recovery identity in original history')
+    current_raw = own[own_offset:]
+    tail = global_raw[offset:]
     w.require(tail[:len(current_raw)] == current_raw, 'raw current preparation mirror equality')
     current = _recovery_rows(current_raw)
     current_mirror, health = [], []
@@ -712,7 +792,7 @@ def _recovery_capture(contract, root):
         else:
             raise ValueError('foreign resource identity outside retained recovery partition')
     exact(current, current_mirror, 'complete current preparation mirror')
-    exact(parsed['readiness-preparation-ledger.jsonl'], retained + current, 'complete own partition')
+    exact(parsed['readiness-preparation-ledger.jsonl'], retained_all + current, 'complete own partition')
     for name, data in captures.items():
         w.require((root / name).read_bytes() == data, 'recovery journal changed during capture')
     return parsed, _recovery_rows(tail), current
@@ -1005,6 +1085,7 @@ def child_environment(plan, runtime):
     env['PYTHONPATH'] = ':'.join(str(SOURCE / p) for p in
                                ('', 'third_party/lerobot/src', 'third_party/rdt', 'third_party/libero_pro'))
     env['PYTHONNOUSERSITE'] = '1'
+    env['QD_ED_N36_R1_SPECIFICATION'] = json.dumps(reference(SPECIFICATION), sort_keys=True)
     return env
 
 
