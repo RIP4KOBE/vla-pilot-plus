@@ -1237,7 +1237,6 @@ def prospective_scope_cpu(recovery_multi_cpu):
     admission functions. Only recovery/accounting fixture bytes are substituted,
     identically in both projections, to avoid reading any owning journal.
     """
-    from scripts import qd_ed_n36_readiness_prepare as preparation
     f = recovery_multi_cpu
     synthetic = copy.deepcopy(f.spec)
     f.spec.clear()
@@ -1253,6 +1252,10 @@ def prospective_scope_cpu(recovery_multi_cpu):
     f.spec['runtime_binding']['preparation'] = f.put('SYNTHETIC-scope-preparation', prep)
     f.repin()
     f.env['HISTORICAL_SPECIFICATION'] = f.historical
+    # Admission starts before any successor measurement or engineering health.
+    f.current.clear()
+    f.health.clear()
+    f.sync()
     return f
 
 
