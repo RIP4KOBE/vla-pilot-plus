@@ -639,12 +639,15 @@ def _recovery_specification(spec):
     exact(policy['previous_specification'], HISTORICAL_SPECIFICATION, 'prospective specification lineage')
     w.require(policy['resource_id'] != old_policy['resource_id'], 'consumed pinned preparation identity')
     contract = _recovery_contract(spec)
-    exact(contract['schema'], 'n36-failed-readiness-recovery-prefix-contract-v2',
-          'prospective multi-predecessor contract required')
+    w.require(contract['schema'] in ('n36-failed-readiness-recovery-prefix-contract-v2',
+                                    'n36-readiness-recovery-prefix-contract-v3'),
+              'prospective multi-predecessor contract required')
 
 
 def _recovery_predecessors(contract):
-    return (contract['predecessors'] if contract['schema'].endswith('-v2')
+    return (contract['predecessors'] if contract['schema'] in (
+                'n36-failed-readiness-recovery-prefix-contract-v2',
+                'n36-readiness-recovery-prefix-contract-v3')
             else [contract['predecessor']])
 
 
@@ -658,12 +661,14 @@ def _recovery_contract(spec):
             'retained_snapshot_reference root_observed_ledger_prefixes root_terminal_reconciliation '
             'schema scientific_success status successor').split()
     w.require(isinstance(contract, dict), 'recovery contract object')
-    multi = contract.get('schema') == 'n36-failed-readiness-recovery-prefix-contract-v2'
+    explicit_terminal = contract.get('schema') == 'n36-readiness-recovery-prefix-contract-v3'
+    multi = explicit_terminal or contract.get('schema') == 'n36-failed-readiness-recovery-prefix-contract-v2'
     if multi:
         keys[keys.index('predecessor')] = 'predecessors'
     w.require(isinstance(contract, dict) and set(contract) == set(keys), 'closed recovery contract')
-    exact(contract['schema'], 'n36-failed-readiness-recovery-prefix-contract-v2' if multi else
-          'n36-failed-readiness-recovery-prefix-contract-v1', 'recovery schema')
+    exact(contract['schema'], 'n36-readiness-recovery-prefix-contract-v3' if explicit_terminal else
+          ('n36-failed-readiness-recovery-prefix-contract-v2' if multi else
+           'n36-failed-readiness-recovery-prefix-contract-v1'), 'recovery schema')
     for key in ('gpu_authorized', 'production_authority', 'provider_measurement_authorized',
                 'release_enabled', 'scientific_success'):
         exact(contract[key], False, 'historical recovery is not authority')
@@ -688,19 +693,26 @@ def _recovery_contract(spec):
     w.require(isinstance(predecessors, list) and predecessors, 'nonempty retained predecessors')
     ids = []
     for predecessor in predecessors:
-        w.require(isinstance(predecessor, dict) and set(predecessor) == set((
+        predecessor_keys = set((
             'consumed events global_health_segment kind own_journal provider_calls_retained '
             'raw_bytes raw_sequence resource_id retained_charge_gpu_hours '
-            'retained_charge_gpu_seconds row_segments rows telemetry_complete').split()), 'closed predecessor')
+            'retained_charge_gpu_seconds row_segments rows telemetry_complete').split())
+        if explicit_terminal:
+            predecessor_keys.add('terminal_status')
+        w.require(isinstance(predecessor, dict) and set(predecessor) == predecessor_keys, 'closed predecessor')
         rid = predecessor['resource_id']
         w.require(isinstance(rid, str) and rid and rid not in ids
                   and rid not in (successor['resource_id'], HEALTH_ID, EPISODE_KEY),
                   'distinct consumed predecessor identities')
         ids.append(rid)
         exact(predecessor['kind'], 'readiness_preparation', 'predecessor kind')
-        exact(predecessor['events'], ['reserved', 'dispatched', 'aborted'], 'terminal predecessor order')
+        # v1/v2 remain abort-only. v3 explicitly binds each consumed terminal;
+        # completed history is retained accounting, never successor readiness.
+        terminal_status = predecessor['terminal_status'] if explicit_terminal else 'aborted'
+        w.require(terminal_status in ('aborted', 'completed'), 'retained terminal status')
+        exact(predecessor['events'], ['reserved', 'dispatched', terminal_status], 'terminal predecessor order')
         exact(predecessor['consumed'], True, 'consumed predecessor')
-        exact(predecessor['telemetry_complete'], False, 'retained unknown telemetry')
+        exact(predecessor['telemetry_complete'], terminal_status == 'completed', 'retained terminal telemetry semantics')
     exact(successor, dict(automatic_retry=False, kind='readiness_preparation',
         occurrences_in_complete_ledgers={name: 0 for name in (*JOURNALS, 'readiness-preparation-ledger.jsonl')},
         resource_id=identity['resource_id'], unconsumed_at_draft=True), 'explicit recovery successor')
@@ -766,7 +778,16 @@ def _recovery_capture(contract, root):
         w.require(all(row['resource_id'] == predecessor['resource_id'] and
                       row['kind'] == predecessor['kind'] for row in retained), 'retained row identity')
         terminal = retained[-1]
-        exact(terminal['telemetry_complete'], False, 'retained terminal telemetry')
+        if contract['schema'] == 'n36-readiness-recovery-prefix-contract-v3':
+            exact(terminal['event'], predecessor['terminal_status'], 'retained terminal status binding')
+            exact(terminal['telemetry_complete'], predecessor['terminal_status'] == 'completed',
+                  'retained terminal telemetry semantics')
+            if predecessor['terminal_status'] == 'completed':
+                w.require(type(terminal['provider_calls']) is int and terminal['provider_calls'] == 1,
+                          'completed retained provider call')
+        exact(terminal['telemetry_complete'], predecessor['telemetry_complete']
+              if contract['schema'] == 'n36-readiness-recovery-prefix-contract-v3' else False,
+              'retained terminal telemetry')
         exact(terminal['provider_calls'], predecessor['provider_calls_retained'], 'retained provider calls')
         exact(terminal['gpu_process_wall_seconds'], predecessor['retained_charge_gpu_seconds'], 'retained seconds')
         exact(terminal['gpu_process_wall_seconds'] / 3600, predecessor['retained_charge_gpu_hours'], 'retained hours')

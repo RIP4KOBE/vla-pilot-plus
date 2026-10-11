@@ -1317,3 +1317,156 @@ def test_prospective_scope_actual_composition_admission(prospective_scope_cpu, m
         with pytest.raises((ValueError, FileNotFoundError)):
             e.specification()
     assert {path: path.read_bytes() for path in f.data.iterdir()} == before
+
+
+def repin_terminal_partition(f):
+    """Build authenticated SYNTHETIC bytes, including deliberately invalid rows."""
+    offset = f.contract['original_ledger_prefixes'][f.env['JOURNALS'][1]]['bytes']
+    retained = b''
+    f.old.clear()
+    for i, predecessor in enumerate(f.contract['predecessors']):
+        payload = f.raw(predecessor['rows'])
+        path = f.root / f'terminal-retained-{i}.jsonl'
+        path.write_bytes(payload)
+        digest = hashlib.sha256(payload).hexdigest()
+        predecessor.update(raw_bytes=len(payload), raw_sequence=dict(path=str(path), sha256=digest))
+        start = len(retained)
+        for key, begin in [('own_journal', start), ('global_health_segment', offset + start)]:
+            predecessor[key].update(start_inclusive=begin, end_exclusive=begin + len(payload), sha256=digest)
+        predecessor['row_segments'] = []
+        cursor = start
+        for row, line in zip(predecessor['rows'], payload.splitlines(keepends=True)):
+            predecessor['row_segments'].append(dict(bytes=len(line), event=row['event'],
+                global_start_inclusive=offset + cursor, global_end_exclusive=offset + cursor + len(line),
+                own_start_inclusive=cursor, own_end_exclusive=cursor + len(line),
+                sha256=hashlib.sha256(line).hexdigest()))
+            cursor += len(line)
+        retained += payload
+        f.old.extend(predecessor['rows'])
+    f.retained_raw = retained
+    f.contract['own_journal_at_draft'].update(bytes=len(retained), sha256=hashlib.sha256(retained).hexdigest())
+    prefix = f.raw(f.baseline[f.env['JOURNALS'][1]]) + retained
+    observed = f.contract['root_observed_ledger_prefixes']
+    observed[f.env['JOURNALS'][1]].update(bytes=len(prefix), sha256=hashlib.sha256(prefix).hexdigest())
+    reconciliation = f.e.read(f.contract['root_terminal_reconciliation'])
+    reconciliation['ledger_prefixes'] = observed
+    f.contract['root_terminal_reconciliation'] = f.put('terminal-reconciliation', reconciliation)
+    identity = f.e.read(f.contract['identity'])
+    identity.update(recovery_of=[p['resource_id'] for p in f.contract['predecessors']],
+        retained_charge_gpu_hours=sum(p['retained_charge_gpu_hours'] for p in f.contract['predecessors']))
+    f.contract['identity'] = f.spec['readiness_recovery'] = f.put('terminal-identity', identity)
+    def sync():
+        f.resources[:] = copy.deepcopy(f.baseline[f.env['JOURNALS'][1]] + f.old + f.current + f.health)
+        f.own.write_bytes(f.retained_raw + f.raw(f.current))
+        (f.data / f.env['JOURNALS'][1]).write_bytes(prefix + f.raw(f.current) + f.raw(f.health))
+    f.sync = sync
+    f.sync()
+    f.repin()
+
+
+@pytest.fixture
+def recovery_terminal_cpu(recovery_multi_cpu):
+    """Two aborted/incomplete and one completed/complete, with all costs retained."""
+    f = recovery_multi_cpu
+    f.contract['schema'] = 'n36-readiness-recovery-prefix-contract-v3'
+    for p in f.contract['predecessors']:
+        p['terminal_status'] = 'aborted'
+    completed = copy.deepcopy(f.contract['predecessors'][-1])
+    completed.update(resource_id='old-three', terminal_status='completed',
+        events=['reserved', 'dispatched', 'completed'], telemetry_complete=True,
+        provider_calls_retained=1, retained_charge_gpu_seconds=234.72371816635132,
+        retained_charge_gpu_hours=234.72371816635132 / 3600)
+    for row in completed['rows']:
+        row['resource_id'] = completed['resource_id']
+    completed['rows'][-1].update(event='completed', telemetry_complete=True,
+        provider_calls=1, gpu_process_wall_seconds=completed['retained_charge_gpu_seconds'])
+    f.contract['predecessors'].append(completed)
+    repin_terminal_partition(f)
+    return f
+
+
+def test_recovery_terminal_cpu_partition_and_budget(recovery_terminal_cpu):
+    f = recovery_terminal_cpu
+    before = {p: p.read_bytes() for p in f.data.iterdir()}
+    assert f.e.specification() == f.spec
+    assert f.e.preparation_health_suffix(f.plan, f.baseline, f.resources) == f.health
+    assert f.calls == ['derive', 'accepted']
+    terminals = f.old[2::3]
+    assert [r['event'] for r in terminals] == ['aborted', 'aborted', 'completed']
+    assert [r['telemetry_complete'] for r in terminals] == [False, False, True]
+    assert terminals[1]['provider_calls'] is None
+    assert {p: p.read_bytes() for p in f.data.iterdir()} == before
+    # Full-budget accounting, fresh admission and successor replay checks use
+    # the same production function bodies for all three retained lifecycles.
+    test_recovery_cpu_complete_budget_and_initial_replay(f)
+
+
+@pytest.mark.parametrize('fault', ['missing_status', 'unknown_status', 'false_status',
+    'false_events', 'false_telemetry', 'bool_as_int', 'abort_complete', 'raw_status',
+    'raw_telemetry', 'raw_bool_as_int', 'unknown_provider', 'bool_provider',
+    'uncharged', 'negative_charge', 'false_charge', 'duplicate_identity',
+    'missing_raw_row', 'reordered_raw_rows', 'extra_raw_row', 'legacy_v2', 'unknown_schema'])
+def test_recovery_terminal_cpu_semantics(recovery_terminal_cpu, fault):
+    f = recovery_terminal_cpu
+    completed = f.contract['predecessors'][-1]
+    terminal = completed['rows'][-1]
+    rebuild = False
+    if fault == 'missing_status': completed.pop('terminal_status')
+    elif fault == 'unknown_status': completed['terminal_status'] = 'valid'
+    elif fault == 'false_status': completed['terminal_status'] = 'aborted'
+    elif fault == 'false_events': completed['events'][-1] = 'aborted'
+    elif fault == 'false_telemetry': completed['telemetry_complete'] = False
+    elif fault == 'bool_as_int': completed['telemetry_complete'] = 1
+    elif fault == 'abort_complete': f.contract['predecessors'][0]['telemetry_complete'] = True
+    elif fault == 'raw_status': terminal['event'] = 'aborted'; rebuild = True
+    elif fault == 'raw_telemetry': terminal['telemetry_complete'] = False; rebuild = True
+    elif fault == 'raw_bool_as_int': terminal['telemetry_complete'] = 1; rebuild = True
+    elif fault in ('unknown_provider', 'bool_provider'):
+        terminal['provider_calls'] = completed['provider_calls_retained'] = None if fault == 'unknown_provider' else True
+        rebuild = True
+    elif fault in ('uncharged', 'negative_charge'):
+        charge = 0.0 if fault == 'uncharged' else -1.0
+        terminal['gpu_process_wall_seconds'] = completed['retained_charge_gpu_seconds'] = charge
+        completed['retained_charge_gpu_hours'] = charge / 3600
+        rebuild = True
+    elif fault == 'false_charge': completed['retained_charge_gpu_seconds'] = 0.0
+    elif fault == 'duplicate_identity': completed['resource_id'] = 'old'
+    elif fault == 'missing_raw_row': completed['rows'].pop(1); rebuild = True
+    elif fault == 'reordered_raw_rows': completed['rows'].reverse(); rebuild = True
+    elif fault == 'extra_raw_row': completed['rows'].append(copy.deepcopy(terminal)); rebuild = True
+    elif fault == 'legacy_v2':
+        f.contract['schema'] = 'n36-failed-readiness-recovery-prefix-contract-v2'
+        for p in f.contract['predecessors']: p.pop('terminal_status')
+    elif fault == 'unknown_schema': f.contract['schema'] = 'n36-readiness-recovery-prefix-contract-v4'
+    if rebuild: repin_terminal_partition(f)
+    else: f.repin()
+    with pytest.raises(ValueError):
+        f.e.specification()
+
+
+@pytest.mark.parametrize('fault', ['missing_first', 'missing_second', 'reverse', 'duplicate',
+    'second_bytes', 'second_own_offset', 'second_global_offset', 'second_row_offset', 'second_row_hash',
+    'second_charge', 'aggregate_charge', 'telemetry', 'provider_unknown', 'consumed_successor',
+    'foreign', 'first_replay', 'second_replay', 'truncated_own', 'original_offset', 'observed_offset',
+    'identity_order', 'raw_hash'])
+def test_recovery_terminal_cpu_partition_faults(recovery_terminal_cpu, fault):
+    test_recovery_multi_cpu_rejects_faults(recovery_terminal_cpu, fault)
+
+
+@pytest.mark.parametrize('fault', ['pending', 'aborted', 'reorder', 'release', 'source',
+    'reservation', 'preterminal_charge', 'provider_calls', 'admission_telemetry',
+    'accounting', 'acceptance', 'health_replay'])
+def test_recovery_terminal_cpu_successor_gates(recovery_terminal_cpu, fault):
+    test_recovery_cpu_preserves_current_lifecycle_rejections(recovery_terminal_cpu, fault)
+
+
+@pytest.mark.parametrize('fault', ['partial_mirror', 'current_spacing', 'health_before',
+    'successor_attempt', 'successor_reservation', 'duplicate_successor'])
+def test_recovery_terminal_cpu_mirror_gates(recovery_terminal_cpu, fault):
+    test_recovery_cpu_rejects_prefix_and_binding_faults(recovery_terminal_cpu, fault)
+
+
+@pytest.mark.parametrize('fault', [None, 'science', 'limits', 'amendment', 'old_identity',
+    'lineage', 'spec_hash', 'policy_hash', 'old_path', 'extra_key'])
+def test_recovery_terminal_cpu_prospective_specification(recovery_terminal_cpu, fault):
+    test_recovery_prospective_cpu_specification(recovery_terminal_cpu, fault)
