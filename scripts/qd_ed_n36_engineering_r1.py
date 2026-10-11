@@ -36,6 +36,14 @@ OWNER_ROUTE_MAPPING = {
     'sha256': '70097b35181e55589df8bb053857b11840f08542fb8ed8bec57635ba493b22a2'}
 HISTORICAL_OWNER = '/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z'
 HISTORICAL_SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001730/recovery-prefix-contract/engineering-r1-spec.canonical-prospective-disabled-v2.json', 'sha256': '6eab17b8f8701ccea6cb5e9eb21f787873ec1d79d6612d775446ceb570e8dce1'}
+# Exact engineering admission, not source adoption or measurement authority.
+# Neither document binds this module's new commit, avoiding a source hash cycle.
+INVENTORY_AMENDMENT = {
+    'path': str(OWNER.parent / 'autonomy_20261004/turns/001834/prospective-runtime-inventory-amendment-v1.json'),
+    'sha256': '77ac3358be8ba46b068f6f826c0dbcc8b23a7a43b3e816001c750318aa337fc4'}
+INVENTORY_AUTHORITY = {
+    'path': str(OWNER.parent / 'autonomy_20261004/turns/001835/engineering-repair/authority-v1.json'),
+    'sha256': 'e85daf0801b9b9b4ff94cbc6df6d27191bd0318981c65acb2b002cd07405f7e7'}
 # Selection is process-stable and inherited by children; it is never authority.
 # Every release/scope/accounting reference must bind this exact selected digest.
 SPECIFICATION = json.loads(os.environ.get('QD_ED_N36_R1_SPECIFICATION',
@@ -594,6 +602,76 @@ def _recovery_read(ref):
     return data
 
 
+def _recovery_inventory(spec, historical):
+    """Admit one pinned inventory correction while comparing the entire baseline.
+
+    The old runtime stays immutable. This checks source bytes, not readiness,
+    adoption, native success, or permission to consume any additional budget.
+    """
+    if ('canonical_inventory_amendment' not in spec
+            and spec.get('canonical_runtime') == historical.get('canonical_runtime')):
+        return False
+    ref = reference(spec['canonical_inventory_amendment'])
+    # Both existing owner/shared lexical routes may refer to the same evidence.
+    w.require(ref['sha256'] == INVENTORY_AMENDMENT['sha256']
+              and Path(ref['path']).resolve() == Path(INVENTORY_AMENDMENT['path']).resolve(),
+              'pinned canonical inventory amendment')
+    amendment = _recovery_json(_recovery_read(ref))
+    authority = _recovery_json(_recovery_read(INVENTORY_AUTHORITY))
+    exact(authority['amendment'], INVENTORY_AMENDMENT, 'inventory engineering authority')
+    exact(amendment['authority'], {k: authority['authority'][k] for k in ('path', 'sha256')},
+          'inventory owning authority')
+    owning = _recovery_read(amendment['authority'])
+    exact(len(owning), authority['authority']['bytes'], 'inventory authority bytes')
+    exact(amendment['old_canonical_runtime'], historical['canonical_runtime'],
+          'inventory immutable old canonical reference')
+    old_ref = reference(historical['canonical_runtime'])
+    new_ref = reference(spec['canonical_runtime'])
+    w.require(Path(new_ref['path']).resolve() != Path(old_ref['path']).resolve()
+              and new_ref['sha256'] != old_ref['sha256'], 'fresh canonical inventory document')
+    old = _recovery_json(_recovery_read(old_ref))
+    new = _recovery_json(_recovery_read(new_ref))
+    before, after = amendment['change']['before'], amendment['change']['after']
+    matches = [i for i, row in enumerate(old['files']) if row['path'] == before['path']]
+    w.require(len(matches) == 1, 'unique amended inventory row')
+    index = matches[0]
+    exact(old['files'][index], before, 'inventory exact old hash and size')
+    expected = json.loads(json.dumps(old))
+    expected['files'][index] = after
+    exact(new, expected, 'inventory exact one-row delta and immutable runtime')
+    # Check both the recorded deployed bytes (read-only) and this validator's
+    # checkout; no other inventory inputs or protected datasets are opened here.
+    for path in (Path(after['path']), Path(__file__).resolve().with_name('qd_ed_n36_source.py')):
+        w.require(path.is_file() and not path.is_symlink(), 'inventory source file path')
+        data = path.read_bytes()
+        w.require(len(data) == after['size_bytes']
+                  and hashlib.sha256(data).hexdigest() == after['sha256'],
+                  'inventory actual reviewed source bytes')
+    w.require(str(Path(after['path']).resolve()) == after['resolved_path'],
+              'inventory source resolved path')
+    w.require(new['cuda_egl_verified'] is new['provider_ready'] is False
+              and new['gpu_mapping']['cuda_egl_verified'] is False
+              and new['preparation']['runtime_ready'] is False
+              and new['preparation']['release_enabled'] is False,
+              'inventory baseline remains disabled')
+    return True
+
+
+def _recovery_inventory_previous(spec, previous_ref, historical):
+    """Validate a new derived snapshot without relabelling the historical spec."""
+    reference(previous_ref)
+    w.require(Path(previous_ref['path']).resolve() != Path(HISTORICAL_SPECIFICATION['path']).resolve(),
+              'inventory previous snapshot must be a new document')
+    previous = _recovery_json(_recovery_read(previous_ref))
+    expected = json.loads(json.dumps(historical))
+    expected['canonical_runtime'] = spec['canonical_runtime']
+    expected['prospective_inventory_derivation'] = {
+        'historical_original': HISTORICAL_SPECIFICATION,
+        'amendment': spec['canonical_inventory_amendment'],
+        'scope': 'New disabled prospective snapshot; historical original is unchanged and not represented as amended.'}
+    exact(previous, expected, 'inventory previous snapshot immutable projection')
+
+
 def _recovery_specification(spec):
     """Allow only prospective operational rebinding of the immutable old spec."""
     if SPECIFICATION == HISTORICAL_SPECIFICATION:
@@ -602,6 +680,10 @@ def _recovery_specification(spec):
               'prospective specification must use new evidence path')
     historical = _recovery_json(_recovery_read(HISTORICAL_SPECIFICATION))
     projected = json.loads(json.dumps(spec))
+    inventory_amended = _recovery_inventory(spec, historical)
+    if inventory_amended:
+        projected.pop('canonical_inventory_amendment')
+        projected['canonical_runtime'] = historical['canonical_runtime']
     for key in ('readiness_recovery', 'recovery_prefix_contract'):
         reference(spec[key])
         w.require(spec[key]['path'] != historical[key]['path'], 'fresh recovery evidence path')
@@ -630,13 +712,19 @@ def _recovery_specification(spec):
         w.require(spec['runtime_binding'][key] != historical['runtime_binding'][key],
                   'fresh runtime evidence path')
     projected_policy = dict(policy)
+    if inventory_amended:
+        exact(policy['baseline'], spec['canonical_runtime'], 'inventory preparation baseline')
+        projected_policy['baseline'] = old_policy['baseline']
     for key in old_policy:
         if key.endswith('_path'):
             w.require(policy[key] != old_policy[key], 'fresh preparation output path')
         if key.endswith('_path') or key in ('previous_specification', 'resource_id'):
             projected_policy[key] = old_policy[key]
     exact(projected_policy, old_policy, 'immutable preparation policy limits')
-    exact(policy['previous_specification'], HISTORICAL_SPECIFICATION, 'prospective specification lineage')
+    if inventory_amended:
+        _recovery_inventory_previous(spec, policy['previous_specification'], historical)
+    else:
+        exact(policy['previous_specification'], HISTORICAL_SPECIFICATION, 'prospective specification lineage')
     w.require(policy['resource_id'] != old_policy['resource_id'], 'consumed pinned preparation identity')
     contract = _recovery_contract(spec)
     w.require(contract['schema'] in ('n36-failed-readiness-recovery-prefix-contract-v2',

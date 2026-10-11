@@ -267,7 +267,8 @@ def test_parent_source_and_shared_safety_predicates_unchanged():
                    '_journal_suffixes', 'reconcile', 'validate_readiness', 'child_environment'}
     assert set(old) == set(new) - {'terminal_parent_prefix', 'validate_runtime_binding', 'preparation_health_suffix',
         '_recovery_json', '_recovery_rows', '_recovery_read', '_recovery_contract',
-        '_recovery_capture', '_recovery_partition', '_recovery_specification', '_recovery_predecessors'}
+        '_recovery_capture', '_recovery_partition', '_recovery_specification', '_recovery_predecessors',
+        '_recovery_inventory', '_recovery_inventory_previous'}
     for name in old.keys() - intentional:
         assert new[name] == old[name], name
     assert e.LIMITS == parent.LIMITS
@@ -1470,3 +1471,136 @@ def test_recovery_terminal_cpu_mirror_gates(recovery_terminal_cpu, fault):
     'lineage', 'spec_hash', 'policy_hash', 'old_path', 'extra_key'])
 def test_recovery_terminal_cpu_prospective_specification(recovery_terminal_cpu, fault):
     test_recovery_prospective_cpu_specification(recovery_terminal_cpu, fault)
+
+
+@pytest.fixture
+def inventory_admission_cpu(prospective_scope_cpu, monkeypatch):
+    """Exact real inventory/authority, synthetic recovery and new snapshot only."""
+    f = prospective_scope_cpu
+    f.historical_doc = e.read(f.historical)
+    f.inventory_amendment = e.read(e.INVENTORY_AMENDMENT)
+    f.spec['canonical_inventory_amendment'] = dict(e.INVENTORY_AMENDMENT)
+    old = e.read(f.historical_doc['canonical_runtime'])
+    amended = copy.deepcopy(old)
+    change = f.inventory_amendment['change']
+    index = next(i for i, row in enumerate(old['files']) if row == change['before'])
+    amended['files'][index] = change['after']
+    f.spec['canonical_runtime'] = f.put('SYNTHETIC-prospective-canonical', amended)
+    previous = copy.deepcopy(f.historical_doc)
+    previous['canonical_runtime'] = f.spec['canonical_runtime']
+    previous['prospective_inventory_derivation'] = dict(
+        historical_original=f.historical, amendment=f.spec['canonical_inventory_amendment'],
+        scope='New disabled prospective snapshot; historical original is unchanged and not represented as amended.')
+    prep = e.read(f.spec['runtime_binding']['preparation'])
+    prep.update(baseline=f.spec['canonical_runtime'],
+                previous_specification=f.put('SYNTHETIC-derived-previous-spec', previous))
+    f.spec['runtime_binding']['preparation'] = f.put('SYNTHETIC-inventory-policy', prep)
+    f.repin()
+    monkeypatch.setattr(e, 'SPECIFICATION', f.env['SPECIFICATION'])
+    monkeypatch.setattr(e, 'HISTORICAL_SPECIFICATION', f.historical)
+    monkeypatch.setattr(e, 'AMENDMENT', f.env['AMENDMENT'])
+    f.inventory_index = index
+    return f
+
+
+@pytest.mark.parametrize('fault', [None, 'amendment_hash', 'amendment_bytes', 'amendment_path',
+    'authority_bytes', 'owning_authority_bytes', 'missing_amendment', 'old_runtime_hash',
+    'new_runtime_hash', 'old_row', 'wrong_new_hash', 'wrong_new_size', 'extra_row',
+    'omitted_row', 'reordered_rows', 'second_delta', 'extra_runtime_key', 'runtime_protocol',
+    'runtime_ready', 'provider_ready', 'release_ready', 'local_source_bytes', 'recorded_source_bytes',
+    'science', 'accounting', 'protocol', 'limits', 'release', 'extra_spec_key',
+    'policy_baseline', 'policy_deadline', 'previous_science', 'previous_accounting',
+    'previous_lineage', 'previous_amendment', 'previous_extra_key', 'previous_no_derivation',
+    'previous_historical', 'previous_hash'])
+def test_inventory_admission_exact_delta_and_projection(inventory_admission_cpu, monkeypatch, fault):
+    f = inventory_admission_cpu
+    runtime = e.read(f.spec['canonical_runtime'])
+    prep = e.read(f.spec['runtime_binding']['preparation'])
+    previous = e.read(prep['previous_specification'])
+    before = {Path(ref['path']): Path(ref['path']).read_bytes() for ref in (
+        e.INVENTORY_AMENDMENT, e.INVENTORY_AUTHORITY, f.historical,
+        f.historical_doc['canonical_runtime'])}
+    journals = {p: p.read_bytes() for p in f.data.iterdir()}
+    if fault == 'amendment_hash': f.spec['canonical_inventory_amendment']['sha256'] = '0' * 64
+    elif fault == 'amendment_path':
+        f.spec['canonical_inventory_amendment'] = f.put('SYNTHETIC-relocated-amendment', f.inventory_amendment)
+    elif fault == 'missing_amendment': f.spec.pop('canonical_inventory_amendment')
+    elif fault == 'old_runtime_hash': f.historical_doc['canonical_runtime']['sha256'] = '0' * 64
+    elif fault == 'new_runtime_hash': f.spec['canonical_runtime']['sha256'] = '0' * 64
+    elif fault == 'old_row': runtime['files'][f.inventory_index] = f.inventory_amendment['change']['before']
+    elif fault == 'wrong_new_hash': runtime['files'][f.inventory_index]['sha256'] = '0' * 64
+    elif fault == 'wrong_new_size': runtime['files'][f.inventory_index]['size_bytes'] += 1
+    elif fault == 'extra_row': runtime['files'].append(runtime['files'][0])
+    elif fault == 'omitted_row': runtime['files'].pop(0)
+    elif fault == 'reordered_rows': runtime['files'].reverse()
+    elif fault == 'second_delta': runtime['files'][0]['sha256'] = '0' * 64
+    elif fault == 'extra_runtime_key': runtime['approved'] = True
+    elif fault == 'runtime_protocol': runtime['stage_condition'] = 'changed'
+    elif fault == 'runtime_ready': runtime['preparation']['runtime_ready'] = True
+    elif fault == 'provider_ready': runtime['provider_ready'] = True
+    elif fault == 'release_ready': runtime['preparation']['release_enabled'] = True
+    elif fault == 'science': f.spec['scope']['episode']['policy_seed'] += 1
+    elif fault == 'accounting': f.spec['retained_snapshot']['gpu_hours_consumed'] = 0
+    elif fault == 'protocol': f.spec['unchanged_files_and_rules'] = []
+    elif fault == 'limits': f.spec['runtime_binding']['measurement_contract']['provider_calls'] = 2
+    elif fault == 'release': f.spec['release_enabled'] = True
+    elif fault == 'extra_spec_key': f.spec['approved'] = True
+    elif fault == 'policy_baseline': prep['baseline'] = f.historical_doc['canonical_runtime']
+    elif fault == 'policy_deadline': prep['deadline'] = '2099-01-01T00:00:00Z'
+    elif fault == 'previous_science': previous['scope']['episode']['policy_seed'] += 1
+    elif fault == 'previous_accounting': previous['retained_snapshot']['gpu_hours_consumed'] = 0
+    elif fault == 'previous_lineage': previous['prospective_inventory_derivation']['historical_original'] = {}
+    elif fault == 'previous_amendment': previous['prospective_inventory_derivation']['amendment']['sha256'] = '0' * 64
+    elif fault == 'previous_extra_key': previous['approved'] = True
+    elif fault == 'previous_no_derivation': previous.pop('prospective_inventory_derivation')
+    elif fault == 'previous_historical': prep['previous_specification'] = f.historical
+    elif fault == 'previous_hash': prep['previous_specification']['sha256'] = '0' * 64
+    if fault in ('amendment_bytes', 'authority_bytes', 'owning_authority_bytes',
+                 'local_source_bytes', 'recorded_source_bytes'):
+        targets = dict(amendment_bytes=e.INVENTORY_AMENDMENT['path'],
+            authority_bytes=e.INVENTORY_AUTHORITY['path'],
+            owning_authority_bytes=f.inventory_amendment['authority']['path'],
+            local_source_bytes=str(Path(e.__file__).with_name('qd_ed_n36_source.py')),
+            recorded_source_bytes=f.inventory_amendment['change']['after']['path'])
+        target = Path(targets[fault]).resolve()
+        real_read = Path.read_bytes
+        monkeypatch.setattr(Path, 'read_bytes', lambda path:
+            real_read(path) + b' ' if path.resolve() == target else real_read(path))
+    # Mutated documents receive honest fresh hashes; rejection must be semantic.
+    if fault not in ('new_runtime_hash',):
+        f.spec['canonical_runtime'] = f.put('SYNTHETIC-mutated-runtime', runtime)
+        if fault != 'policy_baseline': prep['baseline'] = f.spec['canonical_runtime']
+        previous['canonical_runtime'] = f.spec['canonical_runtime']
+    if fault not in ('previous_historical', 'previous_hash'):
+        prep['previous_specification'] = f.put('SYNTHETIC-mutated-previous', previous)
+    f.spec['runtime_binding']['preparation'] = f.put('SYNTHETIC-mutated-policy', prep)
+    if fault == 'old_runtime_hash':
+        f.historical = f.put('SYNTHETIC-mutated-history', f.historical_doc)
+        monkeypatch.setattr(e, 'HISTORICAL_SPECIFICATION', f.historical)
+    f.repin()
+    monkeypatch.setattr(e, 'SPECIFICATION', f.env['SPECIFICATION'])
+    if fault is None:
+        assert e.specification() == f.spec
+        assert f.spec['release_enabled'] is False
+        assert f.spec['scope']['scientific_eligible'] is False
+        assert f.old[-1]['provider_calls'] is None
+    else:
+        with pytest.raises((ValueError, KeyError, FileNotFoundError)):
+            e.specification()
+    # Read through the unpatched method to check no historical bytes were written.
+    reader = real_read if fault in ('amendment_bytes', 'authority_bytes', 'owning_authority_bytes',
+                                   'local_source_bytes', 'recorded_source_bytes') else Path.read_bytes
+    assert {p: reader(p) for p in before} == before
+    assert {p: reader(p) for p in journals} == journals
+
+
+def test_inventory_admission_actual_v4_projection(monkeypatch):
+    """Read-only static admission, not full graph, ledger, native or release proof."""
+    path = Path(e.INVENTORY_AUTHORITY['path']).parent.parent / 'composition-v4/specification.prospective-disabled-v4.json'
+    # Pin the observed v4 input; passing this projection is not graph admission.
+    ref = dict(path=str(path), sha256='bd00228581595d848e5fea70691454fd35c3a8f7d5210d27d2b874580e5dcbeb')
+    monkeypatch.setattr(e, 'SPECIFICATION', ref)
+    monkeypatch.setattr(e, 'HISTORICAL_SPECIFICATION', PINNED_SPECIFICATION)
+    spec = e._recovery_json(e._recovery_read(ref))
+    e._recovery_specification(spec)
+    assert spec['gpu_authorized'] is spec['release_enabled'] is False
