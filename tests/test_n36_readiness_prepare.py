@@ -418,6 +418,58 @@ def test_engineering_admission_of_exact_measured_projection(measured, monkeypatc
         with pytest.raises(ValueError): e.validate_runtime_binding(plan)
 
 
+@pytest.mark.parametrize('fault', [
+    'valid', 'omit_source', 'omit_binding_test', 'unbound_policy', 'scientific_source',
+    'scripts/qd_ed_n36_source_extra.py', 'tests/test_n36_preparation_binding_extra.py',
+    'scripts/qd_ed_n34_source.py',
+])
+def test_preparation_source_scope_requires_exact_prospective_admission(measured, monkeypatch, fault):
+    m = measured
+    spec = copy.deepcopy(m['spec'])
+    binding = spec['runtime_binding']
+    amendment = e.read(binding['amendment'])
+    authority = e.read(binding['repair_authority'])
+    admitted = ['scripts/qd_ed_n36_source.py', 'tests/test_n36_preparation_binding.py']
+    if fault == 'omit_source':
+        admitted.remove('scripts/qd_ed_n36_source.py')
+    elif fault == 'omit_binding_test':
+        admitted.remove('tests/test_n36_preparation_binding.py')
+    elif fault.startswith(('scripts/', 'tests/')):
+        # Even an exactly bound prospective policy cannot admit an unlisted path.
+        admitted.append(fault)
+    amendment['new_allowed_entrypoints'] += admitted
+    binding['source_change_allowlist'] += admitted
+    binding['amendment'] = put(m['root'], 'SYNTHETIC-scope-amendment', amendment)
+    authority['amendment'] = binding['amendment']
+    binding['repair_authority'] = put(m['root'], 'SYNTHETIC-scope-authority', authority)
+    if fault == 'unbound_policy':
+        binding['source_change_allowlist'].append('scripts/unlisted.py')
+    selected = put(m['root'], 'SYNTHETIC-scope-spec', spec)
+    monkeypatch.setattr(e, 'SPECIFICATION', selected)
+    monkeypatch.setattr(e, 'HISTORICAL_SPECIFICATION', selected)
+    baseline = e.read(spec['canonical_runtime'])
+    runtime = copy.deepcopy(baseline)
+    runtime['preparation'].update(source=m['source']['commit'], source_record=m['source_ref'])
+    ref = m['save'](m['prep']['disabled_runtime_path'], runtime)
+    plan = dict(runtime=ref, source=m['source'], scientific_source=copy.deepcopy(m['source']))
+    if fault == 'scientific_source':
+        plan['scientific_source']['commit'] = '0' * 40
+    # Real committed inventory, ancestry, diff, policy and runtime validators run.
+    # All prospective documents and runtime bytes above are synthetic and local.
+    if fault == 'valid':
+        assert e.validate_runtime_binding(plan) == runtime
+        assert runtime['preparation']['runtime_ready'] is False
+        for key in ('files', 'tasks', 'environment', 'frozen_stage_provider', 'stage_condition'):
+            assert runtime[key] == baseline[key]
+        assert not set(admitted) & e.OPERATIONAL_FILES
+    else:
+        label = ('readiness scoped changes' if fault == 'unbound_policy' else
+                 'R1 runtime scientific source binding' if fault == 'scientific_source' else
+                 'R1 runtime repair source allowlist')
+        with pytest.raises(ValueError, match=label):
+            e.validate_runtime_binding(plan)
+
+
 @pytest.mark.parametrize('field', ['release_enabled', 'frozen', 'phase_authorization'])
 def test_preparation_graph_rejects_episode_authority(measured, field):
     m = measured

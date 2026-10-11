@@ -24,7 +24,8 @@ FIELDS = ['preparation.source', 'preparation.source_record', 'cuda_egl_verified'
           'gpu_mapping.cuda_egl_verified', 'cuda_egl_probe', 'provider_ready',
           'provider_evidence', 'preparation.runtime_ready', 'preparation.status',
           'preparation.readiness_proof']
-NEW_FILES = {'scripts/qd_ed_n36_readiness_prepare.py', 'tests/test_n36_readiness_prepare.py'}
+NEW_FILES = {'scripts/qd_ed_n36_readiness_prepare.py', 'tests/test_n36_readiness_prepare.py',
+             'scripts/qd_ed_n36_source.py', 'tests/test_n36_preparation_binding.py'}
 
 
 def closed(value, keys, label):
