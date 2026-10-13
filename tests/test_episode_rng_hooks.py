@@ -38,15 +38,20 @@ def test_default_hooks_do_not_touch_rng_or_require_schedule(fake_main, monkeypat
     assert len(runner.calls) == 2
 
 
-def test_prepare_and_rollout_record_real_task_and_explicit_seed(fake_main, tmp_path):
+@pytest.mark.parametrize('evaluation_name', ['eds_eval', 'evaluation'])
+def test_prepare_and_rollout_record_real_task_and_explicit_seed(fake_main, tmp_path, evaluation_name):
     hooks.install(fake_main)
     runner = fake_main.Main(dict(episode_rng_record_dir=str(tmp_path/'fixtures'), episode_seed_schedule=[546]))
+    if evaluation_name == 'evaluation':
+        runner.config['eds_eval'] = {'output_dir': str(tmp_path/'output'/evaluation_name)}
     episode = tmp_path/'output/episode_1'
     before = rng.signature(rng.capture())
     runner.perform_task_for_episode(episode)
     runner._run_episode(0, episode, 546)
     assert rng.signature(rng.capture()) == before
-    rows = [json.loads(x) for x in (tmp_path/'output/eds_eval/episode_rng_events.jsonl').read_text().splitlines()]
+    rows = [json.loads(x) for x in (tmp_path/'output'/evaluation_name/'episode_rng_events.jsonl').read_text().splitlines()]
+    if evaluation_name == 'evaluation':
+        assert not (tmp_path/'output/eds_eval').exists()
     assert [r['metadata'] for r in rows] == [dict(task_id=3, episode_seed=546, phase=p) for p in ('prepare','rollout')]
     assert len(runner.calls) == 2
 

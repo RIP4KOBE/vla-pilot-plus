@@ -116,7 +116,9 @@ except ModuleNotFoundError as exc:
             return result
 
 # Import LIBERO-PRO benchmark
-LIBERO_PRO_PATH = Path(__file__).parent.parent.parent / "third_party" / "libero_pro"
+_explicit_libero_root = os.environ.get("VLA_LIBERO_ROOT")
+LIBERO_PRO_PATH = (Path(_explicit_libero_root).resolve() if _explicit_libero_root else
+                   Path(__file__).parent.parent.parent / "third_party" / "libero_pro")
 LOCAL_LIBERO_CONFIG_PATH = Path(__file__).parent.parent.parent / ".libero_config"
 os.environ.setdefault("LIBERO_CONFIG_PATH", str(LOCAL_LIBERO_CONFIG_PATH))
 if str(LIBERO_PRO_PATH) not in sys.path:
@@ -125,10 +127,12 @@ _pythonpath_parts = [part for part in os.environ.get("PYTHONPATH", "").split(os.
 if str(LIBERO_PRO_PATH) not in _pythonpath_parts:
     os.environ["PYTHONPATH"] = os.pathsep.join([str(LIBERO_PRO_PATH), *_pythonpath_parts])
 LIBERO_PATH = Path(__file__).parent.parent.parent / "third_party" / "libero"
-if LIBERO_PATH.exists() and str(LIBERO_PATH) not in sys.path:
+if not _explicit_libero_root and LIBERO_PATH.exists() and str(LIBERO_PATH) not in sys.path:
     sys.path.insert(0, str(LIBERO_PATH))
 from libero.libero import benchmark, get_libero_path
 import libero.libero as _libero_module
+if _explicit_libero_root and not Path(_libero_module.__file__).resolve().is_relative_to(LIBERO_PRO_PATH):
+    raise RuntimeError("Imported LIBERO module differs from the explicitly verified runtime root")
 from libero.libero.envs import OffScreenRenderEnv
 
 

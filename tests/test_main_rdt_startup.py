@@ -448,6 +448,11 @@ def _run_execution_horizon_episode(
             distance = target_distances[min(self.plan_index, len(target_distances) - 1)]
             return {} if distance is None else {"target_distance_after": distance}
 
+        def get_last_vls_metrics(self):
+            # This helper tests execution horizons and logging integration;
+            # the real VLS telemetry schema is exercised in its own tests.
+            return {"guidance_type": "vls"}
+
         def get_normalized_reward(self):
             return 0.0
 
@@ -816,7 +821,8 @@ def test_vls_guidance_on_gripper_edge_keeps_policy_horizon(monkeypatch, tmp_path
 
     assert [idx for idx, flag in enumerate(policy.select_flags) if flag] == [0, 8]
     assert policy._action_chunk_horizon == 8
-    assert records == []
+    assert [(r['guidance_type'], r['global_step'], r['execution_horizon_resolved']) for r in records] == [
+        ('vls', 0, 8), ('vls', 8, 8)]
 
 
 @pytest.mark.parametrize(

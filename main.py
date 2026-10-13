@@ -1918,6 +1918,32 @@ class Main:
             if (
                 generate_new_chunk
                 and use_guidance
+                and guidance_type == "vls"
+                and self.policy_type == "rdt"
+                and eds_eval_config.get("enabled", False)
+                and eds_eval_config.get("write_metrics", True)
+            ):
+                get_vls_metrics = getattr(self.policy, "get_last_vls_metrics", None)
+                vls_metrics = get_vls_metrics() if callable(get_vls_metrics) else None
+                if not isinstance(vls_metrics, dict):
+                    raise RuntimeError("Guided VLS chunk did not produce mechanism metrics")
+                vls_metrics.update(
+                    episode=int(episode), episode_seed=int(episode_seed),
+                    global_step=int(global_steps), chunk_id=int(chunk_id),
+                    task_id=actual_task_id, suite=getattr(self.adapter, "suite_name", None),
+                    method_label=eds_eval_config.get("method_label"),
+                    job_id=eds_eval_config.get("job_id"),
+                    execution_horizon_resolved=int(resolved_action_horizon),
+                    execution_horizon_reason=execution_horizon_reason,
+                    select_action_latency_s=select_action_latency_s,
+                )
+                append_jsonl(
+                    Path(eds_eval_config.get("output_dir", self.output_dir)) / "vls_metrics.jsonl",
+                    vls_metrics,
+                )
+            if (
+                generate_new_chunk
+                and use_guidance
                 and guidance_type == "eds"
                 and eds_eval_config.get("enabled", False)
                 and eds_eval_config.get("write_metrics", True)
@@ -2099,10 +2125,14 @@ class Main:
                 # Show scale as "-" if not yet computed (first chunk before guidance runs)
                 scale_str = f"{scale:.1f}" if scale > 0 else "-"
                 status_text.extend([
-                    f"Norm_R: {norm_r:.2f}",
+                    f"{'Guidance_R' if guidance_type == 'vls' else 'Norm_R'}: {norm_r:.2f}",
                     f"Sig_Str: {sig_strength:.1%}",
                     f"Scale: {scale_str}",
                 ])
+                if guidance_type == "vls" and hasattr(self.policy, "get_stage_reward"):
+                    stage_reward = self.policy.get_stage_reward()
+                    stage_reward_text = "unavailable" if stage_reward is None else f"{stage_reward:.2f}"
+                    status_text.append(f"Stage_R: {stage_reward_text}")
 
             image_with_status = add_text_to_image(image, status_text)
             self._append_phase_timing(episode=episode, global_step=global_steps,

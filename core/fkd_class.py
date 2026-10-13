@@ -15,6 +15,7 @@ reward functions (e.g., trajectory reward based on keypoints); FKD does not rely
 
 from __future__ import annotations
 
+import copy
 from enum import Enum
 from typing import Callable, List, Optional, Tuple, Union
 
@@ -32,7 +33,7 @@ def _list_tensor_index(x: TensorOrList, indices: torch.Tensor) -> TensorOrList:
 
 
 class PotentialType(Enum):
-    """Different Feynman-Kac potential types。
+    r"""Different Feynman-Kac potential types。
 
     - DIFF: Only use the current reward and the difference between the current reward and the history reward r_t - r_{t-1}
     - MAX: Maintain the history maximum reward max_t r_t
@@ -96,7 +97,10 @@ class FKD:
         reward_fn: Callable[[TensorOrList], Union[torch.Tensor, List[float]]],
         reward_min_value: float = 0.0,
         device: torch.device | str = torch.device("cuda"),
+        record_diagnostics: bool = False,
     ) -> None:
+        self._diagnostics = (dict(calls=0, score_opportunities=0, actual_resamples=0,
+                                  ess_skips=0, events=[]) if record_diagnostics else None)
         self.potential_type = (
             potential_type
             if isinstance(potential_type, PotentialType)
@@ -162,6 +166,10 @@ class FKD:
         """Whether the last time step has been reached (only as a state query interface)."""
         return self._reached_terminal_sample
 
+    def get_diagnostics(self) -> Optional[dict]:
+        """Pure observation of actual scoring/resampling branches, when enabled."""
+        return copy.deepcopy(self._diagnostics)
+
     def _compute_reward(
         self, x0_preds: TensorOrList
     ) -> Tuple[torch.Tensor, TensorOrList]:
@@ -218,14 +226,24 @@ class FKD:
 
         # sampling_idx represents the "scheduler time step t" in the current implementation, e.g., 999->0.
         sampling_t = int(sampling_idx)
+        event = None
+        if self._diagnostics is not None:
+            self._diagnostics["calls"] += 1
+            event = dict(timestep=sampling_t, scored=False, resampled=False,
+                         ess=None, parent_indices=None, terminal_sort_indices=None)
+            self._diagnostics["events"].append(event)
 
         # Map timestep to its index in scheduler.timesteps, to check order and determine the end
         current_idx = self.t_to_index.get(sampling_t, None)
         if current_idx is None:
+            if event is not None:
+                event["reason"] = "unknown_timestep"
             # Unknown timestep, skip FKD logic
             return latents, None
 
         if current_idx <= self._last_idx_sampled:
+            if event is not None:
+                event["reason"] = "invalid_timestep_order"
             raise ValueError(
                 f"timestep index {current_idx} must be greater than {self._last_idx_sampled},"
                 "please ensure the order of scheduler.timesteps."
@@ -234,14 +252,21 @@ class FKD:
 
         # End: scheduler last time step
         at_terminal_sample = current_idx == (self.time_steps - 1)
+        if event is not None:
+            event["terminal"] = at_terminal_sample
         self._reached_terminal_sample = at_terminal_sample
 
         # Not at resampling time point, return directly (here using the set of "specific timestep values")
         if sampling_t not in self.resampling_interval:
+            if event is not None:
+                event["reason"] = "not_scheduled"
             return xt, None
 
         # Calculate reward
         rs_candidates, population_samples = self._compute_reward(x0)
+        if event is not None:
+            self._diagnostics["score_opportunities"] += 1
+            event["scored"] = True
 
         # Calculate potential & weights
         if self.potential_type == PotentialType.MAX:
@@ -280,6 +305,8 @@ class FKD:
         if self.adaptive_resampling or at_terminal_sample:
             normalized_w = w / w.sum()
             ess = 1.0 / (normalized_w.pow(2).sum() + 1e-12)
+            if event is not None:
+                event["ess"] = float(ess.detach().cpu().item())
             if ess >= 0.5 * self.num_particles and not at_terminal_sample:
                 # Effective sample size is sufficient, no forced resampling
                 do_resample = False
@@ -288,6 +315,10 @@ class FKD:
             indices = torch.multinomial(
                 w, num_samples=self.num_particles, replacement=True
             )
+            if event is not None:
+                self._diagnostics["actual_resamples"] += 1
+                event.update(resampled=True, reason="multinomial",
+                             parent_indices=indices.detach().cpu().tolist())
             resampled_xt = _list_tensor_index(xt, indices)
             self.population_rs = rs_candidates[indices]
             resampled_x0 = _list_tensor_index(population_samples, indices)
@@ -296,6 +327,9 @@ class FKD:
                 self.product_of_potentials[indices] * w[indices]
             )
         else:
+            if event is not None:
+                self._diagnostics["ess_skips"] += 1
+                event["reason"] = "ess_sufficient"
             # No resampling, only update history reward
             resampled_xt = xt
             resampled_x0 = population_samples
@@ -305,6 +339,8 @@ class FKD:
         # ensure index 0 corresponds to the sample with the highest reward, for downstream direct sample[0].
         if at_terminal_sample:
             sort_indices = torch.argsort(self.population_rs, descending=True)
+            if event is not None:
+                event["terminal_sort_indices"] = sort_indices.detach().cpu().tolist()
             resampled_xt = _list_tensor_index(resampled_xt, sort_indices)
             resampled_x0 = _list_tensor_index(resampled_x0, sort_indices)
             self.population_rs = self.population_rs[sort_indices]
