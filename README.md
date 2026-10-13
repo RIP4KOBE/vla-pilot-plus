@@ -2,7 +2,7 @@
 
 在共享的机器人观测、在线视觉 Stage 控制器和执行链上，比较 **VLS、EDS、EDS+QD** 三种推理方法。当前验收范围是 **RDT + LIBERO ObjectSwap OOD**。每任务在线生成 reward 程序，候选评分与梯度在本地 Torch 中计算；在线服务还承担身份描述和执行过程中的视觉 Stage 查询。
 
-三种方法已完成同一冻结版本的十任务在线验收：**EDS 3/10、VLS 1/10、EDS+QD 1/10**，30个任务均有效、零基础设施错误，30份完整视频通过解码检查。本轮整合门槛（三组有效且EDS≥3/10）已通过；发布基础设施更新在原环境与独立安装环境均通过 **1436项CPU测试**。main 合并身份待登记。[逐任务结果与限制](docs/steering/results.md) · [验收状态](docs/steering/integration-status.md)。
+三种方法已完成同一冻结版本的十任务在线验收：**EDS 3/10、VLS 1/10、EDS+QD 1/10**，30个任务均有效、零基础设施错误，30份完整视频通过解码检查。本轮整合门槛（三组有效且EDS≥3/10）已通过；发布基础设施更新在原环境与独立安装环境均通过 **1436项CPU测试**。已合入本地 main，尚未推送远端。[逐任务结果与限制](docs/steering/results.md) · [验收状态](docs/steering/integration-status.md)。
 
 这是每任务一个固定seed的ObjectSwap OOD比较，默认方法预算不同。EDS是本轮观测成功数最高的方法；结果不支持统计优越性、等计算预算或泛化结论。此前迁移版EDS的3/10单独保留。
 
@@ -76,7 +76,7 @@ VLS 上游方法见 [VLS: Steering Pretrained Robot Policies via Vision-Language
 | 迁移在线验收 | `cfecb12db736f1a3408d9528d9336aadcb7e41b5`；EDS 有效 3/10；[完整报告](.worktrees/exp/steering-integration/runs/eds-migration-20261013/migration-full10-report.md)与[验收 JSON](.worktrees/exp/steering-integration/runs/eds-migration-20261013/migration-full10-acceptance.json) |
 | 本次三模式受测 runtime | `33954ead452927fc3168efb610487a688f89169e`；EDS 3/10、VLS 1/10、EDS+QD 1/10；30/30有效，整合gate通过 |
 | 最终代码版本 | `b68777b46a374760a19fa76e3c309d9c84cfcc4c`；补齐两个已受测、原先被ignored的Hydra兼容alias，按原字节追踪；后续文档commit不改科学源码 |
-| 整合分支 / 最终 main 合并 | `codex/rdt-steering-integration`；本地main merge **PENDING_MAIN_MERGE_COMMIT**；本轮未推送 |
+| 整合分支 / 最终 main 合并 | `codex/rdt-steering-integration` 的 `c67ea2eca18f408b99244fcbcd2987f78eee408a` 已合入本地main；merge及团队基准为 `8c1051f85a57115163845ec478d06a3ccc68c190`；本轮未推送 |
 | 后续独立审计器 | 归档修复已接入；接入前的独立EDS复制归档重审将checker source hash与原runtime分别登记于[receipt](.worktrees/exp/steering-integration/checks/archive-v2-candidate-validation/receipt.json)；审计器/基础设施commit `5bf01db84e8c05251f720a3f8b9a73aa019f9568` |
 
 命名映射：`core/c0_reward_contract.py` → `core/target_distance_reward.py`；`core/poe_stage_capture.py` → `core/stage_capture.py`；`vlm_query/c0_contract_v1` → `vlm_query/target_distance`；合同 `c0_xyz_v1` → `target_distance`。Stage profile `evidence_v1/contact_v2/grasp_v3/proprio_v4` → `evidence/contact/grasp/online`。
