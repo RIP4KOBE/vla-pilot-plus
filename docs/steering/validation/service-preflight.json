@@ -1,0 +1,44 @@
+{
+  "started_at": "2026-10-13T08:40:00.180369+00:00",
+  "kind": "preflight_not_performance",
+  "status": "pass",
+  "api": {
+    "response": "red",
+    "valid": true,
+    "model": "gpt-6-astra",
+    "reasoning_effort": "low",
+    "counter": {
+      "backend": "codex_cli",
+      "request_attempts": null,
+      "sdk_retry_attempts": null,
+      "observation_available": false,
+      "logical_call_attempts": 1,
+      "completed_turns": 1,
+      "failed_calls": 0,
+      "usage_complete_calls": 1,
+      "input_tokens": 8573,
+      "cached_input_tokens": 0,
+      "output_tokens": 5,
+      "reasoning_output_tokens": 0,
+      "call_latency_s": 39.43468099902384
+    }
+  },
+  "gpu": {
+    "physical_gpu": 2,
+    "egl_device_id": 1,
+    "name": "NVIDIA H200 NVL",
+    "torch": "2.7.1+cu126",
+    "cuda": "12.6",
+    "tensor_probe": 32.0
+  },
+  "render": {
+    "libero_module": null,
+    "task": "pick_up_the_alphabet_soup_and_place_it_in_the_basket",
+    "image_shape": [
+      128,
+      128,
+      3
+    ]
+  },
+  "completed_at": "2026-10-13T08:40:48.111664+00:00"
+}
