@@ -45,8 +45,8 @@ STAGE_OUTPUT_SCHEMA = {
     "additionalProperties": False,
 }
 
-# Literal present in the pinned 0.155.1 CLI binary. This is an opt-in proposal;
-# the frozen N1V runner does not authorize this new acceptance policy.
+# Exact literal retained from audited CLI transport output.
+# Acceptance is controlled by the explicit per-run event policy below.
 TRANSPORT_FALLBACK_PREFIX = 'Falling back from WebSockets to HTTPS transport. '
 MODEL_METADATA_FALLBACK_TEMPLATE = (
     'Model metadata for `{model}` not found. Defaulting to fallback metadata; '

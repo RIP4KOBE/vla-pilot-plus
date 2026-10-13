@@ -14,6 +14,9 @@ import io
 from pathlib import Path
 import re
 from types import SimpleNamespace
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from scripts.steering_archive import support_asset, marker_frame
 
 import yaml  # Safe parsing only; no runtime/repository import.
 
@@ -126,7 +129,7 @@ def literal_assignment(path, name):
     raise ValueError('No literal assignment ' + name)
 
 
-def instruction_for_task(root, task, manifest):
+def instruction_for_task(root, task, manifest, *, archive_support=None):
     env_path = root / 'environment.json'
     if sha(env_path.read_bytes()) != manifest['environment_sha256']:
         raise ValueError('Environment manifest hash mismatch')
@@ -136,7 +139,7 @@ def instruction_for_task(root, task, manifest):
         raise ValueError('Asset manifest hash mismatch')
     assets = read_json(assets_path)
     rel = 'libero/libero/benchmark/libero_suite_task_map.py'
-    task_map = Path(env['libero']['root']) / rel
+    task_map = support_asset(root, 'task_map', archive_support=archive_support, manifest=manifest)
     expected = assets['files'][rel]
     if isinstance(expected,dict):
         expected = expected['sha256']
@@ -160,7 +163,7 @@ def evaluation_directory(root, manifest):
     return resolved
 
 
-def audit_run(run_dir, task=0, model="gpt-6-astra", effort="low"):
+def audit_run(run_dir, task=0, model="gpt-6-astra", effort="low", archive_support=None):
     """Read saved artifacts only; return task checks without writes or runtime imports."""
     args = SimpleNamespace(run_dir=Path(run_dir), task=task, model=model, effort=effort)
     root = args.run_dir.resolve()
@@ -243,7 +246,7 @@ def audit_run(run_dir, task=0, model="gpt-6-astra", effort="low"):
     check('unique_stage_query_identity', len(query_keys) == len(queries))
     check('queried_prefix_nonempty', bool(queries))
     stage_records, other_stage, reward_records = [], [], []
-    instruction = instruction_for_task(root, args.task, manifest)
+    instruction = instruction_for_task(root, args.task, manifest, archive_support=archive_support)
     reward_dir = episode / 'vlm_agent'
     reward_metadata = tracked(reward_dir / 'metadata.json')
     mapping = {int(k): v for k,v in reward_metadata['key_points_objects_map'].items()}
@@ -434,9 +437,7 @@ def audit_run(run_dir, task=0, model="gpt-6-astra", effort="low"):
             from PIL import Image
             import cv2
             import numpy as np
-            raw_path = Path(marker['raw_png_path'])
-            if not raw_path.exists():
-                raw_path = evaluation / 'stage_unmarked_frames' / f'episode_{episode_index:03d}' / f'step_{query["global_step"]:06d}.png'
+            raw_path = marker_frame(evaluation, episode_index, query['global_step'], marker)
             raw = rgb(raw_path)
             check(label + '/raw_frame_hash', sha(raw_path.read_bytes()) == marker['raw_png_sha256']
                   and sha(raw.tobytes()) == marker['raw_rgb_sha256'])
@@ -597,7 +598,7 @@ def audit_run(run_dir, task=0, model="gpt-6-astra", effort="low"):
         'summary':dict(Counter(c['status'] for c in checks.values())),
         'facts':facts, 'in_flight_or_pending':pending, 'artifact_sha256':file_evidence,
         'limits':[
-            'No saved reply/function is executed. No GPU, simulator, API, repository module imports or writes.',
+            'No saved reply/function is executed. No GPU, simulator, API, policy/simulator imports or raw-run writes.',
             'response_model is transport-config metadata, not independently returned server model attestation.',
             'Raw transport event streams and notice text were not saved. Event-summary checks rely on hash-verified runtime validation and retained notice classifications, not independent parser replay.',
             'Action rows record task and episode, not seed. Seed is established by episode metadata and Stage/compute records.',
@@ -613,6 +614,7 @@ def audit_run(run_dir, task=0, model="gpt-6-astra", effort="low"):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('run_dir', type=Path)
+    parser.add_argument('--archive-support', type=Path)
     parser.add_argument('--task', type=int, default=0)
     parser.add_argument('--model', default='gpt-6-astra')
     parser.add_argument('--effort', default='low')
@@ -620,7 +622,7 @@ def main():
     args = parser.parse_args()
     report_path = args.report.resolve()
     try:
-        result = audit_run(args.run_dir, args.task, args.model, args.effort)
+        result = audit_run(args.run_dir, args.task, args.model, args.effort, archive_support=args.archive_support)
     except Exception as exc:
         # Missing/malformed evidence is a failed audit, never an apparent pass.
         # Preserve a machine-readable result without exposing saved response text.
