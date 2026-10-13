@@ -1,0 +1,39 @@
+This experiment uses a FIXED numerical C0 reward contract for reproducibility.
+Generate a new program for the current task and describe its two stages using
+the actual instructed object and destination. Do not alter the reward formula.
+
+1. There are exactly two stages: reaching/grasping the instructed object, then
+   transporting/placing it in the basket. Return num_stages = 2.
+2. Identify the instructed target from the image and object-keypoint map. Use
+   its lowest numbered keypoint, which the task-grounded detector places first.
+   Hardcode that index, never an absolute world position or a computed selector.
+3. Stage 1 must use full isotropic Euclidean XYZ distance in meters. For each
+   timestep t in T, assign weight 3 when t >= int(0.7*T), otherwise weight 1.
+   Normalize these weights to sum to one. Return the batch mean of the negative
+   weighted sum of SQUARED Euclidean distances from the trajectory to the live
+   target keypoint. Equivalently:
+       -mean_B(sum_T(weights[t] * sum_XYZ((action_sequence-target_pos)**2)))
+4. Do not introduce XY upweighting, coordinate offsets, height biases, distance
+   cross terms, exponentials, gripper terms, scale multipliers, or distractor
+   penalties. This fixed formula takes precedence over optional examples of
+   separate XY and Z distances elsewhere in the prompt.
+5. Stage 2 must return a scalar zero tensor on action_sequence.device. This is
+   the C0 control condition; online Stage and the separate execution controller
+   decide when the learned policy should execute without ED guidance.
+6. All computation is inside the two stageN_guidance functions. Use live input
+   keypoints, torch operations, and scalar outputs. Do not import anything.
+
+The generated program will be checked against this formula at several horizons,
+batch sizes, trajectories and translated keypoint configurations. Do not include
+the checker, tests, helper functions, or alternative reward designs in the output.
+
+Execution precision requirement: input trajectories and keypoints can be
+bfloat16. Preserve the historical operation order exactly: compute
+`all_dists = torch.norm(action_sequence - target_pos, dim=-1)`, then square
+`all_dists ** 2`. Do NOT replace this with sum of elementwise squared differences
+and do NOT cast coordinates to float32. Build temporal weights from float32
+scalar constants torch.tensor(3.0, device=action_sequence.device) and
+torch.tensor(1.0, device=action_sequence.device), normalize their sum, and return
+`-(all_dists ** 2 * weights).sum(dim=1).mean()`. Do not cast the temporal weights
+to the action dtype. Algebraically equivalent rewrites differ in bfloat16; the
+checker tests both float32 and bfloat16 inputs.

@@ -1,0 +1,30 @@
+# Conda system/Python layer of the validated Linux x86_64 steering environment.
+# Create a NEW environment. The channels and eight explicit package versions
+# match the successful isolated conda-create inputs; transitive Conda builds
+# are not locked. The host also needs Git, a C compiler and Linux input headers
+# (evdev was built with GCC 13.3.0 on the validation host).
+#
+# From the repository root, after creating/activating this environment:
+#   python -m pip install -r requirements-steering.txt
+#   python scripts/prepare_steering_assets.py install-libero
+#   python -m pip install --no-deps --no-build-isolation \
+#     -e third_party/libero_pro -e third_party/lerobot
+#   python -m pip install --force-reinstall --no-deps opencv-python-headless==4.12.0.88
+#   python -m pip check
+# Fixed RDT and LeRobot submodules must first be initialized from this checkout.
+# Pip installation is intentionally separate: headless OpenCV must be the final
+# installation affecting cv2. See README for source/assets and CPU verification.
+# The clean environment passed 1118 CPU tests; GPU/API/model execution was not tested.
+name: vla-steering
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.12.12
+  - pip=25.2
+  - setuptools=80.9.0
+  - ffmpeg=8.0.0
+  - libegl=1.7.0
+  - libgl=1.7.0
+  - libglx=1.7.0
+  - libstdcxx-ng=15.2.0

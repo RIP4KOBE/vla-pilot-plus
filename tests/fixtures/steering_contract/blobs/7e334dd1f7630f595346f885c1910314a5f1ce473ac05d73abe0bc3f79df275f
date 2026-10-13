@@ -1,0 +1,97 @@
+{
+  "python": "3.12.12 | packaged by conda-forge | (main, Oct 22 2025, 23:25:55) [GCC 14.3.0]",
+  "packages": {
+    "torch": "2.7.1",
+    "torchvision": "0.22.1",
+    "numpy": "2.2.0",
+    "transformers": "4.53.3",
+    "diffusers": "0.35.2",
+    "mujoco": "3.7.0",
+    "robosuite": "1.4.0",
+    "hydra-core": "1.3.2",
+    "openai": "2.8.1",
+    "lerobot": "0.4.2"
+  },
+  "submodules": {
+    "rdt": {
+      "commit": "b896f4dcac8ed1c3fae4a056200db267607f131f",
+      "dirty": false
+    },
+    "lerobot": {
+      "commit": "715debf6c1723a28f1a57d4274a8c4ec35b6a417",
+      "dirty": false
+    }
+  },
+  "codex_cli": "codex-cli 0.156.1",
+  "libero": {
+    "valid": true,
+    "root": "/home/hynx/lizhuo/VLA-Pilot++/third_party/libero_pro",
+    "files_verified": 2308,
+    "upstream_commit": "eafdb809426b13153aa1e4c42d6601844217dfec",
+    "manifest_sha256": "8b6fa91960398a25af011c2fa9458f910ad4aa4599b45a853b04d743cac7711c"
+  },
+  "rng": {
+    "valid": true,
+    "manifest": "/home/hynx/lizhuo/VLA-Pilot++/tests/fixtures/steering_rng/fixture-manifest.json",
+    "sha256": "628c429d457def157c9163be94a1202721673f97f1e43aa6446e5a06889c6043",
+    "fixture_count": 20,
+    "scope": "file integrity only; RNG restoration is checked by the runtime hooks"
+  },
+  "models": [
+    {
+      "path": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object/config.json",
+      "sha256": "3482cc79b3268ccfca9d8cc9b8e32f3925dc71c3bd60f5e6dfcaa564aecde835",
+      "bytes": 919
+    },
+    {
+      "path": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object/ema/model.safetensors",
+      "sha256": "b4e3631db326689297cd2f0b02d32ade9dc6ee9ae09c03171add64b80e86aaa1",
+      "bytes": 2456705456
+    },
+    {
+      "path": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/snapshots/3db67ab1af984cf10548a73467f0e5bca2aaaeb2/config.json",
+      "sha256": "a58c2192a7166501ad2382c3d7ca3d694a1259b71a23a1925887e5afe7adcbd8",
+      "bytes": 593
+    },
+    {
+      "path": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/snapshots/3db67ab1af984cf10548a73467f0e5bca2aaaeb2/spiece.model",
+      "sha256": "d60acb128cf7b7f2536e8f38a5b18a05535c9e14c7a355904270e15b0945ea86",
+      "bytes": 791656
+    },
+    {
+      "path": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/snapshots/3db67ab1af984cf10548a73467f0e5bca2aaaeb2/tokenizer_config.json",
+      "sha256": "b971dce1d2805c2a66da8657156e7114a30501c6ba602fc947c8bf607a3ead2d",
+      "bytes": 1857
+    },
+    {
+      "path": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384/snapshots/9fdffc58afc957d1a03a25b10dba0329ab15c2a3/config.json",
+      "sha256": "adc04928d8fd19a61822584fe0cf2e813e5ebac17f3e49fb1ea096860ae6457b",
+      "bytes": 576
+    },
+    {
+      "path": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384/snapshots/9fdffc58afc957d1a03a25b10dba0329ab15c2a3/preprocessor_config.json",
+      "sha256": "f59da2f87c3cd079bd4f8f3037e81b277c60c498e279a8020331f67a5a3157e8",
+      "bytes": 368
+    },
+    {
+      "path": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384/snapshots/9fdffc58afc957d1a03a25b10dba0329ab15c2a3/model.safetensors",
+      "sha256": "ea2abad2b7f8a9c1aa5e49a244d5d57ffa71c56f720c94bc5d240ef4d6e1d94a",
+      "bytes": 3511950624
+    },
+    {
+      "path": "/home/hynx/.cache/torch/hub/facebookresearch_dinov2_main/hubconf.py",
+      "sha256": "c1f5090e78ff940b72c076d2bf9c0310d1707c946b3d10e2d6f2b0bdf56a6f64",
+      "bytes": 1126
+    },
+    {
+      "path": "/home/hynx/.cache/torch/hub/checkpoints/dinov2_vitb14_pretrain.pth",
+      "sha256": "0b8b82f85de91b424aded121c7e1dcc2b7bc6d0adeea651bf73a13307fad8c73",
+      "bytes": 346378731
+    },
+    {
+      "path": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/snapshots/3db67ab1af984cf10548a73467f0e5bca2aaaeb2/pytorch_model.bin",
+      "sha256": "c8407a9ae21075667be98f84f4c93e8a7bfc772a352cd2e6998f5916f7181db8",
+      "bytes": 44541587809
+    }
+  ]
+}

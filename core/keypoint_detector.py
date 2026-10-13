@@ -19,6 +19,7 @@ import numpy as np
 import torch
 import cv2
 import matplotlib.pyplot as plt
+from pathlib import Path
 from typing import Optional, Dict, Tuple, List
 from torch.nn.functional import interpolate
 from kmeans_pytorch import kmeans
@@ -82,6 +83,8 @@ class KeypointDetector:
 
     def __init__(self, config):
         self.config = config
+        self._dino_forward_calls = 0
+        self._dino_batch_rows = 0
         self.device = torch.device(self.config['device'])
         self.bounds_min = np.array(self.config['bounds_min'])
         self.bounds_max = np.array(self.config['bounds_max'])
@@ -114,10 +117,19 @@ class KeypointDetector:
         logger.info(f"Loading DINOv2 model: {model_name}")
         self.feature_extractor_type = 'dinov2'
         self.patch_size = 14  # DINOv2 uses patch size 14
-        self.dino_model = torch.hub.load(
-            'facebookresearch/dinov2',
-            model_name
-        ).eval().to(self.device)
+        cached_repo = Path(torch.hub.get_dir()) / "facebookresearch_dinov2_main"
+        if (cached_repo / "hubconf.py").exists():
+            logger.info(f"Loading DINOv2 model from local torch hub cache: {cached_repo}")
+            self.dino_model = torch.hub.load(
+                str(cached_repo),
+                model_name,
+                source="local",
+            ).eval().to(self.device)
+        else:
+            self.dino_model = torch.hub.load(
+                'facebookresearch/dinov2',
+                model_name
+            ).eval().to(self.device)
         logger.info(f"DINOv2 model loaded: {model_name}")
 
     def _load_dinov3(self, model_name: str):
@@ -305,11 +317,24 @@ class KeypointDetector:
         else:
             return self._get_features_dinov2(transformed_rgb, img_h, img_w, patch_h, patch_w)
 
+    def get_compute_counters(self):
+        """Cumulative actual DINO calls; episode consumers take snapshot deltas."""
+        return {
+            "dino_forward_calls": int(getattr(self, "_dino_forward_calls", 0)),
+            "dino_batch_rows": int(getattr(self, "_dino_batch_rows", 0)),
+        }
+
+    def _record_dino_forward(self, batch_rows):
+        # Count at the model boundary, including attempts that raise; no RNG use.
+        self._dino_forward_calls = getattr(self, "_dino_forward_calls", 0) + 1
+        self._dino_batch_rows = getattr(self, "_dino_batch_rows", 0) + int(batch_rows)
+
     def _get_features_dinov2(self, transformed_rgb, img_h, img_w, patch_h, patch_w):
         """Extract features using DINOv2."""
         img_tensors = torch.from_numpy(transformed_rgb).permute(2, 0, 1).unsqueeze(0).to(self.device)
         assert img_tensors.shape[1] == 3, "unexpected image shape"
 
+        self._record_dino_forward(img_tensors.shape[0])
         features_dict = self.dino_model.forward_features(img_tensors)
         raw_feature_grid = features_dict['x_norm_patchtokens']  # [1, patch_h*patch_w, feature_dim]
         raw_feature_grid = raw_feature_grid.reshape(1, patch_h, patch_w, -1)
@@ -338,6 +363,7 @@ class KeypointDetector:
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
 
         # Get features
+        self._record_dino_forward(inputs['pixel_values'].shape[0])
         outputs = self.dino_model(**inputs)
 
         # DINOv3 returns last_hidden_state with shape [1, num_patches + 1, feature_dim]
@@ -645,5 +671,3 @@ class KeypointDetector:
         )
         
         return keypoints, projected, mask_ids, dino_vis
-
-
