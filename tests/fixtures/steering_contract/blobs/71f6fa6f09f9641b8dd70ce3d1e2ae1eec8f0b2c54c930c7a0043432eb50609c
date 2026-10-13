@@ -1,0 +1,650 @@
+{
+  "valid": true,
+  "reason": "consistent_on_probes",
+  "probe_count": 64,
+  "max_absolute_difference": 0.0,
+  "checks": [
+    {
+      "stage": 1,
+      "batch": 1,
+      "horizon": 4,
+      "dtype": "torch.float32",
+      "expected": -0.09297864139080048,
+      "actual": -0.09297864139080048,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 1,
+      "horizon": 4,
+      "dtype": "torch.float32",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 1,
+      "horizon": 7,
+      "dtype": "torch.float32",
+      "expected": -0.0640576034784317,
+      "actual": -0.0640576034784317,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 1,
+      "horizon": 7,
+      "dtype": "torch.float32",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 1,
+      "horizon": 8,
+      "dtype": "torch.float32",
+      "expected": -0.07870839536190033,
+      "actual": -0.07870839536190033,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 1,
+      "horizon": 8,
+      "dtype": "torch.float32",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 1,
+      "horizon": 16,
+      "dtype": "torch.float32",
+      "expected": -0.06568551063537598,
+      "actual": -0.06568551063537598,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 1,
+      "horizon": 16,
+      "dtype": "torch.float32",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 3,
+      "horizon": 4,
+      "dtype": "torch.float32",
+      "expected": -0.0497688353061676,
+      "actual": -0.0497688353061676,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 3,
+      "horizon": 4,
+      "dtype": "torch.float32",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 3,
+      "horizon": 7,
+      "dtype": "torch.float32",
+      "expected": -0.0803990513086319,
+      "actual": -0.0803990513086319,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 3,
+      "horizon": 7,
+      "dtype": "torch.float32",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 3,
+      "horizon": 8,
+      "dtype": "torch.float32",
+      "expected": -0.08623892813920975,
+      "actual": -0.08623892813920975,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 3,
+      "horizon": 8,
+      "dtype": "torch.float32",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 3,
+      "horizon": 16,
+      "dtype": "torch.float32",
+      "expected": -0.053179994225502014,
+      "actual": -0.053179994225502014,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 3,
+      "horizon": 16,
+      "dtype": "torch.float32",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 1,
+      "horizon": 4,
+      "dtype": "torch.float32",
+      "expected": -0.05716048553586006,
+      "actual": -0.05716048553586006,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 1,
+      "horizon": 4,
+      "dtype": "torch.float32",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 1,
+      "horizon": 7,
+      "dtype": "torch.float32",
+      "expected": -0.07468612492084503,
+      "actual": -0.07468612492084503,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 1,
+      "horizon": 7,
+      "dtype": "torch.float32",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 1,
+      "horizon": 8,
+      "dtype": "torch.float32",
+      "expected": -0.0737309604883194,
+      "actual": -0.0737309604883194,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 1,
+      "horizon": 8,
+      "dtype": "torch.float32",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 1,
+      "horizon": 16,
+      "dtype": "torch.float32",
+      "expected": -0.08592689037322998,
+      "actual": -0.08592689037322998,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 1,
+      "horizon": 16,
+      "dtype": "torch.float32",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 3,
+      "horizon": 4,
+      "dtype": "torch.float32",
+      "expected": -0.07751428335905075,
+      "actual": -0.07751428335905075,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 3,
+      "horizon": 4,
+      "dtype": "torch.float32",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 3,
+      "horizon": 7,
+      "dtype": "torch.float32",
+      "expected": -0.05562770366668701,
+      "actual": -0.05562770366668701,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 3,
+      "horizon": 7,
+      "dtype": "torch.float32",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 3,
+      "horizon": 8,
+      "dtype": "torch.float32",
+      "expected": -0.09618372470140457,
+      "actual": -0.09618372470140457,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 3,
+      "horizon": 8,
+      "dtype": "torch.float32",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 3,
+      "horizon": 16,
+      "dtype": "torch.float32",
+      "expected": -0.07404180616140366,
+      "actual": -0.07404180616140366,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 3,
+      "horizon": 16,
+      "dtype": "torch.float32",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 1,
+      "horizon": 4,
+      "dtype": "torch.bfloat16",
+      "expected": -0.061004638671875,
+      "actual": -0.061004638671875,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 1,
+      "horizon": 4,
+      "dtype": "torch.bfloat16",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 1,
+      "horizon": 7,
+      "dtype": "torch.bfloat16",
+      "expected": -0.05611477792263031,
+      "actual": -0.05611477792263031,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 1,
+      "horizon": 7,
+      "dtype": "torch.bfloat16",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 1,
+      "horizon": 8,
+      "dtype": "torch.bfloat16",
+      "expected": -0.1092442125082016,
+      "actual": -0.1092442125082016,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 1,
+      "horizon": 8,
+      "dtype": "torch.bfloat16",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 1,
+      "horizon": 16,
+      "dtype": "torch.bfloat16",
+      "expected": -0.08222140371799469,
+      "actual": -0.08222140371799469,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 1,
+      "horizon": 16,
+      "dtype": "torch.bfloat16",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 3,
+      "horizon": 4,
+      "dtype": "torch.bfloat16",
+      "expected": -0.0939432755112648,
+      "actual": -0.0939432755112648,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 3,
+      "horizon": 4,
+      "dtype": "torch.bfloat16",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 3,
+      "horizon": 7,
+      "dtype": "torch.bfloat16",
+      "expected": -0.05769386887550354,
+      "actual": -0.05769386887550354,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 3,
+      "horizon": 7,
+      "dtype": "torch.bfloat16",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 3,
+      "horizon": 8,
+      "dtype": "torch.bfloat16",
+      "expected": -0.0826154425740242,
+      "actual": -0.0826154425740242,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 3,
+      "horizon": 8,
+      "dtype": "torch.bfloat16",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 3,
+      "horizon": 16,
+      "dtype": "torch.bfloat16",
+      "expected": -0.056334078311920166,
+      "actual": -0.056334078311920166,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 3,
+      "horizon": 16,
+      "dtype": "torch.bfloat16",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 1,
+      "horizon": 4,
+      "dtype": "torch.bfloat16",
+      "expected": -0.11207962036132812,
+      "actual": -0.11207962036132812,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 1,
+      "horizon": 4,
+      "dtype": "torch.bfloat16",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 1,
+      "horizon": 7,
+      "dtype": "torch.bfloat16",
+      "expected": -0.07991849631071091,
+      "actual": -0.07991849631071091,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 1,
+      "horizon": 7,
+      "dtype": "torch.bfloat16",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 1,
+      "horizon": 8,
+      "dtype": "torch.bfloat16",
+      "expected": -0.0453883558511734,
+      "actual": -0.0453883558511734,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 1,
+      "horizon": 8,
+      "dtype": "torch.bfloat16",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 1,
+      "horizon": 16,
+      "dtype": "torch.bfloat16",
+      "expected": -0.05750568211078644,
+      "actual": -0.05750568211078644,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 1,
+      "horizon": 16,
+      "dtype": "torch.bfloat16",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 3,
+      "horizon": 4,
+      "dtype": "torch.bfloat16",
+      "expected": -0.1088816300034523,
+      "actual": -0.1088816300034523,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 3,
+      "horizon": 4,
+      "dtype": "torch.bfloat16",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 3,
+      "horizon": 7,
+      "dtype": "torch.bfloat16",
+      "expected": -0.03658666834235191,
+      "actual": -0.03658666834235191,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 3,
+      "horizon": 7,
+      "dtype": "torch.bfloat16",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 3,
+      "horizon": 8,
+      "dtype": "torch.bfloat16",
+      "expected": -0.051701869815588,
+      "actual": -0.051701869815588,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 3,
+      "horizon": 8,
+      "dtype": "torch.bfloat16",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 1,
+      "batch": 3,
+      "horizon": 16,
+      "dtype": "torch.bfloat16",
+      "expected": -0.07622626423835754,
+      "actual": -0.07622626423835754,
+      "absolute_difference": 0.0,
+      "consistent": true
+    },
+    {
+      "stage": 2,
+      "batch": 3,
+      "horizon": 16,
+      "dtype": "torch.bfloat16",
+      "expected": 0.0,
+      "actual": 0.0,
+      "absolute_difference": 0.0,
+      "consistent": true
+    }
+  ],
+  "target_index": 0,
+  "contract": "target_distance"
+}
