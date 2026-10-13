@@ -1,0 +1,167 @@
+{
+  "schema": "rdt_vls_metrics_v1",
+  "guidance_type": "vls",
+  "sample_batch_size_observed": 4,
+  "action_chunk_horizon": 8,
+  "num_inference_steps": 5,
+  "denoising_steps_executed": 5,
+  "guide_scale": 1.0,
+  "diversity_enabled": true,
+  "diversity_scale": 1.0,
+  "start_ratio": 0.4,
+  "sigmoid_k": 12.0,
+  "sigmoid_x0": 0.7,
+  "gradient": {
+    "attempted": 3,
+    "applied": 3,
+    "zero": 0,
+    "nonfinite": 0,
+    "exception": 0,
+    "unavailable": 0,
+    "events": [
+      {
+        "status": "finite",
+        "timestep": 2,
+        "norm": 198.22705078125,
+        "raw_reward": -502.45849609375,
+        "scale": 0.7069478034973145,
+        "masked_norm": 1.0
+      },
+      {
+        "status": "finite",
+        "timestep": 1,
+        "norm": 138.47377014160156,
+        "raw_reward": -286.08148193359375,
+        "scale": 0.5475994348526001,
+        "masked_norm": 0.9999999403953552
+      },
+      {
+        "status": "finite",
+        "timestep": 0,
+        "norm": 95.42877960205078,
+        "raw_reward": -160.91958618164062,
+        "scale": 0.31615668535232544,
+        "masked_norm": 1.0
+      }
+    ]
+  },
+  "rbf": {
+    "attempted": 2,
+    "applied": 2,
+    "zero": 0,
+    "nonfinite": 0,
+    "exception": 0,
+    "unavailable": 0,
+    "events": [
+      {
+        "status": "finite",
+        "timestep": 4,
+        "norm": 0.2672443389892578,
+        "masked_norm": 0.9999999403953552,
+        "scale": 1.0
+      },
+      {
+        "status": "finite",
+        "timestep": 3,
+        "norm": 0.183677077293396,
+        "masked_norm": 0.9999999403953552,
+        "scale": 1.0
+      }
+    ]
+  },
+  "selection": {
+    "source": "reward_argmax",
+    "index": 0,
+    "latent_fingerprint": "4464f5317e8c4d79b142f95426c0fd2fedd6c7d8a2ac62c7e52ef4a35a4fcdf8",
+    "latent_fingerprint_scope": "before_final_action_mask",
+    "score_source": "existing_final_selection",
+    "reward_slice": "p1_to_p_horizon_minus_1",
+    "raw_score": -33.23148727416992,
+    "score_valid": true,
+    "score_status": "finite_selected_score",
+    "action_chunk_fingerprint": "8055d378fd607d689ee0ef96b978209926e0f8b16cf13c1f8ad92db33be6462f"
+  },
+  "fkd": {
+    "configured_enabled": true,
+    "effective_enabled": true,
+    "diagnostics_available": true,
+    "diagnostics": {
+      "calls": 2,
+      "score_opportunities": 2,
+      "actual_resamples": 2,
+      "ess_skips": 0,
+      "events": [
+        {
+          "timestep": 2,
+          "scored": true,
+          "resampled": true,
+          "ess": null,
+          "parent_indices": [
+            3,
+            2,
+            3,
+            3
+          ],
+          "terminal_sort_indices": null,
+          "terminal": false,
+          "reason": "multinomial"
+        },
+        {
+          "timestep": 1,
+          "scored": true,
+          "resampled": true,
+          "ess": null,
+          "parent_indices": [
+            3,
+            3,
+            0,
+            2
+          ],
+          "terminal_sort_indices": null,
+          "terminal": false,
+          "reason": "multinomial"
+        }
+      ]
+    },
+    "config": {
+      "potential_type": "max",
+      "lmbda": 1.0,
+      "adaptive_resampling": false,
+      "resample_frequency": 1
+    }
+  },
+  "resolved_start_timestep": 2,
+  "compute_delta": {
+    "model_forward_calls": 5,
+    "model_batch_rows": 20,
+    "denoising_invocations": 1,
+    "model_denoising_steps": 5,
+    "denoising_step_batch_rows": 20,
+    "renoise_invocations": 0,
+    "reward_calls": 19,
+    "reward_evaluations": 28,
+    "reward_scoring_batches": 4,
+    "guided_chunks": 1,
+    "unguided_chunks": 0,
+    "rbf_gradient_calls": 2,
+    "rbf_gradient_batch_rows": 8,
+    "vision_encoder_forward_calls": 0,
+    "vision_encoder_batch_rows": 0,
+    "text_encoder_forward_calls": 0,
+    "text_encoder_batch_rows": 0,
+    "model_forward_batch_sizes": [
+      4,
+      4,
+      4,
+      4,
+      4
+    ]
+  },
+  "outer_reward": {
+    "raw_score": -33.23148727416992,
+    "reference": -33.23148727416992,
+    "progress": 0.0,
+    "available": true,
+    "reason": "finite_selected_score"
+  }
+}
