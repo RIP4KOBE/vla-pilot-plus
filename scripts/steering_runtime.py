@@ -65,6 +65,7 @@ def runtime_environment(local, base=None):
                MUJOCO_EGL_DEVICE_ID=str(local['egl_device_id']),
                MUJOCO_GL='egl', PYOPENGL_PLATFORM='egl',
                LIBERO_CONFIG_PATH=str(local['libero_config']),
+               VLA_LIBERO_ROOT=str(local['libero_root']),
                TORCH_HOME=str(local['torch_home']), JOBLIB_MULTIPROCESSING='0',
                PYTHONUNBUFFERED='1', TOKENIZERS_PARALLELISM='false',
                HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1',
@@ -76,10 +77,35 @@ def runtime_environment(local, base=None):
     return env
 
 
+METHODS = ('vls', 'eds', 'eds_qd')
+
+
+def _merge_profile(base, changes, prefix=''):
+    """Profiles override declared settings; misspelled/new settings fail visibly."""
+    for name, value in changes.items():
+        if name not in base:
+            # This optional adapter override makes the effective VLS scale explicit.
+            if prefix + name != 'backend.libero.task_guide_scales':
+                raise ValueError(f'Unknown steering profile setting: {prefix}{name}')
+        if isinstance(value, dict):
+            if not isinstance(base.get(name), dict):
+                raise ValueError(f'Expected a mapping for {prefix}{name}')
+            _merge_profile(base[name], value, prefix + name + '.')
+        else:
+            base[name] = value
+
+
 def load_config(local, *, method, output_dir, tasks=None):
-    if method != 'eds':
-        raise ValueError('EDS migration is being verified; other modes are not yet released')
+    if method not in METHODS:
+        raise ValueError(f'Unknown steering method {method!r}; expected {METHODS}')
     cfg = yaml.safe_load((ROOT / 'configs/evaluation/libero_object_swap.yaml').read_text())
+    profile = yaml.safe_load((ROOT / f'configs/steering/{method}.yaml').read_text())
+    _merge_profile(cfg, profile)
+    expected_guidance = 'vls' if method == 'vls' else 'eds'
+    expected_archive = 'grid_archive' if method == 'eds_qd' else 'none'
+    if (cfg['main']['guidance_type'] != expected_guidance or
+            cfg['main']['eds_config']['qd_archive_mode'] != expected_archive):
+        raise ValueError('Steering method and effective algorithm/archive settings disagree')
     all_tasks = cfg['backend']['libero']['task_ids_filter']
     seeds = dict(zip(all_tasks, cfg['main']['episode_seed_schedule']))
     tasks = all_tasks if tasks is None else list(tasks)
@@ -90,8 +116,14 @@ def load_config(local, *, method, output_dir, tasks=None):
     cfg['main'].update(episode_num=len(tasks), episode_start_index=0,
                        episode_seed_schedule=[seeds[t] for t in tasks])
     cfg['backend']['libero']['task_ids_filter'] = tasks
+    scales = cfg['backend']['libero'].get('task_guide_scales')
+    if scales is not None:
+        if len(scales) != len(all_tasks):
+            raise ValueError('Task guide scales must cover the full declared task list')
+        scale_by_task = dict(zip(all_tasks, scales))
+        cfg['backend']['libero']['task_guide_scales'] = [scale_by_task[t] for t in tasks]
     cfg['steering']['method'] = method
-    cfg['main']['eds_eval'].update(method_label=method, job_id=out.name)
+    cfg['main']['eds_eval'].update(method_label=method, job_id=out.parent.name)
     cfg['main']['episode_rng_fixture_manifest'] = str(ROOT / cfg['main']['episode_rng_fixture_manifest'])
     cfg['perception']['vlm_agent']['query_template_dir'] = str(ROOT / 'vlm_query/target_distance')
     cfg['policy']['rdt'].update(pretrained_path=local['rdt_checkpoint'],
@@ -111,8 +143,22 @@ def source_manifest():
 
 
 def source_unchanged(manifest):
-    return all((ROOT / path).is_file() and digest(ROOT / path) == sha
-               for path, sha in manifest.items())
+    return source_manifest() == manifest
+
+
+def evaluation_directory(folder, manifest=None):
+    """Shared logs live under evaluation; old immutable cohorts remain readable."""
+    folder = Path(folder)
+    if manifest is None:
+        path = folder / 'manifest.json'
+        manifest = json.loads(path.read_text()) if path.exists() else {}
+    relative = Path(manifest.get('evaluation_directory', 'output/eds_eval'))
+    if relative.is_absolute() or '..' in relative.parts:
+        raise ValueError('Evaluation directory must be relative to its cohort')
+    target = (folder / relative).resolve()
+    if not target.is_relative_to(folder.resolve()):
+        raise ValueError('Evaluation directory escapes its cohort')
+    return target
 
 
 def git_commit():
@@ -122,26 +168,54 @@ def git_commit():
 def dependency_manifest(local):
     """Record actual assets and imported dependency revisions before loading CUDA."""
     import importlib.metadata
-    from scripts.prepare_steering_assets import verify_libero, verify_rng, model_files
+    from scripts.prepare_steering_assets import verify_libero, verify_rng, verify_libero_paths
+    from scripts.steering_model_assets import verify_model_assets
     packages = {}
     for name in ('torch', 'torchvision', 'numpy', 'transformers', 'diffusers', 'mujoco',
                  'robosuite', 'hydra-core', 'openai', 'lerobot'):
         packages[name] = importlib.metadata.version(name)
-    model_paths = model_files(Path(local['rdt_checkpoint']), Path(local['text_encoder']),
-                              Path(local['vision_encoder']), Path(local['torch_home']))
+    model_assets = verify_model_assets(local, repository_root=ROOT)
     submodules = {}
-    for name in ('rdt', 'lerobot'):
+    revisions = {'rdt': 'b896f4dcac8ed1c3fae4a056200db267607f131f',
+                 'lerobot': '715debf6c1723a28f1a57d4274a8c4ec35b6a417'}
+    for name, expected in revisions.items():
         path = ROOT / 'third_party' / name
         submodules[name] = {
             'commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=path, text=True).strip(),
             'dirty': bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=path, text=True)),
         }
+        if submodules[name]['commit'] != expected or submodules[name]['dirty']:
+            raise ValueError(f'Runtime vendor {name} must match the clean pinned revision {expected}')
+    # A shared environment can contain stale duplicate dist-info directories.
+    # Record actual imported modules in a separate CPU process, so this check
+    # cannot advance the policy worker's RNG or initialize its CUDA context.
+    code = '''import importlib, json, hashlib
+from pathlib import Path
+names = ['torch', 'torchvision', 'numpy', 'transformers', 'diffusers', 'accelerate',
+         'einops', 'gymnasium', 'PIL', 'psutil', 'mujoco', 'hydra', 'openai', 'cv2', 'lerobot']
+result = {}
+for name in names:
+    module = importlib.import_module(name)
+    path = Path(module.__file__).resolve()
+    result[name] = {'module_version': str(getattr(module, '__version__', 'not_exported')),
+                    'file': str(path), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
+import torch
+assert not torch.cuda.is_initialized()
+print(json.dumps(result))
+'''
+    env = runtime_environment(local)
+    env['CUDA_VISIBLE_DEVICES'] = ''
+    imported = subprocess.check_output([sys.executable, '-c', code], cwd=ROOT,
+                                       env=env, text=True)
+    imported_packages = json.loads(imported.splitlines()[-1])
     return {'python': sys.version, 'packages': packages, 'submodules': submodules,
+            'imported_packages': imported_packages,
+            'package_scope': 'distribution metadata and CPU-imported module entrypoints; not a full dependency tree hash',
             'codex_cli': subprocess.check_output(['codex', '--version'], text=True).strip(),
             'libero': verify_libero(Path(local['libero_root'])),
+            'libero_paths': verify_libero_paths(local),
             'rng': verify_rng(ROOT / 'tests/fixtures/steering_rng'),
-            'models': [{'path': str(p), 'sha256': digest(p), 'bytes': p.stat().st_size}
-                       for p in model_paths]}
+            'model_assets': model_assets}
 
 
 def rows(path):

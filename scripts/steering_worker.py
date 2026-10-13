@@ -20,6 +20,15 @@ def main():
         manifest = json.loads((config_path.parent / 'manifest.json').read_text())
         if digest(config_path) != manifest['config_sha256'] or not source_unchanged(manifest['source_sha256']):
             raise RuntimeError('Frozen config or runtime source changed before worker start')
+        if manifest.get('schema') == 'steering_cohort_v2':
+            from scripts.steering_runtime import load_local
+            from scripts.prepare_steering_assets import verify_libero_paths
+            local_path = config_path.parent / 'local-config.yaml'
+            if digest(local_path) != manifest['local_config_sha256']:
+                raise RuntimeError('Frozen local configuration changed before worker start')
+            environment = json.loads((config_path.parent / 'environment.json').read_text())
+            if verify_libero_paths(load_local(local_path)) != environment['libero_paths']:
+                raise RuntimeError('LIBERO asset path configuration changed before worker start')
         import torch
         if not torch.cuda.is_available():
             raise RuntimeError('CUDA is unavailable; no CPU substitute for the online cohort')

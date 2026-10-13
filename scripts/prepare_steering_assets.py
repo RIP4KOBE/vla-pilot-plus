@@ -28,6 +28,8 @@ import zipfile
 
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 ASSET_MANIFEST = Path(__file__).with_name("steering_assets_manifest.json")
 RNG_MANIFEST_SHA256 = "628c429d457def157c9163be94a1202721673f97f1e43aa6446e5a06889c6043"
 SEEDS = [44, 235, 43, 546, 6, 621, 197, 87, 151, 548]
@@ -179,10 +181,28 @@ def model_files(checkpoint: Path, text: Path, vision: Path, torch_home: Path) ->
     return required
 
 
+def verify_libero_paths(local: dict) -> dict:
+    """Bind the simulator's path configuration to the content-verified tree."""
+    import yaml
+    config_path = Path(local['libero_config']) / 'config.yaml'
+    config = yaml.safe_load(config_path.read_text())
+    benchmark = Path(local['libero_root']).resolve() / 'libero/libero'
+    expected = {'benchmark_root': benchmark, 'assets': benchmark / 'assets',
+                'bddl_files': benchmark / 'bddl_files', 'init_states': benchmark / 'init_files'}
+    if not isinstance(config, dict):
+        raise ValueError('LIBERO path config must be a mapping')
+    for name, target in expected.items():
+        value = config.get(name)
+        if not isinstance(value, str) or not Path(value).is_absolute() or Path(value).resolve() != target.resolve():
+            raise ValueError(f'LIBERO {name} does not point into the verified asset tree')
+    return {'valid': True, 'config_path': str(config_path.resolve()), 'config_sha256': digest(config_path),
+            'bindings': {name: str(path.resolve()) for name, path in expected.items()}}
+
+
 def configure(args) -> dict:
     libero = args.libero_root.resolve()
     checked = verify_libero(libero)
-    files = model_files(args.rdt_checkpoint, args.text_encoder, args.vision_encoder, args.torch_home)
+    model_files(args.rdt_checkpoint, args.text_encoder, args.vision_encoder, args.torch_home)
     benchmark = libero / "libero/libero"
     paths = {"benchmark_root": str(benchmark), "assets": str(benchmark / "assets"),
              "bddl_files": str(benchmark / "bddl_files"), "init_states": str(benchmark / "init_files"),
@@ -195,11 +215,12 @@ def configure(args) -> dict:
              "vision_encoder": str(args.vision_encoder.resolve()),
              "torch_home": str(args.torch_home.resolve()), "libero_root": str(libero),
              "libero_config": str(args.libero_config.resolve())}
+    from scripts.steering_model_assets import verify_model_assets
+    model_assets = verify_model_assets(local, repository_root=ROOT)
     write_json(args.libero_config / "config.yaml", paths, replace=args.replace_config)
     write_json(args.output, local, replace=args.replace_config)
     result = {"valid": True, "machine_config": str(args.output.resolve()), "libero": checked,
-              "model_files": [{"path": str(p.resolve()), "bytes": p.stat().st_size,
-                                **({"sha256": digest(p)} if args.hash_weights else {})} for p in files],
+              "model_assets": model_assets,
               "gpu_egl_mapping": "supplied by caller; this CPU-only command does not validate hardware mapping"}
     if args.report:
         write_json(args.report, result, replace=args.replace_config)
@@ -225,7 +246,7 @@ def main() -> None:
     config.add_argument("--gpu", type=int, required=True)
     config.add_argument("--egl-device-id", type=int, required=True, help="Host EGL index; do not infer it from the CUDA index")
     config.add_argument("--allocator-limit-gib", type=float, default=48)
-    config.add_argument("--hash-weights", action="store_true")
+    config.add_argument("--hash-weights", action="store_true", help="Compatibility option; full model content verification is now always required")
     config.add_argument("--report", type=Path)
     config.add_argument("--replace-config", action="store_true", help="Replace only the two explicitly named config files/report")
     args = parser.parse_args()
