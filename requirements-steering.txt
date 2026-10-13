@@ -1,24 +1,28 @@
-# Observed core pins from the working Python 3.12 steering environment (2026-10-13).
-# This is not a complete transitive lock or a claim of a clean-environment replay.
-# CUDA build is read from torch/version.py; distribution metadata omits +cu126.
-# Install in a NEW environment. Existing requirements.txt/environment.yml describe
-# different historical environments and must not be mixed with these pins.
-# Editable LIBERO and LeRobot are installed separately from prepared local trees:
-#   python -m pip install --no-deps -e third_party/libero_pro -e third_party/lerobot
-# This repository's pinned RDT submodule is imported directly, not pip-installed.
+# Linux x86_64 / Python 3.12.12 steering dependencies, validated 2026-10-13.
+# The isolated final environment passed real processor/import/config checks and
+# 1118 CPU tests at the migration source revision; GPU/API/inference were not run.
+# Version lines preserve the validated 62 direct inputs. The final recipe includes
+# future==1.0.0, discovered through a real BDDL import after the initial install.
+# Install into a NEW environment, separately from historical requirements.txt.
+# From the repository root: python -m pip install -r requirements-steering.txt
+# Then register the fixed local LIBERO/LeRobot sources with --no-deps
+# --no-build-isolation, and force-reinstall opencv-python-headless==4.12.0.88 LAST.
+# Both OpenCV distributions share cv2 files; verify cv2.version.headless is True.
+-c constraints-steering.txt
+-r requirements-steering-lerobot-base.txt
 --extra-index-url https://download.pytorch.org/whl/cu126
-accelerate==1.12.0
+accelerate==1.13.0
 av==15.1.0
 bddl==1.0.1
 cloudpickle==3.1.2
 diffusers==0.35.2
 draccus==0.10.0
 easydict==1.13
-einops==0.8.1
+einops==0.8.2
 filelock==3.28.0
 glfw==2.10.0
 gym==0.26.2
-gymnasium==1.2.2
+gymnasium==1.2.3
 h5py==3.15.1
 huggingface-hub==0.35.3
 hydra-core==1.3.2
@@ -31,14 +35,14 @@ llvmlite==0.45.1
 matplotlib==3.10.7
 mujoco==3.7.0
 numba==0.62.1
-numpy==2.2.0
+numpy==2.2.6
 omegaconf==2.3.0
 openai==2.8.1
 opencv-python==4.12.0.88
 packaging==25.0
-pillow==11.3.0
+pillow==12.2.0
 protobuf==6.33.6
-psutil==7.1.3
+psutil==7.2.2
 PyOpenGL==3.1.6
 pytest==9.0.3
 python-dotenv==1.2.2
@@ -60,3 +64,12 @@ transforms3d==0.4.2
 trimesh==4.10.0
 typing-extensions==4.15.0
 transformers @ git+https://github.com/huggingface/transformers.git@dcddb970176382c0fcf4521b0c0e6fc15894dfe0
+parse==1.20.2
+datasets==4.1.1
+pandas==3.0.2
+pyarrow==23.0.1
+deepdiff==8.6.2
+attrs==25.4.0
+fsspec==2025.9.0
+pyserial==3.5
+future==1.0.0
