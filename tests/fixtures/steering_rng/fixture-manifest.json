@@ -1,0 +1,208 @@
+{
+  "calibration_audit_sha256": "25eaa4854a84bd2051646491741cc9cdcb3cf9fb377b5555301b8134585f6d95",
+  "calibration_valid": true,
+  "fixtures": {
+    "0:prepare": {
+      "file": "fixtures/task_00_prepare.pt",
+      "metadata": {
+        "episode_seed": 44,
+        "phase": "prepare",
+        "task_id": 0
+      },
+      "sha256": "4b94c2157a53199dc3c1a74463f41585d6424ac7494b6fc3693f9aa57961dc12",
+      "state_signature": "87bdf0f41bd3ed0e77b91ad39378ff97908404bbaca4a9046094ab71e06f07d7"
+    },
+    "0:rollout": {
+      "file": "fixtures/task_00_rollout.pt",
+      "metadata": {
+        "episode_seed": 44,
+        "phase": "rollout",
+        "task_id": 0
+      },
+      "sha256": "910313f963faa66e7b1aca68297d317714ceb9cfdafbf42d00e16e1f309de420",
+      "state_signature": "99589dc055cb733226e9349deb7aaec41a57914a81dc1bef2729ffd485e1ae56"
+    },
+    "1:prepare": {
+      "file": "fixtures/task_01_prepare.pt",
+      "metadata": {
+        "episode_seed": 235,
+        "phase": "prepare",
+        "task_id": 1
+      },
+      "sha256": "c622067363ddb1f0546749d590b6a1f61310f0954307e587dad1ae3b15484086",
+      "state_signature": "2d8fe8999926fb76d1326d93aff78f5f575d0741e443c47c4bae417f1ab60044"
+    },
+    "1:rollout": {
+      "file": "fixtures/task_01_rollout.pt",
+      "metadata": {
+        "episode_seed": 235,
+        "phase": "rollout",
+        "task_id": 1
+      },
+      "sha256": "5338c931b8513373672f19399f69c4361c3fdbc35f187d5ee5d7309055350333",
+      "state_signature": "3b3ff1f51d790d52781a139fdaf862c87e70e136c5ef4269be87871c571dc12f"
+    },
+    "2:prepare": {
+      "file": "fixtures/task_02_prepare.pt",
+      "metadata": {
+        "episode_seed": 43,
+        "phase": "prepare",
+        "task_id": 2
+      },
+      "sha256": "a6e7856d144a9245f5607f0e609f691436aab3c9f903901784a1a71e08dbcbe6",
+      "state_signature": "6976bfea5f6a38810b2b8a583eed059f6887d5fce583d4aabd2628f60d3481e4"
+    },
+    "2:rollout": {
+      "file": "fixtures/task_02_rollout.pt",
+      "metadata": {
+        "episode_seed": 43,
+        "phase": "rollout",
+        "task_id": 2
+      },
+      "sha256": "fbac7995fc763e65f1329c5a70ce52db220a02434d5bf4fb06b958acfbcfc6fa",
+      "state_signature": "ab1c343152adcf4586d4306ef67a8a20d8391bb5a54ca75275cef69b81f85372"
+    },
+    "3:prepare": {
+      "file": "fixtures/task_03_prepare.pt",
+      "metadata": {
+        "episode_seed": 546,
+        "phase": "prepare",
+        "task_id": 3
+      },
+      "sha256": "c1db0a66164af74d24d6f4fd48d36bc318304e659dd17e0c248f03355769bed1",
+      "state_signature": "646756f2c723839bd21e29872dd7c53b556030282fe45e90b0dec4b736f0d942"
+    },
+    "3:rollout": {
+      "file": "fixtures/task_03_rollout.pt",
+      "metadata": {
+        "episode_seed": 546,
+        "phase": "rollout",
+        "task_id": 3
+      },
+      "sha256": "461bc783633f3ec97a6b8ade80ef6ee6c332998b309a007157d2bdbdd657a27d",
+      "state_signature": "c7b1e31e2a66e34a47ff04f76fa6a99a3af168811122f0fae1391e23b1433412"
+    },
+    "4:prepare": {
+      "file": "fixtures/task_04_prepare.pt",
+      "metadata": {
+        "episode_seed": 6,
+        "phase": "prepare",
+        "task_id": 4
+      },
+      "sha256": "fa458c8817de3783bc9d7d2b603fded3d5b0618648e5fe33a5a97591538069e2",
+      "state_signature": "1d823df23aae973aa07bac3c0e24577eaf51b78fc6ed1ed0db3b7334c7c30c40"
+    },
+    "4:rollout": {
+      "file": "fixtures/task_04_rollout.pt",
+      "metadata": {
+        "episode_seed": 6,
+        "phase": "rollout",
+        "task_id": 4
+      },
+      "sha256": "d5858d3de808bbf6ceecd0b00f2226da6fb21be441a03e3c70e8851fe20b614f",
+      "state_signature": "b1fc77a9d4439e989d0cb1bfddf1d798870e3eaf2c5fbf465690a4e94d5ad6d1"
+    },
+    "5:prepare": {
+      "file": "fixtures/task_05_prepare.pt",
+      "metadata": {
+        "episode_seed": 621,
+        "phase": "prepare",
+        "task_id": 5
+      },
+      "sha256": "9a6b463fb04fdef0ac6f61b05dc27ee2f5deb9e51898a4221124633293b04af8",
+      "state_signature": "15f44da3744b47b0a2864d5a993b81737f889f9d593f1028b1058e0866b71fdf"
+    },
+    "5:rollout": {
+      "file": "fixtures/task_05_rollout.pt",
+      "metadata": {
+        "episode_seed": 621,
+        "phase": "rollout",
+        "task_id": 5
+      },
+      "sha256": "ace2abc680c5e84fc092a710c1fa07e8c08cc60b12e8b9f0bd9a7b14faca8cce",
+      "state_signature": "ce7f86da06fb38ed4dacd2b276af2d595a3b2ca7f3c0e7b4e86bcdf4b915d98e"
+    },
+    "6:prepare": {
+      "file": "fixtures/task_06_prepare.pt",
+      "metadata": {
+        "episode_seed": 197,
+        "phase": "prepare",
+        "task_id": 6
+      },
+      "sha256": "8eede54bfc088d6b2bdce99e327b2af0d30d8bbe4a27456ba1486bc57188bdd6",
+      "state_signature": "9d380f29c9c12f7ac904eb73b9bbbc273954a0f85bcaa84f0c4b036bdd6acf52"
+    },
+    "6:rollout": {
+      "file": "fixtures/task_06_rollout.pt",
+      "metadata": {
+        "episode_seed": 197,
+        "phase": "rollout",
+        "task_id": 6
+      },
+      "sha256": "abf8406fabd5b2cb5888b1fad7c376f3e984998943c113af2ba474e882e7c2d4",
+      "state_signature": "c50eaa33758ba0d2854aac7dbfb1dcff1e697dcf1828a2e6f0e5d5535b6b7d4d"
+    },
+    "7:prepare": {
+      "file": "fixtures/task_07_prepare.pt",
+      "metadata": {
+        "episode_seed": 87,
+        "phase": "prepare",
+        "task_id": 7
+      },
+      "sha256": "7601a2220930838cd5e5d0024db88f4a2c7b60b479431b0180c148f8b33ddbee",
+      "state_signature": "b2d26a24445812b242d2f360ab8694599066a788fd3f7a1efe668f000b6bec91"
+    },
+    "7:rollout": {
+      "file": "fixtures/task_07_rollout.pt",
+      "metadata": {
+        "episode_seed": 87,
+        "phase": "rollout",
+        "task_id": 7
+      },
+      "sha256": "cd2acdb29d59ee90ce6d0f2b242412c837cc4eeb56d7bd1af542943b4e316421",
+      "state_signature": "96a57b4fdd75a8eee768b1f7ca6b5781cef686c9715ece6f91ffad3dfdc95251"
+    },
+    "8:prepare": {
+      "file": "fixtures/task_08_prepare.pt",
+      "metadata": {
+        "episode_seed": 151,
+        "phase": "prepare",
+        "task_id": 8
+      },
+      "sha256": "09decefac9a7f04d461d9fb0fa4d8743099279bac5c1bb0080155f7a208e9739",
+      "state_signature": "721d3dd4d9b3ee658da90e99216955630a4b19188d93741297d01353ab8b04c7"
+    },
+    "8:rollout": {
+      "file": "fixtures/task_08_rollout.pt",
+      "metadata": {
+        "episode_seed": 151,
+        "phase": "rollout",
+        "task_id": 8
+      },
+      "sha256": "abcbd6df95b10a19fb9b86343dcf9286e70b8d6ee61cdaf9b634f6a636bbb19f",
+      "state_signature": "3fa05c8a481d88eb7d6c7a3dd60d4d2a405f944b342dc3d78733751c164c2f2d"
+    },
+    "9:prepare": {
+      "file": "fixtures/task_09_prepare.pt",
+      "metadata": {
+        "episode_seed": 548,
+        "phase": "prepare",
+        "task_id": 9
+      },
+      "sha256": "06343b102e840e07b8bbf26c560b57f9fb78f93047fb9ba60bb1ff115870cf5d",
+      "state_signature": "5fbb8326c1769a0286997e62a81d24453d62b7c92ecc905123c823d9af9e3739"
+    },
+    "9:rollout": {
+      "file": "fixtures/task_09_rollout.pt",
+      "metadata": {
+        "episode_seed": 548,
+        "phase": "rollout",
+        "task_id": 9
+      },
+      "sha256": "1ee46fdc5dac2f84a4c67cdf07fac5ff9322e03e82b65d33ebd4e7e331da35a5",
+      "state_signature": "539c2a2a68d964193a8a14cf6a77b24ebbefb1351100708c4cfda6fd8f61e469"
+    }
+  },
+  "purpose": "RNG initialization only; no historical replies, actions, reward or environment states",
+  "schema": "episode_rng_fixture_manifest_v1"
+}
