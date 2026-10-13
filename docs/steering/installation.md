@@ -1,6 +1,20 @@
 # 安装、资产与本机配置
 
-依赖配方已在新的 Conda 环境真实安装并完成 CPU 入口、processor 和 1118 项测试验收。该结果绑定迁移提交；最终公共代码的完整验证仍见[整合状态](integration-status.md)。本页提供已接入的安装与资产入口，不把 CPU 成功当作 GPU/API 或任务成绩。
+依赖配方已在全新 Conda 环境真实安装，完成入口/processor验收，最初通过1118项CPU测试；同一独立环境对在线受测公共runtime通过1403项CPU测试，验收后发布基础设施版本通过1436项CPU测试、3项跳过。安装记录与本轮在线成绩分别见[整合状态](integration-status.md)。本页命令面向Linux新clone；在线运行还需取得固定资产并准备自己的Codex登录。
+
+## Codex CLI 与宿主前提
+
+在线路径需要单独安装 [Codex CLI](https://learn.chatgpt.com/docs/codex/cli) 并加入 PATH；下方 Conda/pip 配方不安装它。验收使用 **0.156.1**。官方默认安装方式可能取得更新版本，应记录实际版本，并为不同版本重新验证 exec 参数、事件格式及本项目预检。这里没有声称在干净Python环境中重新完成过CLI安装或新账号登录。
+
+```bash
+command -v codex
+codex --version
+# 已有有效登录可直接检查；新使用者完成自己的登录。
+codex login
+codex login status
+```
+
+无浏览器服务器可参考[官方鉴权说明](https://learn.chatgpt.com/docs/auth#login-on-headless-devices)，使用 `codex login --device-auth`；这需要账户或工作区允许设备码登录。登录凭据留在使用者自己的CLI环境中，不复制到机器配置或Git。
 
 ## 创建新环境
 
@@ -45,14 +59,14 @@ python -c "import cv2.version as v; assert v.headless; print(v.opencv_version, v
 
 ## 固定模型与源码资产
 
-大模型不在仓库中。完整身份由 [steering_model_assets_manifest.json](../../scripts/steering_model_assets_manifest.json) 定义，包含214个文件、50,861,376,376字节和3个归一化源文件约束。此前 CPU 校验已真实流式读取并匹配，未反序列化或执行模型。**精确资产分发的可访问位置仍待维护者提供**，不保证仅凭模型名称可取回相同字节。
+大模型不在仓库中。完整身份由 [steering_model_assets_manifest.json](../../scripts/steering_model_assets_manifest.json) 定义，包含214个文件、50,861,376,376字节和3个归一化源文件约束。此前 CPU 校验已真实流式读取并匹配，未反序列化或执行模型。**目前未配置公开的精确资产包**。维护者本机的逻辑根由ignored `configs/local.yaml`记录；新使用者需取得对应文件副本并自行填写新路径，不保证仅凭模型名称可取回相同字节。
 
 | 机器配置逻辑根 | 必需内容与来源边界 |
 | --- | --- |
-| `rdt_checkpoint` | `config.json`、`ema/model.safetensors`；公开 checkpoint revision 未核实，需维护者提供准确文件或验证固定远端版本 |
+| `rdt_checkpoint` | `config.json`、`ema/model.safetensors`；没有已核实的公开下载来源；需维护者交付与清单匹配的准确文件 |
 | `text_encoder` | T5明确 snapshot，revision `3db67ab1af984cf10548a73467f0e5bca2aaaeb2`，不能指向上层 cache root |
 | `vision_encoder` | SigLIP明确 snapshot，revision `9fdffc58afc957d1a03a25b10dba0329ab15c2a3` |
-| `torch_home` | `hub/facebookresearch_dinov2_main/` 源码及 `hub/checkpoints/dinov2_vitb14_pretrain.pth`；源码 commit 未知，目录名不证明版本 |
+| `torch_home` | `hub/facebookresearch_dinov2_main/` 源码及 `hub/checkpoints/dinov2_vitb14_pretrain.pth`；源码 commit 未知，需维护者交付hash匹配的源码；目录名不证明版本 |
 | `libero_root` | 当前 clone 的固定 LIBERO 代码、资产和 object-swap 输入，默认 `third_party/libero_pro` |
 | `libero_config` | 当前机器的 LIBERO路径配置目录，默认 `.libero_config` |
 
@@ -60,15 +74,17 @@ T5/SigLIP revision 来自本地 cache证据，远端可用性未重新核验。R
 
 ## 配置机器并严格校验
 
-准备上述资产后执行。GPU和EGL编号均为示例，应先确认当前机器的物理对应关系；配置写入新文件，不提交机器配置。
+准备上述资产后执行。GPU和EGL枚举应先通过设备身份和实际render确认。下面使用待替换的设备变量；配置写入新文件，不提交机器配置。
 
 ```bash
+STEERING_GPU="REPLACE_WITH_ASSIGNED_GPU"
+STEERING_EGL="REPLACE_WITH_VERIFIED_EGL_INDEX"
 python scripts/prepare_steering_assets.py configure \
   --rdt-checkpoint /path/to/rdt \
   --text-encoder /path/to/t5/snapshots/3db67ab1af984cf10548a73467f0e5bca2aaaeb2 \
   --vision-encoder /path/to/siglip/snapshots/9fdffc58afc957d1a03a25b10dba0329ab15c2a3 \
   --torch-home /path/to/torch-cache \
-  --gpu 0 --egl-device-id 0 --output configs/local.yaml
+  --gpu "$STEERING_GPU" --egl-device-id "$STEERING_EGL" --output configs/local.yaml
 
 # Optional standalone report; the identical model check is always enforced by
 # configure, preflight and the real launcher. A new report filename is required.
@@ -88,7 +104,7 @@ GPU编号与EGL枚举独立，一次成功render也不证明二者对应同一�
 
 ## 分层验证
 
-1. **CPU配置预览：** 按[README](../../README.md#从安装到运行)对三种方法使用 `--print-config`。这一步不验证模型内容或设备。
+1. **CPU配置预览：** 按[README](../../README.md#开始使用)对三种方法使用 `--print-config`。这一步不验证模型内容或设备。
 2. **本机资产预检：** 运行下面不带GPU/API标志的命令，保存独立报告。
 3. **GPU/API预检：** 已获设备分配且空闲时，在另一个新目录显式增加 `--gpu --api`。
 4. **完整cohort：** 每种方法用自己的新目录与冻结源码，单独完成十任务和审计。
@@ -102,6 +118,6 @@ env -u VLA_CODEX_ONLY CUDA_VISIBLE_DEVICES='' PYTHON_DOTENV_DISABLED=1 \
   python -m pytest tests -q --disable-warnings -p no:cacheprovider
 ```
 
-普通CPU pytest命令不封锁网络/API；正式隔离验收使用专门的socket/provider防护，并检查真实processor身份与图像翻转/8维状态行为。原真实干净安装的结果是 `pip check` 无冲突、62项依赖/入口import、真实root processor、worker `--cfg job`和 **1118 passed、1 warning、86.53s**。其source与日志索引在[README provenance](../../README.md#provenance来源与本地证据)。新集成测试数量使用新一轮结果。
+普通CPU pytest命令不封锁网络/API；正式隔离验收使用专门的socket/provider防护，并检查真实processor身份与图像翻转/8维状态行为。原真实干净安装的结果是 `pip check` 无冲突、62项依赖/入口import、真实root processor、worker `--cfg job`和 **1118 passed、1 warning、86.53s**。其source与日志索引在[README provenance](../../README.md#provenance)。同一独立环境的公共runtime回归为1403 passed、1 warning、124.63s；发布基础设施回归为1436 passed、3 skipped、1 warning、130.02s。3项跳过是只用于外置候选的before/after配置对照，接入前已通过；这些后续回归没有重新安装环境。
 
-该新环境没有验证GPU/EGL reset/render、模型权重加载/策略推理、Codex登录/API或torchcodec的native解码后端；不能沿用另一个环境的在线成绩。依赖成功、资产身份、机制正确和任务成功分别提供证据。
+该独立环境的验收范围仍为CPU；GPU/EGL render、实际模型推理和在线服务证据来自原运行环境，torchcodec native解码也未在干净环境验收。完整cohort与本次资产预检结果各自保存来源。

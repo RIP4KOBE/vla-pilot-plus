@@ -1,10 +1,68 @@
-# Steering 整合状态
+# 整合与验收状态
 
-更新时间：2026-10-13。**阶段3的 EDS 迁移完整验收已通过；阶段4的公共三模式整合正在进行。** 公共版本已通过两环境 CPU 回归与三个设备的 CUDA/EGL 检查，EDS/VLS/EDS+QD 各自十任务和最终合并仍待完成。本文的结果表只登记已完成且有冻结证据的运行。
+2026-10-13三组完整在线验收已通过：**EDS 3/10、VLS 1/10、EDS+QD 1/10，30/30任务有效、零基础设施错误**；三组有效且EDS≥3/10的整合gate通过。全部原始审计和最终汇总已在基础设施变更前封存。随后接入的生命周期/归档修复通过两环境各1436项CPU测试；本地main合并身份待登记，未推送远端。
+
+[逐任务结果与计算预算](results.md) · [随Git结果JSON](validation/final-results.json) · [安装](installation.md) · [运行与归档](evaluation.md)
+
+## 受测与发布身份
+
+| 身份 / 阶段 | 结果 |
+| --- | --- |
+| 在线受测runtime | `33954ead452927fc3168efb610487a688f89169e` |
+| 原始完整验收 | EDS 3/10（task 3、8、9）；VLS 1/10（task 3）；EDS+QD 1/10（task 5）；全部finished、exit 0、source unchanged |
+| 最终整合汇总 | `final_accepted=true`；SHA-256 `a67ee5e13f7563b86ea8fadd9e55dd5d5b80f53601cdd1e65f1af72a2c2402eb` |
+| 原始验收封存 | 17:18:34 UTC；SHA-256 `14502922a48c5c7ec8de5a59e698a2104d7a241cba2b4e1a9e95a4b51a4e4161` |
+| 后续发布基础设施 / 审计器commit | `5bf01db84e8c05251f720a3f8b9a73aa019f9568`；未重跑科学任务、GPU或API |
+| 最终代码版本 | `b68777b46a374760a19fa76e3c309d9c84cfcc4c`；相同runtime字节，补追踪原有两个Hydra兼容alias |
+| 本地main合并commit | **PENDING_MAIN_MERGE_COMMIT** |
+| 远端发布 | 本轮未推送；普通远端clone尚不包含本次整合，需维护者发布后再获取 |
+| 原始证据 / 精确模型资产 | 维护者本机持有，无公开下载包；位置与来源统一见[README provenance](../../README.md#provenance) |
+
+[最终汇总](../../.worktrees/exp/steering-integration/checks/three-mode-final.json)、[封存记录](../../.worktrees/exp/steering-integration/checks/three-mode-final-seal.json)与[视频索引](../../.worktrees/exp/steering-integration/checks/video-health/index.json)都是本机ignored证据。Git保存的JSON记录全部30个task/seed/outcome、原审计hash和视频hash，普通clone可直接查看。
+
+三组在线测试共30个episode，此前迁移另10个；没有额外科学重试。EDS是本轮观测成功数最多的方法。有效性与成功率分别判断；单seed、默认不同预算的十任务比较不构成统计优越性、非劣效或泛化证明。
+
+发布版审计器还对三组保存的原始数据执行独立`--no-write`重审，均通过；[重审摘要](../../.worktrees/exp/steering-integration/checks/release-reaudit-summary.json)保存checker逐文件hash和原receipt不变证明。最终代码版本的[116/116源码绑定](../../.worktrees/exp/steering-integration/checks/release-build-source-binding.json)确认这些字节全部可从Git取得；其中两个兼容alias在原受测snapshot中已有，发布时仅补追踪。原线上归属仍由受测commit加完整manifest/source快照定义。
+
+## 已完成验证
+
+| 项目 | 真实结果 | 证据与范围 |
+| --- | --- | --- |
+| 冻结runtime CPU／原环境 | 1403 passed、2 warnings、124.18s | [日志](../../.worktrees/exp/steering-integration/checks/cpu-common-framework-002.log) |
+| 冻结runtime CPU／独立安装环境 | 1403 passed、1 warning、124.63s | [日志](../../.worktrees/exp/steering-integration/checks/cpu-common-framework-clean.log) |
+| 发布基础设施 CPU／原环境 | 1436 passed、3 skipped、2 warnings、129.98s | [日志](../../.worktrees/exp/steering-integration/checks/cpu-release-primary.log) |
+| 发布基础设施 CPU／独立安装环境 | 1436 passed、3 skipped、1 warning、130.02s | [日志](../../.worktrees/exp/steering-integration/checks/cpu-release-clean.log) |
+| 发布CLI | 6份help + 3模式print-config全部通过 | [receipt](../../.worktrees/exp/steering-integration/checks/release-cli/receipt.json)；未创建run目录 |
+| EDS before/after reference | float32/bfloat16共352动作、RNG/父代/Stage精确比较 | 确定性合成模型/传感器，不覆盖真实模型/GPU核 |
+| 固定资产 | 214个模型/DINO文件、2308个LIBERO文件、20个RNG状态 | 内容及加载选择校验，LIBERO四路径绑定进入environment |
+| 设备映射与渲染 | GPU0→EGL2、GPU1→EGL3、GPU4→EGL6 | UUID、本进程C+G身份及LIBERO reset/render；均H200 NVL |
+| QD数值诊断 | 318/318批、23,850个probe、零失败 | GPU4与独立CPU的bounds位模式/checksum/cell/overflow精确一致，RNG未变 |
+| 公共GPU/API预检 | GPU0/EGL2及1次有效图像请求 | CLI 0.156.1 / gpt-6-astra / low，0 failed calls |
+| 完整在线机制审计 | EDS205、VLS368、EDS+QD284个guided块 | 原v2审计及独立只读重审均通过；详见[结果](results.md) |
+| 视频交付 | 30/30完整CPU解码通过 | 原件、帧数、时长、hash及checker身份登记；不替代任务合同 |
+
+发布版3项skip仅为外置候选阶段的before/after配置对照；三项在应用前均通过。应用后独立复核确认97个科学路径中96个字节不变、1个只改注释且AST不变，三模式print-config与冻结版逐字节相同，worker及配置环境helper保持不变。[应用后复核](../../.worktrees/exp/steering-integration/checks/final-applied-review.json)保留范围；CPU/静态一致性不被记成新在线实验。
+
+本地[公共预检](../../.worktrees/exp/steering-integration/preflight-common-20261013/report.json)、[设备映射](../../.worktrees/exp/steering-integration/checks/gpu014-mapping-summary.json)、[QD完整数值结果](../../.worktrees/exp/steering-integration/checks/qd-gpu4-numeric.json)保留原证据。数值报告SHA-256 `1428b81160316b77b293a02ceb789e1c27de81db3300f293a42a9c1f5e4f91b7`。有限输入诊断不保证全部GPU输入；独立安装环境仅验收CPU，没有重复GPU模型推理、在线服务或torchcodec native解码。
+
+## 验收后基础设施与归档
+
+生命周期取消与可移植归档修复在原始汇总封存后应用，并通过上面的发布版CPU回归。launcher原子取得新目录后才承担状态写入，SIGINT/SIGTERM持锁清理其拥有的worker树，保存partial输出与interrupted状态，不自动重试。SIGKILL/主机失败/提前逃逸子进程仍需外部监督。[命令及边界](evaluation.md#prepared-infrastructure)。
+
+归档重审按哈希绑定的原config/environment恢复执行身份，使用精确任务表与RNG manifest support，直接验证当前归档内的raw PNG，不借原绝对路径补漏。未知schema、v1/v2错配或损坏sidecar均拒绝；不放宽科学数值或机制gate。
+
+接入前独立checker已完成两种真实复制/改名验证，原始run从未修改：
+
+| 已有数据 | 实际验证 | 明确边界 |
+| --- | --- | --- |
+| 迁移v1 | 4,045文件、913,826,636字节；十任务14,081项合同检查通过，缺失/同大小损坏frame及support负例被拒绝 | wrapper仅`legacy_basic_only`；独立auditor的legacy fixture路径放置与support同hash的fixture，不提升为v2 |
+| 公共EDS v2 | 4,048文件、927,345,187字节；禁止读取原workspace其它路径仍完整通过10/10有效、3/10 | 直接使用support，无legacy补位；原run、复制品及当时113个源码hash未变，CUDA未初始化 |
+
+[v1 receipt](../../.worktrees/exp/steering-integration/checks/archive-candidate-validation/receipt.json) SHA-256 `c2351c77e17d5c31cd8ee08d302e54b92cbe274e38a1a003f0f324f1150ba76e`；[v2 receipt](../../.worktrees/exp/steering-integration/checks/archive-v2-candidate-validation/receipt.json) SHA-256 `3781d788fcf08e426091ec140392ed2b0b3a4a6f22d0413c4dbf19f441220b2e`。receipt分别保存原受测身份、原audit hash及独立checker hash；路径可移植性检查不是新的任务成绩。
 
 ## 迁移版 EDS：完整有效 3/10
 
-受测 commit 为 `cfecb12db736f1a3408d9528d9336aadcb7e41b5`。十个任务全部完成，成功 **3/10**，task ID **3、8、9**；零基础设施错误 episode，worker正常结束，运行期间源码未变。十份逐任务合同均完整有效，共 **14,081 项检查通过**。
+受测身份见 [README provenance](../../README.md#provenance) 的迁移验收行。十个任务全部完成，成功 **3/10**，task ID **3、8、9**；零基础设施错误 episode，worker正常结束，运行期间源码未变。十份逐任务合同均完整有效，共 **14,081 项检查通过**。
 
 运行保留 **5,585 个执行动作及 adapter出口记录**、307次在线Stage observation、10次身份请求和10份新生成reward捕获。Stage捕获总数317，其中307为observation。环境为LIBERO ObjectSwap OOD，请求为Codex CLI / gpt-6-astra / low；不将服务请求标记解读为服务端模型内部身份的独立证明。
 
@@ -21,7 +79,7 @@
 | 8 | 151 | 成功，有效 | 211 | 604 | 全部相同 |
 | 9 | 548 | 成功，有效 | 214 | 647 | 全部相同 |
 
-8个任务的完整记录动作序列与参考相同，总共5,313/5,585个动作相同。任务2和4的尾部差异被保留，并非为了同分删除失败。相同3/10不证明全部在线请求、视觉判断或每个任务轨迹严格重现。参考来源身份集中在 [README provenance](../../README.md#provenance来源与本地证据)。
+8个任务的完整记录动作序列与参考相同，总共5,313/5,585个动作相同。任务2和4的尾部差异被保留，并非为了同分删除失败。相同3/10不证明全部在线请求、视觉判断或每个任务轨迹严格重现。参考来源身份集中在 [README provenance](../../README.md#provenance)。
 
 本页是可随Git保存的结果摘要。下列原始证据位于 ignored 目录，只在维护者持有的归档中可用，普通clone不包含：
 
@@ -30,45 +88,12 @@
 - [冻结manifest](../../.worktrees/exp/steering-integration/runs/eds-migration-20261013/manifest.json)、[配置](../../.worktrees/exp/steering-integration/runs/eds-migration-20261013/resolved-config.yaml)、[cohort audit](../../.worktrees/exp/steering-integration/runs/eds-migration-20261013/audit.json)、[最终status](../../.worktrees/exp/steering-integration/runs/eds-migration-20261013/status.json)。
 - [task2动作比较](../../.worktrees/exp/steering-integration/runs/eds-migration-20261013/task2-action-comparison.json)、[task4动作比较](../../.worktrees/exp/steering-integration/runs/eds-migration-20261013/task4-action-comparison.json)、[task9动作比较](../../.worktrees/exp/steering-integration/runs/eds-migration-20261013/task9-action-comparison.json)。其余逐任务报告由验收清单索引。
 
-运行时间为2026-10-13 09:04:05–12:23:58 UTC。原始源码快照、控制器捕获、reward/identity输入输出、计算日志、完整视频与失败证据必须保留在该外部归档。大型原始文件不提交Git；可公开访问的完整归档链接仍待维护者提供。
+运行时间为2026-10-13 09:04:05–12:23:58 UTC。原始源码快照、控制器捕获、reward/identity输入输出、计算日志、完整视频与失败证据必须保留在该外部归档。大型原始文件不提交Git；目前没有配置公开的完整归档下载包；原始证据由维护者本地持有。
 
-## 公共版本：已实现与待验收
+## 安装与资产交接
 
-| 项目 | 当前状态 | 证据边界 / 下一步 |
-| --- | --- | --- |
-| 三模式 CLI/profile | 已实现，三种 `--print-config` 已通过CPU解析 | 配置可解析不等于在线方法已验收 |
-| 统一 Stage 进度 | 已实现；EDS只读已有进度，VLS使用独立selected-score/reference | 完整公共版本CPU和在线回归待结案 |
-| VLS梯度能力/实际机制记录 | 已实现VLS专用探针、gradient/FKD/selection telemetry | 待完整在线机制与任务验证，不以配置开关证明调用发生 |
-| EDS before/after CPU reference | 受控float32/bfloat16共352动作及RNG/父代/Stage精确比较通过 | 合成模型/传感器，不覆盖GPU、真实服务或完整仿真 |
-| 固定模型与LIBERO路径校验 | configure、preflight与真实launcher始终验证模型；模型校验器35项针对性CPU测试通过 | 214项模型/DINO身份保持；LIBERO显式根和4项路径绑定进入environment证据；现有bytecode证明边界保留 |
-| 离线合同与QD重建 | 工具和自包含fixture已接入 | 只证明已记录内容；完整公共套件仍待汇总 |
-| 最终公共CPU套件 | **原环境与独立安装环境均 1403 passed** | 分别124.18s/2 warnings、124.63s/1 warning；日志如下 |
-| GPU设备映射与渲染 | 已实证GPU0→EGL2、GPU1→EGL3、GPU4→EGL6 | CUDA UUID、实际EGL display与本进程C+G记录一致；均完成LIBERO reset/render，未执行动作 |
-| GPU QD数值诊断 | **GPU4通过：318/318批，零失败** | 每批75个边界probe；bounds位模式/checksum/cell/overflow精确一致；不计任务成绩 |
-| 最终公共GPU/API预检 | **待完成/登记** | 旧版预检不能替代最终源码的验证 |
-| 最终公共 EDS 十任务 | **待运行，计划GPU0/EGL2** | 使用公共接口冻结后的新commit/config/run |
-| 最终公共 VLS 十任务 | **待运行，计划GPU1/EGL3** | 单独有效cohort与实际机制证据 |
-| 最终公共 EDS+QD 十任务 | **待运行，计划GPU4/EGL6** | 固定profile数值诊断已通过；在线archive机制与完整cohort仍待验收 |
-| 最终主线合并 | **未完成** | 审阅最终代码、证据、文档后合并；commit待填 |
+[配方](installation.md)包含62项直接依赖、172项约束、固定LeRobot的23项base声明及8项Conda显式版本。全新环境独立创建，未克隆共享环境或使用system-site-packages；最初完成pip check、62项依赖/入口import、真实当前源码的processor身份/行为、worker配置预览及1118项CPU测试，随后同一环境通过上述1403和1436项回归。
 
-当前允许使用已分配的任意空闲GPU，不再限定GPU2。GPU2/3仍属于外部项目；其进程未被中止或占用。本次在另行授权的空闲GPU0/1/4完成设备验证，分别保存本机配置，原GPU2配置未改。三种方法拟使用相同型号H200 NVL，在最终源码冻结后并行开展各自完整cohort；当前没有提前登记启动或结果。见[设备映射与渲染摘要](../../.worktrees/exp/steering-integration/checks/gpu014-mapping-summary.json)。
+安装过程中补入BDDL未声明的future并最后重装同版headless OpenCV，最终配方已包含两项修正。为避免写当时冻结源码，editable metadata来自逐文件一致的外置副本，实际runtime导入当前clone源码。完整来源只在[README provenance](../../README.md#provenance)列出。
 
-[GPU4数值摘要](../../.worktrees/exp/steering-integration/checks/qd-gpu4-numeric-summary.json)与[完整逐例输入/结果](../../.worktrees/exp/steering-integration/checks/qd-gpu4-numeric.json)保留318组确定性16×2输入、共23,850个probe、源码hash、UUID与进程证明。CPU/CUDA全局RNG不变；核心QD与独立审计源码未变。完整报告SHA-256为 `1428b81160316b77b293a02ceb789e1c27de81db3300f293a42a9c1f5e4f91b7`。2GiB限制仅适用于PyTorch分配器；实际峰值reserved为2MiB。数值诊断不加载模型、不调用API、不执行任务，有限输入通过也不证明所有可能GPU输入。若后续发生数值分歧，保存完整差异，不在看到任务结果后放宽审计。
-
-公共版本完整 CPU 日志分别为[原运行环境](../../.worktrees/exp/steering-integration/checks/cpu-common-framework-002.log)与[独立安装环境](../../.worktrees/exp/steering-integration/checks/cpu-common-framework-clean.log)。首次完整运行1397通过、2个旧VLS测试桩缺少新日志接口而失败；补齐测试桩并保留执行长度断言后完整重测，上述通过数字属于新运行。旧失败日志保留，未改写。迁移版全部201个实际EDS搜索块也通过新独立机制审计，见[逐块检查](../../.worktrees/exp/steering-integration/checks/migration-all-chunk-method-audit.json)；这是旧数据离线核验，不计新在线成绩。
-
-## 安装证据与适用范围
-
-[安装配方](installation.md)已接入62项直接依赖、172项约束、固定LeRobot的23项base声明，以及8项Conda显式版本。本轮文件逐行匹配真实验证输入。
-
-真实干净Conda环境的验收绑定上述迁移commit：`pip check` 无损坏依赖；62项依赖与main入口import、当前clone真实LeRobot processor身份/行为、worker `--cfg job`通过；**1118 passed、1 warning、86.53s**。安装不是共享环境克隆，也未使用system-site-packages。为避免当时冻结源码写入，editable元数据来自逐文件一致的外置副本；实际runtime导入的是当前root源码。
-
-真实首次安装补入BDDL缺失的future，并在最后重装同版headless OpenCV；最终配方已包含这些修正，没有声称又创建过第二个完整环境。原始日志/来源见 [README provenance](../../README.md#provenance来源与本地证据)。该新环境没有GPU/EGL reset/render、模型加载/推理、Codex/API或torchcodec native解码验收。
-
-迁移前原工作环境的CPU记录为1118 passed、2 warnings、82.42s，与干净环境记录分别保存。两者均不能替代本次新增公共接口后的最终测试。模型资产的完整CPU身份校验、LIBERO2308文件重建、RNG文件身份和在线成绩也分别记账。
-
-## 完成规则
-
-新公共版本应依次完成最终CPU回归、资产/环境检查、设备身份确认、QD数值与机制gate，以及三种方法各自的完整cohort。每轮保留解析配置、源码hash、实际import环境、设备、在线调用、控制器与执行证据，记录失败和计算预算。
-
-更新结果表时同时填写受测commit、run manifest、任务/seed、成功与基础设施错误、完整审计及可分享证据链接；未运行项保持pending。下一次文档更新不得将本页迁移成绩自动改名为公共版本成绩。
+原始日志、模型、视频和复制归档保存在维护者本机ignored路径；没有配置公开分发服务。新clone需要维护者交付清单匹配的RDT checkpoint与固定DINO源码，T5/SigLIP本地snapshot revision有记录但远端可取回性未核验。严验始终开启，不能因暂缺资产用其他权重冒充本轮身份。

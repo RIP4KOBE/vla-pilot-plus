@@ -1,28 +1,44 @@
 # 协作与验收
 
-公共方法名称使用 **VLS、EDS、EDS+QD**，CLI 为 `vls`、`eds`、`eds_qd`。算法合同见[架构说明](docs/steering/architecture.md)，环境与资产见[安装说明](docs/steering/installation.md)。来源命名、历史目录和分支映射统一记录在 [README provenance](README.md#provenance来源与本地证据)，不加入新的公共入口。
+公共方法为 **VLS、EDS、EDS+QD**，CLI 使用 `vls`、`eds`、`eds_qd`。先读[架构合同](docs/steering/architecture.md)与[当前验收状态](docs/steering/integration-status.md)，安装见[环境说明](docs/steering/installation.md)。历史来源和命名例外统一放在 [README provenance](README.md#provenance)。
 
-## 当前交付状态
+## 提交与评审
 
-迁移版 EDS 的完整在线验收已通过。三模式 profile、统一 Stage 进度、模型身份验证和离线审计已接入；最终公共版本的完整 CPU/GPU 验证与三组十任务仍待完成。[整合状态](docs/steering/integration-status.md) 区分已完成证据和待办，合并代码不等于性能验收。
+从更新后的main建立功能分支，通过PR合入。本次发布的main合并身份见[状态页](docs/steering/integration-status.md)；该字段填写前，整合分支尚不代表已发布的main。PR 写清具体问题、最终行为、影响方法、真实验证命令/结果与未验证范围。保留其他协作者改动，不通过重建 reference 消除回归。
 
-在共同主线建立功能分支，通过 PR 审阅合入。PR 应写清触发问题、最终行为、影响的方法、真实测试命令与结果、未验证边界。保留用户和其他协作者的改动；不要用研究输出目录充当源码分支，也不要用重新生成 reference 的方式消除回归。
+```bash
+# 在工作区干净且本次整合已发布到main后执行。
+git fetch origin
+git switch main
+git pull --ff-only origin main
+git switch -c codex/my-steering-change
+# 编辑并完成相应验证，再提交并推送自己的功能分支。
+git push -u origin codex/my-steering-change
+```
 
-## 配置与运行冻结
+| 变更类型 | 验证重点 |
+| --- | --- |
+| 策略、Stage、提示词、初始化或科学配置 | 行为回归、新配置身份与新的在线 cohort |
+| launcher、资产/审计、安装等基础设施 | 故障与负例回归；证明正常科学输入不变；运行仍绑定实际受测 commit |
+| 文档、注释与纯展示 | 来源与命令核对；编辑后的发布 commit 不替代旧实验 runtime 身份 |
 
-科学设置分为共享 [ObjectSwap 协议](configs/evaluation/libero_object_swap.yaml) 和 [方法 profile](configs/steering)。机器路径、设备和显存配置放在被忽略的 `configs/local.yaml`；凭据、模型权重和大视频不提交。资产 expected manifest、科学 fixture 与其来源说明随代码审阅，不能仅因文件大而删除运行所需资产。
+三组完整在线验收已封存：EDS 3/10、VLS 1/10、EDS+QD 1/10，30个任务全部有效，整合gate通过。随后接入的生命周期/归档修复在两环境各通过1436项CPU测试；在线成绩仍绑定原受测runtime，见[状态页](docs/steering/integration-status.md)和[运行与归档说明](docs/steering/evaluation.md#prepared-infrastructure)。
 
-每个完整 cohort 必须用新的输出目录。启动前记录待验证假设、源码与配置、任务/seed、资产身份、初始化协议和服务参数；运行期间不得修改冻结源码、profile、提示词、依赖或资产。结束后保留全部失败、异常和原始捕获，不能从多轮挑选成功拼成一个分数。目录存在即换新 run ID；不要覆盖旧配置或继续给已漂移的运行计成绩。
+## 配置冻结与对照
 
-对照匹配 suite、任务/seed、初始化、资产、Stage 规则、动作 horizon、环境步数上限和模型请求参数。不同轨迹可产生不同查询时刻，不通过回复回放强制相同轨迹。默认 VLS20 与 EDS16 的计算路径不同，须报告实际模型 batch rows/calls、reward/梯度调用、延迟及在线调用数；等计算预算比较需要单独设定。
+科学设置放在[共享 ObjectSwap 协议](configs/evaluation/libero_object_swap.yaml)和[方法 profile](configs/steering)。机器路径、GPU/EGL与显存选择放在 ignored `configs/local.yaml`。凭据、权重和大视频不提交；必要科学 fixture、expected manifest与来源说明随代码审阅。
 
-## 算法修改与验证
+每次完整 cohort 使用新目录。启动前记录假设、源码/配置、任务与seed、资产、初始化和服务参数；运行期间保持源码、profile、提示词、依赖及资产不变。保留全部成功、失败、基础设施异常和原始捕获。中断/源码漂移不自动重试，不把多轮成功拼成一个分数。
 
-接口清理必须保持动作值/dtype/夹爪符号、评分切片与运算顺序、父代选择、RNG恢复时点、去噪与评分调用数、Stage/query时机和 reference 生命周期。temperature解释、RBF势函数、prompt、Stage阈值、动作块长度、初始化、缓存或 archive 规则的变化都是科学改动，应有独立配置和新运行。
+对照匹配 suite、任务/seed、初始化、资产、Stage规则、动作 horizon、720步上限及模型请求参数。不同轨迹允许有不同在线查询时刻。默认 VLS 与 EDS/QD 不等计算预算，应同时报告模型 calls/batch rows、reward与梯度调用、引导/非引导块、延迟和在线调用数；等预算比较需单独配置。
 
-`get_stage_reward()` 对 EDS 只读已有进度；VLS 使用独立的最终选中候选 score/reference，不能借用内部梯度进度冒充。新增 VLS 梯度能力检查或 telemetry 不得进入 EDS 路径消耗随机数或改变评分。reward可评分与可微分是不同能力；最优点合法零梯度不能一概判坏。
+## 算法语义与测试
 
-用与改动相关的测试验证行为，完成规定的全套检查。以下普通 CPU 命令隐藏 CUDA、关闭 `.env` 读取，但本身不是网络隔离器：
+接口清理保持动作值/dtype/夹爪符号、评分切片与运算顺序、父代选择、RNG恢复时点、模型/评分调用数、Stage/query时机及reference生命周期。temperature、RBF势函数、prompt、Stage阈值、动作块、初始化、缓存或 archive 规则的变化均需作为科学改动登记。
+
+EDS 的 `get_stage_reward()` 只读已有进度；VLS 使用独立最终选中候选 score/reference。VLS梯度能力探针或telemetry不能进入EDS路径消耗随机数或改变评分。可评分与可微分是不同能力；合法的最优点零梯度、FKD的ESS跳过须保留。
+
+先运行与改动有关的行为/负例测试，再完成规定全套检查。普通CPU命令如下；它隐藏CUDA并关闭`.env`读取，但不构成网络隔离：
 
 ```bash
 env -u VLA_CODEX_ONLY CUDA_VISIBLE_DEVICES='' PYTHON_DOTENV_DISABLED=1 \
@@ -30,14 +46,12 @@ env -u VLA_CODEX_ONLY CUDA_VISIBLE_DEVICES='' PYTHON_DOTENV_DISABLED=1 \
   python -m pytest tests -q --disable-warnings -p no:cacheprovider
 ```
 
-[EDS CPU reference fixture](tests/fixtures/steering_eds_golden/README.md) 比较真实搜索、动作转换/cache、Stage和父代路径，模型/传感器/provider为确定性合成输入。它不验证GPU核、真实渲染、模型权重或在线成功率。新 clone 应直接运行，不依赖维护者工作区、私有缓存或缺路径时跳过测试。
+[EDS CPU reference](tests/fixtures/steering_eds_golden/README.md)检查搜索、转换/cache、Stage、父代与RNG，模型/传感器/provider为确定性合成输入。新clone的测试不应依赖维护者私有路径、模型或在线服务。裁剪真实捕获需保留hash与来源；合成结束receipt只用于测试。QD实际参与需由archive更新、父代来源和最终选择证明，observer计数本身不够。遇数值差异先保存完整输入和差异，再定位原因。
 
-离线证据测试可使用裁剪的真实捕获，必须保留原始文件哈希及裁剪来源；合成完成状态只是测试 scaffolding，不能登记为真实任务成功。QD 验收要证明 archive 参与父代和最终选择；仅有 observer 或 per-cell计数不够。数值不一致先保存输入和完整差异，再定位原因；不能在看到任务结果后放宽 gate。
+## 结果、资产与发布
 
-## 资产、日志与发布
+报告分别回答任务success、证据有效性与机制记录一致性。记录受测runtime commit、配置/资产/环境identity、逐任务outcome、基础设施错误、初始化与在线捕获、实际计算量、审计器身份和报告hash。未完成/无效任务保持相应状态；不能登记为正常失败或提前宣告方法优劣。
 
-模型验证必须对固定 expected manifest 比较内容及实际加载选择。保留 HF snapshot 到 blob 的正常链接；已有 DINO bytecode 的兼容边界要披露。新分发包可使用严格 clean 检查，不清理正在使用的缓存。权重、源码与资产的可获取性、许可和身份均需说明，不能用模型名称代替文件身份。
+资产验证比较固定内容和真实加载选择。保留正常HF snapshot链接；DINO bytecode兼容边界与clean分发策略见[安装说明](docs/steering/installation.md)。权重、源码和数据的获取方式与许可分别交接。
 
-最终报告包含：冻结源码/配置、方法、任务/seed、每任务 outcome、基础设施错误、环境/资产identity、初始化与在线捕获、真实机制计数、计算量和各级审计。任务 success、证据有效性、视觉语义正确性分别回答。未完成/无效任务不伪装成普通失败；未运行的方法保留 pending。
-
-原始视频和日志保存在外部 run 归档，保留原文件、manifest与哈希；仓库只放可审阅的小型报告和必要fixture。分享或发布前补可访问归档链接、最终commit及已验证命令。现有 [MIT LICENSE](LICENSE) 只按其范围适用；保留第三方许可证，不推定模型、数据或服务有相同许可。
+原始日志/视频保存在外部归档，Git保存小型报告、manifest和必要fixture。本次全部逐任务结果与原始证据hash保存在[随Git摘要](docs/steering/validation/final-results.json)；完整归档与精确模型包只由维护者本地持有，尚无公开分发入口。交接时给出实际可访问的副本位置、字节hash和许可边界，分别登记runtime/auditor/release身份与真正的main merge commit。后续审计器只在独立报告中重新核验原始快照，原始receipt与运行成绩的源码归属保持不变。现有[MIT LICENSE](LICENSE)与各第三方许可分别适用。

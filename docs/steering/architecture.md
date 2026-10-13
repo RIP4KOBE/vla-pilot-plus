@@ -1,10 +1,37 @@
 # RDT steering 架构与算法合同
 
-**状态：三模式 CLI、profile 与统一 Stage 进度接口已实现；最终公共版本的完整 CPU/GPU 与在线验收待完成。** 迁移版 EDS 已单独验收；其成绩不继承给新公共版本。入口见 [README](../../README.md)，实际进度见[整合状态](integration-status.md)。
+三模式CLI、profile、统一Stage进度与独立机制审计已实现。同一冻结runtime完成EDS 3/10、VLS 1/10、EDS+QD 1/10，三组均通过完整v2与机制审计；验收后基础设施修复也通过两环境各1436项CPU测试。入口见[README](../../README.md)，结果和证据见[整合状态](integration-status.md)。
 
 ## 共享链路与执行边界
 
 一次动作块的链路是：观测 → Stage 更新与 guidance 开关 → RDT 条件编码 → 候选生成/选择 → 动作转换 → 顺序执行。公共方法只使用 VLS、EDS、EDS+QD 三个名称。内部使用两个采样路由 `guidance_type=vls/eds`，以 `qd_archive_mode` 控制 EDS 的 archive；不需要复制第三套引擎。
+
+每个任务准备阶段在线生成新的身份/阶段描述与reward Python程序，并检查reward合同；必要的修复请求也属于准备阶段。执行中的候选评分随后在本地Torch运行，VLS梯度由本地自动微分计算。EDS每个guided动作块176个候选评分不代表176次API请求；unguided块走单候选路径。
+
+```mermaid
+flowchart TD
+    Init[每任务：环境与 RNG 初始化] --> Generate[Codex 在线生成身份、阶段与 reward 内容]
+    Generate --> Obs[当前图像、机器人状态与目标几何]
+    Generate --> Reward[本地 reward 函数]
+    Obs --> Stage[共享 Stage 控制器：按触发条件在线查询]
+    Stage --> Gate{是否开启引导}
+    Gate -->|否| Plain[RDT 单候选去噪]
+    Gate -->|是| Method{steering 模式}
+    Method -->|vls| VLS[VLS：reward 梯度、RBF、条件 FKD]
+    Method -->|eds / eds_qd| EDS[共享 EDS：采样、评分、父代选择、截断去噪]
+    EDS <-->|仅 eds_qd| Archive[动作块内 QD 档案：精英维护与稀疏父代]
+    Reward --> VLS
+    Reward --> EDS
+    VLS --> Choose[选择动作候选]
+    EDS --> Choose
+    Choose -.选中候选的外层 reward 进度.-> Stage
+    Plain --> Execute[统一转换与执行前 8 个动作]
+    Choose --> Execute
+    Execute --> Obs
+    Execute --> Evidence[环境成功判定、日志、视频与独立审计]
+```
+
+图中为概念流程：环境成功或达到720个执行步时结束；在线Stage查询按触发条件发生，不是每个动作一次。精确prepare/rollout RNG恢复时点以hook合同为准。
 
 | 组件 | 实际职责 |
 | --- | --- |
@@ -78,7 +105,7 @@ r=-\sum_{h=0}^{L-1}\bar w_h\|p_h-q\|_2^2.
 
 ## VLS：保留内部梯度参考
 
-VLS 在一个去噪过程的高噪声区间使用多样性项，后续使用 reward 对轨迹/latent 的梯度，且可按 FKD 势函数重采样粒子。普通路径按最终候选 reward 选择；单候选或 FKD terminal 路径有自己的直接返回条件。
+VLS 在一个去噪过程的高噪声区间使用多样性项，后续使用reward对轨迹/latent的梯度，并按自适应FKD决定是否重采样。默认20粒子路径按最终候选reward选择；单候选及FKD terminal的直接返回是兼容分支。
 
 内部引导 scale 随内部归一化 reward g 与噪声变化：
 
@@ -86,15 +113,17 @@ VLS 在一个去噪过程的高噪声区间使用多样性项，后续使用 rew
 s=\frac{\text{guide_scale}}{1+\exp(k(g-x_0))}\sqrt{1-\bar\alpha_t}.
 \]
 
-公共 [VLS profile](../../configs/steering/vls.yaml) 显式固定 20 粒子、guide_scale=80，并给十个任务都指定有效值80；diversity_scale=10、k=25、x_0=0.75。FKD 开启，potential=max、lambda=10、adaptive_resampling=true、resample_frequency=5。这些设置已进入配置，完整在线验收仍待完成。本 RDT 循环读取 `MCMC_steps=4`，但没有据此执行四次 Langevin/MCMC 内循环。不要把其他策略实现或未使用参数计算进预算。
+公共 [VLS profile](../../configs/steering/vls.yaml) 显式固定 20 粒子、guide_scale=80，并给十个任务都指定有效值80；diversity_scale=10、k=25、x_0=0.75。FKD 开启，potential=max、lambda=10、adaptive_resampling=true、resample_frequency=5。完整在线验收中368个guided块记录1472次reward梯度与368次RBF应用；FKD的368次评分机会全部因ESS足够而跳过，实际重采样0次。本 RDT 循环读取 `MCMC_steps=4`，但没有据此执行四次 Langevin/MCMC 内循环。不要把其他策略实现或未使用参数计算进预算。
 
-VLS 与 EDS 的粒子数、重复去噪、reward 梯度、RBF、FKD/父代抽样成本不同。对照同时报告任务成功率、实际 DiT batch rows/calls、reward 调用、梯度次数、延迟和服务调用；如需等计算预算，另立明确实验条件。
+固定checkpoint的五步schedule是 `[999,799,599,400,200]`。默认正常guided块有1次RBF、4次reward梯度尝试；FKD调用3次，frequency=5安排其中1次评分机会。非末步ESS≥10时跳过multinomial，实际重采样0次合法。当前RDT循环排除了terminal timestep的FKD调用，不把兼容terminal分支登记为默认路径已执行。
+
+VLS 与 EDS 的粒子数、重复去噪、reward 梯度、RBF、FKD/父代抽样成本不同。对照同时报告任务成功率、实际 DiT batch rows/calls、reward 调用、梯度次数、延迟和服务调用；默认每个guided块VLS为20×5个DiT batch rows，EDS/QD为16×21；整episode仍需结合guided/unguided块数。telemetry的CPU读取含CUDA同步开销，测得延迟不等同于纯kernel时间。等计算预算比较需另立条件。
 
 ## EDS+QD：动作块内的 archive
 
 公共 [EDS+QD profile](../../configs/steering/eds_qd.yaml) 已通过 `guidance_type=eds` + `qd_archive_mode=grid_archive` 激活 archive，共用初始采样、reward 和截断去噪。
 
-当前 profile 采用目标相对末端 XY 描述符、4×4 网格、每格容量 1、初始固定边界、`sparse_priority` 父代分配、稳定 fingerprint tie-break。格权重为 `(累计候选访问数+1)^(-1)`；按权重分配16个槽位，整数余数平手使用局部 RNG，访问数包括未入档候选。共享底座中的 `uniform_cells` 被 QD profile 显式覆盖为 `sparse_priority`；普通 EDS 不使用 archive。边界来自初始候选 5%/95% 分位数，扩张 10%，每轴最小跨度 0.08m，越界 clamp 到边格。每次运行以解析后的配置为准。当前GPU4数值诊断的318组确定性输入与独立CPU审计逐位一致，完整QD cohort仍待完成；有限诊断不能保证全部GPU输入，具体证据见[整合状态](integration-status.md)。
+当前 profile 采用目标相对末端 XY 描述符、4×4 网格、每格容量 1、初始固定边界、`sparse_priority` 父代分配、稳定 fingerprint tie-break。格权重为 `(累计候选访问数+1)^(-1)`；按权重分配16个槽位，整数余数平手使用局部 RNG，访问数包括未入档候选。共享底座中的 `uniform_cells` 被 QD profile 显式覆盖为 `sparse_priority`；普通 EDS 不使用 archive。边界来自初始候选 5%/95% 分位数，扩张 10%，每轴最小跨度 0.08m，越界 clamp 到边格。每次运行以解析后的配置为准。当前GPU4数值诊断的318组确定性输入与独立CPU审计逐位一致，完整QD cohort的284个guided块均记录active archive、45,440行archive父代和284次archive最终选择；有限诊断不能保证全部GPU输入，具体证据见[整合状态](integration-status.md)。
 
 archive 在一个 guided 动作块中创建，接收初始 population 与 10 轮结果，保留各格高质量候选，并影响父代选择；最终从 archive 选全局最好。它可以保留早期轮次候选，这和普通 EDS 的最终 population 选择不同。当前 fresh 模式下，每个新动作块重新开始；没有跨任务 archive、在线模型训练或递归自我改进。
 
@@ -120,7 +149,7 @@ g=\operatorname{clip}(1-r/r_0,0,1.2)\text{，若 }r_0<-10^{-6};\quad g=0\text{ o
 
 VLS 建立独立的**最终选中候选** score/reference，argmax 路径复用已有最终评分；单候选/FKD terminal 直接返回路径补一次所选候选评分并计入计算量。内部梯度 reward/reference 与 scale 计算保持独立。无法评分时外层进度为不可用，不回退到内部梯度 reward。`get_last_vls_metrics()` 返回实际梯度状态、FKD 重采样/ESS skip、选择与外层进度的缓存记录；记录能力不等于所有在线分支已验收。
 
-Stage 继续为 EDS 使用可评分能力检查，只为 VLS 增加确定性 CPU 梯度探针，并恢复检查前 RNG 状态。探针要求有限、连通且至少一个非最优探针非零；最优点的零梯度合法。detached、round 等无法提供有效梯度的 reward 可以被 VLS 禁用，同时仍允许 EDS 按分数搜索。受控 CPU before/after 回归使用独立冻结 reference；最终整套 CPU 与 GPU/在线验收的进度单独记录。
+Stage 继续为 EDS 使用可评分能力检查，只为 VLS 增加确定性 CPU 梯度探针，并恢复检查前 RNG 状态。探针要求有限、连通，且至少一个非最优探针在可控p1…p7上有非零梯度；p0是固定当前状态，仅p0有梯度不足以引导。最优点的零梯度合法。detached、round 等无法提供有效梯度的 reward 可以被 VLS 禁用，同时仍允许 EDS 按分数搜索。受控CPU before/after回归使用独立冻结reference；全套CPU和设备/数值预检已完成，在线cohort进度单独记录。
 
 ## 感知、初始化与证据限制
 
@@ -128,7 +157,7 @@ Stage 继续为 EDS 使用可评分能力检查，只为 VLS 增加确定性 CPU
 
 20 个 RNG 状态文件只定义 10 个任务 preparation 与 rollout 两个时点的 Python/NumPy/Torch 初始化；不包含历史动作、reward、模型回复或环境回放。SHA 校验确认文件身份，运行 hook 才确认生效时点。普通固定 seed 不能直接替换该协议。
 
-基础 run 审计核对 cohort 完整性与机制字段；细粒度的 prompt/image/code/marker/transport/动作一致性审计和独立 QD 日志重建已接入 `scripts/audit_steering_contract.py`、`scripts/steering_transport_audit.py` 与 `scripts/audit_qd_mechanism.py`。测试可使用裁剪的真实捕获 fixture，但合成的结束 receipt 只是测试输入，不能作为在线任务成绩。日志中的请求模型标记、CPU 合同探针和视频均有各自证明范围，不是服务端模型、视觉真值或所有执行路径的完全证明。
+基础 run 审计核对 cohort 完整性与机制字段；细粒度的 prompt/image/code/marker/transport/动作一致性审计和独立 QD 日志重建已接入 `scripts/audit_steering_contract.py`、`scripts/steering_transport_audit.py` 与 `scripts/audit_qd_mechanism.py`。测试可使用裁剪的真实捕获 fixture，但合成的结束 receipt 只是测试输入，不能作为在线任务成绩。日志中的请求模型标记、CPU合同探针和视频各有证明范围。fresh表示本程序发送当前任务/观测的新请求并保留捕获，不使用本地回复回放；provider报告的cached_input_tokens可非零，它记录服务端输入前缀计费，不能据此推断本地回复重放或声称服务端缓存已关闭。
 
 
 ## 公共配置与证据布局
@@ -138,3 +167,5 @@ Stage 继续为 EDS 使用可评分能力检查，只为 VLS 增加确定性 CPU
 新运行将公共计算/Stage/方法指标放在 `output/evaluation/`，具体路径写入 `manifest.json`。`eds` 和 `eds_qd` 共用搜索引擎，VLS 使用自己的实际机制日志；不能因为保存目录或日志字段含某个引擎名称就认定运行的方法。以 profile、实际分支、父代/最终选择来源和保存记录共同判断。
 
 离线合同审计不重新执行保存的 reward 代码或模型回复，也不独立重演模拟器。动作证据证明后处理命令向 adapter 的传递；模拟器内部控制缩放属于另一个边界。QD 的 candidate stream 可重建记录的 archive 更新，父代 tensor 校验只覆盖实际保存的迭代，不能推广到未记录路径。完整有效 cohort、机制正确和任务成功分别报告。
+
+运行目录、有效性口径与验收后接入的生命周期/归档功能统一见[运行与审计](evaluation.md)。
