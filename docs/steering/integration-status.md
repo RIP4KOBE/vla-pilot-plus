@@ -1,100 +1,74 @@
 # Steering 整合状态
 
-更新时间：2026-10-13。本文是整合期间的状态记录；每项结论只对应已经完成并留下证据的工作。
+更新时间：2026-10-13。**阶段3的 EDS 迁移完整验收已通过；阶段4的公共三模式整合正在进行。** 公共版本已通过两环境 CPU 回归与三个设备的 CUDA/EGL 检查，EDS/VLS/EDS+QD 各自十任务和最终合并仍待完成。本文的结果表只登记已完成且有冻结证据的运行。
 
-**当前结论：EDS 入口、配置解析与预检已落地，新的完整在线验收尚未完成。** 本阶段只开放 `eds`，`vls`/`eds_qd` 在 EDS 十任务验收后接入。没有把历史成功率登记为整合版本的新成绩。
+## 迁移版 EDS：完整有效 3/10
 
-## 交付与验证
+受测 commit 为 `cfecb12db736f1a3408d9528d9336aadcb7e41b5`。十个任务全部完成，成功 **3/10**，task ID **3、8、9**；零基础设施错误 episode，worker正常结束，运行期间源码未变。十份逐任务合同均完整有效，共 **14,081 项检查通过**。
 
-| 项目 | 当前状态 | 完成条件 |
+运行保留 **5,585 个执行动作及 adapter出口记录**、307次在线Stage observation、10次身份请求和10份新生成reward捕获。Stage捕获总数317，其中307为observation。环境为LIBERO ObjectSwap OOD，请求为Codex CLI / gpt-6-astra / low；不将服务请求标记解读为服务端模型内部身份的独立证明。
+
+| Task ID | Seed | 结果 | 动作数 | 合同检查 PASS | 对照记录的动作一致性 |
+| --- | ---: | --- | ---: | ---: | --- |
+| 0 | 44 | 失败，有效 | 720 | 1722 | 全部相同 |
+| 1 | 235 | 失败，有效 | 720 | 1765 | 全部相同 |
+| 2 | 43 | 失败，有效 | 720 | 1808 | 最后24个不同，首次step696 |
+| 3 | 546 | 成功，有效 | 120 | 389 | 全部相同 |
+| 4 | 6 | 失败，有效 | 720 | 1550 | 最后248个不同，首次step472 |
+| 5 | 621 | 失败，有效 | 720 | 1980 | 全部相同 |
+| 6 | 197 | 失败，有效 | 720 | 1679 | 全部相同 |
+| 7 | 87 | 失败，有效 | 720 | 1937 | 全部相同 |
+| 8 | 151 | 成功，有效 | 211 | 604 | 全部相同 |
+| 9 | 548 | 成功，有效 | 214 | 647 | 全部相同 |
+
+8个任务的完整记录动作序列与参考相同，总共5,313/5,585个动作相同。任务2和4的尾部差异被保留，并非为了同分删除失败。相同3/10不证明全部在线请求、视觉判断或每个任务轨迹严格重现。参考来源身份集中在 [README provenance](../../README.md#provenance来源与本地证据)。
+
+本页是可随Git保存的结果摘要。下列原始证据位于 ignored 目录，只在维护者持有的归档中可用，普通clone不包含：
+
+- [完整迁移报告](../../.worktrees/exp/steering-integration/runs/eds-migration-20261013/migration-full10-report.md)。
+- [验收清单、逐任务报告及哈希](../../.worktrees/exp/steering-integration/runs/eds-migration-20261013/migration-full10-acceptance.json)，SHA-256 `c3251c1546b75d85352c77bdda0ea49afed00ca4d74402f099b9794bd73c7178`。
+- [冻结manifest](../../.worktrees/exp/steering-integration/runs/eds-migration-20261013/manifest.json)、[配置](../../.worktrees/exp/steering-integration/runs/eds-migration-20261013/resolved-config.yaml)、[cohort audit](../../.worktrees/exp/steering-integration/runs/eds-migration-20261013/audit.json)、[最终status](../../.worktrees/exp/steering-integration/runs/eds-migration-20261013/status.json)。
+- [task2动作比较](../../.worktrees/exp/steering-integration/runs/eds-migration-20261013/task2-action-comparison.json)、[task4动作比较](../../.worktrees/exp/steering-integration/runs/eds-migration-20261013/task4-action-comparison.json)、[task9动作比较](../../.worktrees/exp/steering-integration/runs/eds-migration-20261013/task9-action-comparison.json)。其余逐任务报告由验收清单索引。
+
+运行时间为2026-10-13 09:04:05–12:23:58 UTC。原始源码快照、控制器捕获、reward/identity输入输出、计算日志、完整视频与失败证据必须保留在该外部归档。大型原始文件不提交Git；可公开访问的完整归档链接仍待维护者提供。
+
+## 公共版本：已实现与待验收
+
+| 项目 | 当前状态 | 证据边界 / 下一步 |
 | --- | --- | --- |
-| 历史实现与结果审计 | 已完成只读核验 | 明确 V17、历史控制组和标准 Object 的边界 |
-| 公共方法接口 | `eds` 已开放；另两模式未开放 | EDS 十任务验收后再接入另外两种方法 |
-| V17 算法与 Stage 迁移 | 已迁移，在线行为待验收 | 代码合同、冻结设置、provider 与初始化保持可追溯 |
-| 环境与资产准备 | 新配方、准备/校验脚本与机器模板已落地 | 干净环境安装及资产完整性继续验证 |
-| README 与贡献说明 | 已按当前 CLI 更新 | 跟随最终验证结果更新，不预填成绩 |
-| 主迁移与 runner 离线回归 | 1,118 passed，2 warnings，82.42 秒 | 含 26 项新增 runner 检查；不证明在线任务成功率 |
-| LIBERO 资产离线重建 | 2,308 个文件哈希全部一致 | 从固定公开版本的本地 Git 对象重建；不是新网络下载或完整新环境安装 |
-| Hydra worker 配置检查 | 通过 | 解析后科学设置与机器路径可被 worker 接受 |
-| 第三方导入位置 | 已核验 | LeRobot 与 LIBERO 均从当前仓库的 `third_party/` 导入，不沿用旧 editable 工作区 |
-| Codex 图像请求预检 | 通过，1 次有效响应 | gpt-6-astra / low 的一次接入检查，不代表长期稳定性 |
-| CUDA 与环境 reset/render | 通过；配置 GPU2 H200 NVL / EGL1 | 运算与图像生成可用 |
-| CUDA/EGL 物理设备对应关系 | 独立查询通过 | GPU2 UUID、PCI 地址、visible cuda:0 与 EGL1 双向关联一致 |
-| 完整策略 smoke | 尚无完成结果登记 | 模型加载及动作 rollout 与环境预检分别报告 |
-| 完整在线 cohort | 待完成 | 同一冻结代码/配置完成所有指定任务，保留所有失败 |
-| 干净 clone 安装 | 待完成 | 按公开说明准备依赖与资产，安装过程不借用隐式旧目录 |
+| 三模式 CLI/profile | 已实现，三种 `--print-config` 已通过CPU解析 | 配置可解析不等于在线方法已验收 |
+| 统一 Stage 进度 | 已实现；EDS只读已有进度，VLS使用独立selected-score/reference | 完整公共版本CPU和在线回归待结案 |
+| VLS梯度能力/实际机制记录 | 已实现VLS专用探针、gradient/FKD/selection telemetry | 待完整在线机制与任务验证，不以配置开关证明调用发生 |
+| EDS before/after CPU reference | 受控float32/bfloat16共352动作及RNG/父代/Stage精确比较通过 | 合成模型/传感器，不覆盖GPU、真实服务或完整仿真 |
+| 固定模型与LIBERO路径校验 | configure、preflight与真实launcher始终验证模型；模型校验器35项针对性CPU测试通过 | 214项模型/DINO身份保持；LIBERO显式根和4项路径绑定进入environment证据；现有bytecode证明边界保留 |
+| 离线合同与QD重建 | 工具和自包含fixture已接入 | 只证明已记录内容；完整公共套件仍待汇总 |
+| 最终公共CPU套件 | **原环境与独立安装环境均 1403 passed** | 分别124.18s/2 warnings、124.63s/1 warning；日志如下 |
+| GPU设备映射与渲染 | 已实证GPU0→EGL2、GPU1→EGL3、GPU4→EGL6 | CUDA UUID、实际EGL display与本进程C+G记录一致；均完成LIBERO reset/render，未执行动作 |
+| GPU QD数值诊断 | **GPU4通过：318/318批，零失败** | 每批75个边界probe；bounds位模式/checksum/cell/overflow精确一致；不计任务成绩 |
+| 最终公共GPU/API预检 | **待完成/登记** | 旧版预检不能替代最终源码的验证 |
+| 最终公共 EDS 十任务 | **待运行，计划GPU0/EGL2** | 使用公共接口冻结后的新commit/config/run |
+| 最终公共 VLS 十任务 | **待运行，计划GPU1/EGL3** | 单独有效cohort与实际机制证据 |
+| 最终公共 EDS+QD 十任务 | **待运行，计划GPU4/EGL6** | 固定profile数值诊断已通过；在线archive机制与完整cohort仍待验收 |
+| 最终主线合并 | **未完成** | 审阅最终代码、证据、文档后合并；commit待填 |
 
-状态更新应附上实际命令、结果和证据位置。未执行的检查写“未执行”或“待完成”，不要用预计通过替代。
+当前允许使用已分配的任意空闲GPU，不再限定GPU2。GPU2/3仍属于外部项目；其进程未被中止或占用。本次在另行授权的空闲GPU0/1/4完成设备验证，分别保存本机配置，原GPU2配置未改。三种方法拟使用相同型号H200 NVL，在最终源码冻结后并行开展各自完整cohort；当前没有提前登记启动或结果。见[设备映射与渲染摘要](../../.worktrees/exp/steering-integration/checks/gpu014-mapping-summary.json)。
 
-## 本次预检记录
+[GPU4数值摘要](../../.worktrees/exp/steering-integration/checks/qd-gpu4-numeric-summary.json)与[完整逐例输入/结果](../../.worktrees/exp/steering-integration/checks/qd-gpu4-numeric.json)保留318组确定性16×2输入、共23,850个probe、源码hash、UUID与进程证明。CPU/CUDA全局RNG不变；核心QD与独立审计源码未变。完整报告SHA-256为 `1428b81160316b77b293a02ceb789e1c27de81db3300f293a42a9c1f5e4f91b7`。2GiB限制仅适用于PyTorch分配器；实际峰值reserved为2MiB。数值诊断不加载模型、不调用API、不执行任务，有限输入通过也不证明所有可能GPU输入。若后续发生数值分歧，保存完整差异，不在看到任务结果后放宽审计。
 
-2026-10-13 08:40:00–08:40:48 UTC 完成一次组合预检：Codex 对红色测试图返回 `red`，记录 1 个完成 turn、0 个失败调用；GPU 为 NVIDIA H200 NVL，PyTorch 2.7.1+cu126 / CUDA 12.6；ObjectSwap task 0 reset/render 返回 `[128,128,3]` 图像。该记录的类型为 `preflight_not_performance`。实际 `codex --version` 为 **0.156.1**，不采用历史注释中的版本号。
+公共版本完整 CPU 日志分别为[原运行环境](../../.worktrees/exp/steering-integration/checks/cpu-common-framework-002.log)与[独立安装环境](../../.worktrees/exp/steering-integration/checks/cpu-common-framework-clean.log)。首次完整运行1397通过、2个旧VLS测试桩缺少新日志接口而失败；补齐测试桩并保留执行长度断言后完整重测，上述通过数字属于新运行。旧失败日志保留，未改写。迁移版全部201个实际EDS搜索块也通过新独立机制审计，见[逐块检查](../../.worktrees/exp/steering-integration/checks/migration-all-chunk-method-audit.json)；这是旧数据离线核验，不计新在线成绩。
 
-该预检之外，已独立核验 CUDA GPU2 / EGL1 的关联：visible cuda:0 的 UUID 为 GPU-a5d6a5f8-b6df-7f3a-c3dc-19734c41ec0e，PCI 地址为 0000:41:00.0；EGL1 的 display/device 查询映射到同一个 CUDA 设备。运行环境显式设置 CUDA_DEVICE_ORDER=PCI_BUS_ID。证据见 [设备映射](validation/gpu-mapping.json)。
+## 安装证据与适用范围
 
-另行导入位置核验确认，LeRobot 使用当前仓库 `third_party/lerobot/src`，LIBERO 使用当前仓库 `third_party/libero_pro`。这排除了本次检查静默沿用旧工作区 editable 安装的情况，但仍不是新 clone 安装验收。
+[安装配方](installation.md)已接入62项直接依赖、172项约束、固定LeRobot的23项base声明，以及8项Conda显式版本。本轮文件逐行匹配真实验证输入。
 
-本机记录位于 `.worktrees/exp/steering-integration/preflight-service/report.json`，worker 配置日志为同目录上级的 `worker-config-check.log`。这些是本次机器上的检查产物，不是需要新 clone 依赖的资源。公开预检命令为：
+真实干净Conda环境的验收绑定上述迁移commit：`pip check` 无损坏依赖；62项依赖与main入口import、当前clone真实LeRobot processor身份/行为、worker `--cfg job`通过；**1118 passed、1 warning、86.53s**。安装不是共享环境克隆，也未使用system-site-packages。为避免当时冻结源码写入，editable元数据来自逐文件一致的外置副本；实际runtime导入的是当前root源码。
 
-```bash
-python scripts/check_steering.py \
-  --local-config configs/local.yaml \
-  --output-dir outputs/steering/preflight-001 \
-  --api --gpu
-```
+真实首次安装补入BDDL缺失的future，并在最后重装同版headless OpenCV；最终配方已包含这些修正，没有声称又创建过第二个完整环境。原始日志/来源见 [README provenance](../../README.md#provenance来源与本地证据)。该新环境没有GPU/EGL reset/render、模型加载/推理、Codex/API或torchcodec native解码验收。
 
-主迁移加 26 项新增 runner 回归后的最终 CPU 命令与结果如下，退出码 0。真实标准输出已保存为 `.worktrees/exp/steering-integration/checks/cpu-migration.log`；该记录取代先前 1,092 项、仅保留会话输出的检查数量。
+迁移前原工作环境的CPU记录为1118 passed、2 warnings、82.42s，与干净环境记录分别保存。两者均不能替代本次新增公共接口后的最终测试。模型资产的完整CPU身份校验、LIBERO2308文件重建、RNG文件身份和在线成绩也分别记账。
 
-```bash
-CUDA_VISIBLE_DEVICES='' /home/hynx/miniconda3/envs/vla-pilot/bin/python \
-  -m pytest tests -q --disable-warnings
-# 1118 passed, 2 warnings in 82.42s
-```
+## 完成规则
 
-资产重建记录为 `.worktrees/exp/steering-integration/environment/libero-clean-reconstruction.json`：通过 `git archive` 从本地固定公开版本对象导出，使用正式准备流程的规范化、补丁和 overlay，2,308 个文件哈希全部通过。该证据明确不包含新的网络下载；完整干净环境安装仍待完成。
+新公共版本应依次完成最终CPU回归、资产/环境检查、设备身份确认、QD数值与机制gate，以及三种方法各自的完整cohort。每轮保留解析配置、源码hash、实际import环境、设备、在线调用、控制器与执行证据，记录失败和计算预算。
 
-## 历史证据边界
-
-| 历史结果 | 条件 | 本次可以据此说明什么 |
-| --- | --- | --- |
-| V17 3/10 | RDT、ObjectSwap OOD、完整十任务、新在线 Codex、历史 RNG 初始化、QD OFF | 提供已审计的迁移目标；不是新代码成绩，也不是 QD 收益 |
-| P2 同轮控制 4/10 | RDT、ObjectSwap OOD、旧在线 Stage/缓存条件 | 是有效历史控制结果；provider、reward 来源和控制器与 V17 不同 |
-| RDT 无引导 9/10 | 标准 `libero_object` | 是标准 Object 历史基线，不能数值压过或否定 OOD 结果 |
-| RDT VLS 7/10 | 标准 Object、历史调参设置、Stage OFF | 说明该历史 guided 设置未超过同报告的无引导基线；不是当前整合版复测 |
-
-来源的精确工作区、版本与冻结快照在 [README 追溯节](../../README.md#来源与追溯) 统一登记。迁移后的证据索引尚待整理。
-
-## 在线验收规则
-
-完整评测入口已实现。以下命令默认使用全部十任务；截至本状态记录，完整新 cohort 的结果尚未登记，不能视为已复现历史 3/10：
-
-```bash
-python scripts/evaluate_steering.py \
-  --method eds \
-  --local-config configs/local.yaml \
-  --output-dir outputs/steering/eds-full10-001
-```
-
-`scripts/run_steering.py` 使用同一参数与 launcher。追加 `--print-config` 仅解析配置，不创建评测；追加 `--tasks 0,1` 仅运行指定子集，不能作为完整十任务验收。实际运行与预检要求输出目录不存在，禁止覆盖上一轮记录。
-
-开始验收前，明确待验证方法、suite、任务/seed、初始化、动作预算、模型与完整配置。运行期间冻结科学代码，使用独立输出目录。完整记录准备失败、运行异常和任务失败，不从不同尝试中选择成功来组成分数。
-
-验收应分别回答：
-
-1. **安装与链路是否可用：** 输入输出、资产、模型、GPU/EGL 和 provider 是否可用。
-2. **执行机制是否正确：** 实际方法、QD archive、Stage、reward reference 和 RNG restore 是否符合冻结配置。
-3. **任务结果是什么：** 完整 cohort 的环境 success 与失败、错误情况。
-4. **结论可以外推多远：** 是否为开发暴露过的固定任务、是否有重复种子或独立验证。
-
-离线测试不证明在线性能；模型调用全部成功不证明 Stage 全部正确；与历史相同的成功数量也不证明轨迹严格重现。若新结果低于迁移目标，应报告差异并定位原因，不能继续引用旧分数掩盖新结果。
-
-## 仍待完成的文档项
-
-- 在全新环境验证新依赖配方与资产准备流程；当前已有机器的成功预检不能代替该检查。
-- 将本机已有 CPU、资产与预检日志整理为可随仓库查看的证据索引。
-- 运行期间持续保持已确认的 CUDA/EGL 设备配置。
-- 补充完整策略 smoke 和完整在线 cohort 的真实运行记录。
-- EDS 十任务验收后再接入 `vls`、`eds_qd`，并分别验证实际机制与在线结果。
-- 将历史来源与新整合结果分别登记到可随仓库查看的证据索引。
-
-算法本身的保留限制见 [架构说明](architecture.md#已知限制)。整合完成不等于所有历史控制缺陷或泛化问题已经解决。
+更新结果表时同时填写受测commit、run manifest、任务/seed、成功与基础设施错误、完整审计及可分享证据链接；未运行项保持pending。下一次文档更新不得将本页迁移成绩自动改名为公共版本成绩。

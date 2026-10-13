@@ -1,61 +1,43 @@
-# 贡献说明
+# 协作与验收
 
-本仓库正在将 RDT 的 VLS、EDS 和 QD 扩展整理为公共实现。当前新入口只开放 `eds`；`vls` 和 `eds_qd` 的入口接入以 EDS 十任务验收完成为前置条件。请先阅读 [README](README.md) 与 [整合状态](docs/steering/integration-status.md)，确认待修改的是共享能力、某个方法，还是评测工具。
+公共方法名称使用 **VLS、EDS、EDS+QD**，CLI 为 `vls`、`eds`、`eds_qd`。算法合同见[架构说明](docs/steering/architecture.md)，环境与资产见[安装说明](docs/steering/installation.md)。来源命名、历史目录和分支映射统一记录在 [README provenance](README.md#provenance来源与本地证据)，不加入新的公共入口。
 
-## 变更边界
+## 当前交付状态
 
-- 保留 `vls`、`eds`、`eds_qd` 三种公共方法的明确语义。增加指标观察器不等于启用 QD archive；更换 Stage 控制器也不是仅调整日志。
-- 算法、provider、提示词、关键点、动作转换、初始化、Stage/reference 和环境资产都可能改变结果。PR 必须列出实际变化的部分。
-- 尽量把迁移、重构和算法实验分开提交。若同时改变，应说明无法拆分的原因，并提供对应验证。
-- 不删除已有失败记录或覆盖冻结配置。新方法、新 seed、修复后的重跑均使用独立输出目录和运行标识。
-- 不把个人模型缓存、凭据、登录状态、`.env` 或其他研究的队列/资源状态带入公共实现。
+迁移版 EDS 的完整在线验收已通过。三模式 profile、统一 Stage 进度、模型身份验证和离线审计已接入；最终公共版本的完整 CPU/GPU 验证与三组十任务仍待完成。[整合状态](docs/steering/integration-status.md) 区分已完成证据和待办，合并代码不等于性能验收。
 
-## 安装与离线开发
+在共同主线建立功能分支，通过 PR 审阅合入。PR 应写清触发问题、最终行为、影响的方法、真实测试命令与结果、未验证边界。保留用户和其他协作者的改动；不要用研究输出目录充当源码分支，也不要用重新生成 reference 的方式消除回归。
 
-使用 [environment-steering.yml](environment-steering.yml)、[requirements-steering.txt](requirements-steering.txt) 和 [资产准备脚本](scripts/prepare_steering_assets.py)，避免把系统全局包或其他实验目录作为隐式依赖。新环境配方仍待干净 clone 验收，不要把本机可导入写成“干净 clone 可复现”，也不要原地升级正在执行 cohort 的共享环境。
+## 配置与运行冻结
 
-`configs/local.yaml` 只包含机器路径与 GPU/EGL 编号，模板为 [local.example.yaml](configs/local.example.yaml)。配置解析可用 `scripts/run_steering.py --method eds --local-config configs/local.yaml --output-dir <新目录> --print-config`；它不使用 GPU 或调用模型。资产文件校验使用 `prepare_steering_assets.py verify-libero` 与 `verify-rng`。需要真实模型/GPU 时，显式使用 `check_steering.py` 的 `--api` / `--gpu`，并保存独立预检目录。
+科学设置分为共享 [ObjectSwap 协议](configs/evaluation/libero_object_swap.yaml) 和 [方法 profile](configs/steering)。机器路径、设备和显存配置放在被忽略的 `configs/local.yaml`；凭据、模型权重和大视频不提交。资产 expected manifest、科学 fixture 与其来源说明随代码审阅，不能仅因文件大而删除运行所需资产。
 
-优先完成不需要模型、GPU 或在线调用的检查：配置解析、方法路由、输入输出形状、动作槽位、reward 合同、Stage 状态机、fixture/hash 和日志合同。针对会改变行为的代码，添加能够检出真实错误的测试；纯文字或低风险可逆调整无需编写镜像测试。
+每个完整 cohort 必须用新的输出目录。启动前记录待验证假设、源码与配置、任务/seed、资产身份、初始化协议和服务参数；运行期间不得修改冻结源码、profile、提示词、依赖或资产。结束后保留全部失败、异常和原始捕获，不能从多轮挑选成功拼成一个分数。目录存在即换新 run ID；不要覆盖旧配置或继续给已漂移的运行计成绩。
 
-当前离线回归已有 1,118 项通过，含 26 项新增 runner 检查，真实日志位置与范围由 [整合状态](docs/steering/integration-status.md) 维护。执行 GPU smoke 或在线 cohort 前，应明确使用的设备、输出位置和运行范围；CUDA 运算与 EGL 渲染分别成功，不足以证明二者使用同一块 GPU。普通单元测试、模块导入和资产检查不得隐式触发完整评测或模型请求。
+对照匹配 suite、任务/seed、初始化、资产、Stage 规则、动作 horizon、环境步数上限和模型请求参数。不同轨迹可产生不同查询时刻，不通过回复回放强制相同轨迹。默认 VLS20 与 EDS16 的计算路径不同，须报告实际模型 batch rows/calls、reward/梯度调用、延迟及在线调用数；等计算预算比较需要单独设定。
 
-当前离线回归使用 `CUDA_VISIBLE_DEVICES='' python -m pytest tests -q --disable-warnings`。提交新入口或算法修改后，按改动范围运行对应检查，并记录所用 Python 环境、实际数量与失败信息；不要只复述上一次的通过数量。
+## 算法修改与验证
 
-## 配置冻结与比较
+接口清理必须保持动作值/dtype/夹爪符号、评分切片与运算顺序、父代选择、RNG恢复时点、去噪与评分调用数、Stage/query时机和 reference 生命周期。temperature解释、RBF势函数、prompt、Stage阈值、动作块长度、初始化、缓存或 archive 规则的变化都是科学改动，应有独立配置和新运行。
 
-正式 cohort 开始前，保存解析后的配置，并记录：
+`get_stage_reward()` 对 EDS 只读已有进度；VLS 使用独立的最终选中候选 score/reference，不能借用内部梯度进度冒充。新增 VLS 梯度能力检查或 telemetry 不得进入 EDS 路径消耗随机数或改变评分。reward可评分与可微分是不同能力；最优点合法零梯度不能一概判坏。
 
-1. 公共方法、启用机制、provider/model、提示词和 Stage 策略。
-2. 源码版本及工作区差异，相关源文件哈希。
-3. suite、任务顺序、每任务 seed、init state、步数上限和终止口径。
-4. policy/encoder/DINO/仿真资产版本与校验值，以及环境与 CLI 版本。
-5. 初始化协议；若使用 RNG fixture，记录 manifest 与每个状态文件哈希。
-6. 输出路径、日志及审计策略。
+用与改动相关的测试验证行为，完成规定的全套检查。以下普通 CPU 命令隐藏 CUDA、关闭 `.env` 读取，但本身不是网络隔离器：
 
-运行期间不得继续修改会影响执行的源码或配置。确需修复时终止该版本的结论，保留已产生的原始记录，另开新运行。一个完整 cohort 必须来自同一冻结设置；不能把重复尝试中的成功拼成一个结果。
+```bash
+env -u VLA_CODEX_ONLY CUDA_VISIBLE_DEVICES='' PYTHON_DOTENV_DISABLED=1 \
+  PYTHONDONTWRITEBYTECODE=1 PYTHONNOUSERSITE=1 \
+  python -m pytest tests -q --disable-warnings -p no:cacheprovider
+```
 
-比较时保持 benchmark、策略、初始化、任务/seed、动作预算与 provider 条件一致。标准 Object 与 ObjectSwap OOD、PI05 与 RDT、缓存 Stage 与在线 Stage、普通 seed 与历史 RNG fixture 都应分别报告。改变其中任何一项时，明确其影响，避免把结果归因于单一算法开关。
+[EDS CPU reference fixture](tests/fixtures/steering_eds_golden/README.md) 比较真实搜索、动作转换/cache、Stage和父代路径，模型/传感器/provider为确定性合成输入。它不验证GPU核、真实渲染、模型权重或在线成功率。新 clone 应直接运行，不依赖维护者工作区、私有缓存或缺路径时跳过测试。
 
-## 结果与审计
+离线证据测试可使用裁剪的真实捕获，必须保留原始文件哈希及裁剪来源；合成完成状态只是测试 scaffolding，不能登记为真实任务成功。QD 验收要证明 archive 参与父代和最终选择；仅有 observer 或 per-cell计数不够。数值不一致先保存输入和完整差异，再定位原因；不能在看到任务结果后放宽 gate。
 
-环境 success、Stage 宣告完成、代理 reward 和局部动作效果分别记录。回合数、完整性、准备错误、运行异常、模型调用失败与保留的失败都必须可查。
+## 资产、日志与发布
 
-历史结果可支持迁移设计，但不能作为新代码实测成绩。离线测试支持实现检查；短 smoke 支持运行链路检查；只有完整在线 cohort 才支持对应范围的在线成功率声明。固定十任务已经参与开发时，要披露该条件，不能称作独立泛化验证。
+模型验证必须对固定 expected manifest 比较内容及实际加载选择。保留 HF snapshot 到 blob 的正常链接；已有 DINO bytecode 的兼容边界要披露。新分发包可使用严格 clean 检查，不清理正在使用的缓存。权重、源码与资产的可获取性、许可和身份均需说明，不能用模型名称代替文件身份。
 
-对机制改进的结论，提供触发前后的输入、状态变化与动作证据，并保留反例。一次恢复触发不等于任务成功，一次环境成功也不保证放置长期稳定或所有 Stage 语义正确。
+最终报告包含：冻结源码/配置、方法、任务/seed、每任务 outcome、基础设施错误、环境/资产identity、初始化与在线捕获、真实机制计数、计算量和各级审计。任务 success、证据有效性、视觉语义正确性分别回答。未完成/无效任务不伪装成普通失败；未运行的方法保留 pending。
 
-## PR 内容
-
-PR 描述应先说明具体问题和修改后的行为，然后写出：
-
-- 涉及的方法、配置与资产；新增或变化的默认值。
-- 已运行的验证命令和结果，以及尚未运行的检查。
-- 是否存在在线结果；如果存在，给出完整输出和冻结配置位置。
-- 与基线的可比较条件、未解决限制和迁移影响。
-
-审阅者应能在不读取私人缓存或历史工作区的情况下理解修改。引用仓库内文件时使用相对链接。依赖变更同时更新环境声明、资产清单和安装说明；新 checkpoint 或 third-party 资产必须保留来源、许可证和校验记录。
-
-## 许可证与第三方内容
-
-保持 [LICENSE](LICENSE) 中的现有 MIT 许可与版权声明。修改第三方文件时保留其许可证和来源；不要假设仓库许可证覆盖权重、数据或外部服务。第三方大文件是否保留应由运行依赖、可获取性和许可证决定，不能仅按体积删除。
+原始视频和日志保存在外部 run 归档，保留原文件、manifest与哈希；仓库只放可审阅的小型报告和必要fixture。分享或发布前补可访问归档链接、最终commit及已验证命令。现有 [MIT LICENSE](LICENSE) 只按其范围适用；保留第三方许可证，不推定模型、数据或服务有相同许可。

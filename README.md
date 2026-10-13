@@ -1,132 +1,101 @@
-# VLA-Pilot++：RDT 推理时引导与在线阶段控制
+# VLA-Pilot++：RDT steering
 
-这个仓库研究如何在不重新训练 RDT 策略的情况下，用视觉语言模型生成任务 reward、判断执行阶段，并在动作采样时进行引导。当前工作是把经过历史审计的 V17 基线整理为可维护、可复现的公共实现。目标方法为 `vls`、`eds`、`eds_qd`；**本阶段的新入口只开放 `eds`**，另外两种方法在 EDS 十任务验收后接入。
+在共享的机器人观测、在线视觉 Stage 控制器和执行链上，比较 **VLS、EDS、EDS+QD** 三种推理方法。公共入口分别使用 `vls`、`eds`、`eds_qd`，配置位于 [configs/steering](configs/steering)。
 
-**当前状态：EDS 入口、配置解析和预检已落地，新的完整在线验收尚未完成。** CPU 检查 1,118 项通过，包含 26 项新增 runner 回归；Codex 图像响应、GPU2 H200 的 CUDA 运算与 LIBERO reset/render 预检通过。独立设备查询已确认当前机器 GPU2 对应 EGL1。这些检查不等于完成策略 rollout 或十任务评测，历史 3/10 也不是本次整合的新成绩。证据与待完成项见 [整合状态](docs/steering/integration-status.md)。
+**当前处于主线整合阶段，尚未完成最终合并。** 迁移版 EDS 已完成有效十任务验收：**3/10，成功 task ID 为 3、8、9**。三模式配置、统一 Stage 进度接口与资产校验已落地；公共版本在原运行环境及独立安装环境均通过 1403 项 CPU 测试，三张卡的 CUDA/EGL 渲染和 QD 数值检查已通过；EDS、VLS、EDS+QD 各自完整十任务仍待完成。不要把迁移结果写成这三个新 cohort 的成绩。[完整状态与逐任务结果](docs/steering/integration-status.md)。
 
-## 方法与评测范围
-
-| 方法 | 主要机制 | 当前定位 |
+| 方法 | 候选生成与选择 | 配置 |
 | --- | --- | --- |
-| `vls` | 在 RDT 去噪中加入关键点 reward 梯度、轨迹多样性作用和可选 FKD 粒子重采样，最终选择动作候选 | 保留既有实现；新入口尚未开放 |
-| `eds` | 对动作候选执行评分、父代选择、重新加噪与截断去噪；初始和迭代采样可加入轨迹多样性 | 当前可选入口；V17 设置，QD archive 关闭，完整在线验收待完成 |
-| `eds_qd` | 在 EDS 搜索中加入按行为描述符组织的质量多样性 archive，影响候选保留与选择 | 后续实验扩展；新入口尚未开放 |
+| VLS | 在去噪中使用 reward 梯度、多样性梯度和 FKD 粒子重采样；20 个候选 | [vls.yaml](configs/steering/vls.yaml) |
+| EDS | 16 个候选，RBF 多样性采样、reward 评分、10 轮父代重采样与截断去噪 | [eds.yaml](configs/steering/eds.yaml) |
+| EDS+QD | 共用 EDS 搜索，动作块内 4×4 行为网格 archive 提供父代与最终候选 | [eds_qd.yaml](configs/steering/eds_qd.yaml) |
 
-V17 的关键变化还包括在线 Stage 复查、携带证据、失败接触恢复，以及同一阶段内保持 reward reference。它不是只增加一个采样参数。具体数据流、算法开关和局限见 [架构说明](docs/steering/architecture.md)。
+默认配置的计算预算不同；QD archive 每个动作块重新建立，没有跨任务记忆或递归自我改进。[算法细节与限制](docs/steering/architecture.md)。
 
-迁移目标评测为 **LIBERO object-swap OOD**：固定 10 个任务，每任务 1 回合，上限 720 动作。历史 V17 在一轮完整在线评测中取得 3/10，QD archive 关闭；这不是 QD 改善性能的证据。标准 `libero_object`、其他策略和不同初始化协议的结果不能直接与它比较。新成绩必须绑定新代码、解析后配置、资产和完整运行证据。
+## 从安装到运行
 
-## 安装与资产
+先按 [安装说明](docs/steering/installation.md) 创建独立环境，准备固定 LIBERO、模型/DINO 资产和 `configs/local.yaml`。已验证的依赖配方在真实干净环境通过 1118 项 CPU 测试；该证据不包含新环境 GPU 推理或在线服务。**模型内容与实际加载路径校验是 configure、preflight 和真实 launcher 的必经步骤**，不以“文件存在”代替身份校验。
 
-支持目标为 Linux、Python 3.12、NVIDIA CUDA 与 EGL 无界面渲染。新依赖声明为 [environment-steering.yml](environment-steering.yml) 和 [requirements-steering.txt](requirements-steering.txt)，依据当前可运行环境固定主要依赖：PyTorch 2.7.1+cu126、torchvision 0.22.1+cu126、transformers 的固定源码版本、diffusers 0.35.2、NumPy 2.2.0、MuJoCo 3.7.0、robosuite 1.4.0。它们是安装配方，尚非经过干净环境复验的完整传递依赖锁。
-
-克隆本仓库后，从仓库根目录在**新环境**中准备依赖。下面是已按脚本接口核对、尚待干净 clone 安装验收的流程；不要用它原地更新共享的旧 `vla-pilot` 环境。
+以下命令从仓库根目录、已激活的新环境执行。输出目录必须不存在；示例在线命令是已实现入口，最终版本的运行验收仍待完成。
 
 ```bash
-git submodule update --init --recursive third_party/rdt third_party/lerobot
-conda env create -f environment-steering.yml
-conda activate vla-steering
-python scripts/prepare_steering_assets.py install-libero
-python -m pip install --no-deps -e third_party/libero_pro -e third_party/lerobot
-python -m pip check
-python scripts/prepare_steering_assets.py verify-libero
-python scripts/prepare_steering_assets.py verify-rng
+# 三种配置均可预览；只解析配置，不创建运行目录或调用 GPU/API。
+python scripts/run_steering.py --method vls --local-config configs/local.yaml \
+  --output-dir outputs/vls-preview --print-config
+python scripts/run_steering.py --method eds --local-config configs/local.yaml \
+  --output-dir outputs/eds-preview --print-config
+python scripts/run_steering.py --method eds_qd --local-config configs/local.yaml \
+  --output-dir outputs/eds-qd-preview --print-config
+
+# 显式运行资产、GPU/渲染和一次真实 Codex 图像请求预检；不是任务成绩。
+python scripts/check_steering.py --local-config configs/local.yaml \
+  --output-dir outputs/preflight-001 --gpu --api
+
+# 每种模式的单任务诊断入口；子集不能登记为十任务成绩。
+python scripts/run_steering.py --method vls --tasks 0 \
+  --local-config configs/local.yaml --output-dir outputs/vls-diagnostic-001
+python scripts/run_steering.py --method eds --tasks 0 \
+  --local-config configs/local.yaml --output-dir outputs/eds-diagnostic-001
+python scripts/run_steering.py --method eds_qd --tasks 0 \
+  --local-config configs/local.yaml --output-dir outputs/eds-qd-diagnostic-001
+
+# 默认包含全部十任务。替换 --method 与新目录即可评测另外两种方法。
+python scripts/evaluate_steering.py --method eds \
+  --local-config configs/local.yaml --output-dir outputs/eds-full10-001
+python scripts/evaluate_steering.py --method vls \
+  --local-config configs/local.yaml --output-dir outputs/vls-full10-001
+python scripts/evaluate_steering.py --method eds_qd \
+  --local-config configs/local.yaml --output-dir outputs/eds-qd-full10-001
 ```
 
-除 Python 依赖外，运行还需要：
+在线路径使用 **Codex CLI / gpt-6-astra / low**，需要使用者自己的有效 CLI 登录。每任务新生成身份描述和 reward，Stage 随执行在线查询。机器配置只保存资产路径与设备选择，不保存凭据。launcher 使用配置中的 GPU/EGL 编号，不能通过 shell 的 CUDA 编号覆盖它；只在设备已分配且空闲时启动，禁止中止他人进程。
 
-| 资产 | 用途与要求 |
+## 查看与审计结果
+
+每次运行保留 `manifest.json`、`resolved-config.yaml`、无凭据的 `local-config.yaml` 快照、`environment.json`、源码快照、`status.json`、`progress.json`、`console.log` 和 `audit.json`。新公共入口的机制/计算日志位于 `output/evaluation/`；原始在线捕获位于 `output/captured_stage_inputs/` 等捕获目录；视频位于 `output/episode_*/`。具体目录以 run manifest 为准。
+
+```bash
+# 完整 cohort 审计：检查在线合同及方法机制，更新 audit.json 和明细。
+python scripts/audit_steering.py outputs/eds-full10-001
+
+# 只读复查已有结果，不覆盖原审计；历史格式会标明审计范围。
+python scripts/audit_steering.py outputs/eds-full10-001 --no-write
+
+# 每任务离线合同审计；完整验收须覆盖 0..9，不能只检查 task 0。
+python scripts/audit_steering_contract.py outputs/eds-full10-001 \
+  --task 0 --report outputs/eds-full10-001/task0-contract-review.json
+```
+
+任务失败只有在完整运行证据有效时才计入成功率。依赖/服务错误、缺捕获、初始化失败、源码或配置漂移应登记为无效或未完成。视频用于解释行为，环境 success 与完整审计共同支持成绩；一次固定十任务结果不证明独立泛化或统计稳健性。日志中的请求模型标记也不独立证明服务端内部模型权重或路由。
+
+原始日志、视频和大型模型不进入 Git；必须在外部归档保留，随报告分享可访问的清单、哈希和位置。当前公开可访问的完整证据归档链接仍待维护者提供，仓库中的小型测试 fixture 不替代原始运行证据。
+
+协作方式见 [CONTRIBUTING.md](CONTRIBUTING.md)。仓库现有 [LICENSE](LICENSE) 为 MIT；第三方代码、模型和数据分别受其原许可约束，不据此推定外部资产可再分发。
+
+## Provenance：来源与本地证据
+
+历史名称只在本节用于追溯，不作为公共方法或配置入口。下列身份属于不同阶段，不能合并为一次实验。
+
+| 来源 | 身份与范围 |
 | --- | --- |
-| RDT 与 LeRobot 源码 | 使用仓库记录的版本；不要用另一份全局安装静默替代 |
-| LIBERO-PRO 源码、BDDL、init states、模型和纹理资产 | 环境运行必需；安装应生成当前 clone 自己的 `LIBERO_CONFIG_PATH`，不能指向历史实验目录 |
-| RDT-1B-LIBERO-Object EMA checkpoint | 连同模型配置、动作/状态约定一起固定 |
-| T5 与 SigLIP | 固定到完整 encoder snapshot；仅提供 HF 缓存根目录不足以锁定版本 |
-| DINOv2 代码与权重 | 关键点提取依赖；离线运行前准备 Torch Hub 缓存 |
-| 历史初始化 fixture | 已放在 `tests/fixtures/steering_rng/`；manifest 和 20 个 RNG 状态文件共同定义初始化协议 |
-| Codex CLI 与 ChatGPT 登录 | V17 在线身份、reward 和 Stage 查询使用的提供方；需要验证 CLI 参数兼容性和模型可用性 |
+| 原 main | `d51cb85f485502e0429c79529872efef2ec59981` |
+| 来源研究 worktree | `.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-gpu6-20260922T063626Z/study_worktree`；来源 HEAD `77761b4cda78ac3b6762a6aa60f97b07fde7c1dc` |
+| 来源在线 baseline | `codex_failed_contact_v17_historical_initialization_online_full10`，位于来源 worktree 的 `artifacts/stage_closed_loop_20260929/runs/`；该轮 3/10、QD OFF，是来源证据 |
+| 来源快照 | 48 个验收文件，含 37 个 untracked、5 个 modified、6 个 clean；仅 merge 来源 HEAD 会遗漏内容 |
+| 当前整合分支 | `codex/rdt-steering-integration`；最终合并 commit 待填 |
+| 新迁移验收 | 冻结 commit `cfecb12db736f1a3408d9528d9336aadcb7e41b5`；新在线十任务有效 3/10；最终公共版本另行验收 |
 
-`install-libero` 下载固定的公开 LIBERO-PRO 版本、应用受校验的补丁与 ObjectSwap 输入包，再校验文件；已有合法本地副本可用 `--source /path/to/libero_pro` 复制。已有目标目录只校验，不覆盖。大模型与 DINO 缓存仍由使用者提供，脚本不会下载它们。旧 `requirements.txt`、`environment.yml` 和 `setup.sh` 不要与新配方混用。SAM3、CALVIN 和 PI05 是可选路径，不是当前 RDT EDS 的必需依赖。
+命名映射：`core/c0_reward_contract.py` → `core/target_distance_reward.py`；`core/poe_stage_capture.py` → `core/stage_capture.py`；`vlm_query/c0_contract_v1` → `vlm_query/target_distance`；reward 合同 `c0_xyz_v1` → `target_distance`。Stage profile `evidence_v1/contact_v2/grasp_v3/proprio_v4` → `evidence/contact/grasp/online`。
 
-已完成一次从固定公开版本的本地 Git 对象出发、使用相同规范化/补丁/输入包流程的离线重建，2,308 个文件哈希全部一致。该检查没有进行新的网络下载，也不能替代干净 clone 的完整安装验收。
+科学提示词保持原字节，[guidance_template_libero.txt](vlm_query/target_distance/guidance_template_libero.txt) 中两处 **C0** 为保留原始模型 stimulus 的兼容例外。它不是公开方法名；改写这些文字须作为新实验条件评审。
 
-## 机器配置
+历史 P2 同轮控制的 4/10 属于另一套 provider/reward/Stage 条件；标准 `libero_object` 的无引导 9/10、VLS 7/10也不是 ObjectSwap OOD 成绩，不能以数字直接排序当前方法。
 
-机器路径与设备编号放在忽略提交的 `configs/local.yaml`，格式见 [local.example.yaml](configs/local.example.yaml)。用资产脚本生成该文件及当前 clone 的 LIBERO 路径配置；以下 `/path/to/` 必须换成实际路径，encoder 必须是明确的 snapshot 目录：
+以下链接指向维护者机器上的 ignored 证据目录，普通 clone 不会自带；它们不是安装依赖或公开下载承诺：
 
-```bash
-python scripts/prepare_steering_assets.py configure --help
-python scripts/prepare_steering_assets.py configure \
-  --rdt-checkpoint /path/to/RDT-1B-LIBERO-Object \
-  --text-encoder /path/to/t5/snapshots/3db67ab1af984cf10548a73467f0e5bca2aaaeb2 \
-  --vision-encoder /path/to/siglip/snapshots/9fdffc58afc957d1a03a25b10dba0329ab15c2a3 \
-  --torch-home /path/to/torch/cache \
-  --gpu 0 --egl-device-id 0 \
-  --output configs/local.yaml \
-  --hash-weights --report outputs/steering/asset-check.json
-```
+- [迁移完整报告](.worktrees/exp/steering-integration/runs/eds-migration-20261013/migration-full10-report.md)、[验收及逐文件哈希](.worktrees/exp/steering-integration/runs/eds-migration-20261013/migration-full10-acceptance.json)。该运行目录保留逐任务合同、动作比较、捕获、日志与视频。
+- [迁移 CPU 日志](.worktrees/exp/steering-integration/checks/cpu-migration.log)：1118 passed、2 warnings、82.42s。
+- [干净安装报告](.worktrees/exp/steering-integration/pending-integration/steering-clean-install-report.md)、[验收摘要](.worktrees/exp/steering-integration/pending-integration/clean-install-validation-summary.json)：1118 passed、1 warning、86.53s，绑定迁移提交。原始外置安装日志位置由该摘要记录。
+- [首次 GPU/API 预检](.worktrees/exp/steering-integration/preflight-service/report.json)：CLI 0.156.1；本机 GPU2/EGL1 的身份关系见[设备记录](docs/steering/validation/gpu-mapping.json)。这不是可移植设备编号。
 
-示例中的 GPU0/EGL0 只是待替换编号，必须改成当前机器实证确认的映射，二者编号不一定相同。本机独立设备查询已确认 GPU2/EGL1，运行入口显式使用 PCI_BUS_ID 的 CUDA 排序。其他机器需重新确认。`configure` 只检查文件并写配置，不验证 GPU。`--hash-weights` 记录所提供权重的哈希，不能单靠“文件存在”证明权重与历史版本相同。新配置内容与已有文件不同时默认拒绝覆盖，检查后才使用 `--replace-config`。
-
-Codex CLI 使用本机 ChatGPT 登录；机器配置中不放 API key 或登录 token。本次预检实际使用 CLI **0.156.1** 与 `gpt-6-astra / low`，不是历史代码注释中的旧版本。其他安装需用 `codex --version` 记录版本，并通过下方显式预检确认参数和模型可用。不要提交模型权重、登录凭据或本机环境文件。
-
-## 运行入口
-
-当前只接受 `--method eds`。先解析配置，不使用 GPU、不调用模型：
-
-```bash
-python scripts/run_steering.py \
-  --method eds \
-  --local-config configs/local.yaml \
-  --output-dir outputs/steering/config-check-001 \
-  --print-config
-```
-
-以下预检会发出一次真实模型图像请求，并执行 CUDA 运算与 LIBERO reset/render；不是完整策略 rollout：
-
-```bash
-python scripts/check_steering.py \
-  --local-config configs/local.yaml \
-  --output-dir outputs/steering/preflight-001 \
-  --api --gpu
-```
-
-`--api` 与 `--gpu` 可分别使用。不带这两个标志只检查本地配置加载与环境构造，不能据此宣称模型或 GPU 可用。
-
-准备完成后，完整十任务的主线命令如下。**CLI 已落地，新的十任务结果仍待验收**：
-
-```bash
-python scripts/evaluate_steering.py \
-  --method eds \
-  --local-config configs/local.yaml \
-  --output-dir outputs/steering/eds-full10-001
-```
-
-`run_steering.py` 与 `evaluate_steering.py` 当前调用同一 launcher，均默认运行全部十任务。若要限定子集，显式追加 `--tasks 0,1`；子集结果不能称为 full10。当前整合机器可将上述 `python` 替换为 `/home/hynx/miniconda3/envs/vla-pilot/bin/python`，其他机器使用自己的已验证环境。
-
-预检和实际评测都要求新的输出目录。评测保存 `resolved-config.yaml`、`manifest.json`、源码快照、`console.log`、`status.json`、`progress.json` 和结束后的 `audit.json`。`status=finished` 只表示进程退出；还需查看 audit 与完整任务结果。运行中保持科学源码和配置不变，失败后保留原目录并另取新运行标识。
-
-旧的 `python main.py`、`run.sh` 仍有各自默认值，不能据此声称启动了 V17。V17 要求新生成的每任务 reward、真实在线 Stage、固定初始化协议和归档关闭；配置中仍含旧 provider 名称的字段不代表实际启用了那个 provider。
-
-## 合作开发
-
-阅读 [贡献说明](CONTRIBUTING.md) 后提交变更。算法、感知、Stage、初始化和评测配置的变化应分别说明；每轮正式评测开始后冻结源码与配置。保留全部失败、异常和完整任务列表，不拼接不同版本或重复运行中的成功。
-
-文档入口：
-
-- [架构与方法机制](docs/steering/architecture.md)
-- [整合状态与验收条件](docs/steering/integration-status.md)
-- [贡献与证据规则](CONTRIBUTING.md)
-
-## 来源与追溯
-
-项目保留 VLS 的历史实现与文档。原始研究背景见 [VLS 论文](https://arxiv.org/abs/2602.03973) 和 [项目页面](https://vision-language-steering.github.io/webpage/)。论文中的实验结论不自动适用于本仓库新增的 RDT/EDS/Stage 设置。
-
-本次整合开始时，主仓库提交为 `d51cb85f485502e0429c79529872efef2ec59981`，已具备 RDT + LIBERO + VLS；整合分支为 `codex/rdt-steering-integration`。
-
-V17 来源目录为 `.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-gpu6-20260922T063626Z/study_worktree`，来源分支为 `exp/rdt-qd-ed-gpu6-20260922T063626Z`，审计时 HEAD 为 `77761b4cda78ac3b6762a6aa60f97b07fde7c1dc`。该目录包含后续工作区修改，**HEAD 本身不完整代表 V17**。
-
-实际来源以该目录下 `artifacts/stage_closed_loop_20260929/runs/codex_failed_contact_v17_historical_initialization_online_full10/` 的 `accepted-setting.json`、`manifest.json`、`resolved-config.yaml` 和 `source/` 冻结快照为准；报告为 `docs/03_evidence/stage_consistency/2026-09-30-codex-v17-full10-report.md`。这些来源路径用于本地审计，不要求新 clone 依赖原实验工作区。迁移后的证据位置将在验收记录中给出。
-
-## 许可证
-
-仓库现有 [LICENSE](LICENSE) 为 MIT，保留原有版权声明 `Copyright (c) 2025 Shuo Liu`。本次文档整理未变更该许可证。第三方源码、仿真资产与模型权重仍受各自许可证和使用条款约束；项目的 MIT 许可证不替代它们。
+公共版本 CPU 两环境均为 1403 passed，GPU 映射及 QD 数值结果已记录；三模式独立 cohort、可分享的证据归档和合并 commit 仍待补，详见[整合状态](docs/steering/integration-status.md)。
