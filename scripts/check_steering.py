@@ -34,6 +34,13 @@ def main():
         if path not in sys.path:
             sys.path.insert(0, path)
     try:
+        from scripts.steering_model_assets import verify_model_assets
+        from scripts.prepare_steering_assets import verify_libero, verify_rng, verify_libero_paths
+        report['model_assets'] = verify_model_assets(local, repository_root=ROOT)
+        report['libero'] = verify_libero(Path(local['libero_root']))
+        report['libero_paths'] = verify_libero_paths(local)
+        report['rng'] = verify_rng(ROOT / 'tests/fixtures/steering_rng')
+        atomic_json(destination / 'report.json', report)
         if args.api:
             from PIL import Image
             from core.codex_vision import CodexVisionTransport
@@ -78,7 +85,7 @@ def main():
                 environment.close()
         report.update(status='pass', completed_at=utc())
     except Exception as exc:
-        report.update(status='fail', error_type=type(exc).__name__, completed_at=utc())
+        report.update(status='fail', error_type=type(exc).__name__, error=str(exc), completed_at=utc())
         atomic_json(destination / 'report.json', report)
         raise
     atomic_json(destination / 'report.json', report)
