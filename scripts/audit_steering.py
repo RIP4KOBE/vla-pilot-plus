@@ -18,6 +18,7 @@ if str(ROOT) not in sys.path:
 from scripts.steering_runtime import atomic_json, digest
 from scripts.audit_steering_contract import audit_run as audit_task_contract, evaluation_directory
 from scripts.audit_qd_mechanism import audit_chunk as audit_search_chunk
+from scripts.steering_archive import execution_identity, support_asset
 
 SUBMODULE_PINS = {'rdt': 'b896f4dcac8ed1c3fae4a056200db267607f131f',
                  'lerobot': '715debf6c1723a28f1a57d4274a8c4ec35b6a417'}
@@ -59,14 +60,15 @@ def protocol_config(folder, manifest, actual):
         by_task = dict(zip(all_tasks, scales))
         expected['backend']['libero']['task_guide_scales'] = [by_task[t] for t in tasks]
     expected['steering']['method'] = manifest['method']
-    expected['main']['eds_eval'].update(method_label=manifest['method'], job_id=folder.name)
+    identity = execution_identity(folder, manifest, actual)
+    expected['main']['eds_eval'].update(method_label=manifest['method'], job_id=identity['job_id'])
     code_root = Path(manifest['code_root'])
     expected['main']['episode_rng_fixture_manifest'] = str(code_root / expected['main']['episode_rng_fixture_manifest'])
     expected['perception']['vlm_agent']['query_template_dir'] = str(code_root / 'vlm_query/target_distance')
     # The asset receipt separately binds these three machine-specific loader roots.
     for field in ('pretrained_path', 'text_encoder', 'vision_encoder'):
         expected['policy']['rdt'][field] = actual['policy']['rdt'][field]
-    expected['hydra']['run']['dir'] = str(folder / 'output')
+    expected['hydra']['run']['dir'] = identity['original_output_dir']
     return expected
 
 
@@ -274,7 +276,7 @@ def vls_reference_continuity(events, metrics):
     return bool(metrics)
 
 
-def audit(folder, *, exit_code=None, output_path=None, write=True):
+def audit(folder, *, exit_code=None, output_path=None, write=True, archive_support=None):
     """Return audit results; write=False never changes a historical run or audit file."""
     folder = Path(folder).resolve()
     destination = Path(output_path).resolve() if output_path is not None else folder / 'audit.json'
@@ -336,7 +338,7 @@ def audit(folder, *, exit_code=None, output_path=None, write=True):
         check('reward_reference_reset_only_on_stage_change', bool(events) and all(r.get('reward_reference_reset')==(r.get('stage_before')!=r.get('stage_after')) for r in events))
         check('rng_restore_order', lambda: [(r['metadata']['task_id'],r['metadata']['episode_seed'],r['metadata']['phase']) for r in restores]==[(t,s,p) for t,s in zip(tasks,seeds) for p in ('prepare','rollout')])
         check('source_snapshot_intact', lambda: bool(manifest['source_sha256']) and all(digest(folder/'source'/p)==h for p,h in manifest['source_sha256'].items()))
-        fixture=read_json(ROOT/'tests/fixtures/steering_rng/fixture-manifest.json')
+        fixture=read_json(support_asset(folder, 'rng_manifest', archive_support=archive_support, manifest=manifest, config=config)) if v2 else read_json(ROOT/'tests/fixtures/steering_rng/fixture-manifest.json')
         check('rng_states_match', lambda: bool(restores) and all(r['sha256']==fixture['fixtures'][f"{r['metadata']['task_id']}:{r['metadata']['phase']}"]['sha256'] and r['state_signature']==fixture['fixtures'][f"{r['metadata']['task_id']}:{r['metadata']['phase']}"]['state_signature'] for r in restores))
         from core.stage_fused_carry_hold import audit_checks as carry_checks
         from core.stage_failed_contact_recheck import audit_checks as contact_checks
@@ -353,7 +355,7 @@ def audit(folder, *, exit_code=None, output_path=None, write=True):
                      videos=[str(v.relative_to(folder)) for v in videos])
             if v2:
                 try:
-                    report=audit_task_contract(folder,task=task,model=manifest['model'],effort=manifest['reasoning_effort'])
+                    report=audit_task_contract(folder,task=task,model=manifest['model'],effort=manifest['reasoning_effort'],archive_support=archive_support)
                     json.dumps(report,allow_nan=False)
                 except Exception as exc:
                     report={'task_id':task,'task_contract_valid':False,'task_evidence_complete':False,
@@ -404,7 +406,7 @@ def audit(folder, *, exit_code=None, output_path=None, write=True):
                 key=metric_identity(metric); identity_valid=all(type(v) is int for v in key)
                 bound=identity_valid and key in expected_keys and key[:2] in expected_seeds
                 bound=bound and ('episode_seed' not in metric or metric['episode_seed']==expected_seeds[key[:2]])
-                bound=bound and metric.get('method_label')==method and metric.get('job_id')==folder.name
+                bound=bound and metric.get('method_label')==method and metric.get('job_id')==execution_identity(folder,manifest,config)['job_id']
                 bound=bound and metric.get('suite')==config['backend']['libero']['suite_name']
                 try:
                     report=(audit_vls_chunk(metric,config) if method=='vls' else
@@ -453,6 +455,6 @@ def audit(folder, *, exit_code=None, output_path=None, write=True):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('run_dir')
-    parser.add_argument('--output',type=Path);parser.add_argument('--no-write',action='store_true')
-    args=parser.parse_args();result=audit(args.run_dir,output_path=args.output,write=not args.no_write)
+    parser.add_argument('--output',type=Path);parser.add_argument('--no-write',action='store_true');parser.add_argument('--archive-support',type=Path)
+    args=parser.parse_args();result=audit(args.run_dir,output_path=args.output,write=not args.no_write,archive_support=args.archive_support)
     print(json.dumps(result,indent=2));raise SystemExit(0 if result['valid'] else 1)
