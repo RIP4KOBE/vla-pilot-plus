@@ -1,0 +1,1386 @@
+{
+  "schema": "steering_final_results_summary_v1",
+  "source": "Derived from immutable original frozen-source aggregation; no new scientific execution.",
+  "date_utc": "2026-10-13",
+  "tested_runtime_commit": "33954ead452927fc3168efb610487a688f89169e",
+  "benchmark": "RDT / LIBERO ObjectSwap OOD",
+  "all_cohorts_valid": true,
+  "integration_acceptance": true,
+  "performance_gate": {
+    "method": "eds",
+    "reference_successes": 3,
+    "denominator": 10,
+    "observed_successes": 3,
+    "passed": true,
+    "scope": "Integration performance threshold; does not change validity of scientifically unsuccessful episodes or completed cohorts."
+  },
+  "scientific_episode_count": {
+    "migration_separate": 10,
+    "common_comparison": 30,
+    "total": 40,
+    "additional_scientific_retries": 0
+  },
+  "evidence_access": {
+    "raw_evidence": "Maintainer-local ignored paths only; no public evidence bundle configured.",
+    "model_assets": "Maintainer-provided exact bytes required; no public accepted asset bundle configured.",
+    "path_base": "repository root; these paths do not accompany an ordinary clone"
+  },
+  "sealed_evidence": {
+    "aggregation": {
+      "path": ".worktrees/exp/steering-integration/checks/three-mode-final.json",
+      "sha256": "a67ee5e13f7563b86ea8fadd9e55dd5d5b80f53601cdd1e65f1af72a2c2402eb"
+    },
+    "seal": {
+      "path": ".worktrees/exp/steering-integration/checks/three-mode-final-seal.json",
+      "sha256": "14502922a48c5c7ec8de5a59e698a2104d7a241cba2b4e1a9e95a4b51a4e4161"
+    },
+    "videos": {
+      "path": ".worktrees/exp/steering-integration/checks/video-health/index.json",
+      "sha256": "93388502f0dda33a1bfd22de7ae56e70e8c4278591029d101b6511cfc807a70a"
+    }
+  },
+  "comparison": {
+    "final_success_counts": {
+      "eds": 3,
+      "vls": 1,
+      "eds_qd": 1
+    },
+    "validated_cohort_success_counts": {
+      "eds": 3,
+      "vls": 1,
+      "eds_qd": 1
+    },
+    "denominator_per_mode": 10,
+    "paired_task_ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "seeds": [
+      44,
+      235,
+      43,
+      546,
+      6,
+      621,
+      197,
+      87,
+      151,
+      548
+    ]
+  },
+  "limits": [
+    "No causal attribution from a single seed per task; provider and device variation are recorded.",
+    "VLS and EDS have different actual compute budgets, reported separately; no equal-compute claim.",
+    "Live JSONL reads are prefixes and may observe a trailing incomplete line.",
+    "Method telemetry checks do not independently establish all descriptor geometry or executed tensor paths.",
+    "Task contract detail timestamps are regenerated; fresh task outcome/check summaries are compared semantically, while cached detail file hashes remain independently checked. Method detail canonical hashes must exactly match the fresh reconstruction.",
+    "No cross-chunk archive learning or recursive self-improvement is claimed."
+  ],
+  "measurement_notes": [
+    "Worker elapsed seconds include online waits, simulation and local work; they are not active GPU hours.",
+    "Compute and service totals retain null when unknown in the source; transport HTTP attempt/retry totals are not inferred from logical CLI calls.",
+    "All 30 terminal videos passed complete CPU decode/frame-count checks; this does not establish semantic pixel or annotation correctness."
+  ],
+  "runs": {
+    "eds": {
+      "state": "accepted",
+      "accepted": true,
+      "completed_tasks": 10,
+      "final_successes": 3,
+      "final_success_task_ids": [
+        3,
+        8,
+        9
+      ],
+      "physical_gpu": 0,
+      "egl_device_id": 2,
+      "timing": {
+        "started_at": "2026-10-13T13:15:18.783095+00:00",
+        "completed_at": "2026-10-13T16:33:14.094064+00:00",
+        "elapsed_s": 11875.310969,
+        "is_final": true
+      },
+      "run_path": ".worktrees/exp/steering-integration/runs/eds-common-20261013",
+      "exit_code": 0,
+      "source_unchanged": true,
+      "infrastructure_errors": 0,
+      "stage": {
+        "boundaries": 699,
+        "queries": 309,
+        "successful_queries": 309,
+        "query_errors": 0,
+        "guided_boundaries": 205,
+        "unguided_boundaries": 494
+      },
+      "mechanism": {
+        "recorded_chunks": 205,
+        "guided_select_action_latency_s": {
+          "total": 523.1232034428976,
+          "observed_subtotal": 523.1232034428976,
+          "known_rows": 205,
+          "unknown_rows": 0
+        },
+        "score_call_count": {
+          "total": 2255,
+          "observed_subtotal": 2255,
+          "known_rows": 205,
+          "unknown_rows": 0
+        },
+        "search_evaluation_count": {
+          "total": 36080,
+          "observed_subtotal": 36080,
+          "known_rows": 205,
+          "unknown_rows": 0
+        },
+        "qd_evaluation_count": {
+          "total": 0,
+          "observed_subtotal": 0,
+          "known_rows": 205,
+          "unknown_rows": 0
+        },
+        "initial_diversity_steps": {
+          "total": 820,
+          "observed_subtotal": 820,
+          "known_rows": 205,
+          "unknown_rows": 0
+        },
+        "rollout_diversity_iters_applied": {
+          "total": 2050,
+          "observed_subtotal": 2050,
+          "known_rows": 205,
+          "unknown_rows": 0
+        },
+        "archive_enabled_chunks": 0,
+        "archive_active_chunks": 0,
+        "parent_sources": {
+          "weighted_offspring": 32800
+        },
+        "final_selection_sources": {
+          "weighted_offspring": 205
+        },
+        "final_coverage": {
+          "count": 0,
+          "minimum": null,
+          "maximum": null,
+          "mean": null
+        }
+      },
+      "compute_totals": {
+        "model_forward_calls": 6775,
+        "model_batch_rows": 71350,
+        "denoising_invocations": 2749,
+        "model_denoising_steps": 6775,
+        "denoising_step_batch_rows": 71350,
+        "renoise_invocations": 2050,
+        "reward_calls": 52480,
+        "reward_evaluations": 52480,
+        "reward_scoring_batches": 3280,
+        "guided_chunks": 205,
+        "unguided_chunks": 494,
+        "rbf_gradient_calls": 3895,
+        "rbf_gradient_batch_rows": 62320,
+        "vision_encoder_forward_calls": 699,
+        "vision_encoder_batch_rows": 4194,
+        "text_encoder_forward_calls": 699,
+        "text_encoder_batch_rows": 699,
+        "dino_forward_calls": 10,
+        "dino_batch_rows": 10,
+        "provider_logical_call_attempts": 329,
+        "provider_completed_turns": 329,
+        "provider_failed_calls": 0,
+        "provider_input_tokens": 3183949,
+        "provider_cached_input_tokens": 1975424,
+        "provider_output_tokens": 37225,
+        "provider_reasoning_output_tokens": 13572,
+        "provider_call_latency_s": 10623.589184571058,
+        "stage_codex_logical_call_attempts": 319,
+        "stage_codex_completed_turns": 319,
+        "stage_codex_failed_calls": 0,
+        "stage_codex_call_latency_s": 10302.087328907335,
+        "guidance_codex_logical_call_attempts": 10,
+        "guidance_codex_completed_turns": 10,
+        "guidance_codex_failed_calls": 0,
+        "guidance_codex_call_latency_s": 321.5018556637224
+      },
+      "compute_unknown_rows": {},
+      "artifacts": {
+        "manifest.json": {
+          "path": ".worktrees/exp/steering-integration/runs/eds-common-20261013/manifest.json",
+          "sha256": "d98fca54037f1b88c08dc3cb805d792badd0446ca5529f405053dccc06fb20d1"
+        },
+        "resolved-config.yaml": {
+          "path": ".worktrees/exp/steering-integration/runs/eds-common-20261013/resolved-config.yaml",
+          "sha256": "2d988bbbf601fdfa193be161859694ac6e89c44b18037b54a49dd30feb8a3e0c"
+        },
+        "environment.json": {
+          "path": ".worktrees/exp/steering-integration/runs/eds-common-20261013/environment.json",
+          "sha256": "c5bb50e42204a16b49272c9d038dabdd9dfecf11cd8ce75c9aa8f0c1d3e88d3e"
+        },
+        "status.json": {
+          "path": ".worktrees/exp/steering-integration/runs/eds-common-20261013/status.json",
+          "sha256": "203fcbd8b23fe602edf741a6876a57ed00dbd36cc0613056a0c1739a9ab449f8"
+        },
+        "audit.json": {
+          "path": ".worktrees/exp/steering-integration/runs/eds-common-20261013/audit.json",
+          "sha256": "967a8532361bbe53c707e384a4f70531f6d94b4fe68c102e20dbb22394290899"
+        }
+      },
+      "tasks": [
+        {
+          "task_id": 0,
+          "seed": 44,
+          "episode": 0,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1765,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/eds-common-20261013/audit-details/task0-contract.json",
+            "sha256": "69fff11bd21a71547b335bbe8c2904dfe05cf6d996046af3b76ce25dd670f896"
+          },
+          "video": {
+            "video_relative_path": "output/episode_1/episode_1_fail_agentview.mp4",
+            "video_sha256": "d0ed3b79ac78eddfb39996a54916955db9dbf2e1d685dddb6bdfcd37c896dc97",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "0996bc44b7d50ee45f00222bdbe4e6b37348901a08dd5d11ae690399e36b725b",
+            "report_sha256": "efd8e7c1e0aba00544a5c0dff14524d570ebb9a86220ac14d1173dfe9bfb10df"
+          }
+        },
+        {
+          "task_id": 1,
+          "seed": 235,
+          "episode": 1,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1765,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/eds-common-20261013/audit-details/task1-contract.json",
+            "sha256": "04456c089b00faec4b71c927de6cb9427c52f59c6908f6b4a85697d185bbd342"
+          },
+          "video": {
+            "video_relative_path": "output/episode_2/episode_2_fail_agentview.mp4",
+            "video_sha256": "1524df9dcaa09c4cd67b820625458bcaa1707146f13801c91fb6ad98dcc8b999",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "0996bc44b7d50ee45f00222bdbe4e6b37348901a08dd5d11ae690399e36b725b",
+            "report_sha256": "8f6e9902d73167786157ee8e24898356600ec1d2fe3bd7fbdce59dd1004e3b87"
+          }
+        },
+        {
+          "task_id": 2,
+          "seed": 43,
+          "episode": 2,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1808,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/eds-common-20261013/audit-details/task2-contract.json",
+            "sha256": "d13d2786bfc0b9af86c47805f1df251c156ade14cf618686dbcc7a05e03d74cf"
+          },
+          "video": {
+            "video_relative_path": "output/episode_3/episode_3_fail_agentview.mp4",
+            "video_sha256": "61eca1fb6ec89b4018027282219512db5737ed393d4b93ee30bdaff31694f4c7",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "0996bc44b7d50ee45f00222bdbe4e6b37348901a08dd5d11ae690399e36b725b",
+            "report_sha256": "fcf69ff7930d0cd665feb643084798dafd85c0657e2aadd4392e1f1d5edd7b2d"
+          }
+        },
+        {
+          "task_id": 3,
+          "seed": 546,
+          "episode": 3,
+          "completed": true,
+          "success": true,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 120,
+          "contract_checks_pass": 346,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/eds-common-20261013/audit-details/task3-contract.json",
+            "sha256": "ca22c28e4ce0d6087ddb0d38373d1cbb70398f19d84cc00f6c931ece2b6d60ca"
+          },
+          "video": {
+            "video_relative_path": "output/episode_4/episode_4_success_agentview.mp4",
+            "video_sha256": "1072a9139c26c22a493020c7e53cee78d3badc32e2c16898c643dd6d1eed97f1",
+            "delivery_valid": true,
+            "frame_count": 120,
+            "duration_s": 12.0,
+            "checker_helper_sha256": "0996bc44b7d50ee45f00222bdbe4e6b37348901a08dd5d11ae690399e36b725b",
+            "report_sha256": "8885f69ed66a13372d1f19f1347781d01fc7bf355ad290ebb8d8e76082aab2cb"
+          }
+        },
+        {
+          "task_id": 4,
+          "seed": 6,
+          "episode": 4,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1679,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/eds-common-20261013/audit-details/task4-contract.json",
+            "sha256": "21c0a9d960108ba95e97b2893d03f689c355a314f687de4df22e0e1c6cda02f6"
+          },
+          "video": {
+            "video_relative_path": "output/episode_5/episode_5_fail_agentview.mp4",
+            "video_sha256": "e1aca476780799d490b2b112291af809931ddcc443732a683d1801e412330899",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "4ed89b71c08ff662790f3249f9401725d9f2e1fa933772f904d255df08293659",
+            "report_sha256": "63965723898d2e2f50a19f1293383717868650697b8d0d5674ef0b523e1d4202"
+          }
+        },
+        {
+          "task_id": 5,
+          "seed": 621,
+          "episode": 5,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1980,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/eds-common-20261013/audit-details/task5-contract.json",
+            "sha256": "64e06fd0524727094e812b2c2a35f5334649c06d7aa8bcad9243f9f3685b1492"
+          },
+          "video": {
+            "video_relative_path": "output/episode_6/episode_6_fail_agentview.mp4",
+            "video_sha256": "84a79c5af3873714169b75ae10ff3748868abec6bfc121e177892304bf143995",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "4ed89b71c08ff662790f3249f9401725d9f2e1fa933772f904d255df08293659",
+            "report_sha256": "4c4aa61594e7a79dfd575f0475681a33387a578311bf570016f20162763856ae"
+          }
+        },
+        {
+          "task_id": 6,
+          "seed": 197,
+          "episode": 6,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1636,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/eds-common-20261013/audit-details/task6-contract.json",
+            "sha256": "f13c85157b28bcb5fdb51418bbc68716dc2e74e59968b4615af1ddc57b0d38b4"
+          },
+          "video": {
+            "video_relative_path": "output/episode_7/episode_7_fail_agentview.mp4",
+            "video_sha256": "131a91b45d2d3267205a2bd28e6986128e7460ee81a21564172cebe24fa49d5d",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "4ed89b71c08ff662790f3249f9401725d9f2e1fa933772f904d255df08293659",
+            "report_sha256": "299c5421dd5e16d58abc695806678c47848e2135182741ac88deadafad9ff4d8"
+          }
+        },
+        {
+          "task_id": 7,
+          "seed": 87,
+          "episode": 7,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1937,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/eds-common-20261013/audit-details/task7-contract.json",
+            "sha256": "818f28d68761be6fd8fd6a0d595586827f1981dce36adc381091c1a80c348f55"
+          },
+          "video": {
+            "video_relative_path": "output/episode_8/episode_8_fail_agentview.mp4",
+            "video_sha256": "f5edaef67552551d01b8d9c688a494aebef2ede48fd85e2198b02e21cd43b27f",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "4ed89b71c08ff662790f3249f9401725d9f2e1fa933772f904d255df08293659",
+            "report_sha256": "bb5d62e352f2da3506a427f4e856bb4d8287f5a58c3b03b901365affbc30316d"
+          }
+        },
+        {
+          "task_id": 8,
+          "seed": 151,
+          "episode": 8,
+          "completed": true,
+          "success": true,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 211,
+          "contract_checks_pass": 604,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/eds-common-20261013/audit-details/task8-contract.json",
+            "sha256": "a9061fc1b5d52282bc53ba8086307d7b51e3f27ba88266d35d37f39f423afebb"
+          },
+          "video": {
+            "video_relative_path": "output/episode_9/episode_9_success_agentview.mp4",
+            "video_sha256": "301e17b5542ab83e01b2bfaa8528bf7ccf79d51128c61aaf71e94a7c07811392",
+            "delivery_valid": true,
+            "frame_count": 211,
+            "duration_s": 21.1,
+            "checker_helper_sha256": "4ed89b71c08ff662790f3249f9401725d9f2e1fa933772f904d255df08293659",
+            "report_sha256": "ff04c65f4139fbe58d89f90f4df9bed7d27abb883ae949573bb9d3409c6b1325"
+          }
+        },
+        {
+          "task_id": 9,
+          "seed": 548,
+          "episode": 9,
+          "completed": true,
+          "success": true,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 214,
+          "contract_checks_pass": 647,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/eds-common-20261013/audit-details/task9-contract.json",
+            "sha256": "ea74c08624e03fcc07098deea48e4a9399c2c0579d42bef36e527a33c94ba462"
+          },
+          "video": {
+            "video_relative_path": "output/episode_10/episode_10_success_agentview.mp4",
+            "video_sha256": "6fa584eab743e8188d520606074fdd672c05adfda8ce35889cad099fd5b07d1e",
+            "delivery_valid": true,
+            "frame_count": 214,
+            "duration_s": 21.4,
+            "checker_helper_sha256": "4ed89b71c08ff662790f3249f9401725d9f2e1fa933772f904d255df08293659",
+            "report_sha256": "4dc7c770fc8d0f188c85dba6b4ca9346860c1dc633058345551275fd4cac8106"
+          }
+        }
+      ]
+    },
+    "vls": {
+      "state": "accepted",
+      "accepted": true,
+      "completed_tasks": 10,
+      "final_successes": 1,
+      "final_success_task_ids": [
+        3
+      ],
+      "physical_gpu": 1,
+      "egl_device_id": 3,
+      "timing": {
+        "started_at": "2026-10-13T13:14:27.261698+00:00",
+        "completed_at": "2026-10-13T16:55:28.522284+00:00",
+        "elapsed_s": 13261.260586,
+        "is_final": true
+      },
+      "run_path": ".worktrees/exp/steering-integration/runs/vls-common-20261013",
+      "exit_code": 0,
+      "source_unchanged": true,
+      "infrastructure_errors": 0,
+      "stage": {
+        "boundaries": 827,
+        "queries": 369,
+        "successful_queries": 369,
+        "query_errors": 0,
+        "guided_boundaries": 368,
+        "unguided_boundaries": 459
+      },
+      "mechanism": {
+        "recorded_chunks": 368,
+        "guided_select_action_latency_s": {
+          "total": 248.26254418678582,
+          "observed_subtotal": 248.26254418678582,
+          "known_rows": 368,
+          "unknown_rows": 0
+        },
+        "guided_model_forward_calls": {
+          "total": 1840,
+          "observed_subtotal": 1840,
+          "known_rows": 368,
+          "unknown_rows": 0
+        },
+        "guided_model_batch_rows": {
+          "total": 36800,
+          "observed_subtotal": 36800,
+          "known_rows": 368,
+          "unknown_rows": 0
+        },
+        "guided_reward_calls": {
+          "total": 23552,
+          "observed_subtotal": 23552,
+          "known_rows": 368,
+          "unknown_rows": 0
+        },
+        "guided_reward_evaluations": {
+          "total": 51520,
+          "observed_subtotal": 51520,
+          "known_rows": 368,
+          "unknown_rows": 0
+        },
+        "guided_reward_scoring_batches": {
+          "total": 1104,
+          "observed_subtotal": 1104,
+          "known_rows": 368,
+          "unknown_rows": 0
+        },
+        "guided_rbf_gradient_calls": {
+          "total": 368,
+          "observed_subtotal": 368,
+          "known_rows": 368,
+          "unknown_rows": 0
+        },
+        "gradient": {
+          "attempted": {
+            "total": 1472,
+            "observed_subtotal": 1472,
+            "known_rows": 368,
+            "unknown_rows": 0
+          },
+          "applied": {
+            "total": 1472,
+            "observed_subtotal": 1472,
+            "known_rows": 368,
+            "unknown_rows": 0
+          },
+          "zero": {
+            "total": 0,
+            "observed_subtotal": 0,
+            "known_rows": 368,
+            "unknown_rows": 0
+          },
+          "nonfinite": {
+            "total": 0,
+            "observed_subtotal": 0,
+            "known_rows": 368,
+            "unknown_rows": 0
+          },
+          "exception": {
+            "total": 0,
+            "observed_subtotal": 0,
+            "known_rows": 368,
+            "unknown_rows": 0
+          },
+          "unavailable": {
+            "total": 0,
+            "observed_subtotal": 0,
+            "known_rows": 368,
+            "unknown_rows": 0
+          }
+        },
+        "rbf": {
+          "attempted": {
+            "total": 368,
+            "observed_subtotal": 368,
+            "known_rows": 368,
+            "unknown_rows": 0
+          },
+          "applied": {
+            "total": 368,
+            "observed_subtotal": 368,
+            "known_rows": 368,
+            "unknown_rows": 0
+          },
+          "zero": {
+            "total": 0,
+            "observed_subtotal": 0,
+            "known_rows": 368,
+            "unknown_rows": 0
+          },
+          "nonfinite": {
+            "total": 0,
+            "observed_subtotal": 0,
+            "known_rows": 368,
+            "unknown_rows": 0
+          },
+          "exception": {
+            "total": 0,
+            "observed_subtotal": 0,
+            "known_rows": 368,
+            "unknown_rows": 0
+          },
+          "unavailable": {
+            "total": 0,
+            "observed_subtotal": 0,
+            "known_rows": 368,
+            "unknown_rows": 0
+          }
+        },
+        "fkd": {
+          "calls": {
+            "total": 1104,
+            "observed_subtotal": 1104,
+            "known_rows": 368,
+            "unknown_rows": 0
+          },
+          "score_opportunities": {
+            "total": 368,
+            "observed_subtotal": 368,
+            "known_rows": 368,
+            "unknown_rows": 0
+          },
+          "actual_resamples": {
+            "total": 0,
+            "observed_subtotal": 0,
+            "known_rows": 368,
+            "unknown_rows": 0
+          },
+          "ess_skips": {
+            "total": 368,
+            "observed_subtotal": 368,
+            "known_rows": 368,
+            "unknown_rows": 0
+          }
+        },
+        "selection_sources": {
+          "reward_argmax": 368
+        }
+      },
+      "compute_totals": {
+        "model_forward_calls": 4135,
+        "model_batch_rows": 39095,
+        "denoising_invocations": 827,
+        "model_denoising_steps": 4135,
+        "denoising_step_batch_rows": 39095,
+        "renoise_invocations": 0,
+        "reward_calls": 23552,
+        "reward_evaluations": 51520,
+        "reward_scoring_batches": 1104,
+        "guided_chunks": 368,
+        "unguided_chunks": 459,
+        "rbf_gradient_calls": 368,
+        "rbf_gradient_batch_rows": 7360,
+        "vision_encoder_forward_calls": 827,
+        "vision_encoder_batch_rows": 4962,
+        "text_encoder_forward_calls": 827,
+        "text_encoder_batch_rows": 827,
+        "dino_forward_calls": 10,
+        "dino_batch_rows": 10,
+        "provider_logical_call_attempts": 389,
+        "provider_completed_turns": 389,
+        "provider_failed_calls": 0,
+        "provider_input_tokens": 3761626,
+        "provider_cached_input_tokens": 2345856,
+        "provider_output_tokens": 47366,
+        "provider_reasoning_output_tokens": 19839,
+        "provider_call_latency_s": 12462.654168310808,
+        "stage_codex_logical_call_attempts": 379,
+        "stage_codex_completed_turns": 379,
+        "stage_codex_failed_calls": 0,
+        "stage_codex_call_latency_s": 12124.798748143949,
+        "guidance_codex_logical_call_attempts": 10,
+        "guidance_codex_completed_turns": 10,
+        "guidance_codex_failed_calls": 0,
+        "guidance_codex_call_latency_s": 337.8554201668594
+      },
+      "compute_unknown_rows": {},
+      "artifacts": {
+        "manifest.json": {
+          "path": ".worktrees/exp/steering-integration/runs/vls-common-20261013/manifest.json",
+          "sha256": "249473e49e9ad14f385715eb798b2fd9f97e9bcbbfd62ca3bf40fd6eb1fee65b"
+        },
+        "resolved-config.yaml": {
+          "path": ".worktrees/exp/steering-integration/runs/vls-common-20261013/resolved-config.yaml",
+          "sha256": "c8a6e440419d8c2d0ad175cad2ff12c15a6bff4784e07da3dceb5025e7e95bcd"
+        },
+        "environment.json": {
+          "path": ".worktrees/exp/steering-integration/runs/vls-common-20261013/environment.json",
+          "sha256": "c5bb50e42204a16b49272c9d038dabdd9dfecf11cd8ce75c9aa8f0c1d3e88d3e"
+        },
+        "status.json": {
+          "path": ".worktrees/exp/steering-integration/runs/vls-common-20261013/status.json",
+          "sha256": "fd17e1ebc64cf3bbf6b8285282684c247cbb1f298d13bd31a54ef8b34aa8d1e3"
+        },
+        "audit.json": {
+          "path": ".worktrees/exp/steering-integration/runs/vls-common-20261013/audit.json",
+          "sha256": "c4133e57a3d717e498e59cf3cacc82795acce2e551ad3ca67eddc0296d8f77f4"
+        }
+      },
+      "tasks": [
+        {
+          "task_id": 0,
+          "seed": 44,
+          "episode": 0,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1765,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/vls-common-20261013/audit-details/task0-contract.json",
+            "sha256": "5b90a1e2328962aa6b20412a3a43978f55b8d325de81df632545be3af357f14e"
+          },
+          "video": {
+            "video_relative_path": "output/episode_1/episode_1_fail_agentview.mp4",
+            "video_sha256": "cb22d5a0309964ee5494894354b82db6147ac74a52e2d6edac79a2527e18b804",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "0996bc44b7d50ee45f00222bdbe4e6b37348901a08dd5d11ae690399e36b725b",
+            "report_sha256": "73a199e2978e84acc832af6d9bdea950fd8277f0b4d671ad3e73d89d46625ebd"
+          }
+        },
+        {
+          "task_id": 1,
+          "seed": 235,
+          "episode": 1,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1765,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/vls-common-20261013/audit-details/task1-contract.json",
+            "sha256": "dccad5938d503b129a0443e12dfb391a962e9364596b592bb6bebf9c76ca395a"
+          },
+          "video": {
+            "video_relative_path": "output/episode_2/episode_2_fail_agentview.mp4",
+            "video_sha256": "4f44a0308cc41d4aee5f4bcfda732f268413e565e9b6a0b908128cf6d08f716e",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "0996bc44b7d50ee45f00222bdbe4e6b37348901a08dd5d11ae690399e36b725b",
+            "report_sha256": "68bff231167320bff1a3d76e6eeea4033f761cfef6b8c35a8e871cddfcf28c88"
+          }
+        },
+        {
+          "task_id": 2,
+          "seed": 43,
+          "episode": 2,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1894,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/vls-common-20261013/audit-details/task2-contract.json",
+            "sha256": "f01e349ea139a459213754ae4792c9ef9848fc1c1891ec19cb26ba44350ed012"
+          },
+          "video": {
+            "video_relative_path": "output/episode_3/episode_3_fail_agentview.mp4",
+            "video_sha256": "cdeb9f8e551fce6ad1445bc43f676b9ede0f2b1438fdef7f1fd2cc8ad613d187",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "0996bc44b7d50ee45f00222bdbe4e6b37348901a08dd5d11ae690399e36b725b",
+            "report_sha256": "6f524475b5a4ec8a5c7cde187208df72474962e4d23bfefc557cc6403ddeab8b"
+          }
+        },
+        {
+          "task_id": 3,
+          "seed": 546,
+          "episode": 3,
+          "completed": true,
+          "success": true,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 134,
+          "contract_checks_pass": 432,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/vls-common-20261013/audit-details/task3-contract.json",
+            "sha256": "230f6013edd835b18185df280551e5221eb75069d1f0b042690a126df2f28051"
+          },
+          "video": {
+            "video_relative_path": "output/episode_4/episode_4_success_agentview.mp4",
+            "video_sha256": "212f79dd5562f91e21b9767f01f043f3f4ee06bb61a4eace0f4c0a76601dce08",
+            "delivery_valid": true,
+            "frame_count": 134,
+            "duration_s": 13.4,
+            "checker_helper_sha256": "0996bc44b7d50ee45f00222bdbe4e6b37348901a08dd5d11ae690399e36b725b",
+            "report_sha256": "e88d4fc893d40e33849b115ff2ce967abcf6ae3917505c877a7db23a0cf59808"
+          }
+        },
+        {
+          "task_id": 4,
+          "seed": 6,
+          "episode": 4,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1765,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/vls-common-20261013/audit-details/task4-contract.json",
+            "sha256": "2094d6593b10ea4b408ef18ee060ce22ff26673d96644a4894ffdf1cdefa5f39"
+          },
+          "video": {
+            "video_relative_path": "output/episode_5/episode_5_fail_agentview.mp4",
+            "video_sha256": "7ee6e3d44b61cfb46dda0a4edb3b13a86c9d5af48f615eaf992424e5dcb0a48c",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "4ed89b71c08ff662790f3249f9401725d9f2e1fa933772f904d255df08293659",
+            "report_sha256": "6fe71ed1da361f3317941f91a1ad1cbfb7a7f2403977b7d078c13e6415a89c92"
+          }
+        },
+        {
+          "task_id": 5,
+          "seed": 621,
+          "episode": 5,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1851,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/vls-common-20261013/audit-details/task5-contract.json",
+            "sha256": "72af6191a50adff1fbb59e7a746e666918853784366f5d4bb6be5507922929b7"
+          },
+          "video": {
+            "video_relative_path": "output/episode_6/episode_6_fail_agentview.mp4",
+            "video_sha256": "a644649811794bf4c9db09ec79a1801cf0ce7cef84c2c4eca8846ab2842433dc",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "4ed89b71c08ff662790f3249f9401725d9f2e1fa933772f904d255df08293659",
+            "report_sha256": "521c0f102d0abc07ccbec8a5cdef2e087ea15d948a8687b424559c0c963c32da"
+          }
+        },
+        {
+          "task_id": 6,
+          "seed": 197,
+          "episode": 6,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1937,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/vls-common-20261013/audit-details/task6-contract.json",
+            "sha256": "9895852bf52d67d99c11cbc19d874abcd248cd6f2ddf87f6d1449ee511f359e3"
+          },
+          "video": {
+            "video_relative_path": "output/episode_7/episode_7_fail_agentview.mp4",
+            "video_sha256": "a51dbed496ed16f5519aee6fc6a7c0d9798efcd112e209caad069c31b88c4db6",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "4ed89b71c08ff662790f3249f9401725d9f2e1fa933772f904d255df08293659",
+            "report_sha256": "d81539664bfa60d1437d170defd7c904a9314fd9cc52ac5f4678e576b2277d7c"
+          }
+        },
+        {
+          "task_id": 7,
+          "seed": 87,
+          "episode": 7,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1765,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/vls-common-20261013/audit-details/task7-contract.json",
+            "sha256": "d066d09b42a5325666c19c19a456186e09b5b157d5a44e414afdd0414ef18386"
+          },
+          "video": {
+            "video_relative_path": "output/episode_8/episode_8_fail_agentview.mp4",
+            "video_sha256": "8614d8746ad3fbd8b04e10ca599f984137d2110e353f61f3c8e670b31f7d6ca4",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "4ed89b71c08ff662790f3249f9401725d9f2e1fa933772f904d255df08293659",
+            "report_sha256": "1987a46e11f95122c5912409cf8bb599a60513f7cb07344030649486632b08d2"
+          }
+        },
+        {
+          "task_id": 8,
+          "seed": 151,
+          "episode": 8,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1808,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/vls-common-20261013/audit-details/task8-contract.json",
+            "sha256": "5ed2ea8a2c389866d590637bd55761bddeeb1ab7857ffacb2f29bd1ca0987674"
+          },
+          "video": {
+            "video_relative_path": "output/episode_9/episode_9_fail_agentview.mp4",
+            "video_sha256": "819f3d86d1715db9e3cd2717c2c324f75210251326426731023d41ad1f07a8e8",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "4ed89b71c08ff662790f3249f9401725d9f2e1fa933772f904d255df08293659",
+            "report_sha256": "1e5a0dd2cc73366647869350a4c49f528c8706050e03ad2347cee3ad85330e11"
+          }
+        },
+        {
+          "task_id": 9,
+          "seed": 548,
+          "episode": 9,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1765,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/vls-common-20261013/audit-details/task9-contract.json",
+            "sha256": "03b7eeefd78647156f6cb663a659acf7038ff5c06800fa2865cbada060a7ad35"
+          },
+          "video": {
+            "video_relative_path": "output/episode_10/episode_10_fail_agentview.mp4",
+            "video_sha256": "95d8b11ba87dccf674da3d5ed60bbeb0765a56a6c53a15b82a3e4336a52e3849",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "4ed89b71c08ff662790f3249f9401725d9f2e1fa933772f904d255df08293659",
+            "report_sha256": "d21d66c010f2c90d3b9b92b87f197c33ee2e1f1696395bb73f9b4aff6d49d903"
+          }
+        }
+      ]
+    },
+    "eds_qd": {
+      "state": "accepted",
+      "accepted": true,
+      "completed_tasks": 10,
+      "final_successes": 1,
+      "final_success_task_ids": [
+        5
+      ],
+      "physical_gpu": 4,
+      "egl_device_id": 6,
+      "timing": {
+        "started_at": "2026-10-13T13:14:34.858647+00:00",
+        "completed_at": "2026-10-13T17:16:17.375281+00:00",
+        "elapsed_s": 14502.516634,
+        "is_final": true
+      },
+      "run_path": ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013",
+      "exit_code": 0,
+      "source_unchanged": true,
+      "infrastructure_errors": 0,
+      "stage": {
+        "boundaries": 838,
+        "queries": 380,
+        "successful_queries": 380,
+        "query_errors": 0,
+        "guided_boundaries": 284,
+        "unguided_boundaries": 554
+      },
+      "mechanism": {
+        "recorded_chunks": 284,
+        "guided_select_action_latency_s": {
+          "total": 743.7852168520913,
+          "observed_subtotal": 743.7852168520913,
+          "known_rows": 284,
+          "unknown_rows": 0
+        },
+        "score_call_count": {
+          "total": 3124,
+          "observed_subtotal": 3124,
+          "known_rows": 284,
+          "unknown_rows": 0
+        },
+        "search_evaluation_count": {
+          "total": 49984,
+          "observed_subtotal": 49984,
+          "known_rows": 284,
+          "unknown_rows": 0
+        },
+        "qd_evaluation_count": {
+          "total": 49984,
+          "observed_subtotal": 49984,
+          "known_rows": 284,
+          "unknown_rows": 0
+        },
+        "initial_diversity_steps": {
+          "total": 1136,
+          "observed_subtotal": 1136,
+          "known_rows": 284,
+          "unknown_rows": 0
+        },
+        "rollout_diversity_iters_applied": {
+          "total": 2840,
+          "observed_subtotal": 2840,
+          "known_rows": 284,
+          "unknown_rows": 0
+        },
+        "archive_enabled_chunks": 284,
+        "archive_active_chunks": 284,
+        "parent_sources": {
+          "qd_archive_offspring": 45440
+        },
+        "final_selection_sources": {
+          "qd_archive": 284
+        },
+        "final_coverage": {
+          "count": 284,
+          "minimum": 0.9375,
+          "maximum": 1.0,
+          "mean": 0.9962588028169014
+        }
+      },
+      "compute_totals": {
+        "model_forward_calls": 8734,
+        "model_batch_rows": 98194,
+        "denoising_invocations": 3678,
+        "model_denoising_steps": 8734,
+        "denoising_step_batch_rows": 98194,
+        "renoise_invocations": 2840,
+        "reward_calls": 72704,
+        "reward_evaluations": 72704,
+        "reward_scoring_batches": 4544,
+        "guided_chunks": 284,
+        "unguided_chunks": 554,
+        "rbf_gradient_calls": 5396,
+        "rbf_gradient_batch_rows": 86336,
+        "vision_encoder_forward_calls": 838,
+        "vision_encoder_batch_rows": 5028,
+        "text_encoder_forward_calls": 838,
+        "text_encoder_batch_rows": 838,
+        "dino_forward_calls": 10,
+        "dino_batch_rows": 10,
+        "provider_logical_call_attempts": 400,
+        "provider_completed_turns": 400,
+        "provider_failed_calls": 0,
+        "provider_input_tokens": 3869031,
+        "provider_cached_input_tokens": 2421888,
+        "provider_output_tokens": 46953,
+        "provider_reasoning_output_tokens": 18465,
+        "provider_call_latency_s": 12921.1647868976,
+        "stage_codex_logical_call_attempts": 390,
+        "stage_codex_completed_turns": 390,
+        "stage_codex_failed_calls": 0,
+        "stage_codex_call_latency_s": 12577.620813398622,
+        "guidance_codex_logical_call_attempts": 10,
+        "guidance_codex_completed_turns": 10,
+        "guidance_codex_failed_calls": 0,
+        "guidance_codex_call_latency_s": 343.5439734989777
+      },
+      "compute_unknown_rows": {},
+      "artifacts": {
+        "manifest.json": {
+          "path": ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/manifest.json",
+          "sha256": "7cf7a18c79f36d25b219ebda3b554a0c3bfc3f59262e919b9dcfcbd81d9cbe50"
+        },
+        "resolved-config.yaml": {
+          "path": ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/resolved-config.yaml",
+          "sha256": "7d997b1f7245a50e9b22a587de07347bb63ae05bcf495437da2d4116fb30f4e6"
+        },
+        "environment.json": {
+          "path": ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/environment.json",
+          "sha256": "c5bb50e42204a16b49272c9d038dabdd9dfecf11cd8ce75c9aa8f0c1d3e88d3e"
+        },
+        "status.json": {
+          "path": ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/status.json",
+          "sha256": "90bec44dedc1d39d69b6561899d3116fe465e62a63ddd50835f62ce46b4ea430"
+        },
+        "audit.json": {
+          "path": ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/audit.json",
+          "sha256": "06df1b8501d33162fbb3a67952eb42c276c966b00b3d6dbe27e5eecc893bbcd7"
+        }
+      },
+      "tasks": [
+        {
+          "task_id": 0,
+          "seed": 44,
+          "episode": 0,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1722,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/audit-details/task0-contract.json",
+            "sha256": "b7f5d4dfbf96694bd457aa0f62c084cadee9c3bf1ff570df3ec8aa7111a50f92"
+          },
+          "video": {
+            "video_relative_path": "output/episode_1/episode_1_fail_agentview.mp4",
+            "video_sha256": "58e9aa537975b9c4d797a893527270378182b7bc1987f956cc5a1f9d214ab94e",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "0996bc44b7d50ee45f00222bdbe4e6b37348901a08dd5d11ae690399e36b725b",
+            "report_sha256": "deba350df914f5e04a0d07d6ecdb26a28a1e3b99c3f14f8518185952313abdf2"
+          }
+        },
+        {
+          "task_id": 1,
+          "seed": 235,
+          "episode": 1,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1937,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/audit-details/task1-contract.json",
+            "sha256": "3f0d74152a0b72b94c101c8dc2cbc2aa08448754d69f43034de01f37319ebd1c"
+          },
+          "video": {
+            "video_relative_path": "output/episode_2/episode_2_fail_agentview.mp4",
+            "video_sha256": "4a7cf84fdad5f08413207649c1047f680a37b0e357d164cfa4f125c5a8b77b11",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "0996bc44b7d50ee45f00222bdbe4e6b37348901a08dd5d11ae690399e36b725b",
+            "report_sha256": "c8625fa9c2528beb095e9eb51a98515ff9330fd2409bf45f2a299652bce3a023"
+          }
+        },
+        {
+          "task_id": 2,
+          "seed": 43,
+          "episode": 2,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1808,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/audit-details/task2-contract.json",
+            "sha256": "0897b9ad11f5edf18961a43d2b129eaa14a2889a6140a8e28da83614781ad871"
+          },
+          "video": {
+            "video_relative_path": "output/episode_3/episode_3_fail_agentview.mp4",
+            "video_sha256": "8be5473fe3acda4ebb61e1c84ed13e014d9e6e8469cffebe632b1cd777d55aab",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "0996bc44b7d50ee45f00222bdbe4e6b37348901a08dd5d11ae690399e36b725b",
+            "report_sha256": "238c8bd8cfeed7d778bebec9e30ca93bdc8e0f115a98f6f7b9a43548b95d7353"
+          }
+        },
+        {
+          "task_id": 3,
+          "seed": 546,
+          "episode": 3,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1765,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/audit-details/task3-contract.json",
+            "sha256": "a70251ba8c2da9f9b0bec6c4b970026e895228d10f070de99f652527ee6f4640"
+          },
+          "video": {
+            "video_relative_path": "output/episode_4/episode_4_fail_agentview.mp4",
+            "video_sha256": "b17bbfc3b5f71b4d614a5c12b167b5b2b0e18f4ca483cfb78f4cf1be2133937e",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "4ed89b71c08ff662790f3249f9401725d9f2e1fa933772f904d255df08293659",
+            "report_sha256": "017d35df9f36c976750d26635d5c9d6393ba0bd698a18866b67b950931d423be"
+          }
+        },
+        {
+          "task_id": 4,
+          "seed": 6,
+          "episode": 4,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1765,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/audit-details/task4-contract.json",
+            "sha256": "2eff34eeb753fd2267836591a18b9b07b46f133006d7b11e16eef8286a5611e5"
+          },
+          "video": {
+            "video_relative_path": "output/episode_5/episode_5_fail_agentview.mp4",
+            "video_sha256": "0e6e983d71cf05ba34e037d645e05b7ef6dcfe8ed99ea013ddbdcdacadf81f81",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "4ed89b71c08ff662790f3249f9401725d9f2e1fa933772f904d255df08293659",
+            "report_sha256": "20c289e53916ae3182fc82afd1ac8bd7da25526c153ce77d62c6bace9169515c"
+          }
+        },
+        {
+          "task_id": 5,
+          "seed": 621,
+          "episode": 5,
+          "completed": true,
+          "success": true,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 223,
+          "contract_checks_pass": 604,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/audit-details/task5-contract.json",
+            "sha256": "0d9dabaa4a263bd4ad5a59ee78728ef1157776db23921b3d9ca6be378ee09ae9"
+          },
+          "video": {
+            "video_relative_path": "output/episode_6/episode_6_success_agentview.mp4",
+            "video_sha256": "1670986813d9f7424eb9e6bcf6ed7b5fc503f1c9b584767d98bfe9df64f3f1f9",
+            "delivery_valid": true,
+            "frame_count": 223,
+            "duration_s": 22.3,
+            "checker_helper_sha256": "4ed89b71c08ff662790f3249f9401725d9f2e1fa933772f904d255df08293659",
+            "report_sha256": "9887f8ac025f789ff347d4afda7a0622d072b69cd0e82cc873fad55e8f6a06d9"
+          }
+        },
+        {
+          "task_id": 6,
+          "seed": 197,
+          "episode": 6,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1894,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/audit-details/task6-contract.json",
+            "sha256": "dfda0d1350fdcd262370a38025a75f8a8cce081e80b0488bd620c83a086ff4b1"
+          },
+          "video": {
+            "video_relative_path": "output/episode_7/episode_7_fail_agentview.mp4",
+            "video_sha256": "c168846f096a745f2aca3522e463e7d9067a56e4028beabe0c4342a9dc230338",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "4ed89b71c08ff662790f3249f9401725d9f2e1fa933772f904d255df08293659",
+            "report_sha256": "1b88676d2d93652cdb6a4792983d4f80b906060848523c7cfb662eb95a7a7efe"
+          }
+        },
+        {
+          "task_id": 7,
+          "seed": 87,
+          "episode": 7,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1937,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/audit-details/task7-contract.json",
+            "sha256": "3f66262ca7441321aded3a1967a78e15edef83921ea9289dda6a80f40c9adb24"
+          },
+          "video": {
+            "video_relative_path": "output/episode_8/episode_8_fail_agentview.mp4",
+            "video_sha256": "2fafe280f0ce09b5a68996eb8f8cc4714045d22d68a95a2cd69fadfa39922355",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "4ed89b71c08ff662790f3249f9401725d9f2e1fa933772f904d255df08293659",
+            "report_sha256": "5d536179ad361edfe27f6dd649e76b4cc1358461321acefa905b9f97b8630023"
+          }
+        },
+        {
+          "task_id": 8,
+          "seed": 151,
+          "episode": 8,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1894,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/audit-details/task8-contract.json",
+            "sha256": "7f474f365aa425c41f01ee7d83c54e9fb2c0f7fe358b3a8fab964ef250013d16"
+          },
+          "video": {
+            "video_relative_path": "output/episode_9/episode_9_fail_agentview.mp4",
+            "video_sha256": "96886a0ebb855bb4126d2e30c1666a8909f644cfba6c5b1b894dbaf2b6f6a069",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "4ed89b71c08ff662790f3249f9401725d9f2e1fa933772f904d255df08293659",
+            "report_sha256": "5c1934afea29d639399efc505ca7612f5c9f47f5a88773626423168cbd0bc678"
+          }
+        },
+        {
+          "task_id": 9,
+          "seed": 548,
+          "episode": 9,
+          "completed": true,
+          "success": false,
+          "contract_valid": true,
+          "accepted": true,
+          "executed_action_rows": 720,
+          "contract_checks_pass": 1894,
+          "contract_report": {
+            "path": ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/audit-details/task9-contract.json",
+            "sha256": "56b0c9530b3c5aca80e377607edc6a937922c238ddfc14d2963e7c8a015383eb"
+          },
+          "video": {
+            "video_relative_path": "output/episode_10/episode_10_fail_agentview.mp4",
+            "video_sha256": "3b210fec35c57b78e88aaafe9a2bbb254082440a97cff4423739c18023ed45d6",
+            "delivery_valid": true,
+            "frame_count": 720,
+            "duration_s": 72.0,
+            "checker_helper_sha256": "4ed89b71c08ff662790f3249f9401725d9f2e1fa933772f904d255df08293659",
+            "report_sha256": "294b7199281a76c8877ee8608754f71b77f66d023f076326c63eff4f9cb6ec91"
+          }
+        }
+      ]
+    }
+  },
+  "release_validation": {
+    "auditor_and_infrastructure_commit": "5bf01db84e8c05251f720a3f8b9a73aa019f9568",
+    "online_science_rerun": false,
+    "cpu": {
+      "primary": {
+        "passed": 1436,
+        "skipped": 3,
+        "warnings": 2,
+        "elapsed_s": 129.98,
+        "log_path": ".worktrees/exp/steering-integration/checks/cpu-release-primary.log",
+        "log_sha256": "056d72623deb57b571fc6fc82c6970d3a4d1793c347a55dd04a9089d1291ac54"
+      },
+      "clean": {
+        "passed": 1436,
+        "skipped": 3,
+        "warnings": 1,
+        "elapsed_s": 130.02,
+        "log_path": ".worktrees/exp/steering-integration/checks/cpu-release-clean.log",
+        "log_sha256": "7d38a19a4b550747f6a498f6574010edc74b5935ec0e3bb0d1b60811a11b1add"
+      }
+    },
+    "cli": {
+      "passed": 9,
+      "receipt_path": ".worktrees/exp/steering-integration/checks/release-cli/receipt.json",
+      "receipt_sha256": "ab904127cc59b3213cc5be60be5ec069872e876b4f099142f9bb52ede8c6305d"
+    },
+    "skip_scope": "Three external-staging-only before/after print-config comparisons; all three passed before patch application.",
+    "code_release_commit": "b68777b46a374760a19fa76e3c309d9c84cfcc4c",
+    "source_binding": {
+      "path": ".worktrees/exp/steering-integration/checks/release-build-source-binding.json",
+      "sha256": "8dc6fec4697a84a4380b12fce06f82825f1f4ab89e31427cc70e065eaff73232",
+      "all_116_paths_match": true
+    },
+    "offline_reaudit": {
+      "path": ".worktrees/exp/steering-integration/checks/release-reaudit-summary.json",
+      "sha256": "d40a97ae8c7faacd4918ba2aed6dcb08a31d91095f9afb80cfecc09dc9bd0b32",
+      "all_three_valid": true,
+      "original_receipts_unchanged": true
+    },
+    "source_snapshot_note": "Original tested provenance is commit plus manifest/source snapshot. Two existing ignored Hydra aliases were later tracked with identical bytes in the code release."
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "schema": "steering-contract-fixture-provenance-v1",
+  "source_run": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-integration/runs/eds-migration-20261013",
+  "source_commit": "cfecb12db736f1a3408d9528d9336aadcb7e41b5",
+  "task_id": 0,
+  "episode_id": 0,
+  "episode_seed": 44,
+  "crop": {
+    "action_steps_inclusive": [
+      0,
+      39
+    ],
+    "stage_query_steps": [
+      0,
+      32
+    ],
+    "stage_capture_indices": [
+      0,
+      1,
+      2
+    ],
+    "reward_capture_indices": [
+      0
+    ],
+    "raw_frames": 2,
+    "full_episode_actions": 720,
+    "full_episode_stage_captures": 39
+  },
+  "facts": {
+    "recorded_png_prompt_response_reward_code_bytes_preserved": true,
+    "archived_proof_source_bytes_preserved": true,
+    "executes_saved_code": false,
+    "is_completed_episode_evidence": false,
+    "is_online_success_result": false,
+    "synthetic_completion_receipts_only_in_test_materialization": true
+  },
+  "materialization_changes": [
+    "environment.libero.root -> materialized assets/libero; recompute environment hash in manifest",
+    "marker raw_png_path -> materialized raw frame within run; marker PNG/RGB/geometry hashes are unchanged",
+    "optional completed mode: synthesize status exited0 and episode_compute provider/capture sums for only retained prefix; mark fixture_synthetic_receipt true; no model/EDS compute values invented"
+  ],
+  "reader_dependencies": [
+    "Python standard library",
+    "PyYAML",
+    "NumPy",
+    "Pillow",
+    "opencv-python",
+    "pytest for tests"
+  ],
+  "files_manifest_sha256": "ee3a1dd5141cf4bdb6764ea7936f1c1ef4bcd6b93dfe1c8b350c05cd0ae97ef3",
+  "file_count": 58,
+  "unique_blob_count": 52,
+  "materialized_bytes": 4836322,
+  "unique_blob_bytes": 4173951
+}

@@ -1,0 +1,397 @@
+{
+  "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+  "created_utc": "2026-10-13T08:59:58Z",
+  "cuda": {
+    "context_created": false,
+    "driver_initialized": true,
+    "logical_device": 0,
+    "pci_bus_id": "0000:41:00.0",
+    "uuid": "GPU-a5d6a5f8-b6df-7f3a-c3dc-19734c41ec0e",
+    "visible_device_count": 1
+  },
+  "cuda_device_order": "PCI_BUS_ID",
+  "cuda_visible_devices": "2",
+  "egl_devices": [
+    {
+      "cuda_attribute_ok": false,
+      "drm_device_file": "",
+      "egl_device_index": 0,
+      "extensions": [
+        "EGL_NV_device_cuda",
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "process_visible_cuda_ordinal": null
+    },
+    {
+      "cuda_attribute_ok": true,
+      "drm_device_file": "",
+      "egl_device_index": 1,
+      "extensions": [
+        "EGL_NV_device_cuda",
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "process_visible_cuda_ordinal": 0
+    },
+    {
+      "cuda_attribute_ok": false,
+      "drm_device_file": "",
+      "egl_device_index": 2,
+      "extensions": [
+        "EGL_NV_device_cuda",
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "process_visible_cuda_ordinal": null
+    },
+    {
+      "cuda_attribute_ok": false,
+      "drm_device_file": "",
+      "egl_device_index": 3,
+      "extensions": [
+        "EGL_NV_device_cuda",
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "process_visible_cuda_ordinal": null
+    },
+    {
+      "cuda_attribute_ok": false,
+      "drm_device_file": "",
+      "egl_device_index": 4,
+      "extensions": [
+        "EGL_NV_device_cuda",
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "process_visible_cuda_ordinal": null
+    },
+    {
+      "cuda_attribute_ok": false,
+      "drm_device_file": "",
+      "egl_device_index": 5,
+      "extensions": [
+        "EGL_NV_device_cuda",
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "process_visible_cuda_ordinal": null
+    },
+    {
+      "cuda_attribute_ok": false,
+      "drm_device_file": "",
+      "egl_device_index": 6,
+      "extensions": [
+        "EGL_NV_device_cuda",
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "process_visible_cuda_ordinal": null
+    },
+    {
+      "cuda_attribute_ok": false,
+      "drm_device_file": "",
+      "egl_device_index": 7,
+      "extensions": [
+        "EGL_NV_device_cuda",
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "process_visible_cuda_ordinal": null
+    },
+    {
+      "cuda_attribute_ok": false,
+      "drm_device_file": "/dev/dri/card1",
+      "drm_pci_bus_id": "0000:61:00.0",
+      "egl_device_index": 8,
+      "extensions": [
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "process_visible_cuda_ordinal": null
+    },
+    {
+      "cuda_attribute_ok": false,
+      "drm_device_file": "/dev/dri/card2",
+      "drm_pci_bus_id": "0000:41:00.0",
+      "egl_device_index": 9,
+      "extensions": [
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "process_visible_cuda_ordinal": null
+    },
+    {
+      "cuda_attribute_ok": false,
+      "drm_device_file": "/dev/dri/card3",
+      "drm_pci_bus_id": "0000:01:00.0",
+      "egl_device_index": 10,
+      "extensions": [
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "process_visible_cuda_ordinal": null
+    },
+    {
+      "cuda_attribute_ok": false,
+      "drm_device_file": "/dev/dri/card4",
+      "drm_pci_bus_id": "0000:21:00.0",
+      "egl_device_index": 11,
+      "extensions": [
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "process_visible_cuda_ordinal": null
+    },
+    {
+      "cuda_attribute_ok": false,
+      "drm_device_file": "/dev/dri/card5",
+      "drm_pci_bus_id": "0000:e1:00.0",
+      "egl_device_index": 12,
+      "extensions": [
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "process_visible_cuda_ordinal": null
+    },
+    {
+      "cuda_attribute_ok": false,
+      "drm_device_file": "/dev/dri/card6",
+      "drm_pci_bus_id": "0000:c1:00.0",
+      "egl_device_index": 13,
+      "extensions": [
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "process_visible_cuda_ordinal": null
+    },
+    {
+      "cuda_attribute_ok": false,
+      "drm_device_file": "/dev/dri/card7",
+      "drm_pci_bus_id": "0000:81:00.0",
+      "egl_device_index": 14,
+      "extensions": [
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "process_visible_cuda_ordinal": null
+    },
+    {
+      "cuda_attribute_ok": false,
+      "drm_device_file": "/dev/dri/card8",
+      "drm_pci_bus_id": "0000:a1:00.0",
+      "egl_device_index": 15,
+      "extensions": [
+        "EGL_EXT_device_drm",
+        "EGL_EXT_device_drm_render_node",
+        "EGL_EXT_device_query_name",
+        "EGL_EXT_device_persistent_id"
+      ],
+      "process_visible_cuda_ordinal": null
+    },
+    {
+      "cuda_attribute_ok": false,
+      "egl_device_index": 16,
+      "extensions": [
+        "EGL_MESA_device_software",
+        "EGL_EXT_device_drm_render_node"
+      ],
+      "process_visible_cuda_ordinal": null
+    }
+  ],
+  "expected_gpu_index": 2,
+  "expected_uuid": "GPU-a5d6a5f8-b6df-7f3a-c3dc-19734c41ec0e",
+  "nvidia_gpus": [
+    {
+      "driver_version": "580.65.06",
+      "index": "0",
+      "memory_used_mib": "0",
+      "name": "NVIDIA H200 NVL",
+      "pci_bus_id": "00000000:01:00.0",
+      "utilization_gpu": "0",
+      "uuid": "GPU-4c78c923-a68a-8e06-e07b-11bdd642118e"
+    },
+    {
+      "driver_version": "580.65.06",
+      "index": "1",
+      "memory_used_mib": "0",
+      "name": "NVIDIA H200 NVL",
+      "pci_bus_id": "00000000:21:00.0",
+      "utilization_gpu": "0",
+      "uuid": "GPU-053aaa97-5574-46a0-cb86-83d0518d8877"
+    },
+    {
+      "driver_version": "580.65.06",
+      "index": "2",
+      "memory_used_mib": "0",
+      "name": "NVIDIA H200 NVL",
+      "pci_bus_id": "00000000:41:00.0",
+      "utilization_gpu": "0",
+      "uuid": "GPU-a5d6a5f8-b6df-7f3a-c3dc-19734c41ec0e"
+    },
+    {
+      "driver_version": "580.65.06",
+      "index": "3",
+      "memory_used_mib": "0",
+      "name": "NVIDIA H200 NVL",
+      "pci_bus_id": "00000000:61:00.0",
+      "utilization_gpu": "0",
+      "uuid": "GPU-62052fa1-37e0-79dc-21aa-5c0f25c0c315"
+    },
+    {
+      "driver_version": "580.65.06",
+      "index": "4",
+      "memory_used_mib": "0",
+      "name": "NVIDIA H200 NVL",
+      "pci_bus_id": "00000000:81:00.0",
+      "utilization_gpu": "0",
+      "uuid": "GPU-0db03731-0858-4141-16ef-c5a0ab7ab5f2"
+    },
+    {
+      "driver_version": "580.65.06",
+      "index": "5",
+      "memory_used_mib": "0",
+      "name": "NVIDIA H200 NVL",
+      "pci_bus_id": "00000000:A1:00.0",
+      "utilization_gpu": "0",
+      "uuid": "GPU-048017bf-c58f-b622-ca2e-000b668c651b"
+    },
+    {
+      "driver_version": "580.65.06",
+      "index": "6",
+      "memory_used_mib": "0",
+      "name": "NVIDIA H200 NVL",
+      "pci_bus_id": "00000000:C1:00.0",
+      "utilization_gpu": "0",
+      "uuid": "GPU-e6b7956b-3c69-0c35-dfaf-c860126692c6"
+    },
+    {
+      "driver_version": "580.65.06",
+      "index": "7",
+      "memory_used_mib": "0",
+      "name": "NVIDIA H200 NVL",
+      "pci_bus_id": "00000000:E1:00.0",
+      "utilization_gpu": "0",
+      "uuid": "GPU-48473162-9548-1a19-04aa-ea86c5349187"
+    }
+  ],
+  "previous_egl_index_1_correct": true,
+  "recommended_environment": {
+    "CUDA_DEVICE_ORDER": "PCI_BUS_ID",
+    "CUDA_VISIBLE_DEVICES": "2",
+    "MUJOCO_EGL_DEVICE_ID": "1",
+    "MUJOCO_GL": "egl",
+    "PYOPENGL_PLATFORM": "egl"
+  },
+  "schema": "steering_gpu_mapping_v1",
+  "scope": "CUDA/EGL device and display metadata only; no kernels, rendering, model, simulator, or provider calls",
+  "selected_display": {
+    "display_device_identity_matches": true,
+    "egl_device_index": 1,
+    "egl_version": [
+      1,
+      5
+    ],
+    "gl_context_created": false,
+    "process_visible_cuda_ordinal": 0,
+    "render_calls": 0
+  },
+  "unmasked_crosscheck_passed": true,
+  "unmasked_metadata": {
+    "context_created": false,
+    "cuda_device_order": "PCI_BUS_ID",
+    "cuda_visible_devices": null,
+    "devices": [
+      {
+        "egl_device_index": 0,
+        "nvidia_index": 3,
+        "pci_bus_id": "00000000:61:00.0",
+        "unmasked_cuda_ordinal": 3,
+        "uuid": "GPU-62052fa1-37e0-79dc-21aa-5c0f25c0c315"
+      },
+      {
+        "egl_device_index": 1,
+        "nvidia_index": 2,
+        "pci_bus_id": "00000000:41:00.0",
+        "unmasked_cuda_ordinal": 2,
+        "uuid": "GPU-a5d6a5f8-b6df-7f3a-c3dc-19734c41ec0e"
+      },
+      {
+        "egl_device_index": 2,
+        "nvidia_index": 0,
+        "pci_bus_id": "00000000:01:00.0",
+        "unmasked_cuda_ordinal": 0,
+        "uuid": "GPU-4c78c923-a68a-8e06-e07b-11bdd642118e"
+      },
+      {
+        "egl_device_index": 3,
+        "nvidia_index": 1,
+        "pci_bus_id": "00000000:21:00.0",
+        "unmasked_cuda_ordinal": 1,
+        "uuid": "GPU-053aaa97-5574-46a0-cb86-83d0518d8877"
+      },
+      {
+        "egl_device_index": 4,
+        "nvidia_index": 7,
+        "pci_bus_id": "00000000:E1:00.0",
+        "unmasked_cuda_ordinal": 7,
+        "uuid": "GPU-48473162-9548-1a19-04aa-ea86c5349187"
+      },
+      {
+        "egl_device_index": 5,
+        "nvidia_index": 6,
+        "pci_bus_id": "00000000:C1:00.0",
+        "unmasked_cuda_ordinal": 6,
+        "uuid": "GPU-e6b7956b-3c69-0c35-dfaf-c860126692c6"
+      },
+      {
+        "egl_device_index": 6,
+        "nvidia_index": 4,
+        "pci_bus_id": "00000000:81:00.0",
+        "unmasked_cuda_ordinal": 4,
+        "uuid": "GPU-0db03731-0858-4141-16ef-c5a0ab7ab5f2"
+      },
+      {
+        "egl_device_index": 7,
+        "nvidia_index": 5,
+        "pci_bus_id": "00000000:A1:00.0",
+        "unmasked_cuda_ordinal": 5,
+        "uuid": "GPU-048017bf-c58f-b622-ca2e-000b668c651b"
+      }
+    ],
+    "egl_display_created": false
+  },
+  "valid": true,
+  "verified_egl_device_index": 1
+}
