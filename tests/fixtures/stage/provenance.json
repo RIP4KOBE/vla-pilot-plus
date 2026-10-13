@@ -1,0 +1,86 @@
+{
+  "contact_events.jsonl": {
+    "source_sha256": "f1ccadf30299bb02b951de20dd9312218019e4256000ace6971eab8d965059f1",
+    "fixture_sha256": "39c859981f9bb09320ac07e55d78ae043556dcc4345ca809b5a8e4f2cbe2e7f0",
+    "source_kind": "recorded_stage_events",
+    "records": 106,
+    "retained_fields": [
+      "completion_confirmed",
+      "contact_phase",
+      "contact_until",
+      "control_observation",
+      "global_step",
+      "gripper_value_used",
+      "gripper_width_m",
+      "guidance_requested",
+      "observation",
+      "physical_carry_evidence",
+      "query_ok",
+      "query_status",
+      "robot_evidence",
+      "stage_after",
+      "target_distance_m",
+      "task_id",
+      "visual_hold"
+    ],
+    "retention": "Complete successful task histories; unsuccessful histories through first eligible recovery; one suspended-target observation."
+  },
+  "recovery_events.jsonl": {
+    "source_sha256": "d8549948d85e18a42e2ab9ca3d732b2bdc8a81d1a4cd27530e51af19c5e0b49b",
+    "fixture_sha256": "ab80b67b516dfb11ce4a4b79e64a9bb2d9c44ce4ad40aeead120bee05599012a",
+    "source_kind": "recorded_stage_events",
+    "records": 105,
+    "retained_fields": [
+      "completion_confirmed",
+      "contact_phase",
+      "contact_until",
+      "control_observation",
+      "global_step",
+      "gripper_value_used",
+      "gripper_width_m",
+      "guidance_requested",
+      "observation",
+      "physical_carry_evidence",
+      "query_ok",
+      "query_status",
+      "robot_evidence",
+      "stage_after",
+      "target_distance_m",
+      "task_id",
+      "visual_hold"
+    ],
+    "retention": "Complete successful task histories; unsuccessful histories through first eligible recovery; one suspended-target observation."
+  },
+  "occluded_held.jsonl": {
+    "source_sha256": "285c305c6c260a0a60111809413fedfd430e1301f085edea73ec95242e241e74",
+    "fixture_sha256": "5678bd5f67ad912224ea5072c95a2290838cfc8a74bc46b8cfdecfa4d51a6213",
+    "source_kind": "recorded_stage_events",
+    "records": 1,
+    "retained_fields": [
+      "completion_confirmed",
+      "contact_phase",
+      "contact_until",
+      "control_observation",
+      "global_step",
+      "gripper_value_used",
+      "gripper_width_m",
+      "guidance_requested",
+      "observation",
+      "physical_carry_evidence",
+      "query_ok",
+      "query_status",
+      "robot_evidence",
+      "stage_after",
+      "target_distance_m",
+      "task_id",
+      "visual_hold"
+    ]
+  },
+  "legacy_stage_method.py.txt": {
+    "source_sha256": "28590c577bc1c8bd0b38a80ca37f1dca5bc1cf53455659870da6d89ef6a0b164",
+    "fixture_sha256": "66221b3da1581b75c67852ff92597aac77d98d3d3963cea9bbb4926ab7f71e06",
+    "source_kind": "Main._update_stage",
+    "source_start_line": 1269,
+    "source_end_line": 1431
+  }
+}
