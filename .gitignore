@@ -105,3 +105,6 @@ output/
 # Local third-party checkouts used for experiments
 third_party/libero/
 third_party/Libero_RDT/
+third_party/libero_pro/
+.libero_config/
+configs/local.yaml
