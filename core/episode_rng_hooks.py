@@ -39,7 +39,8 @@ def apply(runner, *, episode_dir, phase, task_id, episode_seed):
             raise ValueError('Fixture path escaped its calibration artifact')
         proof = restore(path, metadata, entry['sha256'])
         mode = 'historical_fixture_v1'
-    journal = Path(episode_dir).parent/'eds_eval/episode_rng_events.jsonl'
+    evaluation = cfg.get('eds_eval', {}).get('output_dir')
+    journal = (Path(evaluation) if evaluation else Path(episode_dir).parent/'eds_eval') / 'episode_rng_events.jsonl'
     journal.parent.mkdir(parents=True, exist_ok=True)
     with journal.open('a') as file:
         file.write(json.dumps(dict(mode=mode, **proof), sort_keys=True)+'\n')

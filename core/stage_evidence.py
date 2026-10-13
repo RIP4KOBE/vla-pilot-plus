@@ -199,12 +199,67 @@ def assess_reward(functions, keypoints, horizon=8):
         np.random.set_state(np_state)
 
 
+def assess_reward_gradient(functions, keypoints, horizon=8):
+    """VLS-only local differentiability capability; never used by EDS.
+
+    Probe CPU trajectories deterministically, restoring all CPU RNG state. A
+    zero gradient at an optimum is valid if another probe has a finite nonzero
+    gradient on controllable p1..p7 (RDT's p0 is fixed). This is local evidence,
+    not a global guarantee or a reward rewrite.
+    """
+    import numpy as np
+    import torch
+    if not functions:
+        return {"available": False, "reason": "missing_stage_reward"}
+    py_state, np_state = random.getstate(), np.random.get_state()
+    probes, nonzero = 0, 0
+    try:
+        with torch.random.fork_rng(devices=[]), torch.enable_grad():
+            kp = torch.as_tensor(keypoints).detach().to(device="cpu", dtype=torch.float32).clone()
+            if kp.ndim != 2 or kp.shape[1] != 3 or not len(kp) or not torch.isfinite(kp).all():
+                return {"available": False, "reason": "invalid_keypoints"}
+            offsets = torch.tensor([[0., 0., 0.], [.1, 0, 0], [-.1, 0, 0],
+                                    [0, .1, 0], [0, -.1, 0], [0, 0, .1], [0, 0, -.1]])
+            for anchor in kp:
+                for offset in offsets:
+                    path = (anchor + offset)[None, None, :].repeat(1, horizon, 1)
+                    for candidate in (path, path + torch.linspace(0, .07, horizon)[None, :, None]):
+                        candidate = candidate.clone().requires_grad_(True)
+                        total = sum(torch.as_tensor(fn(kp.clone(), candidate)) for fn in functions)
+                        if total.numel() != 1 or not torch.isfinite(total).all():
+                            return {"available": False, "reason": "invalid_reward_output"}
+                        if not total.requires_grad:
+                            return {"available": False, "reason": "reward_gradient_disconnected"}
+                        gradient = torch.autograd.grad(total.sum(), candidate, allow_unused=True)[0]
+                        if gradient is None:
+                            return {"available": False, "reason": "reward_gradient_disconnected"}
+                        if not torch.isfinite(gradient).all():
+                            return {"available": False, "reason": "reward_gradient_nonfinite"}
+                        probes += 1
+                        nonzero += int(bool(torch.any(gradient[:, 1:] != 0)))
+            return {"available": nonzero > 0,
+                    "reason": "finite_gradient_on_probes" if nonzero else "reward_gradient_zero_on_probes",
+                    "probe_count": probes, "nonzero_probe_count": nonzero}
+    except Exception as exc:
+        return {"available": False, "reason": "reward_gradient_probe_error", "error_type": type(exc).__name__}
+    finally:
+        random.setstate(py_state)
+        np.random.set_state(np_state)
+
+
 def update_stage(runner, state, gripper_command):
     """Runtime integration; every boundary logs actual effective guidance state."""
     master = bool(runner.config.get("use_guidance", True))
     cfg = settings(runner.config)
     before_stage, before_guidance = state["current_stage"], state["use_guidance"]
-    reward = float(runner.policy.get_normalized_reward()) if before_guidance else None
+    reward = None
+    if before_guidance:
+        progress_getter = getattr(runner.policy, "get_stage_reward", None)
+        if not callable(progress_getter):
+            progress_getter = runner.policy.get_normalized_reward
+        reward = progress_getter()
+    if reward is not None:
+        reward = float(reward)
     if reward is not None and not math.isfinite(reward):
         reward = None
     controller = runner.config.get("stage_controller", VERSION)
@@ -232,6 +287,15 @@ def update_stage(runner, state, gripper_command):
     capabilities = {stage: assess_reward(fns, runner.stage_live_keypoints,
                     horizon=runner.policy._action_chunk_horizon)
                     for stage, fns in runner.guidance_fns.items()}
+    if (getattr(runner, "policy_type", None) == "rdt"
+            and str(runner.config.get("guidance_type", "vls")).lower() == "vls"):
+        for stage, capability in capabilities.items():
+            if capability["available"]:
+                gradient = assess_reward_gradient(runner.guidance_fns[stage], runner.stage_live_keypoints,
+                                                  horizon=runner.policy._action_chunk_horizon)
+                capability["gradient"] = gradient
+                if not gradient["available"]:
+                    capability.update(available=False, reason=gradient["reason"])
     trigger = query_reason(state, gripper_command, runner.config) if master else None
     result, error = {}, None
     current_target_marker = None

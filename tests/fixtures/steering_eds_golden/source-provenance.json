@@ -1,0 +1,123 @@
+{
+  "schema": "steering_eds_cpu_source_v1",
+  "commit": "cfecb12db736f1a3408d9528d9336aadcb7e41b5",
+  "files": [
+    {
+      "path": "main.py",
+      "bytes": 107899,
+      "sha256": "819dd798ece7b78393547c3e39e988ec06c3eb49701c1baa09aa404adace836a"
+    },
+    {
+      "path": "configs/evaluation/libero_object_swap.yaml",
+      "bytes": 8051,
+      "sha256": "8ca662b5c055f5a367095eccc56fa9dfbadd45a10e9f90b767c1240ebde62d6d"
+    },
+    {
+      "path": "third_party/rdt/models/rdt_runner.py",
+      "bytes": 10942,
+      "sha256": "b7d1aacec1a59df2de8b5bfbecf96e409abc18ca2db7442ae2d44fe5b647d953"
+    },
+    {
+      "path": "core/env_adapters/libero_adapter.py",
+      "bytes": 70776,
+      "sha256": "5789168f59179599fb37ce88193884ec469db63a1a4f68fde350e90936100f19"
+    },
+    {
+      "path": "utils/logging_utils.py",
+      "bytes": 4236,
+      "sha256": "ad614d71030403937d8699544f9985f1909c8cc4402c43e2c9b16b39f263c2c3"
+    },
+    {
+      "path": "core/rdt_policy_steer.py",
+      "bytes": 341700,
+      "sha256": "82c8515542780acc5389d3043d7f25e14e9d23f6149fb067a6dfa99fb9aa584e"
+    },
+    {
+      "path": "core/eds_eval_metrics.py",
+      "bytes": 34419,
+      "sha256": "0e07c57167dd92c07a31395f6ebba0b56d0f65bc62f4fb1e4d5fb30549fd6ae0"
+    },
+    {
+      "path": "core/eds_mechanism_trace.py",
+      "bytes": 24129,
+      "sha256": "312087f5c354f81a820f2acb8419c6380e96805de79f1789c5c7ff23a8fcabf3"
+    },
+    {
+      "path": "core/fkd_class.py",
+      "bytes": 13029,
+      "sha256": "26ccfa9cf4837ce92baf0a5538ac3339d5c55a4f4f7b8f577366a0dd2a408412"
+    },
+    {
+      "path": "core/qd_ed.py",
+      "bytes": 39448,
+      "sha256": "4415ea7f16029e2fa2e7528c1f7065ba673b7a5a512723bfa9611f992298daa4"
+    },
+    {
+      "path": "core/rdt_libero_action_converter.py",
+      "bytes": 2380,
+      "sha256": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d"
+    },
+    {
+      "path": "core/rdt_libero_obs_processor.py",
+      "bytes": 7623,
+      "sha256": "5b6f3857be13254e1d2266270f57199578dbc4066566265b147d91cc30bb2d14"
+    },
+    {
+      "path": "core/stage_evidence.py",
+      "bytes": 22402,
+      "sha256": "533e7f0234f36a7dddbc9cbdb35df7db8dd3d70287530dd6fcfbf57830a61e3c"
+    },
+    {
+      "path": "core/stage_contact_handoff.py",
+      "bytes": 3107,
+      "sha256": "5a4b11ffe1b2f5d31caca2d64fe70806818501c73de9e13f6d5a157f4502f804"
+    },
+    {
+      "path": "core/stage_robot_evidence.py",
+      "bytes": 4575,
+      "sha256": "8b369ee944feccaadeaabcae02c47da03f27fc5ed2f2ef56baeb97ff88a38080"
+    },
+    {
+      "path": "core/stage_grasp_guard.py",
+      "bytes": 8032,
+      "sha256": "5ffe63cc3b13d87954377dfdc7f6c31918b75add5667a1cec1533b84edc3f9e7"
+    },
+    {
+      "path": "core/stage_carry_hold.py",
+      "bytes": 4111,
+      "sha256": "4399c80b209366b807d85b097ec59c9e465a9fe41a3f6821ee747bd5d953728b"
+    },
+    {
+      "path": "core/stage_fused_carry_hold.py",
+      "bytes": 5975,
+      "sha256": "99c4983289e71d7d326b0608f147226019465a139372f293986b189a26babc04"
+    },
+    {
+      "path": "core/stage_failed_contact_recheck.py",
+      "bytes": 6885,
+      "sha256": "a122c01fa3eccc7d2618741a16a2c5918b1414f96ac7c8bf91c4ae92c79b7224"
+    },
+    {
+      "path": "core/stage_release_guard.py",
+      "bytes": 2682,
+      "sha256": "023c0c0568a759118f9d500e0e5a0a5da3eccda6a4704e70f821310c63cfc95d"
+    },
+    {
+      "path": "core/stage_target_marker.py",
+      "bytes": 4133,
+      "sha256": "76dfb70dbfb37f0cfd8cd73d64f9e735285ee64970414ba2af4b164855c50de7"
+    },
+    {
+      "path": "core/stage_observation_json.py",
+      "bytes": 460,
+      "sha256": "1248d162f0c4958a28f52f255a3b9a6bc95c01a8897f1f59e62deee08ce6c5a1"
+    },
+    {
+      "path": "core/target_distance_reward.py",
+      "bytes": 4879,
+      "sha256": "96d6a90bb80af997cf538ba5dd56a9cea8bac6c57f5659c5210b496cd9a3318c"
+    }
+  ],
+  "scope": "Frozen source closure; no model weights, simulator assets, online replies or research worktrees needed",
+  "source_files_unmodified": true
+}

@@ -8,6 +8,7 @@ Duck-typed to match DiffusionPolicySteer / PI05PolicySteer:
 from __future__ import annotations
 
 import json
+import copy
 import hashlib
 import math
 import os
@@ -969,6 +970,13 @@ class RDTSteer:
         self._last_eds_mechanism_trace: Optional[EDSMechanismTrace] = None
         self._eds_chunk_memory: Optional[EDSChunkMemory] = None
         self._eds_chunk_memory_reset_reason: Optional[str] = None
+        self._stage_reward_guidance_type: Optional[str] = None
+        self._vls_stage_reward_reference: Optional[float] = None
+        self._vls_selected_reward: Optional[float] = None
+        self._vls_stage_progress: Optional[float] = None
+        self._last_vls_metrics: Optional[dict] = None
+        self._vls_metrics_work: Optional[dict] = None
+        self._vls_chunk_compute_start: Optional[dict] = None
 
         # Locate the inner DiT score network once at construction.
         self._dit: nn.Module = self._find_dit(rdt_model)
@@ -1362,6 +1370,11 @@ class RDTSteer:
         self._last_eds_artifacts = None
         self._last_eds_initial_sampler_info = None
         self._last_eds_mechanism_trace = None
+        self._stage_reward_guidance_type = None
+        self._reset_vls_stage_reward()
+        self._last_vls_metrics = None
+        self._vls_metrics_work = None
+        self._vls_chunk_compute_start = None
         if self._obs_processor is not None:
             self._obs_processor.reset()
 
@@ -1380,6 +1393,12 @@ class RDTSteer:
     def reset_stage(self) -> None:
         self.reset_eds_chunk_memory("stage_change")
         self._stage_init_reward = None
+        self._reset_vls_stage_reward()
+
+    def _reset_vls_stage_reward(self) -> None:
+        self._vls_stage_reward_reference = None
+        self._vls_selected_reward = None
+        self._vls_stage_progress = None
 
     def reset_eds_chunk_memory(self, reason: str, *, warn: bool = False) -> None:
         self._eds_chunk_memory = None
@@ -1389,6 +1408,31 @@ class RDTSteer:
 
     def get_normalized_reward(self) -> float:
         return self._last_normalized_reward
+
+    def get_stage_reward(self) -> Optional[float]:
+        """Pure outer progress read; EDS retains its exact existing value/reference.
+
+        VLS final-candidate progress is independent of its internal gradient reward.
+        None means a VLS final-candidate score was unavailable, never a fallback to
+        gradient normalization. The controller suppresses stale unguided values.
+        """
+        if self._stage_reward_guidance_type == "vls":
+            return self._vls_stage_progress
+        return self.get_normalized_reward()
+
+    def get_last_vls_metrics(self) -> Optional[dict]:
+        """Return cached observations only; no scoring, model or RNG operations."""
+        return copy.deepcopy(self._last_vls_metrics)
+
+    def _record_vls_gradient(self, kind: str, status: str, **values) -> None:
+        """Observation of values already produced by a VLS gradient call."""
+        if self._vls_metrics_work is None:
+            return
+        record = self._vls_metrics_work[kind]
+        if status in record and isinstance(record[status], int):
+            record[status] += 1
+        record["events"].append(dict(status=status,
+            timestep=self._vls_metrics_work.get("_timestep"), **values))
 
     def reset_episode_compute_counters(self) -> None:
         self._episode_compute = {key: 0 for key in (
@@ -1514,6 +1558,11 @@ class RDTSteer:
         )
 
         if should_sample:
+            self._last_vls_metrics = None
+            if use_guidance and str(guidance_type or "vls").lower() == "vls":
+                self._vls_chunk_compute_start = self.get_episode_compute_counters()
+            if use_guidance:
+                self._stage_reward_guidance_type = str(guidance_type or "vls").lower()
             self._increment_compute("guided_chunks" if use_guidance else "unguided_chunks")
             self._last_visualization_action_candidates = None
             self._last_eds_metrics = None
@@ -1562,6 +1611,10 @@ class RDTSteer:
 
             self._cached_action_chunk = self._postprocess_actions(raw)
             self._cached_action_steps_remaining = self._cached_action_chunk.shape[1]
+            if self._last_vls_metrics is not None:
+                self._last_vls_metrics["selection"]["action_chunk_fingerprint"] = fingerprint_action(
+                    self._cached_action_chunk[0]
+                )
 
         self._cached_action_steps_remaining = max(0, self._cached_action_steps_remaining - 1)
         return self._cached_action_chunk
@@ -1780,9 +1833,50 @@ class RDTSteer:
             reward_fn=reward_fn,
             reward_min_value=float("-inf"),
             device=device,
+            record_diagnostics=True,
         )
 
     def _vls_guided_denoise_loop(
+        self, *, x_t: Tensor, cond: dict, keypoints: Optional[Tensor],
+        guidance_fns: Optional[List[Callable]], vls_config: dict, verbose: bool,
+        global_step: int, current_stage: int,
+    ) -> Tensor:
+        """Observe VLS execution without changing its internal reward reference."""
+        start = self._vls_chunk_compute_start or self.get_episode_compute_counters()
+        self._vls_chunk_compute_start = None
+        self._stage_reward_guidance_type = "vls"
+        def gradient_record():
+            return dict(attempted=0, applied=0, zero=0, nonfinite=0,
+                        exception=0, unavailable=0, events=[])
+        metrics = dict(schema="rdt_vls_metrics_v1", guidance_type="vls",
+            sample_batch_size_observed=int(x_t.shape[0]), action_chunk_horizon=self._action_chunk_horizon,
+            num_inference_steps=self._num_inference_steps, denoising_steps_executed=0,
+            guide_scale=float(vls_config.get("guide_scale", 1.0)),
+            diversity_enabled=bool(vls_config.get("use_diversity", True)),
+            diversity_scale=float(vls_config.get("diversity_scale", 1.0)),
+            start_ratio=vls_config.get("start_ratio"),
+            sigmoid_k=float(vls_config.get("sigmoid_k", 12.0)),
+            sigmoid_x0=float(vls_config.get("sigmoid_x0", .7)),
+            gradient=gradient_record(), rbf=gradient_record(), selection={}, fkd={})
+        self._vls_metrics_work = metrics
+        try:
+            selected = self._vls_guided_denoise_loop_impl(x_t=x_t, cond=cond,
+                keypoints=keypoints, guidance_fns=guidance_fns, vls_config=vls_config,
+                verbose=verbose, global_step=global_step, current_stage=current_stage)
+            end = self.get_episode_compute_counters()
+            metrics["compute_delta"] = {key: (value[len(start[key]):] if isinstance(value, list)
+                                              else value - start[key]) for key, value in end.items()}
+            metrics["outer_reward"] = dict(raw_score=self._vls_selected_reward,
+                reference=self._vls_stage_reward_reference, progress=self._vls_stage_progress,
+                available=self._vls_stage_progress is not None,
+                reason=metrics["selection"].get("score_status", "not_scored"))
+            metrics.pop("_timestep", None)
+            self._last_vls_metrics = metrics
+            return selected
+        finally:
+            self._vls_metrics_work = None
+
+    def _vls_guided_denoise_loop_impl(
         self,
         *,
         x_t: Tensor,
@@ -1810,6 +1904,8 @@ class RDTSteer:
         use_keypoint_guidance = guidance_fns is not None and len(guidance_fns) > 0 and keypoints is not None
         reward_history = []
         start_step = self._resolve_start_step(scheduler.timesteps, start_ratio)
+        metrics = self._vls_metrics_work
+        metrics["resolved_start_timestep"] = start_step
         terminal_t = int(scheduler.timesteps[-1].item())
         fkd = self._init_fkd(
             B=x_t.shape[0],
@@ -1822,10 +1918,13 @@ class RDTSteer:
         )
 
         for i, t in enumerate(scheduler.timesteps):
+            metrics["denoising_steps_executed"] += 1
+            metrics["_timestep"] = int(t.item())
             with torch.no_grad():
                 model_output = self._counted_dit(x_t, t, cond)
 
             if use_diversity and int(t.item()) > start_step and x_t.shape[0] > 1:
+                metrics["rbf"]["attempted"] += 1
                 div_grad = self._compute_diversity_gradient(x_t)
                 if div_grad is not None:
                     masked_div = self._mask_guidance_gradient(div_grad).to(device=model_output.device, dtype=model_output.dtype)
@@ -1834,7 +1933,13 @@ class RDTSteer:
                         * float(diversity_scale)
                         * masked_div[:, :, RDT_GUIDED_TRANSLATION_INDICES]
                     )
+                    metrics["rbf"]["applied"] += 1
+                    if metrics["rbf"]["events"]:
+                        metrics["rbf"]["events"][-1].update(
+                            masked_norm=float(masked_div.detach().norm().cpu().item()),
+                            scale=float(diversity_scale))
             elif use_keypoint_guidance and int(t.item()) <= start_step:
+                metrics["gradient"]["attempted"] += 1
                 kp_grad, reward_value = self._compute_keypoint_gradient(
                     x_t,
                     keypoints,
@@ -1854,6 +1959,10 @@ class RDTSteer:
                         model_output.dtype,
                     )
                     model_output = self._apply_keypoint_guidance(model_output, kp_grad, scale)
+                    metrics["gradient"]["applied"] += 1
+                    if metrics["gradient"]["events"]:
+                        metrics["gradient"]["events"][-1].update(scale=self._last_scale,
+                            masked_norm=float(self._mask_guidance_gradient(kp_grad).detach().norm().cpu().item()))
 
             step_output = self._counted_scheduler_step(scheduler, model_output, t, x_t)
             x0_for_reward, _ = self._select_fkd_x0_source(
@@ -1875,6 +1984,15 @@ class RDTSteer:
 
         if reward_history and self._stage_init_reward is None:
             self._stage_init_reward = reward_history[-1][1]
+
+        diagnostics = fkd.get_diagnostics() if callable(getattr(fkd, "get_diagnostics", None)) else None
+        metrics["fkd"] = dict(configured_enabled=use_fkd, effective_enabled=fkd is not None,
+                              diagnostics_available=diagnostics is not None, diagnostics=diagnostics,
+                              config=(dict(potential_type=fkd_config.get("potential_type", "max"),
+                                  lmbda=float(fkd_config.get("lmbda", 10.0)),
+                                  adaptive_resampling=bool(fkd_config.get("adaptive_resampling", True)),
+                                  resample_frequency=int(fkd_config.get("resample_frequency", 5)))
+                                  if fkd_config is not None else None))
 
         if not torch.isfinite(x_t).all():
             raise ValueError("Guided RDT latent contains non-finite values")
@@ -6826,12 +6944,49 @@ class RDTSteer:
         fkd: Optional[FKD],
     ) -> Tensor:
         if samples.shape[0] == 1:
+            self._record_vls_selection(samples, 0, "single_particle", None, keypoints, guidance_fns)
             return samples
         if fkd is not None and fkd.reached_terminal:
+            self._record_vls_selection(samples[0:1], 0, "fkd_terminal", None, keypoints, guidance_fns)
             return samples[0:1]
         rewards = self._score_particles(samples, keypoints, guidance_fns, slice_kind="fkd")
         best_idx = int(torch.argmax(rewards).item())
+        self._record_vls_selection(samples[best_idx:best_idx + 1], best_idx, "reward_argmax",
+                                   rewards[best_idx], keypoints, guidance_fns)
         return samples[best_idx : best_idx + 1]
+
+    def _record_vls_selection(self, selected, index, source, reward, keypoints, guidance_fns):
+        if self._vls_metrics_work is None:
+            return
+        self._vls_selected_reward = None
+        self._vls_stage_progress = None
+        info = dict(source=source, index=int(index),
+            latent_fingerprint=fingerprint_action(selected[0]),
+            latent_fingerprint_scope="before_final_action_mask",
+            score_source="existing_final_selection" if reward is not None else "extra_selected_score",
+            reward_slice="p1_to_p_horizon_minus_1", raw_score=None, score_valid=False)
+        self._vls_metrics_work["selection"] = info
+        if keypoints is None or not guidance_fns:
+            info["score_status"] = "missing_reward"
+            return
+        if reward is None:
+            try:
+                reward = self._score_particles(selected, keypoints, guidance_fns, slice_kind="fkd")[0]
+            except Exception as exc:
+                # This VLS-only outer observation must not replace the already
+                # selected action or borrow the internal gradient reward.
+                info.update(score_status="selected_score_exception", error_type=type(exc).__name__)
+                return
+        value = float(reward.detach().cpu().item())
+        if not math.isfinite(value):
+            info["score_status"] = "nonfinite_selected_score"
+            return
+        self._vls_selected_reward = value
+        if self._vls_stage_reward_reference is None:
+            self._vls_stage_reward_reference = value
+        reference = self._vls_stage_reward_reference
+        self._vls_stage_progress = max(0.0, min(1.2, 1.0 - value / reference)) if reference < -1e-6 else 0.0
+        info.update(raw_score=value, score_valid=True, score_status="finite_selected_score")
 
     def _order_particles_for_visualization(
         self,
@@ -6938,6 +7093,8 @@ class RDTSteer:
         """
         B = x_t.shape[0]
         if B < 2 or self._adapter is None:
+            if self._vls_metrics_work is not None:
+                self._record_vls_gradient("rbf", "unavailable", reason="missing_population_or_adapter")
             return None
 
         self._increment_compute("rbf_gradient_calls")
@@ -6964,10 +7121,18 @@ class RDTSteer:
                 grads = torch.autograd.grad(potential, x_grad, create_graph=False, allow_unused=True)
                 grad = grads[0]
                 if grad is None:
+                    if self._vls_metrics_work is not None:
+                        self._record_vls_gradient("rbf", "unavailable", reason="disconnected")
                     return None
                 g_norm = torch.norm(grad).item()
+                if self._vls_metrics_work is not None:
+                    self._record_vls_gradient("rbf", "nonfinite" if not math.isfinite(g_norm)
+                        else "zero" if g_norm <= 1e-8 else "finite",
+                        norm=g_norm if math.isfinite(g_norm) else None)
                 return grad / (g_norm + 1e-8) if g_norm > 1e-8 else grad
         except Exception as exc:
+            if self._vls_metrics_work is not None:
+                self._record_vls_gradient("rbf", "exception", error_type=type(exc).__name__)
             log.warning(f"Diversity gradient failed: {exc}")
             return None
 
@@ -7071,6 +7236,8 @@ class RDTSteer:
         Returns (normalized_grad, raw_reward_scalar).
         """
         if not guidance_fns or self._adapter is None:
+            if self._vls_metrics_work is not None:
+                self._record_vls_gradient("gradient", "unavailable", reason="missing_reward_or_adapter")
             return None, 0.0
 
         try:
@@ -7086,8 +7253,12 @@ class RDTSteer:
                 reward = sum(self._counted_reward(fn, keypoints, traj_input) for fn in guidance_fns)
 
                 if isinstance(reward, (int, float)):
+                    if self._vls_metrics_work is not None:
+                        self._record_vls_gradient("gradient", "unavailable", reason="disconnected")
                     return None, float(reward)
                 if not hasattr(reward, "requires_grad") or not reward.requires_grad:
+                    if self._vls_metrics_work is not None:
+                        self._record_vls_gradient("gradient", "unavailable", reason="disconnected")
                     return None, float(reward.item())
 
                 reward_scalar = float(reward.sum().item())
@@ -7105,11 +7276,18 @@ class RDTSteer:
                     reward.sum(), x_grad, create_graph=False, retain_graph=False
                 )[0]
                 if not torch.isfinite(grad).all():
+                    if self._vls_metrics_work is not None:
+                        self._record_vls_gradient("gradient", "nonfinite", norm=None)
                     log.warning(
                         f"Keypoint gradient contained non-finite values; skipping guidance for reward={reward_scalar:.6f}"
                     )
                     return None, reward_scalar
                 g_norm = torch.norm(grad).item()
+                if self._vls_metrics_work is not None:
+                    self._record_vls_gradient("gradient", "nonfinite" if not math.isfinite(g_norm)
+                        else "zero" if g_norm <= 1e-8 else "finite",
+                        norm=g_norm if math.isfinite(g_norm) else None,
+                        raw_reward=reward_scalar if math.isfinite(reward_scalar) else None)
                 normalized = grad / (g_norm + 1e-8) if g_norm > 1e-8 else grad
 
                 if verbose:
@@ -7117,6 +7295,8 @@ class RDTSteer:
 
                 return normalized, reward_scalar
         except Exception as exc:
+            if self._vls_metrics_work is not None:
+                self._record_vls_gradient("gradient", "exception", error_type=type(exc).__name__)
             log.warning(f"Keypoint gradient failed: {exc}")
             return None, 0.0
 

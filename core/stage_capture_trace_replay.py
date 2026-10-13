@@ -60,7 +60,7 @@ class CaptureTraceReplayStageRecognizer(TraceReplayStageRecognizer):
             (target / "codex_prompt.txt").write_text(codex_prompt)
             (target / "parts.json").write_text(json.dumps(parts, ensure_ascii=False, indent=2) + "\n")
             (target / "metadata.json").write_text(json.dumps({
-                "schema": "c0-stage-input-capture-v1", "query_index": index,
+                "schema": "stage-input-capture-v1", "query_index": index,
                 "context": context, "historical_raw_response": response,
                 "codex_prompt_sha256": hashlib.sha256(codex_prompt.encode()).hexdigest(),
                 "image_png_sha256": images,
