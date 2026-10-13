@@ -594,6 +594,7 @@ env_config = {
     "suite_name": "libero_object",
     "camera_name": "agentview_image, robot0_eye_in_hand_image",
     "auto_apply_perturbations": False,
+    "strict_perturbations": False,
     "task_ids_filter": [2],
     "observation_width": 128,
     "observation_height": 129,
@@ -619,6 +620,7 @@ assert captured["kwargs"] == {
     "visualization_height": 641,
     "num_steps_wait": 5,
     "max_episode_steps": 600,
+    "strict_perturbations": False,
 }
 '''
     result = _run_python(script)
@@ -684,6 +686,55 @@ def test_libero_backend_config_defaults_match_eval_parity():
     assert libero_config["max_episode_steps"] == 720
     assert libero_config["visualization_width"] == 640
     assert libero_config["visualization_height"] == 640
+    assert libero_config["strict_perturbations"] is False
+
+
+def test_libero_suffix_resume_starts_on_matching_task_index():
+    script = r'''
+import builtins
+import sys
+import types
+
+libero = types.ModuleType("libero")
+libero_libero = types.ModuleType("libero.libero")
+libero_envs = types.ModuleType("libero.libero.envs")
+libero_libero.benchmark = object()
+libero_libero.get_libero_path = lambda name: "/tmp"
+libero_envs.OffScreenRenderEnv = object
+sys.modules["libero"] = libero
+sys.modules["libero.libero"] = libero_libero
+sys.modules["libero.libero.envs"] = libero_envs
+
+original_import = builtins.__import__
+
+def guarded_import(name, *args, **kwargs):
+    if name == "lerobot" or name.startswith("lerobot."):
+        raise ModuleNotFoundError("No module named 'lerobot'", name="lerobot")
+    return original_import(name, *args, **kwargs)
+
+builtins.__import__ = guarded_import
+
+import core.env_adapters.libero_adapter as adapter
+
+assert adapter._libero_task_index_for_episode(
+    episode_index=6,
+    episodes_per_task=1,
+    task_num=10,
+) == 6
+assert adapter._libero_task_index_for_episode(
+    episode_index=9,
+    episodes_per_task=1,
+    task_num=10,
+) == 9
+assert adapter._libero_task_index_for_episode(
+    episode_index=12,
+    episodes_per_task=2,
+    task_num=10,
+) == 6
+'''
+    result = _run_python(script)
+
+    assert result.returncode == 0, result.stderr
 
 
 def test_libero_adapter_step_binarizes_gripper_before_sending_numpy_action():

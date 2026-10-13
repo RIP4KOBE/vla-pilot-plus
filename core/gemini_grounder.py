@@ -13,6 +13,7 @@ import base64
 import os
 import re
 import io
+import time
 from typing import List, Dict, Tuple, Optional
 from PIL import Image
 from openai import OpenAI
@@ -20,6 +21,55 @@ from openai import OpenAI
 from utils.logging_utils import SteerLogger
 
 logger = SteerLogger("GeminiGrounder")
+
+
+class APIRequestCounter:
+    """Observe HTTP send attempts, including SDK retries, without payload data."""
+
+    def __init__(self):
+        self.request_attempts = 0
+        self.sdk_retry_attempts = 0
+        self.observation_available = False
+
+    def on_request(self, request):
+        self.request_attempts += 1
+        # OpenAI 2.8.1 emits this non-secret count on every HTTP attempt.
+        # Read only; neither headers nor retry behavior are modified.
+        try:
+            self.sdk_retry_attempts += int(request.headers.get("x-stainless-retry-count", "0")) > 0
+        except (AttributeError, TypeError, ValueError):
+            pass
+
+    def snapshot(self):
+        return {
+            "request_attempts": int(self.request_attempts),
+            "sdk_retry_attempts": int(self.sdk_retry_attempts),
+            "observation_available": bool(self.observation_available),
+        }
+
+
+def observe_api_requests(client):
+    """Attach an idempotent observer to the existing sync client's HTTP hooks.
+
+    SDK requests/retries and any caller retries pass through the same hook.
+    Only SDK retries are separately classified; caller retries remain included
+    in total request attempts. Unsupported test/custom transports are reported
+    unavailable instead of changing client behavior.
+    """
+    counter = getattr(client, "_qd_ed_http_request_counter", None)
+    if isinstance(counter, APIRequestCounter):
+        return counter
+    counter = APIRequestCounter()
+    http_client = getattr(client, "_client", None)
+    hooks = getattr(http_client, "event_hooks", None)
+    if isinstance(hooks, dict):
+        hooks.setdefault("request", []).append(counter.on_request)
+        counter.observation_available = True
+    try:
+        client._qd_ed_http_request_counter = counter
+    except (AttributeError, TypeError):
+        pass
+    return counter
 
 
 def _image_to_base64(rgb: np.ndarray) -> str:
@@ -48,6 +98,7 @@ class GeminiGrounder:
         self.config = config
         self.model = config.get("model", "gemini-2.5-flash")
         self.client = _make_client(config)
+        self.api_request_counter = observe_api_requests(self.client)
         logger.info(f"GeminiGrounder initialized with model: {self.model}")
 
     def detect_objects(self, rgb: np.ndarray, object_names: List[str]) -> List[Dict]:
@@ -140,7 +191,8 @@ class GeminiStageRecognizer:
     def __init__(self, config: dict):
         self.config = config
         self.model = config.get("model", "gemini-2.5-flash")
-        self.client = _make_client(config)
+        self._configure_transport(config)
+        self._last_result = None
 
         template_path = config.get("stage_template_path")
         if template_path is None:
@@ -149,7 +201,46 @@ class GeminiStageRecognizer:
         with open(template_path, "r") as f:
             self.prompt_template = f.read()
 
-        logger.info(f"GeminiStageRecognizer initialized with model: {self.model}")
+        logger.info(f"StageRecognizer initialized with model: {self.model}")
+
+    def _configure_transport(self, config):
+        self.client = _make_client(config)
+        self.api_request_counter = observe_api_requests(self.client)
+
+    def _request_stage_response(self, content):
+        observation_mode = self.config.get("output_format") == "stage_observation_v1"
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[{"role": "user", "content": content}],
+            max_tokens=int(self.config.get("observation_max_tokens", 2048)) if observation_mode else 256,
+            temperature=0.0,
+        )
+        if observation_mode:
+            usage = getattr(response, "usage", None)
+            self._last_completion_metadata = {
+                "finish_reason": getattr(response.choices[0], "finish_reason", None),
+                "response_model": getattr(response, "model", None),
+                "max_tokens": int(self.config.get("observation_max_tokens", 2048)),
+                "usage": usage.model_dump() if callable(getattr(usage, "model_dump", None)) else None,
+            }
+        content_text = response.choices[0].message.content
+        return (content_text or "").strip() if observation_mode else content_text.strip()
+
+    def _record_transport_result(self, counter_before):
+        if counter_before is not None:
+            counter_after = self.api_request_counter.snapshot()
+            self._last_result.update(
+                api_request_attempts=counter_after["request_attempts"] - counter_before["request_attempts"],
+                api_sdk_retry_attempts=counter_after["sdk_retry_attempts"] - counter_before["sdk_retry_attempts"],
+                api_request_counter_available=counter_after["observation_available"],
+            )
+
+    @property
+    def last_result(self) -> Optional[Dict[str, object]]:
+        """Return a copy of the latest query metadata for audit logging."""
+        if self._last_result is None:
+            return None
+        return dict(self._last_result)
 
     def identify_stage_and_guidance(
         self,
@@ -186,36 +277,82 @@ class GeminiStageRecognizer:
         })
 
         stage_num, need_guidance = 1, True
+        output = None
+        evidence = ""
+        error = None
+        parse_ok = False
+        query_start_s = time.perf_counter()
+        counter = getattr(self, "api_request_counter", None)
+        counter_before = counter.snapshot() if counter is not None else None
         try:
-            resp = self.client.chat.completions.create(
-                model=self.model,
-                messages=[{"role": "user", "content": content}],
-                max_tokens=256,
-                temperature=0.0,
-            )
-            output = resp.choices[0].message.content.strip()
+            output = self._request_stage_response(content)
 
-            m = re.search(r"stage\s+(\d+)", output.lower())
-            if m:
-                stage_num = int(m.group(1))
+            stage_match = re.search(r"stage\s+(\d+)", output.lower())
+            if stage_match:
+                stage_num = int(stage_match.group(1))
                 if num_stages:
                     stage_num = min(stage_num, num_stages)
 
-            m = re.search(r"guidance:\s*(yes|no)", output.lower())
-            if m:
-                need_guidance = m.group(1) == "yes"
+            guidance_match = re.search(r"guidance:\s*(yes|no)", output.lower())
+            if guidance_match:
+                need_guidance = guidance_match.group(1) == "yes"
 
-            evidence = ""
+            parse_ok = stage_match is not None and guidance_match is not None
+            if not parse_ok:
+                stage_num, need_guidance = 1, True
+                error = "Failed to parse both stage and guidance from response"
+
             m = re.search(r"evidence:\s*(.+)", output, re.IGNORECASE)
             if m:
                 evidence = m.group(1).strip()
 
-            logger.info(f"[Gemini] Stage:{stage_num} Guide:{'ON' if need_guidance else 'OFF'} | {evidence[:80]}")
+            if parse_ok:
+                backend = self.config.get("backend", "openai_compatible")
+                logger.info(f"[Stage:{backend}] Stage:{stage_num} Guide:{'ON' if need_guidance else 'OFF'} | {evidence[:80]}")
+            else:
+                logger.error(error)
         except Exception as e:
-            logger.error(f"Gemini stage recognition failed: {e}")
+            error = str(e)
+            logger.error(f"Stage recognition failed: {e}")
+
+        self._last_result = {
+            "ok": error is None and parse_ok,
+            "parse_ok": parse_ok,
+            "raw_response": output,
+            "parsed_stage": stage_num,
+            "parsed_guidance": need_guidance,
+            "evidence": evidence,
+            "error": error,
+            "query_latency_s": float(time.perf_counter() - query_start_s),
+        }
+        self._record_transport_result(counter_before)
 
         return stage_num, need_guidance
 
 
 def create_gemini_stage_recognizer(config: dict) -> GeminiStageRecognizer:
+    backend = config.get("backend", "openai_compatible")
+    if config.get("output_format") == "stage_observation_v1":
+        if backend == "codex_cli":
+            from core.stage_observation import CodexObservationStageRecognizer
+            return CodexObservationStageRecognizer(config)
+        if backend != "openai_compatible":
+            raise ValueError("Unknown visual observation backend")
+        from core.stage_observation import ObservationStageRecognizer, CapturedObservationStageRecognizer
+        cls = CapturedObservationStageRecognizer if config.get("capture_dir") else ObservationStageRecognizer
+        return cls(config)
+    if backend == "trace_replay_capture":
+        from core.stage_capture_trace_replay import CaptureTraceReplayStageRecognizer
+        return CaptureTraceReplayStageRecognizer(config)
+    if backend == "trace_replay":
+        from core.trace_replay_stage import TraceReplayStageRecognizer
+        return TraceReplayStageRecognizer(config)
+    if backend == "codex_cli":
+        from core.codex_stage import CodexStageRecognizer
+        return CodexStageRecognizer(config)
+    if backend != "openai_compatible":
+        raise ValueError("Unknown stage recognition backend")
+    if config.get("capture_dir"):
+        from core.stage_capture import CapturedStageRecognizer
+        return CapturedStageRecognizer(config)
     return GeminiStageRecognizer(config)
