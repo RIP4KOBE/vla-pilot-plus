@@ -57,7 +57,8 @@ perception:
     backend: codex_cli
     reasoning_effort: ultra
     timeout_seconds: 180
-    transport_retry_count: 1
+    transport_retry_count: 8
+    transport_retry_backoff_seconds: 30.0
     event_policy: completed_transport_cycles_v6
   sam3:
     enabled: false
@@ -88,7 +89,8 @@ perception:
     observation_max_tokens: 8192
     observation_validation_max_attempts: 2
     base_url: null
-    transport_retry_count: 1
+    transport_retry_count: 8
+    transport_retry_backoff_seconds: 30.0
 policy:
   type: rdt
   diffusion:
