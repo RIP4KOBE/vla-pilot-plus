@@ -175,6 +175,38 @@ def test_complete_but_invalid_answer_is_not_retried(monkeypatch, tmp_path):
     assert recognizer.last_result["transport"]["physical_call_attempts"] == 1
 
 
+@pytest.mark.parametrize('recovers', [True, False])
+def test_repeated_rate_limit_is_bounded_and_keeps_same_request(monkeypatch, tmp_path, recovers):
+    recognizer, calls = make(monkeypatch, tmp_path, event_policy="completed_transport_cycles_v6")
+    recognizer.transport_retry_count = 8
+    recognizer.transport_retry_backoff_seconds = 30
+    original = recognizer._request_stage_response_once
+    requests, waits = [], []
+
+    def rate_limit_then_maybe_recover(content):
+        requests.append(content)
+        if recovers and len(requests) == 9:
+            return original(content)
+        recognizer.api_request_counter.values["logical_call_attempts"] += 1
+        recognizer._call_transport = {"completed_turns": 0,
+            "error_diagnostics": [{"http_status_codes": [429], "signals": ["rate_limited"]}]}
+        recognizer._call_raw_response = None
+        raise module.CodexStageError("codex_expected_one_completed_turn")
+
+    monkeypatch.setattr(recognizer, "_request_stage_response_once", rate_limit_then_maybe_recover)
+    monkeypatch.setattr(module.time, "sleep", waits.append)
+    assert identify(recognizer) == ((2, False) if recovers else (1, True))
+    assert len(requests) == 9 and all(r == requests[0] for r in requests)
+    assert waits == [30.] * 8
+    assert len(calls) == int(recovers)
+    result = recognizer.last_result
+    assert result["codex_logical_call_attempts"] == 9
+    assert result["transport"]["physical_call_attempts"] == 9
+    assert len(result["transport"]["failed_transport_attempts"]) == (8 if recovers else 9)
+    if not recovers:
+        assert result['error'] == 'codex_expected_one_completed_turn'
+
+
 def test_authentication_failure_is_not_retried(monkeypatch, tmp_path):
     recognizer, _ = make(monkeypatch, tmp_path, event_policy="completed_transport_cycles_v6")
     recognizer.transport_retry_count = 12

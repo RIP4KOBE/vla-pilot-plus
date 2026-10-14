@@ -39,6 +39,20 @@ def test_legal_incomplete_retry_does_not_count_as_failed_response(pair):
     t['failed_transport_attempts']=[dict(error='codex_timeout',completed_turns=0,event_types=['thread.started','turn.started'],stderr_diagnostic={'signals':['timeout']},error_diagnostics=[])]
     passing(pair)
 
+def test_eight_rate_limit_retries_keep_one_complete_response(pair):
+    r,p=pair;t=r['transport']
+    t['transport_retry_count']=8
+    t['transport_retry_backoff_seconds']=30.
+    t['physical_call_attempts']=9
+    r['counters']['logical_call_attempts']=9
+    t['failed_transport_attempts']=[dict(error='codex_expected_one_completed_turn',
+        completed_turns=0,event_types=['thread.started','turn.failed'],
+        stderr_diagnostic={'signals':[]},
+        error_diagnostics=[{'signals':['rate_limited'],'http_status_codes':[429]}]) for _ in range(8)]
+    passing(pair)
+    t['transport_retry_count']=7
+    assert audit_transport(r,p)['bounded_transport_retries'] is False
+
 @pytest.mark.parametrize('reasoning',[None,0])
 def test_reasoning_unknown_remains_unknown_across_requests(pair,reasoning):
     r,p=pair;r['counters']['reasoning_output_tokens']=None

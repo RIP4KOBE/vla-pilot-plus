@@ -78,6 +78,9 @@ def test_modes_share_online_contract_and_route_mechanism(tmp_path, method):
     assert cfg['perception']['gemini']['model'] == 'gpt-6-astra'
     assert cfg['perception']['gemini']['reasoning_effort'] == 'ultra'
     assert cfg['perception']['vlm_agent']['reasoning_effort'] == 'ultra'
+    for role in ('gemini', 'vlm_agent'):
+        assert cfg['perception'][role]['transport_retry_count'] == 8
+        assert cfg['perception'][role]['transport_retry_backoff_seconds'] == 30.0
     assert cfg['main']['episode_seed_schedule'] == [235, 548]
     assert cfg['main']['eds_eval']['job_id'] == tmp_path.name
     assert cfg['main']['eds_eval']['method_label'] == method

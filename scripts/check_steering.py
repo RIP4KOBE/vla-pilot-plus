@@ -51,7 +51,8 @@ def main():
             stage_config = load_config(local, method='eds', output_dir=destination / 'output')['perception']['gemini']
             transport_config = {key: stage_config[key] for key in
                 ('backend', 'model', 'reasoning_effort', 'timeout_seconds',
-                 'transport_retry_count', 'event_policy', 'cli_path', 'disabled_skill_paths')}
+                 'transport_retry_count', 'transport_retry_backoff_seconds',
+                 'event_policy', 'cli_path', 'disabled_skill_paths')}
             transport_config['capture_dir'] = str(destination / 'api_requests')
             transport = CodexVisionTransport(transport_config)
             answer = transport._request_stage_response([
