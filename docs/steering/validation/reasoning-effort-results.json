@@ -1,0 +1,3367 @@
+{
+  "schema": "rdt_steering_reasoning_effort_results_v1",
+  "date_utc": "2026-10-14",
+  "tested_runtime_commit": "c99565de6e34278c14518748d7c608433a4c529a",
+  "low_runtime_commit": "33954ead452927fc3168efb610487a688f89169e",
+  "branch": "main",
+  "benchmark": "LIBERO ObjectSwap OOD",
+  "requested_model": "gpt-6-astra",
+  "requested_effort": "ultra",
+  "provider": "codex_cli",
+  "auth_mode": "chatgpt",
+  "cli_version": "0.156.1",
+  "online_scope": [
+    "fresh identity per task",
+    "fresh reward program per task",
+    "online Stage on current observations"
+  ],
+  "local_reward_scoring": true,
+  "all_cohorts_valid": true,
+  "primary_episode_count": 30,
+  "all_attempts_started": 66,
+  "all_primary_videos_valid": true,
+  "runtime_source_unchanged_at_seal": true,
+  "source_file_count": 116,
+  "limits": [
+    "One fixed seed per task; online responses and service date vary.",
+    "Ultra also changes bounded incomplete-transport retries from 1 to 8 and backoff from 2 to 30 seconds; this is not an effort-only configuration comparison.",
+    "Old low had no outer retry among its 1118 captured requests; new recovery receipts must be reported separately.",
+    "Differences do not establish general model ability or proven causality.",
+    "Reported worker elapsed and service latency are wall time, not active GPU hours.",
+    "Initial valid ultra VLS was 2/10; the new uniform-protocol VLS is1/10. No score-based selection.",
+    "Methods have different default compute budgets. Archive is reset per action chunk; no recursive self-improvement is established.",
+    "Large raw evidence is local-only and not included in a clone.",
+    "Same-image trace evidence has different generated identity text, so it is not an identical-full-input intervention."
+  ],
+  "evidence": {
+    "repository_relative_base": ".worktrees/exp/steering-ultra-20261014",
+    "aggregate_sha256": "5c8e2988371d4b6eb92d9d6ca1f1fdd5cead46ad63988376784a599ca208cd3c",
+    "seal_sha256": "fcbdf9ce15d5fb344686b9add9dff3f95e0fd9226f464a4a75ad6e31757f362e",
+    "video_index_sha256": "9425f1ed9d10cebb30146f2091aa406965094f398764282298a5ccff5d1151ad",
+    "low_report_sha256": "a67ee5e13f7563b86ea8fadd9e55dd5d5b80f53601cdd1e65f1af72a2c2402eb",
+    "paths": [
+      "checks/ultra-recovery-final.json",
+      "checks/ultra-recovery-final.md",
+      "checks/video-health-recovery/index.json",
+      "checks/video-health-recovery/index.md",
+      "checks/freeze-transport-recovery.json",
+      "checks/transport-recovery-registration.json",
+      "checks/cohort-selection-recovery.json",
+      "checks/all-attempts-ledger.json",
+      "checks/aggregate_steering_cohorts.py",
+      "checks/audit_recovery_videos.py",
+      "checks/low-ultra-recovery-comparison.json",
+      "checks/low-ultra-recovery-comparison.md",
+      "checks/paired-control-traces-final.json",
+      "checks/low-final-transport-statistics.json",
+      "checks/ultra-final-transport-statistics.json",
+      "checks/summarize_transport.py",
+      "checks/compare_efforts_transport_recovery.py",
+      "checks/compare_control_traces.py",
+      "checks/completed-task-loss-diagnostics.json",
+      "checks/completed-task-loss-request-inputs.json",
+      "checks/completed-task-prompt-differences.json",
+      "checks/protected-files-final.json"
+    ]
+  },
+  "validation": {
+    "first_effort_change_cpu": {
+      "passed": 1442,
+      "skipped": 3,
+      "warnings": 2
+    },
+    "transport_revision_cpu": {
+      "client_and_config_passed": 250,
+      "transport_audit_passed": 26
+    },
+    "api_probe_valid": true,
+    "aggregation_independent_audits_valid": true,
+    "protected_user_files_unchanged": 5
+  },
+  "runs": {
+    "eds": {
+      "accepted": true,
+      "low_successes": 3,
+      "ultra_successes": 3,
+      "success_task_ids": [
+        3,
+        8,
+        9
+      ],
+      "configuration_differences": [
+        {
+          "path": "perception.gemini.reasoning_effort",
+          "low_effective": "low",
+          "ultra": "ultra",
+          "low_explicitly_configured": true
+        },
+        {
+          "path": "perception.gemini.transport_retry_count",
+          "low_effective": 1,
+          "ultra": 8,
+          "low_explicitly_configured": true
+        },
+        {
+          "path": "perception.gemini.transport_retry_backoff_seconds",
+          "low_effective": 2,
+          "ultra": 30.0,
+          "low_explicitly_configured": false
+        },
+        {
+          "path": "perception.vlm_agent.reasoning_effort",
+          "low_effective": "low",
+          "ultra": "ultra",
+          "low_explicitly_configured": true
+        },
+        {
+          "path": "perception.vlm_agent.transport_retry_count",
+          "low_effective": 1,
+          "ultra": 8,
+          "low_explicitly_configured": true
+        },
+        {
+          "path": "perception.vlm_agent.transport_retry_backoff_seconds",
+          "low_effective": 2,
+          "ultra": 30.0,
+          "low_explicitly_configured": false
+        }
+      ],
+      "gpu": 0,
+      "egl_device_id": 2,
+      "timing": {
+        "started_at": "2026-10-14T07:28:18.170752+00:00",
+        "completed_at": "2026-10-14T12:32:55.171193+00:00",
+        "elapsed_s": 18277.000441,
+        "is_final": true
+      },
+      "low_timing": {
+        "started_at": "2026-10-13T13:15:18.783095+00:00",
+        "completed_at": "2026-10-13T16:33:14.094064+00:00",
+        "elapsed_s": 11875.310969,
+        "is_final": true
+      },
+      "source_unchanged": true,
+      "worker_exit_code": 0,
+      "config_sha256": "2c562892037a9fbf208bcce9035ad4fbb64a70464e3e38b0a018428459d3f2cf",
+      "environment_sha256": "c5bb50e42204a16b49272c9d038dabdd9dfecf11cd8ce75c9aa8f0c1d3e88d3e",
+      "manifest_sha256": "021e43b7735ce02347489f17c5d38eafdc1a5bea7658cfd040c15f9dc08af65f",
+      "audit_sha256": "ed34dc8824f6ac617527d24cea97f7d7646d422405dc28a594fc2d8534c1bdcb",
+      "full_audit_check_count": 42,
+      "low_transport": {
+        "captured_logical_requests": 329,
+        "physical_cli_attempts": 329,
+        "recovered_requests": 0,
+        "physical_attempt_histogram": {
+          "1": 329
+        },
+        "recovery_signals_by_request": {},
+        "latency_seconds": {
+          "total": 10623.589184571058,
+          "mean": 32.29054463395458,
+          "median": 30.276473954785615,
+          "p95_nearest_rank": 53.22333173803054,
+          "maximum": 85.7320980108343
+        },
+        "capture_counters": {
+          "logical_call_attempts": {
+            "total": 329,
+            "known_records": 329,
+            "total_records": 329
+          },
+          "completed_turns": {
+            "total": 329,
+            "known_records": 329,
+            "total_records": 329
+          },
+          "failed_calls": {
+            "total": 0,
+            "known_records": 329,
+            "total_records": 329
+          },
+          "input_tokens": {
+            "total": 3183949,
+            "known_records": 329,
+            "total_records": 329
+          },
+          "cached_input_tokens": {
+            "total": 1975424,
+            "known_records": 329,
+            "total_records": 329
+          },
+          "output_tokens": {
+            "total": 37225,
+            "known_records": 329,
+            "total_records": 329
+          },
+          "reasoning_output_tokens": {
+            "total": 13572,
+            "known_records": 329,
+            "total_records": 329
+          },
+          "call_latency_s": {
+            "total": 10623.589184571058,
+            "known_records": 329,
+            "total_records": 329
+          }
+        },
+        "limits": [
+          "Latency includes transport recovery/backoff and server wait.",
+          "Legacy logical_call_attempts counter counts physical CLI attempts; captured_logical_requests counts full captured request records.",
+          "Local metadata is not independent attestation of server model identity."
+        ]
+      },
+      "ultra_transport": {
+        "captured_logical_requests": 328,
+        "physical_cli_attempts": 347,
+        "recovered_requests": 19,
+        "physical_attempt_histogram": {
+          "1": 309,
+          "2": 19
+        },
+        "recovery_signals_by_request": {
+          "rate_limited": 19,
+          "timeout": 13,
+          "websocket": 2
+        },
+        "latency_seconds": {
+          "total": 17042.605644521536,
+          "mean": 51.95916355037054,
+          "median": 48.48034336254932,
+          "p95_nearest_rank": 97.35249518300407,
+          "maximum": 145.78825391293503
+        },
+        "capture_counters": {
+          "logical_call_attempts": {
+            "total": 347,
+            "known_records": 328,
+            "total_records": 328
+          },
+          "completed_turns": {
+            "total": 328,
+            "known_records": 328,
+            "total_records": 328
+          },
+          "failed_calls": {
+            "total": 0,
+            "known_records": 328,
+            "total_records": 328
+          },
+          "input_tokens": {
+            "total": 3189017,
+            "known_records": 328,
+            "total_records": 328
+          },
+          "cached_input_tokens": {
+            "total": 1804544,
+            "known_records": 328,
+            "total_records": 328
+          },
+          "output_tokens": {
+            "total": 164869,
+            "known_records": 328,
+            "total_records": 328
+          },
+          "reasoning_output_tokens": {
+            "total": 142467,
+            "known_records": 328,
+            "total_records": 328
+          },
+          "call_latency_s": {
+            "total": 17042.605644521536,
+            "known_records": 328,
+            "total_records": 328
+          }
+        },
+        "limits": [
+          "Latency includes transport recovery/backoff and server wait.",
+          "Legacy logical_call_attempts counter counts physical CLI attempts; captured_logical_requests counts full captured request records.",
+          "Local metadata is not independent attestation of server model identity."
+        ]
+      },
+      "stage": {
+        "boundaries": 699,
+        "queries": 308,
+        "successful_queries": 308,
+        "query_errors": 0,
+        "guided_boundaries": 188,
+        "unguided_boundaries": 511,
+        "recorded_logical_attempts": {
+          "total": 337,
+          "observed_subtotal": 337,
+          "known_rows": 308,
+          "unknown_rows": 0
+        },
+        "recorded_completed_turns": {
+          "total": 318,
+          "observed_subtotal": 318,
+          "known_rows": 308,
+          "unknown_rows": 0
+        },
+        "recorded_failed_calls": {
+          "total": 0,
+          "observed_subtotal": 0,
+          "known_rows": 308,
+          "unknown_rows": 0
+        },
+        "query_latency_s": {
+          "total": 16650.35485355952,
+          "observed_subtotal": 16650.35485355952,
+          "known_rows": 308,
+          "unknown_rows": 0
+        }
+      },
+      "mechanism": {
+        "recorded_chunks": 188,
+        "guided_select_action_latency_s": {
+          "total": 477.3549147460144,
+          "observed_subtotal": 477.3549147460144,
+          "known_rows": 188,
+          "unknown_rows": 0
+        },
+        "score_call_count": {
+          "total": 2068,
+          "observed_subtotal": 2068,
+          "known_rows": 188,
+          "unknown_rows": 0
+        },
+        "search_evaluation_count": {
+          "total": 33088,
+          "observed_subtotal": 33088,
+          "known_rows": 188,
+          "unknown_rows": 0
+        },
+        "qd_evaluation_count": {
+          "total": 0,
+          "observed_subtotal": 0,
+          "known_rows": 188,
+          "unknown_rows": 0
+        },
+        "initial_diversity_steps": {
+          "total": 752,
+          "observed_subtotal": 752,
+          "known_rows": 188,
+          "unknown_rows": 0
+        },
+        "rollout_diversity_iters_applied": {
+          "total": 1880,
+          "observed_subtotal": 1880,
+          "known_rows": 188,
+          "unknown_rows": 0
+        },
+        "archive_enabled_chunks": 0,
+        "archive_active_chunks": 0,
+        "parent_sources": {
+          "weighted_offspring": 30080
+        },
+        "final_selection_sources": {
+          "weighted_offspring": 188
+        },
+        "final_coverage": {
+          "count": 0,
+          "minimum": null,
+          "maximum": null,
+          "mean": null
+        }
+      },
+      "identical_complete_action_task_ids": [
+        1,
+        2,
+        3,
+        6,
+        7,
+        8,
+        9
+      ],
+      "tasks": [
+        {
+          "task_id": 0,
+          "seed": 44,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1765
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01/audit-details/task0-contract.json",
+            "sha256": "365eebf1fd23938929be5ba32f290e8c7b730c5869140aa34c6cf82593c95df0",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/eds-common-20261013/output/episode_1/episode_1_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01/output/episode_1/episode_1_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 1,
+          "seed": 235,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1808
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01/audit-details/task1-contract.json",
+            "sha256": "4220ccab91bc8346045edaf5869bb065c4a2b5c5e0e841ad6797c69ebf9dd6d2",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/eds-common-20261013/output/episode_2/episode_2_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01/output/episode_2/episode_2_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 2,
+          "seed": 43,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1765
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01/audit-details/task2-contract.json",
+            "sha256": "7e01590d63c40a81504bda87bb513661757bf579e35d62665ed10fa38a466fb2",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/eds-common-20261013/output/episode_3/episode_3_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01/output/episode_3/episode_3_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 3,
+          "seed": 546,
+          "accepted": true,
+          "low_success": true,
+          "ultra_success": true,
+          "low_action_count": 120,
+          "ultra_action_count": 120,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 346
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01/audit-details/task3-contract.json",
+            "sha256": "0c710f79b6fe568ac95cc6e9c447283f80bbda6ab6f7d93aa0b3a7fdd97c3aed",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/eds-common-20261013/output/episode_4/episode_4_success_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01/output/episode_4/episode_4_success_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 4,
+          "seed": 6,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1636
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01/audit-details/task4-contract.json",
+            "sha256": "ec03f4687b058989f7dcf1238067eaeb0ddb17f7ac1240be446eb8f661361519",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/eds-common-20261013/output/episode_5/episode_5_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01/output/episode_5/episode_5_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 5,
+          "seed": 621,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1894
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01/audit-details/task5-contract.json",
+            "sha256": "0462f3a177b3c90066930108c967d5daf647852e19bc095f4158b9c2e3ec8f98",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/eds-common-20261013/output/episode_6/episode_6_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01/output/episode_6/episode_6_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 6,
+          "seed": 197,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1679
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01/audit-details/task6-contract.json",
+            "sha256": "e9af18faefc12b913e4c5a862a62fdfa42fccd93a2574fdf7dc38a3c30b3bb18",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/eds-common-20261013/output/episode_7/episode_7_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01/output/episode_7/episode_7_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 7,
+          "seed": 87,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1937
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01/audit-details/task7-contract.json",
+            "sha256": "b24753645d0b2712e4941000ca432491a187394c13f815c541ce60a87759e8f3",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/eds-common-20261013/output/episode_8/episode_8_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01/output/episode_8/episode_8_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 8,
+          "seed": 151,
+          "accepted": true,
+          "low_success": true,
+          "ultra_success": true,
+          "low_action_count": 211,
+          "ultra_action_count": 211,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 647
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01/audit-details/task8-contract.json",
+            "sha256": "91e0e1f8c3c5fa799ec5d8de158f687dcc25426c8468a976e07ac0006f397d8d",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/eds-common-20261013/output/episode_9/episode_9_success_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01/output/episode_9/episode_9_success_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 9,
+          "seed": 548,
+          "accepted": true,
+          "low_success": true,
+          "ultra_success": true,
+          "low_action_count": 214,
+          "ultra_action_count": 214,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 647
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01/audit-details/task9-contract.json",
+            "sha256": "5a5cad39c0138d18fb8d57278f973c7f6c3a90ae842ab9f4ee61c79fe8b08ff0",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/eds-common-20261013/output/episode_10/episode_10_success_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01/output/episode_10/episode_10_success_agentview.mp4"
+          ]
+        }
+      ]
+    },
+    "vls": {
+      "accepted": true,
+      "low_successes": 1,
+      "ultra_successes": 1,
+      "success_task_ids": [
+        3
+      ],
+      "configuration_differences": [
+        {
+          "path": "perception.gemini.reasoning_effort",
+          "low_effective": "low",
+          "ultra": "ultra",
+          "low_explicitly_configured": true
+        },
+        {
+          "path": "perception.gemini.transport_retry_count",
+          "low_effective": 1,
+          "ultra": 8,
+          "low_explicitly_configured": true
+        },
+        {
+          "path": "perception.gemini.transport_retry_backoff_seconds",
+          "low_effective": 2,
+          "ultra": 30.0,
+          "low_explicitly_configured": false
+        },
+        {
+          "path": "perception.vlm_agent.reasoning_effort",
+          "low_effective": "low",
+          "ultra": "ultra",
+          "low_explicitly_configured": true
+        },
+        {
+          "path": "perception.vlm_agent.transport_retry_count",
+          "low_effective": 1,
+          "ultra": 8,
+          "low_explicitly_configured": true
+        },
+        {
+          "path": "perception.vlm_agent.transport_retry_backoff_seconds",
+          "low_effective": 2,
+          "ultra": 30.0,
+          "low_explicitly_configured": false
+        }
+      ],
+      "gpu": 1,
+      "egl_device_id": 3,
+      "timing": {
+        "started_at": "2026-10-14T07:28:22.045819+00:00",
+        "completed_at": "2026-10-14T13:15:55.228477+00:00",
+        "elapsed_s": 20853.182658,
+        "is_final": true
+      },
+      "low_timing": {
+        "started_at": "2026-10-13T13:14:27.261698+00:00",
+        "completed_at": "2026-10-13T16:55:28.522284+00:00",
+        "elapsed_s": 13261.260586,
+        "is_final": true
+      },
+      "source_unchanged": true,
+      "worker_exit_code": 0,
+      "config_sha256": "2cd970b29f5da31544e0c6f480551bd4d8095c9a8afec834405437eeccb1dd15",
+      "environment_sha256": "c5bb50e42204a16b49272c9d038dabdd9dfecf11cd8ce75c9aa8f0c1d3e88d3e",
+      "manifest_sha256": "a648ffa107361101875f69e65d7aefadbc6703973cf499b64f75872fe4871250",
+      "audit_sha256": "8f36bf92ec8bbf96662a6d3dcc3883ab0a47c574fa6fc5e3d1f57fd36ea7fe98",
+      "full_audit_check_count": 43,
+      "low_transport": {
+        "captured_logical_requests": 389,
+        "physical_cli_attempts": 389,
+        "recovered_requests": 0,
+        "physical_attempt_histogram": {
+          "1": 389
+        },
+        "recovery_signals_by_request": {},
+        "latency_seconds": {
+          "total": 12462.654168310808,
+          "mean": 32.03767138383241,
+          "median": 30.576415135059506,
+          "p95_nearest_rank": 52.66160603100434,
+          "maximum": 85.96942392992787
+        },
+        "capture_counters": {
+          "logical_call_attempts": {
+            "total": 389,
+            "known_records": 389,
+            "total_records": 389
+          },
+          "completed_turns": {
+            "total": 389,
+            "known_records": 389,
+            "total_records": 389
+          },
+          "failed_calls": {
+            "total": 0,
+            "known_records": 389,
+            "total_records": 389
+          },
+          "input_tokens": {
+            "total": 3761626,
+            "known_records": 389,
+            "total_records": 389
+          },
+          "cached_input_tokens": {
+            "total": 2345856,
+            "known_records": 389,
+            "total_records": 389
+          },
+          "output_tokens": {
+            "total": 47366,
+            "known_records": 389,
+            "total_records": 389
+          },
+          "reasoning_output_tokens": {
+            "total": 19839,
+            "known_records": 389,
+            "total_records": 389
+          },
+          "call_latency_s": {
+            "total": 12462.654168310808,
+            "known_records": 389,
+            "total_records": 389
+          }
+        },
+        "limits": [
+          "Latency includes transport recovery/backoff and server wait.",
+          "Legacy logical_call_attempts counter counts physical CLI attempts; captured_logical_requests counts full captured request records.",
+          "Local metadata is not independent attestation of server model identity."
+        ]
+      },
+      "ultra_transport": {
+        "captured_logical_requests": 387,
+        "physical_cli_attempts": 408,
+        "recovered_requests": 20,
+        "physical_attempt_histogram": {
+          "1": 367,
+          "2": 19,
+          "3": 1
+        },
+        "recovery_signals_by_request": {
+          "rate_limited": 20,
+          "websocket": 4,
+          "timeout": 11,
+          "stream_disconnected": 1
+        },
+        "latency_seconds": {
+          "total": 20052.042097959667,
+          "mean": 51.814062268629634,
+          "median": 47.913788629928604,
+          "p95_nearest_rank": 91.37423098483123,
+          "maximum": 192.1416597061325
+        },
+        "capture_counters": {
+          "logical_call_attempts": {
+            "total": 408,
+            "known_records": 387,
+            "total_records": 387
+          },
+          "completed_turns": {
+            "total": 387,
+            "known_records": 387,
+            "total_records": 387
+          },
+          "failed_calls": {
+            "total": 0,
+            "known_records": 387,
+            "total_records": 387
+          },
+          "input_tokens": {
+            "total": 3757430,
+            "known_records": 387,
+            "total_records": 387
+          },
+          "cached_input_tokens": {
+            "total": 2196224,
+            "known_records": 387,
+            "total_records": 387
+          },
+          "output_tokens": {
+            "total": 213326,
+            "known_records": 387,
+            "total_records": 387
+          },
+          "reasoning_output_tokens": {
+            "total": 186988,
+            "known_records": 387,
+            "total_records": 387
+          },
+          "call_latency_s": {
+            "total": 20052.042097959667,
+            "known_records": 387,
+            "total_records": 387
+          }
+        },
+        "limits": [
+          "Latency includes transport recovery/backoff and server wait.",
+          "Legacy logical_call_attempts counter counts physical CLI attempts; captured_logical_requests counts full captured request records.",
+          "Local metadata is not independent attestation of server model identity."
+        ]
+      },
+      "stage": {
+        "boundaries": 826,
+        "queries": 367,
+        "successful_queries": 367,
+        "query_errors": 0,
+        "guided_boundaries": 336,
+        "unguided_boundaries": 490,
+        "recorded_logical_attempts": {
+          "total": 398,
+          "observed_subtotal": 398,
+          "known_rows": 367,
+          "unknown_rows": 0
+        },
+        "recorded_completed_turns": {
+          "total": 377,
+          "observed_subtotal": 377,
+          "known_rows": 367,
+          "unknown_rows": 0
+        },
+        "recorded_failed_calls": {
+          "total": 0,
+          "observed_subtotal": 0,
+          "known_rows": 367,
+          "unknown_rows": 0
+        },
+        "query_latency_s": {
+          "total": 19619.200707756216,
+          "observed_subtotal": 19619.200707756216,
+          "known_rows": 367,
+          "unknown_rows": 0
+        }
+      },
+      "mechanism": {
+        "recorded_chunks": 336,
+        "guided_select_action_latency_s": {
+          "total": 225.98225720552728,
+          "observed_subtotal": 225.98225720552728,
+          "known_rows": 336,
+          "unknown_rows": 0
+        },
+        "guided_model_forward_calls": {
+          "total": 1680,
+          "observed_subtotal": 1680,
+          "known_rows": 336,
+          "unknown_rows": 0
+        },
+        "guided_model_batch_rows": {
+          "total": 33600,
+          "observed_subtotal": 33600,
+          "known_rows": 336,
+          "unknown_rows": 0
+        },
+        "guided_reward_calls": {
+          "total": 21504,
+          "observed_subtotal": 21504,
+          "known_rows": 336,
+          "unknown_rows": 0
+        },
+        "guided_reward_evaluations": {
+          "total": 47040,
+          "observed_subtotal": 47040,
+          "known_rows": 336,
+          "unknown_rows": 0
+        },
+        "guided_reward_scoring_batches": {
+          "total": 1008,
+          "observed_subtotal": 1008,
+          "known_rows": 336,
+          "unknown_rows": 0
+        },
+        "guided_rbf_gradient_calls": {
+          "total": 336,
+          "observed_subtotal": 336,
+          "known_rows": 336,
+          "unknown_rows": 0
+        },
+        "gradient": {
+          "attempted": {
+            "total": 1344,
+            "observed_subtotal": 1344,
+            "known_rows": 336,
+            "unknown_rows": 0
+          },
+          "applied": {
+            "total": 1344,
+            "observed_subtotal": 1344,
+            "known_rows": 336,
+            "unknown_rows": 0
+          },
+          "zero": {
+            "total": 0,
+            "observed_subtotal": 0,
+            "known_rows": 336,
+            "unknown_rows": 0
+          },
+          "nonfinite": {
+            "total": 0,
+            "observed_subtotal": 0,
+            "known_rows": 336,
+            "unknown_rows": 0
+          },
+          "exception": {
+            "total": 0,
+            "observed_subtotal": 0,
+            "known_rows": 336,
+            "unknown_rows": 0
+          },
+          "unavailable": {
+            "total": 0,
+            "observed_subtotal": 0,
+            "known_rows": 336,
+            "unknown_rows": 0
+          }
+        },
+        "rbf": {
+          "attempted": {
+            "total": 336,
+            "observed_subtotal": 336,
+            "known_rows": 336,
+            "unknown_rows": 0
+          },
+          "applied": {
+            "total": 336,
+            "observed_subtotal": 336,
+            "known_rows": 336,
+            "unknown_rows": 0
+          },
+          "zero": {
+            "total": 0,
+            "observed_subtotal": 0,
+            "known_rows": 336,
+            "unknown_rows": 0
+          },
+          "nonfinite": {
+            "total": 0,
+            "observed_subtotal": 0,
+            "known_rows": 336,
+            "unknown_rows": 0
+          },
+          "exception": {
+            "total": 0,
+            "observed_subtotal": 0,
+            "known_rows": 336,
+            "unknown_rows": 0
+          },
+          "unavailable": {
+            "total": 0,
+            "observed_subtotal": 0,
+            "known_rows": 336,
+            "unknown_rows": 0
+          }
+        },
+        "fkd": {
+          "calls": {
+            "total": 1008,
+            "observed_subtotal": 1008,
+            "known_rows": 336,
+            "unknown_rows": 0
+          },
+          "score_opportunities": {
+            "total": 336,
+            "observed_subtotal": 336,
+            "known_rows": 336,
+            "unknown_rows": 0
+          },
+          "actual_resamples": {
+            "total": 0,
+            "observed_subtotal": 0,
+            "known_rows": 336,
+            "unknown_rows": 0
+          },
+          "ess_skips": {
+            "total": 336,
+            "observed_subtotal": 336,
+            "known_rows": 336,
+            "unknown_rows": 0
+          }
+        },
+        "selection_sources": {
+          "reward_argmax": 336
+        }
+      },
+      "identical_complete_action_task_ids": [
+        0,
+        1,
+        6,
+        9
+      ],
+      "tasks": [
+        {
+          "task_id": 0,
+          "seed": 44,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1722
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/audit-details/task0-contract.json",
+            "sha256": "4c6b491550a81276c021fd0ea0346fff20163d9d447f0e3f36d4d208d805690d",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/vls-common-20261013/output/episode_1/episode_1_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/output/episode_1/episode_1_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 1,
+          "seed": 235,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1808
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/audit-details/task1-contract.json",
+            "sha256": "3416b5100dea5c10b1d225c7480a090815ff7adceb95536ebe61b4b797d1da2c",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/vls-common-20261013/output/episode_2/episode_2_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/output/episode_2/episode_2_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 2,
+          "seed": 43,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1937
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/audit-details/task2-contract.json",
+            "sha256": "d254d870306a8a91a0c0242bccfe2e287b6ca9bd0172b638cf5bce2f3dc5d758",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/vls-common-20261013/output/episode_3/episode_3_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/output/episode_3/episode_3_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 3,
+          "seed": 546,
+          "accepted": true,
+          "low_success": true,
+          "ultra_success": true,
+          "low_action_count": 134,
+          "ultra_action_count": 122,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 389
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/audit-details/task3-contract.json",
+            "sha256": "539151f2f483e6c4a3e55b9f8260f998e7f5bde4a064b27ce5a74cb57c21b663",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/vls-common-20261013/output/episode_4/episode_4_success_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/output/episode_4/episode_4_success_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 4,
+          "seed": 6,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1722
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/audit-details/task4-contract.json",
+            "sha256": "09170b5c5f2147619f46acfdc46993a0e505abb7046ef8a977ac98e9fd614cc7",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/vls-common-20261013/output/episode_5/episode_5_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/output/episode_5/episode_5_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 5,
+          "seed": 621,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1851
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/audit-details/task5-contract.json",
+            "sha256": "4ef917152c60f80b04d90fe453d900cbd056078285df494d3554622922072fc3",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/vls-common-20261013/output/episode_6/episode_6_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/output/episode_6/episode_6_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 6,
+          "seed": 197,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1937
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/audit-details/task6-contract.json",
+            "sha256": "db7179babc202373a45d19a0133ca98bb8b588e76e62b3ab0f2068d4626fd220",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/vls-common-20261013/output/episode_7/episode_7_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/output/episode_7/episode_7_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 7,
+          "seed": 87,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1722
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/audit-details/task7-contract.json",
+            "sha256": "76e3ae374b8b5ab6e6d82c32215225c80f27c46fa9f7b4341a2d5ee01e2e5b2a",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/vls-common-20261013/output/episode_8/episode_8_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/output/episode_8/episode_8_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 8,
+          "seed": 151,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1808
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/audit-details/task8-contract.json",
+            "sha256": "25dbb46bacd4a2a0de375780fa77d51b8e91c48d232561c6299c8e842e8a68c0",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/vls-common-20261013/output/episode_9/episode_9_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/output/episode_9/episode_9_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 9,
+          "seed": 548,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1765
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/audit-details/task9-contract.json",
+            "sha256": "c2e0e47f94302692338b676a7fd7aea940e6af66726d99fede8d1d9f3fba2f62",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/vls-common-20261013/output/episode_10/episode_10_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/output/episode_10/episode_10_fail_agentview.mp4"
+          ]
+        }
+      ]
+    },
+    "eds_qd": {
+      "accepted": true,
+      "low_successes": 1,
+      "ultra_successes": 0,
+      "success_task_ids": [],
+      "configuration_differences": [
+        {
+          "path": "perception.gemini.reasoning_effort",
+          "low_effective": "low",
+          "ultra": "ultra",
+          "low_explicitly_configured": true
+        },
+        {
+          "path": "perception.gemini.transport_retry_count",
+          "low_effective": 1,
+          "ultra": 8,
+          "low_explicitly_configured": true
+        },
+        {
+          "path": "perception.gemini.transport_retry_backoff_seconds",
+          "low_effective": 2,
+          "ultra": 30.0,
+          "low_explicitly_configured": false
+        },
+        {
+          "path": "perception.vlm_agent.reasoning_effort",
+          "low_effective": "low",
+          "ultra": "ultra",
+          "low_explicitly_configured": true
+        },
+        {
+          "path": "perception.vlm_agent.transport_retry_count",
+          "low_effective": 1,
+          "ultra": 8,
+          "low_explicitly_configured": true
+        },
+        {
+          "path": "perception.vlm_agent.transport_retry_backoff_seconds",
+          "low_effective": 2,
+          "ultra": 30.0,
+          "low_explicitly_configured": false
+        }
+      ],
+      "gpu": 4,
+      "egl_device_id": 6,
+      "timing": {
+        "started_at": "2026-10-14T07:28:25.757393+00:00",
+        "completed_at": "2026-10-14T13:47:25.533171+00:00",
+        "elapsed_s": 22739.775778,
+        "is_final": true
+      },
+      "low_timing": {
+        "started_at": "2026-10-13T13:14:34.858647+00:00",
+        "completed_at": "2026-10-13T17:16:17.375281+00:00",
+        "elapsed_s": 14502.516634,
+        "is_final": true
+      },
+      "source_unchanged": true,
+      "worker_exit_code": 0,
+      "config_sha256": "816be21a26836b10d8a182f7aa12f59bb70754980e8ded58f3d253d0980bcc4b",
+      "environment_sha256": "c5bb50e42204a16b49272c9d038dabdd9dfecf11cd8ce75c9aa8f0c1d3e88d3e",
+      "manifest_sha256": "b1a5aa980ed2bf3c9e7f205f7b4115836fea919f7a56309bec0d5240cdb6ccbe",
+      "audit_sha256": "0ce6edc4511cc132b03bd250b004c7a518e5046a23b54081c4bb02224441e30d",
+      "full_audit_check_count": 42,
+      "low_transport": {
+        "captured_logical_requests": 400,
+        "physical_cli_attempts": 400,
+        "recovered_requests": 0,
+        "physical_attempt_histogram": {
+          "1": 400
+        },
+        "recovery_signals_by_request": {},
+        "latency_seconds": {
+          "total": 12921.1647868976,
+          "mean": 32.302911967244,
+          "median": 30.253473943914287,
+          "p95_nearest_rank": 54.5257434619125,
+          "maximum": 89.83883246593177
+        },
+        "capture_counters": {
+          "logical_call_attempts": {
+            "total": 400,
+            "known_records": 400,
+            "total_records": 400
+          },
+          "completed_turns": {
+            "total": 400,
+            "known_records": 400,
+            "total_records": 400
+          },
+          "failed_calls": {
+            "total": 0,
+            "known_records": 400,
+            "total_records": 400
+          },
+          "input_tokens": {
+            "total": 3869031,
+            "known_records": 400,
+            "total_records": 400
+          },
+          "cached_input_tokens": {
+            "total": 2421888,
+            "known_records": 400,
+            "total_records": 400
+          },
+          "output_tokens": {
+            "total": 46953,
+            "known_records": 400,
+            "total_records": 400
+          },
+          "reasoning_output_tokens": {
+            "total": 18465,
+            "known_records": 400,
+            "total_records": 400
+          },
+          "call_latency_s": {
+            "total": 12921.1647868976,
+            "known_records": 400,
+            "total_records": 400
+          }
+        },
+        "limits": [
+          "Latency includes transport recovery/backoff and server wait.",
+          "Legacy logical_call_attempts counter counts physical CLI attempts; captured_logical_requests counts full captured request records.",
+          "Local metadata is not independent attestation of server model identity."
+        ]
+      },
+      "ultra_transport": {
+        "captured_logical_requests": 422,
+        "physical_cli_attempts": 437,
+        "recovered_requests": 15,
+        "physical_attempt_histogram": {
+          "1": 407,
+          "2": 15
+        },
+        "recovery_signals_by_request": {
+          "rate_limited": 15,
+          "timeout": 9,
+          "websocket": 2
+        },
+        "latency_seconds": {
+          "total": 21121.13193938625,
+          "mean": 50.050075685749405,
+          "median": 47.43280240648892,
+          "p95_nearest_rank": 85.92432841192931,
+          "maximum": 125.76452232105657
+        },
+        "capture_counters": {
+          "logical_call_attempts": {
+            "total": 437,
+            "known_records": 422,
+            "total_records": 422
+          },
+          "completed_turns": {
+            "total": 422,
+            "known_records": 422,
+            "total_records": 422
+          },
+          "failed_calls": {
+            "total": 0,
+            "known_records": 422,
+            "total_records": 422
+          },
+          "input_tokens": {
+            "total": 4097240,
+            "known_records": 422,
+            "total_records": 422
+          },
+          "cached_input_tokens": {
+            "total": 2435456,
+            "known_records": 422,
+            "total_records": 422
+          },
+          "output_tokens": {
+            "total": 232681,
+            "known_records": 422,
+            "total_records": 422
+          },
+          "reasoning_output_tokens": {
+            "total": 204060,
+            "known_records": 422,
+            "total_records": 422
+          },
+          "call_latency_s": {
+            "total": 21121.13193938625,
+            "known_records": 422,
+            "total_records": 422
+          }
+        },
+        "limits": [
+          "Latency includes transport recovery/backoff and server wait.",
+          "Legacy logical_call_attempts counter counts physical CLI attempts; captured_logical_requests counts full captured request records.",
+          "Local metadata is not independent attestation of server model identity."
+        ]
+      },
+      "stage": {
+        "boundaries": 900,
+        "queries": 402,
+        "successful_queries": 402,
+        "query_errors": 0,
+        "guided_boundaries": 277,
+        "unguided_boundaries": 623,
+        "recorded_logical_attempts": {
+          "total": 427,
+          "observed_subtotal": 427,
+          "known_rows": 402,
+          "unknown_rows": 0
+        },
+        "recorded_completed_turns": {
+          "total": 412,
+          "observed_subtotal": 412,
+          "known_rows": 402,
+          "unknown_rows": 0
+        },
+        "recorded_failed_calls": {
+          "total": 0,
+          "observed_subtotal": 0,
+          "known_rows": 402,
+          "unknown_rows": 0
+        },
+        "query_latency_s": {
+          "total": 20695.75721657579,
+          "observed_subtotal": 20695.75721657579,
+          "known_rows": 402,
+          "unknown_rows": 0
+        }
+      },
+      "mechanism": {
+        "recorded_chunks": 277,
+        "guided_select_action_latency_s": {
+          "total": 726.658223939361,
+          "observed_subtotal": 726.658223939361,
+          "known_rows": 277,
+          "unknown_rows": 0
+        },
+        "score_call_count": {
+          "total": 3047,
+          "observed_subtotal": 3047,
+          "known_rows": 277,
+          "unknown_rows": 0
+        },
+        "search_evaluation_count": {
+          "total": 48752,
+          "observed_subtotal": 48752,
+          "known_rows": 277,
+          "unknown_rows": 0
+        },
+        "qd_evaluation_count": {
+          "total": 48752,
+          "observed_subtotal": 48752,
+          "known_rows": 277,
+          "unknown_rows": 0
+        },
+        "initial_diversity_steps": {
+          "total": 1108,
+          "observed_subtotal": 1108,
+          "known_rows": 277,
+          "unknown_rows": 0
+        },
+        "rollout_diversity_iters_applied": {
+          "total": 2770,
+          "observed_subtotal": 2770,
+          "known_rows": 277,
+          "unknown_rows": 0
+        },
+        "archive_enabled_chunks": 277,
+        "archive_active_chunks": 277,
+        "parent_sources": {
+          "qd_archive_offspring": 44320
+        },
+        "final_selection_sources": {
+          "qd_archive": 277
+        },
+        "final_coverage": {
+          "count": 277,
+          "minimum": 0.9375,
+          "maximum": 1.0,
+          "mean": 0.9959386281588448
+        }
+      },
+      "identical_complete_action_task_ids": [
+        1,
+        3,
+        6,
+        7,
+        8,
+        9
+      ],
+      "tasks": [
+        {
+          "task_id": 0,
+          "seed": 44,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1507
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/audit-details/task0-contract.json",
+            "sha256": "f6c067512dd7fad764c6635f2a942891dc6835862f32286151db544de62f82fa",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/output/episode_1/episode_1_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/output/episode_1/episode_1_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 1,
+          "seed": 235,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1894
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/audit-details/task1-contract.json",
+            "sha256": "5d6bc781f44140de25074197dca7abbf16592d5253b25c65279a19c1834d9f44",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/output/episode_2/episode_2_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/output/episode_2/episode_2_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 2,
+          "seed": 43,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1808
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/audit-details/task2-contract.json",
+            "sha256": "e6cb843a70d472ef8afcc26fd374c25312a451e19900097a184e5dd181527374",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/output/episode_3/episode_3_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/output/episode_3/episode_3_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 3,
+          "seed": 546,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1722
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/audit-details/task3-contract.json",
+            "sha256": "a464cb2b8ac2cbd14851a4c076258089faf3c3b8c9b78372c0049e4cd58a6c5b",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/output/episode_4/episode_4_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/output/episode_4/episode_4_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 4,
+          "seed": 6,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1851
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/audit-details/task4-contract.json",
+            "sha256": "355318047ad1080c1d1c0b3ba7cba4d2b3d98ef6461e05bada6ea0b7e708282a",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/output/episode_5/episode_5_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/output/episode_5/episode_5_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 5,
+          "seed": 621,
+          "accepted": true,
+          "low_success": true,
+          "ultra_success": false,
+          "low_action_count": 223,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1722
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/audit-details/task5-contract.json",
+            "sha256": "06ed85f851ec7f6d054135d1ff14c175a995ffe87923544f705a82d5c48afb03",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/output/episode_6/episode_6_success_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/output/episode_6/episode_6_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 6,
+          "seed": 197,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1894
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/audit-details/task6-contract.json",
+            "sha256": "26b400dc48d757cc6a6fcb62060a55154bc9a1eb05cfd98e7ffc1fa9b871925f",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/output/episode_7/episode_7_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/output/episode_7/episode_7_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 7,
+          "seed": 87,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1980
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/audit-details/task7-contract.json",
+            "sha256": "438e9e1a137383b0c1a1f5d2143b24f57795d3506dcc040e0ea1785e8fdb289e",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/output/episode_8/episode_8_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/output/episode_8/episode_8_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 8,
+          "seed": 151,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1894
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/audit-details/task8-contract.json",
+            "sha256": "44fde211c7aeccf43a2c6f9929ff66e71082f51a92d7e1a0e6d8b9c7f5175bc2",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/output/episode_9/episode_9_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/output/episode_9/episode_9_fail_agentview.mp4"
+          ]
+        },
+        {
+          "task_id": 9,
+          "seed": 548,
+          "accepted": true,
+          "low_success": false,
+          "ultra_success": false,
+          "low_action_count": 720,
+          "ultra_action_count": 720,
+          "contract_valid": true,
+          "contract_report": {
+            "valid": true,
+            "summary": {
+              "pass": 1894
+            },
+            "path": ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/audit-details/task9-contract.json",
+            "sha256": "d5861929fbc3b41088f80094a3f3cfd5e538966269e4b085e8e6f7e1bcb4ca63",
+            "hash_encoding": "file_bytes",
+            "written": true
+          },
+          "low_videos": [
+            ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/output/episode_10/episode_10_fail_agentview.mp4"
+          ],
+          "ultra_videos": [
+            ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/output/episode_10/episode_10_fail_agentview.mp4"
+          ]
+        }
+      ]
+    }
+  },
+  "attempt_ledger": {
+    "schema": "ultra_all_attempts_ledger_v1",
+    "at": "2026-10-14T13:49:03.636694+00:00",
+    "total_started": 66,
+    "primary_started": 30,
+    "cohorts": [
+      {
+        "run": ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-full10",
+        "method": "eds",
+        "commit": "6c83eb6a55fa6f92723e58a960d59ee4f606084e",
+        "state": "finished",
+        "started_tasks": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "started_count": 10,
+        "terminal_outcomes": {
+          "completed": 9,
+          "execution_error": 1
+        },
+        "interrupted_without_terminal_compute": [],
+        "successes_from_terminal_videos": 3,
+        "full_audit_valid": false,
+        "primary": false,
+        "manifest_sha256": "aff6fa669ed23fb992fd0ad488dea07d0e8a39e7df9132f924bb97fa5218b512"
+      },
+      {
+        "run": ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-full10-retest-01",
+        "method": "eds",
+        "commit": "6c83eb6a55fa6f92723e58a960d59ee4f606084e",
+        "state": "interrupted",
+        "started_tasks": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "started_count": 5,
+        "terminal_outcomes": {
+          "completed": 3,
+          "execution_error": 1
+        },
+        "interrupted_without_terminal_compute": [
+          4
+        ],
+        "successes_from_terminal_videos": 1,
+        "full_audit_valid": null,
+        "primary": false,
+        "manifest_sha256": "072ebc939b7993837b43707ad5843aa23762971f1c71a664c99481ef5f7e9e2e"
+      },
+      {
+        "run": ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01",
+        "method": "eds",
+        "commit": "c99565de6e34278c14518748d7c608433a4c529a",
+        "state": "finished",
+        "started_tasks": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "started_count": 10,
+        "terminal_outcomes": {
+          "completed": 10
+        },
+        "interrupted_without_terminal_compute": [],
+        "successes_from_terminal_videos": 3,
+        "full_audit_valid": true,
+        "primary": true,
+        "manifest_sha256": "021e43b7735ce02347489f17c5d38eafdc1a5bea7658cfd040c15f9dc08af65f"
+      },
+      {
+        "run": ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-full10",
+        "method": "eds_qd",
+        "commit": "6c83eb6a55fa6f92723e58a960d59ee4f606084e",
+        "state": "finished",
+        "started_tasks": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "started_count": 10,
+        "terminal_outcomes": {
+          "completed": 9,
+          "execution_error": 1
+        },
+        "interrupted_without_terminal_compute": [],
+        "successes_from_terminal_videos": 1,
+        "full_audit_valid": false,
+        "primary": false,
+        "manifest_sha256": "05954009389ec68a6b68f348ae64de805392ace0132e824e2324204f6eeff13e"
+      },
+      {
+        "run": ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-full10-retest-01",
+        "method": "eds_qd",
+        "commit": "6c83eb6a55fa6f92723e58a960d59ee4f606084e",
+        "state": "interrupted",
+        "started_tasks": [
+          0
+        ],
+        "started_count": 1,
+        "terminal_outcomes": {},
+        "interrupted_without_terminal_compute": [
+          0
+        ],
+        "successes_from_terminal_videos": 0,
+        "full_audit_valid": null,
+        "primary": false,
+        "manifest_sha256": "9add62063b700ada4d400b225d612cd8b55e8bf9a82d5b7adbbd8f4d460ea5e8"
+      },
+      {
+        "run": ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01",
+        "method": "eds_qd",
+        "commit": "c99565de6e34278c14518748d7c608433a4c529a",
+        "state": "finished",
+        "started_tasks": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "started_count": 10,
+        "terminal_outcomes": {
+          "completed": 10
+        },
+        "interrupted_without_terminal_compute": [],
+        "successes_from_terminal_videos": 0,
+        "full_audit_valid": true,
+        "primary": true,
+        "manifest_sha256": "b1a5aa980ed2bf3c9e7f205f7b4115836fea919f7a56309bec0d5240cdb6ccbe"
+      },
+      {
+        "run": ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-full10",
+        "method": "vls",
+        "commit": "6c83eb6a55fa6f92723e58a960d59ee4f606084e",
+        "state": "finished",
+        "started_tasks": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "started_count": 10,
+        "terminal_outcomes": {
+          "completed": 10
+        },
+        "interrupted_without_terminal_compute": [],
+        "successes_from_terminal_videos": 2,
+        "full_audit_valid": true,
+        "primary": false,
+        "manifest_sha256": "eec38b303e9223ee6c424517051c15f8861bdc9f433e3e3a285700efac659ce6"
+      },
+      {
+        "run": ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01",
+        "method": "vls",
+        "commit": "c99565de6e34278c14518748d7c608433a4c529a",
+        "state": "finished",
+        "started_tasks": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "started_count": 10,
+        "terminal_outcomes": {
+          "completed": 10
+        },
+        "interrupted_without_terminal_compute": [],
+        "successes_from_terminal_videos": 1,
+        "full_audit_valid": true,
+        "primary": true,
+        "manifest_sha256": "a648ffa107361101875f69e65d7aefadbc6703973cf499b64f75872fe4871250"
+      }
+    ],
+    "note": "No pooled performance score across methods, protocols or retries. Initial VLS remains a separate valid cohort; both incomplete retests preserved."
+  },
+  "completed_task_diagnostics": {
+    "schema": "steering_completed_task_diagnostic_v1",
+    "at": "2026-10-14T11:39:45.717404+00:00",
+    "scope": "Only these normally completed task pairs. New full-cohort audits pending; original QD whole cohort invalid from a separate task9 error. Not a performance selection or acceptance gate.",
+    "limits": [
+      "Same raw image does not imply identical full prompt/history.",
+      "Different observations are not independently correctness-labelled.",
+      "Reward probe agreement is bounded empirical agreement."
+    ],
+    "cases": [
+      {
+        "method": "eds_qd",
+        "task": 5,
+        "comparison": "low",
+        "runs": [
+          ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013",
+          ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01"
+        ],
+        "successes": [
+          true,
+          false
+        ],
+        "action_lengths": [
+          223,
+          720
+        ],
+        "exact_action_prefix_rows": 88,
+        "first_action_difference": 88,
+        "same_image_categorical_changes_before_actions_diverge": [
+          {
+            "step": 16,
+            "same_raw_sha256": "2ae517b0cffaa6be79ca2faaa69d074c4048667600e55ea214d23099ba5bd893",
+            "before": {
+              "grasp": "not_held",
+              "support": "unknown",
+              "target_location": "outside_goal",
+              "target_visibility": "occluded"
+            },
+            "new": {
+              "grasp": "unknown",
+              "support": "unknown",
+              "target_location": "outside_goal",
+              "target_visibility": "occluded"
+            },
+            "before_control": {
+              "stage_after": 1,
+              "guidance_after": true,
+              "contact_phase": "approach",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "usable_reward",
+              "visual_hold": null,
+              "completion_confirmed": false
+            },
+            "new_control": {
+              "stage_after": 1,
+              "guidance_after": true,
+              "contact_phase": "approach",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "usable_reward",
+              "visual_hold": null,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 48,
+            "same_raw_sha256": "e848f7b6fffbfa65c7866257914e15845cfef072493f355f7134569c3a4384b2",
+            "before": {
+              "grasp": "not_held",
+              "support": "unknown",
+              "target_location": "outside_goal",
+              "target_visibility": "occluded"
+            },
+            "new": {
+              "grasp": "unknown",
+              "support": "unknown",
+              "target_location": "outside_goal",
+              "target_visibility": "occluded"
+            },
+            "before_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": null,
+              "completion_confirmed": false
+            },
+            "new_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": null,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 64,
+            "same_raw_sha256": "30152ce5f37b8300daffc22f299b3cedae9ca3537bc25d4c6f8a89d816ea4801",
+            "before": {
+              "grasp": "held",
+              "support": "unsupported",
+              "target_location": "outside_goal",
+              "target_visibility": "occluded"
+            },
+            "new": {
+              "grasp": "unknown",
+              "support": "unknown",
+              "target_location": "outside_goal",
+              "target_visibility": "occluded"
+            },
+            "before_control": {
+              "stage_after": 2,
+              "guidance_after": false,
+              "contact_phase": "transport_or_completion_check",
+              "stage_decision_reason": "visually_held_target",
+              "guidance_gate_reason": "constant_on_probes",
+              "visual_hold": true,
+              "completion_confirmed": false
+            },
+            "new_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": null,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 80,
+            "same_raw_sha256": "9c467a3fd27f8831cee58a507de52582818992569c5a7b984a8f6ec8f01cd522",
+            "before": {
+              "grasp": "held",
+              "support": "unsupported",
+              "target_location": "outside_goal",
+              "target_visibility": "clear"
+            },
+            "new": {
+              "grasp": "unknown",
+              "support": "unsupported",
+              "target_location": "outside_goal",
+              "target_visibility": "clear"
+            },
+            "before_control": {
+              "stage_after": 2,
+              "guidance_after": false,
+              "contact_phase": "transport_or_completion_check",
+              "stage_decision_reason": "visually_held_target",
+              "guidance_gate_reason": "constant_on_probes",
+              "visual_hold": true,
+              "completion_confirmed": false
+            },
+            "new_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": null,
+              "completion_confirmed": false
+            }
+          }
+        ],
+        "control_changes_before_actions_diverge": [
+          {
+            "step": 64,
+            "before": {
+              "stage_after": 2,
+              "guidance_after": false,
+              "contact_phase": "transport_or_completion_check",
+              "stage_decision_reason": "visually_held_target",
+              "guidance_gate_reason": "constant_on_probes",
+              "visual_hold": true,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": null,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 72,
+            "before": {
+              "stage_after": 2,
+              "guidance_after": false,
+              "contact_phase": "transport_or_completion_check",
+              "stage_decision_reason": "visually_held_target",
+              "guidance_gate_reason": "constant_on_probes",
+              "visual_hold": true,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": null,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 80,
+            "before": {
+              "stage_after": 2,
+              "guidance_after": false,
+              "contact_phase": "transport_or_completion_check",
+              "stage_decision_reason": "visually_held_target",
+              "guidance_gate_reason": "constant_on_probes",
+              "visual_hold": true,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": null,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 88,
+            "before": {
+              "stage_after": 2,
+              "guidance_after": false,
+              "contact_phase": "transport_or_completion_check",
+              "stage_decision_reason": "visually_held_target",
+              "guidance_gate_reason": "constant_on_probes",
+              "visual_hold": true,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 1,
+              "guidance_after": true,
+              "contact_phase": "approach",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "usable_reward",
+              "visual_hold": null,
+              "completion_confirmed": false
+            }
+          }
+        ],
+        "reward_probes": [
+          {
+            "valid": true,
+            "probe_count": 64,
+            "max_absolute_difference": 0.0
+          },
+          {
+            "valid": true,
+            "probe_count": 64,
+            "max_absolute_difference": 0.0
+          }
+        ],
+        "request_input_comparisons": [
+          {
+            "step": 64,
+            "response_paths": [
+              ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/output/captured_stage_inputs/request_0209/response.json",
+              ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/output/captured_stage_inputs/request_0204/response.json"
+            ],
+            "full_prompt_equal": false,
+            "all_images_equal": true
+          },
+          {
+            "step": 80,
+            "response_paths": [
+              ".worktrees/exp/steering-integration/runs/eds_qd-common-20261013/output/captured_stage_inputs/request_0210/response.json",
+              ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/output/captured_stage_inputs/request_0205/response.json"
+            ],
+            "full_prompt_equal": false,
+            "all_images_equal": true
+          }
+        ]
+      },
+      {
+        "method": "eds_qd",
+        "task": 5,
+        "comparison": "initial_ultra",
+        "runs": [
+          ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-full10",
+          ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01"
+        ],
+        "successes": [
+          true,
+          false
+        ],
+        "action_lengths": [
+          413,
+          720
+        ],
+        "exact_action_prefix_rows": 256,
+        "first_action_difference": 256,
+        "same_image_categorical_changes_before_actions_diverge": [
+          {
+            "step": 16,
+            "same_raw_sha256": "2ae517b0cffaa6be79ca2faaa69d074c4048667600e55ea214d23099ba5bd893",
+            "before": {
+              "grasp": "not_held",
+              "support": "unknown",
+              "target_location": "outside_goal",
+              "target_visibility": "occluded"
+            },
+            "new": {
+              "grasp": "unknown",
+              "support": "unknown",
+              "target_location": "outside_goal",
+              "target_visibility": "occluded"
+            },
+            "before_control": {
+              "stage_after": 1,
+              "guidance_after": true,
+              "contact_phase": "approach",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "usable_reward",
+              "visual_hold": null,
+              "completion_confirmed": false
+            },
+            "new_control": {
+              "stage_after": 1,
+              "guidance_after": true,
+              "contact_phase": "approach",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "usable_reward",
+              "visual_hold": null,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 112,
+            "same_raw_sha256": "f6a1b746ed6dbeb5bbcad8d888e21e6dc228a624a22b7368c3a4f2b12832c850",
+            "before": {
+              "grasp": "not_held",
+              "support": "supported",
+              "target_location": "outside_goal",
+              "target_visibility": "clear"
+            },
+            "new": {
+              "grasp": "not_held",
+              "support": "supported",
+              "target_location": "outside_goal",
+              "target_visibility": "occluded"
+            },
+            "before_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 144,
+            "same_raw_sha256": "9298d2964a59d22167bceaf11e44c6c761006b3f8d7c99d1042b43c98b250254",
+            "before": {
+              "grasp": "not_held",
+              "support": "supported",
+              "target_location": "outside_goal",
+              "target_visibility": "clear"
+            },
+            "new": {
+              "grasp": "not_held",
+              "support": "supported",
+              "target_location": "outside_goal",
+              "target_visibility": "occluded"
+            },
+            "before_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 160,
+            "same_raw_sha256": "d6896ad02deb2d6415fd3c577f1a7e3e587781ef6112215686f915c6186e58be",
+            "before": {
+              "grasp": "not_held",
+              "support": "supported",
+              "target_location": "outside_goal",
+              "target_visibility": "clear"
+            },
+            "new": {
+              "grasp": "not_held",
+              "support": "supported",
+              "target_location": "outside_goal",
+              "target_visibility": "occluded"
+            },
+            "before_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 192,
+            "same_raw_sha256": "86cd0a1e0d91bb59fc59270d3eed5afe9a9d9131bcb04c6a4ec4fd082ca9cddc",
+            "before": {
+              "grasp": "unknown",
+              "support": "unknown",
+              "target_location": "outside_goal",
+              "target_visibility": "clear"
+            },
+            "new": {
+              "grasp": "unknown",
+              "support": "unknown",
+              "target_location": "outside_goal",
+              "target_visibility": "occluded"
+            },
+            "before_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 256,
+            "same_raw_sha256": "23517aa5afe9455059416d547691b5e344cb807f3fb6e689624a3d1b0b169c13",
+            "before": {
+              "grasp": "unknown",
+              "support": "unknown",
+              "target_location": "outside_goal",
+              "target_visibility": "occluded"
+            },
+            "new": {
+              "grasp": "held",
+              "support": "unsupported",
+              "target_location": "outside_goal",
+              "target_visibility": "occluded"
+            },
+            "before_control": {
+              "stage_after": 1,
+              "guidance_after": true,
+              "contact_phase": "approach",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "usable_reward",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new_control": {
+              "stage_after": 2,
+              "guidance_after": false,
+              "contact_phase": "transport_or_completion_check",
+              "stage_decision_reason": "visually_held_target",
+              "guidance_gate_reason": "constant_on_probes",
+              "visual_hold": true,
+              "completion_confirmed": false
+            }
+          }
+        ],
+        "control_changes_before_actions_diverge": [
+          {
+            "step": 112,
+            "before": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 120,
+            "before": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 144,
+            "before": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 152,
+            "before": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 160,
+            "before": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 168,
+            "before": {
+              "stage_after": 1,
+              "guidance_after": true,
+              "contact_phase": "approach",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "usable_reward",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 1,
+              "guidance_after": true,
+              "contact_phase": "approach",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "usable_reward",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 256,
+            "before": {
+              "stage_after": 1,
+              "guidance_after": true,
+              "contact_phase": "approach",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "usable_reward",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 2,
+              "guidance_after": false,
+              "contact_phase": "transport_or_completion_check",
+              "stage_decision_reason": "visually_held_target",
+              "guidance_gate_reason": "constant_on_probes",
+              "visual_hold": true,
+              "completion_confirmed": false
+            }
+          }
+        ],
+        "reward_probes": [
+          {
+            "valid": true,
+            "probe_count": 64,
+            "max_absolute_difference": 0.0
+          },
+          {
+            "valid": true,
+            "probe_count": 64,
+            "max_absolute_difference": 0.0
+          }
+        ],
+        "request_input_comparisons": [
+          {
+            "step": 256,
+            "response_paths": [
+              ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-full10/output/captured_stage_inputs/request_0214/response.json",
+              ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/output/captured_stage_inputs/request_0216/response.json"
+            ],
+            "full_prompt_equal": false,
+            "all_images_equal": true
+          }
+        ]
+      },
+      {
+        "method": "vls",
+        "task": 6,
+        "comparison": "low",
+        "runs": [
+          ".worktrees/exp/steering-integration/runs/vls-common-20261013",
+          ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01"
+        ],
+        "successes": [
+          false,
+          false
+        ],
+        "action_lengths": [
+          720,
+          720
+        ],
+        "exact_action_prefix_rows": 720,
+        "first_action_difference": null,
+        "same_image_categorical_changes_before_actions_diverge": [
+          {
+            "step": 40,
+            "same_raw_sha256": "edc698507f539666712de45a5d5b1043a1d9022232aed59844093ae2b00ec2d7",
+            "before": {
+              "grasp": "not_held",
+              "support": "supported",
+              "target_location": "outside_goal",
+              "target_visibility": "clear"
+            },
+            "new": {
+              "grasp": "unknown",
+              "support": "unknown",
+              "target_location": "outside_goal",
+              "target_visibility": "occluded"
+            },
+            "before_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 104,
+            "same_raw_sha256": "6bb84636b369950bcfa67738cd7851e131cc1e5aed7ec38149f6b4ba00723380",
+            "before": {
+              "grasp": "not_held",
+              "support": "supported",
+              "target_location": "outside_goal",
+              "target_visibility": "clear"
+            },
+            "new": {
+              "grasp": "unknown",
+              "support": "unknown",
+              "target_location": "outside_goal",
+              "target_visibility": "clear"
+            },
+            "before_control": {
+              "stage_after": 1,
+              "guidance_after": true,
+              "contact_phase": "approach",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "usable_reward",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new_control": {
+              "stage_after": 1,
+              "guidance_after": true,
+              "contact_phase": "approach",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "usable_reward",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 152,
+            "same_raw_sha256": "5adb6eef5fc4739823210c006c985fdeb260219cb79bf4d60347e59cf7689899",
+            "before": {
+              "grasp": "not_held",
+              "support": "supported",
+              "target_location": "outside_goal",
+              "target_visibility": "clear"
+            },
+            "new": {
+              "grasp": "unknown",
+              "support": "unknown",
+              "target_location": "outside_goal",
+              "target_visibility": "clear"
+            },
+            "before_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 312,
+            "same_raw_sha256": "3b0930ff4b767b71704d96b4f09d95d99140c41cc84e4dc4ef6160c2dbf9acca",
+            "before": {
+              "grasp": "unknown",
+              "support": "unknown",
+              "target_location": "above_goal",
+              "target_visibility": "occluded"
+            },
+            "new": {
+              "grasp": "unknown",
+              "support": "unsupported",
+              "target_location": "above_goal",
+              "target_visibility": "occluded"
+            },
+            "before_control": {
+              "stage_after": 2,
+              "guidance_after": false,
+              "contact_phase": "transport_or_completion_check",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "constant_on_probes",
+              "visual_hold": true,
+              "completion_confirmed": false
+            },
+            "new_control": {
+              "stage_after": 2,
+              "guidance_after": false,
+              "contact_phase": "transport_or_completion_check",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "constant_on_probes",
+              "visual_hold": true,
+              "completion_confirmed": false
+            }
+          }
+        ],
+        "control_changes_before_actions_diverge": [
+          {
+            "step": 40,
+            "before": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 48,
+            "before": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 104,
+            "before": {
+              "stage_after": 1,
+              "guidance_after": true,
+              "contact_phase": "approach",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "usable_reward",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 1,
+              "guidance_after": true,
+              "contact_phase": "approach",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "usable_reward",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 112,
+            "before": {
+              "stage_after": 1,
+              "guidance_after": true,
+              "contact_phase": "approach",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "usable_reward",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 1,
+              "guidance_after": true,
+              "contact_phase": "approach",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "usable_reward",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 152,
+            "before": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 160,
+            "before": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          }
+        ],
+        "reward_probes": [
+          {
+            "valid": true,
+            "probe_count": 64,
+            "max_absolute_difference": 0.0
+          },
+          {
+            "valid": true,
+            "probe_count": 64,
+            "max_absolute_difference": 0.0
+          }
+        ],
+        "request_input_comparisons": []
+      },
+      {
+        "method": "vls",
+        "task": 6,
+        "comparison": "initial_ultra",
+        "runs": [
+          ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-full10",
+          ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01"
+        ],
+        "successes": [
+          true,
+          false
+        ],
+        "action_lengths": [
+          335,
+          720
+        ],
+        "exact_action_prefix_rows": 296,
+        "first_action_difference": 296,
+        "same_image_categorical_changes_before_actions_diverge": [
+          {
+            "step": 40,
+            "same_raw_sha256": "edc698507f539666712de45a5d5b1043a1d9022232aed59844093ae2b00ec2d7",
+            "before": {
+              "grasp": "unknown",
+              "support": "supported",
+              "target_location": "outside_goal",
+              "target_visibility": "clear"
+            },
+            "new": {
+              "grasp": "unknown",
+              "support": "unknown",
+              "target_location": "outside_goal",
+              "target_visibility": "occluded"
+            },
+            "before_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 152,
+            "same_raw_sha256": "5adb6eef5fc4739823210c006c985fdeb260219cb79bf4d60347e59cf7689899",
+            "before": {
+              "grasp": "not_held",
+              "support": "supported",
+              "target_location": "outside_goal",
+              "target_visibility": "clear"
+            },
+            "new": {
+              "grasp": "unknown",
+              "support": "unknown",
+              "target_location": "outside_goal",
+              "target_visibility": "clear"
+            },
+            "before_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 200,
+            "same_raw_sha256": "523c7304806c9b17ad615fd3a9d7de0ce5a5b3381615e52c0fe9ae6fa46b2220",
+            "before": {
+              "grasp": "not_held",
+              "support": "supported",
+              "target_location": "outside_goal",
+              "target_visibility": "clear"
+            },
+            "new": {
+              "grasp": "unknown",
+              "support": "unknown",
+              "target_location": "outside_goal",
+              "target_visibility": "occluded"
+            },
+            "before_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 280,
+            "same_raw_sha256": "8ef26b962806068d4c387ad67a35eafebf934f5f319c0821cc93c3770dca3dd8",
+            "before": {
+              "grasp": "unknown",
+              "support": "unknown",
+              "target_location": "outside_goal",
+              "target_visibility": "occluded"
+            },
+            "new": {
+              "grasp": "held",
+              "support": "unsupported",
+              "target_location": "outside_goal",
+              "target_visibility": "occluded"
+            },
+            "before_control": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new_control": {
+              "stage_after": 2,
+              "guidance_after": false,
+              "contact_phase": "transport_or_completion_check",
+              "stage_decision_reason": "visually_held_target",
+              "guidance_gate_reason": "constant_on_probes",
+              "visual_hold": true,
+              "completion_confirmed": false
+            }
+          }
+        ],
+        "control_changes_before_actions_diverge": [
+          {
+            "step": 152,
+            "before": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 160,
+            "before": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 200,
+            "before": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 208,
+            "before": {
+              "stage_after": 1,
+              "guidance_after": true,
+              "contact_phase": "approach",
+              "stage_decision_reason": "target_outside_goal_reacquire",
+              "guidance_gate_reason": "usable_reward",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 1,
+              "guidance_after": true,
+              "contact_phase": "approach",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "usable_reward",
+              "visual_hold": false,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 280,
+            "before": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 2,
+              "guidance_after": false,
+              "contact_phase": "transport_or_completion_check",
+              "stage_decision_reason": "visually_held_target",
+              "guidance_gate_reason": "constant_on_probes",
+              "visual_hold": true,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 288,
+            "before": {
+              "stage_after": 1,
+              "guidance_after": false,
+              "contact_phase": "contact_grace",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "controller_hold",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 2,
+              "guidance_after": false,
+              "contact_phase": "transport_or_completion_check",
+              "stage_decision_reason": "visually_held_target",
+              "guidance_gate_reason": "constant_on_probes",
+              "visual_hold": true,
+              "completion_confirmed": false
+            }
+          },
+          {
+            "step": 296,
+            "before": {
+              "stage_after": 1,
+              "guidance_after": true,
+              "contact_phase": "approach",
+              "stage_decision_reason": "uncertain_preserve_nonterminal_stage",
+              "guidance_gate_reason": "usable_reward",
+              "visual_hold": false,
+              "completion_confirmed": false
+            },
+            "new": {
+              "stage_after": 2,
+              "guidance_after": false,
+              "contact_phase": "transport_or_completion_check",
+              "stage_decision_reason": "visually_held_target",
+              "guidance_gate_reason": "constant_on_probes",
+              "visual_hold": true,
+              "completion_confirmed": false
+            }
+          }
+        ],
+        "reward_probes": [
+          {
+            "valid": true,
+            "probe_count": 64,
+            "max_absolute_difference": 0.0
+          },
+          {
+            "valid": true,
+            "probe_count": 64,
+            "max_absolute_difference": 0.0
+          }
+        ],
+        "request_input_comparisons": [
+          {
+            "step": 280,
+            "response_paths": [
+              ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-full10/output/captured_stage_inputs/request_0237/response.json",
+              ".worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01/output/captured_stage_inputs/request_0230/response.json"
+            ],
+            "full_prompt_equal": false,
+            "all_images_equal": true
+          }
+        ]
+      }
+    ]
+  }
+}
