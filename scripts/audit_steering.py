@@ -34,6 +34,23 @@ def json_digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()).hexdigest()
 
 
+def provider_manifest_matches_config(manifest, config):
+    """Bind both online clients to the recorded low/ultra comparison condition.
+
+    The frozen source YAML is checked independently by fixed_protocol_config;
+    auditing an older low cohort never depends on today's default effort.
+    """
+    effort = manifest.get('reasoning_effort')
+    return (manifest.get('provider') == 'codex_cli'
+            and manifest.get('model') == 'gpt-6-astra'
+            and effort in ('low', 'ultra')
+            and manifest.get('online_stage') is True and manifest.get('fresh_reward') is True
+            and all(config['perception'][role].get('backend') == 'codex_cli'
+                    and config['perception'][role].get('model') == 'gpt-6-astra'
+                    and config['perception'][role].get('reasoning_effort') == effort
+                    for role in ('gemini', 'vlm_agent')))
+
+
 def protocol_config(folder, manifest, actual):
     """Rebuild the effective profile from frozen YAML, without executing source code."""
     expected = yaml.safe_load((folder / 'source/configs/evaluation/libero_object_swap.yaml').read_bytes())
@@ -378,8 +395,7 @@ def audit(folder, *, exit_code=None, output_path=None, write=True, archive_suppo
                 'scripts/steering_assets_manifest.json','scripts/prepare_steering_assets.py','core/episode_rng_hooks.py','core/rdt_policy_steer.py','core/qd_ed.py','core/fkd_class.py')
             check('protocol_sources_frozen',all(p in manifest.get('source_sha256',{}) for p in required_sources))
             check('fixed_protocol_config', lambda: config==protocol_config(folder,manifest,config))
-            check('provider_manifest', manifest.get('provider')=='codex_cli' and manifest.get('model')=='gpt-6-astra'
-                  and manifest.get('reasoning_effort')=='low' and manifest.get('online_stage') is True and manifest.get('fresh_reward') is True)
+            check('provider_manifest', lambda: provider_manifest_matches_config(manifest, config))
             try: checks.update(asset_checks(folder,manifest,config))
             except Exception as exc: checks['asset_evidence_structure']=False;errors['asset_evidence_structure']=type(exc).__name__
             check('extended_task_contracts', all(r['extended_contract']['valid'] for r in task_rows))

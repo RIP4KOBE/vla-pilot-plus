@@ -11,7 +11,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from scripts.steering_runtime import atomic_json, load_local, runtime_environment, utc
+from scripts.steering_runtime import atomic_json, load_config, load_local, runtime_environment, utc
 
 
 def main():
@@ -47,11 +47,13 @@ def main():
             stream = io.BytesIO()
             Image.new('RGB', (96, 96), (255, 0, 0)).save(stream, format='PNG')
             uri = 'data:image/png;base64,' + base64.b64encode(stream.getvalue()).decode()
-            transport = CodexVisionTransport(dict(
-                backend='codex_cli', model='gpt-6-astra', reasoning_effort='low',
-                timeout_seconds=180, transport_retry_count=1,
-                event_policy='completed_transport_cycles_v6',
-                capture_dir=str(destination / 'api_requests')))
+            # Probe the same Stage service configuration the cohort will use.
+            stage_config = load_config(local, method='eds', output_dir=destination / 'output')['perception']['gemini']
+            transport_config = {key: stage_config[key] for key in
+                ('backend', 'model', 'reasoning_effort', 'timeout_seconds',
+                 'transport_retry_count', 'event_policy', 'cli_path', 'disabled_skill_paths')}
+            transport_config['capture_dir'] = str(destination / 'api_requests')
+            transport = CodexVisionTransport(transport_config)
             answer = transport._request_stage_response([
                 {'type': 'text', 'text': 'Identify the solid color in the image. Reply only with the color name in lowercase.'},
                 {'type': 'image_url', 'image_url': {'url': uri}}])
