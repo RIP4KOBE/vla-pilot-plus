@@ -2,6 +2,8 @@
 
 在共享的机器人观测、在线视觉 Stage 控制器和执行链上，比较 **VLS、EDS、EDS+QD** 三种推理方法。当前验收范围是 **RDT + LIBERO ObjectSwap OOD**。每任务在线生成 reward 程序，候选评分与梯度在本地 Torch 中计算；在线服务还承担身份描述和执行过程中的视觉 Stage 查询。
 
+2026-10-14：main 的公共评测配置已将 Codex 推理强度从 `low` 改为 `ultra`，用于三模式各十任务的[推理强度对照实验](docs/steering/reasoning-effort-comparison.md)。以下已验收成绩来自此前的 `low` 条件；不能用它们代表尚未完成的 `ultra` 测试。
+
 三种方法已完成同一冻结版本的十任务在线验收：**EDS 3/10、VLS 1/10、EDS+QD 1/10**，30个任务均有效、零基础设施错误，30份完整视频通过解码检查。本轮整合门槛（三组有效且EDS≥3/10）已通过；发布基础设施更新在原环境与独立安装环境均通过 **1436项CPU测试**。已合入本地 main，尚未推送远端。[逐任务结果与限制](docs/steering/results.md) · [验收状态](docs/steering/integration-status.md)。
 
 这是每任务一个固定seed的ObjectSwap OOD比较，默认方法预算不同。EDS是本轮观测成功数最高的方法；结果不支持统计优越性、等计算预算或泛化结论。此前迁移版EDS的3/10单独保留。
@@ -39,7 +41,7 @@ python scripts/evaluate_steering.py --method eds --local-config configs/local.ya
 python scripts/audit_steering.py outputs/eds-full10-001 --no-write
 ```
 
-可选单任务诊断使用 `scripts/run_steering.py --tasks 0`，保存独立目录和报告。机器配置决定 GPU/EGL 对应关系，shell 的 CUDA 编号不会覆盖它。在线配置固定为 **Codex CLI / gpt-6-astra / low**，使用自己的有效登录。目录存在时换新 run ID，运行期间保持源码、配置、提示词和资产不变。
+可选单任务诊断使用 `scripts/run_steering.py --tasks 0`，保存独立目录和报告。机器配置决定 GPU/EGL 对应关系，shell 的 CUDA 编号不会覆盖它。当前在线配置为 **Codex CLI / gpt-6-astra / ultra**，使用自己的有效登录。目录存在时换新 run ID，运行期间保持源码、配置、提示词和资产不变。
 
 ## 结果与协作
 

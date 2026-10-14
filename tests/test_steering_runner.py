@@ -76,7 +76,8 @@ def test_modes_share_online_contract_and_route_mechanism(tmp_path, method):
     assert cfg['main']['cached_functions_dir'] is None
     assert cfg['perception']['gemini']['backend'] == 'codex_cli'
     assert cfg['perception']['gemini']['model'] == 'gpt-6-astra'
-    assert cfg['perception']['gemini']['reasoning_effort'] == 'low'
+    assert cfg['perception']['gemini']['reasoning_effort'] == 'ultra'
+    assert cfg['perception']['vlm_agent']['reasoning_effort'] == 'ultra'
     assert cfg['main']['episode_seed_schedule'] == [235, 548]
     assert cfg['main']['eds_eval']['job_id'] == tmp_path.name
     assert cfg['main']['eds_eval']['method_label'] == method
@@ -341,7 +342,7 @@ def prepare_v2_cohort(cohort, monkeypatch, method='eds'):
         evaluation_directory='output/evaluation',code_root=str(ROOT),source_sha256=source,
         local_config_sha256=steering_runtime.digest(folder/'local-config.yaml'),physical_gpu=2,egl_device_id=1,
         config_sha256=steering_runtime.digest(cfgpath),environment_sha256=steering_runtime.digest(folder/'environment.json'),
-        provider='codex_cli',model='gpt-6-astra',reasoning_effort='low',online_stage=True,fresh_reward=True)
+        provider='codex_cli',model='gpt-6-astra',reasoning_effort=cfg['perception']['gemini']['reasoning_effort'],online_stage=True,fresh_reward=True)
     write_json(folder/'manifest.json',manifest)
     if method=='eds':
         m=json.loads((ROOT/'tests/fixtures/steering_qd/eds-control-firstchunk.json').read_text())
@@ -403,6 +404,36 @@ def test_legacy_scope_and_read_only_audit_preserve_old_result(cohort):
     assert old.read_bytes()==b'immutable old acceptance\n'
     alternate=folder/'recheck.json';audit_steering.audit(folder,output_path=alternate)
     assert alternate.exists() and old.read_bytes()==b'immutable old acceptance\n'
+
+
+@pytest.mark.parametrize('case', ['ultra', 'historical_low', 'manifest_mismatch',
+                                  'reward_mismatch', 'stage_mismatch', 'unsupported'])
+def test_v2_reasoning_effort_bound_to_both_clients_and_frozen_protocol(cohort, monkeypatch, case):
+    folder, _, cfg = prepare_v2_cohort(cohort, monkeypatch)
+    manifest = json.loads((folder/'manifest.json').read_text())
+    frozen_path = folder/'source/configs/evaluation/libero_object_swap.yaml'
+    frozen = yaml.safe_load(frozen_path.read_text())
+    if case in ('historical_low', 'unsupported'):
+        effort = 'low' if case == 'historical_low' else 'unapproved_effort'
+        for role in ('gemini', 'vlm_agent'):
+            cfg['perception'][role]['reasoning_effort'] = effort
+            frozen['perception'][role]['reasoning_effort'] = effort
+        manifest['reasoning_effort'] = effort
+    elif case == 'manifest_mismatch':
+        manifest['reasoning_effort'] = 'low'
+    elif case in ('reward_mismatch', 'stage_mismatch'):
+        role = 'vlm_agent' if case == 'reward_mismatch' else 'gemini'
+        cfg['perception'][role]['reasoning_effort'] = 'low'
+        frozen['perception'][role]['reasoning_effort'] = 'low'
+    frozen_path.write_text(yaml.safe_dump(frozen))
+    manifest['source_sha256'][str(frozen_path.relative_to(folder/'source'))] = steering_runtime.digest(frozen_path)
+    config_path = folder/'resolved-config.yaml'; config_path.write_text(yaml.safe_dump(cfg))
+    manifest['config_sha256'] = steering_runtime.digest(config_path)
+    write_json(folder/'manifest.json', manifest)
+    result = audit_steering.audit(folder, write=False)
+    assert result['checks']['fixed_protocol_config']
+    assert result['checks']['provider_manifest'] == (case in ('ultra', 'historical_low'))
+    assert result['valid'] == (case in ('ultra', 'historical_low'))
 
 
 @pytest.mark.parametrize('case',['missing_metric','duplicate_metric','extra_metric','wrong_seed','wrong_task','corrupt_chunk','bad_json','missing_new_directory','bad_identity_shape','bad_method_label','bad_job','sampler_fallback'])
