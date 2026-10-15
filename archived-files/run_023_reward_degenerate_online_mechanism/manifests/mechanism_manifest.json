@@ -1,0 +1,381 @@
+{
+  "allowed_gpu_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "checkpoint_fingerprint": {
+    "aggregate_sha256": "a2026bcf4e6f587f4c2492ad9d20fb74e9cdfbe03582e6463f9e38e0d8956c28",
+    "files": [
+      {
+        "path": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object/ema/model.safetensors",
+        "sha256": "b4e3631db326689297cd2f0b02d32ade9dc6ee9ae09c03171add64b80e86aaa1",
+        "size_bytes": 2456705456
+      },
+      {
+        "path": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object/config.json",
+        "sha256": "3482cc79b3268ccfca9d8cc9b8e32f3925dc71c3bd60f5e6dfcaa564aecde835",
+        "size_bytes": 919
+      },
+      {
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/configs/policy.yaml",
+        "sha256": "44a1164f421121edafc47e9880eb0ad97be98732669365f931e0b226bc831cf6",
+        "size_bytes": 1487
+      }
+    ],
+    "pretrained_path": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object",
+    "weight_variant": "ema"
+  },
+  "created_at": "2026-08-12T03:41:06.913820+00:00",
+  "credential_material_present": false,
+  "expected_global_attempt_ids": [
+    55,
+    56,
+    57,
+    58,
+    59,
+    60
+  ],
+  "formal_authorized": false,
+  "global_gpu_hour_cap": 48.0,
+  "global_reservation_cap": 143,
+  "gpu_reference": {
+    "path": "/mnt/data/shared2/zhuoli/output/p2_direction_normalized_rbf/manifests/gpu_reference_peak.json",
+    "reference_peak_vram_mib": 17921.0,
+    "required_free_vram_mib": 22401.25,
+    "sha256": "d49ea817be0f723c6bed15af8b28ef82c24ba31c81ad610ce2f1fff3406dfff1"
+  },
+  "libero_input_fingerprint": {
+    "aggregate_sha256": "259c469e41d062e722e30a6474c4a6918ec93e9c48675f6003eec49ad3b638b8",
+    "files": [
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_alphabet_soup_and_place_it_in_the_basket.bddl",
+        "sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+        "size_bytes": 2123
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_bbq_sauce_and_place_it_in_the_basket.bddl",
+        "sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+        "size_bytes": 2144
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_butter_and_place_it_in_the_basket.bddl",
+        "sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+        "size_bytes": 2108
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_chocolate_pudding_and_place_it_in_the_basket.bddl",
+        "sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+        "size_bytes": 2168
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_cream_cheese_and_place_it_in_the_basket.bddl",
+        "sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+        "size_bytes": 2114
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_ketchup_and_place_it_in_the_basket.bddl",
+        "sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+        "size_bytes": 2099
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_milk_and_place_it_in_the_basket.bddl",
+        "sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+        "size_bytes": 2102
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_orange_juice_and_place_it_in_the_basket.bddl",
+        "sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+        "size_bytes": 2132
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_salad_dressing_and_place_it_in_the_basket.bddl",
+        "sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+        "size_bytes": 2129
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_tomato_sauce_and_place_it_in_the_basket.bddl",
+        "sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+        "size_bytes": 2117
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_alphabet_soup_and_place_it_in_the_basket.pruned_init",
+        "sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+        "size_bytes": 4133
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_bbq_sauce_and_place_it_in_the_basket.pruned_init",
+        "sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+        "size_bytes": 3391
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_butter_and_place_it_in_the_basket.pruned_init",
+        "sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+        "size_bytes": 3390
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_chocolate_pudding_and_place_it_in_the_basket.pruned_init",
+        "sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+        "size_bytes": 2590
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_cream_cheese_and_place_it_in_the_basket.pruned_init",
+        "sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+        "size_bytes": 4191
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_ketchup_and_place_it_in_the_basket.pruned_init",
+        "sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+        "size_bytes": 4123
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_milk_and_place_it_in_the_basket.pruned_init",
+        "sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+        "size_bytes": 4185
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_orange_juice_and_place_it_in_the_basket.pruned_init",
+        "sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+        "size_bytes": 3361
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_salad_dressing_and_place_it_in_the_basket.pruned_init",
+        "sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+        "size_bytes": 3374
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_tomato_sauce_and_place_it_in_the_basket.pruned_init",
+        "sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+        "size_bytes": 4145
+      }
+    ],
+    "suite": "libero_object_swap"
+  },
+  "max_episode_steps": 720,
+  "mechanism": {
+    "jobs": [
+      {
+        "command_sha256": "0bd9814de70e9cc2e24b52a5e20a90506d3390c694d429d79b966ae9804abb79",
+        "config_fingerprint": "f21f6ac6703320ae369ccf4edd147aca96a69a34ce87a2ee38e5d5f7ec312aa9",
+        "formal_label": "p2_stage_on_abs_rbf_control",
+        "job_id": "eds_qd_autoresearch_v2_mechanism_libero_object_swap_mechanism__p2_stage_on_abs_rbf_control"
+      },
+      {
+        "command_sha256": "57cc0517052996a64cc2d53027602e8035f0b2b1b68dc57b33065ca5badd6fa4",
+        "config_fingerprint": "862b0d9532e5b31ec55ea74fd97b466b89256e334e85ac2b126a209efefc2d9c",
+        "formal_label": "eds_qd_reward_degenerate_control_fallback_v1",
+        "job_id": "eds_qd_autoresearch_v2_mechanism_libero_object_swap_mechanism__eds_qd_reward_degenerate_control_fallback_v1"
+      }
+    ],
+    "max_chunks": 16,
+    "profiles": [
+      "p2_stage_on_abs_rbf_control",
+      "eds_qd_reward_degenerate_control_fallback_v1"
+    ],
+    "seeds": [
+      932032,
+      615132,
+      718536
+    ],
+    "tasks": [
+      2,
+      3,
+      9
+    ],
+    "unique_cells": 6
+  },
+  "payload_sha256": "944047076b4347e582f9dd442e685c7b820f358e78dd0a9631fca01d700066c3",
+  "prior_global_reservations": 54,
+  "prior_gpu_hours": 2.934766777777778,
+  "profiles": [
+    {
+      "adaptive_early_stop_patience": 2,
+      "adaptive_min_cem_iters": 4,
+      "adaptive_reward_improvement_eps": 0.001,
+      "cem_iters": 10,
+      "chunk_memory_fraction": 0.0,
+      "chunk_memory_renoise_steps": 2,
+      "chunk_memory_reward_guard_quantile": 0.25,
+      "chunk_population_mode": "fresh",
+      "elite_carryover_count": 0,
+      "execution_contact_distance": 0.04,
+      "execution_horizon_contact": 2,
+      "execution_horizon_far": 8,
+      "execution_horizon_mode": "fixed",
+      "execution_horizon_near": 4,
+      "execution_near_distance": 0.08,
+      "gemini_grounding_enabled": false,
+      "initial_diversity_descriptor_mode": "absolute_eef",
+      "initial_diversity_scale": 20.0,
+      "initial_diversity_start_ratio": 0.8,
+      "initial_sampling_mode": "rbf_diverse_denoise",
+      "label": "p2_stage_on_abs_rbf_control",
+      "max_episode_steps": 720,
+      "method": "p2_stage_on_abs_rbf_control",
+      "num_elites": 16,
+      "p2_joblib_multiprocessing": false,
+      "parent_anchor_count": 0,
+      "parent_anchor_reward_quantile": 0.5,
+      "parent_coverage_mode": "none",
+      "parent_weighting_mode": "legacy_temperature",
+      "population_size": 16,
+      "profile_fingerprint": "f21f6ac6703320ae369ccf4edd147aca96a69a34ce87a2ee38e5d5f7ec312aa9",
+      "qd_archive_mode": "none",
+      "qd_bounds_expand_fraction": 0.1,
+      "qd_bounds_quantiles": [
+        0.05,
+        0.95
+      ],
+      "qd_bounds_update_policy": "fixed_initial",
+      "qd_cell_capacity": 1,
+      "qd_degenerate_fallback_policy": "none",
+      "qd_descriptor": "target_relative_endpoint_xy",
+      "qd_grid_shape": [
+        4,
+        4
+      ],
+      "qd_metrics_observer": true,
+      "qd_min_axis_span_m": 0.08,
+      "qd_overflow_policy": "clamp_edge",
+      "qd_parent_sampling": "sparse_priority",
+      "qd_sparse_exponent": 1.0,
+      "qd_tie_break": "stable_fingerprint",
+      "renoise_t_max": 3,
+      "renoise_t_min": 1,
+      "reward_mode": "normal",
+      "role": "control",
+      "rollout_diversity_band_ratio": 0.2,
+      "rollout_diversity_control_mode": "fixed",
+      "rollout_diversity_decay_floor": 0.25,
+      "rollout_diversity_descriptor_mode": "absolute_eef",
+      "rollout_diversity_iters": "all",
+      "rollout_diversity_scale": 20.0,
+      "rollout_diversity_scale_max": 20.0,
+      "rollout_diversity_scale_min": 0.0,
+      "rollout_diversity_skip_final_steps": 0,
+      "rollout_diversity_start_ratio": 0.6,
+      "rollout_diversity_target_ratio": 1.0,
+      "save_mechanism_trace_to_qualitative": true,
+      "search_schedule_mode": "legacy_linear",
+      "seed": 0,
+      "selection_beta_max": 100.0,
+      "selection_bisection_steps": 24,
+      "selection_ess_target_ratio": 0.6,
+      "stage_recognition_enabled": true,
+      "temperature": 0.1,
+      "truncated_rollout_mode": "rbf_diverse",
+      "use_cem": false
+    },
+    {
+      "adaptive_early_stop_patience": 2,
+      "adaptive_min_cem_iters": 4,
+      "adaptive_reward_improvement_eps": 0.001,
+      "cem_iters": 10,
+      "chunk_memory_fraction": 0.0,
+      "chunk_memory_renoise_steps": 2,
+      "chunk_memory_reward_guard_quantile": 0.25,
+      "chunk_population_mode": "fresh",
+      "elite_carryover_count": 0,
+      "execution_contact_distance": 0.04,
+      "execution_horizon_contact": 2,
+      "execution_horizon_far": 8,
+      "execution_horizon_mode": "fixed",
+      "execution_horizon_near": 4,
+      "execution_near_distance": 0.08,
+      "gemini_grounding_enabled": false,
+      "initial_diversity_descriptor_mode": "absolute_eef",
+      "initial_diversity_scale": 20.0,
+      "initial_diversity_start_ratio": 0.8,
+      "initial_sampling_mode": "rbf_diverse_denoise",
+      "label": "eds_qd_reward_degenerate_control_fallback_v1",
+      "max_episode_steps": 720,
+      "method": "eds_qd_reward_degenerate_control_fallback_v1",
+      "num_elites": 16,
+      "p2_joblib_multiprocessing": false,
+      "parent_anchor_count": 0,
+      "parent_anchor_reward_quantile": 0.5,
+      "parent_coverage_mode": "none",
+      "parent_weighting_mode": "legacy_temperature",
+      "population_size": 16,
+      "profile_fingerprint": "862b0d9532e5b31ec55ea74fd97b466b89256e334e85ac2b126a209efefc2d9c",
+      "qd_archive_mode": "grid_archive",
+      "qd_bounds_expand_fraction": 0.1,
+      "qd_bounds_quantiles": [
+        0.05,
+        0.95
+      ],
+      "qd_bounds_update_policy": "causal_envelope_v1",
+      "qd_cell_capacity": 1,
+      "qd_degenerate_fallback_policy": "control_v1",
+      "qd_descriptor": "target_relative_endpoint_xy",
+      "qd_grid_shape": [
+        4,
+        4
+      ],
+      "qd_metrics_observer": true,
+      "qd_min_axis_span_m": 0.08,
+      "qd_overflow_policy": "clamp_edge",
+      "qd_parent_sampling": "sparse_priority",
+      "qd_sparse_exponent": 1.0,
+      "qd_tie_break": "stable_fingerprint",
+      "renoise_t_max": 3,
+      "renoise_t_min": 1,
+      "reward_mode": "normal",
+      "role": "candidate",
+      "rollout_diversity_band_ratio": 0.2,
+      "rollout_diversity_control_mode": "fixed",
+      "rollout_diversity_decay_floor": 0.25,
+      "rollout_diversity_descriptor_mode": "absolute_eef",
+      "rollout_diversity_iters": "all",
+      "rollout_diversity_scale": 20.0,
+      "rollout_diversity_scale_max": 20.0,
+      "rollout_diversity_scale_min": 0.0,
+      "rollout_diversity_skip_final_steps": 0,
+      "rollout_diversity_start_ratio": 0.6,
+      "rollout_diversity_target_ratio": 1.0,
+      "save_mechanism_trace_to_qualitative": true,
+      "search_schedule_mode": "legacy_linear",
+      "seed": 0,
+      "selection_beta_max": 100.0,
+      "selection_bisection_steps": 24,
+      "selection_ess_target_ratio": 0.6,
+      "stage_recognition_enabled": true,
+      "temperature": 0.1,
+      "truncated_rollout_mode": "rbf_diverse",
+      "use_cem": false
+    }
+  ],
+  "provenance": {
+    "branch": "exp/eds-qd-autoresearch-libero-swap-ood",
+    "code_commit": "d3f09b82dcd87ad0cde2038da0200e93287db3b7",
+    "code_state_sha256": "26001c7644b0a07183d35a3bef9591bf6bd928af279d6cffcc4327406c5bbb96",
+    "protocol_commit": "73724cec4d8c60096e5c6baed46274c7098964a3",
+    "run_021_implementation_commit": "f010e8e4ff1f129e12499b1e0f8d284f505f7455",
+    "run_022_result_commit": "8fde5676fc28ef643c2ccb81ef40707350f7bd32"
+  },
+  "run_022_artifact": {
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_022_reward_degenerate_mechanism_preflight/analysis/mechanism_preflight.v1.json",
+    "sha256": "320fabf54847c77d944ed0ff5bdc2c530331c765d3bcfbef2aa5173c46279bac"
+  },
+  "runtime_cache_fingerprint": {
+    "aggregate_sha256": "7bb36346f0780dfa4e27b838a7e7aabc9d363310f0a921ab3b88bf04b1745db0",
+    "manifest_sha256": "4434ca3bafefdb8f0cdf747e6a4a60d73965033cb125bcd51be48ed14bdced7b",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_010_causal_envelope_candidate/runtime_cache/cached_functions"
+  },
+  "schema": "eds-qd-autoresearch-v2-mechanism-manifest-v1",
+  "source_fingerprints": {
+    "configs/config.yaml": "c5844368c803f97540775365a1d5f3211997e6d77f6a0f0f581ffdf0cad63acc",
+    "core/eds_eval_metrics.py": "cbe31284abf40e4d8ebc54c78b8c534f946e2e1df60f0eab8f898f77b834a450",
+    "core/qd_ed.py": "1516bb75c3a5dc3894792d6b8f5daf7f777c48b7d58ea96496da47a986a970b9",
+    "core/rdt_policy_steer.py": "890068dd804d38771608dbaafd5e38b70a14252f86d7e352b19fa477aca6159e",
+    "scripts/eds_qd_autoresearch_v2_runner.py": "67e4f0434d7adf87f29b31de6c87f709e672169ee020f886ff38cf8757bc067e",
+    "tests/test_eds_qd_autoresearch_v2_runner.py": "88c9e63e58a19dd289abd044ccac3dc2f21a38d39c7b6c657e4c2bb486ac6798"
+  },
+  "strict_perturbations": true,
+  "suite": "libero_object_swap"
+}

@@ -1,0 +1,196 @@
+{
+  "algorithm_source_fingerprints": {
+    "configs/config.yaml": "b20791a2792a5f7c6b3b61a2af02055462aa447059802aceb1293a7f77ecdaf8",
+    "core/eds_eval_metrics.py": "d8fb4d04271aa801089a1202af8baf658dc270b751224bc28b4816c9a6a83429",
+    "core/qd_ed.py": "1516bb75c3a5dc3894792d6b8f5daf7f777c48b7d58ea96496da47a986a970b9",
+    "core/rdt_policy_steer.py": "b8806d7a28e42e6e8a9d2959b5b1d7e5b7c9b304526d4022146c3ba23c8c1ff2"
+  },
+  "allowed_gpu_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "attempt_cap": 143,
+  "checkpoint_fingerprint": {
+    "aggregate_sha256": "a2026bcf4e6f587f4c2492ad9d20fb74e9cdfbe03582e6463f9e38e0d8956c28",
+    "files": [
+      {
+        "path": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object/ema/model.safetensors",
+        "sha256": "b4e3631db326689297cd2f0b02d32ade9dc6ee9ae09c03171add64b80e86aaa1",
+        "size_bytes": 2456705456
+      },
+      {
+        "path": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object/config.json",
+        "sha256": "3482cc79b3268ccfca9d8cc9b8e32f3925dc71c3bd60f5e6dfcaa564aecde835",
+        "size_bytes": 919
+      },
+      {
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/configs/policy.yaml",
+        "sha256": "44a1164f421121edafc47e9880eb0ad97be98732669365f931e0b226bc831cf6",
+        "size_bytes": 1487
+      }
+    ],
+    "pretrained_path": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object",
+    "weight_variant": "ema"
+  },
+  "created_at": "2026-08-11T01:14:56.670984+00:00",
+  "dev_b": {
+    "job_matrix_sha256": "cda8300758144ff03adec8a73672bcf8e9c71dac12218144e1eed639e949b2eb",
+    "seeds": [
+      558482,
+      165717,
+      160148,
+      160312
+    ],
+    "tasks": [
+      3,
+      5,
+      8,
+      9
+    ],
+    "unique_cells": 8
+  },
+  "formal_authorized": false,
+  "gpu_hour_cap": 48.0,
+  "libero_input_fingerprint": {
+    "aggregate_sha256": "259c469e41d062e722e30a6474c4a6918ec93e9c48675f6003eec49ad3b638b8",
+    "files": [
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_alphabet_soup_and_place_it_in_the_basket.bddl",
+        "sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+        "size_bytes": 2123
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_bbq_sauce_and_place_it_in_the_basket.bddl",
+        "sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+        "size_bytes": 2144
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_butter_and_place_it_in_the_basket.bddl",
+        "sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+        "size_bytes": 2108
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_chocolate_pudding_and_place_it_in_the_basket.bddl",
+        "sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+        "size_bytes": 2168
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_cream_cheese_and_place_it_in_the_basket.bddl",
+        "sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+        "size_bytes": 2114
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_ketchup_and_place_it_in_the_basket.bddl",
+        "sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+        "size_bytes": 2099
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_milk_and_place_it_in_the_basket.bddl",
+        "sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+        "size_bytes": 2102
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_orange_juice_and_place_it_in_the_basket.bddl",
+        "sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+        "size_bytes": 2132
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_salad_dressing_and_place_it_in_the_basket.bddl",
+        "sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+        "size_bytes": 2129
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_tomato_sauce_and_place_it_in_the_basket.bddl",
+        "sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+        "size_bytes": 2117
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_alphabet_soup_and_place_it_in_the_basket.pruned_init",
+        "sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+        "size_bytes": 4133
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_bbq_sauce_and_place_it_in_the_basket.pruned_init",
+        "sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+        "size_bytes": 3391
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_butter_and_place_it_in_the_basket.pruned_init",
+        "sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+        "size_bytes": 3390
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_chocolate_pudding_and_place_it_in_the_basket.pruned_init",
+        "sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+        "size_bytes": 2590
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_cream_cheese_and_place_it_in_the_basket.pruned_init",
+        "sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+        "size_bytes": 4191
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_ketchup_and_place_it_in_the_basket.pruned_init",
+        "sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+        "size_bytes": 4123
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_milk_and_place_it_in_the_basket.pruned_init",
+        "sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+        "size_bytes": 4185
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_orange_juice_and_place_it_in_the_basket.pruned_init",
+        "sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+        "size_bytes": 3361
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_salad_dressing_and_place_it_in_the_basket.pruned_init",
+        "sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+        "size_bytes": 3374
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_tomato_sauce_and_place_it_in_the_basket.pruned_init",
+        "sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+        "size_bytes": 4145
+      }
+    ],
+    "suite": "libero_object_swap"
+  },
+  "max_episode_steps": 720,
+  "parent_evidence": {
+    "dev_a_audit_v2_sha256": "9c6d3ecee60d50c7e574b2a795c864483c85c812c0883a96ec81aa5d5d889fa9",
+    "mechanism_audit_v2_sha256": "c7e93f9255aee10f71e2519fa9e539cd537ca4ed89c905cebe334db5c68508ab",
+    "original_run_manifest_sha256": "cb211e2ed3fe2cfa2512f0982153295c9f23fa9964e3f623d1ef3b1eef10ae34"
+  },
+  "payload_sha256": "296b25a832292be31a0a3d089b1f7d0dde7f0655a74e475861633d15b73ff3db",
+  "profiles": [
+    "p2_stage_on_abs_rbf_control",
+    "eds_quality_diversity_sparse_causal_envelope_v1"
+  ],
+  "provenance": {
+    "branch": "exp/eds-qd-autoresearch-libero-swap-ood",
+    "code_commit": "9ae7c00c0699c3a27b8424ffddd64ad8eb6615cb",
+    "code_state_sha256": "03119526333d76fcbead4cd58453fd3e0dca7437ef92ad86e4d825475307b59e",
+    "protocol_commit": "1017bf0212780b2e386764517661cf9970090f8d",
+    "repair_protocol_commit": "8fd3aea0b1ec063aba63fa0bffcf3829f03c006c",
+    "worktree": "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood"
+  },
+  "runtime_cache_sha256": "7bb36346f0780dfa4e27b838a7e7aabc9d363310f0a921ab3b88bf04b1745db0",
+  "schema": "eds-qd-autoresearch-run010-dev-b-manifest-v1",
+  "storage": {
+    "experiment_root": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood",
+    "free_bytes": 209510330368,
+    "outputs_link": "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/outputs",
+    "outputs_target": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood",
+    "passed": true
+  },
+  "strict_perturbations": true,
+  "suite": "libero_object_swap"
+}

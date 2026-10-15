@@ -1,0 +1,118 @@
+{
+  "schema": "eds-qd-autoresearch-v2-cycle-decision-v1",
+  "created_at": "2026-08-12T04:50:46Z",
+  "decision": "CONCLUDE_NO_ADOPTION_WITHIN_V2_CYCLE_REQUEST_VERSIONED_REDESIGN",
+  "project_status": "concluded_no_adoption_v2_cycle",
+  "primary_objective": {
+    "benchmark": "LIBERO-PRO libero_object_swap",
+    "target_success_count": 5,
+    "target_total": 10,
+    "achieved": false
+  },
+  "evaluation": {
+    "historical_formal_best_success_count": 2,
+    "historical_formal_target_gap": 3,
+    "run_023_control_success_count": 1,
+    "run_023_control_success_tasks": [9],
+    "run_023_candidate_success_count": 0,
+    "run_023_candidate_success_tasks": [],
+    "run_023_gained_tasks": [],
+    "run_023_lost_tasks": [9],
+    "formal_evaluation_executed": false,
+    "formal_evaluation_authorized": false,
+    "formal_reason": "Run023 candidate failed the online mechanism gate before Dev-A"
+  },
+  "mechanism_result": {
+    "hypothesis": "H2 exact-degenerate QD quality fallback",
+    "candidate_fallback_chunks": 0,
+    "candidate_active_qd_chunks": 74,
+    "candidate_mode_counts_by_task": {
+      "2": {"fallback": 0, "active_qd": 21},
+      "3": {"fallback": 0, "active_qd": 50},
+      "9": {"fallback": 0, "active_qd": 3}
+    },
+    "candidate_min_reward_spread_by_task": {
+      "2": 0.013580323196947575,
+      "3": 0.012293952517211437,
+      "9": 0.035125732421875
+    },
+    "candidate_to_control_selection_latency_ratio": 1.0012663155710728,
+    "conclusion": "Retrospective exact-zero prevalence did not transfer prospectively; the frozen candidate never activated and lost control task 9"
+  },
+  "cross_cycle_synthesis": {
+    "h1": "Causal-envelope partition resolution was supported but validation remained 1/10",
+    "h2": "Exact-degenerate fallback passed offline identity gates but failed online applicability and retention",
+    "formal_gap_reduced": false,
+    "same_cycle_candidate_remaining": false
+  },
+  "budget": {
+    "effective_online_episode_attempts": 48,
+    "global_reserved_attempts": 66,
+    "attempt_cap": 143,
+    "recovery_slots_consumed_v2": 6,
+    "recovery_slots_remaining_v2": 13,
+    "cumulative_gpu_hours": 3.7471009444444445,
+    "gpu_hour_cap": 48,
+    "formal_episodes": 0
+  },
+  "provenance": {
+    "branch": "exp/eds-qd-autoresearch-libero-swap-ood",
+    "worktree": "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood",
+    "v2_design_commit": "a0b4cada663c9efa1f611177c2710f84509bc9d7",
+    "v2_design_sha256": "e60027149f1e59391d3426cc90905641d382eb75beee756d19cedeb0a920cfb6",
+    "run_023_protocol_commit": "73724cec4d8c60096e5c6baed46274c7098964a3",
+    "run_023_recovery_protocol_commit": "27fc65c56347a1ee94353511a1d2cf9da3be65a1",
+    "run_023_implementation_commit": "6374e23a5073f0708ee4345935df024207740258",
+    "run_023_code_state_sha256": "858915679d6a0b628ea488d31dd9625042dd4ece97c4aa34e6f3fb8593f81fbe",
+    "run_023_result_commit": "00964434d2a5e245758c26f25dbc77e17c182dce",
+    "conclusion_protocol_commit": "2855a91e4ed2672c6a13df3fb6649c8108db0f4d",
+    "conclusion_protocol_sha256": "9fcda27cf7a0aa84a33e02ab95117db2a6ffd97006a5c0a899e2921b08d669f7",
+    "run_023_analysis_sha256": "19061e925bbfe1f97772ae8ee526ce4a06c8b8328bcca36bedc05f7e4e390806"
+  },
+  "algorithm_source_fingerprints": {
+    "configs/config.yaml": "c5844368c803f97540775365a1d5f3211997e6d77f6a0f0f581ffdf0cad63acc",
+    "core/eds_eval_metrics.py": "cbe31284abf40e4d8ebc54c78b8c534f946e2e1df60f0eab8f898f77b834a450",
+    "core/qd_ed.py": "1516bb75c3a5dc3894792d6b8f5daf7f777c48b7d58ea96496da47a986a970b9",
+    "core/rdt_policy_steer.py": "890068dd804d38771608dbaafd5e38b70a14252f86d7e352b19fa477aca6159e"
+  },
+  "evidence": {
+    "run_023_manifest_v1_sha256": "d51a44042357b129595cc220faeecd5a9029f2424e0b803711a32ed31a8ec718",
+    "run_023_manifest_v2_sha256": "8e47ebb3ddcdf4f9b3657d5585902b303d35fa2162e597e2faf1b7d87805d2df",
+    "run_023_manifest_v3_sha256": "9429fe7420cfb613565fd83ee537e37fba5c3cd43093bc38f0bc1c7087d8793a",
+    "run_023_attempt_ledger_sha256": "3f445b32af0935540a56c3882a11987edb2dc56f7126d1593cd03afe5a55a63c",
+    "run_023_gpu_admission_sha256": "f1032bcccf8d4dd9e0b90f9e63c89b2dcdac03bcefe087744bef2d1526ca122c",
+    "run_023_run_manifest_sha256": "5a1420038572c55c572b21dc35b1c4b59f8cc079e9c9a48fb6a0731b0d4fb748",
+    "run_023_audit_sha256": "7f123ecdf3ffb7fbbb881ffebe197ddb2ae8e4b1237233dd2316f6f67e832c54",
+    "prior_cycle_decision_sha256": "dc443cea6baa1194aead93b289a5aef36dde67de54114aa017c53b25727b06a0"
+  },
+  "validity": {
+    "run_023_jobs_valid": 2,
+    "run_023_jobs_total": 2,
+    "safety_gate_passed": true,
+    "latency_gate_passed": true,
+    "attempt_accounting_passed": true,
+    "artifact_gate_passed": true,
+    "credential_gate_passed": true,
+    "mechanism_gate_passed": false,
+    "hard_failures": ["candidate missing fallback record"]
+  },
+  "write_boundary": {
+    "code_and_documents_modified_only_in_owned_worktree": true,
+    "large_artifacts_written_only_in_owned_artifact_root": true,
+    "protected_untracked_file_excluded": "docs/01_specs/2026-08-10-eds-qd-stage-guidance-transition-design.md",
+    "external_historical_sources_read_only": true
+  },
+  "redesign_request": {
+    "required_for_further_execution": true,
+    "most_evidence_supported_direction": "QD observation-derived stage-progress quality/final selection or guarded control-success retention",
+    "scope": "EDS+QD core, QD-first",
+    "requirements": [
+      "versioned design",
+      "new leakage-safe holdout seeds",
+      "explicit online and formal budget",
+      "explicit user approval",
+      "no tolerance sweep or reuse of Run023 outcomes for same-cycle tuning"
+    ]
+  },
+  "credential_material_included": false
+}

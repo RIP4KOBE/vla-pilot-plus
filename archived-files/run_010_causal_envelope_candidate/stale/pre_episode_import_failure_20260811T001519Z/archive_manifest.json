@@ -1,0 +1,79 @@
+{
+  "attempt_ids": [
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "created_at": "2026-08-11T00:16:04.535275+00:00",
+  "credential_pattern_match_count": 0,
+  "entries": [
+    {
+      "archived_path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_010_causal_envelope_candidate/stale/pre_episode_import_failure_20260811T001519Z/outputs/preflight__p2_stage_on_abs_rbf_control",
+      "file_count": 7,
+      "kind": "output_tree",
+      "label": "preflight__p2_stage_on_abs_rbf_control",
+      "original_path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_010_causal_envelope_candidate/preflight__p2_stage_on_abs_rbf_control",
+      "sha256": "ad1c60f9c31c98063d92427deda8815f25d157765bcb24cd5bf7df00773fa953",
+      "size_bytes": 38640
+    },
+    {
+      "archived_path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_010_causal_envelope_candidate/stale/pre_episode_import_failure_20260811T001519Z/runner_logs/preflight__p2_stage_on_abs_rbf_control.log",
+      "kind": "runner_log",
+      "label": "preflight__p2_stage_on_abs_rbf_control",
+      "original_path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/runner_logs/run_010_causal_envelope_candidate/preflight__p2_stage_on_abs_rbf_control.log",
+      "sha256": "dc00a9b799efe37b8ad47adee239c2e637df763726c91601d19b145b44dc5406",
+      "size_bytes": 21188
+    },
+    {
+      "archived_path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_010_causal_envelope_candidate/stale/pre_episode_import_failure_20260811T001519Z/outputs/preflight__eds_quality_diversity_sparse_primary",
+      "file_count": 7,
+      "kind": "output_tree",
+      "label": "preflight__eds_quality_diversity_sparse_primary",
+      "original_path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_010_causal_envelope_candidate/preflight__eds_quality_diversity_sparse_primary",
+      "sha256": "bb55001dd70966cc56211bde7222cf9ef79f83bbf5d77cafae90c2f32eef096a",
+      "size_bytes": 38952
+    },
+    {
+      "archived_path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_010_causal_envelope_candidate/stale/pre_episode_import_failure_20260811T001519Z/runner_logs/preflight__eds_quality_diversity_sparse_primary.log",
+      "kind": "runner_log",
+      "label": "preflight__eds_quality_diversity_sparse_primary",
+      "original_path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/runner_logs/run_010_causal_envelope_candidate/preflight__eds_quality_diversity_sparse_primary.log",
+      "sha256": "f8a4a2c37173f2332dbf0018e00ef708cadf17c27ecb1c4b2c4b7f364618e83c",
+      "size_bytes": 21338
+    },
+    {
+      "archived_path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_010_causal_envelope_candidate/stale/pre_episode_import_failure_20260811T001519Z/outputs/preflight__eds_quality_diversity_sparse_causal_envelope_v1",
+      "file_count": 7,
+      "kind": "output_tree",
+      "label": "preflight__eds_quality_diversity_sparse_causal_envelope_v1",
+      "original_path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_010_causal_envelope_candidate/preflight__eds_quality_diversity_sparse_causal_envelope_v1",
+      "sha256": "e99a1a409b008c791b2e23de85b6c71536da34a039c5fb4ccc9ad3908a941132",
+      "size_bytes": 39295
+    },
+    {
+      "archived_path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_010_causal_envelope_candidate/stale/pre_episode_import_failure_20260811T001519Z/runner_logs/preflight__eds_quality_diversity_sparse_causal_envelope_v1.log",
+      "kind": "runner_log",
+      "label": "preflight__eds_quality_diversity_sparse_causal_envelope_v1",
+      "original_path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/runner_logs/run_010_causal_envelope_candidate/preflight__eds_quality_diversity_sparse_causal_envelope_v1.log",
+      "sha256": "c613484861d4a9537274b0d225ffd900a720a8d4da9330d5ccb81412f362133e",
+      "size_bytes": 21507
+    },
+    {
+      "archived_path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_010_causal_envelope_candidate/stale/pre_episode_import_failure_20260811T001519Z/phase/run_manifest.csv",
+      "kind": "phase_csv",
+      "original_path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood/run_010_causal_envelope_candidate/run_manifest.csv",
+      "sha256": "d5f2c5e77aed910f8c33809c2e8e475d40d3d78f7719128ad08a4c98cffc05c6",
+      "size_bytes": 6584
+    }
+  ],
+  "initialized_episode_attempts": 0,
+  "payload_sha256": "67e645ca1ebe2892fd66fd8130422ec33b51e954adcc8c02bc4cc812bfba1c8a",
+  "reason": "v3 recovery workers failed before model or episode initialization because pinned RDT gitlink was uninitialized",
+  "schema": "eds-qd-autoresearch-pre-episode-import-archive-v1",
+  "task_outcomes_observed": false,
+  "v3_protocol_commit": "b344dc850e8d63b2a78438d64d152693e8f7789f",
+  "v4_protocol_commit": "80169057ef170dbe702c5cd25c6f4ac03b14381e"
+}

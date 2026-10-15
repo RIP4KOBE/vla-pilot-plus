@@ -1,0 +1,460 @@
+{
+  "allowed_gpu_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "attempt_cap": 143,
+  "checkpoint_fingerprint": {
+    "aggregate_sha256": "a2026bcf4e6f587f4c2492ad9d20fb74e9cdfbe03582e6463f9e38e0d8956c28",
+    "files": [
+      {
+        "path": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object/ema/model.safetensors",
+        "sha256": "b4e3631db326689297cd2f0b02d32ade9dc6ee9ae09c03171add64b80e86aaa1",
+        "size_bytes": 2456705456
+      },
+      {
+        "path": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object/config.json",
+        "sha256": "3482cc79b3268ccfca9d8cc9b8e32f3925dc71c3bd60f5e6dfcaa564aecde835",
+        "size_bytes": 919
+      },
+      {
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/configs/policy.yaml",
+        "sha256": "44a1164f421121edafc47e9880eb0ad97be98732669365f931e0b226bc831cf6",
+        "size_bytes": 1487
+      }
+    ],
+    "pretrained_path": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object",
+    "weight_variant": "ema"
+  },
+  "created_at": "2026-08-10T16:47:24.704724+00:00",
+  "dev_a": {
+    "profiles": [
+      "p2_stage_on_abs_rbf_control",
+      "eds_quality_diversity_sparse_causal_envelope_v1"
+    ],
+    "seeds": [
+      512905,
+      150741,
+      463456,
+      452903
+    ],
+    "tasks": [
+      3,
+      5,
+      8,
+      9
+    ],
+    "unique_cells": 8
+  },
+  "failed_offline_preflight_v1_sha256": "1654574975a02df00be5ac6c78b986b18baf1657bf997a808c1fcb5aa58f9a61",
+  "formal_authorized": false,
+  "gemini_grounding_enabled": false,
+  "gpu_hour_cap": 48.0,
+  "gpu_reference": {
+    "path": "/mnt/data/shared2/zhuoli/output/p2_direction_normalized_rbf/manifests/gpu_reference_peak.json",
+    "reference_peak_vram_mib": 17921.0,
+    "required_free_vram_mib": 22401.25,
+    "sha256": "d49ea817be0f723c6bed15af8b28ef82c24ba31c81ad610ce2f1fff3406dfff1"
+  },
+  "libero_input_fingerprint": {
+    "aggregate_sha256": "259c469e41d062e722e30a6474c4a6918ec93e9c48675f6003eec49ad3b638b8",
+    "files": [
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_alphabet_soup_and_place_it_in_the_basket.bddl",
+        "sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+        "size_bytes": 2123
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_bbq_sauce_and_place_it_in_the_basket.bddl",
+        "sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+        "size_bytes": 2144
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_butter_and_place_it_in_the_basket.bddl",
+        "sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+        "size_bytes": 2108
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_chocolate_pudding_and_place_it_in_the_basket.bddl",
+        "sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+        "size_bytes": 2168
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_cream_cheese_and_place_it_in_the_basket.bddl",
+        "sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+        "size_bytes": 2114
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_ketchup_and_place_it_in_the_basket.bddl",
+        "sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+        "size_bytes": 2099
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_milk_and_place_it_in_the_basket.bddl",
+        "sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+        "size_bytes": 2102
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_orange_juice_and_place_it_in_the_basket.bddl",
+        "sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+        "size_bytes": 2132
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_salad_dressing_and_place_it_in_the_basket.bddl",
+        "sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+        "size_bytes": 2129
+      },
+      {
+        "path": "libero/libero/bddl_files/libero_object_swap/pick_up_the_tomato_sauce_and_place_it_in_the_basket.bddl",
+        "sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+        "size_bytes": 2117
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_alphabet_soup_and_place_it_in_the_basket.pruned_init",
+        "sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+        "size_bytes": 4133
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_bbq_sauce_and_place_it_in_the_basket.pruned_init",
+        "sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+        "size_bytes": 3391
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_butter_and_place_it_in_the_basket.pruned_init",
+        "sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+        "size_bytes": 3390
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_chocolate_pudding_and_place_it_in_the_basket.pruned_init",
+        "sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+        "size_bytes": 2590
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_cream_cheese_and_place_it_in_the_basket.pruned_init",
+        "sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+        "size_bytes": 4191
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_ketchup_and_place_it_in_the_basket.pruned_init",
+        "sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+        "size_bytes": 4123
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_milk_and_place_it_in_the_basket.pruned_init",
+        "sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+        "size_bytes": 4185
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_orange_juice_and_place_it_in_the_basket.pruned_init",
+        "sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+        "size_bytes": 3361
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_salad_dressing_and_place_it_in_the_basket.pruned_init",
+        "sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+        "size_bytes": 3374
+      },
+      {
+        "path": "libero/libero/init_files/libero_object_swap/pick_up_the_tomato_sauce_and_place_it_in_the_basket.pruned_init",
+        "sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+        "size_bytes": 4145
+      }
+    ],
+    "suite": "libero_object_swap"
+  },
+  "max_episode_steps": 720,
+  "mechanism_preflight": {
+    "max_chunks": 2,
+    "seeds": [
+      512905,
+      150741
+    ],
+    "tasks": [
+      3,
+      5
+    ],
+    "unique_cells": 6
+  },
+  "offline_preflight_sha256": "3097afadbf2f3a5ab827a8242c2f4bd43ed20bec46d0ff76c62fef2d7b62f7a9",
+  "payload_sha256": "20e7e17c70c4360df4d8534c4bc3ff0c204988bc4fd7acfa544ca4b7c8e9511e",
+  "profiles": [
+    {
+      "adaptive_early_stop_patience": 2,
+      "adaptive_min_cem_iters": 4,
+      "adaptive_reward_improvement_eps": 0.001,
+      "cem_iters": 10,
+      "chunk_memory_fraction": 0.0,
+      "chunk_memory_renoise_steps": 2,
+      "chunk_memory_reward_guard_quantile": 0.25,
+      "chunk_population_mode": "fresh",
+      "elite_carryover_count": 0,
+      "execution_contact_distance": 0.04,
+      "execution_horizon_contact": 2,
+      "execution_horizon_far": 8,
+      "execution_horizon_mode": "fixed",
+      "execution_horizon_near": 4,
+      "execution_near_distance": 0.08,
+      "gemini_grounding_enabled": false,
+      "initial_diversity_descriptor_mode": "absolute_eef",
+      "initial_diversity_scale": 20.0,
+      "initial_diversity_start_ratio": 0.8,
+      "initial_sampling_mode": "rbf_diverse_denoise",
+      "label": "p2_stage_on_abs_rbf_control",
+      "max_episode_steps": 720,
+      "method": "p2_stage_on_abs_rbf_control",
+      "num_elites": 16,
+      "p2_joblib_multiprocessing": false,
+      "parent_anchor_count": 0,
+      "parent_anchor_reward_quantile": 0.5,
+      "parent_coverage_mode": "none",
+      "parent_weighting_mode": "legacy_temperature",
+      "population_size": 16,
+      "profile_fingerprint": "81ca433c3319192ae1db6ffeafb2a2eca7ae31c986214cde027b9d02ab63eaac",
+      "qd_archive_mode": "none",
+      "qd_bounds_expand_fraction": 0.1,
+      "qd_bounds_quantiles": [
+        0.05,
+        0.95
+      ],
+      "qd_bounds_update_policy": "fixed_initial",
+      "qd_cell_capacity": 1,
+      "qd_descriptor": "target_relative_endpoint_xy",
+      "qd_grid_shape": [
+        4,
+        4
+      ],
+      "qd_metrics_observer": true,
+      "qd_min_axis_span_m": 0.08,
+      "qd_overflow_policy": "clamp_edge",
+      "qd_parent_sampling": "sparse_priority",
+      "qd_sparse_exponent": 1.0,
+      "qd_tie_break": "stable_fingerprint",
+      "renoise_t_max": 3,
+      "renoise_t_min": 1,
+      "reward_mode": "normal",
+      "role": "control",
+      "rollout_diversity_band_ratio": 0.2,
+      "rollout_diversity_control_mode": "fixed",
+      "rollout_diversity_decay_floor": 0.25,
+      "rollout_diversity_descriptor_mode": "absolute_eef",
+      "rollout_diversity_iters": "all",
+      "rollout_diversity_scale": 20.0,
+      "rollout_diversity_scale_max": 20.0,
+      "rollout_diversity_scale_min": 0.0,
+      "rollout_diversity_skip_final_steps": 0,
+      "rollout_diversity_start_ratio": 0.6,
+      "rollout_diversity_target_ratio": 1.0,
+      "save_mechanism_trace_to_qualitative": true,
+      "search_schedule_mode": "legacy_linear",
+      "seed": 0,
+      "selection_beta_max": 100.0,
+      "selection_bisection_steps": 24,
+      "selection_ess_target_ratio": 0.6,
+      "stage_recognition_enabled": true,
+      "temperature": 0.1,
+      "truncated_rollout_mode": "rbf_diverse",
+      "use_cem": false
+    },
+    {
+      "adaptive_early_stop_patience": 2,
+      "adaptive_min_cem_iters": 4,
+      "adaptive_reward_improvement_eps": 0.001,
+      "cem_iters": 10,
+      "chunk_memory_fraction": 0.0,
+      "chunk_memory_renoise_steps": 2,
+      "chunk_memory_reward_guard_quantile": 0.25,
+      "chunk_population_mode": "fresh",
+      "elite_carryover_count": 0,
+      "execution_contact_distance": 0.04,
+      "execution_horizon_contact": 2,
+      "execution_horizon_far": 8,
+      "execution_horizon_mode": "fixed",
+      "execution_horizon_near": 4,
+      "execution_near_distance": 0.08,
+      "gemini_grounding_enabled": false,
+      "initial_diversity_descriptor_mode": "absolute_eef",
+      "initial_diversity_scale": 20.0,
+      "initial_diversity_start_ratio": 0.8,
+      "initial_sampling_mode": "rbf_diverse_denoise",
+      "label": "eds_quality_diversity_sparse_primary",
+      "max_episode_steps": 720,
+      "method": "eds_quality_diversity_sparse_primary",
+      "num_elites": 16,
+      "p2_joblib_multiprocessing": false,
+      "parent_anchor_count": 0,
+      "parent_anchor_reward_quantile": 0.5,
+      "parent_coverage_mode": "none",
+      "parent_weighting_mode": "legacy_temperature",
+      "population_size": 16,
+      "profile_fingerprint": "2a407265057cbf8ecf5f7f4bbc87f783b9df009f4a23f27d51cf07fa72334d41",
+      "qd_archive_mode": "grid_archive",
+      "qd_bounds_expand_fraction": 0.1,
+      "qd_bounds_quantiles": [
+        0.05,
+        0.95
+      ],
+      "qd_bounds_update_policy": "fixed_initial",
+      "qd_cell_capacity": 1,
+      "qd_descriptor": "target_relative_endpoint_xy",
+      "qd_grid_shape": [
+        4,
+        4
+      ],
+      "qd_metrics_observer": true,
+      "qd_min_axis_span_m": 0.08,
+      "qd_overflow_policy": "clamp_edge",
+      "qd_parent_sampling": "sparse_priority",
+      "qd_sparse_exponent": 1.0,
+      "qd_tie_break": "stable_fingerprint",
+      "renoise_t_max": 3,
+      "renoise_t_min": 1,
+      "reward_mode": "normal",
+      "role": "reference",
+      "rollout_diversity_band_ratio": 0.2,
+      "rollout_diversity_control_mode": "fixed",
+      "rollout_diversity_decay_floor": 0.25,
+      "rollout_diversity_descriptor_mode": "absolute_eef",
+      "rollout_diversity_iters": "all",
+      "rollout_diversity_scale": 20.0,
+      "rollout_diversity_scale_max": 20.0,
+      "rollout_diversity_scale_min": 0.0,
+      "rollout_diversity_skip_final_steps": 0,
+      "rollout_diversity_start_ratio": 0.6,
+      "rollout_diversity_target_ratio": 1.0,
+      "save_mechanism_trace_to_qualitative": true,
+      "search_schedule_mode": "legacy_linear",
+      "seed": 0,
+      "selection_beta_max": 100.0,
+      "selection_bisection_steps": 24,
+      "selection_ess_target_ratio": 0.6,
+      "stage_recognition_enabled": true,
+      "temperature": 0.1,
+      "truncated_rollout_mode": "rbf_diverse",
+      "use_cem": false
+    },
+    {
+      "adaptive_early_stop_patience": 2,
+      "adaptive_min_cem_iters": 4,
+      "adaptive_reward_improvement_eps": 0.001,
+      "cem_iters": 10,
+      "chunk_memory_fraction": 0.0,
+      "chunk_memory_renoise_steps": 2,
+      "chunk_memory_reward_guard_quantile": 0.25,
+      "chunk_population_mode": "fresh",
+      "elite_carryover_count": 0,
+      "execution_contact_distance": 0.04,
+      "execution_horizon_contact": 2,
+      "execution_horizon_far": 8,
+      "execution_horizon_mode": "fixed",
+      "execution_horizon_near": 4,
+      "execution_near_distance": 0.08,
+      "gemini_grounding_enabled": false,
+      "initial_diversity_descriptor_mode": "absolute_eef",
+      "initial_diversity_scale": 20.0,
+      "initial_diversity_start_ratio": 0.8,
+      "initial_sampling_mode": "rbf_diverse_denoise",
+      "label": "eds_quality_diversity_sparse_causal_envelope_v1",
+      "max_episode_steps": 720,
+      "method": "eds_quality_diversity_sparse_causal_envelope_v1",
+      "num_elites": 16,
+      "p2_joblib_multiprocessing": false,
+      "parent_anchor_count": 0,
+      "parent_anchor_reward_quantile": 0.5,
+      "parent_coverage_mode": "none",
+      "parent_weighting_mode": "legacy_temperature",
+      "population_size": 16,
+      "profile_fingerprint": "e774aea3af69599f6dff713f6d845206d1e6ca9bc0fcc2412a326975fdbc11b1",
+      "qd_archive_mode": "grid_archive",
+      "qd_bounds_expand_fraction": 0.1,
+      "qd_bounds_quantiles": [
+        0.05,
+        0.95
+      ],
+      "qd_bounds_update_policy": "causal_envelope_v1",
+      "qd_cell_capacity": 1,
+      "qd_descriptor": "target_relative_endpoint_xy",
+      "qd_grid_shape": [
+        4,
+        4
+      ],
+      "qd_metrics_observer": true,
+      "qd_min_axis_span_m": 0.08,
+      "qd_overflow_policy": "clamp_edge",
+      "qd_parent_sampling": "sparse_priority",
+      "qd_sparse_exponent": 1.0,
+      "qd_tie_break": "stable_fingerprint",
+      "renoise_t_max": 3,
+      "renoise_t_min": 1,
+      "reward_mode": "normal",
+      "role": "candidate",
+      "rollout_diversity_band_ratio": 0.2,
+      "rollout_diversity_control_mode": "fixed",
+      "rollout_diversity_decay_floor": 0.25,
+      "rollout_diversity_descriptor_mode": "absolute_eef",
+      "rollout_diversity_iters": "all",
+      "rollout_diversity_scale": 20.0,
+      "rollout_diversity_scale_max": 20.0,
+      "rollout_diversity_scale_min": 0.0,
+      "rollout_diversity_skip_final_steps": 0,
+      "rollout_diversity_start_ratio": 0.6,
+      "rollout_diversity_target_ratio": 1.0,
+      "save_mechanism_trace_to_qualitative": true,
+      "search_schedule_mode": "legacy_linear",
+      "seed": 0,
+      "selection_beta_max": 100.0,
+      "selection_bisection_steps": 24,
+      "selection_ess_target_ratio": 0.6,
+      "stage_recognition_enabled": true,
+      "temperature": 0.1,
+      "truncated_rollout_mode": "rbf_diverse",
+      "use_cem": false
+    }
+  ],
+  "provenance": {
+    "branch": "exp/eds-qd-autoresearch-libero-swap-ood",
+    "code_commit": "0f41841758d1e79a695f8b8bacd758eda94554d5",
+    "code_state_sha256": "1b4c1c51d78e7136fd001ac9f8a1da55125244461700a7a45f1a0aa6b94062e7",
+    "protocol_commit": "1017bf0212780b2e386764517661cf9970090f8d",
+    "repair_protocol_commit": "8fd3aea0b1ec063aba63fa0bffcf3829f03c006c",
+    "worktree": "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood"
+  },
+  "regression_test_evidence": {
+    "command": [
+      "/home/hynx/miniconda3/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/test_qd_ed_archive.py",
+      "tests/test_eds_quality_diversity_runner.py",
+      "tests/test_eds_quality_diversity_audit.py",
+      "tests/test_rdt_steer.py",
+      "tests/test_eds_eval_metrics.py",
+      "tests/test_eds_eval_runner.py",
+      "tests/test_main_rdt_startup.py",
+      "tests/test_env_adapters_imports.py",
+      "tests/test_eds_qd_autoresearch_runner.py"
+    ],
+    "command_sha256": "447f34b7caf50ff35061b1b3e33bc65f88073b0f623533e621fe82db9591305a",
+    "exit_code": 0,
+    "passed": true,
+    "passed_count": 781
+  },
+  "runtime_cache_sha256": "7bb36346f0780dfa4e27b838a7e7aabc9d363310f0a921ab3b88bf04b1745db0",
+  "schema": "eds-qd-autoresearch-run010-manifest-v1",
+  "stage_recognition_enabled": true,
+  "storage": {
+    "experiment_root": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood",
+    "free_bytes": 228038217728,
+    "outputs_link": "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/outputs",
+    "outputs_target": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-qd-autoresearch-libero-swap-ood",
+    "passed": true
+  },
+  "strict_perturbations": true,
+  "suite": "libero_object_swap"
+}

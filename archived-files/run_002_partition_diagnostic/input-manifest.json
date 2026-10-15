@@ -1,0 +1,218 @@
+[
+  {
+    "expected_qd_records": 226,
+    "expected_records": 226,
+    "expected_sha256": "85e0df08a7cd10dec0066089fb07455bff4df295202aaaa5d97c6d13bf0a39f6",
+    "hash_matches": true,
+    "observed_sha256": "85e0df08a7cd10dec0066089fb07455bff4df295202aaaa5d97c6d13bf0a39f6",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/formal/eds_quality_diversity_sparse_primary/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 189,
+    "expected_records": 189,
+    "expected_sha256": "ef146db21c6b0419116d2325f729344a7c80e2cec1ceeff5102409383d90dabb",
+    "hash_matches": true,
+    "observed_sha256": "ef146db21c6b0419116d2325f729344a7c80e2cec1ceeff5102409383d90dabb",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/formal/eds_quality_diversity_uniform_expand00/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 248,
+    "expected_records": 248,
+    "expected_sha256": "7557f971f73b71767c3bd544d3f609d9e72822785aee2ae3b84990778f0adae4",
+    "hash_matches": true,
+    "observed_sha256": "7557f971f73b71767c3bd544d3f609d9e72822785aee2ae3b84990778f0adae4",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/formal/eds_quality_diversity_uniform_expand20/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 138,
+    "expected_records": 138,
+    "expected_sha256": "6036837f3d7309ed8b30f54b5dc7fcd356c4e0a7c9c5cddc6e6d1d80022cd241",
+    "hash_matches": true,
+    "observed_sha256": "6036837f3d7309ed8b30f54b5dc7fcd356c4e0a7c9c5cddc6e6d1d80022cd241",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/formal/eds_quality_diversity_uniform_grid3/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 140,
+    "expected_records": 140,
+    "expected_sha256": "954a1d36e81f88a28836ab42eb4f18f527057578d13c13bdb479262898a84ab6",
+    "hash_matches": true,
+    "observed_sha256": "954a1d36e81f88a28836ab42eb4f18f527057578d13c13bdb479262898a84ab6",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/formal/eds_quality_diversity_uniform_primary/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 117,
+    "expected_records": 117,
+    "expected_sha256": "09018ec4a36b6ec7955ba15e652c2aea6e5336c6d1951667a67372796d83e7ad",
+    "hash_matches": true,
+    "observed_sha256": "09018ec4a36b6ec7955ba15e652c2aea6e5336c6d1951667a67372796d83e7ad",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/formal/eds_quality_diversity_uniform_q00100/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 115,
+    "expected_records": 115,
+    "expected_sha256": "55fb310fe050c3adb1364537a2a381d8c49941561593c78f51e75dced0606829",
+    "hash_matches": true,
+    "observed_sha256": "55fb310fe050c3adb1364537a2a381d8c49941561593c78f51e75dced0606829",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/formal/eds_quality_diversity_uniform_q1090/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 137,
+    "expected_records": 137,
+    "expected_sha256": "def57116c4310d992a98e419ab0b973d9ac0c683cc8f2ae77220f73e7704a0e2",
+    "hash_matches": true,
+    "observed_sha256": "def57116c4310d992a98e419ab0b973d9ac0c683cc8f2ae77220f73e7704a0e2",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/formal/eds_quality_diversity_uniform_span04/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 153,
+    "expected_records": 153,
+    "expected_sha256": "e4edc71e19fe34ef726991dd0a761c2466603034325df7a5896387f901ec9d73",
+    "hash_matches": true,
+    "observed_sha256": "e4edc71e19fe34ef726991dd0a761c2466603034325df7a5896387f901ec9d73",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/formal/eds_quality_diversity_uniform_span12/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 172,
+    "expected_records": 172,
+    "expected_sha256": "17c5956c495ec179bf9fb1b1f823970dc9aa016c47224e02f3a5f2957e80fced",
+    "hash_matches": true,
+    "observed_sha256": "17c5956c495ec179bf9fb1b1f823970dc9aa016c47224e02f3a5f2957e80fced",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/search_budget_sweep_20260808/output_store/formal/eds_qd_sparse_primary_p32_k15/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 201,
+    "expected_records": 201,
+    "expected_sha256": "0cf191caf092b2af37f8b9838d10598005ebc3c4c58df0cd9a1cd899d2e8181c",
+    "hash_matches": true,
+    "observed_sha256": "0cf191caf092b2af37f8b9838d10598005ebc3c4c58df0cd9a1cd899d2e8181c",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/search_budget_sweep_20260808/output_store/formal/eds_qd_sparse_primary_p32_k20/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 198,
+    "expected_records": 198,
+    "expected_sha256": "4d6bb12425d07e78b0e3fb1429431bc4eb50fcdaec9a2b23b9f597541e283587",
+    "hash_matches": true,
+    "observed_sha256": "4d6bb12425d07e78b0e3fb1429431bc4eb50fcdaec9a2b23b9f597541e283587",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/search_budget_sweep_20260808/output_store/formal/eds_qd_sparse_primary_p32_k25/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 159,
+    "expected_records": 159,
+    "expected_sha256": "de8e72c3246726a0f17b934c7064d0c696e9e6515a00657227058723a720931b",
+    "hash_matches": true,
+    "observed_sha256": "de8e72c3246726a0f17b934c7064d0c696e9e6515a00657227058723a720931b",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/search_budget_sweep_20260808/output_store/formal/eds_qd_sparse_primary_p48_k15/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 173,
+    "expected_records": 173,
+    "expected_sha256": "c1122a3de233949cc064122493d3d418add787879b68197516cb10b1e6dc876a",
+    "hash_matches": true,
+    "observed_sha256": "c1122a3de233949cc064122493d3d418add787879b68197516cb10b1e6dc876a",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/search_budget_sweep_20260808/output_store/formal/eds_qd_sparse_primary_p48_k20/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 170,
+    "expected_records": 170,
+    "expected_sha256": "01cd23811aa23f08359bd80b766fadcdc127bbe38023e138e4d93e4549c4ad7e",
+    "hash_matches": true,
+    "observed_sha256": "01cd23811aa23f08359bd80b766fadcdc127bbe38023e138e4d93e4549c4ad7e",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/search_budget_sweep_20260808/output_store/formal/eds_qd_sparse_primary_p48_k25/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 192,
+    "expected_records": 192,
+    "expected_sha256": "37204ce308fc29a823180bba08481764ee1fbdca9fb49415d0132e622f56ceb5",
+    "hash_matches": true,
+    "observed_sha256": "37204ce308fc29a823180bba08481764ee1fbdca9fb49415d0132e622f56ceb5",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/search_budget_sweep_20260808/output_store/formal/eds_qd_sparse_primary_p64_k15/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 189,
+    "expected_records": 189,
+    "expected_sha256": "c323a108f70762c38f1f1408416c13186377d0753e9129fa22c1a0e2da463fe7",
+    "hash_matches": true,
+    "observed_sha256": "c323a108f70762c38f1f1408416c13186377d0753e9129fa22c1a0e2da463fe7",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/search_budget_sweep_20260808/output_store/formal/eds_qd_sparse_primary_p64_k20/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 165,
+    "expected_records": 165,
+    "expected_sha256": "aa2486a01afe9c94ae6a1d540a3698b2d73d7d91ad982451a7a7a64f0637c3eb",
+    "hash_matches": true,
+    "observed_sha256": "aa2486a01afe9c94ae6a1d540a3698b2d73d7d91ad982451a7a7a64f0637c3eb",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/search_budget_sweep_20260808/output_store/formal/eds_qd_sparse_primary_p64_k25/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 187,
+    "expected_records": 187,
+    "expected_sha256": "048c6db5fe1fcb9983d73c514e30c3f6fd7ca88cc103356d0bef7db85790fb86",
+    "hash_matches": true,
+    "observed_sha256": "048c6db5fe1fcb9983d73c514e30c3f6fd7ca88cc103356d0bef7db85790fb86",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/search_budget_sweep_20260808/output_store/formal/eds_qd_uniform_expand20_p32_k15/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 191,
+    "expected_records": 191,
+    "expected_sha256": "fef9edfd648c9be377b54a581db6a8f6f21e94e6822d5620d543bca456ef323a",
+    "hash_matches": true,
+    "observed_sha256": "fef9edfd648c9be377b54a581db6a8f6f21e94e6822d5620d543bca456ef323a",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/search_budget_sweep_20260808/output_store/formal/eds_qd_uniform_expand20_p32_k20/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 200,
+    "expected_records": 200,
+    "expected_sha256": "fbf578f9757705756d7fd82210c7b87ece9a9c9ba89398d49dc12d9b66f5b8db",
+    "hash_matches": true,
+    "observed_sha256": "fbf578f9757705756d7fd82210c7b87ece9a9c9ba89398d49dc12d9b66f5b8db",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/search_budget_sweep_20260808/output_store/formal/eds_qd_uniform_expand20_p32_k25/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 184,
+    "expected_records": 184,
+    "expected_sha256": "f082d4cac45f1ed078eda80be01d9da55e8de54ada26313caa911f70955f52dd",
+    "hash_matches": true,
+    "observed_sha256": "f082d4cac45f1ed078eda80be01d9da55e8de54ada26313caa911f70955f52dd",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/search_budget_sweep_20260808/output_store/formal/eds_qd_uniform_expand20_p48_k15/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 288,
+    "expected_records": 288,
+    "expected_sha256": "67b20620cea11524f0cd929a4b804b7eb5e409e52bd2b1090242deb921f65128",
+    "hash_matches": true,
+    "observed_sha256": "67b20620cea11524f0cd929a4b804b7eb5e409e52bd2b1090242deb921f65128",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/search_budget_sweep_20260808/output_store/formal/eds_qd_uniform_expand20_p48_k20/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 132,
+    "expected_records": 132,
+    "expected_sha256": "4440708064b48b46a0b213824ed7052585865da499ff2d9cbe4fe5461f39e878",
+    "hash_matches": true,
+    "observed_sha256": "4440708064b48b46a0b213824ed7052585865da499ff2d9cbe4fe5461f39e878",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/search_budget_sweep_20260808/output_store/formal/eds_qd_uniform_expand20_p48_k25/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 149,
+    "expected_records": 149,
+    "expected_sha256": "b055e51beb4a43d509b8a2cb07438e296cad54778e0e725c25fba54538fa703e",
+    "hash_matches": true,
+    "observed_sha256": "b055e51beb4a43d509b8a2cb07438e296cad54778e0e725c25fba54538fa703e",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/search_budget_sweep_20260808/output_store/formal/eds_qd_uniform_expand20_p64_k15/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 146,
+    "expected_records": 146,
+    "expected_sha256": "c0ffc959d15c15a4519491735b768986a7322a77a66d89fd6dae7287432252af",
+    "hash_matches": true,
+    "observed_sha256": "c0ffc959d15c15a4519491735b768986a7322a77a66d89fd6dae7287432252af",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/search_budget_sweep_20260808/output_store/formal/eds_qd_uniform_expand20_p64_k20/eds_eval/eds_metrics.jsonl"
+  },
+  {
+    "expected_qd_records": 146,
+    "expected_records": 146,
+    "expected_sha256": "e46165509c04d5162484a9cbbcc174dd7d22991a628303f076fe20c7c7f7e775",
+    "hash_matches": true,
+    "observed_sha256": "e46165509c04d5162484a9cbbcc174dd7d22991a628303f076fe20c7c7f7e775",
+    "path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/search_budget_sweep_20260808/output_store/formal/eds_qd_uniform_expand20_p64_k25/eds_eval/eds_metrics.jsonl"
+  }
+]

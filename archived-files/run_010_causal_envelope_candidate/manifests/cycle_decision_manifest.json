@@ -1,0 +1,105 @@
+{
+  "schema": "eds-qd-autoresearch-cycle-decision-v1",
+  "created_at": "2026-08-11T04:06:31Z",
+  "decision": "CONCLUDE_NO_ADOPTION_WITHIN_FROZEN_CYCLE_REQUEST_VERSIONED_REDESIGN",
+  "project_status": "concluded_no_adoption_current_cycle",
+  "primary_objective": {
+    "benchmark": "LIBERO-PRO libero_object_swap",
+    "target_success_count": 5,
+    "target_total": 10,
+    "achieved": false
+  },
+  "evaluation": {
+    "historical_formal_best_success_count": 2,
+    "historical_formal_target_gap": 3,
+    "validation_control_success_count": 0,
+    "validation_control_success_tasks": [],
+    "validation_candidate_success_count": 1,
+    "validation_candidate_success_tasks": [0],
+    "validation_gained_tasks": [0],
+    "validation_lost_tasks": [],
+    "validation_target_gap": 4,
+    "formal_evaluation_executed": false,
+    "formal_evaluation_authorized": false,
+    "formal_reason": "Validation candidate was below the frozen 5/10 gate"
+  },
+  "mechanism_result": {
+    "hypothesis": "H1 causal monotonic QD descriptor envelope",
+    "resolution_support_task_count": 10,
+    "resolution_support_task_total": 10,
+    "raw_initial_bounds_overflow_p95": 0.9375,
+    "post_envelope_overflow_p95": 0.0,
+    "candidate_to_sparse_selection_latency_ratio": 1.0921590929301273,
+    "conclusion": "Partition-resolution mechanism supported but insufficient for task success"
+  },
+  "budget": {
+    "effective_online_episode_attempts": 42,
+    "global_reserved_attempts": 54,
+    "attempt_cap": 143,
+    "cumulative_gpu_hours_including_incident": 2.934766777777778,
+    "gpu_hour_cap": 48,
+    "formal_episodes": 0
+  },
+  "provenance": {
+    "branch": "exp/eds-qd-autoresearch-libero-swap-ood",
+    "worktree": "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood",
+    "frozen_design_commit": "1aee76489ea8989a832dec49b747239f2db90981",
+    "frozen_design_sha256": "4de266d0192781f5018c3ac1a276b40fd5e8701a8e0ba23dc21be52ad56ed852",
+    "validation_protocol_commit": "4b9c72c0eec68538839195a181bd5128b44ab4d7",
+    "validation_implementation_commit": "838b5550f96dfb9d8dbcf59bfc8052b9e1038350",
+    "validation_code_state_sha256": "5446d4fd7a1011fc1c1b96a5cd4d1c7abaa4cc976657a0241e802385c8cf5024",
+    "validation_result_commit": "eca85e69504cb4240e8b059f65f6237d4fb54272",
+    "conclusion_protocol_commit": "028e3029ee13a7139b5508d250ec9e9947334b80",
+    "conclusion_protocol_sha256": "14dd5874e19ebdf4dec482f2e134f8ea373eb2203ed4e2732b84cf7f2bba3153",
+    "result_analysis_sha256": "a6d02543abbb8a00635b83cec954f1cd7bd8499796e4717aa634654f8768c5b3"
+  },
+  "algorithm_source_fingerprints": {
+    "configs/config.yaml": "b20791a2792a5f7c6b3b61a2af02055462aa447059802aceb1293a7f77ecdaf8",
+    "core/eds_eval_metrics.py": "d8fb4d04271aa801089a1202af8baf658dc270b751224bc28b4816c9a6a83429",
+    "core/qd_ed.py": "1516bb75c3a5dc3894792d6b8f5daf7f777c48b7d58ea96496da47a986a970b9",
+    "core/rdt_policy_steer.py": "b8806d7a28e42e6e8a9d2959b5b1d7e5b7c9b304526d4022146c3ba23c8c1ff2"
+  },
+  "evidence": {
+    "validation_manifest_sha256": "0b9a19fc648bc7b0cf7291bd003387c01be82a015087b684e2d85007d41acd02",
+    "validation_gpu_admission_sha256": "e03d1e7f7447e4248faf3cedf2c3498f508ec3ba075af10a86814c7774336eda",
+    "validation_attempt_ledger_sha256": "df733b977265495e81e6e09dd081d163de4c6648cee88cc5e21ddc904af6da1a",
+    "validation_run_manifest_csv_sha256": "ed3f6bbf7179abcaa2f0eddd54208c4744575ad254dd50fd43257b32a7e74de2",
+    "validation_audit_sha256": "3f72d025b492e24e7f615db7c3207c4927710794797dd228edf0579ab1290774",
+    "mechanism_audit_v2_sha256": "c7e93f9255aee10f71e2519fa9e539cd537ca4ed89c905cebe334db5c68508ab",
+    "dev_a_audit_v2_sha256": "9c6d3ecee60d50c7e574b2a795c864483c85c812c0883a96ec81aa5d5d889fa9",
+    "dev_b_audit_sha256": "7a73b3ae67d3980147bb48d14198b4de9cbabb14262c82effce656b3f91ff64f",
+    "search_budget_report_sha256": "580cf8c007053c497866d80a5e8c643a4a15c3bbb8281f8de5742a5bbff30c1e",
+    "stage_guidance_report_sha256": "ecc7554c7a14dea6a56a532cdaa0ab99bc65f2d95a0bee212c1292964b4ac426"
+  },
+  "validity": {
+    "validation_jobs_valid": 2,
+    "validation_jobs_total": 2,
+    "safety_gate_passed": true,
+    "mechanism_gate_passed": true,
+    "latency_gate_passed": true,
+    "attempt_accounting_passed": true,
+    "artifact_gate_passed": true,
+    "credential_gate_passed": true,
+    "target_gate_passed": false,
+    "hard_failures": ["candidate validation success is below 5/10"]
+  },
+  "write_boundary": {
+    "code_and_documents_modified_only_in_owned_worktree": true,
+    "large_artifacts_written_only_in_owned_artifact_root": true,
+    "protected_untracked_file_excluded": "docs/01_specs/2026-08-10-eds-qd-stage-guidance-transition-design.md",
+    "external_historical_sources_read_only": true
+  },
+  "redesign_request": {
+    "required_for_further_execution": true,
+    "most_evidence_supported_direction": "H2 QD reward-quality, replacement, and final-selection calibration",
+    "scope": "EDS+QD core, QD-first",
+    "requirements": [
+      "versioned design",
+      "new leakage-safe validation holdout seeds",
+      "explicit online/formal budget",
+      "explicit user approval",
+      "no reuse of revealed validation outcomes for candidate tuning"
+    ]
+  },
+  "credential_material_included": false
+}

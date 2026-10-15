@@ -1,0 +1,156 @@
+{
+  "algorithm_source_fingerprints": {
+    "configs/config.yaml": "f8a9f07d52ea69ee3a69202ab5b89b4214353208ec27961ebcaef9b3d5b02d57",
+    "core/eds_eval_metrics.py": "870636edbaf1023b6c8a71f7f0778e6efa29833fc24f64b651e48714a0d61a31",
+    "core/qd_ed.py": "4a43cc2db1f1f87eaabf2146058347f119f6059beb4bdf2e67e36f9b6680b653",
+    "core/rdt_policy_steer.py": "bdc523f602453c402aa290ed40e495952578a5e028e0c9374365161255e7cd41"
+  },
+  "budget": {
+    "attempt_cap": 143,
+    "cumulative_gpu_hours": 5.447063166666667,
+    "effective_online_episode_attempts": 66,
+    "formal_episodes": 0,
+    "global_reserved_attempts": 90,
+    "gpu_hour_cap": 48,
+    "recovery_slots_consumed_v3": 6,
+    "recovery_slots_remaining_v3": 13
+  },
+  "created_at": "2026-08-12T08:56:58Z",
+  "credential_material_included": false,
+  "cross_cycle_synthesis": {
+    "formal_gap_reduced": false,
+    "h1": "Causal-envelope partition resolution improved but validation remained 1/10",
+    "h2": "Exact-degenerate fallback passed offline identity but never activated prospectively and lost control task 9",
+    "h4_v3": "One global-quality anchor repaired lineage omission and gained task 9 in Run033, but transferred as 0/6 versus 0/6 on frozen Dev-A",
+    "same_cycle_candidate_remaining": false
+  },
+  "decision": "CONCLUDE_NO_ADOPTION_WITHIN_V3_CYCLE_TARGET_NOT_MET",
+  "evaluation": {
+    "formal_evaluation_authorized": false,
+    "formal_evaluation_executed": false,
+    "formal_reason": "Run034 candidate failed both frozen Dev-A task gates",
+    "historical_formal_best_success_count": 2,
+    "historical_formal_target_gap": 3,
+    "run_034_candidate_success_count": 0,
+    "run_034_candidate_success_tasks": [],
+    "run_034_control_success_count": 0,
+    "run_034_control_success_tasks": [],
+    "run_034_gained_tasks": [],
+    "run_034_lost_tasks": [],
+    "validation_evaluation_authorized": false,
+    "validation_evaluation_executed": false
+  },
+  "evidence": {
+    "prior_v2_cycle_decision_sha256": "4010b620976ee8aa26ee05e6655a60c6ec4bc194511698254e9b2eb0bf9f1334",
+    "run_030_analysis_sha256": "9c7d07e7d8fa1f1f9fc3f9aa742cafcfb94de43d1b076cbf62250d7d1325abca",
+    "run_030_artifact_sha256": "cede7bbb823621e5ac21a3b5eb10c7ceb6e4acdf967d63ab5fb61135f472d812",
+    "run_031_analysis_sha256": "9f67b106b8e84585a6ce739dbfd8194bf6fc353a6a5e59fdd718cd1e32f66dac",
+    "run_032_analysis_sha256": "4c9ae2c9334a69ab6e56c0da66139e3efe52a4612f572c71f2657b05f2b2354b",
+    "run_032_artifact_sha256": "31dd437c377c41af369336f6161f194012143dbcf847a2ae150ac82fdf3de24b",
+    "run_033_analysis_sha256": "4b85fd21780d1a28fc895c50f4e3d9f7854b20bd45932fe2df91368aabb043f7",
+    "run_033_attempt_ledger_sha256": "b75aecccf0cd4301fd0f17f28f9d96dee2e2b84516911783381d390e43cb2fe6",
+    "run_033_audit_sha256": "b5f4c671d28bcec039f0b3ad6536ab1191fcad6c4f8c843926e66e3612acf96b",
+    "run_033_recovery_manifest_sha256": "6364f4a04a49c75d99c695d7bf7e0c186949a20b44c4f44776437b7c019d07e2",
+    "run_034_analysis_sha256": "b8f94f6c27daa4d35130275dde62adac8d2bcccccf326835808fb30a47d1c4c3",
+    "run_034_attempt_ledger_sha256": "db07734c1869b10ec29ed735f977be00a7491477871566570a207a060f2224da",
+    "run_034_audit_sha256": "2e590656dd60a18a17bf45ff7a2e1e9209daaaa34980a5d686b9d6f8879a0e68",
+    "run_034_gpu_admission_sha256": "4f89f3933ffe26448759c235ce26e6cef103db3ecbcb02540d08ec9506f9359f",
+    "run_034_manifest_sha256": "206911d750000f41aeed6e1739fb315b35a21f8f5b1dd78327eca5b32628601f",
+    "run_034_run_manifest_sha256": "9e39ee02bc23b7fa437db0c93ee30cdd586a971fdd66916f0134531c84953342"
+  },
+  "mechanism_result": {
+    "candidate_anchor_activations": 1060,
+    "candidate_anchor_rescue_rate": 0.4009433962264151,
+    "candidate_anchor_rescues": 425,
+    "candidate_metric_records": 106,
+    "candidate_to_control_selection_latency_ratio": 1.0528941297521386,
+    "compute_contract": {
+      "qd_evaluations_per_complete_chunk": 176,
+      "score_calls_per_complete_chunk": 11,
+      "search_evaluations_per_complete_chunk": 176
+    },
+    "conclusion": "Global-best lineage retention is a real allocation repair but did not transfer to frozen Dev-A task completion",
+    "hypothesis": "H4-v3 one global-quality parent anchor plus fifteen unchanged sparse-QD slots",
+    "run_033": {
+      "candidate_success_count": 1,
+      "candidate_success_tasks": [9],
+      "control_success_count": 0,
+      "control_success_tasks": [],
+      "gained_tasks": [9],
+      "lost_tasks": []
+    },
+    "run_034_failure_class_by_task": {
+      "candidate": {
+        "0": "timeout without completion",
+        "1": "timeout without completion",
+        "2": "timeout without completion",
+        "4": "timeout without completion",
+        "6": "timeout without completion",
+        "7": "timeout without completion"
+      },
+      "control": {
+        "0": "timeout without completion",
+        "1": "timeout without completion",
+        "2": "timeout without completion",
+        "4": "timeout without completion",
+        "6": "timeout without completion",
+        "7": "timeout without completion"
+      }
+    }
+  },
+  "primary_objective": {
+    "achieved": false,
+    "benchmark": "LIBERO-PRO libero_object_swap",
+    "target_success_count": 5,
+    "target_total": 10
+  },
+  "project_status": "concluded_no_adoption_v3_target_not_met",
+  "provenance": {
+    "branch": "exp/eds-qd-autoresearch-libero-swap-ood",
+    "conclusion_protocol_commit": "858c04696931f362fe3c4e04f7f44285c80e851d",
+    "conclusion_protocol_sha256": "979b86187fb824df47792a13bf4dc293a3487cab6488950881f069bfbf437f42",
+    "run_031_implementation_commit": "f453e645828d8076d72eee70c84669b385573b70",
+    "run_032_implementation_commit": "83a97150779be240d4d43847f13077dc61af4157",
+    "run_033_recovery_implementation_commit": "e1b4f3e8a75e1a817494f49957425b32ae2152c8",
+    "run_033_result_commit": "c67a82bfb461a841fb92ed48167a81f5630b7cc4",
+    "run_034_implementation_commit": "567014add4e08e053fead92297aa9b74ef370c8c",
+    "run_034_protocol_commit": "fa51d5db5133602ab8e19cb8215b0d96c2b11de6",
+    "run_034_result_commit": "79a2de70bfad50e0d4cb597a844bc85c2965b82f",
+    "v3_design_commit": "f30e47cd51cf09ee2ad8bfdad0986167dd8fb480",
+    "v3_design_sha256": "0a2ea24763ef824010e462bbb76fa25d0e1b51d7217848f2e58b49153aabb742",
+    "worktree": "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood"
+  },
+  "schema": "eds-qd-autoresearch-v3-cycle-decision-v1",
+  "validity": {
+    "artifact_gate_passed": true,
+    "attempt_accounting_passed": true,
+    "credential_gate_passed": true,
+    "hard_failures": [
+      "candidate Dev-A success count is below 3/6",
+      "candidate Dev-A improvement is below +1"
+    ],
+    "latency_gate_passed": true,
+    "mechanism_gate_passed": true,
+    "run_034_jobs_total": 2,
+    "run_034_jobs_valid": 2,
+    "safety_gate_passed": true,
+    "task_gate_passed": false
+  },
+  "write_boundary": {
+    "code_and_documents_modified_only_in_owned_worktree": true,
+    "external_historical_sources_read_only": true,
+    "large_artifacts_written_only_in_owned_artifact_root": true,
+    "protected_untracked_file_excluded": "docs/01_specs/2026-08-10-eds-qd-stage-guidance-transition-design.md"
+  },
+  "future_execution": {
+    "authorized": false,
+    "requirements": [
+      "new versioned design",
+      "new leakage-safe development and validation splits",
+      "explicit remaining budget",
+      "explicit user approval",
+      "no reuse of revealed Run034 outcomes for same-cycle tuning"
+    ],
+    "scope_if_approved": "EDS+QD core, QD-first"
+  }
+}
