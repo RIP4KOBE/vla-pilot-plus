@@ -1,0 +1,128 @@
+{
+  "schema": "historical_source_snapshot_v1",
+  "created_date": "2026-10-15",
+  "original_branch": "exp/rdt-qd-ed-decision-evidence-20260923",
+  "original_commit": "5b36c44ac86834b26c67b9b9e5445f67bc6daedb",
+  "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/support/decision_evidence",
+  "archive_path": "/mnt/data/shared2/hynx/vla-pilot-repository-archive-20261015/workspaces/snapshot-02/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/support/decision_evidence",
+  "snapshot_source_files_considered": 3019,
+  "changed_or_added_files": [
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/n3-first3-independent-review/review-v1-supersession-note.md",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/n3-first3-independent-review/review-v1-supersession-note.md",
+      "bytes": 964,
+      "sha256": "37f76b45ee2cf13526d1cf625631ea1c9d30b8eb9b360a4995b85aa9e751152e",
+      "git_blob": "5835f5592d1020d3cd5de388a98cae2d0ea5db22",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/n3-first3-independent-review/review-v1.md",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/n3-first3-independent-review/review-v1.md",
+      "bytes": 1592,
+      "sha256": "07ff137edb354a8c53cc43ab8b67a4a0a7a888073a8d9cc2d446587dc6dd2104",
+      "git_blob": "4da2c7152d3a316fcafbc01794e7da0d60928b8d",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/n3-first3-independent-review/review-v2.md",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/n3-first3-independent-review/review-v2.md",
+      "bytes": 1882,
+      "sha256": "9ece94efc24e2885cdc74632bf66f3d04ea760946a8a27003a0edd4f5c265708",
+      "git_blob": "10f2e301d5457152623cb77b7d7fd7f1f64c0011",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/n3-first3-independent-review/test_independent_review.py",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/n3-first3-independent-review/test_independent_review.py",
+      "bytes": 5017,
+      "sha256": "e81f7d8613881b26dc781483f8a1674e26703fbbc20882dd7b15e0212f752342",
+      "git_blob": "13228b891dbcd6befb5f489fcc89b89daafc11d1",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/n3-first3-independent-review/test_independent_review_v2.py",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/n3-first3-independent-review/test_independent_review_v2.py",
+      "bytes": 8908,
+      "sha256": "fbb5ba6b9786736c787c58f444a338ba228e0935393e04843e8f0b9cb44f8e8c",
+      "git_blob": "b50b212e698436da5acf6c0f836cbc890b26c968",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/n3-post-dev-conditional-preparation/source-only-memo-v1.md",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/n3-post-dev-conditional-preparation/source-only-memo-v1.md",
+      "bytes": 11411,
+      "sha256": "13b87184d2ce47fdab63eb55ac98bee684c45978deffa238ece905d535559dcd",
+      "git_blob": "da6ec797fefd8fb6b1deb5079d71dc53f0525df7",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/observed-baseline-profiles.json",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/observed-baseline-profiles.json",
+      "bytes": 56327,
+      "sha256": "41ce29c19f22d34c80358241d2443827408e1727afcc18ff416c7da3cbf7f1c9",
+      "git_blob": "7ec30633f1c8703d082f2414b78e7cd82550d5a7",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/prospective-protocol.md",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/prospective-protocol.md",
+      "bytes": 8653,
+      "sha256": "a2b47b75aa613c2a248c673f2eb7d956b539eee4a0d4c9cc7d0d382640d9db5a",
+      "git_blob": "9002e8808c70d7e1ef46a33ac774b7f33726de19",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/supervisor-support.py",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/supervisor-support.py",
+      "bytes": 14199,
+      "sha256": "5c99ca463d1fd0614696a305f297b7eb7dfeb92014a733e10f9cf75982d9d2c6",
+      "git_blob": "d83a273421a69ba3555eb4cb6904074fdac7db60",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/test_supervisor_support.py",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/test_supervisor_support.py",
+      "bytes": 14510,
+      "sha256": "146e920dd35816d69b555c587ba54af37e22400efd42c32d2118d71c476be068",
+      "git_blob": "1d565860ea8946884fd4ea76db4c36a8dddef0b3",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/osc-action-boundary-source-review/review-v1.md",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/osc-action-boundary-source-review/review-v1.md",
+      "bytes": 6700,
+      "sha256": "5e729a4702e839d338f32f1dc711f1bdfd1dc7da7ce962eeedd61131055298f8",
+      "git_blob": "bf6b27da82df33e1fec21400ef1aaae736c9066f",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/selected-tracking-independent-interpretation/memo-v1.md",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/selected-tracking-independent-interpretation/memo-v1.md",
+      "bytes": 10267,
+      "sha256": "75251b70bd97d2461ecc26e34bba5442ec7bc13b747e8eb046fa463190821cba",
+      "git_blob": "77eb52ed7db00fc0634a79af5f6882133ccb73cc",
+      "mode": "100644",
+      "previous_blob": null
+    }
+  ],
+  "deleted_tracked_paths": [],
+  "excluded_sensitive_or_large_paths": [],
+  "submodule_source_copies": ".historical-source/submodule-files/",
+  "scope": "Original Git history plus actual tracked working files and archived source/configuration/documentation. Large raw evidence, credentials and transient Git administration remain in private archive. Original source bytes are not edited.",
+  "publication_redaction": {
+    "policy": "Credential-like values and AWS signed URL queries removed in a separate exported history. Original private archive remains byte-exact. Published commit identities may differ; see main source index for original-to-published mapping.",
+    "published_parent_commit": "9cfa84e19b50ec4db4375cc6a1513a07cf701eee",
+    "overlay_redacted_paths": 0
+  }
+}
