@@ -1,0 +1,56 @@
+{
+  "schema": "historical_source_snapshot_v1",
+  "created_date": "2026-10-15",
+  "original_branch": "exp/rdt-qd-ed-n2-runner-20260923",
+  "original_commit": "ed56611dc45d28dbc59ffa172a810a810360dfc1",
+  "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n2_executed_quality/runner",
+  "archive_path": "/mnt/data/shared2/hynx/vla-pilot-repository-archive-20261015/workspaces/snapshot-02/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n2_executed_quality/runner",
+  "snapshot_source_files_considered": 3016,
+  "changed_or_added_files": [
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/selected-tracking-independent-review/protocol-source-review.md",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/selected-tracking-independent-review/protocol-source-review.md",
+      "bytes": 3451,
+      "sha256": "f3481cea5747a6ae1495f9fb48617199c8129995a891d0012ba7760fcb6a84f1",
+      "git_blob": "0d832a975d71a35bd008889df216789b99053d11",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/selected-tracking-independent-review/review-v1.md",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/selected-tracking-independent-review/review-v1.md",
+      "bytes": 2451,
+      "sha256": "befa713fe27aafb3831a3b261c50dd15e14aaaf1390742aaa8297be324e64473",
+      "git_blob": "4b3d6707a1533ede33d60d3243eeada1aaf3c86f",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/selected-tracking-independent-review/source-review-inputs.json",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/selected-tracking-independent-review/source-review-inputs.json",
+      "bytes": 1340,
+      "sha256": "d32cd7bd8a32d1f1aa95470e4be17a735a10dd07ac83aa5768c6f64d4fd96da2",
+      "git_blob": "506d4574b5eb321d1400fac94363677aea23d232",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/selected-tracking-independent-review/test_independent_selected_tracking.py",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/selected-tracking-independent-review/test_independent_selected_tracking.py",
+      "bytes": 5463,
+      "sha256": "efa0b81c700325d8d8551ddb230db5848c5e870ebb3e26addbcd88f6ec9c6b29",
+      "git_blob": "92db46d80ad10e4700d2cbc85c84ee00971c01bf",
+      "mode": "100644",
+      "previous_blob": null
+    }
+  ],
+  "deleted_tracked_paths": [],
+  "excluded_sensitive_or_large_paths": [],
+  "submodule_source_copies": ".historical-source/submodule-files/",
+  "scope": "Original Git history plus actual tracked working files and archived source/configuration/documentation. Large raw evidence, credentials and transient Git administration remain in private archive. Original source bytes are not edited.",
+  "publication_redaction": {
+    "policy": "Credential-like values and AWS signed URL queries removed in a separate exported history. Original private archive remains byte-exact. Published commit identities may differ; see main source index for original-to-published mapping.",
+    "published_parent_commit": "ae0774172ce1e745fff0063982948f92b5c2c84a",
+    "overlay_redacted_paths": 0
+  }
+}
