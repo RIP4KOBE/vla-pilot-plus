@@ -1,0 +1,11 @@
+{
+  "schema": "historical_stash_untracked_v1",
+  "original_commit": "f6ac6b0d1d08f4b33a9039f36e2ebb19ed65c88f",
+  "scope": "Original untracked tree from the preserved stash third parent; small original binary language caches remain in existing Git history.",
+  "files": [],
+  "publication_redaction": {
+    "policy": "Credential-like values and AWS signed URL queries removed in a separate exported history. Original private archive remains byte-exact. Published commit identities may differ; see main source index for original-to-published mapping.",
+    "published_parent_commit": "f6ac6b0d1d08f4b33a9039f36e2ebb19ed65c88f",
+    "overlay_redacted_paths": 0
+  }
+}
