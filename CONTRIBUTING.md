@@ -1,13 +1,13 @@
 # 协作与验收
 
-公共方法为 **VLS、EDS、EDS+QD**，CLI 使用 `vls`、`eds`、`eds_qd`。先读[架构合同](docs/steering/architecture.md)与[当前验收状态](docs/steering/integration-status.md)，安装见[环境说明](docs/steering/installation.md)。历史来源和命名例外统一放在 [README provenance](README.md#provenance)。
+公共方法为 **VLS、EDS、EDS+QD**，CLI 使用 `vls`、`eds`、`eds_qd`。先读[研究提案](docs/research/research_proposal.md)、[研究进度](docs/research/research_progress.md)和[开发指导](AGENTS.md)，再读[架构合同](docs/steering/architecture.md)与[当前验收状态](docs/steering/integration-status.md)，安装见[环境说明](docs/steering/installation.md)。历史来源和命名例外统一放在 [README provenance](README.md#provenance)。
 
 ## 提交与评审
 
-从更新后的main建立功能分支，通过PR合入。本次已完成本地main合并，团队基准见[状态页](docs/steering/integration-status.md)；远端尚未推送，远端协作需先由维护者发布。PR 写清具体问题、最终行为、影响方法、真实验证命令/结果与未验证范围。保留其他协作者改动，不通过重建 reference 消除回归。
+从更新后的main建立功能分支，通过PR合入。已验收框架已发布到远端main；团队基准见[状态页](docs/steering/integration-status.md)，最新发布和归档见[维护报告](docs/maintenance/repository-consolidation-20261015.md)。PR 写清具体问题、最终行为、影响方法、真实验证命令/结果与未验证范围。保留其他协作者改动，不通过重建 reference 消除回归。
 
 ```bash
-# 在工作区干净且本次整合已发布到main后执行。
+# 保护本地改动，在工作区干净时执行。
 git fetch origin
 git switch main
 git pull --ff-only origin main
@@ -22,7 +22,9 @@ git push -u origin codex/my-steering-change
 | launcher、资产/审计、安装等基础设施 | 故障与负例回归；证明正常科学输入不变；运行仍绑定实际受测 commit |
 | 文档、注释与纯展示 | 来源与命令核对；编辑后的发布 commit 不替代旧实验 runtime 身份 |
 
-三组完整在线验收已封存：EDS 3/10、VLS 1/10、EDS+QD 1/10，30个任务全部有效，整合gate通过。随后接入的生命周期/归档修复在两环境各通过1436项CPU测试；在线成绩仍绑定原受测runtime，见[状态页](docs/steering/integration-status.md)和[运行与归档说明](docs/steering/evaluation.md#prepared-infrastructure)。
+历史low三组完整在线验收已封存：EDS 3/10、VLS 1/10、EDS+QD 1/10，30个任务全部有效，整合gate通过。随后接入的生命周期/归档修复在两环境各通过1436项CPU测试；在线成绩仍绑定原受测runtime，见[状态页](docs/steering/integration-status.md)和[运行与归档说明](docs/steering/evaluation.md#prepared-infrastructure)。
+
+当前ultra共同协议为EDS 3/10、VLS 1/10、EDS+QD 0/10，独立于上述low结果；详见[推理强度对照](docs/steering/reasoning-effort-comparison.md)。新研究不得混用两套协议。
 
 ## 配置冻结与对照
 
