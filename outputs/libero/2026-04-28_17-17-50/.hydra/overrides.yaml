@@ -1,0 +1,6 @@
+- env=libero
+- policy.type=pi05
+- main.use_guidance=false
+- main.episode_num=10
+- main.sample_batch_size=1
+- main.render=false

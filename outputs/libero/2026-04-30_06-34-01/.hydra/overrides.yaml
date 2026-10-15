@@ -1,0 +1,5 @@
+- env=libero
+- policy.type=rdt
+- main.episode_num=10
+- main.use_guidance=false
+- main.sample_batch_size=1
