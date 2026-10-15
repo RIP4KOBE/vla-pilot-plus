@@ -743,6 +743,8 @@ class Main:
                 self.gemini_stage_recognizer = create_gemini_stage_recognizer(gemini_config)
                 log.info("Gemini stage recognizer initialized")
             except Exception as e:
+                if gemini_config.get('backend') in ('codex_cli', 'trace_replay'):
+                    raise RuntimeError("Required Stage initialization failed") from e
                 log.warning(f"Failed to initialize Gemini stage recognizer: {e}")
                 self.gemini_stage_recognizer = None
         else:
@@ -1061,6 +1063,10 @@ class Main:
         if trigger_reason and self.gemini_stage_recognizer is not None and vlm_query_count < vlm_query_limit:
             log.info(f"[Trigger] {trigger_reason} (query {vlm_query_count + 1}/{vlm_query_limit})")
 
+            set_trace_context = getattr(self.gemini_stage_recognizer, "set_trace_context", None)
+            if callable(set_trace_context):
+                set_trace_context(state, trigger_reason)
+
             new_stage, need_guidance = self.gemini_stage_recognizer.identify_stage_and_guidance(
                 current_rgb=np.array(self.adapter.get_vlm_image()),
                 instruction=self.adapter.get_task_description(),
@@ -1134,7 +1140,17 @@ class Main:
                 "evidence": query_result.get("evidence"),
                 "error": query_result.get("error"),
                 "query_latency_s": query_result.get("query_latency_s"),
+                **{key: query_result[key] for key in (
+                    "transport", "codex_logical_call_attempts", "codex_completed_turns",
+                    "codex_failed_calls", "codex_usage_complete_calls", "codex_input_tokens",
+                    "codex_cached_input_tokens", "codex_output_tokens",
+                    "codex_reasoning_output_tokens", "codex_call_latency_s",
+                ) if key in query_result},
             })
+
+        if (query_status == "error" and
+                getattr(self.gemini_stage_recognizer, "output_format", None) == "json_schema_v1"):
+            raise RuntimeError("stage_json_query_failed: " + str(query_result.get("error")))
 
         # Update tracking state
         state['prev_norm_reward'] = curr_reward
