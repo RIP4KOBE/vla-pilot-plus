@@ -12,7 +12,7 @@
 
 两轮各30回合均完整有效。ultra测试中另加强了传输恢复：重试1→8次、等待2→30秒，最终54个限流请求恢复，零回合级基础设施错误。首次ultra的独立有效VLS为2/10，分开保留；表中使用预先登记的新统一协议整组结果，没有按分数挑选回合。
 
-2026-10-13 的low整合验收已通过三组有效且EDS≥3/10的门槛；当时发布基础设施在原环境与独立安装环境均通过 **1436项CPU测试**。本次改档及传输修订的检查另见对照报告。代码已在本地 main，尚未推送远端。[原low逐任务结果](docs/steering/results.md) · [整合验收状态](docs/steering/integration-status.md)。
+2026-10-13 的low整合验收已通过三组有效且EDS≥3/10的门槛；当时发布基础设施在原环境与独立安装环境均通过 **1436项CPU测试**。本次改档及传输修订的检查另见对照报告。代码已于2026-10-15普通推送至远端 main；本次整理及最终发布记录见[维护报告](docs/maintenance/repository-consolidation-20261015.md)。[原low逐任务结果](docs/steering/results.md) · [整合验收状态](docs/steering/integration-status.md)。
 
 这是每任务一个固定seed的ObjectSwap OOD比较，默认方法预算不同。EDS是本轮观测成功数最高的方法；结果不支持统计优越性、等计算预算或泛化结论。此前迁移版EDS的3/10单独保留。
 
@@ -24,9 +24,18 @@
 
 默认配置的计算预算不同。QD archive 每个动作块重新建立；算法、Stage 进度及其限制见[架构说明](docs/steering/architecture.md)。
 
+## 项目与研发导航
+
+- [Research Proposal v0.1](docs/research/research_proposal.md)：核心想法、可检验假设、QD 与递归改进路线；明确标注 Notion 图片尚未读取的来源缺口。
+- [Research Progress](docs/research/research_progress.md)：当前能力、最可靠 EDS 对照、分协议逐任务结果和下一步验收。
+- [AGENTS.md](AGENTS.md) 与 [CONTRIBUTING.md](CONTRIBUTING.md)：开发规则、检查命令和团队协作。
+- [文档导航](docs/README.md) 与 [仓库整理报告](docs/maintenance/repository-consolidation-20261015.md)：历史材料、分支/工作树归档和发布状态。
+
+项目目标是在冻结 RDT 的推理阶段，以 EDS 为底座引入有用的 quality-diversity 和执行反馈。当前 QD 仅在动作块内维护档案；跨块/跨任务改进以及自动 BD 是待验证研究方向。
+
 ## 开始使用
 
-以下流程以取得本地main整合版本（或维护者提供的整合分支）为前提。本轮尚未推送远端，普通`origin/main` clone暂不包含这些入口；维护者发布后再clone/pull。
+远端 `main` 已包含验收框架。新合作者先 clone，再按下列安装与资产流程准备环境；普通 clone 不包含模型和完整原始实验归档。
 
 先完成[安装与资产准备](docs/steering/installation.md)：创建独立环境，单独安装并登录 Codex CLI，取得与清单匹配的模型/DINO 资产，再生成 `configs/local.yaml`。**目前没有配置公开的精确资产包**；RDT checkpoint与固定DINO源码需由维护者交付并通过清单验证，仅 clone 仓库不足以在线运行。模型内容与实际加载路径校验是 configure、preflight 和真实 launcher 的必经步骤。
 
@@ -75,18 +84,18 @@ VLS 上游方法见 [VLS: Steering Pretrained Robot Policies via Vision-Language
 <a id="provenance"></a>
 ## Provenance：来源与本地证据
 
-历史名称与 worktree 映射集中在本节，不作为公共方法或配置入口。受测 runtime、后续审计器与最终发布 commit 分别记录；基础设施补丁进入发布版本后，不能把旧 cohort 改称在新版本上运行。
+历史名称与 worktree 映射集中在本节，不作为公共方法或配置入口。2026-10-15清理映射见[归档清单](docs/maintenance/cleanup-inventory-20261015.json)；旧工作区路径保留为静态归档别名，不再用于开发。受测 runtime、后续审计器与最终发布 commit 分别记录；基础设施补丁进入发布版本后，不能把旧 cohort 改称在新版本上运行。
 
 | 来源 / 身份 | 范围 |
 | --- | --- |
-| 原 main / 本轮未推送的origin/main | `d51cb85f485502e0429c79529872efef2ec59981`；2026-10-13 17:22 UTC fetch核验 |
+| 整合前 origin/main（历史） | `d51cb85f485502e0429c79529872efef2ec59981`；2026-10-13 17:22 UTC fetch核验 |
 | 来源研究 worktree | `.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-gpu6-20260922T063626Z/study_worktree`；HEAD `77761b4cda78ac3b6762a6aa60f97b07fde7c1dc` |
 | 来源在线 baseline | `codex_failed_contact_v17_historical_initialization_online_full10`，位于来源 worktree 的 `artifacts/stage_closed_loop_20260929/runs/`；3/10、QD OFF |
 | 来源验收快照 | 48 个文件：37 个 untracked、5 个 modified、6 个 clean；来源 HEAD 本身不包含全部验收内容 |
 | 迁移在线验收 | `cfecb12db736f1a3408d9528d9336aadcb7e41b5`；EDS 有效 3/10；[完整报告](.worktrees/exp/steering-integration/runs/eds-migration-20261013/migration-full10-report.md)与[验收 JSON](.worktrees/exp/steering-integration/runs/eds-migration-20261013/migration-full10-acceptance.json) |
 | low三模式受测 runtime | `33954ead452927fc3168efb610487a688f89169e`；EDS 3/10、VLS 1/10、EDS+QD 1/10；30/30有效，整合gate通过 |
 | 整合时最终代码版本 | `b68777b46a374760a19fa76e3c309d9c84cfcc4c`；补齐两个已受测、原先被ignored的Hydra兼容alias，按原字节追踪；后续文档commit不改科学源码 |
-| 整合分支 / 最终 main 合并 | `codex/rdt-steering-integration` 的 `c67ea2eca18f408b99244fcbcd2987f78eee408a` 已合入本地main；merge及团队基准为 `8c1051f85a57115163845ec478d06a3ccc68c190`；本轮未推送 |
+| 整合分支 / 最终 main 合并 | `codex/rdt-steering-integration` 的 `c67ea2eca18f408b99244fcbcd2987f78eee408a` 已合入本地main；merge及团队基准为 `8c1051f85a57115163845ec478d06a3ccc68c190`；2026-10-15随main普通发布 |
 | 后续独立审计器 | 归档修复已接入；接入前的独立EDS复制归档重审将checker source hash与原runtime分别登记于[receipt](.worktrees/exp/steering-integration/checks/archive-v2-candidate-validation/receipt.json)；审计器/基础设施commit `5bf01db84e8c05251f720a3f8b9a73aa019f9568` |
 | 首轮ultra受测 runtime | `6c83eb6a55fa6f92723e58a960d59ee4f606084e`；VLS有效2/10；EDS、EDS+QD各有1个HTTP429回合错误，整组无效 |
 | ultra统一协议受测 runtime | `c99565de6e34278c14518748d7c608433a4c529a`；在main完成，未新增worktree；EDS 3/10、VLS 1/10、EDS+QD 0/10，30/30有效；[报告及来源索引](docs/steering/reasoning-effort-comparison.md) |

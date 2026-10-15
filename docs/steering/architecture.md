@@ -1,6 +1,6 @@
 # RDT steering 架构与算法合同
 
-三模式CLI、profile、统一Stage进度与独立机制审计已实现。同一冻结runtime完成EDS 3/10、VLS 1/10、EDS+QD 1/10，三组均通过完整v2与机制审计；验收后基础设施修复也通过两环境各1436项CPU测试。入口见[README](../../README.md)，结果和证据见[整合状态](integration-status.md)。
+三模式CLI、profile、统一Stage进度与独立机制审计已实现。2026-10-13的low协议在同一冻结runtime完成EDS 3/10、VLS 1/10、EDS+QD 1/10，三组均通过完整v2与机制审计；验收后基础设施修复也通过两环境各1436项CPU测试。下文所引在线机制计数来自这轮low验收，不能当作当前ultra计数。当前默认ultra的独立结果及研发状态见[Research Progress](../research/research_progress.md)，入口见[README](../../README.md)，原low证据见[整合状态](integration-status.md)。
 
 ## 共享链路与执行边界
 

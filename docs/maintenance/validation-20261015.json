@@ -1,0 +1,202 @@
+{
+  "schema": "repository_consolidation_validation_v1",
+  "date_utc": "2026-10-15",
+  "scientific_experiments_started": 0,
+  "gpu_or_online_api_calls": 0,
+  "runtime_identity": {
+    "runtime_commit": "c99565de6e34278c14518748d7c608433a4c529a",
+    "runtime_checked": 116,
+    "runtime_mismatches": [],
+    "protected_files": {
+      "HANDOFF.md": true,
+      "HANDOFF_REBOOT_PAUSE_20260923.md": true,
+      "docs/01_specs/2026-09-21-rdt-qd-ed-autoresearch-execution-prompt.md": true,
+      "docs/01_specs/2026-09-22-rdt-qd-ed-object-swap-next-round-experiment-plan.md": true,
+      "docs/02_analysis/vls_guidance/2026-06-05-rdt-guided-denoise-loop-vls-steering-analysis.md": true
+    }
+  },
+  "cpu_regression": {
+    "command": "env -u VLA_CODEX_ONLY CUDA_VISIBLE_DEVICES= PYTHON_DOTENV_DISABLED=1 PYTHONDONTWRITEBYTECODE=1 PYTHONNOUSERSITE=1 python -m pytest tests/test_steering_lifecycle_archive.py tests/test_steering_runner.py -q --disable-warnings -p no:cacheprovider",
+    "passed": 144,
+    "skipped": 3,
+    "seconds": 11.89,
+    "log_sha256": "d60b8d9a4f4f1195518c02da6452c5fbe40256b25cfbcce3ad5c7cd9b2f8f528"
+  },
+  "libero_assets": {
+    "files_verified": 2308,
+    "manifest_sha256": "8b6fa91960398a25af011c2fa9458f910ad4aa4599b45a853b04d743cac7711c",
+    "root": "/home/hynx/lizhuo/VLA-Pilot++/third_party/libero_pro",
+    "upstream_commit": "eafdb809426b13153aa1e4c42d6601844217dfec",
+    "valid": true
+  },
+  "rng_assets": {
+    "fixture_count": 20,
+    "manifest": "/home/hynx/lizhuo/VLA-Pilot++/tests/fixtures/steering_rng/fixture-manifest.json",
+    "scope": "file integrity only; RNG restoration is checked by the runtime hooks",
+    "sha256": "628c429d457def157c9163be94a1202721673f97f1e43aa6446e5a06889c6043",
+    "valid": true
+  },
+  "entrypoints": [
+    {
+      "method": "eds",
+      "returncode": 0,
+      "ten_tasks": true,
+      "effort": "ultra",
+      "output_created": false
+    },
+    {
+      "method": "vls",
+      "returncode": 0,
+      "ten_tasks": true,
+      "effort": "ultra",
+      "output_created": false
+    },
+    {
+      "method": "eds_qd",
+      "returncode": 0,
+      "ten_tasks": true,
+      "effort": "ultra",
+      "output_created": false
+    },
+    {
+      "help_entrypoints": 5,
+      "passed": true
+    }
+  ],
+  "cohort_reaudits": [
+    {
+      "protocol": "low",
+      "method": "eds",
+      "run": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-integration/runs/eds-common-20261013",
+      "support": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/low-eds",
+      "report": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/cohort-review/low-eds.json",
+      "valid": true,
+      "successes": 3,
+      "completed": 10,
+      "raw_receipts_unchanged": true,
+      "seconds": 15.60924506187439,
+      "report_sha256": "196b282560856673735c8865b44f0c16ddffaed36897161512f48da962440f32"
+    },
+    {
+      "protocol": "low",
+      "method": "vls",
+      "run": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-integration/runs/vls-common-20261013",
+      "support": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/low-vls",
+      "report": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/cohort-review/low-vls.json",
+      "valid": true,
+      "successes": 1,
+      "completed": 10,
+      "raw_receipts_unchanged": true,
+      "seconds": 17.97691035270691,
+      "report_sha256": "dc0df302ca3c3e1f59c7453b734d5d561701c2eaf50f62373e1331d5837643de"
+    },
+    {
+      "protocol": "low",
+      "method": "eds_qd",
+      "run": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-integration/runs/eds_qd-common-20261013",
+      "support": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/low-eds_qd",
+      "report": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/cohort-review/low-eds_qd.json",
+      "valid": true,
+      "successes": 1,
+      "completed": 10,
+      "raw_receipts_unchanged": true,
+      "seconds": 19.117422103881836,
+      "report_sha256": "183353d4474a391120ea40e98edd89ad4779c10f5f7ae33c71b315c2b8ee0196"
+    },
+    {
+      "protocol": "ultra",
+      "method": "eds",
+      "run": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01",
+      "support": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/ultra-eds",
+      "report": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/cohort-review/ultra-eds.json",
+      "valid": true,
+      "successes": 3,
+      "completed": 10,
+      "raw_receipts_unchanged": true,
+      "seconds": 14.589166402816772,
+      "report_sha256": "4f203817d5a56c58f5c5927c53d4bfa4c74eb2778520b1077defd7c0466c1bc0"
+    },
+    {
+      "protocol": "ultra",
+      "method": "vls",
+      "run": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01",
+      "support": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/ultra-vls",
+      "report": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/cohort-review/ultra-vls.json",
+      "valid": true,
+      "successes": 1,
+      "completed": 10,
+      "raw_receipts_unchanged": true,
+      "seconds": 17.2463116645813,
+      "report_sha256": "9aaec39b7dcefce9eb16db92d644d171e4a50df80678de9c8dd2738ee9ce3574"
+    },
+    {
+      "protocol": "ultra",
+      "method": "eds_qd",
+      "run": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01",
+      "support": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/ultra-eds_qd",
+      "report": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/cohort-review/ultra-eds_qd.json",
+      "valid": true,
+      "successes": 0,
+      "completed": 10,
+      "raw_receipts_unchanged": true,
+      "seconds": 19.84305477142334,
+      "report_sha256": "4df9e96d3e05fecef362fa387428619cfe30f7e93fc4664a7d4968df26475fd6"
+    }
+  ],
+  "relocated_eds_cohort": {
+    "source": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-integration/runs/eds-common-20261013",
+    "archive": "/mnt/data/shared2/hynx/vla-pilot-repository-archive-20261015/accepted-cohorts/low-eds-preserved",
+    "checksum_equal": true,
+    "full_audit_valid": true,
+    "successes": 3,
+    "completed": 10,
+    "support": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/low-eds",
+    "report": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/cohort-review/relocated-low-eds.json",
+    "report_sha256": "3d451c0a209463e7e373ab1309cefef6ae37019d4d4820c820bee51aab93866c",
+    "scope": "new copy and independent output; source run receipts untouched; no simulator/GPU/API execution"
+  },
+  "original_published_reports_unchanged": [
+    {
+      "path": "docs/steering/results.md",
+      "sha256": "1cad2f877c3f25d5881c6904f3aa5d977b459e6bb1566a22f7b1966f5d71d76a"
+    },
+    {
+      "path": "docs/steering/reasoning-effort-comparison.md",
+      "sha256": "904893a8c3a27ae1bffd39992a6b0dda637d70dbe569b76e4b46cdd07d92ce4f"
+    },
+    {
+      "path": "docs/steering/validation/final-results.json",
+      "sha256": "c28a0802730d4236013fe5ba055357d6b22ab3d7d2924a8c92c39ae9f1fbb350"
+    },
+    {
+      "path": "docs/steering/validation/reasoning-effort-results.json",
+      "sha256": "192ddc1a07c212e478dcaa1893ea71e45a57f93a0e0bebc48490ccca854fb4ea"
+    }
+  ],
+  "progress_table_matches_published_results": true,
+  "archive_copy_groups_verified": 13,
+  "retired_worktrees": 72,
+  "retired_local_branches": 75,
+  "remaining_worktrees": 1,
+  "remaining_local_branches": [
+    "main"
+  ],
+  "archive_symlinks": {
+    "links_checked": 5376,
+    "already_broken_before": 45,
+    "new_problems": [],
+    "worktree_aliases_checked": 72
+  },
+  "local_evidence_root": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015",
+  "limits": [
+    "Notion Proposal image bodies and bookmark target unreadable through current connector; not synthesized as read content.",
+    "Existing 45 broken historical links preserved and indexed; zero new broken links.",
+    "No fresh simulator/GPU/API run; re-audits check recorded evidence.",
+    "Exact models and full raw archives remain maintainer-local, not publicly downloadable.",
+    "Five original user untracked files remain protected and are excluded from commits."
+  ],
+  "markdown_links": {
+    "checked": 126,
+    "missing": []
+  }
+}

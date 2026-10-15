@@ -1,0 +1,45 @@
+{
+  "read_date": "2026-10-15",
+  "project_url": "https://app.notion.com/p/315803e44a5c80a0909bc325be418726",
+  "proposal_url": "https://app.notion.com/p/319803e44a5c80699dd2f2077f19bb61",
+  "section": "Proposal / 关键问题思考",
+  "connector_read_only": true,
+  "section_response_sha256": "8702db4b1b3f95480e29d8289248bee48f6241c74c3fe40d2062802e21417922",
+  "image_reference_count": 26,
+  "readable_intent": "在VLA-Pilot的基础上，增强quality diversity，进一步凸显进化搜索算法的优势",
+  "readable_topics": [
+    "利用QD增强原有的ED算法对VLA Steering带来的好处",
+    "QD中objective和measures (BD)的区别",
+    "具体算法实现伪代码",
+    "具体如何设计measures/BD",
+    "如何利用MLLM实现不同任务的自动化BD设计推理"
+  ],
+  "unread_material": [
+    "26 image bodies",
+    "innovation-analysis bookmark target"
+  ],
+  "attempts": [
+    {
+      "input": "containing project page",
+      "result": "text + image references; overall truncated"
+    },
+    {
+      "input": "independent Proposal section",
+      "result": "readable text + 26 image references"
+    },
+    {
+      "input": "image block UUID",
+      "result": "blank block, no image pixels or signed URL"
+    },
+    {
+      "input": "bookmark block UUID",
+      "result": "blank block, destination not exposed"
+    },
+    {
+      "input": "exact notion-file-block file URI",
+      "result": "400 invalid URL"
+    }
+  ],
+  "user_followup": "No corresponding text/link available; asked to attempt direct file read. Attempted; current connector has no binary read capability for these references.",
+  "limits": "No OCR, image semantics, full-image review, or bookmark-content claim. No unrelated Notion content exported."
+}
