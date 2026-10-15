@@ -1,0 +1,150 @@
+{
+  "schema": "resource-isolation-proof-metadata-review-v1",
+  "scientific_referenced_files_opened": false,
+  "references": {
+    "W_runtime": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-diagnostic/runtime-manifest.json",
+      "sha256": "2118d25a2e91c170c2842aec7ef11159df6c15a314d1a28153779722f22aea8e",
+      "artifact_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z",
+      "worktree": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z",
+      "cuda_egl_probe": {
+        "resource_id": "rdt-qd-ed-final-20260921T093925Z__gpu3_cuda_egl__060fecd66f77",
+        "evidence_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/probes/rdt-qd-ed-final-20260921T093925Z__gpu3_cuda_egl__060fecd66f77/probe-evidence.json",
+        "evidence_sha256": "9cf6fd4ef55893b2dc617e87f8284b0c398b95a069c2803a1ea7b8693428dc95"
+      }
+    },
+    "W_plan": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-dev-v1/plan.frozen.json",
+      "sha256": "8f9c058cd0e87da1ba8a108c1d778b6da445bba5a87b5c212351d7145770c5ed",
+      "artifact_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z",
+      "worktree": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z",
+      "source_commit": "f6a9ab04c0f184bbe2f8c837b33492835bc8fec9",
+      "runtime_manifest_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-diagnostic/runtime-manifest.json",
+      "runtime_manifest_sha256": "2118d25a2e91c170c2842aec7ef11159df6c15a314d1a28153779722f22aea8e",
+      "health_resources": [
+        {
+          "resource_id": "rdt-qd-ed-final-20260921T093925Z__gpu3_cuda_egl__060fecd66f77",
+          "scope": "reused_prior"
+        },
+        {
+          "resource_id": "rdt-qd-ed-final-20260921T093925Z__gpu3_freshboot_model_first__be47760b9287",
+          "scope": "reused_prior"
+        }
+      ],
+      "prerequisite_refs": {
+        "common_kernel": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__freshboot_c0_t00_20260923__47a4507eacbe/freshboot-kernel-monitor.json",
+          "sha256": "04142cd89bf16b39bb60670b75bf1f9265fc0f435afcd790ca4c9094fc8ef406"
+        },
+        "common_process": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__freshboot_c0_t00_20260923__47a4507eacbe/process.json",
+          "sha256": "f5bb3e266858748bbd04b3b4869949f807d6bf27ffc004a600612d17ffbba257"
+        },
+        "common_result": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__freshboot_c0_t00_20260923__47a4507eacbe/attempt-result.json",
+          "sha256": "e857433165577c23648fd4854d134cce5dd7bc0cb3d24bdae9d0c6e3f1bfd61e"
+        },
+        "health_contract": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-model-first/frozen-contract.json",
+          "sha256": "7871dce7f04d8e94b82a7ed5975390898eb75261d6319fb635ffe64bbf77012c"
+        },
+        "health_result": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-model-first/rdt-qd-ed-final-20260921T093925Z__gpu3_freshboot_model_first__be47760b9287/healthcheck-result.json",
+          "sha256": "c510a6e5c6a3735612d93cc576f9b61670bac6f25c88a17edecd2b4a8c5fe5e5"
+        }
+      }
+    },
+    "X_runtime": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/n1w-transport-fallback/runtime-manifest.json",
+      "sha256": "7de5b438a09b10b9c44db5e5508dac960a80724c279ed9bd358ba62252f3bc39",
+      "artifact_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z",
+      "worktree": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z",
+      "cuda_egl_probe": {
+        "resource_id": "rdt-qd-ed-final-20260921T093925Z__gpu2_cuda_egl__ca0a661d87c1",
+        "evidence_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/probes/rdt-qd-ed-final-20260921T093925Z__gpu2_cuda_egl__ca0a661d87c1/probe-evidence.json",
+        "evidence_sha256": "d165c3571a7d144dc93bf8c98e321004f3fe573bac0138ab1434e190f034d1c9"
+      }
+    },
+    "X_plan": {
+      "path": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-n1w-approved-plan.json",
+      "sha256": "fa3408e75f49385178987db533b9d00d4fefb8f1dfa24647fd245cf9fe5980c2",
+      "artifact_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z",
+      "worktree": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z",
+      "source_commit": "c75ff0f4eb4c8ae23dfc41b5f7449e99c06ff9ee",
+      "runtime_manifest_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/n1w-transport-fallback/runtime-manifest.json",
+      "runtime_manifest_sha256": "7de5b438a09b10b9c44db5e5508dac960a80724c279ed9bd358ba62252f3bc39"
+    }
+  },
+  "required_proofs": [
+    {
+      "required_by": "W_runtime",
+      "resource_id": "rdt-qd-ed-final-20260921T093925Z__gpu3_cuda_egl__060fecd66f77",
+      "charged_owner": "W",
+      "settled_in_snapshot": true,
+      "evidence_semantics_revalidated": false
+    },
+    {
+      "required_by": "W_plan",
+      "resource_id": "rdt-qd-ed-final-20260921T093925Z__gpu3_cuda_egl__060fecd66f77",
+      "charged_owner": "W",
+      "settled_in_snapshot": true,
+      "evidence_semantics_revalidated": false
+    },
+    {
+      "required_by": "W_plan",
+      "resource_id": "rdt-qd-ed-final-20260921T093925Z__gpu3_freshboot_model_first__be47760b9287",
+      "charged_owner": "W",
+      "settled_in_snapshot": true,
+      "evidence_semantics_revalidated": false
+    },
+    {
+      "required_by": "X_runtime",
+      "resource_id": "rdt-qd-ed-final-20260921T093925Z__gpu2_cuda_egl__ca0a661d87c1",
+      "charged_owner": "X",
+      "settled_in_snapshot": true,
+      "evidence_semantics_revalidated": false
+    }
+  ],
+  "source_refs": [
+    {
+      "owner": "W",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_final_runner.py",
+      "sha256": "c3ccced7b0535a824a96724f787dfc5cd3636f1de023149082593d35dc975d5b"
+    },
+    {
+      "owner": "W",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_n4_plan.py",
+      "sha256": "e5a6fd6e084a0748d786a0baec4472507d5ba61384696023b76a0099c05c59e9"
+    },
+    {
+      "owner": "W",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_available_gpu_queue.py",
+      "sha256": "4882bf38a14de334b76f000bc23e492cce4be5e9da9e802472f8025d7baba394"
+    },
+    {
+      "owner": "X",
+      "path": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/scripts/qd_ed_final_runner.py",
+      "sha256": "a3fb70c24a5035a0f7d0aac6f6663122349e832f38ad31566d16629f6158b662"
+    },
+    {
+      "owner": "X",
+      "path": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/scripts/qd_ed_available_gpu_queue.py",
+      "sha256": "5b01b5ea4557549e004c2c1ee1e62e8961e9f23e0d9a1288da1b73dd2b3d90e5"
+    },
+    {
+      "owner": "X",
+      "path": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/scripts/qd_ed_n1v_supervise.py",
+      "sha256": "aea2834c2127fdab3b2163ea6514fb4749005d9b0d1308f3608da98113cd7d17"
+    }
+  ],
+  "cross_ledger_duplicate_ids": [],
+  "duplicate_group_output_dirs": [],
+  "snapshot": {
+    "path": "docs/03_evidence/qd_ed_final/continuation_20260923/resource-isolation-review/snapshot-v1.json",
+    "sha256": "ad563e5dda37ab1c3c59edf8a89cf775489c92da0967dba81e34e5bb586e2838"
+  },
+  "audit_script": {
+    "path": "docs/03_evidence/qd_ed_final/continuation_20260923/resource-isolation-review/audit_resource_ownership.py",
+    "sha256": "238cce531fd856b41a10f59d11cc8e970bb3797fb97d0e01339ebe384ebd48d8"
+  }
+}

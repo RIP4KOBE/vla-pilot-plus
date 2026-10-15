@@ -1,0 +1,83 @@
+{
+  "schema": "historical_source_snapshot_v1",
+  "created_date": "2026-10-15",
+  "original_branch": "exp/rdt-qd-ed-n4-audit-20260924",
+  "original_commit": "847ebdfa23b6747b627f832a90a7c37e743c77a5",
+  "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n4_terminal_population/audit",
+  "archive_path": "/mnt/data/shared2/hynx/vla-pilot-repository-archive-20261015/workspaces/snapshot-02/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n4_terminal_population/audit",
+  "snapshot_source_files_considered": 3042,
+  "changed_or_added_files": [
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/n4-protected-evaluation-preparation/memo-v1.md",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/n4-protected-evaluation-preparation/memo-v1.md",
+      "bytes": 9242,
+      "sha256": "632c8dd210aaa950d54d8f5ab7caff41563596ea66034a35e9cc911afb802ee0",
+      "git_blob": "0af5357b9a3fe39a4a0b7bb9cb71f66ae0d40eb9",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/n4-protected-evaluation-preparation/source-refs-v1.json",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/n4-protected-evaluation-preparation/source-refs-v1.json",
+      "bytes": 4067,
+      "sha256": "cd42b30a55f7c6d8a140c3ef490395f2604c2f0e439a8f58cce822c5a94a48ae",
+      "git_blob": "d99d7919c015474b244b474f4f971fddf5fa94b1",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/resource-isolation-review/audit_resource_ownership.py",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/resource-isolation-review/audit_resource_ownership.py",
+      "bytes": 11937,
+      "sha256": "238cce531fd856b41a10f59d11cc8e970bb3797fb97d0e01339ebe384ebd48d8",
+      "git_blob": "21e7e0494adf906598e30ebd24c9872d7012328b",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/resource-isolation-review/audit_resource_ownership_v2.py",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/resource-isolation-review/audit_resource_ownership_v2.py",
+      "bytes": 11937,
+      "sha256": "90c1003fef21a92276881fd13ab2beb92296fa31d45d83f5fb200c5f4d6c5393",
+      "git_blob": "5151e39d192d5fe3b48de4b6e8410deca80f8ef0",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/resource-isolation-review/proof-and-source-review-v1.json",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/resource-isolation-review/proof-and-source-review-v1.json",
+      "bytes": 8204,
+      "sha256": "ed3ec60aa5c6edcf81d3cc00a64d772c78aba35619cfaf9d567a6671e43d8dc3",
+      "git_blob": "134c5f0dc18385e18ba283cb2eb92963ad8dd52c",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/resource-isolation-review/review-v1.md",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/resource-isolation-review/review-v1.md",
+      "bytes": 9699,
+      "sha256": "57be54ecdfbd22e1f676218d289f73f1c1ab8994b6acac77577777deb71feb27",
+      "git_blob": "64406301b529add988d6937e4c798579e167e6bb",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/resource-isolation-review/review-v2-final-snapshot.md",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/resource-isolation-review/review-v2-final-snapshot.md",
+      "bytes": 4851,
+      "sha256": "38261a8667e755a812efb9ad338626cf7358391f9c49e3cfe70e608530c322af",
+      "git_blob": "e25da1f0dd1eebc8a3afd046da523f01889f2561",
+      "mode": "100644",
+      "previous_blob": null
+    }
+  ],
+  "deleted_tracked_paths": [],
+  "excluded_sensitive_or_large_paths": [],
+  "submodule_source_copies": ".historical-source/submodule-files/",
+  "scope": "Original Git history plus actual tracked working files and archived source/configuration/documentation. Large raw evidence, credentials and transient Git administration remain in private archive. Original source bytes are not edited.",
+  "publication_redaction": {
+    "policy": "Credential-like values and AWS signed URL queries removed in a separate exported history. Original private archive remains byte-exact. Published commit identities may differ; see main source index for original-to-published mapping.",
+    "published_parent_commit": "d5e708a2e22ff73b90b9c9186929a8c3edd9e7db",
+    "overlay_redacted_paths": 0
+  }
+}
