@@ -1,0 +1,161 @@
+# ============================================
+# RDT LIBERO 微调项目 - Git 忽略文件
+# ============================================
+
+# ============ 训练产物和大文件 ============
+# Checkpoints (模型权重文件，通常很大)
+checkpoints/
+*.bin
+*.pth
+*.safetensors
+*.ckpt
+
+# 训练输出和评估结果
+outs/
+outputs/
+results/
+
+# WandB 日志和缓存
+wandb/
+.wandb/
+
+# 训练日志
+logs/
+*.log
+nohup.out
+
+# ============ Python 相关 ============
+# 字节码和缓存
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# 分发和打包
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# ============ 虚拟环境 ============
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv
+
+# ============ IDE 和编辑器 ============
+# VSCode / Cursor
+.vscode/
+.cursor/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+
+# Vim
+*.swp
+*.swo
+*~
+.*.sw?
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# ============ Jupyter Notebook ============
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# ============ 数据集（通常很大）============
+# 如果数据集很大，取消注释以下行
+# data/datasets/
+# data/*.hdf5
+# *.hdf5
+# *.h5
+
+# ============ 操作系统文件 ============
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+
+# Linux
+.directory
+.Trash-*
+
+# ============ 临时文件 ============
+*.tmp
+*.temp
+*.bak
+*.backup
+*.orig
+
+# ============ 环境变量和密钥 ============
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+secrets/
+.secrets/
+
+# ============ 其他 ============
+# 压缩文件
+*.zip
+*.tar.gz
+*.tar
+*.rar
+
+# 大型视频文件
+*.mp4
+*.avi
+*.mkv
+*.mov
+
+# PDF 和文档（可选）
+# *.pdf
+
+# 测试覆盖率
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.tox/
+
