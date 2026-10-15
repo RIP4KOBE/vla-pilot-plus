@@ -1,0 +1,19 @@
+{
+  "schema": "historical_source_snapshot_v1",
+  "created_date": "2026-10-15",
+  "original_branch": "debug/diffusion-baseline",
+  "original_commit": "c528347697413a4c29f0c798009af37dacee0b21",
+  "worktree": "/home/hynx/VLA-Pilot++/.worktrees/debug-diffusion-baseline",
+  "archive_path": "/mnt/data/shared2/hynx/vla-pilot-repository-archive-20261015/workspaces/snapshot-01",
+  "snapshot_source_files_considered": 58,
+  "changed_or_added_files": [],
+  "deleted_tracked_paths": [],
+  "excluded_sensitive_or_large_paths": [],
+  "submodule_source_copies": ".historical-source/submodule-files/",
+  "scope": "Original Git history plus actual tracked working files and archived source/configuration/documentation. Large raw evidence, credentials and transient Git administration remain in private archive. Original source bytes are not edited.",
+  "publication_redaction": {
+    "policy": "Credential-like values and AWS signed URL queries removed in a separate exported history. Original private archive remains byte-exact. Published commit identities may differ; see main source index for original-to-published mapping.",
+    "published_parent_commit": "c528347697413a4c29f0c798009af37dacee0b21",
+    "overlay_redacted_paths": 0
+  }
+}
