@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # C0 control: the learned policy and execution controller handle placement.
+    reward = torch.zeros((), device=action_sequence.device)
+    return reward.mean()
+

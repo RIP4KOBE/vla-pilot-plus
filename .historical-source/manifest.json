@@ -1,0 +1,36 @@
+{
+  "schema": "historical_supplemental_source_v1",
+  "date": "2026-10-15",
+  "source_root": "/mnt/data/shared2/hynx/steering-ultra-20261014/runs",
+  "files": [],
+  "scope": "Source/configuration/documentation only. Raw videos/model weights/logs/captures and private files remain external. Source symlinks are materialized here and mapped to their observed targets.",
+  "entries_key": "files",
+  "entry_count": 3782,
+  "entry_shards": [
+    {
+      "path": ".historical-source/manifests/part-0000.json",
+      "entries": 1000,
+      "sha256": "e8a2b30722bc3005a97e68b56f3ca8d67db0bfffdd42a749822fd1b36643fbbb"
+    },
+    {
+      "path": ".historical-source/manifests/part-0001.json",
+      "entries": 1000,
+      "sha256": "adf3d8a9accc690902f75aa41a741ca2366f516ffa1a8530c3b519a5a307215c"
+    },
+    {
+      "path": ".historical-source/manifests/part-0002.json",
+      "entries": 1000,
+      "sha256": "74988783547b36aafbc740d5e1dcc2fd632e36a85952281cc4629c03730098b9"
+    },
+    {
+      "path": ".historical-source/manifests/part-0003.json",
+      "entries": 782,
+      "sha256": "7bd211718a0bf8a31b2018d48dcc87c80235ac4ec1d7963ed9271a4fe8f575f9"
+    }
+  ],
+  "publication_redaction": {
+    "policy": "Credential-like values and AWS signed URL queries removed in a separate exported history. Original private archive remains byte-exact. Published commit identities may differ; see main source index for original-to-published mapping.",
+    "published_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
+    "overlay_redacted_paths": 0
+  }
+}

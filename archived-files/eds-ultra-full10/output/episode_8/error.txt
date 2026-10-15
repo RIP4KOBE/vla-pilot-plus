@@ -1,0 +1,16 @@
+Error during episode execution:
+Traceback (most recent call last):
+  File "/home/hynx/lizhuo/VLA-Pilot++/main.py", line 1559, in run
+    self._run_episode(episode, episode_dir, episode_seed)
+  File "/home/hynx/lizhuo/VLA-Pilot++/core/episode_rng_hooks.py", line 76, in rollout_with_fixture
+    return rollout(self, episode, episode_dir, episode_seed)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/lizhuo/VLA-Pilot++/main.py", line 1733, in _run_episode
+    stage_state = self._update_stage(stage_state, gripper_val, UPPER_THRESHOLD, LOWER_THRESHOLD)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/lizhuo/VLA-Pilot++/main.py", line 1323, in _update_stage
+    return update_stage(self, state, gripper_val)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/lizhuo/VLA-Pilot++/core/stage_evidence.py", line 447, in update_stage
+    raise RuntimeError(error)
+RuntimeError: stage_evidence_observation_failed

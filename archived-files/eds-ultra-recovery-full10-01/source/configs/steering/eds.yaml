@@ -1,0 +1,6 @@
+# Accepted EDS search, with RBF diversity and no active archive.
+main:
+  guidance_type: eds
+  eds_config:
+    qd_archive_mode: none
+    qd_metrics_observer: true

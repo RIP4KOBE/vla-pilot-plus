@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # C0 control: the learned policy handles placement in the basket.
+    reward = torch.zeros((), device=action_sequence.device)
+    return reward.mean()
+

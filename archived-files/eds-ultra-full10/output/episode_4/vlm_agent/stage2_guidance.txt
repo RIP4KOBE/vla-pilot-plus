@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    reward = torch.zeros((), device=action_sequence.device)
+    return reward.mean()
+
