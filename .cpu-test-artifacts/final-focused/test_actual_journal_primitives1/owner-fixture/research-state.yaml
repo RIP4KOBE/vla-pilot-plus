@@ -1,0 +1,26 @@
+budget:
+  dispatched: 1
+  aborted: 0
+  valid: 0
+  invalid: 0
+  completed: 0
+  running: 1
+  gpu_hours_consumed: 0.0
+runner:
+  by_bucket:
+    baseline: 1
+    development: 0
+    validation: 0
+    formal: 0
+    recovery: 0
+  reserved_attempts: 1
+  gpu_hours_by_bucket:
+    baseline: 0.0
+    development: 0.0
+    validation: 0.0
+    formal: 0.0
+    recovery: 0.0
+  gpu_healthcheck_hours: 0.0
+  gpu_healthcheck_inflight: 0
+  last_attempt_id: n36_engineering_t00_c0_001479
+  last_event: dispatched

@@ -1,0 +1,33 @@
+{
+  "schema": "historical_source_snapshot_v1",
+  "created_date": "2026-10-15",
+  "original_branch": "detached-808e27f70256",
+  "original_commit": "808e27f702564fe51db45016e139b68ecb476f8c",
+  "worktree": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+  "archive_path": "/mnt/data/shared2/hynx/vla-pilot-repository-archive-20261015/workspaces/snapshot-10",
+  "snapshot_source_files_considered": 5289,
+  "changed_or_added_files": [],
+  "deleted_tracked_paths": [],
+  "excluded_sensitive_or_large_paths": [],
+  "submodule_source_copies": ".historical-source/submodule-files/",
+  "scope": "Original Git history plus actual tracked working files and archived source/configuration/documentation. Large raw evidence, credentials and transient Git administration remain in private archive. Original source bytes are not edited.",
+  "entries_key": "changed_or_added_files",
+  "entry_count": 1622,
+  "entry_shards": [
+    {
+      "path": ".historical-source/manifests/part-0000.json",
+      "entries": 1000,
+      "sha256": "94ca8775132da24793ac23c933b87448268c877b3985f270e233aac00bd41746"
+    },
+    {
+      "path": ".historical-source/manifests/part-0001.json",
+      "entries": 622,
+      "sha256": "54e4034c6312e5fe2010ecb821aa4a0aab7d9fc96d938b30d80a8f15b2b87168"
+    }
+  ],
+  "publication_redaction": {
+    "policy": "Credential-like values and AWS signed URL queries removed in a separate exported history. Original private archive remains byte-exact. Published commit identities may differ; see main source index for original-to-published mapping.",
+    "published_parent_commit": "0ed9f9d9af1b0e8ef09c6c95077c6e1238ea08bc",
+    "overlay_redacted_paths": 1
+  }
+}

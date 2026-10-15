@@ -1,0 +1,14 @@
+{
+  "audit_closure_ast_exact_extraction": true,
+  "retained_top_level_closure_statements": 21,
+  "scientific_paths_unchanged": true,
+  "changed_tracked_paths": [
+    "scripts/qd_ed_n36_bridge.py",
+    "scripts/qd_ed_n36_healthcheck.py",
+    "scripts/qd_ed_n36_release.py",
+    "scripts/qd_ed_n36_report.py",
+    "scripts/qd_ed_n36_runner.py",
+    "scripts/qd_ed_n36_worker.py"
+  ],
+  "base": "813f25bc89a3920149739a2bf957b2e1b3db29c4"
+}
