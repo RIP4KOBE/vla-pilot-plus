@@ -1,0 +1,1010 @@
+{
+  "artifact_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z",
+  "code_files": [
+    {
+      "path": "configs/backend/libero.yaml",
+      "sha256": "e1d1f41f178c7e5968e04b8337c13e8f37b691a7b3e93f9f8e9f7bb5796deb14",
+      "size_bytes": 1341
+    },
+    {
+      "path": "configs/config.yaml",
+      "sha256": "be98e1127a93b30864c0f42832ba71adc11b115c34b1e2e0f748e2f3cb5bd55a",
+      "size_bytes": 6067
+    },
+    {
+      "path": "configs/perception.yaml",
+      "sha256": "b7d318d41b9d14eae435f4303693c8fca43c876a25fd26a9a6f8187da921daae",
+      "size_bytes": 2612
+    },
+    {
+      "path": "configs/policy.yaml",
+      "sha256": "44a1164f421121edafc47e9880eb0ad97be98732669365f931e0b226bc831cf6",
+      "size_bytes": 1487
+    },
+    {
+      "path": "configs/qd_ed_final/baseline_profiles.json",
+      "sha256": "75ba829fc29db71ae31669cd803c24fbe8ea96fe347160539a273f9d73551690",
+      "size_bytes": 55803
+    },
+    {
+      "path": "configs/qd_ed_final/candidate_n1.json",
+      "sha256": "5e74d72f108df53897e790677154c5ca3691b1aeb318297168d3bffcb84bfe3c",
+      "size_bytes": 3546
+    },
+    {
+      "path": "core/__init__.py",
+      "sha256": "233696e00a1ada9a70a50c11160a96884d223df0e7b92aa7ba8bc8a61503efe6",
+      "size_bytes": 1551
+    },
+    {
+      "path": "core/codex_stage.py",
+      "sha256": "8002d2e8baecf7744ee71cf503f9754700c56417deca0a4b93e4e59f44095b6c",
+      "size_bytes": 17202
+    },
+    {
+      "path": "core/codex_stage_policy.py",
+      "sha256": "f85dcf28afa44ad421b306eccd8e6514cd993d9e830db6fcbdc872e38f80ebdd",
+      "size_bytes": 7206
+    },
+    {
+      "path": "core/diffusion_policy_steer.py",
+      "sha256": "97f0ee3b9159461e15f6b58ea2bd95119a5514872025b4c99594ec6b71815eaa",
+      "size_bytes": 22706
+    },
+    {
+      "path": "core/eds_eval_metrics.py",
+      "sha256": "0e07c57167dd92c07a31395f6ebba0b56d0f65bc62f4fb1e4d5fb30549fd6ae0",
+      "size_bytes": 34419
+    },
+    {
+      "path": "core/eds_mechanism_trace.py",
+      "sha256": "312087f5c354f81a820f2acb8419c6380e96805de79f1789c5c7ff23a8fcabf3",
+      "size_bytes": 24129
+    },
+    {
+      "path": "core/env_adapters/__init__.py",
+      "sha256": "790830ee3d9a8a6a0c59a114fbc77fb50bc158d05e13ff9e2e634ad7f370d9c4",
+      "size_bytes": 2922
+    },
+    {
+      "path": "core/env_adapters/base_adapter.py",
+      "sha256": "a5bb4f9e06f458fc38e6cc7486e6c6d268fc67bfaf6fd9f84f90514236144de8",
+      "size_bytes": 17086
+    },
+    {
+      "path": "core/env_adapters/calvin_adapter.py",
+      "sha256": "396957c62660edddf9704a24cbef15d9cf5f2bbb4da39ee4b9123c4d240a0541",
+      "size_bytes": 34596
+    },
+    {
+      "path": "core/env_adapters/libero_adapter.py",
+      "sha256": "5789168f59179599fb37ce88193884ec469db63a1a4f68fde350e90936100f19",
+      "size_bytes": 70776
+    },
+    {
+      "path": "core/fkd_class.py",
+      "sha256": "26ccfa9cf4837ce92baf0a5538ac3339d5c55a4f4f7b8f577366a0dd2a408412",
+      "size_bytes": 13029
+    },
+    {
+      "path": "core/gemini_grounder.py",
+      "sha256": "0d1a51c8dbd077f274235ae00c1b3ab538e0f9745d85fd12417e21f57980b1f6",
+      "size_bytes": 12775
+    },
+    {
+      "path": "core/keypoint_detector.py",
+      "sha256": "5fa108f01168ecb1f2433bc53f093701e0079fa6cf35abf910ec0347075d055e",
+      "size_bytes": 28857
+    },
+    {
+      "path": "core/keypoint_tracker.py",
+      "sha256": "292d63964b90405769118bda0e1acc9666f8ae076f41abbb7df8e5bf8abc6f45",
+      "size_bytes": 8747
+    },
+    {
+      "path": "core/pi05_steer.py",
+      "sha256": "ed9146d92bf09af1b1ec99774bd8042c70869ba2246c98ff04d23961ed83e962",
+      "size_bytes": 18337
+    },
+    {
+      "path": "core/policy_observation_sampling.py",
+      "sha256": "c7e93e81541c34dd45e22dffc43a24d428d043a56c0dd6766bfd286e2ff07f4d",
+      "size_bytes": 234
+    },
+    {
+      "path": "core/qd_ed.py",
+      "sha256": "4415ea7f16029e2fa2e7528c1f7065ba673b7a5a512723bfa9611f992298daa4",
+      "size_bytes": 39448
+    },
+    {
+      "path": "core/rdt_libero_action_converter.py",
+      "sha256": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d",
+      "size_bytes": 2380
+    },
+    {
+      "path": "core/rdt_libero_obs_processor.py",
+      "sha256": "5b6f3857be13254e1d2266270f57199578dbc4066566265b147d91cc30bb2d14",
+      "size_bytes": 7623
+    },
+    {
+      "path": "core/rdt_policy_steer.py",
+      "sha256": "82c8515542780acc5389d3043d7f25e14e9d23f6149fb067a6dfa99fb9aa584e",
+      "size_bytes": 341700
+    },
+    {
+      "path": "core/sam3_segmenter.py",
+      "sha256": "e3f3cdd5a970b738ffcf17c7fd765041195d1b9f40a1d2b3809c1459cb5dce81",
+      "size_bytes": 11141
+    },
+    {
+      "path": "core/sam_refiner.py",
+      "sha256": "fbe8a642294895773a3aad1a5e4a9dd21b2af1ad0b09e6d89cecb94b171ad909",
+      "size_bytes": 15252
+    },
+    {
+      "path": "core/sam_segmenter.py",
+      "sha256": "c4e243d22adf3becfaa1f94f33e9ff05c1e2962899de4e11a656d2ffb16cb8bf",
+      "size_bytes": 19075
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/available-gpu-amendment.md",
+      "sha256": "0098289d2d94b9c4e7f353a540877a64cd680cbc53217773fa47878d17f755c5",
+      "size_bytes": 2302
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/codex-provider-amendment.md",
+      "sha256": "0cc80d2f98b3764bcc6e50cc94738fb4d0f1bf62eb5c824d415c2314f68bf26f",
+      "size_bytes": 4508
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/codex-stage-event-amendment.md",
+      "sha256": "ad7b0618c909d4a7ab8a5812292d2fa734a746723b0ccb41989ae55b85e494b7",
+      "size_bytes": 4988
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/codex-stage-json-amendment.md",
+      "sha256": "e9cbbb05914ccb8731aced80f57bec62d5397509ca6e7e575571f418e44704fe",
+      "size_bytes": 4138
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/codex-stage-timeout-amendment.md",
+      "sha256": "d0b649e8aa38c8bee0fadc9c9037282d06b5f6faf2ee69142558ac087c868bad",
+      "size_bytes": 3918
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/gpu2-blocking-memcheck-diagnostic.md",
+      "sha256": "905dd470c989b997c1b6dfd5b1eb2871873013ac42b43469135bf1354cd461c6",
+      "size_bytes": 2436
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/gpu2-migration-amendment.md",
+      "sha256": "3c31adb0bbba1c6f5449ffd9729b44c9bd843d09e076e182163b2c1e3d83d8a0",
+      "size_bytes": 2537
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/gpu2-post-reboot-diagnostic.md",
+      "sha256": "01dc7d9ee381762ec3092a7be576c6c5eda6650b597ecc062c5b237419a308e5",
+      "size_bytes": 2697
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/gpu2-uncached-memcheck-diagnostic.md",
+      "sha256": "c6be54694cc69e557b0c8e9d0ae7eaf0121dec973c8f797d8b9fe7c5cceccc0b",
+      "size_bytes": 2621
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/gpu5-cuda-memcheck-diagnostic.md",
+      "sha256": "f123970dade4a1706860c25185b33973038bbcfde140960975053ce820ad751c",
+      "size_bytes": 2733
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/gpu5-egl-serialization-diagnostic.md",
+      "sha256": "394b0efe2ae005982ec35c641beb1996539baec0d296a26bc9223d74d514b398",
+      "size_bytes": 3872
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/gpu5-migration-amendment.md",
+      "sha256": "ae63e607fda8719adbfde486b36819f6b0632ddfc29bf914378ee7c2c5484d0e",
+      "size_bytes": 2192
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/gpu5-render-lifetime-diagnostic.md",
+      "sha256": "d75d147f1a746b7e10da81987a643f1d390ac6107e8c909105b65f6b4b43d050",
+      "size_bytes": 3390
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/gpu5-resource-amendment.md",
+      "sha256": "2df464cc889eaa6aa5b6e8c7f401a86069d95428b40e0aad57b8f496b22413bb",
+      "size_bytes": 2341
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/gpu6-goal-execution-amendment.md",
+      "sha256": "3dc85b6f7cc08090abf467844206578e2871e91c25371f96aeb3d99a911652b1",
+      "size_bytes": 2114
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/gpu6-kernel-xid-amendment.md",
+      "sha256": "65549f88a0fd17a6714f41b671ef574552f9fc058ad88950b3d505caa88bc777",
+      "size_bytes": 3718
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/gpu6-native-closed-loop-diagnostic.md",
+      "sha256": "626736a1cdacb44f721082bda7d3ad4cd6998ee5ad0188708853edf0900dd25c",
+      "size_bytes": 3565
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/n1r-post-reboot-cohort.md",
+      "sha256": "1c6cec12dd635829ef2ea03aec6e9ac8cf4fcddf8ae762a4eca5fbc3f18d237c",
+      "size_bytes": 3659
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/n1u-budget-reallocation-approved.md",
+      "sha256": "f13ca0cb9b2dd4c6de3d697680a57c30ed0913756cd66badd22f23761fb21bce",
+      "size_bytes": 2670
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/n1u-budget-reallocation-proposal.md",
+      "sha256": "a2d8ecd7f4b1bc3fdfc899998e4d67da2ec8bfb18dbd524dc7d85b150eaa0560",
+      "size_bytes": 3986
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/protocol.md",
+      "sha256": "e3d3c2ed50db4a845e4d0713671db225c96f124ca8719d171e5d7006f0a5e0b0",
+      "size_bytes": 5537
+    },
+    {
+      "path": "experiments/iteration_001_execution_intent/startup-repair-amendment.md",
+      "sha256": "7edc8d05830c75156e05f3ba687b84b2dbcf00fe3b976a3c605c457710d9ceaa",
+      "size_bytes": 3536
+    },
+    {
+      "path": "main.py",
+      "sha256": "cdcc2d7f7d077d9fc5472d61d21a7028d3143136c74f7f716fe8277054dccf2f",
+      "size_bytes": 100851
+    },
+    {
+      "path": "scripts/qd_ed_available_gpu_queue.py",
+      "sha256": "5b01b5ea4557549e004c2c1ee1e62e8961e9f23e0d9a1288da1b73dd2b3d90e5",
+      "size_bytes": 32977
+    },
+    {
+      "path": "scripts/qd_ed_codex_launch.py",
+      "sha256": "91101e37e4fab893d9a8de32b3ff5d910a08fc30caa049e69e4b6a5ffd2127bf",
+      "size_bytes": 3467
+    },
+    {
+      "path": "scripts/qd_ed_final_report.py",
+      "sha256": "1e5ced6f6406ed4fd77f28c621d948ff111fcc2efc084dfdd1320366f41ff918",
+      "size_bytes": 10228
+    },
+    {
+      "path": "scripts/qd_ed_final_runner.py",
+      "sha256": "6eabb1ce72a8a8d5e6df3a36d6aa7c9ba5a0fa6035110de1d8307bf5ebefb6a6",
+      "size_bytes": 74282
+    },
+    {
+      "path": "scripts/qd_ed_gpu_faults.py",
+      "sha256": "013ed8f02659c6b17fb874f1cdb967e35ec6aa2bc58c1dd0e09a9b5b4b2f6a01",
+      "size_bytes": 3676
+    },
+    {
+      "path": "scripts/qd_ed_gpu_probe.py",
+      "sha256": "0601017b650a4ac3bbcc666dc3e29daa5183e3e083f44bf7f8caa0203263ba6b",
+      "size_bytes": 19902
+    },
+    {
+      "path": "scripts/qd_ed_poe_launch.py",
+      "sha256": "86ecaf3d0d1454613ee4bec1337dca7ed81d35ce59cfda1e62d7839a58e39b82",
+      "size_bytes": 7829
+    },
+    {
+      "path": "scripts/qd_ed_policy_native_probe.py",
+      "sha256": "1ddddb7f72ea2dc2d297b3aaf9e80af47944f49ccfcb9d73c097ebe97880be92",
+      "size_bytes": 21407
+    },
+    {
+      "path": "scripts/qd_ed_runtime_setup.py",
+      "sha256": "ad05efd769034d3f9937aebbba10abc16039a5f1b5026e6bacd808e13d717a9c",
+      "size_bytes": 17773
+    },
+    {
+      "path": "tests/test_codex_stage.py",
+      "sha256": "459bf78e4d60985d7f44b9224c767d0e3abc364c61d1785edbf2e209b9ed4b7a",
+      "size_bytes": 23208
+    },
+    {
+      "path": "tests/test_qd_ed_final_runner.py",
+      "sha256": "5caf58f6c1893f4628cef3b5fd59bf2d182f2f1a68433b9eb28ddce182fe73bd",
+      "size_bytes": 57227
+    },
+    {
+      "path": "utils/__init__.py",
+      "sha256": "debd228bdc6164ea3f2fc49e0ef8aa891754e7748fe91ac21e8ef74b6a72a49f",
+      "size_bytes": 481
+    },
+    {
+      "path": "utils/config_utils.py",
+      "sha256": "d9f2a7665db2ee15f882be442eed791c0300607d2b62c12dfbe8651253c18af5",
+      "size_bytes": 3177
+    },
+    {
+      "path": "utils/cuda_egl_guard.py",
+      "sha256": "8d6689c11a208a0c85e5db7a5778b0eaf9a5c5efecfa17d7dc9d0f09f603ee94",
+      "size_bytes": 2631
+    },
+    {
+      "path": "utils/eds_eval_vis.py",
+      "sha256": "d155d2b2e6e72bd877899c1fdc6f0e57d847ea63d68b55a74a0606c90ab86676",
+      "size_bytes": 17043
+    },
+    {
+      "path": "utils/eds_mechanism_pretest_vis.py",
+      "sha256": "a9ccf922bc717f955375455d56cc55f9ac49a439690461de453f2dc1b20af8fc",
+      "size_bytes": 59907
+    },
+    {
+      "path": "utils/guidance_utils.py",
+      "sha256": "b0fe9d6d5fc014143f5877918de9bd0986b1688b4a6a90980847b7d15cab0c82",
+      "size_bytes": 11945
+    },
+    {
+      "path": "utils/hydra_plugins/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "utils/hydra_plugins/task_searchpath.py",
+      "sha256": "32aa364739836f11f48299bd3e49a59a89a1baa4512f3a6f0bc962496739d218",
+      "size_bytes": 1273
+    },
+    {
+      "path": "utils/keypoint_utils.py",
+      "sha256": "fb7730f5dbe6ba72584f9d7204d2578be225dc69655c7c26006a8be9a92d3c1f",
+      "size_bytes": 9396
+    },
+    {
+      "path": "utils/logging_utils.py",
+      "sha256": "ad614d71030403937d8699544f9985f1909c8cc4402c43e2c9b16b39f263c2c3",
+      "size_bytes": 4236
+    },
+    {
+      "path": "utils/mujoco_phase_diagnostics.py",
+      "sha256": "cdf75645bd958a3cff1fbf78acada4c804a6f663a6aab27224fbd5cfdf7cffac",
+      "size_bytes": 1992
+    },
+    {
+      "path": "utils/plot_results.py",
+      "sha256": "3c8c26e719aa8742a07a134875b3dfcf0d0b2c1dedc277a8e694de0945787c90",
+      "size_bytes": 11634
+    },
+    {
+      "path": "utils/render_lifetime_diagnostics.py",
+      "sha256": "f25c8ba222f2682a701b6b1b15bae58d5b6cac519658b5c73e7be3850244e865",
+      "size_bytes": 3444
+    },
+    {
+      "path": "utils/vis_utils.py",
+      "sha256": "6e256ca29aabcb8ffeb852e56c732ec56885394bb8e4e8ca2fd0957e989289b8",
+      "size_bytes": 31179
+    },
+    {
+      "path": "vlm_query/guidance_template.txt",
+      "sha256": "ac7a53e64f82e735b295682347cc4775da7c611715798e0d79f8a6fe34cb11c5",
+      "size_bytes": 8266
+    },
+    {
+      "path": "vlm_query/guidance_template_calvin.txt",
+      "sha256": "b29b7554b27207269f572a40a4d51f7498d36e3eca4effb94349e32ebce8caee",
+      "size_bytes": 23426
+    },
+    {
+      "path": "vlm_query/guidance_template_libero.txt",
+      "sha256": "0a11498ed5317170bff8e8cd3909c508ea810e4fa9f006555ef37a50f4459c54",
+      "size_bytes": 3441
+    },
+    {
+      "path": "vlm_query/segmentation_planning_template.txt",
+      "sha256": "975e6905b66e749e351f2282a73e5f30eeee6735643622f74808b2379a938d30",
+      "size_bytes": 1589
+    },
+    {
+      "path": "vlm_query/stage_template.txt",
+      "sha256": "758d71a441496074410428b005a068a18b6d92273b9278c1181334cf9e67005b",
+      "size_bytes": 3655
+    },
+    {
+      "path": "vlm_query/vlm_agent.py",
+      "sha256": "64a2f470045ab5be8840eb9758c1d8cb13cc2487d5993f2c47862052f8679494",
+      "size_bytes": 19570
+    }
+  ],
+  "egl_mapping_verified": true,
+  "episodes": [
+    {
+      "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+      "budget_bucket": "development",
+      "env_seed": 1969522881,
+      "episode_key": "n1u_dev_t00_q0",
+      "init_file_sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+      "init_index": 0,
+      "init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
+      "iteration": "N1U",
+      "policy_seed": 1969522881,
+      "profile": "Q0",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 0,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+      "budget_bucket": "development",
+      "env_seed": 1969522881,
+      "episode_key": "n1u_dev_t00_c0",
+      "init_file_sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+      "init_index": 0,
+      "init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
+      "iteration": "N1U",
+      "policy_seed": 1969522881,
+      "profile": "C0",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 0,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+      "budget_bucket": "development",
+      "env_seed": 1661846292,
+      "episode_key": "n1u_dev_t01_c0",
+      "init_file_sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+      "init_index": 0,
+      "init_row_sha256": "2c0b399c52b759187483bbc0473bad47b366f3e5a3816f8ce98a5d37640a1725",
+      "iteration": "N1U",
+      "policy_seed": 1661846292,
+      "profile": "C0",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 1,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+      "budget_bucket": "development",
+      "env_seed": 1661846292,
+      "episode_key": "n1u_dev_t01_q0",
+      "init_file_sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+      "init_index": 0,
+      "init_row_sha256": "2c0b399c52b759187483bbc0473bad47b366f3e5a3816f8ce98a5d37640a1725",
+      "iteration": "N1U",
+      "policy_seed": 1661846292,
+      "profile": "Q0",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 1,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+      "budget_bucket": "development",
+      "env_seed": 496956836,
+      "episode_key": "n1u_dev_t02_q0",
+      "init_file_sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+      "init_index": 0,
+      "init_row_sha256": "f77a5f5866952552461f703b40f853add2c13d75cbd54cd8fbbaae641db165c1",
+      "iteration": "N1U",
+      "policy_seed": 496956836,
+      "profile": "Q0",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 2,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+      "budget_bucket": "development",
+      "env_seed": 496956836,
+      "episode_key": "n1u_dev_t02_c0",
+      "init_file_sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+      "init_index": 0,
+      "init_row_sha256": "f77a5f5866952552461f703b40f853add2c13d75cbd54cd8fbbaae641db165c1",
+      "iteration": "N1U",
+      "policy_seed": 496956836,
+      "profile": "C0",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 2,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+      "budget_bucket": "development",
+      "env_seed": 851784825,
+      "episode_key": "n1u_dev_t03_c0",
+      "init_file_sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+      "init_index": 0,
+      "init_row_sha256": "faa3e635dd29229f763f8748098f92543b7f680fb4212e7036ec49ba55d57c93",
+      "iteration": "N1U",
+      "policy_seed": 851784825,
+      "profile": "C0",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 3,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+      "budget_bucket": "development",
+      "env_seed": 851784825,
+      "episode_key": "n1u_dev_t03_q0",
+      "init_file_sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+      "init_index": 0,
+      "init_row_sha256": "faa3e635dd29229f763f8748098f92543b7f680fb4212e7036ec49ba55d57c93",
+      "iteration": "N1U",
+      "policy_seed": 851784825,
+      "profile": "Q0",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 3,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+      "budget_bucket": "development",
+      "env_seed": 1144935104,
+      "episode_key": "n1u_dev_t04_q0",
+      "init_file_sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+      "init_index": 0,
+      "init_row_sha256": "e773740b1d2927cb47331e1ff21a056e7118e6aef76681b8001521ff462c10a9",
+      "iteration": "N1U",
+      "policy_seed": 1144935104,
+      "profile": "Q0",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 4,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+      "budget_bucket": "development",
+      "env_seed": 1144935104,
+      "episode_key": "n1u_dev_t04_c0",
+      "init_file_sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+      "init_index": 0,
+      "init_row_sha256": "e773740b1d2927cb47331e1ff21a056e7118e6aef76681b8001521ff462c10a9",
+      "iteration": "N1U",
+      "policy_seed": 1144935104,
+      "profile": "C0",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 4,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+      "budget_bucket": "development",
+      "env_seed": 970869399,
+      "episode_key": "n1u_dev_t05_c0",
+      "init_file_sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+      "init_index": 0,
+      "init_row_sha256": "b9ce167f1250d75a658ff60926d83963155810d20a06d45bdc84a30faf0f47a4",
+      "iteration": "N1U",
+      "policy_seed": 970869399,
+      "profile": "C0",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 5,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+      "budget_bucket": "development",
+      "env_seed": 970869399,
+      "episode_key": "n1u_dev_t05_q0",
+      "init_file_sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+      "init_index": 0,
+      "init_row_sha256": "b9ce167f1250d75a658ff60926d83963155810d20a06d45bdc84a30faf0f47a4",
+      "iteration": "N1U",
+      "policy_seed": 970869399,
+      "profile": "Q0",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 5,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+      "budget_bucket": "development",
+      "env_seed": 324717095,
+      "episode_key": "n1u_dev_t06_q0",
+      "init_file_sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+      "init_index": 0,
+      "init_row_sha256": "aa4fe30bc10b84fcc2ee6b6d38448fbbf6bae9872c2092b0dd19f9b92aa98e11",
+      "iteration": "N1U",
+      "policy_seed": 324717095,
+      "profile": "Q0",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 6,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+      "budget_bucket": "development",
+      "env_seed": 324717095,
+      "episode_key": "n1u_dev_t06_c0",
+      "init_file_sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+      "init_index": 0,
+      "init_row_sha256": "aa4fe30bc10b84fcc2ee6b6d38448fbbf6bae9872c2092b0dd19f9b92aa98e11",
+      "iteration": "N1U",
+      "policy_seed": 324717095,
+      "profile": "C0",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 6,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+      "budget_bucket": "development",
+      "env_seed": 1541693852,
+      "episode_key": "n1u_dev_t07_c0",
+      "init_file_sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+      "init_index": 0,
+      "init_row_sha256": "e7dfc87fb7c0a1315e209abb64da13fea1e37ea489253efeedeee7ea14548914",
+      "iteration": "N1U",
+      "policy_seed": 1541693852,
+      "profile": "C0",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 7,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+      "budget_bucket": "development",
+      "env_seed": 1541693852,
+      "episode_key": "n1u_dev_t07_q0",
+      "init_file_sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+      "init_index": 0,
+      "init_row_sha256": "e7dfc87fb7c0a1315e209abb64da13fea1e37ea489253efeedeee7ea14548914",
+      "iteration": "N1U",
+      "policy_seed": 1541693852,
+      "profile": "Q0",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 7,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+      "budget_bucket": "development",
+      "env_seed": 1709579522,
+      "episode_key": "n1u_dev_t08_q0",
+      "init_file_sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+      "init_index": 0,
+      "init_row_sha256": "718f2fb31f45c25f9c3f1bcf7637ba8ec113b0773b6ce829c7f4b3d02c154555",
+      "iteration": "N1U",
+      "policy_seed": 1709579522,
+      "profile": "Q0",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 8,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+      "budget_bucket": "development",
+      "env_seed": 1709579522,
+      "episode_key": "n1u_dev_t08_c0",
+      "init_file_sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+      "init_index": 0,
+      "init_row_sha256": "718f2fb31f45c25f9c3f1bcf7637ba8ec113b0773b6ce829c7f4b3d02c154555",
+      "iteration": "N1U",
+      "policy_seed": 1709579522,
+      "profile": "C0",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 8,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+      "budget_bucket": "development",
+      "env_seed": 1045350852,
+      "episode_key": "n1u_dev_t09_c0",
+      "init_file_sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+      "init_index": 0,
+      "init_row_sha256": "d8309b31899377d1051f6d7da47edc747b294842a6fec748aff6c9b822d8797e",
+      "iteration": "N1U",
+      "policy_seed": 1045350852,
+      "profile": "C0",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 9,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+      "budget_bucket": "development",
+      "env_seed": 1045350852,
+      "episode_key": "n1u_dev_t09_q0",
+      "init_file_sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+      "init_index": 0,
+      "init_row_sha256": "d8309b31899377d1051f6d7da47edc747b294842a6fec748aff6c9b822d8797e",
+      "iteration": "N1U",
+      "policy_seed": 1045350852,
+      "profile": "Q0",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 9,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+      "budget_bucket": "development",
+      "env_seed": 1969522881,
+      "episode_key": "n1u_dev_t00_n1",
+      "init_file_sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+      "init_index": 0,
+      "init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
+      "iteration": "N1U",
+      "policy_seed": 1969522881,
+      "profile": "N1",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 0,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+      "budget_bucket": "development",
+      "env_seed": 1661846292,
+      "episode_key": "n1u_dev_t01_n1",
+      "init_file_sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+      "init_index": 0,
+      "init_row_sha256": "2c0b399c52b759187483bbc0473bad47b366f3e5a3816f8ce98a5d37640a1725",
+      "iteration": "N1U",
+      "policy_seed": 1661846292,
+      "profile": "N1",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 1,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+      "budget_bucket": "development",
+      "env_seed": 496956836,
+      "episode_key": "n1u_dev_t02_n1",
+      "init_file_sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+      "init_index": 0,
+      "init_row_sha256": "f77a5f5866952552461f703b40f853add2c13d75cbd54cd8fbbaae641db165c1",
+      "iteration": "N1U",
+      "policy_seed": 496956836,
+      "profile": "N1",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 2,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+      "budget_bucket": "development",
+      "env_seed": 851784825,
+      "episode_key": "n1u_dev_t03_n1",
+      "init_file_sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+      "init_index": 0,
+      "init_row_sha256": "faa3e635dd29229f763f8748098f92543b7f680fb4212e7036ec49ba55d57c93",
+      "iteration": "N1U",
+      "policy_seed": 851784825,
+      "profile": "N1",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 3,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+      "budget_bucket": "development",
+      "env_seed": 1144935104,
+      "episode_key": "n1u_dev_t04_n1",
+      "init_file_sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+      "init_index": 0,
+      "init_row_sha256": "e773740b1d2927cb47331e1ff21a056e7118e6aef76681b8001521ff462c10a9",
+      "iteration": "N1U",
+      "policy_seed": 1144935104,
+      "profile": "N1",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 4,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+      "budget_bucket": "development",
+      "env_seed": 970869399,
+      "episode_key": "n1u_dev_t05_n1",
+      "init_file_sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+      "init_index": 0,
+      "init_row_sha256": "b9ce167f1250d75a658ff60926d83963155810d20a06d45bdc84a30faf0f47a4",
+      "iteration": "N1U",
+      "policy_seed": 970869399,
+      "profile": "N1",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 5,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+      "budget_bucket": "development",
+      "env_seed": 324717095,
+      "episode_key": "n1u_dev_t06_n1",
+      "init_file_sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+      "init_index": 0,
+      "init_row_sha256": "aa4fe30bc10b84fcc2ee6b6d38448fbbf6bae9872c2092b0dd19f9b92aa98e11",
+      "iteration": "N1U",
+      "policy_seed": 324717095,
+      "profile": "N1",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 6,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+      "budget_bucket": "development",
+      "env_seed": 1541693852,
+      "episode_key": "n1u_dev_t07_n1",
+      "init_file_sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+      "init_index": 0,
+      "init_row_sha256": "e7dfc87fb7c0a1315e209abb64da13fea1e37ea489253efeedeee7ea14548914",
+      "iteration": "N1U",
+      "policy_seed": 1541693852,
+      "profile": "N1",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 7,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+      "budget_bucket": "development",
+      "env_seed": 1709579522,
+      "episode_key": "n1u_dev_t08_n1",
+      "init_file_sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+      "init_index": 0,
+      "init_row_sha256": "718f2fb31f45c25f9c3f1bcf7637ba8ec113b0773b6ce829c7f4b3d02c154555",
+      "iteration": "N1U",
+      "policy_seed": 1709579522,
+      "profile": "N1",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 8,
+      "timeout_seconds": 1800
+    },
+    {
+      "bddl_sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+      "budget_bucket": "development",
+      "env_seed": 1045350852,
+      "episode_key": "n1u_dev_t09_n1",
+      "init_file_sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+      "init_index": 0,
+      "init_row_sha256": "d8309b31899377d1051f6d7da47edc747b294842a6fec748aff6c9b822d8797e",
+      "iteration": "N1U",
+      "policy_seed": 1045350852,
+      "profile": "N1",
+      "seed_block": "dev",
+      "split": "dev",
+      "task_id": 9,
+      "timeout_seconds": 1800
+    }
+  ],
+  "frozen": true,
+  "input_contract_label": "input_repaired",
+  "phase_authorization": {
+    "dev": true,
+    "validation": false,
+    "formal": false
+  },
+  "profiles_path": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/configs/qd_ed_final/baseline_profiles.json",
+  "profiles_sha256": "75ba829fc29db71ae31669cd803c24fbe8ea96fe347160539a273f9d73551690",
+  "run_name": "rdt-qd-ed-final-20260921T093925Z",
+  "runtime_inventory_path": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/runtime-inventory.json",
+  "runtime_inventory_sha256": "44d456203ca168eec9eddfb6834d54347153b2c859eb1b4fc0dea02c15138b83",
+  "runtime_manifest_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/n1u-deadline-stage/runtime-manifest.json",
+  "runtime_manifest_sha256": "67ccf12f8bc318f1a860e4d0aa0088368e5334471fe6c9dbbecd9b3d8c362427",
+  "schema": "qd-ed-final-plan-v1",
+  "seed_plan_path": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/frozen-seed-plan.json",
+  "seed_plan_sha256": "9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1",
+  "source_commit": "4170aeb52c029be17bf31b2933ad6e5a62b02cb3",
+  "worktree": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z",
+  "stage_condition": "codex_login_astra_low_json_reconnect_180s_v1",
+  "provider_amendment": "experiments/iteration_001_execution_intent/codex-provider-amendment.md",
+  "scientific_config_files": [
+    "configs/perception.yaml",
+    "configs/qd_ed_final/baseline_profiles.json",
+    "configs/qd_ed_final/candidate_n1.json",
+    "experiments/iteration_001_execution_intent/available-gpu-amendment.md",
+    "experiments/iteration_001_execution_intent/codex-provider-amendment.md",
+    "experiments/iteration_001_execution_intent/codex-stage-event-amendment.md",
+    "experiments/iteration_001_execution_intent/codex-stage-json-amendment.md",
+    "experiments/iteration_001_execution_intent/gpu2-blocking-memcheck-diagnostic.md",
+    "experiments/iteration_001_execution_intent/gpu2-post-reboot-diagnostic.md",
+    "experiments/iteration_001_execution_intent/gpu2-uncached-memcheck-diagnostic.md",
+    "experiments/iteration_001_execution_intent/gpu5-resource-amendment.md",
+    "experiments/iteration_001_execution_intent/gpu6-goal-execution-amendment.md",
+    "experiments/iteration_001_execution_intent/gpu6-native-closed-loop-diagnostic.md",
+    "experiments/iteration_001_execution_intent/n1r-post-reboot-cohort.md",
+    "experiments/iteration_001_execution_intent/n1u-budget-reallocation-approved.md",
+    "experiments/iteration_001_execution_intent/protocol.md",
+    "experiments/iteration_001_execution_intent/startup-repair-amendment.md",
+    "vlm_query/stage_template.txt"
+  ],
+  "candidate_profiles": {
+    "N1": {
+      "path": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/configs/qd_ed_final/candidate_n1.json",
+      "sha256": "5e74d72f108df53897e790677154c5ca3691b1aeb318297168d3bffcb84bfe3c"
+    }
+  },
+  "ordering_amendment": "experiments/iteration_001_execution_intent/startup-repair-amendment.md",
+  "resource_amendment": "experiments/iteration_001_execution_intent/gpu2-migration-amendment.md",
+  "frozen_at": "2026-09-24T03:03:15.334029+00:00",
+  "hardware_selection": {
+    "parent_plan_path": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-gpu2-post-reboot-plan.json",
+    "parent_plan_sha256": "b480fc04c88a15850394d0e986f024bad8bf4821850929a93a273ccfe615507b",
+    "physical_gpu": 2,
+    "uuid": "GPU-a5d6a5f8-b6df-7f3a-c3dc-19734c41ec0e",
+    "hardware_environment_preview": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/resource_queue/fcc6d11fcf3e4b16b9e985be242cad4e/hardware-environment-preview.json",
+    "hardware_environment_preview_sha256": "430566092720a389afb9c2d4f39a1c4cb13e44a594266969badacd87782c9a5f",
+    "selected_at_unix": 1790138665.5326934
+  },
+  "cohort_amendment": "experiments/iteration_001_execution_intent/codex-stage-timeout-amendment.md",
+  "cohort_context": {
+    "iteration": "N1U",
+    "common_intervention": "Common Stage deadline90to180seconds; final bounded availability adjustment",
+    "runtime_diagnostic_attempt_id": "rdt-qd-ed-final-20260921T093925Z__gpu2_post_reboot_c0_t00__3b58560be246",
+    "runtime_diagnostic_excluded": true,
+    "parent_N1_cohort_remains_closed": true,
+    "task_order_from": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-n1-dev-plan.json",
+    "task_order_source_sha256": "080985fead54fac3806702c0d8db51904ef94c6aa2231b21cecbf38c7f7bcbfd",
+    "algorithm_change_from_Q0": "N1 descriptor only",
+    "physical_gpu": 2,
+    "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+    "parent_N1R_cohort_closed": "INCOMPLETE_STAGE_FORMAT_FAILURE",
+    "parent_N1R_valid_cells": 1,
+    "parent_N1R_dispatched": 2,
+    "parent_N1R_plan": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-n1r-post-reboot-plan.json",
+    "parent_N1R_sha256": "77dfe77430ac0073e304cd95b78ebb9534c508394fdecd7ffc6ec6cce6669551",
+    "old_cells_excluded": true,
+    "automatic_retry": false,
+    "parent_N1S_status": "INCOMPLETE_STAGE_EVENT_FAILURE",
+    "parent_N1S_plan": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-n1s-structured-stage-plan.json",
+    "parent_N1S_sha256": "aac028a9f085b9a0d3fbbbb270bca8841e3fd0bfcc0990ddf61b115bbbbbe4b7",
+    "parent_N1S_valid": 8,
+    "parent_N1S_dispatched": 9,
+    "parent_N1T_status": "INCOMPLETE_STAGE_TIMEOUT",
+    "parent_N1T_plan": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-n1t-reconnect-stage-plan.json",
+    "parent_N1T_sha256": "490e5d044a2c427eba1972669742ee30cae4bfde70c2551ad79624e45c31acfd",
+    "parent_N1T_valid": 17,
+    "parent_N1T_dispatched": 18,
+    "final_replacement_cohort": true,
+    "remaining_development_slots_after_full_cohort": 0,
+    "conditional_N2_H_not_fundable_after_full_cohort": true
+  },
+  "budget_amendment": "experiments/iteration_001_execution_intent/n1u-budget-reallocation-approved.md",
+  "budget_reallocation": {
+    "authorization_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/resource/n1u-budget-approval/authorization.json",
+    "authorization_sha256": "ebd43aa5ad751aee9de02c956f9da91ffaa1e76312189ebcf07c3a99b682ea55",
+    "caps": {
+      "baseline": 11,
+      "development": 122,
+      "validation": 60,
+      "formal": 40,
+      "recovery": 7
+    },
+    "parent_plan_path": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-n1u-deadline-stage-plan.json",
+    "parent_plan_sha256": "b62d36b976b5f11cb92bc999e4ec0bfd13c5f774283aaa447abdedc05fa1e633",
+    "administrative_revision_only": true
+  }
+}

@@ -1,0 +1,29 @@
+[
+  {
+    "path": "scripts/c0_codex_repro.py",
+    "original_blob": "25d03e8b74f6bb4c8d432199b4f1838fca41a482",
+    "published_blob": "7a68bb9c72126b926df2c13f680f59bfa7bfc508",
+    "original_sha256": "c7f33f702f7e66e2472d60a5c2790a9be7eb36a3a09b09276e868c7f65b9b169",
+    "published_sha256": "2a0d8c936231c3a6da190a8c567f86253ca22235f549160b43bffe2a11679895",
+    "original_bytes": 15299,
+    "published_bytes": 15287
+  },
+  {
+    "path": "scripts/c0_trace_replay.py",
+    "original_blob": "a408be2e9182571db9ee829c883523bdbb9f8a06",
+    "published_blob": "e1ecdfadc1cf0d80e0561a8d5a4f551e9868bf37",
+    "original_sha256": "fca1f6bf8c54c8e28297c202a30140a65ecf4e59454b4eb8ab7cf958bd10fb81",
+    "published_sha256": "188cf5e26cffec39a94bc616b788d648cdf3eb3a8554cc185dad833f10142e65",
+    "original_bytes": 10508,
+    "published_bytes": 10496
+  },
+  {
+    "path": ".historical-source/submodule-files/third_party/lerobot/README.md",
+    "original_blob": "964af4c1df10eb1cca25eda2d586d51dd779b390",
+    "published_blob": "5161d529a81cfd7c487a298ea80f257f819e889d",
+    "original_sha256": "868cd7dca6325e38f078a7aed445ad4ddd554ac1ea05bed9b3445c94fa2994e8",
+    "published_sha256": "0bb0ced83bbb460a49789e6412a013ab96c86e14367dc8ca6eaaf11137280f96",
+    "original_bytes": 18721,
+    "published_bytes": 18441
+  }
+]

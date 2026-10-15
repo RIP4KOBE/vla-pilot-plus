@@ -58,15 +58,17 @@ def public_invocation_policy(*, model, reasoning_effort, timeout_seconds, cli_pa
                              disabled_skill_paths=(), output_format="legacy_text",
                              event_policy="strict_v1"):
     """Credential-free, deterministic full wrapper policy for freeze hashes."""
-    if output_format not in {"legacy_text", "json_schema_v1"}:
+    if output_format not in {"legacy_text", "json_schema_v1", "requested_format_v1"}:
         raise ValueError("Unknown Codex Stage output format")
     if event_policy not in {"strict_v1", "completed_reconnect_v1", "completed_transport_fallback_v1",
                             "completed_transport_fallback_preturn_v2",
                             "completed_transport_fallback_preturn_multiline_v3",
                             "completed_known_startup_warnings_v4",
-                            "completed_known_startup_warnings_combo_v5"}:
+                            "completed_known_startup_warnings_combo_v5",
+                            "completed_transport_cycles_v6"}:
         raise ValueError("Unknown Codex Stage event policy")
-    if event_policy != "strict_v1" and output_format != "json_schema_v1":
+    if (event_policy not in {"strict_v1", "completed_transport_cycles_v6"}
+            and output_format != "json_schema_v1"):
         raise ValueError("Reconnect policy requires structured output")
     policy = {
         "backend": "codex_cli", "auth_mode": "chatgpt", "model": str(model),
@@ -103,6 +105,16 @@ def public_invocation_policy(*, model, reasoning_effort, timeout_seconds, cli_pa
         "maximum_event_bytes": _MAX_EVENTS_BYTES,
         "process_group": "inherit_outer_runner_group",
     }
+    if output_format == "requested_format_v1":
+        policy["output_format"] = output_format
+        policy["config_overrides"]["forced_login_method"] = "chatgpt"
+        policy["config_overrides"]["developer_instructions"] = (
+            "This invocation is a single visual inference request. Use only the attached "
+            "images and user text. Image order follows the labels in the user prompt. "
+            "Do not call tools, browse, read files, invoke skills, or perform other tasks. "
+            "Return only the answer in the exact format requested by the user: prose, "
+            "a JSON object, or Python source as specified in that request."
+        )
     if output_format == "json_schema_v1":
         policy["output_format"] = output_format
         policy["output_schema"] = json.loads(json.dumps(STAGE_OUTPUT_SCHEMA))
@@ -117,13 +129,16 @@ def public_invocation_policy(*, model, reasoning_effort, timeout_seconds, cli_pa
     if event_policy != "strict_v1":
         policy["event_policy"] = event_policy
         policy["reconnect_acceptance"] = (
-            "explicit_numbered_reconnecting_notice_inside_single_turn_then_"
-            "one_complete_usage_one_schema_message_exit_zero_no_other_error"
+            "explicit_numbered_reconnecting_notice_inside_single_turn_then_" +
+            ("one_complete_usage_one_message_exit_zero_no_other_error"
+             if event_policy == "completed_transport_cycles_v6" else
+             "one_complete_usage_one_schema_message_exit_zero_no_other_error")
         )
     if event_policy in {"completed_transport_fallback_v1", "completed_transport_fallback_preturn_v2",
                         "completed_transport_fallback_preturn_multiline_v3",
                         "completed_known_startup_warnings_v4",
-                        "completed_known_startup_warnings_combo_v5"}:
+                        "completed_known_startup_warnings_combo_v5",
+                        "completed_transport_cycles_v6"}:
         policy["transport_fallback_acceptance"] = {
             "exact_notice_prefix": TRANSPORT_FALLBACK_PREFIX,
             "maximum_notice_characters": 2048,
@@ -134,24 +149,32 @@ def public_invocation_policy(*, model, reasoning_effort, timeout_seconds, cli_pa
                          if event_policy in {"completed_transport_fallback_preturn_v2",
                                              "completed_transport_fallback_preturn_multiline_v3",
                                              "completed_known_startup_warnings_v4",
-                                             "completed_known_startup_warnings_combo_v5"} else
+                                             "completed_known_startup_warnings_combo_v5",
+                                             "completed_transport_cycles_v6"} else
                          "inside_single_turn_before_agent_message_and_completion"),
             "line_break_policy": ("bounded_suffix_may_contain_cr_lf_no_other_controls"
                                   if event_policy in {"completed_transport_fallback_preturn_multiline_v3",
                                                       "completed_known_startup_warnings_v4",
-                                                      "completed_known_startup_warnings_combo_v5"} else
+                                                      "completed_known_startup_warnings_combo_v5",
+                                                      "completed_transport_cycles_v6"} else
                                   "no_line_breaks"),
-            "required_completion": "one_schema_message_then_one_usage_exit_zero_no_other_error",
+            "required_completion": ("one_message_then_one_usage_exit_zero_no_other_error"
+                                    if event_policy == "completed_transport_cycles_v6" else
+                                    "one_schema_message_then_one_usage_exit_zero_no_other_error"),
             "new_application_invocations": 0,
         }
     if event_policy in {"completed_known_startup_warnings_v4",
-                        "completed_known_startup_warnings_combo_v5"}:
+                        "completed_known_startup_warnings_combo_v5",
+                        "completed_transport_cycles_v6"}:
         policy["model_metadata_warning_acceptance"] = {
             "exact_notice": MODEL_METADATA_FALLBACK_TEMPLATE.format(model=model),
             "position": "after_single_thread_start_before_turn_start_only",
             "maximum_total_known_warnings": (
-                2 if event_policy == "completed_known_startup_warnings_combo_v5" else 1),
-            "required_completion": "one_schema_message_one_usage_exit_zero_no_other_error",
+                2 if event_policy in {"completed_known_startup_warnings_combo_v5",
+                                      "completed_transport_cycles_v6"} else 1),
+            "required_completion": ("one_message_one_usage_exit_zero_no_other_error"
+                                    if event_policy == "completed_transport_cycles_v6" else
+                                    "one_schema_message_one_usage_exit_zero_no_other_error"),
         }
     if event_policy == "completed_known_startup_warnings_combo_v5":
         policy["combined_warning_acceptance"] = {
@@ -160,6 +183,17 @@ def public_invocation_policy(*, model, reasoning_effort, timeout_seconds, cli_pa
             "numbered_reconnect_notices_max": 5,
             "reconnect_order": "strictly_increasing_same_maximum",
             "required_completion": "one_schema_message_one_usage_exit_zero_no_other_error",
+        }
+    if event_policy == "completed_transport_cycles_v6":
+        policy["combined_warning_acceptance"] = {
+            "model_metadata_notices_max": 1,
+            "transport_fallback_notices_max": 1,
+            "numbered_reconnect_notices_max_per_transport_phase": 5,
+            "transport_phases_max": 2,
+            "reconnect_order": "strictly_increasing_same_maximum_within_each_phase",
+            "phase_boundary": "single_exact_websocket_to_https_fallback_notice",
+            "required_completion": "one_message_one_usage_exit_zero_no_other_error",
+            "output_format": output_format,
         }
     return policy
 

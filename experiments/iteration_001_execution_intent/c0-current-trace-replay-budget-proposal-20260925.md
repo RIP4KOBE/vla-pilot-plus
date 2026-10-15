@@ -1,0 +1,15 @@
+# Current-source C0 replay: ready-to-run budget proposal
+
+## Purpose and frozen comparison
+
+The historical-source C0 + original Poe/Gemini Stage-reply replay now matches the original 3/10 and all ten videos byte-for-byte. Run one corresponding ten-task cohort from the **current GPU2 source commit `77761b4cda78ac3b6762a6aa60f97b07fde7c1dc`**, with the same historical command, task order/seeds, cache, original raw Stage replies and physical GPU2. QD is explicitly off; new-only QD defaults are fixed to none/fixed-initial. The replay adapter bytes in historical/current source are identical. Every Stage query validates task, seed, step, chunk, trigger and previous control state before replying. A mismatch aborts the run and is an invalid comparison, not a C0 task failure.
+
+The runnable code is [current replay runner](../../scripts/c0_current_trace_replay.py) with [frozen v2 manifest](../../artifacts/c0_trace_replay_20260925/current-manifest-v2.json). CPU checks passed: Python compilation, adapter first-response and mismatch-abort tests, and Hydra full config composition. An earlier unlaunched v1 manifest had an invalid Hydra `+backend` override; it was preserved, corrected in v2 and never used for a GPU episode. The runner refuses dispatch without an explicit user budget authorization record.
+
+## Requested one-time resource change
+
+After historical replay, effective GPU2 study consumption is **148/250 attempts** and **14.750016/48 GPU hours**. Existing validation/formal protected reserves are **100 attempts/24 GPU hours**, leaving only **2 unprotected attempts**. A full ten-task current-source comparison needs **8 additional attempt slots**. Proposed cap: **250 → 258 attempts**, keeping **48 GPU hours** and the protected **100 attempts/24 hours** unchanged. The new ten-task cohort would use at most ten primary attempts and at most nine of the currently available 9.249984 unprotected GPU hours. If all ten run, effective consumption would be at most **158/258 attempts**; GPU-hour consumption is charged by actual process wall time. No recovery/retry quota, algorithm candidate, validation or formal evaluation is added.
+
+Run one worker on physical GPU2 under the owning study lock. Stop on first replay mismatch, startup/config error, one hour without a new episode, nine hours process wall time, or any budget violation; preserve partial output and charge every started episode. Success criterion for current-source parity is ten completed tasks, 127 matching historical Stage events, **3/10 on task 3,8,9**, ten identical initial particle CSVs and ten identical videos. If the score or trajectory differs, report first divergent observation/action/event and classify current-source regression without changing the historical result.
+
+This is an experiment-protocol/budget amendment only. It has not been approved or dispatched. The historical 3/10 reply replay already validates the old code/environment; this second cohort is needed specifically before concluding the **current** source is safe for a new QD/ED optimization round.

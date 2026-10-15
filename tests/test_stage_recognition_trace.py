@@ -264,6 +264,11 @@ def test_stage_trigger_appends_auditable_redacted_event(tmp_path):
         "stage_after": 2,
         "guidance_before": True,
         "guidance_after": False,
+        "normalized_reward_before": 0.0,
+        "normalized_reward_at_query": 0.0,
+        "normalized_reward_after_stage_update": 0.0,
+        "schmitt_upper": 0.8,
+        "schmitt_lower": 0.6,
         "vlm_query_count": 1,
         "vlm_query_limit": 10,
         "stage_min_query_gap_steps": 0,
@@ -386,4 +391,6 @@ def test_episode_metadata_records_seed_for_stage_pairing(tmp_path):
         "episode_id": 3,
         "episode_seed": 321,
         "task_id": 7,
+        "episode_policy_rng_mode": "continuous",
+        "episode_policy_rng_seed": None,
     }

@@ -1,0 +1,7 @@
+# Existing worktree relocated under `.worktrees/exp`
+
+Per the user's 2026-09-25 directory instruction, the **existing** GPU2 worktree and branch `exp/rdt-qd-ed-gpu6-20260922T063626Z` were moved with `git worktree move` from `.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z` to `.worktrees/exp/rdt-qd-ed-gpu6-20260922T063626Z`. No additional Git worktree or branch was created. The old path is now a compatibility symlink to the new location.
+
+The worktree's `artifacts` symlink exposes the original 6.3 GB result tree at `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z`. Raw attempts, frozen plans, runtime manifests, and the final audit remain at their original storage paths and were not copied, reclassified, or edited. The N1AB source HEAD remains `77761b4cda78ac3b6762a6aa60f97b07fde7c1dc`.
+
+The [relocation audit](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/analysis/n1ab/worktree-relocation-audit.json) verifies the unchanged plan, runtime manifest, and final audit SHA-256 values, plus all 91 frozen code-file hashes and 3,289 runtime-file hashes (9/9 checks passed). The legacy `validate-plan` command is path-sensitive: its frozen records contain the old absolute worktree path, while `/home/hynx/VLA-Pilot++` also became a symlink on 2026-09-25. It therefore rejects the path layout before content verification. The frozen historical plan is intentionally unchanged; any future run should freeze a new plan using the current worktree location rather than silently rewriting historical records.

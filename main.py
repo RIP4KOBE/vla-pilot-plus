@@ -22,7 +22,8 @@ warnings.filterwarnings("ignore", category=UserWarning, message=".*'frozen'.*Fie
 # Load .env before anything else
 try:
     from dotenv import load_dotenv
-    load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+    if os.environ.get('VLA_CODEX_ONLY') != '1':
+        load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 except ImportError:
     pass
 # Set tokenizers parallelism to false to avoid fork warnings
@@ -48,6 +49,7 @@ import tqdm
 import time
 import sys
 import json
+import hashlib
 import warnings
 
 # Hydra imports
@@ -74,6 +76,12 @@ def _config_section_to_dict(section: Any, section_name: str) -> dict:
             return dict(section)
         raise TypeError(f"{section_name} must be a mapping, got {type(section).__name__}")
     raise TypeError(f"{section_name} must be a mapping, got {type(section).__name__}")
+
+
+def _episode_policy_rng_seed(run_seed: int, episode: int, episode_seed: int) -> int:
+    """Stable seed for prospective paired Stage comparisons across episodes."""
+    payload = f"episode-policy-rng-v1:{run_seed}:{episode}:{episode_seed}".encode()
+    return int.from_bytes(hashlib.sha256(payload).digest()[:4], "big")
 
 
 _LEGACY_MAIN_VLS_FIELDS = (
@@ -704,6 +712,9 @@ class Main:
 
     def _init_components(self, cfg: DictConfig):
         """Initialize components."""
+        if os.environ.get('VLA_CODEX_ONLY') == '1':
+            from scripts.codex_only_runtime import validate_config
+            validate_config(OmegaConf.to_container(cfg, resolve=True))
         if not self.config.get("use_guidance", True):
             self.keypoint_detector = None
             self.sam3_segmenter = None
@@ -721,10 +732,24 @@ class Main:
         # Get perception config (loaded from perception.yaml with @package perception)
         perception_cfg = cfg.get('perception', {})
         stage_config = OmegaConf.to_container(perception_cfg.get('gemini', {}), resolve=True)
+        stage_controller = self.config.get("stage_controller", "legacy")
+        if stage_controller not in {"legacy", "evidence_v1", "contact_v2", "grasp_v3", "proprio_v4"}:
+            raise ValueError("Unknown main.stage_controller")
+        if stage_controller in {"evidence_v1", "contact_v2", "grasp_v3", "proprio_v4"}:
+            from core.stage_evidence import settings
+            settings(self.config)
+            if self.backend != "libero" or not self.config.get("use_vlm_stage_recognition", True):
+                raise ValueError("evidence_v1 requires LIBERO and online Stage recognition")
+            if stage_config.get("backend", "openai_compatible") not in {"openai_compatible", "codex_cli"}:
+                raise ValueError("evidence_v1 requires an online visual observation transport")
+            stage_config["output_format"] = "stage_observation_v1"
+        elif stage_config.get("output_format") == "stage_observation_v1":
+            raise ValueError("stage_observation_v1 requires main.stage_controller=evidence_v1")
         codex_stage = stage_config.get('backend') == 'codex_cli'
+        codex_fresh = codex_stage and perception_cfg.get('vlm_agent', {}).get('backend') == 'codex_cli'
         if codex_stage:
             cache = self.config.get('cached_functions_dir')
-            if not cache or not Path(cache).is_dir():
+            if not codex_fresh and (not cache or not Path(cache).is_dir()):
                 raise ValueError("Codex Stage requires an existing frozen cached_functions_dir")
             if any(perception_cfg.get(name, {}).get('enabled', False)
                    for name in ('sam3', 'gemini_grounding')):
@@ -771,7 +796,7 @@ class Main:
         # Ensure query_template_dir is absolute path
         if vlm_config.get('query_template_dir') and not os.path.isabs(vlm_config['query_template_dir']):
             vlm_config['query_template_dir'] = os.path.join(PROJECT_ROOT, vlm_config['query_template_dir'])
-        if codex_stage:
+        if codex_stage and not codex_fresh:
             self.vlm_agent = _CachedGuidanceAgent()
         else:
             self.vlm_agent = VLMAgent(
@@ -779,7 +804,8 @@ class Main:
                 base_dir=self.output_dir,
                 env_type=self.backend,
             )
-            self.vlm_agent.api_request_counter = observe_api_requests(self.vlm_agent.client)
+            if not codex_fresh:
+                self.vlm_agent.api_request_counter = observe_api_requests(self.vlm_agent.client)
 
         # Initialize Gemini stage recognizer (for real-time stage recognition)
         if self.config.get("use_vlm_stage_recognition", True):
@@ -787,8 +813,12 @@ class Main:
                 self.gemini_stage_recognizer = create_gemini_stage_recognizer(stage_config)
                 log.info(f"Stage recognizer initialized: {stage_config.get('backend', 'openai_compatible')}")
             except Exception as e:
+                if stage_controller in {"evidence_v1", "contact_v2", "grasp_v3", "proprio_v4"}:
+                    raise RuntimeError("Required evidence Stage initialization failed") from e
                 if codex_stage:
                     raise RuntimeError("Codex Stage initialization failed; provider fallback is disabled") from e
+                if stage_config.get('backend') in {'trace_replay', 'trace_replay_capture'}:
+                    raise RuntimeError("Required Stage initialization failed; provider fallback is disabled") from e
                 log.warning(f"Failed to initialize Gemini stage recognizer: {e}")
                 self.gemini_stage_recognizer = None
         else:
@@ -935,8 +965,13 @@ class Main:
         os.makedirs(self.vlm_agent.task_dir, exist_ok=True)
 
         # Load or generate guidance functions
-        if self.cached_functions_dir is not None:
-            guidance_functions_dir = self.cached_functions_dir
+        task_cache_root = self.config.get("cached_functions_root")
+        if task_cache_root and self.cached_functions_dir is not None:
+            raise ValueError("Choose task cache root or a single cache directory")
+        if task_cache_root or self.cached_functions_dir is not None:
+            guidance_functions_dir = (
+                str(Path(task_cache_root) / f"episode_{_adapter_actual_task_id(self.adapter) + 1}" / "vlm_agent")
+                if task_cache_root else self.cached_functions_dir)
             if not os.path.exists(guidance_functions_dir):
                 raise ValueError(f"cached_functions_dir does not exist: {guidance_functions_dir}")
             log.info(f"Using cached guidance functions from: {guidance_functions_dir}")
@@ -955,6 +990,11 @@ class Main:
         with open(os.path.join(guidance_functions_dir, 'metadata.json'), 'r') as f:
             self.program_info = json.load(f)
 
+        if task_cache_root:
+            frozen_map = {int(k): v for k, v in self.program_info['key_points_objects_map'].items()}
+            if frozen_map != self.keypoint_id_to_object:
+                raise ValueError("Task-bound cached reward keypoint identity changed")
+
         if self.config.get("require_task_cache_identity", False):
             _validate_task_cache_identity(
                 self.program_info,
@@ -966,6 +1006,16 @@ class Main:
         for stage in range(1, self.program_info['num_stages'] + 1):
             load_path = os.path.join(guidance_functions_dir, f'stage{stage}_guidance.txt')
             self.guidance_fns[stage] = load_functions_from_txt(load_path) if os.path.exists(load_path) else []
+
+        if self.config.get("stage_controller", "legacy") in {"evidence_v1", "contact_v2", "grasp_v3", "proprio_v4"} and set(self.guidance_fns) != {1, 2}:
+            raise ValueError("evidence_v1 supports exactly two pick/place stages")
+
+        reward_contract = self.config.get('reward_contract')
+        if reward_contract:
+            if reward_contract != 'c0_xyz_v1':
+                raise ValueError('Unknown numerical reward contract')
+            from core.c0_reward_contract import validate_task
+            validate_task(self, key_points, episode_dir)
 
         output_raw_path = os.path.join(guidance_functions_dir, 'output_raw.txt')
         self.stage_descriptions = self.vlm_agent._extract_stage_descriptions_from_output(output_raw_path)
@@ -996,6 +1046,11 @@ class Main:
             )
         except (AttributeError, IndexError, TypeError, ValueError):
             return None, None
+
+    def _stage_gripper_value(self, action_chunk, action_idx, previous_executed_gripper_command):
+        if self.config.get("stage_controller", "legacy") in {"evidence_v1", "contact_v2", "grasp_v3", "proprio_v4"}:
+            return previous_executed_gripper_command
+        return self._get_gripper_value(action_chunk, action_idx)
 
     def _stage_event_secrets(self) -> list[str]:
         secrets = [
@@ -1050,6 +1105,8 @@ class Main:
                     "episode_id": int(episode),
                     "episode_seed": int(episode_seed),
                     "task_id": task_id,
+                    "episode_policy_rng_mode": str(self.config.get("episode_policy_rng_mode", "continuous")),
+                    "episode_policy_rng_seed": getattr(self, "_current_episode_policy_rng_seed", None),
                 },
             )
         except Exception as e:
@@ -1261,7 +1318,11 @@ class Main:
         Update stage recognition state based on reward and gripper triggers.
         Returns updated state dict.
         """
+        if self.config.get("stage_controller", "legacy") in {"evidence_v1", "contact_v2", "grasp_v3", "proprio_v4"}:
+            from core.stage_evidence import update_stage
+            return update_stage(self, state, gripper_val)
         curr_reward = self.policy.get_normalized_reward()
+        observed_reward = curr_reward
         prev_reward = state['prev_norm_reward']
         prev_gripper = state['prev_gripper_open']
 
@@ -1308,6 +1369,10 @@ class Main:
                 vlm_query_count < vlm_query_limit and not stage_query_gap_active):
             log.info(f"[Trigger] {trigger_reason} (query {vlm_query_count + 1}/{vlm_query_limit})")
             state['last_vlm_query_step'] = int(state.get('global_step', 0))
+
+            set_trace_context = getattr(self.gemini_stage_recognizer, "set_trace_context", None)
+            if callable(set_trace_context):
+                set_trace_context(state, trigger_reason)
 
             new_stage, need_guidance = self.gemini_stage_recognizer.identify_stage_and_guidance(
                 current_rgb=np.array(self.adapter.get_vlm_image()),
@@ -1370,6 +1435,11 @@ class Main:
                 "stage_after": state['current_stage'],
                 "guidance_before": guidance_before,
                 "guidance_after": state['use_guidance'],
+                "normalized_reward_before": float(prev_reward),
+                "normalized_reward_at_query": float(observed_reward),
+                "normalized_reward_after_stage_update": float(curr_reward),
+                "schmitt_upper": float(upper_th),
+                "schmitt_lower": float(lower_th),
                 "vlm_query_count": state.get('vlm_query_count', vlm_query_count),
                 "vlm_query_limit": int(vlm_query_limit),
                 "stage_min_query_gap_steps": stage_min_query_gap_steps,
@@ -1397,9 +1467,11 @@ class Main:
 
         # This explicitly frozen transport condition fails closed after preserving
         # its event. The episode exception path still saves video and all usage.
-        if (query_status == "error" and
-                getattr(self.gemini_stage_recognizer, "output_format", None) == "json_schema_v1"):
-            raise RuntimeError("stage_json_query_failed: " + str(query_result.get("error")))
+        if query_status == "error":
+            if getattr(self.gemini_stage_recognizer, "output_format", None) == "json_schema_v1":
+                raise RuntimeError("stage_json_query_failed: " + str(query_result.get("error")))
+            if getattr(self.gemini_stage_recognizer, "config", {}).get("backend") == "codex_cli":
+                raise RuntimeError("codex_stage_query_failed: " + str(query_result.get("error")))
 
         # Update tracking state
         state['prev_norm_reward'] = curr_reward
@@ -1429,6 +1501,18 @@ class Main:
                 episode_index=episode,
                 sampled_seed=sampled_seed,
             )
+            rng_mode = str(self.config.get("episode_policy_rng_mode", "continuous"))
+            if rng_mode not in {"continuous", "per_episode_v1", "per_seed_v1"}:
+                raise ValueError("Unknown episode_policy_rng_mode")
+            self._current_episode_policy_rng_seed = None
+            if rng_mode in {"per_episode_v1", "per_seed_v1"}:
+                policy_seed = _episode_policy_rng_seed(
+                    int(self.cfg.get("seed", 0)), int(episode) if rng_mode == "per_episode_v1" else 0, int(episode_seed))
+                random.seed(policy_seed)
+                np.random.seed(policy_seed)
+                torch.manual_seed(policy_seed)
+                torch.cuda.manual_seed_all(policy_seed)
+                self._current_episode_policy_rng_seed = policy_seed
             self.policy.reset()
             self._begin_episode_compute()
             self.video_recorder.clear()
@@ -1633,7 +1717,10 @@ class Main:
                 first_gripper_value, last_gripper_value = self._get_gripper_edge_values(
                     action_chunk
                 )
-                gripper_val = self._get_gripper_value(action_chunk, action_executed)
+                gripper_val = self._stage_gripper_value(
+                    action_chunk, action_executed, previous_executed_gripper_command)
+                if self.config.get("stage_controller", "legacy") in {"evidence_v1", "contact_v2", "grasp_v3", "proprio_v4"}:
+                    self.stage_live_keypoints = keypoints
                 stage_state.update({
                     'task_id': _adapter_actual_task_id(self.adapter),
                     'global_step': int(global_steps),
@@ -1752,6 +1839,9 @@ class Main:
                 action_transition = {"action": action_chunk}
                 action_transition = self.adapter.env_postprocessor(action_transition)
                 action_chunk = action_transition["action"]
+            if self.config.get("stage_controller", "legacy") in {"grasp_v3", "proprio_v4"} and self.config.get("use_guidance", True):
+                from core.stage_grasp_guard import apply_to_action
+                action_chunk = apply_to_action(self, stage_state, action_chunk, action_executed, global_steps)
             if generate_new_chunk:
                 chunk_id += 1
                 replan_count += 1

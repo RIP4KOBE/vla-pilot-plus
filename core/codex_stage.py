@@ -15,6 +15,7 @@ import re
 import shutil
 import subprocess
 import tempfile
+import time
 
 import psutil
 
@@ -131,6 +132,14 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         self.timeout_seconds = float(config.get("timeout_seconds", 90))
         if not 0 < self.timeout_seconds <= 600:
             raise ValueError("Codex Stage timeout must be in (0, 600] seconds")
+        self.transport_retry_count = int(config.get("transport_retry_count", 0))
+        self.transport_retry_backoff_seconds = float(config.get("transport_retry_backoff_seconds", 2))
+        if not 0 <= self.transport_retry_count <= 20:
+            raise ValueError("Codex Stage transport retries must be in [0, 20]")
+        if not 0 <= self.transport_retry_backoff_seconds <= 30:
+            raise ValueError("Codex Stage retry backoff must be in [0, 30] seconds")
+        self.capture_dir = Path(config["capture_dir"]).resolve() if config.get("capture_dir") else None
+        self._capture_index = 0
         configured_cli = config.get("cli_path") or shutil.which("codex")
         if not configured_cli:
             raise ValueError("Codex CLI is unavailable")
@@ -156,6 +165,9 @@ class CodexStageRecognizer(GeminiStageRecognizer):
             "application_max_attempts": 1,
             "internal_http_retry_observation_available": False,
             "internal_retry_policy": "cli_managed_unknown",
+            "transport_retry_count": self.transport_retry_count,
+            "transport_retry_backoff_seconds": self.transport_retry_backoff_seconds,
+            "capture_enabled": self.capture_dir is not None,
         }
         self._call_transport = {}
         self._call_raw_response = None
@@ -223,7 +235,8 @@ class CodexStageRecognizer(GeminiStageRecognizer):
             "completed_transport_fallback_v1", "completed_transport_fallback_preturn_v2",
             "completed_transport_fallback_preturn_multiline_v3",
             "completed_known_startup_warnings_v4",
-            "completed_known_startup_warnings_combo_v5"}
+            "completed_known_startup_warnings_combo_v5",
+            "completed_transport_cycles_v6"}
         for event_index, event in enumerate(events):
             kind = event.get("type")
             event_types.append(kind if isinstance(kind, str) else "invalid")
@@ -266,20 +279,24 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                     and (not any(char in message for char in ("\x00", "\r", "\n"))
                          if self.event_policy not in {"completed_transport_fallback_preturn_multiline_v3",
                                                    "completed_known_startup_warnings_v4",
-                                                   "completed_known_startup_warnings_combo_v5"}
+                                                   "completed_known_startup_warnings_combo_v5",
+                                                   "completed_transport_cycles_v6"}
                          else not any(ord(char) < 32 and char not in "\t\r\n" for char in message))
                     and (starts == 1 or (self.event_policy in {
                          "completed_transport_fallback_preturn_v2",
                          "completed_transport_fallback_preturn_multiline_v3",
                          "completed_known_startup_warnings_v4",
-                         "completed_known_startup_warnings_combo_v5"}
+                         "completed_known_startup_warnings_combo_v5",
+                         "completed_transport_cycles_v6"}
                          and starts == 0 and thread_starts == 1 and event_index == 1))
                     and not completed and not messages and not transport_fallbacks
                     and (not model_metadata_warnings or
-                         self.event_policy == "completed_known_startup_warnings_combo_v5"))
+                         self.event_policy in {"completed_known_startup_warnings_combo_v5",
+                                               "completed_transport_cycles_v6"}))
                 metadata_warning = (
                     self.event_policy in {"completed_known_startup_warnings_v4",
-                                          "completed_known_startup_warnings_combo_v5"}
+                                          "completed_known_startup_warnings_combo_v5",
+                                          "completed_transport_cycles_v6"}
                     and kind == "item.completed" and item_kind == "error"
                     and message == MODEL_METADATA_FALLBACK_TEMPLATE.format(model=self.model)
                     and starts == 0 and thread_starts == 1 and event_index == 1
@@ -329,7 +346,8 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                                               "completed_transport_fallback_preturn_v2",
                                               "completed_transport_fallback_preturn_multiline_v3",
                                               "completed_known_startup_warnings_v4",
-                                              "completed_known_startup_warnings_combo_v5"} and reconnect
+                                              "completed_known_startup_warnings_combo_v5",
+                                              "completed_transport_cycles_v6"} and reconnect
                         and starts == 1 and not completed and not messages):
                     error_code = "codex_unexpected_event"
             else:
@@ -351,7 +369,8 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         if fallback_policy:
             self._call_transport['transport_fallback_notices'] = transport_fallbacks
         if self.event_policy in {"completed_known_startup_warnings_v4",
-                                 "completed_known_startup_warnings_combo_v5"}:
+                                 "completed_known_startup_warnings_combo_v5",
+                                 "completed_transport_cycles_v6"}:
             self._call_transport['model_metadata_warning_notices'] = model_metadata_warnings
         if self.event_policy == "completed_known_startup_warnings_combo_v5":
             reconnects = [notice for notice in errors
@@ -361,10 +380,28 @@ class CodexStageRecognizer(GeminiStageRecognizer):
                     or any(a >= b or max_a != max_b for (a, max_a), (b, max_b)
                            in zip(pairs, pairs[1:]))):
                 error_code = "codex_invalid_reconnect_sequence"
+        if self.event_policy == "completed_transport_cycles_v6":
+            if len(transport_fallbacks) > 1 or len(model_metadata_warnings) > 1:
+                error_code = "codex_invalid_transport_cycle"
+            if any(notice["classification"] != "numbered_reconnecting_notice" for notice in errors):
+                error_code = "codex_invalid_transport_cycle"
+            fallback_index = transport_fallbacks[0]["event_index"] if transport_fallbacks else None
+            phases = (
+                [[notice for notice in errors if notice["event_index"] < fallback_index],
+                 [notice for notice in errors if notice["event_index"] > fallback_index]]
+                if fallback_index is not None else [errors]
+            )
+            for phase in phases:
+                pairs = [(notice["attempt"], notice["maximum"]) for notice in phase]
+                if (len(phase) > 5 or any(
+                        a >= b or max_a != max_b for (a, max_a), (b, max_b)
+                        in zip(pairs, pairs[1:]))):
+                    error_code = "codex_invalid_transport_cycle"
         if self.event_policy in {"completed_transport_fallback_preturn_v2",
                                  "completed_transport_fallback_preturn_multiline_v3",
                                  "completed_known_startup_warnings_v4",
-                                 "completed_known_startup_warnings_combo_v5"} and thread_starts != 1:
+                                 "completed_known_startup_warnings_combo_v5",
+                                 "completed_transport_cycles_v6"} and thread_starts != 1:
             error_code = "codex_expected_one_thread"
         if starts == complete_turns == len(usages) == 1 and stream_error is None:
             self.api_request_counter.values["usage_complete_calls"] += 1
@@ -399,7 +436,82 @@ class CodexStageRecognizer(GeminiStageRecognizer):
         evidence = " ".join(value["evidence"].splitlines())
         return f"stage {value['stage']}\nguidance: {value['guidance']}\nevidence: {evidence}"
 
+    def _capture_request(self, content):
+        """Keep exact Stage input parts once per logical query for online audit."""
+        if self.capture_dir is None:
+            return
+        folder = self.capture_dir / f"request_{self._capture_index:04d}"
+        self._capture_index += 1
+        folder.mkdir(parents=True, exist_ok=False)
+        parts = []
+        texts = []
+        image_hashes = []
+        for part in content:
+            if part["type"] == "text":
+                texts.append(part["text"])
+                parts.append({"type": "text", "text": part["text"]})
+            elif part["type"] == "image_url":
+                prefix = "data:image/png;base64,"
+                uri = part["image_url"]["url"]
+                if not uri.startswith(prefix):
+                    raise CodexStageError("codex_expected_png")
+                data = base64.b64decode(uri[len(prefix):], validate=True)
+                name = f"image_{len(image_hashes) + 1:02d}.png"
+                (folder / name).write_bytes(data)
+                image_hash = hashlib.sha256(data).hexdigest()
+                image_hashes.append(image_hash)
+                parts.append({"type": "image_url", "file": name, "sha256": image_hash})
+            else:
+                raise CodexStageError("codex_unexpected_content")
+        prompt = "\n\n".join(texts)
+        (folder / "codex_prompt.txt").write_text(prompt)
+        (folder / "parts.json").write_text(json.dumps(parts, ensure_ascii=False, sort_keys=True))
+        (folder / "metadata.json").write_text(json.dumps({
+            "schema": "codex-online-stage-input-v1",
+            "query_index": self._capture_index - 1,
+            "prompt_sha256": hashlib.sha256(prompt.encode()).hexdigest(),
+            "image_png_sha256": image_hashes,
+        }, sort_keys=True))
+
     def _request_stage_response(self, content):
+        self._capture_request(content)
+        failed_attempts = []
+        for retry_index in range(self.transport_retry_count + 1):
+            try:
+                output = self._request_stage_response_once(content)
+            except CodexStageError as exc:
+                transport = dict(self._call_transport)
+                failed_attempts.append({
+                    "error": str(exc),
+                    "process_returncode": transport.get("process_returncode"),
+                    "completed_turns": transport.get("completed_turns"),
+                    "event_types": transport.get("event_types", []),
+                    "error_diagnostics": transport.get("error_diagnostics", []),
+                    "stderr_diagnostic": transport.get("stderr_diagnostic", {}),
+                })
+                self._call_transport["failed_transport_attempts"] = failed_attempts
+                self._call_transport["physical_call_attempts"] = retry_index + 1
+                incomplete = (transport.get("completed_turns", 0) == 0
+                              and self._call_raw_response is None)
+                retryable = str(exc) in {
+                    "codex_expected_one_completed_turn", "codex_timeout",
+                    "codex_transport_failure", "codex_nonzero_exit",
+                }
+                signals = set(transport.get("stderr_diagnostic", {}).get("signals", []))
+                for diagnostic in transport.get("error_diagnostics", []):
+                    signals.update(diagnostic.get("signals", []))
+                terminal = bool(signals & {"authentication_failed", "permission_denied",
+                                           "quota_exhausted"})
+                if retry_index >= self.transport_retry_count or not (incomplete and retryable) or terminal:
+                    raise
+                time.sleep(min(30.0, self.transport_retry_backoff_seconds * (2 ** retry_index)))
+            else:
+                self._call_transport["failed_transport_attempts"] = failed_attempts
+                self._call_transport["physical_call_attempts"] = retry_index + 1
+                return output
+        raise AssertionError("Unreachable Codex transport retry state")
+
+    def _request_stage_response_once(self, content):
         self.api_request_counter.values["logical_call_attempts"] += 1
         self._call_transport = dict(self.transport_metadata)
         self._call_raw_response = None

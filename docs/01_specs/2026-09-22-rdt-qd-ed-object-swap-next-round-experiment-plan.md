@@ -1,4 +1,162 @@
+# CURRENT — N1W closed incomplete; GPU2 idle
+
+2026-09-24T09:04:40.087283+00:00: N1W stopped at08:56:50UTC by its registered rule: N1/task0 primary Stage180s timeout, then its sole authorized recovery hit episode1800s timeout at432steps. Status `INCOMPLETE_RECOVERY_EPISODE_TIMEOUT_NO_ADOPTION`. 30main planned;3main+1recovery dispatched;2scientifically valid cells (Q0/task0 failure,C0/task0 failure);N1zero valid;27main undispatched. No ≥5/10 claim, no adoption, no validation/formal. New descriptor and mixed-duty parent sampling observed only in partial N1 trajectories. Recovery recorded22completed Stage calls totaling1649.74s (91.57%wall); incomplete final activity/tokens/compute unknown. No HTTPSfallback notice accepted in this cohort, noXid.
+
+Owned supervisor3318782 and recoveryworker3404890 exited; local runner lease released; GPU2idle. Do not auto-resume this closed N1W queue or spend its remaining4 recovery slots on a second retry of thiscell. Original terminal bytes and all historical costs preserved. GPU2private budget44/250attempts,6.6404783742/48GPUh; caps13/125/60/40/12; validation60/14h and formal40/10hprotected. Resource isolation stays ACTIVE; GPU3 has independent authority and must not be modified/preempted.
+
+Executed sourcec75ff0f4eb4c8ae23dfc41b5f7449e99c06ff9ee; original N1Wplan/runtime unchanged. Report `/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/docs/03_evidence/qd_ed_n1w/2026-09-24-final-report.md`; machine audit `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/analysis/n1w/final-audit.json` (16checksPASS). Latest lifecycle evidence `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/n1w-gpu2-independent-v1/launch-result.json`. Next priority is Stage latency/deadline diagnosis under a prospective explicit protocol, then a complete comparable N1 evaluation. No new scientific version is launched by this closeout. All older running/pending/shared-priority notices below are historical.
+
+---
+
+# CURRENT — N1W resumed on GPU2 with independent resources
+
+2026-09-24T08:02:40.669042+00:00: Resource isolation is ACTIVE and independently validated PASS. Latest authority is `RESOURCE_ISOLATION_USER_20260924.md` and authorization SHA `4026c141ff9bd06f31734c0a43122327b359c35bd847670f641961df9ce81f47`. This supersedes every older cross-study hold, GPU priority and shared-budget instruction below. Only mutate this study's state/journals/locks/artifacts; never preempt GPU3 or change its budget. Two independent workers are authorized, one per study, GPU2 for this study.
+
+The coordinator resumed the existing frozen N1W plan with supervisor PID 3318782, start ticks 9916028, boot 2a1fa95f-ab0d-488c-a298-fc488ddd2af7. Do not launch a duplicate. Live status: `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/n1w-gpu2-independent-v1/status.json`; launch and logs alongside. Read-only live helper: `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/n1w_progress.py`. The original supervisor stopped administratively after Q0/task0's terminal; its evidence remains at `runtime/n1w-gpu2/`.
+
+N1W Q0/task0 is a valid task failure: 720 steps, 708.2615 seconds, 47 active QD chunks, 15 completed Stage calls, no Stage error or accepted fallback. It is retained and must not be retried. C0/task0 is now running; N1 is next and remains untested. N1W main cells dispatched 2/30, valid 1/30, recoveries 0/5 at this timestamp.
+
+Private GPU2 budget remains 250 attempts/48 GPUh, caps 13/125/60/40/12, protected validation 60 attempts/14h and formal 40 attempts/10h. Migration assigned 41 historical dispatched attempts and 5.71151713077406 GPUh to GPU2, preserving original bytes and costs exactly once; current C0 adds one running attempt (42 dispatched). Migration is resource-only: it does not authorize extra scientific candidates or relax phase gates. Full N1W30 and max5 typed-timeout recoveries remain the approved scope.
+
+Frozen source `c75ff0f4eb4c8ae23dfc41b5f7449e99c06ff9ee`, original plan SHA `fa3408e75f49385178987db533b9d00d4fefb8f1dfa24647fd245cf9fe5980c2`, runtime SHA `7de5b438a09b10b9c44db5e5508dac960a80724c279ed9bd358ba62252f3bc39` are unchanged. Preserve HEAD/code/plan/runtime during this cohort. Owner verification: `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/resource/n1w-approved/isolation-owner-verification.json` (23 checks passed); coordinator activation and validation are recorded in the isolation authority. Target ≥5/10 is not yet demonstrated. Continue monitoring the recorded supervisor and audit N1 mechanism activity without selecting on early outcomes.
+
+---
+
+# CURRENT — N1W GPU2 queue launched
+
+2026-09-24T07:19:01.596388+00:00: approvedN1W30primary+max5typedStage-timeout recoveries,max1percell. QueuePID3262566,startticks9715863,boot2a1fa95f-ab0d-488c-a298-fc488ddd2af7. GPU2/EGL1only,sharedsingleworker,idle120s.237CPUtestspassed6.85s;fullsource/model/input/providercheckspassed33.98s. NoextraGPUprobe/liveStagecall. Source `c75ff0f4eb4c8ae23dfc41b5f7449e99c06ff9ee`,plan `/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-n1w-approved-plan.json` SHA `fa3408e75f49385178987db533b9d00d4fefb8f1dfa24647fd245cf9fe5980c2`,runtimeSHA `7de5b438a09b10b9c44db5e5508dac960a80724c279ed9bd358ba62252f3bc39`.
+
+Stagecondition codex_login_astra_low_json_transport_fallback_180s_v1, publicpolicySHA 47b97a211a069a6f104f7928e32aeaa0f72031e7a948ee320ee1ef3416fdd6d2. OldN1Vclosedandunchanged. First2N1implementationchecks countin30,notasuccessscreen. PreserveHEAD/code/runtime/planbyteswhilequeuealive. Sharedstart115attempts/16.1696985304GPUh,caps13/125/60/40/12,total250/48h,protected60/40attempts14/10h. GPU3held. Status `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/n1w-gpu2/status.json`;livehelper `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/n1w_progress.py`. Estimated6–8hpluswait/recovery,subjecttoprotectedresources.
+
+---
+
+# CURRENT — N1V closed incomplete; proposed parser fix is inactive
+
+2026-09-24T07:02:43.337384+00:00: N1V1/30 dispatched,0scientifically valid,1invalid,0recoveries,29undispatched; N1untested. Atstep152 the5thStagecall completed97.145s withJSON/usage but erroritem causedcodex_unexpected_item. Notcodex_timeout; noautomaticrecovery. GPU2worker/queue exited,sharedlockreleased,Xidempty. Shared115/250attempts,16.1696985304/48GPUh; caps13/124/60/40/13unchanged;100attempts/24hprotected.
+
+Executed sourcec0a2b2a851a1b35ccd99d5bec5b4d4ddaeb5d394,planSHAd91ef55173c76c1f2df308f57912a515fa3e7006d23dbf0d255f4aa3e7e7fefc. Report `/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/docs/03_evidence/qd_ed_n1v/2026-09-24-final-report.md`; audit `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/analysis/n1v/final-audit.json`. Post-close opt-inparserfix passed202CPUtests; oldpolicyunchanged,newpolicystillrejectedbyactiveN1Vrunner. NoGPU/liveStagecall added. N1Wproposal `/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/experiments/iteration_001_execution_intent/n1w-transport-fallback-proposal.md` needsexplicitapproval before acceptance-policy/bucket changes: same250/48h,transfer1recoverytoDev,new30primary+max5timeoutrecoveries. No oldoutcome relabeling orpooling. This notice supersedes activeN1V/pendingN1Vbudget text below.
+
+---
+
+# CURRENT — N1V GPU2 queue launched
+
+2026-09-24T06:45:19.954197+00:00: approved N1V30 primary + at most6 typed-timeout recoveries, max1percell. Queue PID3214148, startticks9509655, boot2a1fa95f-ab0d-488c-a298-fc488ddd2af7. PhysicalGPU2/EGL1 only, single shared worker,120s idle gate. Full source/model/input/provider preflight passed34.29s;207distinct CPU checks passed (205suite plus2new supervisor end-to-end cases). No new live diagnostic or GPU probe. Source `c0a2b2a851a1b35ccd99d5bec5b4d4ddaeb5d394`, plan `/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-n1v-approved-plan.json` SHA `d91ef55173c76c1f2df308f57912a515fa3e7006d23dbf0d255f4aa3e7e7fefc`. Runtime unchanged SHA `67ccf12f8bc318f1a860e4d0aa0088368e5334471fe6c9dbbecd9b3d8c362427`.
+
+Status: `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/n1v-gpu2/status.json`; process/log alongside. Read-only live helper `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/n1v_progress.py`. Preserve sourceHEAD/fingerprints while queue alive. Taskinterleaved Q0/C0/N1 orC0/Q0/N1,30cells. Completed legal task failures retained; only approved incomplete Stage180s timeout with complete rejection-path checks may recover. Stage tokenusageunknown staysunknown. Do not pool oldN1U/S/T. No >=5/10claim until original Dev/validation/formal gates.
+
+Shared start114attempts,16.081373451GPUh; cap250/48h; caps13/124/60/40/13; validation60+14h/formal40+10hprotected. Available30primary+6recovery,7.918626549GPUh before protection. GPU3 remains held under latestN1Vapproval. Expected6–8h pluswait/recovery; hard resource limits can stop early.
+
+---
+
+# CURRENT — Stage diagnostics complete; N1V proposal awaits approval
+
+2026-09-24T04:55:56.644134+00:00: User asked to continue. CPU observability repair committed337196e8672a2309b06d221c9f3436bc81cf9083;153tests passed6.63s. Six prespecified CPU-only live calls all completed with usage,10.03–27.31s,112.19s total,58746input/377output tokens. No GPU2 episode added, no Stage/model/timeout/acceptance changes. Historical timeout not reproduced; root cause and long-run reliability remain unproven. Evidence `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/analysis/stage-transport-diagnostics-20260924/audit.json`. N1U remains closed with N1 untested; no old result relabeled or pooled.
+
+Existing user GPU2 priority honored: GPU3 N4 supervisor3021562 paused at04:52:25UTC AFTER C0/task0 and Q0/task0 completed and their audits finished; no active episode aborted. Selected N4/task0 remains undispatched. Queue exited, shared runner lock available. Pause proof resource/gpu3-priority-boundary-pause-20260924/status.json and verification.json. Do not automatically resume the GPU3 queue or launch its remaining plan while this resource hold is active.
+
+Budget synchronization defect identified: prior approved transfer was only reflected in GPU2 worktree; parent retained old20/100/60/40/20 caps. Both state files now reflect already-approved11/122/60/40/7, global240/48unchanged. Ledger actual baseline13 exceeds that prior cap11 by2; preserve this actual use, no reclassification. Shared114attempts (baseline13,development94,recovery7),16.081373451GPUh,zero running. After validation/formal100attempts/24h protected, effective remaining development/recovery capacity is26attempts/7.918626549GPUh. Source caps in older parent may be stricter; they do not grant extra authority.
+
+Concrete N1V proposal NOT approved/applied yet: `/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/experiments/iteration_001_execution_intent/n1v-bounded-recovery-proposal.md`. Request global240->250attempts, still48GPUh/protectedvalidation60+14h/formal40+10h; caps13/124/60/40/13 fund30new main cells plus at most6prospectively eligible Stage-timeout recovery episodes, max1percell, no legal-task-failure retry. New30 task-interleaved C0/Q0/N1 cells, same originalalgorithm/seeds/commonStage180, no application retries and no old-cohort pooling. Requires explicit approval before changing hard total/recovery rules or GPU dispatch. Async question pending; do not treat silence as approval. Full follow-up report: `/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/docs/03_evidence/qd_ed_n1u/2026-09-24-stage-diagnostics-followup.md`.
+
+---
+
+# CURRENT — N1U closed incomplete; no active GPU work
+
+Updated 2026-09-24T03:36:54.994004+00:00. Final N1U cohort ended2026-09-24T03:28:17Z with INCOMPLETE_STAGE_TIMEOUT_FINAL_NO_ADOPTION:30planned,2dispatched,1scientifically valid Q0/task0 failure,1invalid C0/task0,28undispatched. N1 has never started and its effectiveness is unknown; formal>=5/10 not demonstrated. This supersedes prior active/pending queue messages below.
+
+C0/task0 attemptaa2a8c792842 reached88steps; call5 timed out after180.209659953s with8numbered reconnect notices and an error item, no completed response/usage, one application invocation. Failed-call tokens and internal HTTP counts unknown. No Xid records. Preserve original terminal classification and allcosts. Final bounded-cohort rule closes this version on invalidity; no automatic retry/replacement or remaining28 dispatch, no validation/formal dispatch. Budget remains approved11/122/60/40/7, no silent rollback or further transfer. Shared112attempts/development94,15.7399580955GPUh consumed,28development slots/no recovery slots remaining,24GPUh protected. N1U cost0.2989421725GPUh.
+
+Owned queue2922757 and worker2964039 both exited; shared runner lock released and GPU2 idle. No active competing research workers observed. Local priority hold is resolved by N1U termination; this notice does not authorize another queue, version or budget change. User continuation was handled by auditing and closing the approved final route.
+
+Executed source4170aeb52c029be17bf31b2933ad6e5a62b02cb3; plan data/qd-ed-n1u-budget-approved-plan.json SHA84dedea9a5adbf38d13333faa0a1f843796013c2a73e46653b1b5f93d3400884. Original frozen artifacts/ledger retained.126prelaunch CPU checks + full frozen-input/provider checks passed; runtime/Stage/QD terminal audits complete. Final report: `/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/docs/03_evidence/qd_ed_n1u/2026-09-24-final-report.md`. Failure audit: `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/analysis/n1u-stage-timeout/audit.json`. Candidate hypothesis remains untested; no adoption.
+
+---
+
+# CURRENT — Approved reallocation applied; GPU2 N1U launched
+
+2026-09-24T03:05:32.842771+00:00: User explicitly approved transferring baseline9 + recovery13 to development and launching N1U. Effective caps baseline11/development122/validation60/formal40/recovery7, total240 attempts/48GPUh unchanged. Validation14h/formal10h remain protected. No extra baseline/recovery attempts remain. Authorization resource/n1u-budget-approval/authorization.json SHAebd43aa5ad751aee9de02c956f9da91ffaa1e76312189ebcf07c3a99b682ea55. This supersedes all pending-budget/priority notes below.
+
+QueuePID2922757,start_ticks8189893,boot2a1fa95f-ab0d-488c-a298-fc488ddd2af7,launched2026-09-24T03:04:41.840522+00:00. Status/process/log prefix `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/n1u-gpu2-approved-queue`. Wrapper runtime/n1u_capacity_cohort_queue.py unchanged; manifest resource/n1u-budget-approved-cohort/manifest.json SHAd23b7108060654f4280b944d737e2cde0ea875466849a807aabed431c5a43b47. It holds the shared runner lock over30 cells and checks whole-cohort capacity before dispatch. OnlyGPU2/EGL1,oneworker,poll5s,idle120s. Do not dispatch competing follow-on work ahead of N1U. At launch shared110attempts/development92/15.441015923GPUh, zero existing N1U reservations. Other GPU3 queues already ended; no process was killed.
+
+Source4170aeb52c029be17bf31b2933ad6e5a62b02cb3; administrative plan data/qd-ed-n1u-budget-approved-plan.json SHA84dedea9a5adbf38d13333faa0a1f843796013c2a73e46653b1b5f93d3400884. Original30 episode rows/order/seeds/profiles unchanged; original runtime SHA67ccf12f8bc318f1a860e4d0aa0088368e5334471fe6c9dbbecd9b3d8c362427 unchanged.126CPU tests passed2.52s; full model/input/source and managed provider checks passed34.23s. No live synthetic Stage call or GPU probe added. Preserve source/HEAD/plan/wrapper/manifest while queue alive.
+
+First20 valid controls then10 N1, Stage180s/episode1800s/720steps. Invalidity/infrastructure failure closes final cohort incomplete; no replacement or automatic retry. Keep earlier cohorts separate and all costs. Target is unachieved until original Dev/validation/formal gates pass. Estimate6–8h wall time; currently8.559GPUh available before protected time, hard limit remains. Continue reporting current-session progress using runtime/n1u_progress.py and analysis/n1u/live-report.zh.md.
+
+---
+
+# CURRENT — GPU2 N1U priority authorized; budget amendment pending
+
+Updated 2026-09-24T02:51:19.317385+00:00. The user explicitly selected GPU2 N1U priority and authorized pausing the other GPU3 queue after its active episode completes. This supersedes earlier pending-priority/no-stop notes below. At inspection no research worker was active, the shared runner lock was available, and GPU2 was idle. GPU3 N2 had already finished its remaining27 episodes at2026-09-23T18:39:12Z; subsequent N3 also finished. No process was killed. Do not launch a competing follow-on queue ahead of N1U.
+
+N1U capacity queue1368687 exited at2026-09-23T18:39:17Z: insufficient development slots for complete N1U cohort. N1U has0 reserved /0 dispatched /0 valid of30; no current N1U process. Shared ledger now110 dispatched, development92/100, baseline11/20, recovery7/20, validation0/60, formal0/40;15.4410159230GPUh consumed, zero running. The frozen30-cell cohort is22 development slots short. No N1 effectiveness conclusion is available.
+
+Concrete proposal (NOT AUTHORIZED/NOT APPLIED): transfer unused baseline9 + recovery13 to development, caps11/122/60/40/7; total240attempts/48GPUh unchanged, validation60/14h and formal40/10h protected. This consumes all remaining recovery attempt capacity. Available unprotected GPU time8.5589840770h; estimated N1U wall time6–8h, not a guarantee. User confirmation requested for this budget amendment only; priority authorization does not need repeating. Proposal: `/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/experiments/iteration_001_execution_intent/n1u-budget-reallocation-proposal.md`. Audit: `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/analysis/n1u-priority-review/capacity-proposal.json`. Do not bypass budget admission, shorten the full cohort, relabel historical attempts, or pool prior conditions. Original frozen source/plan/wrapper remain unchanged.
+
+---
+
+# CURRENT RESOURCE UPDATE — N1U waits with full-cohort capacity guard
+
+2026-09-23T13:41:22.983294+00:00: Waiting-only queue1355545 exited before any N1U dispatch. New queue1368687,start_ticks3370008 uses runtime/n1u_capacity_cohort_queue.py and resource/n1u-full-cohort-capacity/manifest.json (SHA02557ab7d61aeaf04ccd5b750282f9fc3236a08799e2645273f02aa0b0841dec). Status/process/log prefix runtime/n1u-gpu2-capacity-queue. Same frozen scientific plan/source. After acquiring shared runner lease, require development remaining>=30 and total remaining>=30 before any N1U episode. Original lease function unchanged;6-test evidence reused. Old wrappers/manifests preserved.
+
+A user priority question is pending via asynchronous input: current GPU2 N1U versus other worktree GPU3 N2. No approval to stop GPU3 has arrived. Do not stop/modify other queue without that answer. At13:35 shareddevelopment47; parent supervisor828304 holds lease for task1..9 (27cells, firsttwo completed by13:38), so remaining25 would leave only28slots if allfinish. User may authorize pausing that queue at a clean between-episode boundary; otherwise keep waiting and respect whole-cohort capacity. Current owned N1U0/30 dispatched. Continue monitoring in this session.
+
+---
+
+# CURRENT — N1U final bounded deadline cohort queued on GPU2
+
+2026-09-23 13:34 UTC: N1T closed INCOMPLETE_STAGE_TIMEOUT: 17 valid outcomes (C0 0/8, Q0 1/9, success task8), invalid C0/task8 at384steps/792.4381s, 12 undispatched; N1 untested. Failed Stage call21 reached90.1837s without completion/usage; noXid. Preserve classification/terminal/costs; missing failed-call tokens remain unknown. Audit artifact analysis/n1t-stage-timeout/audit.json. Old queue813373 exited and released lock.
+
+N1U is one final complete common-condition cohort, C0/Q0/N1 each10, original tasks/seeds/init/order. Common per-call timeout180s, one application call, same CLI0.155.1/gpt-6-astra/low/schema/reconnect policy;720steps/1800s per episode. No further cohort restart if invalid; no old identity retry/pooling. All20 controls must be valid before N1. If N1 fails Dev, remaining development slots cannot fund full N2/H; close honestly without expanding budget. Original validation/formal gates stay closed until met.
+
+Frozen source5b94baed2fd31e655485d01d2d793c52973bf0d4; plan data/qd-ed-n1u-deadline-stage-plan.json SHA b62d36b976b5f11cb92bc999e4ec0bfd13c5f774283aaa447abdedc05fa1e633; runtime SHA67ccf12f8bc318f1a860e4d0aa0088368e5334471fe6c9dbbecd9b3d8c362427; public Stage hash2bc3e8fcca7c3de0581d0a30478defcb4f6f944491fa3e5ba791642496e60980.187 focusedCPU tests+6 sharedlock tests and full frozen input/provider verification passed. QueuePID1355545,start_ticks3326293,boot2a1fa95f-ab0d-488c-a298-fc488ddd2af7. Wrapper runtime/n1u_cohort_queue.py; manifest resource/n1u-cohort-lock/manifest.json SHAc2e00adfa322d7b4e176f4391b8c9e160fb78d3571fdf5a1fde4f709d9d97a66. Progress runtime/n1u_progress.py; Chinese report analysis/n1u/live-report.zh.md. Do not change source/HEAD/plan/wrapper/manifest while queue alive.
+
+At13:34 waiting for another worktree's GPU3 shared worker; do not stop it. Our GPU remains2 only, one shared worker,120s idle. At13:35 shared ledger54dispatched/development47,7.7903completedGPUh plus one running; other worktree costs continue to reduce remaining capacity. N1U0/30 dispatched. Provisional4–6h plus shared-lock wait. User wants sustained current-session progress; continue work rather than ending with a background-only status. Goal UI remains paused despite explicit user resume; no API resume method, no forced status hack.
+
+---
+
+# 2026-09-23 09:47UTC 资源调度更新
+
+N1T首个Q0/task0已有效完成：失败、720步、12分14秒、17次Stage均成功、无Xid。原等待队列在没有活跃GPU回合时退出，新调度器PID813373已取得共享锁，将串行执行原计划剩余29回合。原算法/源码/计划/种子/预算不变，最多一个GPU工作进程、仅GPU2、回合间120秒空闲检查；6项CPU锁测试通过。资源修订与精确wrapper指纹保存在artifact resource/n1t-cohort-lock-amendment。此前结果保持独立且计账保留。
+
+---
+
+# 2026-09-23 更新：N1T共同传输条件下的完整比较
+
+N1S执行9/30：C0有效0/4、Q0有效0/4、N1尚未执行；第9回合在432步因未知CLI error事件无效退出。保留原始结论与成本，不把该事件推断成已知重连，不重试旧身份，不混入新比较。
+
+新N1T共30回合（C0/Q0/N1各10），保持原任务顺序、种子、初始化、720步和1800秒上限；唯一共同工程修改是严格识别明确编号的重连提示，并要求完整正常结束、JSON/计账有效和退出码0。未知错误、超时和非零退出仍停止。299项CPU测试、93个正常调用重建回放通过。源码冻结a5a65c441bb29412f90d1335069ebd0cd1118512；计划SHA490e5d044a2c427eba1972669742ee30cae4bfde70c2551ad79624e45c31acfd。队列PID690225，GPU2专用，共享单worker锁，5秒扫描、120秒空闲准入。
+
+按已完成回合估计新30回合约3–5小时，另加共享锁等待；正式验证仍未开始。晋级门槛不变：Dev至少5/10且不低于同轮C0/Q0，随后独立验证20/组和正式10/组。共享240attempt/48GPUh与development100上限不扩张。完整规则见工作树 experiments/iteration_001_execution_intent/codex-stage-event-amendment.md。
+
+---
+
+# Latest scheduling update — 2026-09-23T06:58:58Z
+
+N1S remains the identical30-cell scientific plan, source ee1c5e19ae73bdb35a2f2a76230b648e23ade407, SHA aac028a9f085b9a0d3fbbbb270bca8841e3fd0bfcc0990ddf61b115bbbbbe4b7. Completed2 valid task failures (Q0task0,C0task0), remaining28. To reduce shared-lock response delay, stopped waiting-only queue268706 without aborting any episode; new queue454276 scans every5s with the same120s stable-idle gate, physicalGPU2 only and shared one-worker limit. No experimental condition change or dispatched retry. Status/log prefix artifact runtime/n1s-gpu2-fast-queue; progress runtime/n1s_progress.py.
+
+---
+
+# ACTIVE — N1S structured Stage comparison on GPU2
+
+2026-09-23T05:44:13.855192+00:00: Queue PID268706, source ee1c5e19ae73bdb35a2f2a76230b648e23ade407, plan data/qd-ed-n1s-structured-stage-plan.json SHA aac028a9f085b9a0d3fbbbb270bca8841e3fd0bfcc0990ddf61b115bbbbbe4b7. Common json_schema_v1 Stage condition; C0/Q0/N1 each10 (30cells), original Dev seeds/init/order, physicalGPU2 only.282 CPU tests and exactly3/3 synthetic live format/usage checks passed, total29379input/177output tokens and45.2250s API wall time, noGPU. Queue validates inputs then waits shared runner/120s idle. Stop on invalidity; no retries. Monitor artifact runtime/n1s_progress.py, status/log prefix runtime/n1s-gpu2-queue. Do not change frozen source/HEAD while live. N1R closed1/30valid,2dispatched; all old results excluded. Formal target remains unachieved. User requests sustained current-session progress.
+
+---
+
+# CURRENT — Stage format repair before N1S on GPU2
+
+2026-09-23T05:42:49.782253+00:00: N1R closed INCOMPLETE_STAGE_FORMAT_FAILURE; Q0task0 valid failure0/1 in629.0953s, C0task0 aborted after malformed completed Stage response atstep320 (notGPUfault),546.6074s. Old identities/results/costs remain unchanged. Owned queue92477 and child exited. New opt-in json_schema_v1 contract, strict validator and stop-after-preserving-failed-event implemented;282 relevant CPU tests pass. Three prespecified CPU-only live format/usage checks in progress, artifacts analysis/stage-json-live-check. No N1S GPU episode dispatched yet. Next: if3/3pass, freeze common-condition N1S30 original seeds/order, GPU2-only, one shared worker, no automatic retry. GPU3 parent diagnostic owns shared worker currently; do not interfere. User asks sustained progress in current conversation.
+
+---
+
 # RDT + QD + ED：Object-Swap 下一轮实验方案
+
+## 2026-09-23 05:04 UTC：完整诊断通过，N1R比较队列已启动
+
+重启后的C0诊断完整运行720步，879.08秒，无Xid，28/28 Stage调用成功，成本和视频校验通过。任务失败0/1，独立保留，不纳入后续30次。可据此恢复共同运行条件下的N1R比较；故障根因仍未知，继续监控。新队列PID92477，固定GPU2，按原顺序先20个C0/Q0对照再10个N1。计划 data/qd-ed-n1r-post-reboot-plan.json；source 9ba5f628a6b13dde4f707876ff8312b49a46c319。每次720步/1800秒，共享锁、120秒连续空闲和全部有效性检查保持开启。无效或基础设施故障则停止，合法任务失败继续。Validation/Formal尚未授权派发。首轮暂估8–15小时，另外计共享锁/GPU等待；前2–3个完整比较episode后更新。
+
+## 2026-09-23 重启后继续（当前状态）
+
+用户已明确继续。共享数据盘因设备编号变化启动挂载失败，已按 UUID 恢复原路径；旧日志和共享账本已找回，未重置历史结果或成本。固定 GPU2，驱动580.65.06。新增一次独立 GPU2_POST_REBOOT_C0 工程诊断：重新核对本次boot的CUDA/EGL，再用普通生产路径运行 task0/C0，原seed/init与720步限制不变，900秒上限。它不计入N1R三组比较；诊断结果审查通过后才能冻结共同条件并启动30-cell矩阵。157项CPU测试通过；检查队列PID30127已启动。重启前未完成memcheck仍为中断，不能据此宣称无错误。
 
 版本：v4，2026-09-22。状态：**AUTHORIZED / 用户最新指定 GPU2，继续既定测试与条件迭代**。
 

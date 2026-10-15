@@ -13,6 +13,7 @@ import numpy as np
 import time
 import re
 from datetime import datetime
+from pathlib import Path
 
 from utils.logging_utils import SteerLogger
 log = SteerLogger("VLMAgent")
@@ -32,7 +33,15 @@ class VLMAgent:
         api_key = config.get('api_key') or os.environ.get('OPENAI_API_KEY') or os.environ.get('OPENAI_API_KEY')
         base_url = config.get('base_url') or os.environ.get('AZURE_OPENAI_BASE_URL')  # For Azure OpenAI
 
-        if base_url:
+        if config.get('backend') == 'codex_cli':
+            from core.codex_vision import CodexVisionTransport
+            self.codex_transport = CodexVisionTransport(config)
+            self.api_request_counter = self.codex_transport.api_request_counter
+            self.client = None
+            log.info('Using Codex CLI managed ChatGPT login for fresh visual generation')
+        elif config.get('backend', 'openai_compatible') != 'openai_compatible':
+            raise ValueError('Unknown guidance backend')
+        elif base_url:
             self.client = OpenAI(api_key=api_key, base_url=base_url)
             log.info(f"Using custom OpenAI endpoint: {base_url}")
         else:
@@ -108,6 +117,14 @@ class VLMAgent:
         return "incomplete chunked read" in message or "empty vlm response" in message
 
     def _query_guidance_with_retry(self, messages):
+        if self.config.get('backend') == 'codex_cli':
+            if len(messages) != 1 or messages[0]['role'] != 'user' or not isinstance(messages[0]['content'], list):
+                raise ValueError('Codex guidance requires one multimodal user request')
+            if getattr(self, 'task_dir', None):
+                self.codex_transport.capture_dir = Path(self.task_dir) / 'codex_requests'
+            # Transport-only retries are managed by the shared adapter; a complete
+            # but semantically undesirable reply is never retried here.
+            return self.codex_transport._request_stage_response(messages[0]['content'])
         max_retries = int(self.config.get("api_max_retries", 3))
         retry_backoff = float(self.config.get("api_retry_backoff_seconds", 2.0))
         retry_backoff_max = float(self.config.get("api_retry_max_backoff_seconds", 30.0))
@@ -407,13 +424,13 @@ class VLMAgent:
         ]
 
         try:
-            response = self.client.chat.completions.create(
-                model=self.config['model'],
-                messages=messages,
-                temperature=0.3,  # Lower temperature for consistent outputs
-                max_completion_tokens=200
-            )
-            output = response.choices[0].message.content.strip()
+            if self.config.get('backend') == 'codex_cli':
+                output = self._query_guidance_with_retry(messages).strip()
+            else:
+                response = self.client.chat.completions.create(
+                    model=self.config['model'], messages=messages,
+                    temperature=0.3, max_completion_tokens=200)
+                output = response.choices[0].message.content.strip()
             log.info(f"[Segmentation Planning] VLM output: {output}")
 
             # Parse JSON output

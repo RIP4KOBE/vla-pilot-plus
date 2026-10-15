@@ -123,6 +123,76 @@ def test_success_preserves_prompt_pixels_order_and_reports_observed_cost(monkeyp
     assert result["codex_call_latency_s"] >= 0
 
 
+def test_online_capture_keeps_exact_prompt_and_png_order(monkeypatch, tmp_path):
+    recognizer, calls = make(monkeypatch, tmp_path)
+    recognizer.capture_dir = tmp_path / "captured"
+    assert identify(recognizer) == (2, False)
+    folder = recognizer.capture_dir / "request_0000"
+    parts = json.loads((folder / "parts.json").read_text())
+    metadata = json.loads((folder / "metadata.json").read_text())
+    assert (folder / "codex_prompt.txt").read_text() == calls[0].prompt
+    assert [part["type"] for part in parts] == ["text", "text", "image_url", "text", "image_url"]
+    assert np.array_equal(np.array(Image.open(folder / "image_01.png")), calls[0].images[0])
+    assert np.array_equal(np.array(Image.open(folder / "image_02.png")), calls[0].images[1])
+    assert metadata["prompt_sha256"] == recognizer.last_result["transport"]["request_fingerprint"]["prompt_sha256"]
+    assert metadata["image_png_sha256"] == recognizer.last_result["transport"]["request_fingerprint"]["image_png_sha256"]
+
+
+def test_incomplete_transport_reply_retries_then_keeps_complete_answer(monkeypatch, tmp_path):
+    recognizer, calls = make(monkeypatch, tmp_path, event_policy="completed_transport_cycles_v6")
+    recognizer.transport_retry_count = 2
+    recognizer.transport_retry_backoff_seconds = 0
+    original = recognizer._request_stage_response_once
+    seen = []
+
+    def first_failure_then_success(content):
+        seen.append(True)
+        if len(seen) == 1:
+            recognizer.api_request_counter.values["logical_call_attempts"] += 1
+            recognizer._call_transport = {"completed_turns": 0, "event_types": ["thread.started", "turn.failed"]}
+            recognizer._call_raw_response = None
+            raise module.CodexStageError("codex_expected_one_completed_turn")
+        return original(content)
+
+    monkeypatch.setattr(recognizer, "_request_stage_response_once", first_failure_then_success)
+    assert identify(recognizer) == (2, False)
+    assert len(seen) == 2 and len(calls) == 1
+    result = recognizer.last_result
+    assert result["codex_logical_call_attempts"] == 2
+    assert result["transport"]["physical_call_attempts"] == 2
+    assert [item["error"] for item in result["transport"]["failed_transport_attempts"]] == [
+        "codex_expected_one_completed_turn"]
+
+
+def test_complete_but_invalid_answer_is_not_retried(monkeypatch, tmp_path):
+    recognizer, calls = make(monkeypatch, tmp_path, event_list=events(answer="not JSON"),
+                             output_format="json_schema_v1",
+                             event_policy="completed_transport_cycles_v6")
+    recognizer.transport_retry_count = 4
+    assert identify(recognizer) == (1, True)
+    assert len(calls) == 1
+    assert recognizer.last_result["error"] == "codex_invalid_structured_response"
+    assert recognizer.last_result["transport"]["physical_call_attempts"] == 1
+
+
+def test_authentication_failure_is_not_retried(monkeypatch, tmp_path):
+    recognizer, _ = make(monkeypatch, tmp_path, event_policy="completed_transport_cycles_v6")
+    recognizer.transport_retry_count = 12
+    seen = []
+
+    def failed_auth(content):
+        seen.append(True)
+        recognizer._call_transport = {"completed_turns": 0,
+            "error_diagnostics": [{"signals": ["authentication_failed"]}]}
+        recognizer._call_raw_response = None
+        raise module.CodexStageError("codex_expected_one_completed_turn")
+
+    monkeypatch.setattr(recognizer, "_request_stage_response_once", failed_auth)
+    assert identify(recognizer) == (1, True)
+    assert len(seen) == 1
+    assert recognizer.last_result["transport"]["physical_call_attempts"] == 1
+
+
 def test_child_environment_uses_existing_login_without_mutating_parent(monkeypatch, tmp_path):
     for name in module._REMOVED_ENVIRONMENT:
         monkeypatch.setenv(name, "test-provider-value")
@@ -372,6 +442,56 @@ def test_combined_live_startup_warnings_require_v5(monkeypatch, tmp_path):
     assert len(transport['model_metadata_warning_notices']) == 1
     assert len(transport['transport_fallback_notices']) == 1
     assert [e['attempt'] for e in transport['error_events']] == [2, 3, 4, 5]
+
+
+def two_transport_phase_stream(answer):
+    stream = events(answer=answer)
+    notices = [
+        {'type': 'error', 'message': f'Reconnecting... {attempt}/5 (stream disconnected)'}
+        for attempt in (2, 3, 4, 5)
+    ]
+    notices.append(fallback_notice())
+    notices.extend(
+        {'type': 'error', 'message': f'Reconnecting... {attempt}/5 (stream disconnected)'}
+        for attempt in (1, 2, 3, 4)
+    )
+    stream[2:2] = notices
+    return stream
+
+
+@pytest.mark.parametrize('output_format,answer', [
+    ('json_schema_v1', json.dumps({'stage': 2, 'guidance': 'no', 'evidence': 'held'})),
+    ('legacy_text', ANSWER),
+])
+def test_completed_two_transport_phases_v6_preserves_reply_and_usage(
+        monkeypatch, tmp_path, output_format, answer):
+    stream = two_transport_phase_stream(answer)
+    recognizer, calls = make(monkeypatch, tmp_path, event_list=stream,
+        output_format=output_format, event_policy='completed_transport_cycles_v6')
+    assert identify(recognizer) == (2, False)
+    assert len(calls) == recognizer.last_result['codex_usage_complete_calls'] == 1
+    assert recognizer.last_result['raw_response'] == answer
+    transport = recognizer.last_result['transport']
+    assert [item['attempt'] for item in transport['error_events']] == [2, 3, 4, 5, 1, 2, 3, 4]
+    assert len(transport['transport_fallback_notices']) == 1
+
+
+@pytest.mark.parametrize('change', ['missing_fallback', 'duplicate_fallback', 'unknown_error',
+                                    'too_many_in_phase', 'missing_reply', 'nonzero'])
+def test_transport_cycle_v6_still_rejects_incomplete_or_unknown_stream(
+        monkeypatch, tmp_path, change):
+    stream = two_transport_phase_stream(ANSWER)
+    if change == 'missing_fallback': stream.pop(6)
+    if change == 'duplicate_fallback': stream.insert(7, fallback_notice())
+    if change == 'unknown_error': stream[3]['message'] = 'unknown provider failure'
+    if change == 'too_many_in_phase':
+        stream.insert(6, {'type': 'error', 'message': 'Reconnecting... 6/6 (stream disconnected)'})
+    if change == 'missing_reply': stream.pop(-2)
+    recognizer, _ = make(monkeypatch, tmp_path, event_list=stream,
+        returncode=1 if change == 'nonzero' else 0,
+        event_policy='completed_transport_cycles_v6')
+    assert identify(recognizer) == (1, True)
+    assert recognizer.last_result['codex_failed_calls'] == 1
 
 
 @pytest.mark.parametrize('change', ['wrong_model', 'duplicate_metadata', 'duplicate_fallback',
