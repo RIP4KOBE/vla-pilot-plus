@@ -1,0 +1,11 @@
+Error during episode execution:
+Traceback (most recent call last):
+  File "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-pg-diverse-sampling/main.py", line 1022, in run
+    self._run_episode(episode, episode_dir, episode_seed)
+  File "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-pg-diverse-sampling/main.py", line 1160, in _run_episode
+    keypoints = self.keypoint_tracker.get_keypoint_positions()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-pg-diverse-sampling/core/keypoint_tracker.py", line 158, in get_keypoint_positions
+    assert self._keypoint_registry, \
+           ^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Keypoints have not been registered yet. Call register_keypoints() first.

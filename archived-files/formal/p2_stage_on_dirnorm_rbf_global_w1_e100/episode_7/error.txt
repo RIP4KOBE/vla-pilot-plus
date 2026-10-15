@@ -1,0 +1,32 @@
+Error during episode execution:
+Traceback (most recent call last):
+  File "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-pg-diverse-sampling/main.py", line 1017, in run
+    self._run_episode(episode, episode_dir, episode_seed)
+  File "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-pg-diverse-sampling/main.py", line 1266, in _run_episode
+    action_chunk = self.policy.select_action(**select_kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-pg-diverse-sampling/core/rdt_policy_steer.py", line 1416, in select_action
+    raw = self._predict_guided(
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-pg-diverse-sampling/core/rdt_policy_steer.py", line 1568, in _predict_guided
+    guided = self._eds_guided_denoise_loop(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-pg-diverse-sampling/core/rdt_policy_steer.py", line 4544, in _eds_guided_denoise_loop
+    population = self._eds_initial_population(x_t=x_t, cond=cond, cfg=cfg)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-pg-diverse-sampling/core/rdt_policy_steer.py", line 2803, in _eds_initial_population
+    population, info = self._eds_initial_denoise_rbf_diverse(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-pg-diverse-sampling/core/rdt_policy_steer.py", line 2671, in _eds_initial_denoise_rbf_diverse
+    div_grad, descriptor_evidence = self._compute_eds_diversity_gradient(
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-pg-diverse-sampling/core/rdt_policy_steer.py", line 6177, in _compute_eds_diversity_gradient
+    components = _eds_direction_normalized_distance_components(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-pg-diverse-sampling/core/rdt_policy_steer.py", line 218, in _eds_direction_normalized_distance_components
+    direction = 0.5 * torch.cdist(
+                      ^^^^^^^^^^^^
+  File "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/functional.py", line 1505, in cdist
+    return _VF.cdist(x1, x2, p, None)  # type: ignore[attr-defined]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: "cdist_cuda" not implemented for 'BFloat16'
