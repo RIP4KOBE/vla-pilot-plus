@@ -1,0 +1,890 @@
+{
+  "state": "remote_verified",
+  "date": "2026-10-15",
+  "branch_count_including_main": 24,
+  "history_tag_prefix": "history/20261015/",
+  "branches": [
+    {
+      "local_path": ".worktrees/debug-diffusion-baseline",
+      "desired_branch": "debug-diffusion-baseline",
+      "source_branch": "codex/archive/20261015/debug/diffusion-baseline",
+      "source_commit": "cb3ed9a2983bcbc0641bae7f6fc04b5e0f2072fb",
+      "classification": "source_implementation",
+      "target_commit": "cb3ed9a2983bcbc0641bae7f6fc04b5e0f2072fb",
+      "preserved_existing_tip": null,
+      "reconciliation_commit": false,
+      "tree": "f498325f4d691109cc081e37878eac3fb451d7f3"
+    },
+    {
+      "local_path": ".worktrees/exp/eds-init-fps",
+      "desired_branch": "exp/eds-init-fps",
+      "source_branch": "codex/archive/20261015/exp/eds-init-fps",
+      "source_commit": "a51186471478d552fa5f2be9b603da7321c8409c",
+      "classification": "source_implementation",
+      "target_commit": "a51186471478d552fa5f2be9b603da7321c8409c",
+      "preserved_existing_tip": null,
+      "reconciliation_commit": false,
+      "tree": "490da0ac42c47c315572edc78f1ad4f6739f6c10"
+    },
+    {
+      "local_path": ".worktrees/exp/eds-init-pg-diverse-sampling",
+      "desired_branch": "exp/eds-init-pg-diverse-sampling",
+      "source_branch": "codex/archive/20261015/exp/eds-init-pg-diverse-sampling",
+      "source_commit": "5afdaffee229bbdbd08ebd82d3bf568d4ab08a58",
+      "classification": "source_implementation",
+      "target_commit": "688436ba4a56592cc07d2d254e7bda937da4f770",
+      "preserved_existing_tip": "849760962eb606ef6c6c04f8f422f079877355c9",
+      "reconciliation_commit": true,
+      "tree": "7bf3e98a501c8332f9d46dbf92aa3e993d985415"
+    },
+    {
+      "local_path": ".worktrees/exp/eds-qd-autoresearch-libero-swap-ood",
+      "desired_branch": "exp/eds-qd-autoresearch-libero-swap-ood",
+      "source_branch": "codex/archive/20261015/exp/eds-qd-autoresearch-libero-swap-ood",
+      "source_commit": "0cd3dd4914c658626447fe41621a8e6c380e573b",
+      "classification": "source_implementation",
+      "target_commit": "0cd3dd4914c658626447fe41621a8e6c380e573b",
+      "preserved_existing_tip": null,
+      "reconciliation_commit": false,
+      "tree": "11ee10d43fc77b08d57a135848b8708832d87ea9"
+    },
+    {
+      "local_path": ".worktrees/exp/eds-qd-stage-guidance-transition",
+      "desired_branch": "exp/eds-qd-stage-guidance-transition",
+      "source_branch": "codex/archive/20261015/exp/eds-qd-stage-guidance-transition",
+      "source_commit": "44e0b99c6a04397d5a3df8fb8969f166ad4cc30f",
+      "classification": "source_implementation",
+      "target_commit": "44e0b99c6a04397d5a3df8fb8969f166ad4cc30f",
+      "preserved_existing_tip": null,
+      "reconciliation_commit": false,
+      "tree": "f1645ca8a2ec971ad4395daafc54fc1c19495147"
+    },
+    {
+      "local_path": ".worktrees/exp/eds-quality-diversity",
+      "desired_branch": "exp/eds-quality-diversity",
+      "source_branch": "codex/archive/20261015/exp/c0-codex-historical-20260925",
+      "source_commit": "2c5ab63617eb06ad6830d862a2b883a080325fb9",
+      "classification": "source_implementation",
+      "target_commit": "2c5ab63617eb06ad6830d862a2b883a080325fb9",
+      "preserved_existing_tip": null,
+      "reconciliation_commit": false,
+      "tree": "d7ed21fd4e742cec7a6c6b3d5002bba76de551b8"
+    },
+    {
+      "local_path": ".worktrees/exp/rdt-qd-ed-decision-evidence-20260923",
+      "desired_branch": "exp/rdt-qd-ed-decision-evidence-20260923",
+      "source_branch": "codex/archive/20261015/exp/rdt-qd-ed-decision-evidence-20260923",
+      "source_commit": "79c2d808b11f80e70f8a50068ea85db3524d55c5",
+      "classification": "source_implementation",
+      "target_commit": "79c2d808b11f80e70f8a50068ea85db3524d55c5",
+      "preserved_existing_tip": null,
+      "reconciliation_commit": false,
+      "tree": "8ba0fd94dfa7b3b54f852830e5c8ce72a577ac69"
+    },
+    {
+      "local_path": ".worktrees/exp/rdt-qd-ed-executed-quality-20260923",
+      "desired_branch": "exp/rdt-qd-ed-executed-quality-20260923",
+      "source_branch": "codex/archive/20261015/exp/rdt-qd-ed-executed-quality-20260923",
+      "source_commit": "aede728fff0107bc964e1aa452fc71d4f844a080",
+      "classification": "source_implementation",
+      "target_commit": "aede728fff0107bc964e1aa452fc71d4f844a080",
+      "preserved_existing_tip": null,
+      "reconciliation_commit": false,
+      "tree": "c5c301d88c64bce7427367c0e0aea4b205b67952"
+    },
+    {
+      "local_path": ".worktrees/exp/rdt-qd-ed-final-20260921T093925Z",
+      "desired_branch": "exp/rdt-qd-ed-final-20260921T093925Z",
+      "source_branch": "codex/archive/20261015/exp/rdt-qd-ed-final-20260921T093925Z",
+      "source_commit": "5b9ac46772c1e10b9a917b97efbc47e871fc1fcb",
+      "classification": "source_implementation",
+      "target_commit": "5b9ac46772c1e10b9a917b97efbc47e871fc1fcb",
+      "preserved_existing_tip": null,
+      "reconciliation_commit": false,
+      "tree": "65a4f11abaf03054fe94c80da3afb49f86483315"
+    },
+    {
+      "local_path": ".worktrees/exp/rdt-qd-ed-gpu6-20260922T063626Z",
+      "desired_branch": "exp/rdt-qd-ed-gpu6-20260922T063626Z",
+      "source_branch": "codex/archive/20261015/exp/rdt-qd-ed-gpu6-20260922T063626Z",
+      "source_commit": "a8afe1c044976842eb3d754d82909806a5b555bd",
+      "classification": "source_implementation",
+      "target_commit": "a8afe1c044976842eb3d754d82909806a5b555bd",
+      "preserved_existing_tip": null,
+      "reconciliation_commit": false,
+      "tree": "8c60a47911959bf71cd3fcdb11f710cdbf661c17"
+    },
+    {
+      "local_path": ".worktrees/exp/rdt-qd-ed-n2-runner-20260923",
+      "desired_branch": "exp/rdt-qd-ed-n2-runner-20260923",
+      "source_branch": "codex/archive/20261015/exp/rdt-qd-ed-n2-runner-20260923",
+      "source_commit": "1a2065e974c76111d4cf000e2013126e85456821",
+      "classification": "source_implementation",
+      "target_commit": "1a2065e974c76111d4cf000e2013126e85456821",
+      "preserved_existing_tip": null,
+      "reconciliation_commit": false,
+      "tree": "6f5bc4f2066b66321a13baf2655f3363bc758daf"
+    },
+    {
+      "local_path": ".worktrees/exp/rdt-qd-ed-n3-runner-20260924",
+      "desired_branch": "exp/rdt-qd-ed-n3-runner-20260924",
+      "source_branch": "codex/archive/20261015/exp/rdt-qd-ed-n3-runner-20260924",
+      "source_commit": "7f5f1c815eb379f4499bf46fd5d84067e1ae3f39",
+      "classification": "source_implementation",
+      "target_commit": "7f5f1c815eb379f4499bf46fd5d84067e1ae3f39",
+      "preserved_existing_tip": null,
+      "reconciliation_commit": false,
+      "tree": "e681cf5cbb85c2b0c7de5898e3a313ff1eac5cb4"
+    },
+    {
+      "local_path": ".worktrees/exp/rdt-qd-ed-n4-audit-20260924",
+      "desired_branch": "exp/rdt-qd-ed-n4-audit-20260924",
+      "source_branch": "codex/archive/20261015/exp/rdt-qd-ed-n4-audit-20260924",
+      "source_commit": "f2e7bf4bbab67d02bcf53a78fd81e0a83bcc946e",
+      "classification": "source_implementation",
+      "target_commit": "f2e7bf4bbab67d02bcf53a78fd81e0a83bcc946e",
+      "preserved_existing_tip": null,
+      "reconciliation_commit": false,
+      "tree": "fea11ea44013f0f1f07ddfa5b550036713cdb8fc"
+    },
+    {
+      "local_path": ".worktrees/exp/rdt-qd-ed-n4-e1-runner-20260924",
+      "desired_branch": "exp/rdt-qd-ed-n4-e1-runner-20260924",
+      "source_branch": "codex/archive/20261015/exp/rdt-qd-ed-n4-e1-runner-20260924",
+      "source_commit": "cef6b4777c33b1f26b21abeffcaf240649320812",
+      "classification": "source_implementation",
+      "target_commit": "cef6b4777c33b1f26b21abeffcaf240649320812",
+      "preserved_existing_tip": null,
+      "reconciliation_commit": false,
+      "tree": "7f1ddaac6de5ee2af4da6706d313c7c0ecf087cd"
+    },
+    {
+      "local_path": ".worktrees/exp/rdt-qd-ed-n4-evaluation-audit-20260924",
+      "desired_branch": "exp/rdt-qd-ed-n4-evaluation-audit-20260924",
+      "source_branch": "codex/archive/20261015/exp/rdt-qd-ed-n4-evaluation-audit-20260924",
+      "source_commit": "0d681ad1c9ecde039c0b06e1221086a3e3c51396",
+      "classification": "source_implementation",
+      "target_commit": "0d681ad1c9ecde039c0b06e1221086a3e3c51396",
+      "preserved_existing_tip": null,
+      "reconciliation_commit": false,
+      "tree": "035df258a35458f1993aafca26e637eede6dd408"
+    },
+    {
+      "local_path": ".worktrees/exp/rdt-qd-ed-n4-evaluation-runner-20260924",
+      "desired_branch": "exp/rdt-qd-ed-n4-evaluation-runner-20260924",
+      "source_branch": "codex/archive/20261015/exp/rdt-qd-ed-n4-evaluation-runner-20260924",
+      "source_commit": "924b52a3aebc8f25198bc01cb1c3a02e8834de0a",
+      "classification": "source_implementation",
+      "target_commit": "924b52a3aebc8f25198bc01cb1c3a02e8834de0a",
+      "preserved_existing_tip": null,
+      "reconciliation_commit": false,
+      "tree": "346d12dbb0fc2e7c08a11c2749e8c666c0f770b5"
+    },
+    {
+      "local_path": ".worktrees/exp/rdt-qd-ed-n4-runner-20260924",
+      "desired_branch": "exp/rdt-qd-ed-n4-runner-20260924",
+      "source_branch": "codex/archive/20261015/exp/rdt-qd-ed-n4-runner-20260924",
+      "source_commit": "610384b112d8fe90adb5fe85d1f8da51d63186b4",
+      "classification": "source_implementation",
+      "target_commit": "610384b112d8fe90adb5fe85d1f8da51d63186b4",
+      "preserved_existing_tip": null,
+      "reconciliation_commit": false,
+      "tree": "6847c86690ecc0abaf57ba27a230543f42896433"
+    },
+    {
+      "local_path": ".worktrees/exp/rdt-qd-ed-n4-terminal-20260924",
+      "desired_branch": "exp/rdt-qd-ed-n4-terminal-20260924",
+      "source_branch": "codex/archive/20261015/exp/rdt-qd-ed-n4-terminal-20260924",
+      "source_commit": "0901e64df1c08c9d0eaba2ea2bfd85c4f54bfcfe",
+      "classification": "source_implementation",
+      "target_commit": "0901e64df1c08c9d0eaba2ea2bfd85c4f54bfcfe",
+      "preserved_existing_tip": null,
+      "reconciliation_commit": false,
+      "tree": "fef8b26341a5a5e4a1133be9af8f91afde2e5a5a"
+    },
+    {
+      "local_path": ".worktrees/exp/rdt-qd-ed-stage-lifecycle-20260924",
+      "desired_branch": "exp/rdt-qd-ed-stage-lifecycle-20260924",
+      "source_branch": "codex/archive/20261015/exp/rdt-qd-ed-stage-lifecycle-20260924",
+      "source_commit": "f9d56e482339d959de8eb42261ad3989a65d4aca",
+      "classification": "source_implementation",
+      "target_commit": "f9d56e482339d959de8eb42261ad3989a65d4aca",
+      "preserved_existing_tip": null,
+      "reconciliation_commit": false,
+      "tree": "7a6cec650520616dd0401cc632d3d7a662366025"
+    },
+    {
+      "local_path": ".worktrees/feat/rdt-integration",
+      "desired_branch": "feat/rdt-integration",
+      "source_branch": "codex/archive/20261015/feat/rdt-integration",
+      "source_commit": "aae5f5d9115de9cc3f33f8dfca9e0e211ab3d6a2",
+      "classification": "source_implementation",
+      "target_commit": "aae5f5d9115de9cc3f33f8dfca9e0e211ab3d6a2",
+      "preserved_existing_tip": "3835192744a4be5dc00790774e0593383cbeacf8",
+      "reconciliation_commit": false,
+      "tree": "46bd30590f98e9972c845bf881e107b7faf9ccff"
+    },
+    {
+      "local_path": ".worktrees/feat/rdt-libero-gt-rollout-reintegration",
+      "desired_branch": "feat/rdt-libero-gt-rollout-reintegration",
+      "source_branch": "codex/archive/20261015/feat/rdt-libero-gt-rollout-reintegration",
+      "source_commit": "c5ce243fd0631120d252e1ceff1014db993b7d9f",
+      "classification": "source_implementation",
+      "target_commit": "c5ce243fd0631120d252e1ceff1014db993b7d9f",
+      "preserved_existing_tip": "73b90c69b7ad5517a5313cd0bd4ba4d44a16eee0",
+      "reconciliation_commit": false,
+      "tree": "e50a43106f495abe05a4e4094f240b9049fe1dde"
+    },
+    {
+      "local_path": ".worktrees/feat/rdt-libero-object-ckpt",
+      "desired_branch": "feat/rdt-libero-object-ckpt",
+      "source_branch": "codex/archive/20261015/feat/rdt-libero-object-ckpt",
+      "source_commit": "48c94524ae5c4fcd96a121afff75f890bc098260",
+      "classification": "source_implementation",
+      "target_commit": "48c94524ae5c4fcd96a121afff75f890bc098260",
+      "preserved_existing_tip": "1be4afbf17eaac9066e417ea1309cc1d326d1520",
+      "reconciliation_commit": false,
+      "tree": "112509c751d40505b2efaec6923870ad66cc39df"
+    },
+    {
+      "local_path": ".worktrees/feat/rdt_ed_steering_integration",
+      "desired_branch": "feat/rdt_ed_steering_integration",
+      "source_branch": "codex/archive/20261015/rdt_ed_steering_integration",
+      "source_commit": "b03e40f631f0d93e6fdd9eea6e5d7736cc91450c",
+      "classification": "source_implementation",
+      "target_commit": "b03e40f631f0d93e6fdd9eea6e5d7736cc91450c",
+      "preserved_existing_tip": null,
+      "reconciliation_commit": false,
+      "tree": "446b4a9a68ffdcf210bbf56db93dd42dffeaa1b5"
+    }
+  ],
+  "excluded_directories": [
+    {
+      "local_path": ".worktrees/exp/history-publication-20261015",
+      "desired_branch": "exp/history-publication-20261015",
+      "source_branch": null,
+      "source_commit": null,
+      "classification": "management_or_residual"
+    },
+    {
+      "local_path": ".worktrees/exp/repository-maintenance-20261015",
+      "desired_branch": "exp/repository-maintenance-20261015",
+      "source_branch": null,
+      "source_commit": null,
+      "classification": "management_or_residual"
+    },
+    {
+      "local_path": ".worktrees/exp/steering-integration",
+      "desired_branch": "exp/steering-integration",
+      "source_branch": null,
+      "source_commit": null,
+      "classification": "management_or_residual"
+    },
+    {
+      "local_path": ".worktrees/exp/steering-ultra-20261014",
+      "desired_branch": "exp/steering-ultra-20261014",
+      "source_branch": null,
+      "source_commit": null,
+      "classification": "management_or_residual"
+    },
+    {
+      "local_path": ".worktrees/feat/rdt-libero-gt-rollout-integration",
+      "desired_branch": "feat/rdt-libero-gt-rollout-integration",
+      "source_branch": null,
+      "source_commit": null,
+      "classification": "management_or_residual"
+    }
+  ],
+  "retired_branches": [
+    {
+      "branch": "chore/integrate-rdt-libero-vls",
+      "commit": "25e98a8fe2ada8f0b363a6539b819dfd8f909956",
+      "tag": "history/20261015/chore/integrate-rdt-libero-vls",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/chore/integrate-rdt-libero-vls"
+    },
+    {
+      "branch": "codex/archive/20261015/chore/integrate-rdt-libero-vls",
+      "commit": "17fc88b4a56a163aedfa8cda74a938034ed47cb7",
+      "tag": "history/20261015/codex/archive/20261015/chore/integrate-rdt-libero-vls",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/chore/integrate-rdt-libero-vls"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n24-gripper-mode-parent-rescue",
+      "commit": "6c26945e1a56e099fc9a5fb75b385f090fe98ab8",
+      "tag": "history/20261015/codex/archive/20261015/codex/n24-gripper-mode-parent-rescue",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n24-gripper-mode-parent-rescue"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n24-validation-agent",
+      "commit": "ebdac8915a0985e731cae0d47a3bccd0be3a133d",
+      "tag": "history/20261015/codex/archive/20261015/codex/n24-validation-agent",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n24-validation-agent"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n25-actuator-clipped-rbf",
+      "commit": "923a7b0954fb85e34327a6b7d3499a5a29d8f413",
+      "tag": "history/20261015/codex/archive/20261015/codex/n25-actuator-clipped-rbf",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n25-actuator-clipped-rbf"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n25-continuation-downstream-evidence",
+      "commit": "50584b437eb9ed4932864210982ebff8357144e6",
+      "tag": "history/20261015/codex/archive/20261015/codex/n25-continuation-downstream-evidence",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n25-continuation-downstream-evidence"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n25-infrastructure-continuation",
+      "commit": "a5aa603fa2ffc8d741bdb28644ee963365b397e0",
+      "tag": "history/20261015/codex/archive/20261015/codex/n25-infrastructure-continuation",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n25-infrastructure-continuation"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n25-validation-agent",
+      "commit": "1a32a52fddb5c535e08008a3e8458660ea092f1f",
+      "tag": "history/20261015/codex/archive/20261015/codex/n25-validation-agent",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n25-validation-agent"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n26-clean-output-rbf",
+      "commit": "495ef79afc9b9c366f308c782c2b7282253e574a",
+      "tag": "history/20261015/codex/archive/20261015/codex/n26-clean-output-rbf",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n26-clean-output-rbf"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n26-logical-dev",
+      "commit": "fc8a86bc29fda80cd95d9e8c9b8969147796e068",
+      "tag": "history/20261015/codex/archive/20261015/codex/n26-logical-dev",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n26-logical-dev"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n27-feasible-ray-update",
+      "commit": "8dd92da15280318804d25895c69e178b9dbb381c",
+      "tag": "history/20261015/codex/archive/20261015/codex/n27-feasible-ray-update",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n27-feasible-ray-update"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n27-hydra-continuation",
+      "commit": "0073a1758bfc23f96fb182ee5962ce223e527107",
+      "tag": "history/20261015/codex/archive/20261015/codex/n27-hydra-continuation",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n27-hydra-continuation"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n28-parent-before-renoise-20261001",
+      "commit": "f75c33713019323d038ddca877fdaa17f2f0f126",
+      "tag": "history/20261015/codex/archive/20261015/codex/n28-parent-before-renoise-20261001",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n28-parent-before-renoise-20261001"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n29-population-relative-trust-20261001",
+      "commit": "90a7d3d4a807fd17721eb58a8338c9cae367fc0e",
+      "tag": "history/20261015/codex/archive/20261015/codex/n29-population-relative-trust-20261001",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n29-population-relative-trust-20261001"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n30-executed-progress-continuation",
+      "commit": "e2c40df2e805fe02c301fec60902cbe70f30ba87",
+      "tag": "history/20261015/codex/archive/20261015/codex/n30-executed-progress-continuation",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n30-executed-progress-continuation"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n30-feedback-continuation",
+      "commit": "158b0c1ca340297305a73c37f2c594e904492545",
+      "tag": "history/20261015/codex/archive/20261015/codex/n30-feedback-continuation",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n30-feedback-continuation"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n30-initial-observation-repair",
+      "commit": "6d3bfa77129a65c66d3767a497d7b0738394cfb5",
+      "tag": "history/20261015/codex/archive/20261015/codex/n30-initial-observation-repair",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n30-initial-observation-repair"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n30-repair-continuation",
+      "commit": "d2146aeeb5774ba667b82f5698fa7d6d308c657d",
+      "tag": "history/20261015/codex/archive/20261015/codex/n30-repair-continuation",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n30-repair-continuation"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n30-terminal-feedback-repair",
+      "commit": "a8752a9c218abe4e3d0b474e840773ab3bea05f3",
+      "tag": "history/20261015/codex/archive/20261015/codex/n30-terminal-feedback-repair",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n30-terminal-feedback-repair"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n31-capture-dwell",
+      "commit": "4b43b7a024c0e0b7008198054ee37b0e03af94a9",
+      "tag": "history/20261015/codex/archive/20261015/codex/n31-capture-dwell",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n31-capture-dwell"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n34-production-integration",
+      "commit": "1b67ea71f4a981b0532671d06cf84a41f9596937",
+      "tag": "history/20261015/codex/archive/20261015/codex/n34-production-integration",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n34-production-integration"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n36-cyutility-alias-001243",
+      "commit": "0130501950cb5388540ffde3586824816950fc04",
+      "tag": "history/20261015/codex/archive/20261015/codex/n36-cyutility-alias-001243",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n36-cyutility-alias-001243"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/n36-nonprogress-tangent",
+      "commit": "32aa091feb06d0cca23431f32ae6424a0410930d",
+      "tag": "history/20261015/codex/archive/20261015/codex/n36-nonprogress-tangent",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n36-nonprogress-tangent"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/rdt-qd-ed-n22-hold-lift-20260930",
+      "commit": "a2b22756a38f228aa4f8e1c4b60681a768163c0c",
+      "tag": "history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n22-hold-lift-20260930",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n22-hold-lift-20260930"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/rdt-qd-ed-n22-validation-20260930",
+      "commit": "d3c49d2d4a84b692cdea04a3848db0796e5dc041",
+      "tag": "history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n22-validation-20260930",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n22-validation-20260930"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/rdt-qd-ed-n23-arithmetic-audit-20260930",
+      "commit": "2189c949d949bcd6d62eb90c523a7e8bd8120db8",
+      "tag": "history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n23-arithmetic-audit-20260930",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n23-arithmetic-audit-20260930"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/rdt-qd-ed-n23-clipped-quality-20260930",
+      "commit": "3929eaa0dd43437e3889a17844cb3db174570e33",
+      "tag": "history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n23-clipped-quality-20260930",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n23-clipped-quality-20260930"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/rdt-qd-ed-n23-continuation-20260930",
+      "commit": "c62eb2645ace05230a2d095304644466495eaf49",
+      "tag": "history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n23-continuation-20260930",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n23-continuation-20260930"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/rdt-qd-ed-n23-validation-20260930",
+      "commit": "6835c3f4e5e33fb87cb50b9099ae3108b0a611be",
+      "tag": "history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n23-validation-20260930",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n23-validation-20260930"
+    },
+    {
+      "branch": "codex/archive/20261015/codex/rdt-steering-integration",
+      "commit": "907900b8ae4e8b72ab265a471549357f60df3776",
+      "tag": "history/20261015/codex/archive/20261015/codex/rdt-steering-integration",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/rdt-steering-integration"
+    },
+    {
+      "branch": "codex/archive/20261015/debug/diffusion-baseline",
+      "commit": "cb3ed9a2983bcbc0641bae7f6fc04b5e0f2072fb",
+      "tag": "history/20261015/codex/archive/20261015/debug/diffusion-baseline",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/debug/diffusion-baseline"
+    },
+    {
+      "branch": "codex/archive/20261015/detached-808e27f70256",
+      "commit": "f9f2c84ab55ae4929a037ff64d06267b56738aa3",
+      "tag": "history/20261015/codex/archive/20261015/detached-808e27f70256",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/detached-808e27f70256"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/c0-codex-historical-20260925",
+      "commit": "2c5ab63617eb06ad6830d862a2b883a080325fb9",
+      "tag": "history/20261015/codex/archive/20261015/exp/c0-codex-historical-20260925",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/c0-codex-historical-20260925"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/eds-init-fps",
+      "commit": "a51186471478d552fa5f2be9b603da7321c8409c",
+      "tag": "history/20261015/codex/archive/20261015/exp/eds-init-fps",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/eds-init-fps"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/eds-init-pg-diverse-sampling",
+      "commit": "5afdaffee229bbdbd08ebd82d3bf568d4ab08a58",
+      "tag": "history/20261015/codex/archive/20261015/exp/eds-init-pg-diverse-sampling",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/eds-init-pg-diverse-sampling"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/eds-qd-autoresearch-libero-swap-ood",
+      "commit": "0cd3dd4914c658626447fe41621a8e6c380e573b",
+      "tag": "history/20261015/codex/archive/20261015/exp/eds-qd-autoresearch-libero-swap-ood",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/eds-qd-autoresearch-libero-swap-ood"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/eds-qd-stage-guidance-transition",
+      "commit": "44e0b99c6a04397d5a3df8fb8969f166ad4cc30f",
+      "tag": "history/20261015/codex/archive/20261015/exp/eds-qd-stage-guidance-transition",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/eds-qd-stage-guidance-transition"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/eds-quality-diversity",
+      "commit": "9280f69fa4940dbe5937d55467d8ad2870b61300",
+      "tag": "history/20261015/codex/archive/20261015/exp/eds-quality-diversity",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/eds-quality-diversity"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/n32-archive-eligible-cpu-20261004",
+      "commit": "3452e89857af1d19bf38cf86d445ce937474b137",
+      "tag": "history/20261015/codex/archive/20261015/exp/n32-archive-eligible-cpu-20261004",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/n32-archive-eligible-cpu-20261004"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/n34-continuation11-20261009",
+      "commit": "732dc17176312d4f75cfc4555f2711a2a142fb0a",
+      "tag": "history/20261015/codex/archive/20261015/exp/n34-continuation11-20261009",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/n34-continuation11-20261009"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/n34-observed-jaw-approach-20261008",
+      "commit": "eca06d819b3f7cde0e804a0a012b179377307641",
+      "tag": "history/20261015/codex/archive/20261015/exp/n34-observed-jaw-approach-20261008",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/n34-observed-jaw-approach-20261008"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/n35-closure-intent-cpu-20261009",
+      "commit": "59d0ab67896ddeed89f48b76e2480a2366740f85",
+      "tag": "history/20261015/codex/archive/20261015/exp/n35-closure-intent-cpu-20261009",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/n35-closure-intent-cpu-20261009"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/n36-engineering-adapter-001482",
+      "commit": "31a1432dec3a3c239d3387107d33067cf7de27cb",
+      "tag": "history/20261015/codex/archive/20261015/exp/n36-engineering-adapter-001482",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/n36-engineering-adapter-001482"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/n36-engineering-r1-001617",
+      "commit": "bb403dd653a5859b611ba2deac760f294c11e2d9",
+      "tag": "history/20261015/codex/archive/20261015/exp/n36-engineering-r1-001617",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/n36-engineering-r1-001617"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/n36r2-alias-recovery-001250",
+      "commit": "1845944e6465c7f8fe9ad701852d66693e829b5e",
+      "tag": "history/20261015/codex/archive/20261015/exp/n36r2-alias-recovery-001250",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/n36r2-alias-recovery-001250"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/n36r3-generated-import-001299",
+      "commit": "2e577b239f47eeddfc4a9148d60058632d4f11e3",
+      "tag": "history/20261015/codex/archive/20261015/exp/n36r3-generated-import-001299",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/n36r3-generated-import-001299"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-decision-evidence-20260923",
+      "commit": "79c2d808b11f80e70f8a50068ea85db3524d55c5",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-decision-evidence-20260923",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-decision-evidence-20260923"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-executed-quality-20260923",
+      "commit": "aede728fff0107bc964e1aa452fc71d4f844a080",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-executed-quality-20260923",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-executed-quality-20260923"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-final-20260921T093925Z",
+      "commit": "5b9ac46772c1e10b9a917b97efbc47e871fc1fcb",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-final-20260921T093925Z",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-final-20260921T093925Z"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-gpu6-20260922T063626Z",
+      "commit": "a8afe1c044976842eb3d754d82909806a5b555bd",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-gpu6-20260922T063626Z",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-gpu6-20260922T063626Z"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n10-tracker-snapshot-20260928",
+      "commit": "c1aebe717e32c29dac538d9d9d142f18ed6b7f17",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n10-tracker-snapshot-20260928",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n10-tracker-snapshot-20260928"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n11-parent-survival-20260928",
+      "commit": "a02a00543bf19792bedf273c0c62ae0005aeb19d",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n11-parent-survival-20260928",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n11-parent-survival-20260928"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n17-passive-physics-20260929",
+      "commit": "dc70438b772470afc1168f0b033dc0bbd15c5b2f",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n17-passive-physics-20260929",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n17-passive-physics-20260929"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n18-lift-quality-20260929",
+      "commit": "0d2c3eabc559d798ae1531b6318ea813a3aaf6a3",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n18-lift-quality-20260929",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n18-lift-quality-20260929"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n19-lift-quality-corrected-20260929",
+      "commit": "c26e2af137ddda152eb3773913d540cd6723e4ad",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n19-lift-quality-corrected-20260929",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n19-lift-quality-corrected-20260929"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n2-runner-20260923",
+      "commit": "1a2065e974c76111d4cf000e2013126e85456821",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n2-runner-20260923",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n2-runner-20260923"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n20-raw-binding-20260929",
+      "commit": "066763aed8267b182d685f415069909f51d9f65a",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n20-raw-binding-20260929",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n20-raw-binding-20260929"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n21-stage-raw-20260930",
+      "commit": "4426a1fee27d5f3212ba917ce2813ad2a75a7007",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n21-stage-raw-20260930",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n21-stage-raw-20260930"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n3-runner-20260924",
+      "commit": "7f5f1c815eb379f4499bf46fd5d84067e1ae3f39",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n3-runner-20260924",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n3-runner-20260924"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n4-audit-20260924",
+      "commit": "f2e7bf4bbab67d02bcf53a78fd81e0a83bcc946e",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-audit-20260924",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-audit-20260924"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n4-e1-runner-20260924",
+      "commit": "cef6b4777c33b1f26b21abeffcaf240649320812",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-e1-runner-20260924",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-e1-runner-20260924"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n4-evaluation-audit-20260924",
+      "commit": "0d681ad1c9ecde039c0b06e1221086a3e3c51396",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-evaluation-audit-20260924",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-evaluation-audit-20260924"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n4-evaluation-runner-20260924",
+      "commit": "924b52a3aebc8f25198bc01cb1c3a02e8834de0a",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-evaluation-runner-20260924",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-evaluation-runner-20260924"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n4-runner-20260924",
+      "commit": "610384b112d8fe90adb5fe85d1f8da51d63186b4",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-runner-20260924",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-runner-20260924"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n4-terminal-20260924",
+      "commit": "0901e64df1c08c9d0eaba2ea2bfd85c4f54bfcfe",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-terminal-20260924",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-terminal-20260924"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n5-grasp-timing-20260925",
+      "commit": "37568403e5a13930ddec4cb25f5028f136e4a96e",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n5-grasp-timing-20260925",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n5-grasp-timing-20260925"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n6-height-20260925",
+      "commit": "838af86aeb461137fb638063ab0da417c99d8db3",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n6-height-20260925",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n6-height-20260925"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n7-direction-height-20260925",
+      "commit": "c4f1ebd87865017d837490478424557b87b45207",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n7-direction-height-20260925",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n7-direction-height-20260925"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n7-formal-20260925",
+      "commit": "fabea2aa129895b0ab8e90c0afde90fe2aef0873",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n7-formal-20260925",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n7-formal-20260925"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n7-validation-20260925",
+      "commit": "6c58dc2f6e847f0b915bdf3a5e2624586365c313",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n7-validation-20260925",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n7-validation-20260925"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-n9-contact-sweep",
+      "commit": "162b7263cad345685593af835ed4d763d9e2a260",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n9-contact-sweep",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n9-contact-sweep"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-stage-e2-20260928",
+      "commit": "6c66c26029bcec7c0969e125a2bef8be4f90c4ca",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-stage-e2-20260928",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-stage-e2-20260928"
+    },
+    {
+      "branch": "codex/archive/20261015/exp/rdt-qd-ed-stage-lifecycle-20260924",
+      "commit": "f9d56e482339d959de8eb42261ad3989a65d4aca",
+      "tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-stage-lifecycle-20260924",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-stage-lifecycle-20260924"
+    },
+    {
+      "branch": "codex/archive/20261015/feat/rdt-integration",
+      "commit": "aae5f5d9115de9cc3f33f8dfca9e0e211ab3d6a2",
+      "tag": "history/20261015/codex/archive/20261015/feat/rdt-integration",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/feat/rdt-integration"
+    },
+    {
+      "branch": "codex/archive/20261015/feat/rdt-libero-gt-rollout-reintegration",
+      "commit": "c5ce243fd0631120d252e1ceff1014db993b7d9f",
+      "tag": "history/20261015/codex/archive/20261015/feat/rdt-libero-gt-rollout-reintegration",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/feat/rdt-libero-gt-rollout-reintegration"
+    },
+    {
+      "branch": "codex/archive/20261015/feat/rdt-libero-object-ckpt",
+      "commit": "48c94524ae5c4fcd96a121afff75f890bc098260",
+      "tag": "history/20261015/codex/archive/20261015/feat/rdt-libero-object-ckpt",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/feat/rdt-libero-object-ckpt"
+    },
+    {
+      "branch": "codex/archive/20261015/rdt_ed_steering_integration",
+      "commit": "b03e40f631f0d93e6fdd9eea6e5d7736cc91450c",
+      "tag": "history/20261015/codex/archive/20261015/rdt_ed_steering_integration",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/rdt_ed_steering_integration"
+    },
+    {
+      "branch": "codex/archive/20261015/saved-stash",
+      "commit": "be36342c82cf7b7d458f460acb9e7f32ce46fafa",
+      "tag": "history/20261015/codex/archive/20261015/saved-stash",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/saved-stash"
+    },
+    {
+      "branch": "codex/archive/20261015/saved-stash-untracked",
+      "commit": "a45821849d61cd1fb5d203076e0c0c1d030dfdff",
+      "tag": "history/20261015/codex/archive/20261015/saved-stash-untracked",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/saved-stash-untracked"
+    },
+    {
+      "branch": "codex/archive/20261015/supplement-01-p2_direction_normalized_rbf",
+      "commit": "6e012502e58ef5d1ef5ef1150ce895a328a8dca0",
+      "tag": "history/20261015/codex/archive/20261015/supplement-01-p2_direction_normalized_rbf",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-01-p2_direction_normalized_rbf"
+    },
+    {
+      "branch": "codex/archive/20261015/supplement-02-rdt-qd-ed-gpu6-20260922T063626Z",
+      "commit": "e7d3579d44477a8ba3130e884940af1ffcc9c844",
+      "tag": "history/20261015/codex/archive/20261015/supplement-02-rdt-qd-ed-gpu6-20260922T063626Z",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-02-rdt-qd-ed-gpu6-20260922T063626Z"
+    },
+    {
+      "branch": "codex/archive/20261015/supplement-03-rdt-qd-ed-final-20260921T093925Z",
+      "commit": "7c01070f11d771e994999ea56e08865aecf19c0a",
+      "tag": "history/20261015/codex/archive/20261015/supplement-03-rdt-qd-ed-final-20260921T093925Z",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-03-rdt-qd-ed-final-20260921T093925Z"
+    },
+    {
+      "branch": "codex/archive/20261015/supplement-04-outputs",
+      "commit": "f17bc4163811b1ec7332313677149af8828911bb",
+      "tag": "history/20261015/codex/archive/20261015/supplement-04-outputs",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-04-outputs"
+    },
+    {
+      "branch": "codex/archive/20261015/supplement-05-eds-qd-autoresearch-libero-swap-ood",
+      "commit": "86831c64d9c169d850abb322d678e01805f805dd",
+      "tag": "history/20261015/codex/archive/20261015/supplement-05-eds-qd-autoresearch-libero-swap-ood",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-05-eds-qd-autoresearch-libero-swap-ood"
+    },
+    {
+      "branch": "codex/archive/20261015/supplement-06-p2_adaptive_eds_rbf",
+      "commit": "74caf8472889d6782decf65c7ba6fe8b3f3f08fa",
+      "tag": "history/20261015/codex/archive/20261015/supplement-06-p2_adaptive_eds_rbf",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-06-p2_adaptive_eds_rbf"
+    },
+    {
+      "branch": "codex/archive/20261015/supplement-07-steering-integration",
+      "commit": "34ad5a93257daab8bec0ef3f6ceaca7e48544350",
+      "tag": "history/20261015/codex/archive/20261015/supplement-07-steering-integration",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-07-steering-integration"
+    },
+    {
+      "branch": "codex/archive/20261015/supplement-08-steering-ultra-20261014",
+      "commit": "e0dbd3c021c329d9e425ad2b1122627cbd195e34",
+      "tag": "history/20261015/codex/archive/20261015/supplement-08-steering-ultra-20261014",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-08-steering-ultra-20261014"
+    },
+    {
+      "branch": "codex/archive/20261015/supplement-09-repository-maintenance-20261015",
+      "commit": "84159c48ca2bac24670dba3ddbb26792e23e3b86",
+      "tag": "history/20261015/codex/archive/20261015/supplement-09-repository-maintenance-20261015",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-09-repository-maintenance-20261015"
+    },
+    {
+      "branch": "codex/archive/20261015/supplement-10-outputs",
+      "commit": "2fb06859e88573f97d1596c4cb72dccd0bbfd55a",
+      "tag": "history/20261015/codex/archive/20261015/supplement-10-outputs",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-10-outputs"
+    },
+    {
+      "branch": "codex/archive/20261015/supplement-11-libero_pro",
+      "commit": "d6f315af782d1fbc05a90d255429d4bbd3034083",
+      "tag": "history/20261015/codex/archive/20261015/supplement-11-libero_pro",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-11-libero_pro"
+    },
+    {
+      "branch": "codex/archive/20261015/supplement-12-source-file-links",
+      "commit": "ca20c123b798ec2f49b835e8d7ec238a042841ba",
+      "tag": "history/20261015/codex/archive/20261015/supplement-12-source-file-links",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-12-source-file-links"
+    },
+    {
+      "branch": "codex/archive/20261015/supplement-13-ultra-runs",
+      "commit": "92e89f5aff18de65164ab87ec63704f840dec2f9",
+      "tag": "history/20261015/codex/archive/20261015/supplement-13-ultra-runs",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-13-ultra-runs"
+    },
+    {
+      "branch": "debug/diffusion-baseline",
+      "commit": "c528347697413a4c29f0c798009af37dacee0b21",
+      "tag": "history/20261015/debug/diffusion-baseline",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/debug/diffusion-baseline"
+    },
+    {
+      "branch": "exp/eds-init-pg-diverse-sampling",
+      "commit": "849760962eb606ef6c6c04f8f422f079877355c9",
+      "tag": "history/20261015/exp/eds-init-pg-diverse-sampling",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/exp/eds-init-pg-diverse-sampling"
+    },
+    {
+      "branch": "feat/rdt-integration",
+      "commit": "3835192744a4be5dc00790774e0593383cbeacf8",
+      "tag": "history/20261015/feat/rdt-integration",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/feat/rdt-integration"
+    },
+    {
+      "branch": "feat/rdt-libero-gt-rollout-reintegration",
+      "commit": "73b90c69b7ad5517a5313cd0bd4ba4d44a16eee0",
+      "tag": "history/20261015/feat/rdt-libero-gt-rollout-reintegration",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/feat/rdt-libero-gt-rollout-reintegration"
+    },
+    {
+      "branch": "feat/rdt-libero-object-ckpt",
+      "commit": "1be4afbf17eaac9066e417ea1309cc1d326d1520",
+      "tag": "history/20261015/feat/rdt-libero-object-ckpt",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/feat/rdt-libero-object-ckpt"
+    },
+    {
+      "branch": "rdt_ed_steering_integration",
+      "commit": "2628fab7cda767c474cf2d163c3564218d119657",
+      "tag": "history/20261015/rdt_ed_steering_integration",
+      "url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/rdt_ed_steering_integration"
+    }
+  ],
+  "remote_branch_count": 24,
+  "history_tag_count": 98
+}

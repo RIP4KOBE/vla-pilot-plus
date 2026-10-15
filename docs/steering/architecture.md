@@ -38,9 +38,9 @@ flowchart TD
 | `scripts/steering_runtime.py`、`run_steering.py`、`steering_worker.py` | 合成科学配置与机器配置；冻结源码/配置；设置导入、CUDA/EGL/Hydra 环境；安装 RNG hooks；启动及审计 |
 | `main.py` | episode/动作块执行；每个新动作块前更新 Stage，再采样；记录 raw 与 executed 动作 |
 | `core/rdt_policy_steer.py` | 共享 RDT 编码、VLS/EDS、轨迹投影、评分、候选选择和动作缓存 |
-| `core/stage_evidence.py`、`stage_contact_handoff.py` | 视觉与 reward 能力判定、接触交接、guidance/reference 生命周期 |
+| `core/stage/controller.py` | 视觉与 reward 能力判定、接触交接、guidance/reference 生命周期 |
 | `core/target_distance_reward.py`、`vlm_query/target_distance/` | 新生成 reward 的数值合同与固定提示词 |
-| `core/stage_capture.py`、Codex transport | 图像/提示词/模型回复捕获，合法事件生命周期及请求元数据 |
+| `core/online/codex.py`、`core/online/capture.py` | 图像/提示词/模型回复捕获，合法事件生命周期及请求元数据 |
 | `core/episode_rng_hooks.py` | 在规定的 preparation/rollout 边界恢复初始化 RNG 状态 |
 
 RDT latent 是 `[B,64,128]`，使用当前图像、机器人状态和文本条件。执行只解码前 **8** 个 7D 动作，控制频率 20 Hz；夹爪二值化与动作后处理属于算法语义。多样性/reward 梯度只允许修改这 8 步的平移槽位。当前配置关闭外部抓取动作覆盖。
@@ -145,7 +145,7 @@ g=\operatorname{clip}(1-r/r_0,0,1.2)\text{，若 }r_0<-10^{-6};\quad g=0\text{ o
 
 ### 已实现的统一外层接口
 
-策略提供纯读取 `get_stage_reward()`，`stage_evidence.update_stage` 优先使用它。EDS 分支直接返回已有进度，不重新评分、写 reference 或调用 RNG；接口的实际行为仍须结合回归与新公共版本在线验收判断。
+策略提供纯读取 `get_stage_reward()`，`core.stage.controller.update_stage` 优先使用它。EDS 分支直接返回已有进度，不重新评分、写 reference 或调用 RNG；接口的实际行为仍须结合回归与新公共版本在线验收判断。
 
 VLS 建立独立的**最终选中候选** score/reference，argmax 路径复用已有最终评分；单候选/FKD terminal 直接返回路径补一次所选候选评分并计入计算量。内部梯度 reward/reference 与 scale 计算保持独立。无法评分时外层进度为不可用，不回退到内部梯度 reward。`get_last_vls_metrics()` 返回实际梯度状态、FKD 重采样/ESS skip、选择与外层进度的缓存记录；记录能力不等于所有在线分支已验收。
 

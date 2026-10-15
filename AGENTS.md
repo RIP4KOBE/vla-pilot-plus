@@ -2,7 +2,7 @@
 
 ## 目的与权威入口
 
-研究冻结 VLA/RDT 的 inference-time steering，在 EDS 基础上引入 quality-diversity，探索有用的行为多样性和执行反馈驱动的改进。先读 [Proposal](docs/research/research_proposal.md)、[Progress](docs/research/research_progress.md)，运行与安装读 [README](README.md)。本文件为仓库统一 agent 指导；`CLAUDE.md` 只作导航。
+研究冻结 VLA/RDT 的 inference-time steering，在 EDS 基础上引入 quality-diversity，探索有用的行为多样性和执行反馈驱动的改进。先读 [Proposal](docs/research/research_proposal.md)、[Progress](docs/research/research_progress.md)，运行与安装读 [README](README.md)。本文件为仓库统一 agent 指导。
 
 当前已验收：VLS、EDS、EDS+QD 共同框架；ObjectSwap OOD low 成绩依次 1/10、3/10、1/10，最终 ultra 为 1/10、3/10、0/10。两种协议分开报告。当前最可靠对照为含 RBF 的 EDS；QD 尚未证明优势。默认 archive 每动作块重建，不能宣称跨块/跨任务学习或 recursive self-improvement 已实现并验收。
 
@@ -18,11 +18,12 @@
 | `main.py`、`core/env_adapters/` | 观测、动作转换与执行/反馈 |
 | `core/rdt_policy_steer.py` | 共用 RDT、VLS/EDS 搜索与候选选择 |
 | `core/qd_ed.py` | descriptor、档案、精英与父代 |
-| `core/stage_*.py`、`core/codex_*.py` | Stage 控制、证据、在线请求与捕获 |
+| `core/stage/`、`core/online/` | Stage 控制、视觉事实、Codex 请求与捕获 |
+| `core/diagnostics/` | 显式离线 Stage 回放；不能计入在线成绩 |
 | `core/target_distance_reward.py`、`vlm_query/target_distance/` | reward 合同与受控提示词 |
 | `tests/`、`docs/steering/`、`docs/research/` | 回归、验收证据、研究方向/进展 |
 
-公共方法名为 VLS/`vls`、EDS/`eds`、EDS+QD/`eds_qd`。QD 扩展 EDS 的档案/父代过程，不复制全套推理代码。旧 `run.sh`、`setup.sh` 和其他 policy/backend 留作兼容；它们不是当前验收协议的替代入口。
+公共方法名为 VLS/`vls`、EDS/`eds`、EDS+QD/`eds_qd`。QD 扩展 EDS 的档案/父代过程，不复制全套推理代码。旧安装配方和 shell 入口已退役；使用 `*-steering*` 配方及公共 launcher。其他 policy/backend 源码暂留兼容，尚不属于当前验收范围。
 
 ## 科学行为与实验有效性
 

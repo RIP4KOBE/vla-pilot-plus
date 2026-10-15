@@ -49,7 +49,7 @@ flowchart LR
 | 服务错误 | 部分错误回到 stage 1 / guidance on | 有限传输/格式恢复；仍失败时登记基础设施错误，不伪装成正常预测 |
 | 接入 | reward 的 OpenAI-compatible SDK + Stage 的 Google SDK | 当前 Codex CLI 登录，共用视觉 transport；固定模型/effort、捕获与请求计数 |
 
-当前入口和职责见 [main.py](../../main.py)、[stage_evidence.py](../../core/stage_evidence.py)、[stage_observation.py](../../core/stage_observation.py)、[VLMAgent](../../vlm_query/vlm_agent.py)、[公共协议](../../configs/evaluation/libero_object_swap.yaml)。当前机制也使用 simulator 提供的几何/机器人信息，并非纯 RGB 的端到端 Agent。任务成功仍由环境判定，不能以控制器 stage 0 代替成功。
+当前入口和职责见 [main.py](../../main.py)、[stage_evidence.py](https://github.com/RIP4KOBE/vla-pilot-plus/blob/e8a3b6a76172431b6f3f510ceb25b3afd10e8730/core/stage_evidence.py)、[stage_observation.py](https://github.com/RIP4KOBE/vla-pilot-plus/blob/e8a3b6a76172431b6f3f510ceb25b3afd10e8730/core/stage_observation.py)、[VLMAgent](../../vlm_query/vlm_agent.py)、[公共协议](../../configs/evaluation/libero_object_swap.yaml)。当前机制也使用 simulator 提供的几何/机器人信息，并非纯 RGB 的端到端 Agent。任务成功仍由环境判定，不能以控制器 stage 0 代替成功。
 
 ## 4. 为什么文件多，能否精简
 

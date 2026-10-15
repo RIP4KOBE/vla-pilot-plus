@@ -23,10 +23,12 @@
       "commit": "17fc88b4a56a163aedfa8cda74a938034ed47cb7",
       "sanitized_parent_commit": "25e98a8fe2ada8f0b363a6539b819dfd8f909956",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/chore/integrate-rdt-libero-vls",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/chore/integrate-rdt-libero-vls",
       "tree": "67d6a0613fe5e442209352dfd52c21bf73ac1c28",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/chore/integrate-rdt-libero-vls",
+      "historical_tag": "history/20261015/codex/archive/20261015/chore/integrate-rdt-libero-vls"
     },
     {
       "branch": "codex/archive/20261015/codex/n24-gripper-mode-parent-rescue",
@@ -41,10 +43,12 @@
       "commit": "6c26945e1a56e099fc9a5fb75b385f090fe98ab8",
       "sanitized_parent_commit": "3aa128df43b36707e61d9f43abe280c7745fff6c",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n24-gripper-mode-parent-rescue",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n24-gripper-mode-parent-rescue",
       "tree": "187bc577246be579264a439e6288f55af80c60ef",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n24-gripper-mode-parent-rescue",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n24-gripper-mode-parent-rescue"
     },
     {
       "branch": "codex/archive/20261015/codex/n24-validation-agent",
@@ -59,10 +63,12 @@
       "commit": "ebdac8915a0985e731cae0d47a3bccd0be3a133d",
       "sanitized_parent_commit": "c0995736068eb62bc1412a628f1c6bbc4c323b07",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n24-validation-agent",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n24-validation-agent",
       "tree": "4dfa665ca49e6ad261ee670ddffb4036981b24af",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n24-validation-agent",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n24-validation-agent"
     },
     {
       "branch": "codex/archive/20261015/codex/n25-actuator-clipped-rbf",
@@ -77,10 +83,12 @@
       "commit": "923a7b0954fb85e34327a6b7d3499a5a29d8f413",
       "sanitized_parent_commit": "05585722b01d3e4c2169f6cddaacc99a69827428",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n25-actuator-clipped-rbf",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n25-actuator-clipped-rbf",
       "tree": "888b0762c5647ea37f5e147b24e65ecd1a6d8f60",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n25-actuator-clipped-rbf",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n25-actuator-clipped-rbf"
     },
     {
       "branch": "codex/archive/20261015/codex/n25-continuation-downstream-evidence",
@@ -95,10 +103,12 @@
       "commit": "50584b437eb9ed4932864210982ebff8357144e6",
       "sanitized_parent_commit": "1b97f70e20f468a8925d37f0a7ee72c0e57926de",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n25-continuation-downstream-evidence",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n25-continuation-downstream-evidence",
       "tree": "60eaa3ef68b25a8c7785fd8b1e65666c07990432",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n25-continuation-downstream-evidence",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n25-continuation-downstream-evidence"
     },
     {
       "branch": "codex/archive/20261015/codex/n25-infrastructure-continuation",
@@ -113,10 +123,12 @@
       "commit": "a5aa603fa2ffc8d741bdb28644ee963365b397e0",
       "sanitized_parent_commit": "7c536ae3d00e3e74cb49cc3112d65e5521236ba1",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n25-infrastructure-continuation",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n25-infrastructure-continuation",
       "tree": "bca81936725d1515e1dc30324276dab21614897b",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n25-infrastructure-continuation",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n25-infrastructure-continuation"
     },
     {
       "branch": "codex/archive/20261015/codex/n25-validation-agent",
@@ -131,10 +143,12 @@
       "commit": "1a32a52fddb5c535e08008a3e8458660ea092f1f",
       "sanitized_parent_commit": "e76ff75fb79068f75868bb44982ff16f51f127ab",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n25-validation-agent",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n25-validation-agent",
       "tree": "692a181e36d37a8ac50e4c496da73bff9437122e",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n25-validation-agent",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n25-validation-agent"
     },
     {
       "branch": "codex/archive/20261015/codex/n26-clean-output-rbf",
@@ -149,10 +163,12 @@
       "commit": "495ef79afc9b9c366f308c782c2b7282253e574a",
       "sanitized_parent_commit": "045da81be6e1f2bdbc4b8c2dd0fcf04a62508bd3",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n26-clean-output-rbf",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n26-clean-output-rbf",
       "tree": "054a41b073f8db5043d5bba2072daae38342fd26",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n26-clean-output-rbf",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n26-clean-output-rbf"
     },
     {
       "branch": "codex/archive/20261015/codex/n26-logical-dev",
@@ -167,10 +183,12 @@
       "commit": "fc8a86bc29fda80cd95d9e8c9b8969147796e068",
       "sanitized_parent_commit": "756d0a2149f2ef4d61d144c7c83aa84010037e69",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n26-logical-dev",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n26-logical-dev",
       "tree": "d63d39a8030cff7ebbc3e00784a7dfdb601a2fc5",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n26-logical-dev",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n26-logical-dev"
     },
     {
       "branch": "codex/archive/20261015/codex/n27-feasible-ray-update",
@@ -185,10 +203,12 @@
       "commit": "8dd92da15280318804d25895c69e178b9dbb381c",
       "sanitized_parent_commit": "7c4780bb9e3b9b44cf27b6d1f0dc943fddafede8",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n27-feasible-ray-update",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n27-feasible-ray-update",
       "tree": "d8fa88522840655a8f568887b54af477124ab40e",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n27-feasible-ray-update",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n27-feasible-ray-update"
     },
     {
       "branch": "codex/archive/20261015/codex/n27-hydra-continuation",
@@ -203,10 +223,12 @@
       "commit": "0073a1758bfc23f96fb182ee5962ce223e527107",
       "sanitized_parent_commit": "32acc9f3e981c38464a99a93c84c6f1eff47eb7b",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n27-hydra-continuation",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n27-hydra-continuation",
       "tree": "fb4305156c62d1429ae4de2ab29b3aa0c5231545",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n27-hydra-continuation",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n27-hydra-continuation"
     },
     {
       "branch": "codex/archive/20261015/codex/n28-parent-before-renoise-20261001",
@@ -221,10 +243,12 @@
       "commit": "f75c33713019323d038ddca877fdaa17f2f0f126",
       "sanitized_parent_commit": "80583acd66084142fe5c45f4758d9208e78e6bef",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n28-parent-before-renoise-20261001",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n28-parent-before-renoise-20261001",
       "tree": "e9b469db6ce93e8f5743a0bc7c2cff6d0eb005a4",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n28-parent-before-renoise-20261001",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n28-parent-before-renoise-20261001"
     },
     {
       "branch": "codex/archive/20261015/codex/n29-population-relative-trust-20261001",
@@ -239,10 +263,12 @@
       "commit": "90a7d3d4a807fd17721eb58a8338c9cae367fc0e",
       "sanitized_parent_commit": "984b55061d36254da8a9c546dde40dca6b6a0cc8",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n29-population-relative-trust-20261001",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n29-population-relative-trust-20261001",
       "tree": "ee596f049a49293bfb8d73adf8eb015f17fe1226",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n29-population-relative-trust-20261001",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n29-population-relative-trust-20261001"
     },
     {
       "branch": "codex/archive/20261015/codex/n30-executed-progress-continuation",
@@ -257,10 +283,12 @@
       "commit": "e2c40df2e805fe02c301fec60902cbe70f30ba87",
       "sanitized_parent_commit": "43f0b441a7165d8ee85ffee796a1b448bc7fc5d5",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n30-executed-progress-continuation",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n30-executed-progress-continuation",
       "tree": "ab5c45e1111f472a3141cab1d7950a9924f9b6ec",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n30-executed-progress-continuation",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n30-executed-progress-continuation"
     },
     {
       "branch": "codex/archive/20261015/codex/n30-feedback-continuation",
@@ -275,10 +303,12 @@
       "commit": "158b0c1ca340297305a73c37f2c594e904492545",
       "sanitized_parent_commit": "45074302a4bd94991ab91a95902ded2c61c34540",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n30-feedback-continuation",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n30-feedback-continuation",
       "tree": "e8c68d557ff611b989b52f2b358fa2241f505a17",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n30-feedback-continuation",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n30-feedback-continuation"
     },
     {
       "branch": "codex/archive/20261015/codex/n30-initial-observation-repair",
@@ -293,10 +323,12 @@
       "commit": "6d3bfa77129a65c66d3767a497d7b0738394cfb5",
       "sanitized_parent_commit": "d858818d6324b30bb7a9c754f81df14933211a29",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n30-initial-observation-repair",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n30-initial-observation-repair",
       "tree": "1c5b3938f724f76a67961cd19e1ff143f284aabc",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n30-initial-observation-repair",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n30-initial-observation-repair"
     },
     {
       "branch": "codex/archive/20261015/codex/n30-repair-continuation",
@@ -311,10 +343,12 @@
       "commit": "d2146aeeb5774ba667b82f5698fa7d6d308c657d",
       "sanitized_parent_commit": "de417819806f6dd378f5c916cb4c0e1e1d32ffe1",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n30-repair-continuation",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n30-repair-continuation",
       "tree": "dcb485f01be0f3be6c08e7d3513349103732f11b",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n30-repair-continuation",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n30-repair-continuation"
     },
     {
       "branch": "codex/archive/20261015/codex/n30-terminal-feedback-repair",
@@ -329,10 +363,12 @@
       "commit": "a8752a9c218abe4e3d0b474e840773ab3bea05f3",
       "sanitized_parent_commit": "4a0316250b957fc86d6bb997e503a631702e2cb3",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n30-terminal-feedback-repair",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n30-terminal-feedback-repair",
       "tree": "c6f4a213ae888d74d67c7714e6486fce4d16b358",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n30-terminal-feedback-repair",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n30-terminal-feedback-repair"
     },
     {
       "branch": "codex/archive/20261015/codex/n31-capture-dwell",
@@ -347,10 +383,12 @@
       "commit": "4b43b7a024c0e0b7008198054ee37b0e03af94a9",
       "sanitized_parent_commit": "fd1ae2114718ee925e061b0eeb047c006def7512",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n31-capture-dwell",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n31-capture-dwell",
       "tree": "3c3b43b149518f4e3b11de7fa0537e5d872ee5c4",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n31-capture-dwell",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n31-capture-dwell"
     },
     {
       "branch": "codex/archive/20261015/codex/n34-production-integration",
@@ -365,10 +403,12 @@
       "commit": "1b67ea71f4a981b0532671d06cf84a41f9596937",
       "sanitized_parent_commit": "ea8d91d21577b233937031782ed09af8cfda0949",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n34-production-integration",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n34-production-integration",
       "tree": "7901a0ebe6940b506707d11193c0f95c8b3e1e69",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n34-production-integration",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n34-production-integration"
     },
     {
       "branch": "codex/archive/20261015/codex/n36-cyutility-alias-001243",
@@ -383,10 +423,12 @@
       "commit": "0130501950cb5388540ffde3586824816950fc04",
       "sanitized_parent_commit": "ed3457cfa8ff8eca5c27d9e0f65149de2d4c5b66",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n36-cyutility-alias-001243",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n36-cyutility-alias-001243",
       "tree": "a6492b4e8d844ea9557ba97d026ff25149d5f49a",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n36-cyutility-alias-001243",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n36-cyutility-alias-001243"
     },
     {
       "branch": "codex/archive/20261015/codex/n36-nonprogress-tangent",
@@ -401,10 +443,12 @@
       "commit": "32aa091feb06d0cca23431f32ae6424a0410930d",
       "sanitized_parent_commit": "a40efb02105ee873ea12873af3a4a14427acf935",
       "publication_redactions": 1,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n36-nonprogress-tangent",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/n36-nonprogress-tangent",
       "tree": "dff6080990117fbf7b0a275224cbbc68b4e8ead7",
       "inventory_entries": 620,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/n36-nonprogress-tangent",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/n36-nonprogress-tangent"
     },
     {
       "branch": "codex/archive/20261015/codex/rdt-qd-ed-n22-hold-lift-20260930",
@@ -419,10 +463,12 @@
       "commit": "a2b22756a38f228aa4f8e1c4b60681a768163c0c",
       "sanitized_parent_commit": "e60eea7e9e93aebfee3ffb15c34c2c9c282a5df0",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/rdt-qd-ed-n22-hold-lift-20260930",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n22-hold-lift-20260930",
       "tree": "3d335e343a9c890008fdfe3baf0b1e9f08dc905a",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/rdt-qd-ed-n22-hold-lift-20260930",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n22-hold-lift-20260930"
     },
     {
       "branch": "codex/archive/20261015/codex/rdt-qd-ed-n22-validation-20260930",
@@ -437,10 +483,12 @@
       "commit": "d3c49d2d4a84b692cdea04a3848db0796e5dc041",
       "sanitized_parent_commit": "f4003c57d63501a5e57d80767e545f7f3cd4433c",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/rdt-qd-ed-n22-validation-20260930",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n22-validation-20260930",
       "tree": "733b42306c16f33f9a8672670151a907a1234e78",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/rdt-qd-ed-n22-validation-20260930",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n22-validation-20260930"
     },
     {
       "branch": "codex/archive/20261015/codex/rdt-qd-ed-n23-arithmetic-audit-20260930",
@@ -455,10 +503,12 @@
       "commit": "2189c949d949bcd6d62eb90c523a7e8bd8120db8",
       "sanitized_parent_commit": "7a7e98a5113ab845a10ff12dc31b17a786a5bbd8",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/rdt-qd-ed-n23-arithmetic-audit-20260930",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n23-arithmetic-audit-20260930",
       "tree": "7cfd026fbd6de3f9db92d6201b9f1b9738f96d16",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/rdt-qd-ed-n23-arithmetic-audit-20260930",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n23-arithmetic-audit-20260930"
     },
     {
       "branch": "codex/archive/20261015/codex/rdt-qd-ed-n23-clipped-quality-20260930",
@@ -473,10 +523,12 @@
       "commit": "3929eaa0dd43437e3889a17844cb3db174570e33",
       "sanitized_parent_commit": "8625f1d6cef6d5dc3371c4abae261bb9e67e5466",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/rdt-qd-ed-n23-clipped-quality-20260930",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n23-clipped-quality-20260930",
       "tree": "bd79767933ea0f5143768cbe625053dbfd2b6bb5",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/rdt-qd-ed-n23-clipped-quality-20260930",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n23-clipped-quality-20260930"
     },
     {
       "branch": "codex/archive/20261015/codex/rdt-qd-ed-n23-continuation-20260930",
@@ -491,10 +543,12 @@
       "commit": "c62eb2645ace05230a2d095304644466495eaf49",
       "sanitized_parent_commit": "87f902605ebcc072c9ab6f87a2ae49c14ea1737e",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/rdt-qd-ed-n23-continuation-20260930",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n23-continuation-20260930",
       "tree": "e73b79a1bc9c57ea6b349b1b016679f71a885729",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/rdt-qd-ed-n23-continuation-20260930",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n23-continuation-20260930"
     },
     {
       "branch": "codex/archive/20261015/codex/rdt-qd-ed-n23-validation-20260930",
@@ -509,10 +563,12 @@
       "commit": "6835c3f4e5e33fb87cb50b9099ae3108b0a611be",
       "sanitized_parent_commit": "e89f2e48ebd07a3108f32148e2c423c267a560b6",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/rdt-qd-ed-n23-validation-20260930",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n23-validation-20260930",
       "tree": "81fdfa44c11bc6953789681b74a06470bd2d7148",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/rdt-qd-ed-n23-validation-20260930",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/rdt-qd-ed-n23-validation-20260930"
     },
     {
       "branch": "codex/archive/20261015/codex/rdt-steering-integration",
@@ -527,10 +583,12 @@
       "commit": "907900b8ae4e8b72ab265a471549357f60df3776",
       "sanitized_parent_commit": "56d1afda6ef53e3752c1f47fd74182a01ffd07ac",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/rdt-steering-integration",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/codex/rdt-steering-integration",
       "tree": "19339895a54272e19cbaddb29e44f5e1ab983a97",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/codex/rdt-steering-integration",
+      "historical_tag": "history/20261015/codex/archive/20261015/codex/rdt-steering-integration"
     },
     {
       "branch": "codex/archive/20261015/debug/diffusion-baseline",
@@ -545,10 +603,12 @@
       "commit": "cb3ed9a2983bcbc0641bae7f6fc04b5e0f2072fb",
       "sanitized_parent_commit": "c528347697413a4c29f0c798009af37dacee0b21",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/debug/diffusion-baseline",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/debug/diffusion-baseline",
       "tree": "f498325f4d691109cc081e37878eac3fb451d7f3",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/debug/diffusion-baseline",
+      "historical_tag": "history/20261015/codex/archive/20261015/debug/diffusion-baseline"
     },
     {
       "branch": "codex/archive/20261015/exp/c0-codex-historical-20260925",
@@ -563,10 +623,12 @@
       "commit": "2c5ab63617eb06ad6830d862a2b883a080325fb9",
       "sanitized_parent_commit": "2a026979a6597321a757079a7678d7c79b956094",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/c0-codex-historical-20260925",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/c0-codex-historical-20260925",
       "tree": "d7ed21fd4e742cec7a6c6b3d5002bba76de551b8",
       "inventory_entries": 158,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/c0-codex-historical-20260925",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/c0-codex-historical-20260925"
     },
     {
       "branch": "codex/archive/20261015/exp/eds-init-fps",
@@ -581,10 +643,12 @@
       "commit": "a51186471478d552fa5f2be9b603da7321c8409c",
       "sanitized_parent_commit": "2bf783d2627d6cdf40788c29a63ed57ea4bdbbf3",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/eds-init-fps",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/eds-init-fps",
       "tree": "490da0ac42c47c315572edc78f1ad4f6739f6c10",
       "inventory_entries": 1,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/eds-init-fps",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/eds-init-fps"
     },
     {
       "branch": "codex/archive/20261015/exp/eds-init-pg-diverse-sampling",
@@ -599,10 +663,12 @@
       "commit": "5afdaffee229bbdbd08ebd82d3bf568d4ab08a58",
       "sanitized_parent_commit": "95ff860b811e1b10080066a432b08a508a761a11",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/eds-init-pg-diverse-sampling",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/eds-init-pg-diverse-sampling",
       "tree": "7bf3e98a501c8332f9d46dbf92aa3e993d985415",
       "inventory_entries": 14246,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/eds-init-pg-diverse-sampling",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/eds-init-pg-diverse-sampling"
     },
     {
       "branch": "codex/archive/20261015/exp/eds-qd-autoresearch-libero-swap-ood",
@@ -617,10 +683,12 @@
       "commit": "0cd3dd4914c658626447fe41621a8e6c380e573b",
       "sanitized_parent_commit": "9690f406f0bf3c80c5ae08224b135b7cbe7ba860",
       "publication_redactions": 1,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/eds-qd-autoresearch-libero-swap-ood",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/eds-qd-autoresearch-libero-swap-ood",
       "tree": "11ee10d43fc77b08d57a135848b8708832d87ea9",
       "inventory_entries": 114548,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/eds-qd-autoresearch-libero-swap-ood",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/eds-qd-autoresearch-libero-swap-ood"
     },
     {
       "branch": "codex/archive/20261015/exp/eds-qd-stage-guidance-transition",
@@ -635,10 +703,12 @@
       "commit": "44e0b99c6a04397d5a3df8fb8969f166ad4cc30f",
       "sanitized_parent_commit": "0e3bd54ae8090945ad4e44e3f7d06348e99a755d",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/eds-qd-stage-guidance-transition",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/eds-qd-stage-guidance-transition",
       "tree": "f1645ca8a2ec971ad4395daafc54fc1c19495147",
       "inventory_entries": 153,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/eds-qd-stage-guidance-transition",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/eds-qd-stage-guidance-transition"
     },
     {
       "branch": "codex/archive/20261015/exp/eds-quality-diversity",
@@ -653,10 +723,12 @@
       "commit": "9280f69fa4940dbe5937d55467d8ad2870b61300",
       "sanitized_parent_commit": "e314820baf7247fe517fcc7d24694adf58b88160",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/eds-quality-diversity",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/eds-quality-diversity",
       "tree": "7a7f822e118e2237c9d5f69499ab7884a42e714d",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/eds-quality-diversity",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/eds-quality-diversity"
     },
     {
       "branch": "codex/archive/20261015/exp/n32-archive-eligible-cpu-20261004",
@@ -671,10 +743,12 @@
       "commit": "3452e89857af1d19bf38cf86d445ce937474b137",
       "sanitized_parent_commit": "beba1763abb2e1b98b1484fb158d1cab0bfa0557",
       "publication_redactions": 1,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/n32-archive-eligible-cpu-20261004",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/n32-archive-eligible-cpu-20261004",
       "tree": "82a6b120067b6bb881175ee4465678d9e9a8f692",
       "inventory_entries": 620,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/n32-archive-eligible-cpu-20261004",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/n32-archive-eligible-cpu-20261004"
     },
     {
       "branch": "codex/archive/20261015/exp/n34-continuation11-20261009",
@@ -689,10 +763,12 @@
       "commit": "732dc17176312d4f75cfc4555f2711a2a142fb0a",
       "sanitized_parent_commit": "222e93f981dcbca816f8545e2d49746282eaa9f4",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/n34-continuation11-20261009",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/n34-continuation11-20261009",
       "tree": "3e39fcda2a474b8e44f13ea97eee3e2b071153cd",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/n34-continuation11-20261009",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/n34-continuation11-20261009"
     },
     {
       "branch": "codex/archive/20261015/exp/n34-observed-jaw-approach-20261008",
@@ -707,10 +783,12 @@
       "commit": "eca06d819b3f7cde0e804a0a012b179377307641",
       "sanitized_parent_commit": "67d4745fb561f00fd6567428fcf8ba26d84d3630",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/n34-observed-jaw-approach-20261008",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/n34-observed-jaw-approach-20261008",
       "tree": "1d0ad9103c720d5f12caa4d12995ce50c0acd0d0",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/n34-observed-jaw-approach-20261008",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/n34-observed-jaw-approach-20261008"
     },
     {
       "branch": "codex/archive/20261015/exp/n35-closure-intent-cpu-20261009",
@@ -725,10 +803,12 @@
       "commit": "59d0ab67896ddeed89f48b76e2480a2366740f85",
       "sanitized_parent_commit": "968305374396a311e6b50d6a5c29d12f49febcbd",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/n35-closure-intent-cpu-20261009",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/n35-closure-intent-cpu-20261009",
       "tree": "9252bf7a38b0133e68497914b876f4643b97093e",
       "inventory_entries": 1,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/n35-closure-intent-cpu-20261009",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/n35-closure-intent-cpu-20261009"
     },
     {
       "branch": "codex/archive/20261015/exp/n36-engineering-adapter-001482",
@@ -743,10 +823,12 @@
       "commit": "31a1432dec3a3c239d3387107d33067cf7de27cb",
       "sanitized_parent_commit": "f9884d85ef0bfc3f89705c6f71cdb86063b619b5",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/n36-engineering-adapter-001482",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/n36-engineering-adapter-001482",
       "tree": "b53eddea580267c935bbf8535eed7aecc852ae4a",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/n36-engineering-adapter-001482",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/n36-engineering-adapter-001482"
     },
     {
       "branch": "codex/archive/20261015/exp/n36-engineering-r1-001617",
@@ -761,10 +843,12 @@
       "commit": "bb403dd653a5859b611ba2deac760f294c11e2d9",
       "sanitized_parent_commit": "0ed9f9d9af1b0e8ef09c6c95077c6e1238ea08bc",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/n36-engineering-r1-001617",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/n36-engineering-r1-001617",
       "tree": "b6c845e231f481048552f70a17ea4ad133575e4e",
       "inventory_entries": 781,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/n36-engineering-r1-001617",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/n36-engineering-r1-001617"
     },
     {
       "branch": "codex/archive/20261015/exp/n36r2-alias-recovery-001250",
@@ -779,10 +863,12 @@
       "commit": "1845944e6465c7f8fe9ad701852d66693e829b5e",
       "sanitized_parent_commit": "84890a8cb37f3b95ee7ff88168aec91adf330336",
       "publication_redactions": 1,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/n36r2-alias-recovery-001250",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/n36r2-alias-recovery-001250",
       "tree": "d1a68c4ce40b3634bcd7b22c2e7eaa65440b6542",
       "inventory_entries": 620,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/n36r2-alias-recovery-001250",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/n36r2-alias-recovery-001250"
     },
     {
       "branch": "codex/archive/20261015/exp/n36r3-generated-import-001299",
@@ -797,10 +883,12 @@
       "commit": "2e577b239f47eeddfc4a9148d60058632d4f11e3",
       "sanitized_parent_commit": "1ec66cc3c9364b4527f213c87e81a50f9e70cb3f",
       "publication_redactions": 1,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/n36r3-generated-import-001299",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/n36r3-generated-import-001299",
       "tree": "6dab16cd83e0b1f3074e22d61e4c9f810f020639",
       "inventory_entries": 632,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/n36r3-generated-import-001299",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/n36r3-generated-import-001299"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-decision-evidence-20260923",
@@ -815,10 +903,12 @@
       "commit": "79c2d808b11f80e70f8a50068ea85db3524d55c5",
       "sanitized_parent_commit": "9cfa84e19b50ec4db4375cc6a1513a07cf701eee",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-decision-evidence-20260923",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-decision-evidence-20260923",
       "tree": "8ba0fd94dfa7b3b54f852830e5c8ce72a577ac69",
       "inventory_entries": 12,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-decision-evidence-20260923",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-decision-evidence-20260923"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-executed-quality-20260923",
@@ -833,10 +923,12 @@
       "commit": "aede728fff0107bc964e1aa452fc71d4f844a080",
       "sanitized_parent_commit": "88c645315ce325a603a52716ef6b25d0e76c10a2",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-executed-quality-20260923",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-executed-quality-20260923",
       "tree": "c5c301d88c64bce7427367c0e0aea4b205b67952",
       "inventory_entries": 12,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-executed-quality-20260923",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-executed-quality-20260923"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-final-20260921T093925Z",
@@ -851,10 +943,12 @@
       "commit": "5b9ac46772c1e10b9a917b97efbc47e871fc1fcb",
       "sanitized_parent_commit": "2c53904faae1b992aa785425fc8e3dfcf6b985f6",
       "publication_redactions": 1,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-final-20260921T093925Z",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-final-20260921T093925Z",
       "tree": "65a4f11abaf03054fe94c80da3afb49f86483315",
       "inventory_entries": 651,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-final-20260921T093925Z",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-final-20260921T093925Z"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-gpu6-20260922T063626Z",
@@ -869,10 +963,12 @@
       "commit": "a8afe1c044976842eb3d754d82909806a5b555bd",
       "sanitized_parent_commit": "738c9e085c26c803d13024d9d8044e86ac07130f",
       "publication_redactions": 3,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-gpu6-20260922T063626Z",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-gpu6-20260922T063626Z",
       "tree": "8c60a47911959bf71cd3fcdb11f710cdbf661c17",
       "inventory_entries": 824,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-gpu6-20260922T063626Z",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-gpu6-20260922T063626Z"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n10-tracker-snapshot-20260928",
@@ -887,10 +983,12 @@
       "commit": "c1aebe717e32c29dac538d9d9d142f18ed6b7f17",
       "sanitized_parent_commit": "daf70db62492303b901852a689947957cba28eb6",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n10-tracker-snapshot-20260928",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n10-tracker-snapshot-20260928",
       "tree": "a440f40506a63df9c5830aafef44f03e5514fc4e",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n10-tracker-snapshot-20260928",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n10-tracker-snapshot-20260928"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n11-parent-survival-20260928",
@@ -905,10 +1003,12 @@
       "commit": "a02a00543bf19792bedf273c0c62ae0005aeb19d",
       "sanitized_parent_commit": "83c169e013748d27fd97f8259b69cf271142575e",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n11-parent-survival-20260928",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n11-parent-survival-20260928",
       "tree": "9202f5a65308718c100c95147ab28b736da7577b",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n11-parent-survival-20260928",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n11-parent-survival-20260928"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n17-passive-physics-20260929",
@@ -923,10 +1023,12 @@
       "commit": "dc70438b772470afc1168f0b033dc0bbd15c5b2f",
       "sanitized_parent_commit": "538dea12af9921cee944188f4698bf2cd1f900c6",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n17-passive-physics-20260929",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n17-passive-physics-20260929",
       "tree": "1b192481ed7482ae48ef0c8c71417bd958dad64c",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n17-passive-physics-20260929",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n17-passive-physics-20260929"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n18-lift-quality-20260929",
@@ -941,10 +1043,12 @@
       "commit": "0d2c3eabc559d798ae1531b6318ea813a3aaf6a3",
       "sanitized_parent_commit": "ee0528b7ff10326b0a41c84d49d90ce6751c9a01",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n18-lift-quality-20260929",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n18-lift-quality-20260929",
       "tree": "9b9035d6c611d2ebe852e7af2323d5fbc0e529de",
       "inventory_entries": 2,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n18-lift-quality-20260929",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n18-lift-quality-20260929"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n19-lift-quality-corrected-20260929",
@@ -959,10 +1063,12 @@
       "commit": "c26e2af137ddda152eb3773913d540cd6723e4ad",
       "sanitized_parent_commit": "b5112e467aaeb4726969e32e1aed6012525a0385",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n19-lift-quality-corrected-20260929",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n19-lift-quality-corrected-20260929",
       "tree": "d6eacd4f772dcc3834f87135d0b3b788fd2e0f30",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n19-lift-quality-corrected-20260929",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n19-lift-quality-corrected-20260929"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n2-runner-20260923",
@@ -977,10 +1083,12 @@
       "commit": "1a2065e974c76111d4cf000e2013126e85456821",
       "sanitized_parent_commit": "ae0774172ce1e745fff0063982948f92b5c2c84a",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n2-runner-20260923",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n2-runner-20260923",
       "tree": "6f5bc4f2066b66321a13baf2655f3363bc758daf",
       "inventory_entries": 4,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n2-runner-20260923",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n2-runner-20260923"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n20-raw-binding-20260929",
@@ -995,10 +1103,12 @@
       "commit": "066763aed8267b182d685f415069909f51d9f65a",
       "sanitized_parent_commit": "8e463a5b5c9f0aca84c39f1804219ae130e3700d",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n20-raw-binding-20260929",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n20-raw-binding-20260929",
       "tree": "a813461ae6310af347b7b150ef5ffc4fc34e58b8",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n20-raw-binding-20260929",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n20-raw-binding-20260929"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n21-stage-raw-20260930",
@@ -1013,10 +1123,12 @@
       "commit": "4426a1fee27d5f3212ba917ce2813ad2a75a7007",
       "sanitized_parent_commit": "d7c3094fffa47155c04df47a724e4833f2774eba",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n21-stage-raw-20260930",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n21-stage-raw-20260930",
       "tree": "727155d9394195b5b8aea3a8ff0f81197a270189",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n21-stage-raw-20260930",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n21-stage-raw-20260930"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n3-runner-20260924",
@@ -1031,10 +1143,12 @@
       "commit": "7f5f1c815eb379f4499bf46fd5d84067e1ae3f39",
       "sanitized_parent_commit": "c09442bf2ef524b34bf281f74a293ffba457f873",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n3-runner-20260924",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n3-runner-20260924",
       "tree": "e681cf5cbb85c2b0c7de5898e3a313ff1eac5cb4",
       "inventory_entries": 11,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n3-runner-20260924",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n3-runner-20260924"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n4-audit-20260924",
@@ -1049,10 +1163,12 @@
       "commit": "f2e7bf4bbab67d02bcf53a78fd81e0a83bcc946e",
       "sanitized_parent_commit": "d5e708a2e22ff73b90b9c9186929a8c3edd9e7db",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n4-audit-20260924",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-audit-20260924",
       "tree": "fea11ea44013f0f1f07ddfa5b550036713cdb8fc",
       "inventory_entries": 7,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n4-audit-20260924",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-audit-20260924"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n4-e1-runner-20260924",
@@ -1067,10 +1183,12 @@
       "commit": "cef6b4777c33b1f26b21abeffcaf240649320812",
       "sanitized_parent_commit": "9d5f47708e59010015bd6e082569161cfa62e996",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n4-e1-runner-20260924",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-e1-runner-20260924",
       "tree": "7f1ddaac6de5ee2af4da6706d313c7c0ecf087cd",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n4-e1-runner-20260924",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-e1-runner-20260924"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n4-evaluation-audit-20260924",
@@ -1085,10 +1203,12 @@
       "commit": "0d681ad1c9ecde039c0b06e1221086a3e3c51396",
       "sanitized_parent_commit": "ba79dae129a770cd815b747eb551d733f0f8012d",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n4-evaluation-audit-20260924",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-evaluation-audit-20260924",
       "tree": "035df258a35458f1993aafca26e637eede6dd408",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n4-evaluation-audit-20260924",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-evaluation-audit-20260924"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n4-evaluation-runner-20260924",
@@ -1103,10 +1223,12 @@
       "commit": "924b52a3aebc8f25198bc01cb1c3a02e8834de0a",
       "sanitized_parent_commit": "6adc80b701734169a6598f550503d84e48a015d7",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n4-evaluation-runner-20260924",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-evaluation-runner-20260924",
       "tree": "346d12dbb0fc2e7c08a11c2749e8c666c0f770b5",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n4-evaluation-runner-20260924",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-evaluation-runner-20260924"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n4-runner-20260924",
@@ -1121,10 +1243,12 @@
       "commit": "610384b112d8fe90adb5fe85d1f8da51d63186b4",
       "sanitized_parent_commit": "0ae67881833057177097efffbcf0ff2bb5d3dc86",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n4-runner-20260924",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-runner-20260924",
       "tree": "6847c86690ecc0abaf57ba27a230543f42896433",
       "inventory_entries": 1,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n4-runner-20260924",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-runner-20260924"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n4-terminal-20260924",
@@ -1139,10 +1263,12 @@
       "commit": "0901e64df1c08c9d0eaba2ea2bfd85c4f54bfcfe",
       "sanitized_parent_commit": "b4141ed7a5cb12b62805373e89c6560b052deee3",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n4-terminal-20260924",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-terminal-20260924",
       "tree": "fef8b26341a5a5e4a1133be9af8f91afde2e5a5a",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n4-terminal-20260924",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n4-terminal-20260924"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n5-grasp-timing-20260925",
@@ -1157,10 +1283,12 @@
       "commit": "37568403e5a13930ddec4cb25f5028f136e4a96e",
       "sanitized_parent_commit": "d226a52f254a6cd1dc5d15f57260211483cd32ef",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n5-grasp-timing-20260925",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n5-grasp-timing-20260925",
       "tree": "27a4e94292176079d2dfc5a4089425ce79dc7aa8",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n5-grasp-timing-20260925",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n5-grasp-timing-20260925"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n6-height-20260925",
@@ -1175,10 +1303,12 @@
       "commit": "838af86aeb461137fb638063ab0da417c99d8db3",
       "sanitized_parent_commit": "212154cb4dbf9684d78655128bb8193123222e7e",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n6-height-20260925",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n6-height-20260925",
       "tree": "ef84cb119890c64199b55ae7b605d1fb0a534188",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n6-height-20260925",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n6-height-20260925"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n7-direction-height-20260925",
@@ -1193,10 +1323,12 @@
       "commit": "c4f1ebd87865017d837490478424557b87b45207",
       "sanitized_parent_commit": "b6e550b9f1760ad63cd9a45abfde5553d599b0c6",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n7-direction-height-20260925",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n7-direction-height-20260925",
       "tree": "d1691474a5c5a99324cc4e1851685123c7bfcbb5",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n7-direction-height-20260925",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n7-direction-height-20260925"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n7-formal-20260925",
@@ -1211,10 +1343,12 @@
       "commit": "fabea2aa129895b0ab8e90c0afde90fe2aef0873",
       "sanitized_parent_commit": "0f6e5855c087fcec52dd7af8560cdee4cc2e6f23",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n7-formal-20260925",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n7-formal-20260925",
       "tree": "b487a8c97b216f9da965a25bb9707fee417d7e5d",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n7-formal-20260925",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n7-formal-20260925"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n7-validation-20260925",
@@ -1229,10 +1363,12 @@
       "commit": "6c58dc2f6e847f0b915bdf3a5e2624586365c313",
       "sanitized_parent_commit": "e12874d4e2fe0530548359eb0b2fb4d94dc7d2ab",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n7-validation-20260925",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n7-validation-20260925",
       "tree": "b4222ee10cba104c95c46a42b1cf272e42b8ac86",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n7-validation-20260925",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n7-validation-20260925"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-n9-contact-sweep",
@@ -1247,10 +1383,12 @@
       "commit": "162b7263cad345685593af835ed4d763d9e2a260",
       "sanitized_parent_commit": "cec97ac4b3246b09a8d488b424995bfeb22a76da",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n9-contact-sweep",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n9-contact-sweep",
       "tree": "deb7a3f128f7d3d1ecb123f4590c2734de460f09",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-n9-contact-sweep",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-n9-contact-sweep"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-stage-e2-20260928",
@@ -1265,10 +1403,12 @@
       "commit": "6c66c26029bcec7c0969e125a2bef8be4f90c4ca",
       "sanitized_parent_commit": "816d79c76b45111990ffc707b8c7c1e727258080",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-stage-e2-20260928",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-stage-e2-20260928",
       "tree": "460a6b8595d187085356388c2fafde0ad3741571",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-stage-e2-20260928",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-stage-e2-20260928"
     },
     {
       "branch": "codex/archive/20261015/exp/rdt-qd-ed-stage-lifecycle-20260924",
@@ -1283,10 +1423,12 @@
       "commit": "f9d56e482339d959de8eb42261ad3989a65d4aca",
       "sanitized_parent_commit": "b51645028cddaacf5e78d1230db0dfbd6d77abc1",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-stage-lifecycle-20260924",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/exp/rdt-qd-ed-stage-lifecycle-20260924",
       "tree": "7a6cec650520616dd0401cc632d3d7a662366025",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/exp/rdt-qd-ed-stage-lifecycle-20260924",
+      "historical_tag": "history/20261015/codex/archive/20261015/exp/rdt-qd-ed-stage-lifecycle-20260924"
     },
     {
       "branch": "codex/archive/20261015/feat/rdt-integration",
@@ -1301,10 +1443,12 @@
       "commit": "aae5f5d9115de9cc3f33f8dfca9e0e211ab3d6a2",
       "sanitized_parent_commit": "3835192744a4be5dc00790774e0593383cbeacf8",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/feat/rdt-integration",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/feat/rdt-integration",
       "tree": "46bd30590f98e9972c845bf881e107b7faf9ccff",
       "inventory_entries": 195,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/feat/rdt-integration",
+      "historical_tag": "history/20261015/codex/archive/20261015/feat/rdt-integration"
     },
     {
       "branch": "codex/archive/20261015/feat/rdt-libero-gt-rollout-reintegration",
@@ -1319,10 +1463,12 @@
       "commit": "c5ce243fd0631120d252e1ceff1014db993b7d9f",
       "sanitized_parent_commit": "73b90c69b7ad5517a5313cd0bd4ba4d44a16eee0",
       "publication_redactions": 1,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/feat/rdt-libero-gt-rollout-reintegration",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/feat/rdt-libero-gt-rollout-reintegration",
       "tree": "e50a43106f495abe05a4e4094f240b9049fe1dde",
       "inventory_entries": 998,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/feat/rdt-libero-gt-rollout-reintegration",
+      "historical_tag": "history/20261015/codex/archive/20261015/feat/rdt-libero-gt-rollout-reintegration"
     },
     {
       "branch": "codex/archive/20261015/feat/rdt-libero-object-ckpt",
@@ -1337,10 +1483,12 @@
       "commit": "48c94524ae5c4fcd96a121afff75f890bc098260",
       "sanitized_parent_commit": "1be4afbf17eaac9066e417ea1309cc1d326d1520",
       "publication_redactions": 1,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/feat/rdt-libero-object-ckpt",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/feat/rdt-libero-object-ckpt",
       "tree": "112509c751d40505b2efaec6923870ad66cc39df",
       "inventory_entries": 1213,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/feat/rdt-libero-object-ckpt",
+      "historical_tag": "history/20261015/codex/archive/20261015/feat/rdt-libero-object-ckpt"
     },
     {
       "branch": "codex/archive/20261015/rdt_ed_steering_integration",
@@ -1355,10 +1503,12 @@
       "commit": "b03e40f631f0d93e6fdd9eea6e5d7736cc91450c",
       "sanitized_parent_commit": "2bf783d2627d6cdf40788c29a63ed57ea4bdbbf3",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/rdt_ed_steering_integration",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/rdt_ed_steering_integration",
       "tree": "446b4a9a68ffdcf210bbf56db93dd42dffeaa1b5",
       "inventory_entries": 2541,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/rdt_ed_steering_integration",
+      "historical_tag": "history/20261015/codex/archive/20261015/rdt_ed_steering_integration"
     },
     {
       "branch": "codex/archive/20261015/detached-808e27f70256",
@@ -1373,10 +1523,12 @@
       "commit": "f9f2c84ab55ae4929a037ff64d06267b56738aa3",
       "sanitized_parent_commit": "0ed9f9d9af1b0e8ef09c6c95077c6e1238ea08bc",
       "publication_redactions": 1,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/detached-808e27f70256",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/detached-808e27f70256",
       "tree": "fc3014c732e8d930fbff6c764511725ae43d5e8e",
       "inventory_entries": 1622,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/detached-808e27f70256",
+      "historical_tag": "history/20261015/codex/archive/20261015/detached-808e27f70256"
     },
     {
       "branch": "codex/archive/20261015/saved-stash",
@@ -1391,10 +1543,12 @@
       "commit": "be36342c82cf7b7d458f460acb9e7f32ce46fafa",
       "sanitized_parent_commit": "c15327572eba1046b381c4b56ef8a79e32bfcb76",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/saved-stash",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/saved-stash",
       "tree": "1be2eb20a40b03f110cc4c36a5b1fac013d56f38",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/saved-stash",
+      "historical_tag": "history/20261015/codex/archive/20261015/saved-stash"
     },
     {
       "branch": "codex/archive/20261015/supplement-01-p2_direction_normalized_rbf",
@@ -1404,10 +1558,12 @@
       "commit": "6e012502e58ef5d1ef5ef1150ce895a328a8dca0",
       "sanitized_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-01-p2_direction_normalized_rbf",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-01-p2_direction_normalized_rbf",
       "tree": "0e46ec6c0ea47919ec5784a7a6cadf5a5f225446",
       "inventory_entries": 884,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-01-p2_direction_normalized_rbf",
+      "historical_tag": "history/20261015/codex/archive/20261015/supplement-01-p2_direction_normalized_rbf"
     },
     {
       "branch": "codex/archive/20261015/supplement-02-rdt-qd-ed-gpu6-20260922T063626Z",
@@ -1417,10 +1573,12 @@
       "commit": "e7d3579d44477a8ba3130e884940af1ffcc9c844",
       "sanitized_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
       "publication_redactions": 20,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-02-rdt-qd-ed-gpu6-20260922T063626Z",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-02-rdt-qd-ed-gpu6-20260922T063626Z",
       "tree": "eafee0676e5b06f284158886775a35504073a4cb",
       "inventory_entries": 9767,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-02-rdt-qd-ed-gpu6-20260922T063626Z",
+      "historical_tag": "history/20261015/codex/archive/20261015/supplement-02-rdt-qd-ed-gpu6-20260922T063626Z"
     },
     {
       "branch": "codex/archive/20261015/supplement-03-rdt-qd-ed-final-20260921T093925Z",
@@ -1430,10 +1588,12 @@
       "commit": "7c01070f11d771e994999ea56e08865aecf19c0a",
       "sanitized_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
       "publication_redactions": 3,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-03-rdt-qd-ed-final-20260921T093925Z",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-03-rdt-qd-ed-final-20260921T093925Z",
       "tree": "41ab60d03b55e4a08dfea05ce371a99366f5bf06",
       "inventory_entries": 26652,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-03-rdt-qd-ed-final-20260921T093925Z",
+      "historical_tag": "history/20261015/codex/archive/20261015/supplement-03-rdt-qd-ed-final-20260921T093925Z"
     },
     {
       "branch": "codex/archive/20261015/supplement-04-outputs",
@@ -1443,10 +1603,12 @@
       "commit": "f17bc4163811b1ec7332313677149af8828911bb",
       "sanitized_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-04-outputs",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-04-outputs",
       "tree": "3731daefb229ad5e09e8f6a2d242cc7aa7141ffa",
       "inventory_entries": 1723,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-04-outputs",
+      "historical_tag": "history/20261015/codex/archive/20261015/supplement-04-outputs"
     },
     {
       "branch": "codex/archive/20261015/supplement-05-eds-qd-autoresearch-libero-swap-ood",
@@ -1456,10 +1618,12 @@
       "commit": "86831c64d9c169d850abb322d678e01805f805dd",
       "sanitized_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-05-eds-qd-autoresearch-libero-swap-ood",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-05-eds-qd-autoresearch-libero-swap-ood",
       "tree": "e8e6f14d1193085396353dfd97db0e90bfdb2b93",
       "inventory_entries": 454,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-05-eds-qd-autoresearch-libero-swap-ood",
+      "historical_tag": "history/20261015/codex/archive/20261015/supplement-05-eds-qd-autoresearch-libero-swap-ood"
     },
     {
       "branch": "codex/archive/20261015/supplement-06-p2_adaptive_eds_rbf",
@@ -1469,10 +1633,12 @@
       "commit": "74caf8472889d6782decf65c7ba6fe8b3f3f08fa",
       "sanitized_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-06-p2_adaptive_eds_rbf",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-06-p2_adaptive_eds_rbf",
       "tree": "870ecb0ddd69de5916c65c0b3e02c34ff497c371",
       "inventory_entries": 594,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-06-p2_adaptive_eds_rbf",
+      "historical_tag": "history/20261015/codex/archive/20261015/supplement-06-p2_adaptive_eds_rbf"
     },
     {
       "branch": "codex/archive/20261015/supplement-07-steering-integration",
@@ -1482,10 +1648,12 @@
       "commit": "34ad5a93257daab8bec0ef3f6ceaca7e48544350",
       "sanitized_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
       "publication_redactions": 1,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-07-steering-integration",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-07-steering-integration",
       "tree": "22214dc57775e531aaef95269bc274a8adf8fbe1",
       "inventory_entries": 3757,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-07-steering-integration",
+      "historical_tag": "history/20261015/codex/archive/20261015/supplement-07-steering-integration"
     },
     {
       "branch": "codex/archive/20261015/supplement-08-steering-ultra-20261014",
@@ -1495,10 +1663,12 @@
       "commit": "e0dbd3c021c329d9e425ad2b1122627cbd195e34",
       "sanitized_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-08-steering-ultra-20261014",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-08-steering-ultra-20261014",
       "tree": "a9bd4ed225432dbc21f5bf68a20d15b6d8babdf1",
       "inventory_entries": 41,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-08-steering-ultra-20261014",
+      "historical_tag": "history/20261015/codex/archive/20261015/supplement-08-steering-ultra-20261014"
     },
     {
       "branch": "codex/archive/20261015/supplement-09-repository-maintenance-20261015",
@@ -1508,10 +1678,12 @@
       "commit": "84159c48ca2bac24670dba3ddbb26792e23e3b86",
       "sanitized_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-09-repository-maintenance-20261015",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-09-repository-maintenance-20261015",
       "tree": "4413b7d456aeb147d41c196a61b827efbb79fa86",
       "inventory_entries": 28,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-09-repository-maintenance-20261015",
+      "historical_tag": "history/20261015/codex/archive/20261015/supplement-09-repository-maintenance-20261015"
     },
     {
       "branch": "codex/archive/20261015/supplement-10-outputs",
@@ -1521,10 +1693,12 @@
       "commit": "2fb06859e88573f97d1596c4cb72dccd0bbfd55a",
       "sanitized_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-10-outputs",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-10-outputs",
       "tree": "59d626d57c8c2532bcab204d606d4719a0f1ca88",
       "inventory_entries": 264,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-10-outputs",
+      "historical_tag": "history/20261015/codex/archive/20261015/supplement-10-outputs"
     },
     {
       "branch": "codex/archive/20261015/supplement-11-libero_pro",
@@ -1534,10 +1708,12 @@
       "commit": "d6f315af782d1fbc05a90d255429d4bbd3034083",
       "sanitized_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-11-libero_pro",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-11-libero_pro",
       "tree": "4ae77a61d496ce737cd3d3dd253a9c3d9e7d79f3",
       "inventory_entries": 949,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-11-libero_pro",
+      "historical_tag": "history/20261015/codex/archive/20261015/supplement-11-libero_pro"
     },
     {
       "branch": "codex/archive/20261015/supplement-12-source-file-links",
@@ -1547,10 +1723,12 @@
       "commit": "ca20c123b798ec2f49b835e8d7ec238a042841ba",
       "sanitized_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-12-source-file-links",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-12-source-file-links",
       "tree": "c2bae1daf451b535b374224b88e0ad6e6a96f6eb",
       "inventory_entries": 109,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-12-source-file-links",
+      "historical_tag": "history/20261015/codex/archive/20261015/supplement-12-source-file-links"
     },
     {
       "branch": "codex/archive/20261015/supplement-13-ultra-runs",
@@ -1560,10 +1738,12 @@
       "commit": "92e89f5aff18de65164ab87ec63704f840dec2f9",
       "sanitized_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-13-ultra-runs",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/supplement-13-ultra-runs",
       "tree": "187f8e58c57ffb240ce3fdce4e9645e426b5deb8",
       "inventory_entries": 3782,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/supplement-13-ultra-runs",
+      "historical_tag": "history/20261015/codex/archive/20261015/supplement-13-ultra-runs"
     },
     {
       "branch": "codex/archive/20261015/saved-stash-untracked",
@@ -1572,10 +1752,13 @@
       "manifest_sha256": "0f8b4df4c18acdfc498633a17cb88542a48969f02c6aed43275a7db61070444d",
       "sanitized_parent_commit": "f6ac6b0d1d08f4b33a9039f36e2ebb19ed65c88f",
       "publication_redactions": 0,
-      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/saved-stash-untracked",
+      "github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/history/20261015/codex/archive/20261015/saved-stash-untracked",
       "tree": "1736bd019381b331e6f18e76e723200b2939c677",
       "inventory_entries": 0,
-      "remote_verified": true
+      "remote_verified": true,
+      "original_github_url": "https://github.com/RIP4KOBE/vla-pilot-plus/tree/codex/archive/20261015/saved-stash-untracked",
+      "historical_tag": "history/20261015/codex/archive/20261015/saved-stash-untracked"
     }
-  ]
+  ],
+  "navigation_note": "Original publication identities retained; old branches are superseded by the directory-matched branch index and history/20261015 tags."
 }

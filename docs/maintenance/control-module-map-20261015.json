@@ -1,0 +1,100 @@
+{
+  "base_commit": "e8a3b6a76172431b6f3f510ceb25b3afd10e8730",
+  "module_map": {
+    "core.stage_evidence": "core.stage.controller",
+    "core.stage_contact_handoff": "core.stage.controller",
+    "core.stage_observation_json": "core.stage.contract",
+    "core.stage_response_validation": "core.stage.contract",
+    "core.stage_identity_memory": "core.stage.observation",
+    "core.stage_target_marker": "core.stage.observation",
+    "core.stage_observation": "core.stage.observation",
+    "core.stage_robot_evidence": "core.stage.grasp",
+    "core.stage_grasp_guard": "core.stage.grasp",
+    "core.stage_carry_hold": "core.stage.carry",
+    "core.stage_fused_carry_hold": "core.stage.carry",
+    "core.stage_failed_contact_recheck": "core.stage.recovery",
+    "core.stage_release_guard": "core.stage.recovery",
+    "core.codex_stage": "core.online.codex",
+    "core.codex_vision": "core.online.codex",
+    "core.codex_stage_policy": "core.online.policy",
+    "core.stage_capture": "core.online.capture",
+    "core.trace_replay_stage": "core.diagnostics.stage_replay",
+    "core.stage_capture_trace_replay": "core.diagnostics.stage_replay"
+  },
+  "new_groups": {
+    "core/stage/controller.py": [
+      "core/stage_evidence.py",
+      "core/stage_contact_handoff.py"
+    ],
+    "core/stage/contract.py": [
+      "core/stage_observation_json.py",
+      "core/stage_response_validation.py"
+    ],
+    "core/stage/observation.py": [
+      "core/stage_identity_memory.py",
+      "core/stage_target_marker.py",
+      "core/stage_observation.py"
+    ],
+    "core/stage/grasp.py": [
+      "core/stage_robot_evidence.py",
+      "core/stage_grasp_guard.py"
+    ],
+    "core/stage/carry.py": [
+      "core/stage_carry_hold.py",
+      "core/stage_fused_carry_hold.py"
+    ],
+    "core/stage/recovery.py": [
+      "core/stage_failed_contact_recheck.py",
+      "core/stage_release_guard.py"
+    ],
+    "core/online/codex.py": [
+      "core/codex_stage.py",
+      "core/codex_vision.py"
+    ],
+    "core/online/policy.py": [
+      "core/codex_stage_policy.py"
+    ],
+    "core/online/capture.py": [
+      "core/stage_capture.py"
+    ],
+    "core/diagnostics/stage_replay.py": [
+      "core/trace_replay_stage.py",
+      "core/stage_capture_trace_replay.py"
+    ]
+  },
+  "import_consumers_updated": [
+    "core/gemini_grounder.py",
+    "scripts/codex_only_runtime.py",
+    "scripts/check_steering.py",
+    "scripts/audit_steering.py",
+    "tests/test_stage_evidence.py",
+    "tests/test_stage_release_guard.py",
+    "tests/test_codex_online_observation.py",
+    "tests/test_stage_carry_runtime.py",
+    "tests/test_stage_target_marker_runtime.py",
+    "tests/test_stage_robot_evidence.py",
+    "tests/test_stage_identity_memory.py",
+    "tests/test_stage_reward_progress_handoff.py",
+    "tests/test_codex_stage.py",
+    "tests/test_stage_response_validation.py",
+    "tests/test_stage_fused_carry_hold.py",
+    "tests/test_stage_grasp_guard.py",
+    "tests/test_stage_partial_visibility.py",
+    "tests/test_main_rdt_startup.py",
+    "tests/test_stage_payload_runtime.py",
+    "tests/test_stage_gripper_passthrough.py",
+    "tests/test_stage_capture_trace_replay.py",
+    "tests/test_stage_carry_hold.py",
+    "tests/test_stage_recovery_priority.py",
+    "tests/test_stage_target_marker.py",
+    "tests/test_stage_contact_handoff.py",
+    "tests/steering_eds_golden.py",
+    "tests/test_stage_observation_json.py",
+    "tests/test_stage_reward_capability.py",
+    "tests/test_stage_capture.py",
+    "tests/test_stage_reward_reference.py",
+    "tests/test_stage_failed_contact_recheck.py",
+    "vlm_query/vlm_agent.py",
+    "main.py"
+  ]
+}

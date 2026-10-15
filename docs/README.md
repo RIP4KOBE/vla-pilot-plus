@@ -9,6 +9,8 @@
 | 运行、结果判读、审计与归档 | [evaluation](steering/evaluation.md) |
 | 已验收 low 结果 | [results](steering/results.md) |
 | ultra 对照、所有尝试与归因边界 | [reasoning-effort-comparison](steering/reasoning-effort-comparison.md) |
+| 当前源码目录对应的研究分支与历史标签 | [分支索引](maintenance/branch-index.md) |
+| 控制代码重构与开源入口整理 | [本轮发布报告](maintenance/public-release-20261015.md) |
 | 主线发布、清理与历史工作区映射 | [整理报告](maintenance/repository-consolidation-20261015.md) |
 | main 清理候选及 Stage/Codex 必要性 | [依赖审查](maintenance/main-scope-and-control-dependencies-20261015.md) |
 | 从 GitHub 查阅历史分支、工作树和未提交源码 | [远端源码索引](maintenance/historical-source-index-20261015.md) |

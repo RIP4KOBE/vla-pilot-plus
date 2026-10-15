@@ -1,0 +1,131 @@
+{
+  "base_commit": "e8a3b6a76172431b6f3f510ceb25b3afd10e8730",
+  "logic_nodes_compared": 66,
+  "module_constants_compared": 20,
+  "logic_differences": [],
+  "normalization": "Ignore import statements and compensate only __file__.parents depth for relocated template lookup; all function/class bodies and literal constants otherwise AST-identical. Import/runtime behavior checked separately by tests.",
+  "protected_scientific_files": [
+    "core/rdt_policy_steer.py",
+    "core/qd_ed.py",
+    "core/target_distance_reward.py",
+    "configs/perception.yaml",
+    "configs/config.yaml",
+    "configs/policy.yaml",
+    "configs/local.example.yaml",
+    "configs/evaluation/libero_object_swap.yaml",
+    "configs/steering/eds_qd.yaml",
+    "configs/steering/eds.yaml",
+    "configs/steering/vls.yaml",
+    "configs/backend/libero.yaml",
+    "configs/backend/calvin.yaml",
+    "configs/stage_controller/evidence.yaml",
+    "configs/stage_controller/contact.yaml",
+    "configs/stage_controller/online.yaml",
+    "configs/stage_controller/grasp.yaml",
+    "configs/env/libero.yaml",
+    "configs/env/calvin.yaml",
+    "configs/task/drawer_open.yaml",
+    "configs/task/door_left.yaml",
+    "configs/task/button_off.yaml",
+    "configs/task/drawer_close.yaml",
+    "configs/task/door_right.yaml",
+    "configs/task/button_on.yaml",
+    "configs/task/push_blue.yaml",
+    "configs/task/calvin/drawer_open.yaml",
+    "configs/task/calvin/door_left.yaml",
+    "configs/task/calvin/button_off.yaml",
+    "configs/task/calvin/drawer_close.yaml",
+    "configs/task/calvin/door_right.yaml",
+    "configs/task/calvin/button_on.yaml",
+    "configs/task/calvin/push_blue.yaml",
+    "vlm_query/stage_template.txt",
+    "vlm_query/guidance_template_libero.txt",
+    "vlm_query/guidance_template.txt",
+    "vlm_query/stage_observation_v1.txt",
+    "vlm_query/segmentation_planning_template.txt",
+    "vlm_query/guidance_template_calvin.txt",
+    "vlm_query/target_distance/stage_template.txt",
+    "vlm_query/target_distance/guidance_template_libero.txt",
+    "vlm_query/target_distance/guidance_template.txt",
+    "vlm_query/target_distance/segmentation_planning_template.txt"
+  ],
+  "protected_scientific_files_unchanged": true,
+  "targeted_tests": {
+    "passed": 421,
+    "warnings": 1,
+    "seconds": 5.02
+  },
+  "full_cpu_tests": {
+    "passed": 1449,
+    "skipped": 3,
+    "warnings": 1,
+    "seconds": 136.17
+  },
+  "frozen_eds_golden_matches": true,
+  "new_online_evaluations": 0,
+  "historical_cohort_reaudit": {
+    "valid": true,
+    "method": "eds",
+    "run": "eds-common-20261013",
+    "no_write": true,
+    "completed": 10,
+    "planned": 10,
+    "successes": 3,
+    "success_task_ids": [
+      3,
+      8,
+      9
+    ],
+    "infrastructure_error_episodes": 0
+  },
+  "cli_previews": {
+    "vls": {
+      "parsed": true,
+      "episodes": 10,
+      "provider": "codex_cli",
+      "model": "gpt-6-astra",
+      "effort": "ultra",
+      "config_sha256": "24bc651e3fe04e1ed2de4717827ef3dcf039b1635c311510e0a602f478969e11"
+    },
+    "eds": {
+      "parsed": true,
+      "episodes": 10,
+      "provider": "codex_cli",
+      "model": "gpt-6-astra",
+      "effort": "ultra",
+      "config_sha256": "d5d87df727deea5d124a8eef2d602d40f8383748c5ec9d336880bdf86c0d172e"
+    },
+    "eds_qd": {
+      "parsed": true,
+      "episodes": 10,
+      "provider": "codex_cli",
+      "model": "gpt-6-astra",
+      "effort": "ultra",
+      "config_sha256": "511d301e7fd14177601d6e5c1c7538bcc98bd323b4843d8494a030c0a414faac"
+    }
+  },
+  "cli_help_checked": [
+    "evaluate_steering",
+    "check_steering",
+    "audit_steering",
+    "prepare_steering_assets"
+  ],
+  "post_harness_compatibility_tests": {
+    "passed": 3,
+    "seconds": 21.54
+  },
+  "pre_refactor_source_golden": {
+    "behavior_sha256": "ba7dbf70737100d50d950194d15fbc2699a63b52509bd0579a5af002f7011b50",
+    "comparison_difference": null,
+    "source_unchanged": true,
+    "cuda_initialized": false,
+    "network_and_subprocess_guard": true
+  },
+  "diagnostic_setup_note": "Initial temporary source export omitted the pinned third_party/rdt/models/rdt_runner.py; added the file from the unchanged pinned gitlink and reran in a new output directory.",
+  "post_refactor_behavior_sha256": "ba7dbf70737100d50d950194d15fbc2699a63b52509bd0579a5af002f7011b50",
+  "before_after_behavior_hash_identical": true,
+  "changed_document_links_checked": 142,
+  "missing_changed_document_links": [],
+  "implementation_commit": "cca021081d4ee7b849f8fa459fecf512fcb221f5",
+  "cleanup_commit": "293450e8ae04c287119b5b0ae7c1afbff2cefaba"
+}

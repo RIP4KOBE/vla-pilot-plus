@@ -129,7 +129,7 @@ flowchart TD
 - 搜索与模式边界：[rdt_policy_steer.py](../../core/rdt_policy_steer.py)、[三种 profile](../../configs/steering)。
 - BD、档案、精英与父代：[qd_ed.py](../../core/qd_ed.py)；独立机制重建：[audit_qd_mechanism.py](../../scripts/audit_qd_mechanism.py)。
 - 执行与反馈边界：[main.py](../../main.py)、[LIBERO adapter](../../core/env_adapters/libero_adapter.py)。
-- Stage/reward：[stage_evidence.py](../../core/stage_evidence.py)、[target_distance_reward.py](../../core/target_distance_reward.py)、[固定提示词](../../vlm_query/target_distance)。
+- Stage/reward：[Stage controller](../../core/stage/controller.py)、[target_distance_reward.py](../../core/target_distance_reward.py)、[固定提示词](../../vlm_query/target_distance)。
 - 状态、结果、下一步验收：[Research Progress](research_progress.md)；开发约束：[AGENTS.md](../../AGENTS.md)。
 
 | 版本 / 日期 | 变更 | 证据与保留问题 |

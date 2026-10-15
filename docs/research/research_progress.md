@@ -1,6 +1,6 @@
 # VLA-Pilot++ Research Progress
 
-最近核对：**2026-10-15**。本文件是“当前做到哪里”的权威入口，与 [Proposal v0.1](research_proposal.md) 的 RQ1–RQ5 对应。实验报告保留原日期与原始字节；本次是仓库发布、归档和文档整理，没有新增科学实验。
+最近核对：**2026-10-15**。本文件是“当前做到哪里”的权威入口，与 [Proposal v0.1](research_proposal.md) 的 RQ1–RQ5 对应。实验报告保留原日期与原始字节；本次包含控制代码组织重构、仓库发布、归档和文档整理，没有新增科学实验。
 
 ## 1. 当前结论与源码身份
 
@@ -14,7 +14,7 @@
 | ultra 最终共同协议受测 runtime | `c99565de6e34278c14518748d7c608433a4c529a` |
 | 整理后的发布身份 | 包含本文件的 main 提交；用 `git rev-parse HEAD` 确认，并与[整理报告](../maintenance/repository-consolidation-20261015.md)中的发布记录核对 |
 
-整理前已验证 116 个 runtime 文件与 ultra 冻结快照逐字节一致；整理后的最终复核见报告。发布提交与受测提交分开记，不将文档发布或归档操作描述为一次新实验。
+此前整理前曾核对 116 个 runtime 文件与 ultra 冻结快照逐字节一致。2026-10-15 的后续模块重构改变了文件路径与源码哈希：19 个控制/传输模块合为 10 个实现文件，66 个函数/类逻辑节点及 20 个模块常量经限定的 AST 对照一致，EDS 离线闭环匹配冻结参考，全套 CPU 检查为 1449 passed、3 skipped。该证据不能描述为新版重新取得在线 3/10；在线成绩仍归属上表原 runtime。见[本轮发布报告](../maintenance/public-release-20261015.md)及[检查记录](../maintenance/control-layout-validation-20261015.json)。
 
 ## 2. 研究目标与实现状态
 
@@ -117,7 +117,7 @@
 | BD、cell、精英、父代 | `core/qd_ed.py`、`configs/steering/eds_qd.yaml` | 有限值/边界/平手/分配守恒、实际父代和最终输出 |
 | 搜索接入 | `core/rdt_policy_steer.py` | EDS reference 不变；QD 分支实际使用档案，评分/RNG/调用数可审计 |
 | 执行反馈 | `main.py`、`core/env_adapters/libero_adapter.py`、`core/eds_eval_metrics.py` | 区分预测与实测；动作后处理、时序、reset 和观测权限 |
-| Stage/reward（另立科学条件） | `core/stage_evidence.py`、`stage_contact_handoff.py`、`target_distance_reward.py`、`vlm_query/target_distance/` | 门控/失败复查/评分能力一致；新协议在线验收 |
+| Stage/reward（另立科学条件） | `core/stage/controller.py`、`target_distance_reward.py`、`vlm_query/target_distance/` | 门控/失败复查/评分能力一致；新协议在线验收 |
 | 评测/归档 | `scripts/run_steering.py`、`steering_runtime.py`、`audit_steering.py`、`steering_archive.py` | 配置冻结、进程所有权、无效运行区分、搬迁后只读重审 |
 
 测试文件按职责分布于 `tests/test_qd_ed_archive.py`、`test_rdt_steer.py`、`test_steering_eds_parity.py`（引用 `steering_eds_golden.py`）、`test_steering_runner.py` 和 Stage/transport 系列；先以 `rg --files tests` 确认实际文件名及范围。完整开发约束见 [AGENTS.md](../../AGENTS.md) 与 [CONTRIBUTING.md](../../CONTRIBUTING.md)。
