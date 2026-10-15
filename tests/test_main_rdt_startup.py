@@ -1014,7 +1014,7 @@ def test_codex_components_load_cached_descriptions_without_api_credentials(monke
 
 
 def test_codex_startup_real_factory_receives_stage_config_without_grounding_overwrite(monkeypatch, tmp_path):
-    import core.codex_stage as codex_stage
+    import core.online.codex as codex_stage
     import core.gemini_grounder as gemini_grounder
 
     main, runner, cfg, _ = _codex_component_runner(monkeypatch, tmp_path)

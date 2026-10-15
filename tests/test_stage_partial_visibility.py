@@ -10,8 +10,8 @@ import numpy as np
 import pytest
 import torch
 
-from core.stage_evidence import decide, held_observation_is_usable, update_stage
-from core.stage_grasp_guard import update_visual_hold
+from core.stage.controller import decide, held_observation_is_usable, update_stage
+from core.stage.grasp import update_visual_hold
 
 ROOT=Path.cwd()
 

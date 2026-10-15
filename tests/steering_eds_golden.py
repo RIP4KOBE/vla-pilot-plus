@@ -11,6 +11,7 @@ import ast
 import hashlib
 import gzip
 import importlib.metadata
+import importlib
 import json
 import logging
 import os
@@ -88,8 +89,10 @@ def load_runtime(root):
     envmod = ModuleType('core.env_adapters'); envmod.BaseEnvAdapter = object
     envmod.__path__ = [str(root/'core/env_adapters')]; sys.modules[envmod.__name__] = envmod
     from core.rdt_policy_steer import RDTSteer
-    from core.stage_evidence import parse_observation
-    from core.stage_grasp_guard import apply_to_action
+    packaged = (root/'core/stage/controller.py').is_file()
+    controller = importlib.import_module('core.stage.controller' if packaged else 'core.stage_evidence')
+    grasp = importlib.import_module('core.stage.grasp' if packaged else 'core.stage_grasp_guard')
+    parse_observation, apply_to_action = controller.parse_observation, grasp.apply_to_action
     from core.target_distance_reward import reference
     projection = extract_method(root/'core/env_adapters/libero_adapter.py', 'LiberoAdapter',
         'delta_actions_to_ee_trajectory', {'torch':torch,'np':np,'Union':Union})
@@ -431,7 +434,15 @@ def main():
     if out.exists():p.error('Output directory must be new')
     out.mkdir(parents=True)
     provenance=json.loads(args.provenance.read_text())
-    source_before={f['path']:sha((root/f['path']).read_bytes()) for f in provenance['files']}
+    # The frozen provenance retains original paths; only the candidate layout is mapped.
+    sys.path.insert(0, str(HERE.parent))
+    from scripts.steering_source_layout import source_path, PACKAGE_INITIALIZERS, CONTROL_PATH_MAP
+    layout = 'packaged' if (root/'core/stage/controller.py').is_file() else 'flat'
+    paths = {source_path(f['path'], layout) for f in provenance['files']}
+    if layout == 'packaged':
+        paths.update(CONTROL_PATH_MAP.values())
+        paths.update(PACKAGE_INITIALIZERS)
+    source_before={path:sha((root/path).read_bytes()) for path in sorted(paths)}
     runtime=load_runtime(root)
     logging.disable(logging.CRITICAL)
     behavior={'schema':'eds_cpu_golden_behavior_v1',

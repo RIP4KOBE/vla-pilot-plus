@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from core.gemini_grounder import GeminiStageRecognizer, create_gemini_stage_recognizer
-from core.stage_capture import CapturedStageRecognizer
+from core.online.capture import CapturedStageRecognizer
 
 
 @pytest.mark.parametrize("reply,decision", [("stage 2\nguidance: no", (2, False)),

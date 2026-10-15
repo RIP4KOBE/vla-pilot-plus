@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 from types import SimpleNamespace
-from core.stage_grasp_guard import goal_alignment, update_visual_hold, guard_command, check_held_observation
+from core.stage.grasp import goal_alignment, update_visual_hold, guard_command, check_held_observation
 
 
 def test_open_is_delayed_only_for_held_target_outside_goal():
@@ -63,7 +63,7 @@ def test_open_command_alone_is_not_grasp_truth():
 
 
 def test_runtime_action_guard_preserves_arm_and_cached_policy_chunk():
-    from core.stage_grasp_guard import apply_to_action
+    from core.stage.grasp import apply_to_action
     journal=[]
     adapter=SimpleNamespace(get_obs=lambda:{'robot0_gripper_qpos':np.array([.02,-.02])},
         get_task_description=lambda:'pick up the bbq sauce and place it in the basket',

@@ -6,7 +6,7 @@ from test_stage_carry_runtime import runner_state
 
 
 def test_runtime_annotates_current_frame_preserves_raw_and_records_same_target(tmp_path):
-    from core.stage_evidence import update_stage
+    from core.stage.controller import update_stage
     runner,state,safety = runner_state()
     runner.backend='libero'
     runner.config.update(use_guidance=True,stage_controller='online',stage_target_marker_enabled=True,

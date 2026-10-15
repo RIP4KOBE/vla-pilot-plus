@@ -17,7 +17,7 @@ OBS={'target_visibility':'clear','target_location':'outside_goal','grasp':'not_h
 
 
 def fake_cli(monkeypatch, tmp_path, replies):
-    import core.codex_stage as transport
+    import core.online.codex as transport
     import core.gemini_grounder as legacy
     import vlm_query.vlm_agent as guidance
     cli=tmp_path/'codex';cli.touch();calls=[]

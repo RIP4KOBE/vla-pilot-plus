@@ -1,4 +1,4 @@
-from core import stage_contact_handoff as handoff
+import core.stage.controller as handoff
 
 
 def decision(*, reward, distance, proximity=True, stage=1):

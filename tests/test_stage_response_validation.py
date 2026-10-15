@@ -1,7 +1,7 @@
 from types import SimpleNamespace
 import json
 import pytest
-from core.stage_response_validation import request_validated, ObservationValidationError
+from core.stage.contract import request_validated, ObservationValidationError
 
 
 def observer(replies,finish='stop'):

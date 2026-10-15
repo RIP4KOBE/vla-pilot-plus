@@ -1,8 +1,8 @@
 from types import SimpleNamespace
 import numpy as np
 import torch
-from core.stage_carry_hold import update
-from core.stage_grasp_guard import apply_to_action
+from core.stage.carry import update
+from core.stage.grasp import apply_to_action
 
 
 def runner_state():
@@ -42,7 +42,7 @@ def test_visual_claim_alone_does_not_block_native_regrasp_open():
 
 
 def test_stage_update_collects_carry_between_queries_and_keeps_failure_priority():
-    from core.stage_evidence import update_stage
+    from core.stage.controller import update_stage
     runner,state,journal=runner_state();events=[]
     runner.config.update(use_guidance=True,stage_controller='online')
     runner.policy=SimpleNamespace(_action_chunk_horizon=8,get_normalized_reward=lambda:0.,reset_stage=lambda:None)

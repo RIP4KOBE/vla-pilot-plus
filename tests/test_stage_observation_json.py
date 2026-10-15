@@ -1,7 +1,7 @@
 import json
 import pytest
-from core.stage_evidence import parse_observation
-from core.stage_response_validation import request_validated, ObservationValidationError
+from core.stage.controller import parse_observation
+from core.stage.contract import request_validated, ObservationValidationError
 
 
 OBS=dict(target_visibility='unknown',target_location='unknown',grasp='unknown',support='unknown',evidence='Hidden by the basket.')

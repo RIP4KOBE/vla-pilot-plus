@@ -736,7 +736,7 @@ class Main:
         if stage_controller not in {"legacy", "evidence", "contact", "grasp", "online"}:
             raise ValueError("Unknown main.stage_controller")
         if stage_controller in {"evidence", "contact", "grasp", "online"}:
-            from core.stage_evidence import settings
+            from core.stage.controller import settings
             settings(self.config)
             if self.backend != "libero" or not self.config.get("use_vlm_stage_recognition", True):
                 raise ValueError("evidence requires LIBERO and online Stage recognition")
@@ -1319,7 +1319,7 @@ class Main:
         Returns updated state dict.
         """
         if self.config.get("stage_controller", "legacy") in {"evidence", "contact", "grasp", "online"}:
-            from core.stage_evidence import update_stage
+            from core.stage.controller import update_stage
             return update_stage(self, state, gripper_val)
         curr_reward = self.policy.get_normalized_reward()
         observed_reward = curr_reward
@@ -1840,7 +1840,7 @@ class Main:
                 action_transition = self.adapter.env_postprocessor(action_transition)
                 action_chunk = action_transition["action"]
             if self.config.get("stage_controller", "legacy") in {"grasp", "online"} and self.config.get("use_guidance", True):
-                from core.stage_grasp_guard import apply_to_action
+                from core.stage.grasp import apply_to_action
                 action_chunk = apply_to_action(self, stage_state, action_chunk, action_executed, global_steps)
             if generate_new_chunk:
                 chunk_id += 1

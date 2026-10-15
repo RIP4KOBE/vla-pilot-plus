@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 import torch
 
-from core.stage_evidence import assess_reward, assess_reward_gradient, update_stage
+from core.stage.controller import assess_reward, assess_reward_gradient, update_stage
 from test_stage_evidence import fake_runner, outside, reward, state
 
 
@@ -66,7 +66,7 @@ def test_eds_never_calls_gradient_capability(monkeypatch):
     runner = fake_runner([outside()])
     runner.policy_type = "rdt"
     runner.config["guidance_type"] = "eds"
-    monkeypatch.setattr("core.stage_evidence.assess_reward_gradient", lambda *args, **kw: pytest.fail("EDS gradient probe"))
+    monkeypatch.setattr("core.stage.controller.assess_reward_gradient", lambda *args, **kw: pytest.fail("EDS gradient probe"))
     update_stage(runner, state(), -1.)
 
 

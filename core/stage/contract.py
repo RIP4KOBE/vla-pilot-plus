@@ -1,4 +1,18 @@
-"""Bounded re-request of malformed visual observations, never semantic retries."""
+"""Lossless response decoding and strict observation validation."""
+
+
+
+
+
+def unwrap(text):
+    if not isinstance(text, str):
+        raise TypeError('observation text must be a string')
+    text = text.strip()
+    lines = text.splitlines()
+    if (len(lines) >= 3 and lines[0].strip().lower() in {'```json', '```'}
+            and lines[-1].strip() == '```'):
+        return '\n'.join(lines[1:-1]).strip(), 'single_json_fence'
+    return text, 'bare_json'
 
 
 class ObservationValidationError(ValueError):
@@ -8,8 +22,7 @@ class ObservationValidationError(ValueError):
 
 
 def request_validated(observer, content, limit):
-    from core.stage_evidence import parse_observation
-    from core.stage_observation_json import unwrap
+    from core.stage.controller import parse_observation
     if isinstance(limit,bool) or not isinstance(limit,int) or not 1 <= limit <= 3:
         raise ValueError('observation validation limit must be an integer in [1,3]')
     attempts=[]

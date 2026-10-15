@@ -15,9 +15,9 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-import core.codex_stage as module
-from core.codex_stage import CodexStageRecognizer
-from core.codex_stage_policy import discover_disabled_skill_paths, policy_sha256, public_invocation_policy
+import core.online.codex as module
+from core.online.codex import CodexStageRecognizer
+from core.online.policy import discover_disabled_skill_paths, policy_sha256, public_invocation_policy
 from core.gemini_grounder import GeminiStageRecognizer, create_gemini_stage_recognizer
 
 

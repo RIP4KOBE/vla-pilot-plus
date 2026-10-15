@@ -3,7 +3,7 @@ import hashlib
 import cv2
 import numpy as np
 import pytest
-from core.stage_target_marker import annotate, save_raw_frame
+from core.stage.observation import annotate, save_raw_frame
 
 
 def runner():

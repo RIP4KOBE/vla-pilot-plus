@@ -357,8 +357,8 @@ def audit(folder, *, exit_code=None, output_path=None, write=True, archive_suppo
         check('source_snapshot_intact', lambda: bool(manifest['source_sha256']) and all(digest(folder/'source'/p)==h for p,h in manifest['source_sha256'].items()))
         fixture=read_json(support_asset(folder, 'rng_manifest', archive_support=archive_support, manifest=manifest, config=config)) if v2 else read_json(ROOT/'tests/fixtures/steering_rng/fixture-manifest.json')
         check('rng_states_match', lambda: bool(restores) and all(r['sha256']==fixture['fixtures'][f"{r['metadata']['task_id']}:{r['metadata']['phase']}"]['sha256'] and r['state_signature']==fixture['fixtures'][f"{r['metadata']['task_id']}:{r['metadata']['phase']}"]['state_signature'] for r in restores))
-        from core.stage_fused_carry_hold import audit_checks as carry_checks
-        from core.stage_failed_contact_recheck import audit_checks as contact_checks
+        from core.stage.carry import audit_checks as carry_checks
+        from core.stage.recovery import audit_checks as contact_checks
         check('carry_check_structure', lambda: all(carry_checks(events).values()))
         check('contact_check_structure', lambda: all(contact_checks(events).values()))
         task_rows=[]

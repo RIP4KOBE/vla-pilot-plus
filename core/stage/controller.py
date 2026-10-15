@@ -1,11 +1,11 @@
-"""Opt-in two-stage pick/place controller; no simulator success labels as inputs.
+"""Stage decisions, query scheduling, reward gates and contact handoff."""
 
-The VLM reports observations, never a control command. Completion remains a
-revocable visual hypothesis, not the environment's success criterion.
-"""
+
 import json
 import math
 import random
+import re
+
 
 VERSION = "evidence"
 FORMAT = "stage_observation_v1"
@@ -19,7 +19,7 @@ ENUMS = {
 
 def parse_observation(text):
     """Strict JSON schema after lossless outer presentation decoding."""
-    from core.stage_observation_json import unwrap
+    from core.stage.contract import unwrap
     text, _ = unwrap(text)
     def unique_pairs(pairs):
         result = {}
@@ -265,23 +265,22 @@ def update_stage(runner, state, gripper_command):
     controller = runner.config.get("stage_controller", VERSION)
     distance, width, control_observation, sensor_reason = None, None, None, None
     if controller in {"contact", "grasp", "online"}:
-        from core.stage_contact_handoff import target_distance
         distance = target_distance(runner)
     if controller in {"grasp", "online"}:
-        from core.stage_grasp_guard import check_held_observation, observed_width, update_visual_hold
+        from core.stage.grasp import check_held_observation, observed_width, update_visual_hold
         width = observed_width(runner)
         check_held_observation(state, None, step=int(state["global_step"]), executed_gripper=gripper_command,
                                width=width, distance=distance)
     robot_evidence = None
     if controller == "online":
-        from core.stage_robot_evidence import check, filter_observation, apply_recovery, target_goal_geometry, enforce_recovery_priority
+        from core.stage.grasp import check, filter_observation, apply_recovery, target_goal_geometry, enforce_recovery_priority
         robot_evidence = check(state, step=int(state["global_step"]), width=width, distance=distance,
             executed_gripper=gripper_command, geometry=target_goal_geometry(runner))
     physical_carry_evidence = None
     fused_hold_established = False
     fused_hold_release_active = None
     if controller == 'online' and runner.config.get('physical_carry_hold_enabled', False):
-        from core.stage_carry_hold import observe as observe_physical_carry, filter_observation as filter_carry_observation, finalize as finalize_physical_carry
+        from core.stage.carry import observe as observe_physical_carry, filter_observation as filter_carry_observation, finalize as finalize_physical_carry
         physical_carry_evidence = observe_physical_carry(state, step=int(state['global_step']),
             evidence=robot_evidence, executed_gripper=gripper_command)
     capabilities = {stage: assess_reward(fns, runner.stage_live_keypoints,
@@ -314,7 +313,7 @@ def update_stage(runner, state, gripper_command):
             current_rgb = runner.adapter.get_vlm_image()
             observation_options = {}
             if runner.config.get('stage_target_marker_enabled', False):
-                from core.stage_target_marker import annotate, save_raw_frame
+                from core.stage.observation import annotate, save_raw_frame
                 raw_rgb = current_rgb
                 current_rgb, current_target_marker = annotate(runner, raw_rgb)
                 save_raw_frame(runner.config['eds_eval']['output_dir'], state, raw_rgb, current_target_marker)
@@ -351,8 +350,8 @@ def update_stage(runner, state, gripper_command):
                     reason = sensor_reason
                 if (physical_carry_evidence is not None and
                         runner.config.get('stage_fused_carry_hold_enabled', False)):
-                    from core.stage_fused_carry_hold import establish_hold, REASON
-                    from core.stage_carry_hold import active_release
+                    from core.stage.carry import establish_hold, REASON
+                    from core.stage.carry import active_release
                     fused_hold_release_active = active_release(state, int(state['global_step']))
                     fused_hold_established = establish_hold(
                         state, control_observation, observation, physical_carry_evidence, robot_evidence,
@@ -367,7 +366,6 @@ def update_stage(runner, state, gripper_command):
             if recovery_reason == "robot_observed_failed_grasp_reacquire":
                 reason = recovery_reason
     if controller in {"contact", "grasp", "online"}:
-        from core.stage_contact_handoff import apply_handoff, target_distance
         apply_handoff(state, step=int(state["global_step"]), reward=reward, was_guided=before_guidance,
                       distance=distance, observation=result.get("observation"), config=runner.config)
     recovery_priority_override = False
@@ -375,7 +373,7 @@ def update_stage(runner, state, gripper_command):
         recovery_priority_override = enforce_recovery_priority(state, robot_evidence, int(state['global_step']))
     failed_contact_recheck = None
     if runner.config.get('stage_failed_contact_recheck_enabled', False):
-        from core.stage_failed_contact_recheck import observe as recheck_failed_contact, REASON as RECHECK_REASON
+        from core.stage.recovery import observe as recheck_failed_contact, REASON as RECHECK_REASON
         failed_contact_recheck = recheck_failed_contact(state,
             observation=control_observation, raw_observation=result.get('observation'),
             evidence=robot_evidence, cue=physical_carry_evidence,
@@ -446,3 +444,62 @@ def update_stage(runner, state, gripper_command):
         # No silent stage 1 fallback after malformed output or broken transport.
         raise RuntimeError(error)
     return state
+
+
+def target_distance(runner):
+    import numpy as np
+    task = runner.adapter.get_task_description().lower()
+    match = re.search(r"pick up (?:the )?(.+?) and place", task)
+    if not match:
+        return None
+    target = match.group(1).replace(" ", "_")
+    keys = [int(k) for k, value in runner.keypoint_id_to_object.items()
+            if str(value).lower().startswith(target + "_") or str(value).lower() == target]
+    if not keys:
+        return None
+    kp = np.asarray(runner.stage_live_keypoints)
+    position = np.asarray(runner.adapter.get_ee_pose_world().position)
+    distance = float(np.linalg.norm(kp[keys] - position, axis=-1).min())
+    return distance if math.isfinite(distance) else None
+
+
+def apply_handoff(state, *, step, reward, was_guided, distance, observation, config):
+    """Keep visual stage semantics but permit a bounded unguided grasp interval."""
+    previous_phase = state.get("contact_phase", "approach")
+    if state["current_stage"] == 0:
+        state["contact_phase"] = "visually_complete"
+        state["contact_until"] = None
+        return
+    if state["current_stage"] == 2:
+        state["contact_phase"] = "transport_or_completion_check"
+        state["contact_until"] = None
+        return
+    if previous_phase in {"transport_or_completion_check", "visually_complete"}:
+        state["contact_phase"] = "approach"
+        state["recovery_approach_since"] = step
+    until = state.get("contact_until")
+    if until is not None and step < until:
+        state["contact_phase"] = "contact_grace"
+        state["guidance_requested"] = False
+        return
+    if until is not None:
+        state["contact_until"] = None
+        state["contact_phase"] = "approach"
+        state["recovery_approach_since"] = step
+        state["guidance_requested"] = True
+        return
+    since = state.get("recovery_approach_since", 0)
+    minimum = int(config.get("contact_min_approach_steps", 16))
+    close = (bool(config.get("contact_proximity_handoff_enabled", True)) and
+             distance is not None and distance <= float(config.get("contact_distance_m", .06)))
+    progressed = was_guided and reward is not None and reward >= float(config.get("contact_reward_threshold", .8))
+    if config.get("contact_require_measured_proximity", False):
+        progressed = progressed and distance is not None and distance <= float(config.get("contact_reward_max_distance_m", .10))
+    if step - since >= minimum and (close or progressed):
+        state["contact_until"] = step + int(config.get("contact_grace_steps", 64))
+        state["contact_phase"] = "contact_grace"
+        state["contact_trigger"] = "current_keypoint_distance" if close else "fresh_guided_reward_progress"
+        state["guidance_requested"] = False
+    else:
+        state["contact_phase"] = "approach"
+        state["guidance_requested"] = True

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from core import stage_failed_contact_recheck as module
+import core.stage.recovery as module
 FIXTURES = Path(__file__).resolve().parent / 'fixtures/stage'
 CONTACT_EVENTS = 'contact_events.jsonl'
 RECOVERY_EVENTS = 'recovery_events.jsonl'
@@ -172,8 +172,8 @@ def runtime(enabled=True, missing_reward=False):
 
 def test_runtime_recheck_wins_grace_without_resetting_reward_stage_or_overriding_actions():
     import numpy as np
-    from core.stage_evidence import update_stage
-    from core.stage_grasp_guard import apply_to_action
+    from core.stage.controller import update_stage
+    from core.stage.grasp import apply_to_action
     for enabled in [False,True]:
         runner,state,logs,resets,safety,select,source = runtime(enabled)
         for step in [40,48,56]:
@@ -194,7 +194,7 @@ def test_runtime_recheck_wins_grace_without_resetting_reward_stage_or_overriding
 
 
 def test_runtime_reward_capability_remains_the_final_gate():
-    from core.stage_evidence import update_stage
+    from core.stage.controller import update_stage
     runner,state,logs,_,_,select,source = runtime(missing_reward=True)
     for step in [40,48,56]:
         select(step);update_stage(runner,state,source[step]['gripper_value_used'])
@@ -206,7 +206,7 @@ def test_runtime_reward_capability_remains_the_final_gate():
 @pytest.mark.parametrize('corruption', ['missing_seed','wrong_seed','fake_open_width','recovery_gate_off',
                                       'reference_reset','wrong_reason','rewritten_raw','forged_confirmation'])
 def test_audit_rejects_broken_provenance_or_control_outcome(corruption):
-    from core.stage_evidence import update_stage
+    from core.stage.controller import update_stage
     runner,state,logs,_,_,select,source = runtime()
     for step in [40,48,56]:
         select(step);update_stage(runner,state,source[step]['gripper_value_used'])

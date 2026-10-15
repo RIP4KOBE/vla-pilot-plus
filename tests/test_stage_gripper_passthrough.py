@@ -1,7 +1,7 @@
 import copy
 import torch
 from test_stage_payload_runtime import setup
-from core.stage_grasp_guard import apply_to_action
+from core.stage.grasp import apply_to_action
 
 
 def test_passthrough_preserves_every_action_component_and_logs_suppressed_hold():

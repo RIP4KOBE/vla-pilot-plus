@@ -17,6 +17,7 @@ from types import SimpleNamespace
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from scripts.steering_archive import support_asset, marker_frame
+from scripts.steering_source_layout import evidence_layout, proof_files, source_path
 
 import yaml  # Safe parsing only; no runtime/repository import.
 
@@ -207,14 +208,10 @@ def audit_run(run_dir, task=0, model="gpt-6-astra", effort="low", archive_suppor
     check('no_other_remote_perception_config', all(
         config['perception'].get(name, {}).get('enabled') is False
         for name in ('sam3','gemini_grounding')))
-    proof_files = ('main.py','core/codex_vision.py','core/codex_stage.py','core/codex_stage_policy.py',
-                   'core/stage_grasp_guard.py','core/stage_target_marker.py','core/stage_observation.py',
-                   'core/env_adapters/libero_adapter.py','vlm_query/vlm_agent.py',
-                   'core/stage_identity_memory.py','core/stage_response_validation.py','core/stage_evidence.py',
-                   'vlm_query/stage_observation_v1.txt','core/target_distance_reward.py')
+    layout = evidence_layout(manifest['source_sha256'])
     check('archived_evidence_implementations_match_manifest', all(
         sha((root / 'source' / path).read_bytes()) == manifest['source_sha256'].get(path)
-        for path in proof_files))
+        for path in proof_files(layout)))
     # Read once: this is a prefix snapshot, not an observer modifying the running job.
     rows = {}
     for name in ('stage_events', 'safety_events', 'episode_metadata', 'episode_compute', 'phase_timing'):
@@ -261,7 +258,7 @@ def audit_run(run_dir, task=0, model="gpt-6-astra", effort="low", archive_suppor
                   for p in reward_metadata['init_keypoint_positions']))
     used_observation_captures = set()
     policy_template = None
-    expected_disabled_features = set(literal_assignment(root/'source/core/codex_stage_policy.py','_DISABLED_FEATURES'))
+    expected_disabled_features = set(literal_assignment(root/'source'/source_path('core/codex_stage_policy.py', layout),'_DISABLED_FEATURES'))
     request_dirs = [(p, 'stage') for p in sorted((out / 'captured_stage_inputs').glob('request_*'))]
     request_dirs += [(p, 'reward') for p in sorted((episode / 'vlm_agent/codex_requests').glob('request_*'))]
     complete_request_names = []
@@ -416,7 +413,7 @@ def audit_run(run_dir, task=0, model="gpt-6-astra", effort="low", archive_suppor
             expected_observation_prompt = (root/'source/vlm_query/stage_observation_v1.txt').read_bytes().decode().format(
                 instruction=instruction+'\nTarget appearance from the initial reference (identity only): '+str(query.get('identity_memory')),
                 keypoint_info=mapping_labels)
-            marker_prompt = literal_assignment(root/'source/core/stage_target_marker.py','PROMPT')
+            marker_prompt = literal_assignment(root/'source'/source_path('core/stage_target_marker.py', layout),'PROMPT')
             expected_observation_prompt += '\n' + marker_prompt
             check(label + f'/current_prompt_contract{index}', record['prompt'] == expected_observation_prompt
                   + '\n\nCurrent observation; judge this image')

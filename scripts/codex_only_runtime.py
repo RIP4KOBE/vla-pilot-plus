@@ -5,7 +5,7 @@ import os
 
 
 def worker_environment(base=None):
-    from core.codex_stage_policy import _REMOVED_ENVIRONMENT
+    from core.online.policy import _REMOVED_ENVIRONMENT
     env = dict(os.environ if base is None else base)
     for name in (*_REMOVED_ENVIRONMENT, 'POE_API_KEY', 'POE_ACCESS_KEY',
                  'GOOGLE_API_KEY', 'GEMINI_API_KEY'):

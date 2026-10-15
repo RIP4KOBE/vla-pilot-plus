@@ -1,4 +1,4 @@
-from core.stage_robot_evidence import check, filter_observation, apply_recovery
+from core.stage.grasp import check, filter_observation, apply_recovery
 
 
 def measure(s, step, width=.001, distance=.09, command=1, outside=True):
@@ -58,7 +58,7 @@ def test_runtime_recovers_empty_grasp_between_online_queries():
     import numpy as np
     import torch
     from types import SimpleNamespace
-    from core.stage_evidence import update_stage
+    from core.stage.controller import update_stage
     events=[]
     raw=dict(target_visibility='clear',target_location='outside_goal',grasp='held',
              support='unsupported',evidence='Target appears near fingers.')

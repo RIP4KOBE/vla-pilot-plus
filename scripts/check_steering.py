@@ -43,7 +43,7 @@ def main():
         atomic_json(destination / 'report.json', report)
         if args.api:
             from PIL import Image
-            from core.codex_vision import CodexVisionTransport
+            from core.online.codex import CodexVisionTransport
             stream = io.BytesIO()
             Image.new('RGB', (96, 96), (255, 0, 0)).save(stream, format='PNG')
             uri = 'data:image/png;base64,' + base64.b64encode(stream.getvalue()).decode()

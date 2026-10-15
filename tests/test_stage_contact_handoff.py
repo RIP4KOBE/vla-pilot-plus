@@ -1,6 +1,6 @@
 from types import SimpleNamespace
 import numpy as np
-from core.stage_contact_handoff import apply_handoff, target_distance
+from core.stage.controller import apply_handoff, target_distance
 
 
 def update(s, step, reward=None, guided=True, distance=None):

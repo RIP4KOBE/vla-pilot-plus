@@ -1,5 +1,5 @@
 import pytest
-from core import stage_carry_hold as carry
+import core.stage.carry as carry
 
 
 def evidence(z=.15, width=.04, distance=.05, no_grasp=False):

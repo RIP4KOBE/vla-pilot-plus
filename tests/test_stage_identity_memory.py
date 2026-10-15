@@ -1,6 +1,6 @@
 from types import SimpleNamespace
 import numpy as np
-from core.stage_identity_memory import identify
+from core.stage.observation import identify
 import json
 
 

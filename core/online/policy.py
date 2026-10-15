@@ -1,8 +1,11 @@
-"""Pure public Codex Stage invocation policy and deterministic freeze hash."""
+"""Public invocation policy and environment boundaries for Codex requests."""
+
+
 import hashlib
 import json
 import os
 from pathlib import Path
+
 
 _DISABLED_FEATURES = (
     "shell_tool", "unified_exec", "plugins", "apps", "multi_agent", "hooks",

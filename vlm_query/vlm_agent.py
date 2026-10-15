@@ -34,7 +34,7 @@ class VLMAgent:
         base_url = config.get('base_url') or os.environ.get('AZURE_OPENAI_BASE_URL')  # For Azure OpenAI
 
         if config.get('backend') == 'codex_cli':
-            from core.codex_vision import CodexVisionTransport
+            from core.online.codex import CodexVisionTransport
             self.codex_transport = CodexVisionTransport(config)
             self.api_request_counter = self.codex_transport.api_request_counter
             self.client = None

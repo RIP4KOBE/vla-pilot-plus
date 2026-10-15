@@ -1,10 +1,10 @@
-"""Observe live Stage inputs without changing the original request or parser."""
+"""Capture support for the legacy OpenAI-compatible Stage transport."""
+
 
 import base64
 import hashlib
 import json
 from pathlib import Path
-
 from core.gemini_grounder import GeminiStageRecognizer
 
 

@@ -1,5 +1,5 @@
-from core.stage_robot_evidence import apply_recovery, enforce_recovery_priority
-from core.stage_contact_handoff import apply_handoff
+from core.stage.grasp import apply_recovery, enforce_recovery_priority
+from core.stage.controller import apply_handoff
 
 
 def test_failed_grasp_reacquisition_wins_even_inside_reopen_cooldown():

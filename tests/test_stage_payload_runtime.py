@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 from types import SimpleNamespace
-from core.stage_grasp_guard import apply_to_action
+from core.stage.grasp import apply_to_action
 
 
 def setup(enabled):

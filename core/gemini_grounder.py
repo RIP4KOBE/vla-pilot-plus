@@ -334,25 +334,25 @@ def create_gemini_stage_recognizer(config: dict) -> GeminiStageRecognizer:
     backend = config.get("backend", "openai_compatible")
     if config.get("output_format") == "stage_observation_v1":
         if backend == "codex_cli":
-            from core.stage_observation import CodexObservationStageRecognizer
+            from core.stage.observation import CodexObservationStageRecognizer
             return CodexObservationStageRecognizer(config)
         if backend != "openai_compatible":
             raise ValueError("Unknown visual observation backend")
-        from core.stage_observation import ObservationStageRecognizer, CapturedObservationStageRecognizer
+        from core.stage.observation import ObservationStageRecognizer, CapturedObservationStageRecognizer
         cls = CapturedObservationStageRecognizer if config.get("capture_dir") else ObservationStageRecognizer
         return cls(config)
     if backend == "trace_replay_capture":
-        from core.stage_capture_trace_replay import CaptureTraceReplayStageRecognizer
+        from core.diagnostics.stage_replay import CaptureTraceReplayStageRecognizer
         return CaptureTraceReplayStageRecognizer(config)
     if backend == "trace_replay":
-        from core.trace_replay_stage import TraceReplayStageRecognizer
+        from core.diagnostics.stage_replay import TraceReplayStageRecognizer
         return TraceReplayStageRecognizer(config)
     if backend == "codex_cli":
-        from core.codex_stage import CodexStageRecognizer
+        from core.online.codex import CodexStageRecognizer
         return CodexStageRecognizer(config)
     if backend != "openai_compatible":
         raise ValueError("Unknown stage recognition backend")
     if config.get("capture_dir"):
-        from core.stage_capture import CapturedStageRecognizer
+        from core.online.capture import CapturedStageRecognizer
         return CapturedStageRecognizer(config)
     return GeminiStageRecognizer(config)

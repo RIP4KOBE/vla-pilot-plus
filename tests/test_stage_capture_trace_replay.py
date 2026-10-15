@@ -14,7 +14,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from core.gemini_grounder import create_gemini_stage_recognizer
-from core.stage_capture_trace_replay import CaptureTraceReplayStageRecognizer
+from core.diagnostics.stage_replay import CaptureTraceReplayStageRecognizer
 
 
 def test_capture_replay_preserves_response_and_multimodal_input(tmp_path):

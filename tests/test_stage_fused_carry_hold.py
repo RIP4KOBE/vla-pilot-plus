@@ -9,9 +9,9 @@ import numpy as np
 import pytest
 import torch
 
-from core.stage_evidence import update_stage
-from core.stage_fused_carry_hold import establish_hold, REASON, audit_checks
-from core.stage_grasp_guard import apply_to_action
+from core.stage.controller import update_stage
+from core.stage.carry import establish_hold, REASON, audit_checks
+from core.stage.grasp import apply_to_action
 
 
 @lru_cache(maxsize=1)
@@ -252,7 +252,7 @@ def test_audit_rejects_unsupported_or_misreported_establishment(corruption):
 def test_archived_helper_audits_without_an_installed_production_module(tmp_path):
     import importlib.util
     import shutil
-    import core.stage_fused_carry_hold as candidate
+    import core.stage.carry as candidate
     path = tmp_path / 'archived_fused_hold.py'
     shutil.copy2(candidate.__file__, path)
     spec = importlib.util.spec_from_file_location('archived_fused_hold', path)

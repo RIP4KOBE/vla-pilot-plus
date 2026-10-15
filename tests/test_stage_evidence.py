@@ -9,7 +9,7 @@ import numpy as np
 import pytest
 import torch
 
-from core.stage_evidence import (parse_observation, decide, apply_guidance_gate,
+from core.stage.controller import (parse_observation, decide, apply_guidance_gate,
     query_reason, assess_reward, settings, update_stage)
 from core.gemini_grounder import create_gemini_stage_recognizer
 

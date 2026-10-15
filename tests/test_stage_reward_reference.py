@@ -9,7 +9,7 @@ def load(name, path):
     spec.loader.exec_module(module)
     return module
 
-from core import stage_evidence as controller
+import core.stage.controller as controller
 fixture = load("reference_test_helpers", ROOT / "tests/test_stage_evidence.py")
 
 @pytest.mark.parametrize("preserve", [False, True])

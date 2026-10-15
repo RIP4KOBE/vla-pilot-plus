@@ -172,3 +172,55 @@ def test_evaluation_directory_rejects_symlink_escape(tmp_path):
     (root/'evaluation').symlink_to(outside,target_is_directory=True)
     with pytest.raises(ValueError):
         evaluation_directory(root,{'evaluation_directory':'evaluation'})
+
+
+def packaged_source_fixture(tmp_path):
+    """Synthetic relocation of a fixed capture; never a new performance result."""
+    from scripts.steering_source_layout import CONTROL_PATH_MAP, proof_files
+    root = materialize(tmp_path / 'packaged-run', completed=True)
+    manifest_path = root / 'manifest.json'
+    manifest = json.loads(manifest_path.read_bytes())
+    for old in CONTROL_PATH_MAP:
+        manifest['source_sha256'].pop(old, None)
+        (root / 'source' / old).unlink(missing_ok=True)
+    repository = Path(__file__).resolve().parents[2]
+    import hashlib
+    for relative in proof_files('packaged'):
+        target = root / 'source' / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        data = (repository / relative).read_bytes()
+        target.write_bytes(data)
+        manifest['source_sha256'][relative] = hashlib.sha256(data).hexdigest()
+    manifest_path.write_text(json.dumps(manifest))
+    return root
+
+
+def test_packaged_control_layout_keeps_offline_contract_auditable(tmp_path):
+    from scripts.audit_steering_contract import audit_run
+    root = packaged_source_fixture(tmp_path)
+    result = audit_run(root)
+    assert result['task_contract_valid'] is True, result['checks']
+    assert result['cohort_valid'] is None
+
+
+@pytest.mark.parametrize('case', ['missing_policy', 'old_policy_fallback', 'altered_marker'])
+def test_packaged_control_layout_rejects_missing_mixed_or_tampered_sources(tmp_path, case):
+    from scripts.audit_steering_contract import audit_run
+    root = packaged_source_fixture(tmp_path)
+    manifest_path = root / 'manifest.json'
+    manifest = json.loads(manifest_path.read_bytes())
+    if case == 'missing_policy':
+        manifest['source_sha256'].pop('core/online/policy.py')
+    elif case == 'old_policy_fallback':
+        manifest['source_sha256']['core/codex_stage_policy.py'] = manifest['source_sha256'].pop('core/online/policy.py')
+        (root / 'source/core/online/policy.py').rename(root / 'source/core/codex_stage_policy.py')
+    else:
+        marker = root / 'source/core/stage/observation.py'
+        marker.write_bytes(marker.read_bytes() + b'\n# unregistered source modification\n')
+    manifest_path.write_text(json.dumps(manifest))
+    if case in {'missing_policy', 'old_policy_fallback'}:
+        with pytest.raises(ValueError, match='control source'):
+            audit_run(root)
+    else:
+        result = audit_run(root)
+        assert result['task_contract_valid'] is False, result
