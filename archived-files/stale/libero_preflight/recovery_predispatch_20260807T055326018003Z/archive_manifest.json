@@ -1,0 +1,40 @@
+{
+  "archive_root": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/stale/libero_preflight/recovery_predispatch_20260807T055326018003Z",
+  "created_at": "2026-08-07T05:53:26.156055+00:00",
+  "jobs": [
+    {
+      "archive_tree_sha256": "8d929d678f59bb97d822335c72e3ce0bc9135115d49092df9315559c1d3102c1",
+      "existing_config_fingerprint": "a5c272b96dbefb61313ac5c244d49027fd56285f22da733d764d03fdeabac015",
+      "formal_label": "p2_stage_on_abs_rbf_control",
+      "job_id": "eds_quality_diversity_preflight_libero_object_swap_preflight__p2_stage_on_abs_rbf_control",
+      "label": "preflight__p2_stage_on_abs_rbf_control",
+      "next_config_fingerprint": "b984ef1f1e75fedb09403dbc54d60c5bce7ccf689926e0333a61946e3a6cc4c6",
+      "pre_episode_without_output": false
+    },
+    {
+      "archive_tree_sha256": "4ceee34f816783ccaff09b7c95a9cd4a57b255ef1ea855bd5882085e8f8a46bb",
+      "existing_config_fingerprint": "d6dd2bd9a70c490bca818401af0a4e794e261c4084a24ba0d76b5aa1dd59bf64",
+      "formal_label": "eds_quality_diversity_uniform_primary",
+      "job_id": "eds_quality_diversity_preflight_libero_object_swap_preflight__eds_quality_diversity_uniform_primary",
+      "label": "preflight__eds_quality_diversity_uniform_primary",
+      "next_config_fingerprint": "11ff0ff62278e43983675ffbe6558cc098fedc75ed7a1c223e686e1635090eee",
+      "pre_episode_without_output": false
+    },
+    {
+      "archive_tree_sha256": "b1399d0708457118899fe64570e5a243e51a6cccd3cbe3745a879d6e8e06f217",
+      "existing_config_fingerprint": null,
+      "formal_label": "eds_quality_diversity_sparse_primary",
+      "job_id": "eds_quality_diversity_preflight_libero_object_swap_preflight__eds_quality_diversity_sparse_primary",
+      "label": "preflight__eds_quality_diversity_sparse_primary",
+      "next_config_fingerprint": "ee15e59037bacb2fae1252620d5c835e2a5716b8353619bad39f5b524aeb71f3",
+      "pre_episode_without_output": true
+    }
+  ],
+  "payload_sha256": "981efcea315d9e9ab92c2f8b765c0db45fe6c6148c4f8ebecd9a293d72fa386b",
+  "reason": "failed preflight preserved before exact-cell recovery dispatch",
+  "schema": "eds-qd-recovery-archive-v1",
+  "status_csv": {
+    "archived_path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/stale/libero_preflight/recovery_predispatch_20260807T055326018003Z/phase_status.csv",
+    "sha256": "3c8f5b89f218a0c561a8eccdd111668422dd6d4bc909c74e32d6a9ea290dafc6"
+  }
+}

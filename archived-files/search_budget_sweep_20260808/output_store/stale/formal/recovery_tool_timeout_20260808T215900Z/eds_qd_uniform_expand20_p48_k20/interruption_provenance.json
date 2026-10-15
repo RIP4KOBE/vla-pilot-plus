@@ -1,0 +1,67 @@
+{
+  "active_metadata_episode_ids_after_prune": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "active_metrics_episode_counts_after_prune": {
+    "0": 2,
+    "1": 13,
+    "2": 19,
+    "3": 66,
+    "4": 31,
+    "5": 56
+  },
+  "active_stage_events_sha256_after_prune": "cc5d23d521327e9d08ac5dc713e1256e56b06fcc2a37cfbca34bc46c9af06fc5",
+  "actual_attempts_after_continuation": 201,
+  "affected_label": "eds_qd_uniform_expand20_p48_k20",
+  "algorithm_or_config_change": false,
+  "archived_metadata_sha256": "49f9b543507d544097ac34086c118ee086791ac4a5123df159e3454c07931528",
+  "archived_metrics_sha256": "a1afd31faf274b5ed342d4c0ae86dbc1c96a2731f38420d9e686014bf861b703",
+  "canonical_hydra_episode_start_index": 0,
+  "canonical_merged_result": "1/10",
+  "canonical_result_basis": "ten episode video outcome filenames",
+  "canonical_results_sha256": "67000afb2ed86cb6e4fdcafa33e1862a5e5325d0e0046a24686153b7a4e120f6",
+  "completed_episode_indices_before_interruption": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "continuation_completed": true,
+  "continuation_completed_episode_indices": [
+    6,
+    7,
+    8,
+    9
+  ],
+  "continuation_episode_start_index": 6,
+  "continuation_hydra_archived_path": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/search_budget_sweep_20260808/output_store/stale/formal/recovery_tool_timeout_20260808T215900Z/eds_qd_uniform_expand20_p48_k20/hydra.continuation",
+  "continuation_local_result": "1/4",
+  "continuation_results_sha256": "c051937aacf1fe61acadf702fab051dd8c802394eaa6a1cb27016af68ff360a7",
+  "interruption": "outer shell_command timeout at 3600 seconds",
+  "ledger_reserved_attempts": 200,
+  "partial_attempt_had_metrics": true,
+  "partial_episode_index_archived": 6,
+  "partial_stage_event_count_archived": 4,
+  "partial_stage_events_sha256": "415eea48e56d1cfb7991a6766883c555fc577bc22d9f878a7a3df97fa8a44321",
+  "schema": "eds-qd-recovery-tool-timeout-v1",
+  "soft_cap_exception_attempts": 1,
+  "video_outcomes": {
+    "episode_1": "fail",
+    "episode_10": "success",
+    "episode_2": "fail",
+    "episode_3": "fail",
+    "episode_4": "fail",
+    "episode_5": "fail",
+    "episode_6": "fail",
+    "episode_7": "fail",
+    "episode_8": "fail",
+    "episode_9": "fail"
+  }
+}

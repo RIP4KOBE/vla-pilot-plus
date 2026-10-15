@@ -1,0 +1,15 @@
+Error during episode execution:
+Traceback (most recent call last):
+  File "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-stage-guidance-transition/main.py", line 1270, in run
+    self._run_episode(episode, episode_dir, episode_seed)
+  File "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-stage-guidance-transition/main.py", line 1579, in _run_episode
+    action_chunk = self.policy.select_action(**select_kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-stage-guidance-transition/core/rdt_policy_steer.py", line 1432, in select_action
+    self._obs_processor.observe(batch)
+  File "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-stage-guidance-transition/core/rdt_libero_obs_processor.py", line 77, in observe
+    state_128, state_mask_128 = self._build_state(obs)
+                                ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-stage-guidance-transition/core/rdt_libero_obs_processor.py", line 145, in _build_state
+    raise ValueError(
+ValueError: Expected robot0_gripper_qpos values within raw qpos range [-0.04245, 0.05185]; values=[0.008084386587142944, -0.04524122178554535]

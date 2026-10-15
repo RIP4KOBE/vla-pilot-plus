@@ -1,0 +1,26 @@
+{
+  "schema": "historical_supplemental_source_v1",
+  "date": "2026-10-15",
+  "source_root": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs",
+  "files": [],
+  "scope": "Source/configuration/documentation only. Raw videos/model weights/logs/captures and private files remain external. Source symlinks are materialized here and mapped to their observed targets.",
+  "entries_key": "files",
+  "entry_count": 1723,
+  "entry_shards": [
+    {
+      "path": ".historical-source/manifests/part-0000.json",
+      "entries": 1000,
+      "sha256": "5416aebca1d9bc8cd44943b7e65d5f27b939040a047d5f4918f38236b75e472b"
+    },
+    {
+      "path": ".historical-source/manifests/part-0001.json",
+      "entries": 723,
+      "sha256": "9a32bf1d1b694ed6123b2918c60e68971965d2f6a140795df7f55d177eaca61b"
+    }
+  ],
+  "publication_redaction": {
+    "policy": "Credential-like values and AWS signed URL queries removed in a separate exported history. Original private archive remains byte-exact. Published commit identities may differ; see main source index for original-to-published mapping.",
+    "published_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
+    "overlay_redacted_paths": 0
+  }
+}

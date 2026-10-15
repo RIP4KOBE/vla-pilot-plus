@@ -1,0 +1,7 @@
+Error during episode preparation:
+Traceback (most recent call last):
+  File "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-quality-diversity/main.py", line 1062, in run
+    self.perform_task_for_episode(episode_dir)
+  File "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-quality-diversity/main.py", line 771, in perform_task_for_episode
+    raise ValueError(f"cached_functions_dir does not exist: {guidance_functions_dir}")
+ValueError: cached_functions_dir does not exist: /mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/runtime_cache/cached_functions

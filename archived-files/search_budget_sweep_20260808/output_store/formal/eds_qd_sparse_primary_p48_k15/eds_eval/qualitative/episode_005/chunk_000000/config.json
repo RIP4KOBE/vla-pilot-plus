@@ -1,0 +1,120 @@
+{
+  "cem_iters": 15,
+  "episode": 5,
+  "global_step": 0,
+  "population_size": 48,
+  "reward_mode": "normal",
+  "scoring_keypoint_indices": [
+    0
+  ],
+  "selected_idx": 2,
+  "stages": [
+    {
+      "iter_idx": 0,
+      "stage": "initial_before_diversity"
+    },
+    {
+      "iter_idx": 0,
+      "stage": "initial_after_diversity_phase"
+    },
+    {
+      "iter_idx": 0,
+      "stage": "initial_final"
+    },
+    {
+      "iter_idx": 0,
+      "stage": "initial"
+    },
+    {
+      "iter_idx": 0,
+      "stage": "scored"
+    },
+    {
+      "iter_idx": 0,
+      "stage": "resampled"
+    },
+    {
+      "iter_idx": 0,
+      "stage": "renoised"
+    },
+    {
+      "iter_idx": 0,
+      "stage": "rollout_before_diversity"
+    },
+    {
+      "iter_idx": 0,
+      "stage": "rollout_after_diversity_phase"
+    },
+    {
+      "iter_idx": 0,
+      "stage": "rollout_final"
+    },
+    {
+      "iter_idx": 0,
+      "stage": "after_rollout"
+    },
+    {
+      "iter_idx": 0,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 1,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 2,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 3,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 4,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 5,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 6,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 7,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 8,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 9,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 10,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 11,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 12,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 13,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 14,
+      "stage": "full_process_after_rollout"
+    }
+  ],
+  "suite": "libero_object_swap",
+  "task_id": 5,
+  "use_cem": false
+}
