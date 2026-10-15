@@ -1,0 +1,1 @@
+Identify the solid color in the image. Reply only with the color name in lowercase.

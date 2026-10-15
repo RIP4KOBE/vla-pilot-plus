@@ -1,0 +1,15 @@
+{
+  "execution": {
+    "job_id": "output",
+    "original_output_dir": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-integration/runs/eds-migration-20261013/output",
+    "original_run_dir": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-integration/runs/eds-migration-20261013"
+  },
+  "files": {
+    "fixture-manifest.json": "628c429d457def157c9163be94a1202721673f97f1e43aa6446e5a06889c6043",
+    "libero_suite_task_map.py": "0feec8499da91e25a134273b6624ffa7adb9c6dc7da23f8cb5e3cd8998d1c80f"
+  },
+  "original_config_sha256": "4b4a27116b3602d9a28d8c4e30a1d89d3d927fffef5acec4499b0405a28c8844",
+  "original_environment_sha256": "7e334dd1f7630f595346f885c1910314a5f1ce473ac05d73abe0bc3f79df275f",
+  "original_manifest_sha256": "ab4d36d2519b57185250fa647095768f1c70598ce8e55bc474cc77c68a90ca2c",
+  "schema": "steering_archive_support_v1"
+}

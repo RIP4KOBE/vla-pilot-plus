@@ -1,0 +1,11 @@
+usage: check_steering.py [-h] --local-config LOCAL_CONFIG --output-dir
+                         OUTPUT_DIR [--api] [--gpu]
+
+Explicit, separately recorded environment or managed-login service probes.
+
+options:
+  -h, --help            show this help message and exit
+  --local-config LOCAL_CONFIG
+  --output-dir OUTPUT_DIR
+  --api                 Make one real Codex image request
+  --gpu                 Check CUDA and render the task environment

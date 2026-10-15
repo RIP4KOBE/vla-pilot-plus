@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # C0 control: the learned policy places the ketchup in basket_1_main.
+    reward = torch.tensor(0.0, device=action_sequence.device)
+    return reward.mean()
+

@@ -1,0 +1,18 @@
+usage: prepare_steering_archive.py [-h] --support-dir SUPPORT_DIR
+                                   [--task-map TASK_MAP]
+                                   [--rng-manifest RNG_MANIFEST]
+                                   run_dir
+
+Create hash-bound task/RNG sidecars outside an unchanged, terminal run
+archive.
+
+positional arguments:
+  run_dir
+
+options:
+  -h, --help            show this help message and exit
+  --support-dir SUPPORT_DIR
+                        New separate sidecar directory
+  --task-map TASK_MAP   Optional copy; must match frozen LIBERO asset SHA
+  --rng-manifest RNG_MANIFEST
+                        Optional copy; must match frozen config SHA

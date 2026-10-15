@@ -1,0 +1,15 @@
+# Original RDT VLS effective LIBERO settings, under the common online protocol.
+main:
+  guidance_type: vls
+  vls_config:
+    sample_batch_size: 20
+    guide_scale: 80.0
+    diversity_scale: 10.0
+  eds_config:
+    qd_archive_mode: none
+    qd_metrics_observer: false
+  eds_mechanism_pretest:
+    enabled: false
+backend:
+  libero:
+    task_guide_scales: [80, 80, 80, 80, 80, 80, 80, 80, 80, 80]

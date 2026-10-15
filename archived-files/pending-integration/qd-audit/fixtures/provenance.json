@@ -1,0 +1,7 @@
+{
+  "source_run": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-integration/runs/eds-migration-20261013",
+  "source_line": 1,
+  "raw_metric_line_sha256": "0e2689014f3b080c64b7097373adb36a3e4b2c89b75b05d4e35d3a5614d70193",
+  "config_sha256": "4b4a27116b3602d9a28d8c4e30a1d89d3d927fffef5acec4499b0405a28c8844",
+  "scope": "Real EDS archive-OFF record, only a control/nonactivation fixture, never a QD online result"
+}

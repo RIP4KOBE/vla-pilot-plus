@@ -1,0 +1,31 @@
+--- a/scripts/audit_steering_contract.py
++++ b/scripts/audit_steering_contract.py
+@@ -1,6 +1,6 @@
+ #!/usr/bin/env python3
+ """Offline evidence audit draft. Imports no repository modules; never executes saved code.
+-Only --report beneath /tmp may be written. Running cohorts always remain pending.
++Only the explicit --report destination is written. Running cohorts remain pending.
+ PNG verification uses Pillow/OpenCV/NumPy on CPU, without CUDA/simulation/API.
+ """
+ import argparse
+@@ -298,7 +298,10 @@
+               and transport.get('transport_retry_backoff_seconds') == role_config.get('transport_retry_backoff_seconds',2.0)
+               and transport.get('timeout_seconds') == role_config.get('timeout_seconds',180)
+               and transport.get('application_max_attempts') == 1)
+-        from steering_transport_audit import audit_transport
++        if __package__:
++            from .steering_transport_audit import audit_transport
++        else:
++            from steering_transport_audit import audit_transport
+         for name, passed in audit_transport(response, policy).items():
+             if passed is None:
+                 wait(label + '/transport/' + name, 'Transport evidence not observable')
+@@ -600,8 +603,6 @@
+     parser.add_argument('--report', type=Path, required=True)
+     args = parser.parse_args()
+     report_path = args.report.resolve()
+-    if Path('/tmp') not in report_path.parents:
+-        parser.error('--report must be beneath /tmp')
+     try:
+         result = audit_run(args.run_dir, args.task, args.model, args.effort)
+     except Exception as exc:

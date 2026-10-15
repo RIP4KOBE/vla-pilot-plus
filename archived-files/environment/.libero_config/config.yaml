@@ -1,0 +1,7 @@
+{
+  "benchmark_root": "/home/hynx/lizhuo/VLA-Pilot++/third_party/libero_pro/libero/libero",
+  "bddl_files": "/home/hynx/lizhuo/VLA-Pilot++/third_party/libero_pro/libero/libero/bddl_files",
+  "init_states": "/home/hynx/lizhuo/VLA-Pilot++/third_party/libero_pro/libero/libero/init_files",
+  "assets": "/home/hynx/lizhuo/VLA-Pilot++/third_party/libero_pro/libero/libero/assets",
+  "datasets": "/home/hynx/lizhuo/VLA-Pilot++/third_party/libero_pro/libero/datasets"
+}

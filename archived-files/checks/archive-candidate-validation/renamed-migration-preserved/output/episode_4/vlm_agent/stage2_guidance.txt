@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Basket placement uses the learned policy under the C0 control condition.
+    return torch.tensor(0.0, device=action_sequence.device)
+

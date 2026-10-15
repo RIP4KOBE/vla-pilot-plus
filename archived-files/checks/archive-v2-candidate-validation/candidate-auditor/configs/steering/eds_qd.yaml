@@ -1,0 +1,6 @@
+# Reuse the EDS search; the archive supplies parents and the final candidate.
+main:
+  guidance_type: eds
+  eds_config:
+    qd_archive_mode: grid_archive
+    qd_parent_sampling: sparse_priority

@@ -1,0 +1,71 @@
+[
+  {
+    "key": ".hydra",
+    "old": null,
+    "new": {
+      "run": {
+        "dir": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-integration/config-check/output"
+      },
+      "job": {
+        "chdir": false
+      }
+    }
+  },
+  {
+    "key": ".main.eds_eval.job_id",
+    "old": "codex_failed_contact_v17_historical_initialization_online_full10",
+    "new": "output"
+  },
+  {
+    "key": ".main.eds_eval.method_label",
+    "old": "proprio_v4",
+    "new": "eds"
+  },
+  {
+    "key": ".main.eds_eval.output_dir",
+    "old": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-gpu6-20260922T063626Z/artifacts/stage_closed_loop_20260929/runs/codex_failed_contact_v17_historical_initialization_online_full10/output/eds_eval",
+    "new": "${main.output_dir}/eds_eval"
+  },
+  {
+    "key": ".main.episode_rng_fixture_manifest",
+    "old": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/stage_closed_loop_20260929/runs/historical_initialization_calibration_v1/fixture-manifest.json",
+    "new": "/home/hynx/lizhuo/VLA-Pilot++/tests/fixtures/steering_rng/fixture-manifest.json"
+  },
+  {
+    "key": ".main.reward_contract",
+    "old": "c0_xyz_v1",
+    "new": "target_distance"
+  },
+  {
+    "key": ".main.stage_controller",
+    "old": "proprio_v4",
+    "new": "online"
+  },
+  {
+    "key": ".perception.gemini.capture_dir",
+    "old": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-gpu6-20260922T063626Z/artifacts/stage_closed_loop_20260929/runs/codex_failed_contact_v17_historical_initialization_online_full10/output/captured_stage_inputs",
+    "new": "${main.output_dir}/captured_stage_inputs"
+  },
+  {
+    "key": ".perception.vlm_agent.query_template_dir",
+    "old": "vlm_query/c0_contract_v1",
+    "new": "/home/hynx/lizhuo/VLA-Pilot++/vlm_query/target_distance"
+  },
+  {
+    "key": ".policy.rdt.text_encoder",
+    "old": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl",
+    "new": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/snapshots/3db67ab1af984cf10548a73467f0e5bca2aaaeb2"
+  },
+  {
+    "key": ".policy.rdt.vision_encoder",
+    "old": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384",
+    "new": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384/snapshots/9fdffc58afc957d1a03a25b10dba0329ab15c2a3"
+  },
+  {
+    "key": ".steering",
+    "old": null,
+    "new": {
+      "method": "eds"
+    }
+  }
+]

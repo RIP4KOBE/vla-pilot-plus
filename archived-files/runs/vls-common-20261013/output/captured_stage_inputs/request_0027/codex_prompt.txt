@@ -1,0 +1,42 @@
+Observe a robot doing a two-stage pick-and-place task. Report visual facts ONLY.
+Task: pick up the alphabet soup and place it in the basket
+Target appearance from the initial reference (identity only): The target is the small upright alphabet soup can at keypoint 0, just left of the basket and behind the larger tomato sauce can. It has a short cylindrical shape, a dark gray metal top, and a mostly blue label with yellow-orange soup imagery near the bottom. It is smaller than the red-and-green tomato sauce can in the foreground and sits to the right of the dark green salad dressing bottle.
+Initial reference keypoint labels: 0: alphabet_soup_1_main
+1: basket_1_main
+2: basket_1_main
+3: basket_1_main
+4: basket_1_main
+5: salad_dressing_1_main
+6: salad_dressing_1_main
+7: cream_cheese_1_main
+8: milk_1_main
+9: milk_1_main
+10: tomato_sauce_1_main
+11: butter_1_main
+
+Identify the exact instructed object and the destination (basket in these tasks).
+The initial image helps identify objects; only the CURRENT image describes the
+current state. Do not infer success from a gripper command, a reward, a stage
+description, proximity, or what the robot was supposed to do.
+
+Distinguish an object next to the basket from one inside its interior. Overlap in
+the image alone does not establish containment or support. If the basket rim,
+robot or another object hides the target, use occluded/unknown. A closed gripper
+near an object is not proof that the object is held. A target visibly suspended
+and supported by the fingers can be held. If grasp/contact is ambiguous, unknown.
+Use supported only when the target visibly rests on a surface; unsupported for
+a suspended target; otherwise unknown. An open gripper does not prove placement.
+Describe visible target location relative to the destination and fingers, and
+state uncertainty. Never fabricate facts hidden behind the robot or basket wall.
+
+Return exactly one JSON object, no Markdown fences, no control decisions, with
+these five keys and ONLY the following enum values:
+target_visibility: "clear", "occluded", or "unknown"
+target_location: "outside_goal", "inside_goal", "above_goal", or "unknown"
+grasp: "held", "not_held", or "unknown"
+support: "supported", "unsupported", or "unknown"
+evidence: a short string giving visible supporting evidence and any uncertainty
+
+The magenta circle marked TARGET locates the instructed target using its tracked keypoint in this CURRENT image. It is an identity aid only: it does not prove grasp, visibility, support, containment, or success. Judge visible evidence around that location; use unknown/occluded if hidden. Do not judge a different object left at the target's initial location. A point outside this image is not drawn; absence of a marker is not evidence of task completion.
+
+Current observation; judge this image

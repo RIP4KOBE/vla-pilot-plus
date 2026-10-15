@@ -1,0 +1,21 @@
+{
+  "schema": "steering_final_source_review_repros_v1",
+  "lifecycle": {
+    "scope": "Actual frozen run() body; asset/GPU/config dependencies stubbed; worker is CPU sleep",
+    "launcher_exit_code": -15,
+    "worker_survives_launcher": true,
+    "gpu_lock_released_while_worker_alive": true,
+    "saved_status": "running",
+    "audit_written": false
+  },
+  "relocation": {
+    "original_config_matches": true,
+    "relocated_config_matches": false,
+    "original_output_root": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-integration/runs/eds-common-20261013/output",
+    "reconstructed_output_root": "/tmp/steering-relocation-review-c00v3zt7/eds-common-20261013/output",
+    "only_hydra_output_root_differs": true,
+    "scope": "AST-extracted frozen protocol_config; preserved manifest/config bytes; copied two frozen YAML inputs only"
+  },
+  "cuda_visible_devices": "",
+  "gpu_or_api_invocations": 0
+}

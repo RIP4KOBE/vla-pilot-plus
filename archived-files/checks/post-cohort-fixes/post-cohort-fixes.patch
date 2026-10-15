@@ -1,0 +1,1052 @@
+diff --git a/scripts/run_steering.py b/scripts/run_steering.py
+--- a/scripts/run_steering.py
++++ b/scripts/run_steering.py
+@@ -15,6 +15,7 @@
+ 
+ ROOT = Path(__file__).resolve().parents[1]
+ sys.path.insert(0, str(ROOT))
++from scripts.steering_process import LauncherInterrupted, worker_lifecycle
+ from scripts.steering_runtime import (atomic_json, dependency_manifest, digest, git_commit, load_config, load_local,
+     rows, runtime_environment, source_manifest, source_unchanged, utc, METHODS, evaluation_directory)
+ 
+@@ -52,79 +53,80 @@
+         if int(gpu.rsplit(',', 1)[1].strip()) > 512:
+             raise RuntimeError('Selected GPU is not idle; no other processes will be stopped')
+         folder.mkdir(parents=True)
+-        (folder / 'output').mkdir()
+-        local_snapshot = {key: local[key] for key in ('gpu', 'egl_device_id', 'rdt_checkpoint',
+-            'text_encoder', 'vision_encoder', 'libero_root', 'libero_config', 'torch_home')}
+-        local_snapshot['allocator_limit_gib'] = local.get('allocator_limit_gib', 48)
+-        local_snapshot_path = folder / 'local-config.yaml'
+-        local_snapshot_path.write_text(yaml.safe_dump(local_snapshot, sort_keys=True))
+-        preflight_status = {'state': 'preflight', 'started_at': utc(),
+-                            'launcher_pid': os.getpid(), 'run_dir': str(folder),
+-                            'planned': len(cfg['backend']['libero']['task_ids_filter']),
+-                            'scientific_tasks_started': 0}
+-        atomic_json(folder / 'status.json', preflight_status)
+-        print(json.dumps({'state': 'verifying_assets', 'run': str(folder)}), flush=True)
+-        try:
+-            atomic_json(folder / 'environment.json', dependency_manifest(local))
+-        except Exception as exc:
+-            preflight_status.update(state='preflight_failed', completed_at=utc(),
+-                                    error_type=type(exc).__name__, error=str(exc))
++        with worker_lifecycle(folder) as owner:
++            (folder / 'output').mkdir()
++            local_snapshot = {key: local[key] for key in ('gpu', 'egl_device_id', 'rdt_checkpoint',
++                'text_encoder', 'vision_encoder', 'libero_root', 'libero_config', 'torch_home')}
++            local_snapshot['allocator_limit_gib'] = local.get('allocator_limit_gib', 48)
++            local_snapshot_path = folder / 'local-config.yaml'
++            local_snapshot_path.write_text(yaml.safe_dump(local_snapshot, sort_keys=True))
++            preflight_status = {'state': 'preflight', 'started_at': utc(),
++                                'launcher_pid': os.getpid(), 'run_dir': str(folder),
++                                'planned': len(cfg['backend']['libero']['task_ids_filter']),
++                                'scientific_tasks_started': 0}
+             atomic_json(folder / 'status.json', preflight_status)
+-            raise
+-        config_path = folder / 'resolved-config.yaml'
+-        config_path.write_text(yaml.safe_dump(cfg, sort_keys=False))
+-        source = source_manifest()
+-        for path in source:
+-            dest = folder / 'source' / path
+-            dest.parent.mkdir(parents=True, exist_ok=True)
+-            shutil.copy2(ROOT / path, dest)
+-        manifest = {'schema': 'steering_cohort_v2', 'created_at': utc(), 'method': args.method,
+-                    'evaluation_directory': 'output/evaluation',
+-                    'code_root': str(ROOT), 'commit': git_commit(), 'source_sha256': source,
+-                    'config_sha256': digest(config_path), 'local_config_sha256': digest(local_snapshot_path),
+-                    'input_local_config_sha256': digest(args.local_config),
+-                    'environment_sha256': digest(folder / 'environment.json'),
+-                    'gpu': gpu, 'physical_gpu': local['gpu'], 'egl_device_id': local['egl_device_id'],
+-                    'tasks': cfg['backend']['libero']['task_ids_filter'],
+-                    'seeds': cfg['main']['episode_seed_schedule'], 'provider': 'codex_cli',
+-                    'model': cfg['perception']['gemini']['model'],
+-                    'reasoning_effort': cfg['perception']['gemini']['reasoning_effort'],
+-                    'fresh_reward': True, 'online_stage': True}
+-        atomic_json(folder / 'manifest.json', manifest)
+-        cmd = [sys.executable, str(ROOT / 'scripts/steering_worker.py'), str(config_path)]
+-        gpu_now = subprocess.check_output(['nvidia-smi', '-i', str(local['gpu']),
+-            '--query-gpu=memory.used', '--format=csv,noheader,nounits'], text=True).strip()
+-        if int(gpu_now) > 512:
+-            preflight_status.update(state='preflight_failed', completed_at=utc(),
+-                                    error='Selected GPU became occupied during asset verification')
+-            atomic_json(folder / 'status.json', preflight_status)
+-            raise RuntimeError(preflight_status['error'])
+-        with (folder / 'console.log').open('w') as logfile:
+-            proc = subprocess.Popen(cmd, cwd=ROOT, env=runtime_environment(local),
+-                                    stdout=logfile, stderr=subprocess.STDOUT)
+-            status = {'state': 'running', 'pid': proc.pid, 'started_at': utc(), 'argv': cmd,
+-                      'launcher_pid': os.getpid(), 'run_dir': str(folder),
+-                      'planned': len(manifest['tasks'])}
+-            atomic_json(folder / 'status.json', status)
+-            previous = None
+-            while proc.poll() is None:
+-                now = progress(folder)
+-                atomic_json(folder / 'progress.json', dict(updated_at=utc(), **now))
+-                if now != previous:
+-                    print(json.dumps(dict(run=str(folder), **now)), flush=True)
+-                    previous = now
+-                time.sleep(5)
+-            status.update(exit_code=proc.returncode, completed_at=utc(),
+-                          source_unchanged=source_unchanged(source), state='finished')
+-            atomic_json(folder / 'status.json', status)
+-            atomic_json(folder / 'progress.json', dict(updated_at=utc(), **progress(folder)))
+-        from scripts.audit_steering import audit
+-        result = audit(folder, exit_code=proc.returncode)
+-        result['checks']['runtime_source_unchanged'] = status['source_unchanged']
+-        result['valid'] = all(result['checks'].values())
+-        atomic_json(folder / 'audit.json', result)
+-        print(json.dumps(result, ensure_ascii=False), flush=True)
+-        return 0 if result['valid'] else 2
++            print(json.dumps({'state': 'verifying_assets', 'run': str(folder)}), flush=True)
++            try:
++                atomic_json(folder / 'environment.json', dependency_manifest(local))
++            except Exception as exc:
++                preflight_status.update(state='preflight_failed', completed_at=utc(),
++                                        error_type=type(exc).__name__, error=str(exc))
++                atomic_json(folder / 'status.json', preflight_status)
++                raise
++            config_path = folder / 'resolved-config.yaml'
++            config_path.write_text(yaml.safe_dump(cfg, sort_keys=False))
++            source = source_manifest()
++            for path in source:
++                dest = folder / 'source' / path
++                dest.parent.mkdir(parents=True, exist_ok=True)
++                shutil.copy2(ROOT / path, dest)
++            manifest = {'schema': 'steering_cohort_v2', 'created_at': utc(), 'method': args.method,
++                        'evaluation_directory': 'output/evaluation',
++                        'code_root': str(ROOT), 'commit': git_commit(), 'source_sha256': source,
++                        'config_sha256': digest(config_path), 'local_config_sha256': digest(local_snapshot_path),
++                        'input_local_config_sha256': digest(args.local_config),
++                        'environment_sha256': digest(folder / 'environment.json'),
++                        'gpu': gpu, 'physical_gpu': local['gpu'], 'egl_device_id': local['egl_device_id'],
++                        'tasks': cfg['backend']['libero']['task_ids_filter'],
++                        'seeds': cfg['main']['episode_seed_schedule'], 'provider': 'codex_cli',
++                        'model': cfg['perception']['gemini']['model'],
++                        'reasoning_effort': cfg['perception']['gemini']['reasoning_effort'],
++                        'fresh_reward': True, 'online_stage': True}
++            atomic_json(folder / 'manifest.json', manifest)
++            cmd = [sys.executable, str(ROOT / 'scripts/steering_worker.py'), str(config_path)]
++            gpu_now = subprocess.check_output(['nvidia-smi', '-i', str(local['gpu']),
++                '--query-gpu=memory.used', '--format=csv,noheader,nounits'], text=True).strip()
++            if int(gpu_now) > 512:
++                preflight_status.update(state='preflight_failed', completed_at=utc(),
++                                        error='Selected GPU became occupied during asset verification')
++                atomic_json(folder / 'status.json', preflight_status)
++                raise RuntimeError(preflight_status['error'])
++            with (folder / 'console.log').open('w') as logfile:
++                proc = owner.spawn(cmd, cwd=ROOT, env=runtime_environment(local),
++                                        stdout=logfile, stderr=subprocess.STDOUT)
++                status = {'state': 'running', 'pid': proc.pid, 'started_at': utc(), 'argv': cmd,
++                          'launcher_pid': os.getpid(), 'run_dir': str(folder),
++                          'planned': len(manifest['tasks'])}
++                atomic_json(folder / 'status.json', status)
++                previous = None
++                while proc.poll() is None:
++                    now = progress(folder)
++                    atomic_json(folder / 'progress.json', dict(updated_at=utc(), **now))
++                    if now != previous:
++                        print(json.dumps(dict(run=str(folder), **now)), flush=True)
++                        previous = now
++                    time.sleep(5)
++                status.update(exit_code=proc.returncode, completed_at=utc(),
++                              source_unchanged=source_unchanged(source), state='finished')
++                atomic_json(folder / 'status.json', status)
++                atomic_json(folder / 'progress.json', dict(updated_at=utc(), **progress(folder)))
++            from scripts.audit_steering import audit
++            result = audit(folder, exit_code=proc.returncode)
++            result['checks']['runtime_source_unchanged'] = status['source_unchanged']
++            result['valid'] = all(result['checks'].values())
++            atomic_json(folder / 'audit.json', result)
++            print(json.dumps(result, ensure_ascii=False), flush=True)
++            return 0 if result['valid'] else 2
+ 
+ 
+ def main():
+@@ -135,7 +137,10 @@
+     parser.add_argument('--tasks', help='Comma-separated ids; default is all ten tasks')
+     parser.add_argument('--print-config', action='store_true', help='Resolve configuration without GPU/API work')
+     args = parser.parse_args()
+-    return run(args)
++    try:
++        return run(args)
++    except LauncherInterrupted as exc:
++        return 128 + exc.signum
+ 
+ 
+ if __name__ == '__main__':
+diff --git a/scripts/steering_process.py b/scripts/steering_process.py
+new file mode 100644
+--- /dev/null
++++ b/scripts/steering_process.py
+@@ -0,0 +1,165 @@
++"""Owned worker cancellation for the launcher; no scientific runtime imports.
++
++SIGINT/SIGTERM are handled. SIGKILL, host death, and descendants that escaped by
++reparenting before discovery require an external supervisor and cannot be made
++recoverable by a Python finally block. Partial results are never resumed here.
++"""
++from contextlib import contextmanager
++import json
++import os
++from pathlib import Path
++import signal
++import subprocess
++import time
++from datetime import datetime, timezone
++
++import psutil
++
++
++class LauncherInterrupted(BaseException):
++    def __init__(self, signum):
++        self.signum = signum
++        super().__init__(f'Launcher received {signal.Signals(signum).name}')
++
++
++def durable_json(path, value):
++    path = Path(path)
++    path.parent.mkdir(parents=True, exist_ok=True)
++    temporary = path.with_name(path.name + f'.interrupted-{os.getpid()}.tmp')
++    with temporary.open('w') as file:
++        json.dump(value, file, sort_keys=True, indent=2, allow_nan=False)
++        file.write('\n'); file.flush(); os.fsync(file.fileno())
++    os.replace(temporary, path)
++    fd = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
++    try:
++        os.fsync(fd)
++    finally:
++        os.close(fd)
++
++
++class OwnedWorker:
++    def __init__(self, *, grace_seconds=5.):
++        self.proc = None
++        self.root = None
++        self.spawning = False
++        self.signum = None
++        self.grace_seconds = grace_seconds
++
++    def interrupt(self, signum, frame):
++        self.signum = self.signum or signum
++        # Do not lose a child in the Popen-return/assignment window. This also
++        # avoids inheriting a blocked signal mask in the worker.
++        if not self.spawning:
++            raise LauncherInterrupted(self.signum)
++
++    def spawn(self, *args, **kwargs):
++        if self.proc is not None:
++            raise RuntimeError('One scientific worker per launcher; retries are forbidden')
++        self.spawning = True
++        try:
++            self.proc = subprocess.Popen(*args, **kwargs, start_new_session=True)
++            try:
++                self.root = psutil.Process(self.proc.pid)
++                self.root.create_time()  # Cache identity; psutil checks PID reuse on signals.
++            except psutil.NoSuchProcess:
++                self.root = None
++        finally:
++            self.spawning = False
++        if self.signum is not None:
++            raise LauncherInterrupted(self.signum)
++        return self.proc
++
++    def stop(self):
++        known, errors = {}, []
++        def remember(process):
++            try:
++                identity = (process.pid, process.create_time())
++                if identity not in known:
++                    known[identity] = process
++                    process.suspend()
++            except psutil.NoSuchProcess:
++                pass
++            except psutil.Error as exc:
++                errors.append(dict(pid=process.pid, operation='suspend', error=type(exc).__name__))
++        if self.root is not None:
++            remember(self.root)
++            # Stop newly discovered children before rescanning; descendants may
++            # have their own sessions/process groups (e.g. a provider subprocess).
++            for _ in range(16):
++                before = len(known)
++                for parent in list(known.values()):
++                    try:
++                        for child in parent.children(recursive=True): remember(child)
++                    except psutil.NoSuchProcess:
++                        pass
++                    except psutil.Error as exc:
++                        errors.append(dict(pid=parent.pid, operation='discover', error=type(exc).__name__))
++                if len(known) == before: break
++        processes = list(reversed(list(known.values())))
++        for process in processes:
++            try:
++                process.terminate()
++            except psutil.NoSuchProcess:
++                pass
++            except psutil.Error as exc:
++                errors.append(dict(pid=process.pid, operation='terminate', error=type(exc).__name__))
++            finally:
++                try: process.resume()  # Deliver a pending SIGTERM to a stopped process.
++                except psutil.NoSuchProcess: pass
++                except psutil.Error as exc:
++                    errors.append(dict(pid=process.pid, operation='resume', error=type(exc).__name__))
++        _, alive = psutil.wait_procs(processes, timeout=self.grace_seconds)
++        for process in alive:
++            try: process.kill()
++            except psutil.NoSuchProcess: pass
++            except psutil.Error as exc:
++                errors.append(dict(pid=process.pid, operation='kill', error=type(exc).__name__))
++        psutil.wait_procs(alive, timeout=self.grace_seconds)
++        if self.proc is not None:
++            try: self.proc.wait(timeout=self.grace_seconds)
++            except subprocess.TimeoutExpired:
++                errors.append(dict(pid=self.proc.pid, operation='reap', error='TimeoutExpired'))
++        survivors = []
++        for identity, process in known.items():
++            try:
++                if process.is_running() and process.status() != psutil.STATUS_ZOMBIE:
++                    survivors.append(dict(pid=identity[0], create_time=identity[1]))
++            except psutil.NoSuchProcess: pass
++            except psutil.Error as exc:
++                errors.append(dict(pid=identity[0], operation='verify_exit', error=type(exc).__name__))
++        return dict(scope='Captured owned descendant process identities only',
++                    discovered_pids=sorted(p.pid for p in processes), survivors=survivors,
++                    errors=errors, cleanup_complete=not survivors and not errors,
++                    limits=['SIGKILL/host death cannot be handled.',
++                            'Already-reparented escaped descendants require an external supervisor.'])
++
++
++@contextmanager
++def worker_lifecycle(folder, *, grace_seconds=5.):
++    """Caller must have atomically claimed this new run directory before entry."""
++    folder = Path(folder)
++    owner = OwnedWorker(grace_seconds=grace_seconds)
++    handled = (signal.SIGINT, signal.SIGTERM)
++    old = {s: signal.getsignal(s) for s in handled}
++    for signum in handled: signal.signal(signum, owner.interrupt)
++    try:
++        yield owner
++    except BaseException as exc:
++        # Finish owned cleanup/status writing even if the terminal sends a
++        # second cancellation signal. Never signal unrelated sessions or GPUs.
++        for signum in handled: signal.signal(signum, signal.SIG_IGN)
++        cleanup = owner.stop()
++        try: status = json.loads((folder/'status.json').read_text())
++        except (OSError, ValueError): status = {'launcher_pid': os.getpid(), 'run_dir': str(folder)}
++        interrupted = isinstance(exc, (LauncherInterrupted, KeyboardInterrupt))
++        terminal = 'interrupted' if interrupted else ('preflight_failed' if status.get('state') == 'preflight_failed' else 'launcher_failed')
++        status.update(state=terminal,
++            completed_at=datetime.now(timezone.utc).isoformat(),
++            exit_code=owner.proc.returncode if owner.proc is not None else None,
++            launcher_signal=getattr(exc, 'signum', signal.SIGINT if isinstance(exc, KeyboardInterrupt) else None),
++            error_type=type(exc).__name__, worker_cleanup=cleanup,
++            partial_evidence_preserved=True, automatic_retry=False)
++        durable_json(folder/'status.json', status)
++        raise
++    finally:
++        for signum, handler in old.items(): signal.signal(signum, handler)
+diff --git a/scripts/steering_archive.py b/scripts/steering_archive.py
+new file mode 100644
+--- /dev/null
++++ b/scripts/steering_archive.py
+@@ -0,0 +1,151 @@
++"""Hash-bound offline archive lookup. Never rewrite scientific run receipts."""
++import hashlib
++import json
++from pathlib import Path
++import shutil
++
++import yaml
++
++TASK_MAP = 'libero/libero/benchmark/libero_suite_task_map.py'
++SUPPORT_FILES = {'task_map': 'libero_suite_task_map.py', 'rng_manifest': 'fixture-manifest.json'}
++
++
++def digest(path):
++    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
++
++
++def read_json(path):
++    return json.loads(Path(path).read_bytes())
++
++
++def frozen_inputs(folder, manifest=None, config=None):
++    folder = Path(folder).resolve()
++    actual_manifest = read_json(folder/'manifest.json')
++    if manifest is not None and manifest != actual_manifest:
++        raise ValueError('Caller manifest differs from saved manifest')
++    manifest = actual_manifest
++    if digest(folder/'resolved-config.yaml') != manifest['config_sha256']:
++        raise ValueError('Frozen config hash mismatch')
++    actual_config = yaml.safe_load((folder/'resolved-config.yaml').read_bytes())
++    if config is not None and config != actual_config:
++        raise ValueError('Caller config differs from saved frozen config')
++    if digest(folder/'environment.json') != manifest['environment_sha256']:
++        raise ValueError('Frozen environment hash mismatch')
++    return manifest, actual_config, read_json(folder/'environment.json')
++
++
++def execution_identity(folder, manifest=None, config=None):
++    """Execution paths are hash-bound metadata, not paths to trust for archive I/O."""
++    manifest, config, _ = frozen_inputs(folder, manifest, config)
++    output = Path(config['hydra']['run']['dir'])
++    if not output.is_absolute() or output.name != 'output' or '..' in output.parts:
++        raise ValueError('Unsupported original output directory')
++    original = output.parent
++    job_id = config['main']['eds_eval']['job_id']
++    # The recorded v1 launcher used the output-folder name; v2 uses run name.
++    # Keep both explicit protocols strict rather than accepting arbitrary IDs.
++    schema = manifest.get('schema')
++    if schema == 'steering_cohort_v1':
++        expected_job_id = output.name
++    elif schema == 'steering_cohort_v2':
++        expected_job_id = original.name
++    else:
++        raise ValueError('Unsupported original cohort schema')
++    if job_id != expected_job_id:
++        raise ValueError('Original job id/output directory mismatch')
++    status = read_json(Path(folder)/'status.json')
++    if status.get('run_dir') is not None and status['run_dir'] != str(original):
++        raise ValueError('Original status/config run directory mismatch')
++    return {'original_run_dir': str(original), 'original_output_dir': str(output), 'job_id': job_id}
++
++
++def expected_assets(folder, manifest=None, config=None):
++    manifest, config, environment = frozen_inputs(folder, manifest, config)
++    rel = 'scripts/steering_assets_manifest.json'
++    asset_file = Path(folder)/'source'/rel
++    if digest(asset_file) != manifest['source_sha256'][rel]:
++        raise ValueError('Frozen asset manifest hash mismatch')
++    task_hash = read_json(asset_file)['files'][TASK_MAP]
++    if isinstance(task_hash, dict): task_hash = task_hash['sha256']
++    rng_hash = config['main']['episode_rng_fixture_manifest_sha256']
++    if environment['rng']['sha256'] != rng_hash:
++        raise ValueError('Recorded RNG/config hash mismatch')
++    return {'task_map': task_hash, 'rng_manifest': rng_hash}, {
++        'task_map': Path(environment['libero']['root'])/TASK_MAP,
++        'rng_manifest': Path(config['main']['episode_rng_fixture_manifest'])}
++
++
++def support_asset(folder, kind, *, archive_support=None, manifest=None, config=None):
++    """Prefer an exact verified support bundle; otherwise verify original asset bytes.
++
++    A present-but-invalid bundle is an error, never permission to fall back.
++    No arbitrary path map, basename search, current-checkout substitution or gate
++    relaxation is accepted. The expected hashes come from frozen run evidence.
++    """
++    folder = Path(folder).resolve()
++    hashes, originals = expected_assets(folder, manifest, config)
++    if kind not in SUPPORT_FILES: raise ValueError('Unknown support asset')
++    support = Path(archive_support).resolve() if archive_support is not None else folder/'archive-support'
++    if archive_support is not None or support.exists():
++        receipt = read_json(support/'manifest.json')
++        expected = dict(schema='steering_archive_support_v1',
++            original_manifest_sha256=digest(folder/'manifest.json'),
++            original_config_sha256=digest(folder/'resolved-config.yaml'),
++            original_environment_sha256=digest(folder/'environment.json'),
++            execution=execution_identity(folder, manifest, config),
++            files={SUPPORT_FILES[k]: hashes[k] for k in SUPPORT_FILES})
++        if receipt != expected:
++            raise ValueError('Archive support binding mismatch')
++        for key, name in SUPPORT_FILES.items():
++            path = (support/name).resolve()
++            if not path.is_relative_to(support.resolve()) or not path.is_file() or digest(path) != hashes[key]:
++                raise ValueError('Archive support asset hash/path mismatch: '+key)
++        return support/SUPPORT_FILES[kind]
++    path = originals[kind]
++    if not path.is_absolute() or digest(path) != hashes[kind]:
++        raise ValueError('Original support asset hash/path mismatch: '+kind)
++    return path
++
++
++def prepare_support(folder, support_dir, *, task_map=None, rng_manifest=None):
++    """Create a new separate sidecar directory after the source run is terminal."""
++    folder = Path(folder).resolve(); destination = Path(support_dir).resolve()
++    if destination.is_relative_to(folder):
++        raise ValueError('Create support outside the preserved source run')
++    state = read_json(folder/'status.json').get('state')
++    if state not in ('finished', 'exited', 'interrupted', 'launcher_failed', 'preflight_failed'):
++        raise ValueError('Do not archive support for a running cohort')
++    manifest, config, _ = frozen_inputs(folder)
++    hashes, originals = expected_assets(folder, manifest, config)
++    sources = {'task_map': Path(task_map) if task_map is not None else originals['task_map'],
++               'rng_manifest': Path(rng_manifest) if rng_manifest is not None else originals['rng_manifest']}
++    for key, source in sources.items():
++        if digest(source) != hashes[key]:
++            raise ValueError('Supplied support asset hash mismatch: '+key)
++    receipt = dict(schema='steering_archive_support_v1',
++        original_manifest_sha256=digest(folder/'manifest.json'),
++        original_config_sha256=digest(folder/'resolved-config.yaml'),
++        original_environment_sha256=digest(folder/'environment.json'),
++        execution=execution_identity(folder, manifest, config),
++        files={SUPPORT_FILES[k]: hashes[k] for k in SUPPORT_FILES})
++    destination.mkdir(parents=True, exist_ok=False)
++    for key, source in sources.items():
++        shutil.copyfile(source, destination/SUPPORT_FILES[key])
++        if digest(destination/SUPPORT_FILES[key]) != hashes[key]:
++            raise ValueError('Support source changed while copying: '+key)
++    (destination/'manifest.json').write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n')
++    return receipt
++
++
++def marker_frame(evaluation, episode_index, global_step, marker):
++    """Read only the run-relative raw frame; original absolute path is provenance."""
++    if any(type(x) is not int or x < 0 for x in (episode_index, global_step)):
++        raise ValueError('Invalid raw frame episode/step identity')
++    evaluation = Path(evaluation).resolve()
++    path = evaluation/'stage_unmarked_frames'/f'episode_{episode_index:03d}'/f'step_{global_step:06d}.png'
++    resolved = path.resolve()
++    if not resolved.is_relative_to(evaluation) or not resolved.is_file():
++        raise ValueError('Raw frame missing or outside archive')
++    if digest(resolved) != marker['raw_png_sha256']:
++        raise ValueError('Archived raw frame hash mismatch')
++    return resolved
+diff --git a/scripts/prepare_steering_archive.py b/scripts/prepare_steering_archive.py
+new file mode 100644
+--- /dev/null
++++ b/scripts/prepare_steering_archive.py
+@@ -0,0 +1,19 @@
++"""Create hash-bound task/RNG sidecars outside an unchanged, terminal run archive."""
++import argparse
++import json
++from pathlib import Path
++import sys
++
++sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
++from scripts.steering_archive import prepare_support
++
++
++if __name__ == '__main__':
++    parser=argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('run_dir')
++    parser.add_argument('--support-dir', required=True, help='New separate sidecar directory')
++    parser.add_argument('--task-map', help='Optional copy; must match frozen LIBERO asset SHA')
++    parser.add_argument('--rng-manifest', help='Optional copy; must match frozen config SHA')
++    args=parser.parse_args()
++    print(json.dumps(prepare_support(args.run_dir,args.support_dir,
++        task_map=args.task_map,rng_manifest=args.rng_manifest),indent=2))
+diff --git a/scripts/audit_steering.py b/scripts/audit_steering.py
+--- a/scripts/audit_steering.py
++++ b/scripts/audit_steering.py
+@@ -18,6 +18,7 @@
+ from scripts.steering_runtime import atomic_json, digest
+ from scripts.audit_steering_contract import audit_run as audit_task_contract, evaluation_directory
+ from scripts.audit_qd_mechanism import audit_chunk as audit_search_chunk
++from scripts.steering_archive import execution_identity, support_asset
+ 
+ SUBMODULE_PINS = {'rdt': 'b896f4dcac8ed1c3fae4a056200db267607f131f',
+                  'lerobot': '715debf6c1723a28f1a57d4274a8c4ec35b6a417'}
+@@ -59,14 +60,15 @@
+         by_task = dict(zip(all_tasks, scales))
+         expected['backend']['libero']['task_guide_scales'] = [by_task[t] for t in tasks]
+     expected['steering']['method'] = manifest['method']
+-    expected['main']['eds_eval'].update(method_label=manifest['method'], job_id=folder.name)
++    identity = execution_identity(folder, manifest, actual)
++    expected['main']['eds_eval'].update(method_label=manifest['method'], job_id=identity['job_id'])
+     code_root = Path(manifest['code_root'])
+     expected['main']['episode_rng_fixture_manifest'] = str(code_root / expected['main']['episode_rng_fixture_manifest'])
+     expected['perception']['vlm_agent']['query_template_dir'] = str(code_root / 'vlm_query/target_distance')
+     # The asset receipt separately binds these three machine-specific loader roots.
+     for field in ('pretrained_path', 'text_encoder', 'vision_encoder'):
+         expected['policy']['rdt'][field] = actual['policy']['rdt'][field]
+-    expected['hydra']['run']['dir'] = str(folder / 'output')
++    expected['hydra']['run']['dir'] = identity['original_output_dir']
+     return expected
+ 
+ 
+@@ -274,7 +276,7 @@
+     return bool(metrics)
+ 
+ 
+-def audit(folder, *, exit_code=None, output_path=None, write=True):
++def audit(folder, *, exit_code=None, output_path=None, write=True, archive_support=None):
+     """Return audit results; write=False never changes a historical run or audit file."""
+     folder = Path(folder).resolve()
+     destination = Path(output_path).resolve() if output_path is not None else folder / 'audit.json'
+@@ -336,7 +338,7 @@
+         check('reward_reference_reset_only_on_stage_change', bool(events) and all(r.get('reward_reference_reset')==(r.get('stage_before')!=r.get('stage_after')) for r in events))
+         check('rng_restore_order', lambda: [(r['metadata']['task_id'],r['metadata']['episode_seed'],r['metadata']['phase']) for r in restores]==[(t,s,p) for t,s in zip(tasks,seeds) for p in ('prepare','rollout')])
+         check('source_snapshot_intact', lambda: bool(manifest['source_sha256']) and all(digest(folder/'source'/p)==h for p,h in manifest['source_sha256'].items()))
+-        fixture=read_json(ROOT/'tests/fixtures/steering_rng/fixture-manifest.json')
++        fixture=read_json(support_asset(folder, 'rng_manifest', archive_support=archive_support, manifest=manifest, config=config)) if v2 else read_json(ROOT/'tests/fixtures/steering_rng/fixture-manifest.json')
+         check('rng_states_match', lambda: bool(restores) and all(r['sha256']==fixture['fixtures'][f"{r['metadata']['task_id']}:{r['metadata']['phase']}"]['sha256'] and r['state_signature']==fixture['fixtures'][f"{r['metadata']['task_id']}:{r['metadata']['phase']}"]['state_signature'] for r in restores))
+         from core.stage_fused_carry_hold import audit_checks as carry_checks
+         from core.stage_failed_contact_recheck import audit_checks as contact_checks
+@@ -353,7 +355,7 @@
+                      videos=[str(v.relative_to(folder)) for v in videos])
+             if v2:
+                 try:
+-                    report=audit_task_contract(folder,task=task,model=manifest['model'],effort=manifest['reasoning_effort'])
++                    report=audit_task_contract(folder,task=task,model=manifest['model'],effort=manifest['reasoning_effort'],archive_support=archive_support)
+                     json.dumps(report,allow_nan=False)
+                 except Exception as exc:
+                     report={'task_id':task,'task_contract_valid':False,'task_evidence_complete':False,
+@@ -404,7 +406,7 @@
+                 key=metric_identity(metric); identity_valid=all(type(v) is int for v in key)
+                 bound=identity_valid and key in expected_keys and key[:2] in expected_seeds
+                 bound=bound and ('episode_seed' not in metric or metric['episode_seed']==expected_seeds[key[:2]])
+-                bound=bound and metric.get('method_label')==method and metric.get('job_id')==folder.name
++                bound=bound and metric.get('method_label')==method and metric.get('job_id')==execution_identity(folder,manifest,config)['job_id']
+                 bound=bound and metric.get('suite')==config['backend']['libero']['suite_name']
+                 try:
+                     report=(audit_vls_chunk(metric,config) if method=='vls' else
+@@ -453,6 +455,6 @@
+ 
+ if __name__=='__main__':
+     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('run_dir')
+-    parser.add_argument('--output',type=Path);parser.add_argument('--no-write',action='store_true')
+-    args=parser.parse_args();result=audit(args.run_dir,output_path=args.output,write=not args.no_write)
++    parser.add_argument('--output',type=Path);parser.add_argument('--no-write',action='store_true');parser.add_argument('--archive-support',type=Path)
++    args=parser.parse_args();result=audit(args.run_dir,output_path=args.output,write=not args.no_write,archive_support=args.archive_support)
+     print(json.dumps(result,indent=2));raise SystemExit(0 if result['valid'] else 1)
+diff --git a/scripts/audit_steering_contract.py b/scripts/audit_steering_contract.py
+--- a/scripts/audit_steering_contract.py
++++ b/scripts/audit_steering_contract.py
+@@ -14,6 +14,9 @@
+ from pathlib import Path
+ import re
+ from types import SimpleNamespace
++import sys
++sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
++from scripts.steering_archive import support_asset, marker_frame
+ 
+ import yaml  # Safe parsing only; no runtime/repository import.
+ 
+@@ -126,7 +129,7 @@
+     raise ValueError('No literal assignment ' + name)
+ 
+ 
+-def instruction_for_task(root, task, manifest):
++def instruction_for_task(root, task, manifest, *, archive_support=None):
+     env_path = root / 'environment.json'
+     if sha(env_path.read_bytes()) != manifest['environment_sha256']:
+         raise ValueError('Environment manifest hash mismatch')
+@@ -136,7 +139,7 @@
+         raise ValueError('Asset manifest hash mismatch')
+     assets = read_json(assets_path)
+     rel = 'libero/libero/benchmark/libero_suite_task_map.py'
+-    task_map = Path(env['libero']['root']) / rel
++    task_map = support_asset(root, 'task_map', archive_support=archive_support, manifest=manifest)
+     expected = assets['files'][rel]
+     if isinstance(expected,dict):
+         expected = expected['sha256']
+@@ -160,7 +163,7 @@
+     return resolved
+ 
+ 
+-def audit_run(run_dir, task=0, model="gpt-6-astra", effort="low"):
++def audit_run(run_dir, task=0, model="gpt-6-astra", effort="low", archive_support=None):
+     """Read saved artifacts only; return task checks without writes or runtime imports."""
+     args = SimpleNamespace(run_dir=Path(run_dir), task=task, model=model, effort=effort)
+     root = args.run_dir.resolve()
+@@ -243,7 +246,7 @@
+     check('unique_stage_query_identity', len(query_keys) == len(queries))
+     check('queried_prefix_nonempty', bool(queries))
+     stage_records, other_stage, reward_records = [], [], []
+-    instruction = instruction_for_task(root, args.task, manifest)
++    instruction = instruction_for_task(root, args.task, manifest, archive_support=archive_support)
+     reward_dir = episode / 'vlm_agent'
+     reward_metadata = tracked(reward_dir / 'metadata.json')
+     mapping = {int(k): v for k,v in reward_metadata['key_points_objects_map'].items()}
+@@ -434,9 +437,7 @@
+             from PIL import Image
+             import cv2
+             import numpy as np
+-            raw_path = Path(marker['raw_png_path'])
+-            if not raw_path.exists():
+-                raw_path = evaluation / 'stage_unmarked_frames' / f'episode_{episode_index:03d}' / f'step_{query["global_step"]:06d}.png'
++            raw_path = marker_frame(evaluation, episode_index, query['global_step'], marker)
+             raw = rgb(raw_path)
+             check(label + '/raw_frame_hash', sha(raw_path.read_bytes()) == marker['raw_png_sha256']
+                   and sha(raw.tobytes()) == marker['raw_rgb_sha256'])
+@@ -597,7 +598,7 @@
+         'summary':dict(Counter(c['status'] for c in checks.values())),
+         'facts':facts, 'in_flight_or_pending':pending, 'artifact_sha256':file_evidence,
+         'limits':[
+-            'No saved reply/function is executed. No GPU, simulator, API, repository module imports or writes.',
++            'No saved reply/function is executed. No GPU, simulator, API, policy/simulator imports or raw-run writes.',
+             'response_model is transport-config metadata, not independently returned server model attestation.',
+             'Raw transport event streams and notice text were not saved. Event-summary checks rely on hash-verified runtime validation and retained notice classifications, not independent parser replay.',
+             'Action rows record task and episode, not seed. Seed is established by episode metadata and Stage/compute records.',
+@@ -613,6 +614,7 @@
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument('run_dir', type=Path)
++    parser.add_argument('--archive-support', type=Path)
+     parser.add_argument('--task', type=int, default=0)
+     parser.add_argument('--model', default='gpt-6-astra')
+     parser.add_argument('--effort', default='low')
+@@ -620,7 +622,7 @@
+     args = parser.parse_args()
+     report_path = args.report.resolve()
+     try:
+-        result = audit_run(args.run_dir, args.task, args.model, args.effort)
++        result = audit_run(args.run_dir, args.task, args.model, args.effort, archive_support=args.archive_support)
+     except Exception as exc:
+         # Missing/malformed evidence is a failed audit, never an apparent pass.
+         # Preserve a machine-readable result without exposing saved response text.
+diff --git a/tests/test_steering_lifecycle_archive.py b/tests/test_steering_lifecycle_archive.py
+new file mode 100644
+--- /dev/null
++++ b/tests/test_steering_lifecycle_archive.py
+@@ -0,0 +1,323 @@
++"""Narrow CPU regressions for externally staged fixes; no real run writes."""
++from copy import deepcopy
++import fcntl
++import hashlib
++import json
++import os
++from pathlib import Path
++import shutil
++import signal
++import subprocess
++import sys
++import time
++
++import psutil
++import pytest
++import yaml
++
++STAGE = Path(__file__).resolve().parents[1]
++CANDIDATE = STAGE/'candidate' if (STAGE/'candidate').is_dir() else STAGE
++ROOT = STAGE.parents[4] if CANDIDATE != STAGE else STAGE
++sys.path.insert(0, str(CANDIDATE))
++sys.path.append(str(ROOT))
++from scripts import steering_archive as archive
++from scripts import audit_steering as audit
++from scripts.audit_steering_contract import instruction_for_task
++from scripts.steering_process import LauncherInterrupted, worker_lifecycle
++
++
++def write_json(path, value):
++    Path(path).write_text(json.dumps(value,sort_keys=True)+'\n')
++
++
++def not_running(pid):
++    try: return not psutil.Process(pid).is_running() or psutil.Process(pid).status()==psutil.STATUS_ZOMBIE
++    except psutil.NoSuchProcess: return True
++
++
++@pytest.mark.parametrize('signum', [signal.SIGTERM, signal.SIGINT])
++def test_cancel_owned_tree_separate_session_and_preserve_unrelated(tmp_path, signum):
++    env=dict(os.environ, CUDA_VISIBLE_DEVICES='', PYTHONDONTWRITEBYTECODE='1',
++             PYTHONPATH=str(CANDIDATE))
++    other=subprocess.Popen([sys.executable,'-c','import time; time.sleep(60)'],start_new_session=True)
++    launcher=subprocess.Popen([sys.executable,str(STAGE/'tests/lifecycle_child.py'),'launcher',str(tmp_path)],
++                              env=env,start_new_session=True)
++    owned=[]
++    try:
++        deadline=time.monotonic()+10
++        while not (tmp_path/'ready').exists():
++            assert launcher.poll() is None
++            assert time.monotonic()<deadline
++            time.sleep(.02)
++        owned=[json.loads((tmp_path/f'{role}.json').read_text())['pid'] for role in ('worker','grandchild')]
++        assert os.getsid(owned[0]) != os.getsid(owned[1])
++        os.kill(launcher.pid, signum)
++        time.sleep(.1)
++        with (tmp_path/'gpu.lock').open('a+') as lock:
++            with pytest.raises(BlockingIOError): fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
++        os.kill(launcher.pid, signum)  # Repeated cancellation must not bypass cleanup.
++        assert launcher.wait(timeout=10)==128+signum
++        status=json.loads((tmp_path/'status.json').read_text())
++        assert status['state']=='interrupted' and status['launcher_signal']==signum
++        assert status['partial_steps']==7 and status['partial_evidence_preserved'] is True
++        assert status['automatic_retry'] is False
++        assert status['worker_cleanup']['cleanup_complete'] is True
++        assert set(status['worker_cleanup']['discovered_pids'])==set(owned)
++        assert all(not_running(pid) for pid in owned)
++        assert other.poll() is None
++        with (tmp_path/'gpu.lock').open('a+') as lock: fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
++        assert not (tmp_path/'audit.json').exists()
++    finally:
++        if launcher.poll() is None: launcher.kill(); launcher.wait()
++        for pid in owned:
++            if not not_running(pid):
++                try: os.kill(pid,signal.SIGKILL)
++                except ProcessLookupError: pass
++        other.terminate(); other.wait()
++
++
++def test_preflight_interrupt_is_terminal_and_restores_handlers(tmp_path):
++    old={s:signal.getsignal(s) for s in (signal.SIGINT,signal.SIGTERM)}
++    with pytest.raises(LauncherInterrupted):
++        with worker_lifecycle(tmp_path) as owner:
++            owner.interrupt(signal.SIGTERM,None)
++    status=json.loads((tmp_path/'status.json').read_text())
++    assert status['state']=='interrupted' and status['exit_code'] is None
++    assert status['worker_cleanup']['discovered_pids']==[]
++    assert all(signal.getsignal(s)==handler for s,handler in old.items())
++
++
++def test_monitor_failure_cleans_owned_worker_and_preserves_exception(tmp_path):
++    with pytest.raises(RuntimeError, match='test monitor failure'):
++        with worker_lifecycle(tmp_path,grace_seconds=.1) as owner:
++            proc=owner.spawn([sys.executable,'-c','import time; time.sleep(60)'])
++            raise RuntimeError('test monitor failure')
++    assert not_running(proc.pid)
++    status=json.loads((tmp_path/'status.json').read_text())
++    assert status['state']=='launcher_failed' and status['error_type']=='RuntimeError'
++
++
++def test_output_claim_race_never_rewrites_winning_status(tmp_path,monkeypatch):
++    from scripts import run_steering
++    from types import SimpleNamespace
++    folder=tmp_path/'cohort';winner=b'{"state":"running","owner":"other-launcher"}\n'
++    monkeypatch.setattr(run_steering,'ROOT',tmp_path/'code')
++    monkeypatch.setattr(run_steering,'load_local',lambda _: {'gpu':0})
++    monkeypatch.setattr(run_steering,'load_config',lambda *a,**kw: {})
++    def admission(*a,**kw):
++        folder.mkdir();(folder/'status.json').write_bytes(winner)
++        return 'SYNTHETIC, CPU, 0'
++    monkeypatch.setattr(run_steering.subprocess,'check_output',admission)
++    args=SimpleNamespace(local_config='unused',output_dir=str(folder),tasks=None,method='eds',print_config=False)
++    with pytest.raises(FileExistsError):run_steering.run(args)
++    assert (folder/'status.json').read_bytes()==winner
++
++
++def test_busy_gpu_admission_does_not_claim_output(tmp_path,monkeypatch):
++    from scripts import run_steering
++    from types import SimpleNamespace
++    folder=tmp_path/'cohort'
++    monkeypatch.setattr(run_steering,'ROOT',tmp_path/'code')
++    monkeypatch.setattr(run_steering,'load_local',lambda _: {'gpu':0})
++    monkeypatch.setattr(run_steering,'load_config',lambda *a,**kw: {})
++    monkeypatch.setattr(run_steering.subprocess,'check_output',lambda *a,**kw:'SYNTHETIC, CPU, 1024')
++    with pytest.raises(RuntimeError,match='not idle'):
++        run_steering.run(SimpleNamespace(local_config='unused',output_dir=str(folder),tasks=None,method='eds',print_config=False))
++    assert not folder.exists()
++
++
++def test_normal_worker_same_argv_environment_and_no_retry(tmp_path):
++    report=tmp_path/'child.json'
++    code='import json,os,sys; open(sys.argv[1],"w").write(json.dumps([sys.argv[2:],os.environ["TEST_SCIENTIFIC_VALUE"]]))'
++    with worker_lifecycle(tmp_path) as owner:
++        proc=owner.spawn([sys.executable,'-c',code,str(report),'--original-worker-arg'],
++                        env=dict(os.environ,TEST_SCIENTIFIC_VALUE='unchanged',CUDA_VISIBLE_DEVICES=''))
++        assert proc.wait(timeout=10)==0
++        with pytest.raises(RuntimeError,match='retries are forbidden'):
++            owner.spawn([sys.executable,'-c','raise SystemExit(99)'])
++    assert json.loads(report.read_text())==[['--original-worker-arg'],'unchanged']
++    assert not (tmp_path/'status.json').exists()
++
++
++@pytest.fixture
++def frozen_archive(tmp_path):
++    """Synthetic original receipts with real frozen profile YAML; no performance claim."""
++    run=tmp_path/'original'/'science-run';run.mkdir(parents=True)
++    from scripts import steering_runtime
++    machine=dict(gpu=0,egl_device_id=2,rdt_checkpoint='/assets/rdt',text_encoder='/assets/text',vision_encoder='/assets/vision')
++    config=steering_runtime.load_config(machine,method='eds',output_dir=run/'output')
++    config['hydra']['run']['dir']=str(run/'output')
++    config['main']['eds_eval']['job_id']=run.name
++    originals=tmp_path/'original-assets'; originals.mkdir()
++    fixture=originals/'fixture-manifest.json';write_json(fixture,{'schema':'synthetic_hash_binding_test','fixtures':{}})
++    config['main']['episode_rng_fixture_manifest']=str(fixture)
++    config['main']['episode_rng_fixture_manifest_sha256']=archive.digest(fixture)
++    # Protocol reconstruction expects this source-relative path. Copy the frozen
++    # evaluation YAML and modify only its synthetic fixture binding below.
++    taskmap=originals/archive.TASK_MAP;taskmap.parent.mkdir(parents=True)
++    taskmap.write_text("libero_task_map = {'libero_object': ['pick_up_the_mug_and_place_it_in_the_basket']}\n")
++    (run/'resolved-config.yaml').write_text(yaml.safe_dump(config))
++    source={}
++    for rel in ('configs/evaluation/libero_object_swap.yaml','configs/steering/eds.yaml'):
++        p=run/'source'/rel;p.parent.mkdir(parents=True,exist_ok=True)
++        shutil.copyfile(ROOT/rel,p)
++        if 'evaluation' in rel:
++            base=yaml.safe_load(p.read_text())
++            base['main']['episode_rng_fixture_manifest']=str(fixture)
++            base['main']['episode_rng_fixture_manifest_sha256']=archive.digest(fixture)
++            p.write_text(yaml.safe_dump(base))
++        source[rel]=archive.digest(p)
++    assets=run/'source/scripts/steering_assets_manifest.json';assets.parent.mkdir(parents=True)
++    write_json(assets,{'files':{archive.TASK_MAP:archive.digest(taskmap)}})
++    source['scripts/steering_assets_manifest.json']=archive.digest(assets)
++    write_json(run/'environment.json',{'rng':{'sha256':archive.digest(fixture)},'libero':{'root':str(originals)}})
++    manifest=dict(schema='steering_cohort_v2',method='eds',code_root=str(steering_runtime.ROOT),
++        tasks=config['backend']['libero']['task_ids_filter'],seeds=config['main']['episode_seed_schedule'],
++        config_sha256=archive.digest(run/'resolved-config.yaml'),
++        environment_sha256=archive.digest(run/'environment.json'),source_sha256=source)
++    write_json(run/'manifest.json',manifest)
++    write_json(run/'status.json',{'state':'finished','exit_code':0,'run_dir':str(run),'source_unchanged':True})
++    return run,originals,config,manifest
++
++
++def test_original_audit_bindings_unchanged(frozen_archive):
++    run,_,config,manifest=frozen_archive
++    assert audit.protocol_config(run,manifest,config)==config
++    assert instruction_for_task(run,0,manifest)=='pick up the mug and place it in the basket'
++    assert archive.support_asset(run,'rng_manifest').read_bytes()==Path(config['main']['episode_rng_fixture_manifest']).read_bytes()
++
++
++@pytest.mark.parametrize('new_name',['science-run','renamed-archive'])
++def test_moved_archive_without_original_assets_validates_exact_support(frozen_archive,tmp_path,new_name):
++    run,originals,config,manifest=frozen_archive
++    original_hashes={p.name:archive.digest(p) for p in run.iterdir() if p.is_file()}
++    support=tmp_path/'support'
++    archive.prepare_support(run,support)
++    moved=tmp_path/'moved'/new_name;shutil.copytree(run,moved)
++    shutil.rmtree(run);shutil.rmtree(originals)
++    assert audit.protocol_config(moved,manifest,config)==config
++    assert archive.execution_identity(moved)['job_id']=='science-run'
++    assert instruction_for_task(moved,0,manifest,archive_support=support)=='pick up the mug and place it in the basket'
++    assert archive.digest(archive.support_asset(moved,'rng_manifest',archive_support=support))==config['main']['episode_rng_fixture_manifest_sha256']
++    assert {p.name:archive.digest(p) for p in moved.iterdir() if p.is_file()}==original_hashes
++
++
++@pytest.mark.parametrize('schema,job_id,valid',[
++    ('steering_cohort_v1','output',True),
++    ('steering_cohort_v1','science-run',False),
++    ('steering_cohort_v2','output',False),
++    ('steering_cohort_v2','science-run',True),
++    ('steering_cohort_v1','arbitrary',False),
++    ('steering_cohort_v3','science-run',False),
++])
++def test_archive_original_job_id_follows_exact_recorded_schema(frozen_archive,tmp_path,schema,job_id,valid):
++    run,_,config,manifest=frozen_archive
++    config['main']['eds_eval']['job_id']=job_id
++    (run/'resolved-config.yaml').write_text(yaml.safe_dump(config))
++    manifest['schema']=schema
++    manifest['config_sha256']=archive.digest(run/'resolved-config.yaml')
++    write_json(run/'manifest.json',manifest)
++    if not valid:
++        with pytest.raises(ValueError):archive.prepare_support(run,tmp_path/'support')
++        assert not (tmp_path/'support').exists()
++        return
++    support=tmp_path/'support';archive.prepare_support(run,support)
++    moved=tmp_path/'renamed-archive';shutil.copytree(run,moved)
++    assert archive.execution_identity(moved)['job_id']==job_id
++    assert instruction_for_task(moved,0,manifest,archive_support=support)=='pick up the mug and place it in the basket'
++    assert archive.digest(archive.support_asset(moved,'rng_manifest',archive_support=support))==config['main']['episode_rng_fixture_manifest_sha256']
++    status=json.loads((moved/'status.json').read_text());status['run_dir']=str(moved)
++    write_json(moved/'status.json',status)
++    with pytest.raises(ValueError,match='status/config'):
++        archive.support_asset(moved,'rng_manifest',archive_support=support)
++
++
++@pytest.mark.parametrize('kind',['task_map','rng_manifest'])
++@pytest.mark.parametrize('damage',['same_size_corruption','missing','symlink_escape'])
++def test_bad_support_rejected_even_when_original_assets_exist(frozen_archive,tmp_path,kind,damage):
++    run,_,_,_=frozen_archive;support=tmp_path/'support';archive.prepare_support(run,support)
++    p=support/archive.SUPPORT_FILES[kind]
++    if damage=='same_size_corruption':
++        data=p.read_bytes();p.write_bytes(bytes([data[0]^1])+data[1:])
++    elif damage=='missing': p.unlink()
++    else:
++        external=tmp_path/'outside';shutil.copyfile(p,external);p.unlink();p.symlink_to(external)
++    with pytest.raises((ValueError,FileNotFoundError)):
++        archive.support_asset(run,'task_map',archive_support=support)
++
++
++@pytest.mark.parametrize('damage',['receipt_hash','receipt_path','config_output','environment','status_original_path'])
++def test_archive_binding_changes_rejected(frozen_archive,tmp_path,damage):
++    run,_,_,_=frozen_archive;support=tmp_path/'support';archive.prepare_support(run,support)
++    if damage.startswith('receipt'):
++        p=support/'manifest.json';x=json.loads(p.read_text())
++        if damage=='receipt_hash':x['original_manifest_sha256']='0'*64
++        else:x['files']['../elsewhere']='0'*64
++        write_json(p,x)
++    elif damage=='config_output':
++        p=run/'resolved-config.yaml';x=yaml.safe_load(p.read_text());x['hydra']['run']['dir']='/arbitrary/output';p.write_text(yaml.safe_dump(x))
++    elif damage=='environment':
++        p=run/'environment.json';x=json.loads(p.read_text());x['libero']['root']='/arbitrary';write_json(p,x)
++    else:
++        p=run/'status.json';x=json.loads(p.read_text());x['run_dir']='/arbitrary';write_json(p,x)
++    with pytest.raises(ValueError):archive.support_asset(run,'rng_manifest',archive_support=support)
++
++
++def test_support_creation_refuses_running_or_wrong_source(frozen_archive,tmp_path):
++    run,_,_,_=frozen_archive
++    wrong=tmp_path/'wrong';wrong.write_text('incorrect')
++    with pytest.raises(ValueError,match='hash mismatch'):
++        archive.prepare_support(run,tmp_path/'support',task_map=wrong)
++    assert not (tmp_path/'support').exists()
++    p=run/'status.json';x=json.loads(p.read_text());x['state']='running';write_json(p,x)
++    with pytest.raises(ValueError,match='running cohort'):archive.prepare_support(run,tmp_path/'support')
++
++
++def test_support_creation_never_writes_inside_preserved_run(frozen_archive):
++    run,_,_,_=frozen_archive
++    with pytest.raises(ValueError,match='outside the preserved source run'):
++        archive.prepare_support(run,run/'archive-support')
++    assert not (run/'archive-support').exists()
++
++
++@pytest.mark.parametrize('damage',['missing','corrupt','symlink_escape'])
++def test_archive_raw_frame_cannot_borrow_original_file(tmp_path,damage):
++    original=tmp_path/'original.png';original.write_bytes(b'original fixture PNG bytes')
++    marker={'raw_png_path':str(original),'raw_png_sha256':archive.digest(original)}
++    evaluation=tmp_path/'archive/output/evaluation'
++    frame=evaluation/'stage_unmarked_frames/episode_000/step_000008.png'
++    frame.parent.mkdir(parents=True)
++    if damage=='corrupt':frame.write_bytes(b'changed! fixture PNG bytes')
++    elif damage=='symlink_escape':frame.symlink_to(original)
++    with pytest.raises(ValueError):archive.marker_frame(evaluation,0,8,marker)
++    assert original.exists()
++
++
++def test_archive_raw_frame_reads_local_hash_matched_copy(tmp_path):
++    evaluation=tmp_path/'archive/output/evaluation'
++    frame=evaluation/'stage_unmarked_frames/episode_000/step_000008.png'
++    frame.parent.mkdir(parents=True);frame.write_bytes(b'fixture PNG bytes')
++    marker={'raw_png_path':'/unavailable/original.png','raw_png_sha256':archive.digest(frame)}
++    assert archive.marker_frame(evaluation,0,8,marker)==frame.resolve()
++
++
++@pytest.mark.skipif(CANDIDATE == ROOT, reason='Staging-only before/after source comparison; not a self-comparison after integration')
++@pytest.mark.parametrize('method',['eds','vls','eds_qd'])
++def test_public_print_config_scientific_fields_unchanged(method,tmp_path):
++    env=dict(os.environ,CUDA_VISIBLE_DEVICES='',PYTHONDONTWRITEBYTECODE='1')
++    local=tmp_path/'local.yaml'
++    machine={key:str(tmp_path/'assets'/key) for key in ('rdt_checkpoint','text_encoder','vision_encoder','libero_root','libero_config','torch_home')}
++    for value in machine.values():Path(value).mkdir(parents=True)
++    machine.update(gpu=0,egl_device_id=2)
++    local.write_text(yaml.safe_dump(machine))
++    configs=[]
++    for script in (ROOT/'scripts/run_steering.py',CANDIDATE/'scripts/run_steering.py'):
++        raw=subprocess.check_output([sys.executable,str(script),'--method',method,'--local-config',str(local),
++            '--output-dir',str(tmp_path/'not-created'),'--print-config'],env=env,cwd=ROOT,text=True)
++        configs.append(yaml.safe_load(raw))
++    # Only installation-root lookup paths differ in this external staging copy.
++    for config in configs:
++        config['main']['episode_rng_fixture_manifest']='<repo>/tests/fixtures/steering_rng/fixture-manifest.json'
++        config['perception']['vlm_agent']['query_template_dir']='<repo>/vlm_query/target_distance'
++    assert configs[0]==configs[1]
++    assert not (tmp_path/'not-created').exists()
+diff --git a/tests/lifecycle_child.py b/tests/lifecycle_child.py
+new file mode 100644
+--- /dev/null
++++ b/tests/lifecycle_child.py
+@@ -0,0 +1,33 @@
++"""Owned CPU processes for lifecycle regression tests, never scientific workers."""
++import fcntl
++import json
++import os
++from pathlib import Path
++import signal
++import subprocess
++import sys
++import time
++
++from scripts.steering_process import LauncherInterrupted, worker_lifecycle
++
++role, folder = sys.argv[1], Path(sys.argv[2])
++if role == 'grandchild':
++    signal.signal(signal.SIGTERM, signal.SIG_IGN)
++    (folder/'grandchild.json').write_text(json.dumps({'pid': os.getpid()}))
++    time.sleep(60)
++elif role == 'worker':
++    subprocess.Popen([sys.executable, __file__, 'grandchild', str(folder)], start_new_session=True)
++    (folder/'worker.json').write_text(json.dumps({'pid': os.getpid()}))
++    time.sleep(60)
++elif role == 'launcher':
++    with (folder/'gpu.lock').open('a+') as lock:
++        fcntl.flock(lock, fcntl.LOCK_EX)
++        try:
++            with worker_lifecycle(folder, grace_seconds=.25) as owner:
++                owner.spawn([sys.executable, __file__, 'worker', str(folder)])
++                (folder/'status.json').write_text(json.dumps({'state':'running','partial_steps':7}))
++                while not (folder/'grandchild.json').exists(): time.sleep(.01)
++                (folder/'ready').write_text('ready')
++                time.sleep(60)
++        except LauncherInterrupted as exc:
++            raise SystemExit(128+exc.signum)

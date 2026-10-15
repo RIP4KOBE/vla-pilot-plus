@@ -1,0 +1,14 @@
+usage: audit_steering.py [-h] [--output OUTPUT] [--no-write]
+                         [--archive-support ARCHIVE_SUPPORT]
+                         run_dir
+
+Offline cohort evidence checks, with explicit legacy and complete-v2 scopes.
+
+positional arguments:
+  run_dir
+
+options:
+  -h, --help            show this help message and exit
+  --output OUTPUT
+  --no-write
+  --archive-support ARCHIVE_SUPPORT

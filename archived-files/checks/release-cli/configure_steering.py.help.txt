@@ -1,0 +1,1 @@
+/home/hynx/miniconda3/envs/vla-pilot/bin/python: can't open file '/home/hynx/lizhuo/VLA-Pilot++/scripts/configure_steering.py': [Errno 2] No such file or directory

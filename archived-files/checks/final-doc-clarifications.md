@@ -1,0 +1,6 @@
+# Final report clarification notes
+
+- Fresh online generation means this program sends new identity/reward/Stage requests for the actual current task/observation and preserves their input/output captures. It does not use local reply replay or a previous task reward cache for the scored cohort. Provider-reported cached_input_tokens can still be nonzero: they describe server-side input-prefix accounting, not evidence of local answer replay. Preserve these counters and do not claim the provider internal cache is disabled or independently observable.
+- Reward code/descriptions are generated online once per task; numeric reward scoring and VLS gradients are computed locally over candidate trajectories. Stage observations are evaluated online during execution. These are distinct operations.
+- Configuring adaptive FKD does not require actual resampling at every eligible step. ESS sufficient is a valid recorded skip. For the default 5-step VLS schedule, terminal FKD sorting is not reached; do not claim it ran from generic helper support.
+- The shared protocol fixes evaluation assets and control settings; it is not compute-matched: VLS uses20particles×5forwardsteps per guided chunk, EDS/QD16particles×21forwardsteps. Report measured whole-episode guided/unguided chunks and compute in addition to per-guided-chunk budgets.

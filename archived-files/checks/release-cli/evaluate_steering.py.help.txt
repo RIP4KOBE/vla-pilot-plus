@@ -1,0 +1,15 @@
+usage: evaluate_steering.py [-h] [--method {vls,eds,eds_qd}] --local-config
+                            LOCAL_CONFIG --output-dir OUTPUT_DIR
+                            [--tasks TASKS] [--print-config]
+
+Run one immutable online steering cohort with progress and a separate validity
+audit.
+
+options:
+  -h, --help            show this help message and exit
+  --method {vls,eds,eds_qd}
+  --local-config LOCAL_CONFIG
+  --output-dir OUTPUT_DIR
+                        New immutable run directory
+  --tasks TASKS         Comma-separated ids; default is all ten tasks
+  --print-config        Resolve configuration without GPU/API work

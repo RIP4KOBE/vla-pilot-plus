@@ -1,0 +1,164 @@
+class Main:
+    def _update_stage(self, state: dict, gripper_val: Optional[float],
+                      upper_th: float, lower_th: float) -> dict:
+        """
+        Update stage recognition state based on reward and gripper triggers.
+        Returns updated state dict.
+        """
+        curr_reward = self.policy.get_normalized_reward()
+        observed_reward = curr_reward
+        prev_reward = state['prev_norm_reward']
+        prev_gripper = state['prev_gripper_open']
+
+        # Detect gripper change (action < 0 = OPEN, action > 0 = CLOSE)
+        curr_gripper_open = (gripper_val < 0) if gripper_val is not None else None
+        gripper_changed = (prev_gripper is not None and curr_gripper_open is not None
+                          and curr_gripper_open != prev_gripper)
+
+        # Detect gripper state changes
+        gripper_just_closed = gripper_changed and not curr_gripper_open
+        gripper_just_opened = gripper_changed and curr_gripper_open
+
+        # Schmitt trigger on reward (only relevant when guidance is active)
+        reward_rising = state['use_guidance'] and (prev_reward < upper_th and curr_reward >= upper_th)
+        reward_falling = state['use_guidance'] and (prev_reward > lower_th and curr_reward <= lower_th)
+
+        # Build trigger reason (priority: gripper > reward > chunk interval > periodic)
+        trigger_reason = None
+        if gripper_just_closed:
+            trigger_reason = "gripper closed"
+        elif gripper_just_opened:
+            trigger_reason = "gripper opened"
+        elif reward_rising:
+            trigger_reason = f"reward rose above {upper_th:.0%}"
+        elif reward_falling:
+            trigger_reason = f"reward dropped below {lower_th:.0%}"
+
+        # Query VLM if triggered (with limit check)
+        vlm_query_limit = self.config.get("vlm_query_limit", 10)
+        stage_min_query_gap_steps = int(self.config.get("stage_min_query_gap_steps", 0))
+        if stage_min_query_gap_steps < 0:
+            raise ValueError("stage_min_query_gap_steps must be nonnegative")
+        vlm_query_count = state.get('vlm_query_count', 0)
+        last_vlm_query_step = state.get('last_vlm_query_step')
+        stage_query_gap_active = (last_vlm_query_step is not None and
+            int(state.get('global_step', 0)) - last_vlm_query_step < stage_min_query_gap_steps)
+        stage_before = state['current_stage']
+        guidance_before = state['use_guidance']
+        query_status = None
+        skipped_reason = None
+        query_result = {}
+
+        if (trigger_reason and self.gemini_stage_recognizer is not None and
+                vlm_query_count < vlm_query_limit and not stage_query_gap_active):
+            log.info(f"[Trigger] {trigger_reason} (query {vlm_query_count + 1}/{vlm_query_limit})")
+            state['last_vlm_query_step'] = int(state.get('global_step', 0))
+
+            set_trace_context = getattr(self.gemini_stage_recognizer, "set_trace_context", None)
+            if callable(set_trace_context):
+                set_trace_context(state, trigger_reason)
+
+            new_stage, need_guidance = self.gemini_stage_recognizer.identify_stage_and_guidance(
+                current_rgb=np.array(self.adapter.get_vlm_image()),
+                instruction=self.adapter.get_task_description(),
+                stage_descriptions=self.stage_descriptions,
+                init_img_with_keypoints=self.init_img_with_keypoints,
+                keypoint_id_to_object=self.keypoint_id_to_object,
+                num_stages=len(self.guidance_fns),
+                trigger_reason=trigger_reason,
+            )
+
+            state['vlm_query_count'] = vlm_query_count + 1
+            query_result = getattr(self.gemini_stage_recognizer, "last_result", None) or {}
+            if query_result:
+                query_status = "ok" if query_result.get("ok") else "error"
+            else:
+                query_status = "completed_without_result_metadata"
+
+            if new_stage != state['current_stage'] or need_guidance != state['use_guidance']:
+                log.info(f"[VLM] Stage: {state['current_stage']} → {new_stage}, Guidance: {state['use_guidance']} → {need_guidance}")
+                stage_changed = new_stage != state['current_stage']
+                guidance_changed = need_guidance != state['use_guidance']
+                if stage_changed:
+                    self.policy.reset_stage()
+                    curr_reward = 0.0  # Reset for new stage
+                elif guidance_changed:
+                    reset_chunk_memory = getattr(
+                        self.policy,
+                        "reset_eds_chunk_memory",
+                        None,
+                    )
+                    if callable(reset_chunk_memory):
+                        reset_chunk_memory("guidance_change")
+
+            state.update({
+                'current_stage': new_stage,
+                'use_guidance': need_guidance,
+            })
+        elif trigger_reason and vlm_query_count >= vlm_query_limit:
+            log.debug(f"[Trigger] {trigger_reason} (skipped, limit {vlm_query_limit} reached)")
+            query_status = "skipped"
+            skipped_reason = "query_limit_reached"
+        elif trigger_reason and stage_query_gap_active:
+            query_status = "skipped"
+            skipped_reason = "minimum_query_gap"
+        elif trigger_reason:
+            log.debug(f"[Trigger] {trigger_reason} (skipped, recognizer unavailable)")
+            query_status = "skipped"
+            skipped_reason = "recognizer_unavailable"
+
+        if trigger_reason:
+            self._append_stage_event({
+                "episode_id": state.get("episode_id"),
+                "task_id": state.get("task_id"),
+                "global_step": state.get("global_step"),
+                "chunk_id": state.get("chunk_id"),
+                "episode_seed": state.get("episode_seed"),
+                "trigger_reason": trigger_reason,
+                "stage_before": stage_before,
+                "stage_after": state['current_stage'],
+                "guidance_before": guidance_before,
+                "guidance_after": state['use_guidance'],
+                "normalized_reward_before": float(prev_reward),
+                "normalized_reward_at_query": float(observed_reward),
+                "normalized_reward_after_stage_update": float(curr_reward),
+                "schmitt_upper": float(upper_th),
+                "schmitt_lower": float(lower_th),
+                "vlm_query_count": state.get('vlm_query_count', vlm_query_count),
+                "vlm_query_limit": int(vlm_query_limit),
+                "stage_min_query_gap_steps": stage_min_query_gap_steps,
+                "last_vlm_query_step": state.get('last_vlm_query_step'),
+                "gripper_value_used": gripper_val,
+                "previous_gripper_value": state.get("previous_gripper_value"),
+                "first_gripper_value": state.get("first_gripper_value"),
+                "last_gripper_value": state.get("last_gripper_value"),
+                "query_status": query_status,
+                "query_ok": query_result.get("ok"),
+                "skipped_reason": skipped_reason,
+                "raw_response": query_result.get("raw_response"),
+                "parsed_stage": query_result.get("parsed_stage"),
+                "parsed_guidance": query_result.get("parsed_guidance"),
+                "evidence": query_result.get("evidence"),
+                "error": query_result.get("error"),
+                "query_latency_s": query_result.get("query_latency_s"),
+                **{key: query_result[key] for key in (
+                    "api_request_attempts", "api_sdk_retry_attempts", "api_request_counter_available",
+                    "transport", "codex_logical_call_attempts", "codex_completed_turns", "codex_failed_calls",
+                    "codex_usage_complete_calls", "codex_input_tokens", "codex_cached_input_tokens",
+                    "codex_output_tokens", "codex_reasoning_output_tokens", "codex_call_latency_s"
+                ) if key in query_result},
+            })
+
+        # This explicitly frozen transport condition fails closed after preserving
+        # its event. The episode exception path still saves video and all usage.
+        if query_status == "error":
+            if getattr(self.gemini_stage_recognizer, "output_format", None) == "json_schema_v1":
+                raise RuntimeError("stage_json_query_failed: " + str(query_result.get("error")))
+            if getattr(self.gemini_stage_recognizer, "config", {}).get("backend") == "codex_cli":
+                raise RuntimeError("codex_stage_query_failed: " + str(query_result.get("error")))
+
+        # Update tracking state
+        state['prev_norm_reward'] = curr_reward
+        state['prev_gripper_open'] = curr_gripper_open
+        state['last_gripper_value_used'] = gripper_val
+        return state

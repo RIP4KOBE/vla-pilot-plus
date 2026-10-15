@@ -1,0 +1,49 @@
+{
+  "kind": "documentation_consistency_checks_only",
+  "files": [
+    {
+      "path": "CONTRIBUTING.md",
+      "bytes": 6010,
+      "sha256": "e46d7f3daaa504a587f388d61ac84fb2c368b89f696e745e7be8001fb33797bd"
+    },
+    {
+      "path": "README.md",
+      "bytes": 7574,
+      "sha256": "ee54454a98a860f48731195dd7c3ffe75a550df99064d2217e1b475669ac8b2a"
+    },
+    {
+      "path": "REVIEW_NOTES.md",
+      "bytes": 3077,
+      "sha256": "214785cf5de9eada1c465eca6ba8e82438c832c2862c3452cf54b3df1da86bbc"
+    },
+    {
+      "path": "docs/steering/architecture.md",
+      "bytes": 12055,
+      "sha256": "e63f3c0ffac6b7f57173148dd070dedcf5722769bbee5c34e0815d4ae912887d"
+    },
+    {
+      "path": "docs/steering/installation.md",
+      "bytes": 8814,
+      "sha256": "81e4969c06935d0fd03ec86bbd2bed226fda867d545d86085f706768b510f96b"
+    },
+    {
+      "path": "validated-inputs/steering-constraints-validated.txt",
+      "bytes": 3617,
+      "sha256": "6337457788b7f777bc83870d2cfb80cef09bec4f81097dd1326acf793768835a"
+    },
+    {
+      "path": "validated-inputs/steering-lerobot-base-validated.txt",
+      "bytes": 854,
+      "sha256": "ef346db5c977e00dd4a5d81fb8a1340e236a776559969898b365be418c3b5f42"
+    },
+    {
+      "path": "validated-inputs/steering-requirements-validated.txt",
+      "bytes": 1622,
+      "sha256": "ce35c0ee1cdbd15425bfede6b439907ddb092ef2546b1a7abf9860d0431b7cb3"
+    }
+  ],
+  "errors": [],
+  "repository_writes": false,
+  "gpu_api_model_calls": false,
+  "tests_executed": false
+}

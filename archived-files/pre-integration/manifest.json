@@ -1,0 +1,414 @@
+{
+  "base_main": "d51cb85f485502e0429c79529872efef2ec59981",
+  "origin_main": "d51cb85f485502e0429c79529872efef2ec59981",
+  "source_worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-gpu6-20260922T063626Z/study_worktree",
+  "source_head": "77761b4cda78ac3b6762a6aa60f97b07fde7c1dc",
+  "protected_untracked": [
+    {
+      "path": "HANDOFF.md",
+      "sha256": "50b89906a7ef268d6174f95fa81db853976b1e8e710d8083d8290335221a2ee1"
+    },
+    {
+      "path": "HANDOFF_REBOOT_PAUSE_20260923.md",
+      "sha256": "372d7b9f4be4a4872599b4b337219487ed7c49537ffa31c9225dff325ab1134a"
+    },
+    {
+      "path": "docs/01_specs/2026-09-21-rdt-qd-ed-autoresearch-execution-prompt.md",
+      "sha256": "3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef"
+    },
+    {
+      "path": "docs/01_specs/2026-09-22-rdt-qd-ed-object-swap-next-round-experiment-plan.md",
+      "sha256": "a82bbb98abc4929f5a1c8fefdb68ab2d5fcb480b2cbdf3189f8c8ef0376c58ca"
+    },
+    {
+      "path": "docs/02_analysis/vls_guidance/2026-06-05-rdt-guided-denoise-loop-vls-steering-analysis.md",
+      "sha256": "9eabae36e0e91dedb0633873443278ba77231a37591ef7fc16399622fe6e5d77"
+    }
+  ],
+  "accepted_source": [
+    {
+      "relative_path": "configs/stage_controller/contact_v2.yaml",
+      "proposed_group": "configuration",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "d388b368486637c28d4b6d725ba1bd31768597f84dcab1c990fdb0fa1ee86115",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "configs/stage_controller/evidence_v1.yaml",
+      "proposed_group": "configuration",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "04f74121acc04f3fb90297cdacae650094de1cebb5df0bd060bb95c733f2a198",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "configs/stage_controller/grasp_v3.yaml",
+      "proposed_group": "configuration",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "2b8a0cf760953a7279769ffe0a361a0d32c2b23107cf45a446e21f5b2d2ead9f",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "configs/stage_controller/proprio_v4.yaml",
+      "proposed_group": "configuration",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "79c244fc4ba71371854d62db00576483e395e557c21b1269c402dadc3a9df960",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/c0_reward_contract.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "6221c72d396ba91ced023316abfbb0a99dee7066c3c25e8144e5e2f8f2fe88ba",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/codex_stage.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "tracked_modified",
+      "accepted_sha256": "b4e25401adb149f973fb0c05206dbe45995e37fdd713510f4cdfe4f527516197",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/codex_stage_policy.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "tracked_modified",
+      "accepted_sha256": "9be544ecec9b238d308ddedb5f14622b8a62fef95e57f702bac72bf142ac301f",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/codex_vision.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "9ee885b8024dc42c22c0e993f94d6bcf50c3082e1a11f6d60c5599f2c9131325",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/env_adapters/libero_adapter.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "tracked_clean",
+      "accepted_sha256": "5789168f59179599fb37ce88193884ec469db63a1a4f68fde350e90936100f19",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/episode_rng_fixture.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "50a1b0c942215819ee2bea76993e12ba68990d3b0cf98c120b15dd52bb319db7",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/episode_rng_hooks.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "95fb2ca979ff99edcf9562c8654693c7549aff49d9612944bb0a74bc486327e6",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/gemini_grounder.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "tracked_modified",
+      "accepted_sha256": "534d0d5a9d201f632317e9b51b0a9fe0682706eca63faa4a2c86cb8c91d19a5a",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/poe_stage_capture.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "0098b9025511bb286c366bdf5ef8106a12c1d270066c238c1dc190d096bc91bf",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/rdt_libero_action_converter.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "tracked_clean",
+      "accepted_sha256": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/rdt_policy_steer.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "tracked_clean",
+      "accepted_sha256": "82c8515542780acc5389d3043d7f25e14e9d23f6149fb067a6dfa99fb9aa584e",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/stage_carry_hold.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "4399c80b209366b807d85b097ec59c9e465a9fe41a3f6821ee747bd5d953728b",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/stage_contact_handoff.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "eb540451c11972c30ee1bab29e5d7bcb7cf2792c7fe09764a70c41b580c9ed5c",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/stage_evidence.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "7b335d0289dcd3f1fd33a466b7359a253f1cf14c6d5a6b1578cf32bd0b08a3da",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/stage_failed_contact_recheck.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "a122c01fa3eccc7d2618741a16a2c5918b1414f96ac7c8bf91c4ae92c79b7224",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/stage_fused_carry_hold.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "99c4983289e71d7d326b0608f147226019465a139372f293986b189a26babc04",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/stage_grasp_guard.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "fa71442760023819a72a4368429141145fe87d5fa8cbd9668f7e45d9936d4e3a",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/stage_identity_memory.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "a0065321af99c0947ca1e84e61f77ab750d811bdfc9e10936cb39e4c682ca5cf",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/stage_observation.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "16a33eb1ff9e721e593573cc11988bd5fbec1a56307ed8827611c5326307c4d4",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/stage_observation_json.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "1248d162f0c4958a28f52f255a3b9a6bc95c01a8897f1f59e62deee08ce6c5a1",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/stage_release_guard.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "023c0c0568a759118f9d500e0e5a0a5da3eccda6a4704e70f821310c63cfc95d",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/stage_response_validation.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "0454eb4648c6e340ef96bd54888f7ed66d8ff9d1744208e8b60c616f7ebdd87b",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/stage_robot_evidence.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "8b369ee944feccaadeaabcae02c47da03f27fc5ed2f2ef56baeb97ff88a38080",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "core/stage_target_marker.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "76dfb70dbfb37f0cfd8cd73d64f9e735285ee64970414ba2af4b164855c50de7",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "main.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "tracked_modified",
+      "accepted_sha256": "28add695dfe62f4e04be252e2630bf5fe4ce2d49b90e7a175ad87e9ab3669de5",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "scripts/c0_poe_fresh_retest.py",
+      "proposed_group": "runtime_refactor",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "2a43ed68fae8e93b0e44092c24ad9ae6c59bf3a017aac9f15ab85c7ba1014525",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "scripts/c0_poe_online_retest.py",
+      "proposed_group": "runtime_refactor",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "1c28d08daf65150dd6631b203e0aded87d681e290a7548bd6a92c1167e54e150",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "scripts/c0_poe_resilient_worker.py",
+      "proposed_group": "runtime_refactor",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "abcac8a7e49bbc45a66837ada84061dd5943de5439d04413e4cb9792321afc4a",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "scripts/c0_trace_replay.py",
+      "proposed_group": "runtime_refactor",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "fca1f6bf8c54c8e28297c202a30140a65ecf4e59454b4eb8ab7cf958bd10fb81",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "scripts/codex_only_runtime.py",
+      "proposed_group": "runtime_refactor",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "d27c380570f58e3c5cafc6f2bd149a1d13967372bfceab2a5e1e89b0e791fa1e",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "scripts/stage_closed_loop_deep_audit.py",
+      "proposed_group": "runtime_refactor",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "565800e6da75b75bda32496ca258a9fc511de21919479210cd0b04bcd73167c0",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "scripts/stage_closed_loop_run.py",
+      "proposed_group": "runtime_refactor",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "32c9be3be5757c63533c217d22124ebce0a507212716ec4e2b3a529790592188",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "scripts/stage_closed_loop_worker.py",
+      "proposed_group": "runtime_refactor",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "f7d7fa01eae262fd43148759c5ecb1c2767916a30099f676f5da160c1c54ac88",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "scripts/stage_codex_audit.py",
+      "proposed_group": "runtime_refactor",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "7a942eff0bbb16f8597b6887a024a0a9c0d7571de8d48df74a8952ed26a3fbf2",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "scripts/stage_rng_fixture_worker.py",
+      "proposed_group": "runtime_refactor",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "f7be4f5e1b01ed1daada127aa9ef08a2958af0f9f97bec7a2e99e79366f2ed7e",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "utils/guidance_utils.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "tracked_clean",
+      "accepted_sha256": "b0fe9d6d5fc014143f5877918de9bd0986b1688b4a6a90980847b7d15cab0c82",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "vlm_query/c0_contract_v1/guidance_template.txt",
+      "proposed_group": "prompts",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "ac7a53e64f82e735b295682347cc4775da7c611715798e0d79f8a6fe34cb11c5",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "vlm_query/c0_contract_v1/guidance_template_libero.txt",
+      "proposed_group": "prompts",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "0c98461b3dd126caeed82d0c53cdec63ba40a7a45c3be958cb169a672c8570e7",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "vlm_query/c0_contract_v1/segmentation_planning_template.txt",
+      "proposed_group": "prompts",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "975e6905b66e749e351f2282a73e5f30eeee6735643622f74808b2379a938d30",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "vlm_query/c0_contract_v1/stage_template.txt",
+      "proposed_group": "prompts",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "758d71a441496074410428b005a068a18b6d92273b9278c1181334cf9e67005b",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "vlm_query/guidance_template.txt",
+      "proposed_group": "prompts",
+      "git_status_at_review": "tracked_clean",
+      "accepted_sha256": "ac7a53e64f82e735b295682347cc4775da7c611715798e0d79f8a6fe34cb11c5",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "vlm_query/guidance_template_libero.txt",
+      "proposed_group": "prompts",
+      "git_status_at_review": "tracked_clean",
+      "accepted_sha256": "0a11498ed5317170bff8e8cd3909c508ea810e4fa9f006555ef37a50f4459c54",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "vlm_query/stage_observation_v1.txt",
+      "proposed_group": "prompts",
+      "git_status_at_review": "untracked",
+      "accepted_sha256": "14ea3cf594ed358a399d3c49c96f599885072e381b3b02dff520b9b42ec5e3c0",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    },
+    {
+      "relative_path": "vlm_query/vlm_agent.py",
+      "proposed_group": "scientific_runtime",
+      "git_status_at_review": "tracked_modified",
+      "accepted_sha256": "e60d3021741b4fb357ba7605a29eb294676d04b2d1e2ed33bc84abe3b6d74d8d",
+      "frozen_matches": "True",
+      "current_matches": "True"
+    }
+  ]
+}

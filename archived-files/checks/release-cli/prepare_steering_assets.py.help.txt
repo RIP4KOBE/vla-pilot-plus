@@ -1,0 +1,31 @@
+usage: prepare_steering_assets.py [-h]
+                                  {verify-rng,install-libero,verify-libero,configure}
+                                  ...
+
+Prepare steering assets without importing Torch, a simulator, or a model client.
+
+From a new clone, install environment-steering.yml, then run::
+
+    python scripts/prepare_steering_assets.py install-libero
+    python scripts/prepare_steering_assets.py verify-rng
+    python scripts/prepare_steering_assets.py configure --help
+
+install-libero downloads the pinned public LIBERO-PRO revision, applies the
+recorded vendor patch, and installs the small frozen object-swap input bundle.
+It does not regenerate scenes. An existing verified local tree may instead be
+copied with --source. Large models remain external and must be supplied as local
+paths. configure writes a machine file and a LIBERO path file; neither contains
+credentials. No command launches an episode or changes a Python environment.
+
+positional arguments:
+  {verify-rng,install-libero,verify-libero,configure}
+    verify-rng          Hash-check the twenty packaged RNG files; no Torch
+                        import
+    install-libero      Fetch pinned LIBERO or copy an already verified local
+                        tree
+    verify-libero       Check exact code, assets, and fixed object-swap inputs
+    configure           Write flat machine YAML (JSON syntax) and LIBERO path
+                        config
+
+options:
+  -h, --help            show this help message and exit

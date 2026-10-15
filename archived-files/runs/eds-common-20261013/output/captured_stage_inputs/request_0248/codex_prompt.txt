@@ -1,0 +1,16 @@
+Identify only the instructed target object. Task: pick up the milk and place it in the basket
+The initial image is annotated with these object keypoint labels:
+0: milk_1_main
+1: milk_1_main
+2: basket_1_main
+3: basket_1_main
+4: basket_1_main
+5: basket_1_main
+6: cream_cheese_1_main
+7: tomato_sauce_1_main
+8: tomato_sauce_1_main
+9: butter_1_main
+10: orange_juice_1_main
+11: orange_juice_1_main
+12: chocolate_pudding_1_main
+Describe the exact target by visible shape, colors, label and size so it can be recognized in another camera frame. Distinguish it from neighboring distractors. Do not describe robot actions or infer any current grasp or task success. Do not give commands or control decisions. Use under 100 words.

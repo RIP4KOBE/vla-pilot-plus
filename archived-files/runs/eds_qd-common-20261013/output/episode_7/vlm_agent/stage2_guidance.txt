@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # C0 control: the learned policy places the butter in basket_1_main.
+    return torch.tensor(0.0, device=action_sequence.device)
+

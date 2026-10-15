@@ -1,0 +1,36 @@
+{
+  "schema": "historical_supplemental_source_v1",
+  "date": "2026-10-15",
+  "source_root": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-integration",
+  "files": [],
+  "scope": "Source/configuration/documentation only. Raw videos/model weights/logs/captures and private files remain external. Source symlinks are materialized here and mapped to their observed targets.",
+  "entries_key": "files",
+  "entry_count": 3757,
+  "entry_shards": [
+    {
+      "path": ".historical-source/manifests/part-0000.json",
+      "entries": 1000,
+      "sha256": "24ae2d192ff48802efa2aa886162415defd653310d6092c2eeaa6e9d55a81a66"
+    },
+    {
+      "path": ".historical-source/manifests/part-0001.json",
+      "entries": 1000,
+      "sha256": "24a86530f3141bd72516a6c2b6b24a808c9653fa9c08ed8aa6c3ae1b84d6a1d8"
+    },
+    {
+      "path": ".historical-source/manifests/part-0002.json",
+      "entries": 1000,
+      "sha256": "95ef8ec1927bbd68fe35cfbbfc82b52dcde18dc51cee9fb4438a95d194a90cd7"
+    },
+    {
+      "path": ".historical-source/manifests/part-0003.json",
+      "entries": 757,
+      "sha256": "9c750c4030ea00a3a476d1258de3377f544d9d23aea5836bb953c1b6b1e8fe01"
+    }
+  ],
+  "publication_redaction": {
+    "policy": "Credential-like values and AWS signed URL queries removed in a separate exported history. Original private archive remains byte-exact. Published commit identities may differ; see main source index for original-to-published mapping.",
+    "published_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
+    "overlay_redacted_paths": 1
+  }
+}
