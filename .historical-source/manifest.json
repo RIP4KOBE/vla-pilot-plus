@@ -1,0 +1,29 @@
+{
+  "schema": "historical_source_snapshot_v1",
+  "created_date": "2026-10-15",
+  "original_branch": "exp/eds-init-fps",
+  "original_commit": "2628fab7cda767c474cf2d163c3564218d119657",
+  "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/historical_variants/eds_init_fps",
+  "archive_path": "/mnt/data/shared2/hynx/vla-pilot-repository-archive-20261015/workspaces/snapshot-02/historical_variants/eds_init_fps",
+  "snapshot_source_files_considered": 2613,
+  "changed_or_added_files": [
+    {
+      "source_path": "docs/01_specs/eds-init-fps-design.md",
+      "published_path": "docs/01_specs/eds-init-fps-design.md",
+      "bytes": 27264,
+      "sha256": "1429de533bc82ece48cdb66e0507cd3ec682cad7e7c64b25d00ad7365e72216f",
+      "git_blob": "4dad1a8a3bcc1d400fe03112dca91c322b9b253e",
+      "mode": "100644",
+      "previous_blob": null
+    }
+  ],
+  "deleted_tracked_paths": [],
+  "excluded_sensitive_or_large_paths": [],
+  "submodule_source_copies": ".historical-source/submodule-files/",
+  "scope": "Original Git history plus actual tracked working files and archived source/configuration/documentation. Large raw evidence, credentials and transient Git administration remain in private archive. Original source bytes are not edited.",
+  "publication_redaction": {
+    "policy": "Credential-like values and AWS signed URL queries removed in a separate exported history. Original private archive remains byte-exact. Published commit identities may differ; see main source index for original-to-published mapping.",
+    "published_parent_commit": "2bf783d2627d6cdf40788c29a63ed57ea4bdbbf3",
+    "overlay_redacted_paths": 0
+  }
+}
