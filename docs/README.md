@@ -10,5 +10,8 @@
 | 已验收 low 结果 | [results](steering/results.md) |
 | ultra 对照、所有尝试与归因边界 | [reasoning-effort-comparison](steering/reasoning-effort-comparison.md) |
 | 主线发布、清理与历史工作区映射 | [整理报告](maintenance/repository-consolidation-20261015.md) |
+| main 清理候选及 Stage/Codex 必要性 | [依赖审查](maintenance/main-scope-and-control-dependencies-20261015.md) |
 
 `00_overview`、`01_specs`、`02_analysis`、`03_evidence`、`04_plans`、`05_runs`、`08_archive` 保存早期研究依据，按原路径保留供历史引用。其旧日期说明、任务计划、绝对路径、模型和预算不是当前开发约束；不将其视为最新运行说明。当前机制与结果以 `research/`、`steering/` 及实际源码/配置为准。历史差异不通过回写旧证据消除。
+
+2026-10-15 将用户原有的四份未跟踪文档按原字节纳入版本管理：根目录 [HANDOFF](../HANDOFF.md)、[旧执行指令](01_specs/2026-09-21-rdt-qd-ed-autoresearch-execution-prompt.md)、[旧实验计划](01_specs/2026-09-22-rdt-qd-ed-object-swap-next-round-experiment-plan.md)、[旧 VLS 链路分析](02_analysis/vls_guidance/2026-06-05-rdt-guided-denoise-loop-vls-steering-analysis.md)。它们只描述各自日期的历史状态；其中旧入口、预算和“尚未合入 main”等结论不覆盖当前 Progress。原文中的机器路径按历史归档索引追溯，不保证在新 clone 中可直接访问。
