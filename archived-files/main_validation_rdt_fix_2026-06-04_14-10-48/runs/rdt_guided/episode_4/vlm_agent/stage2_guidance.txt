@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No decision-making needed for the basket placement
+    # The diffusion policy knows how to generalize the placement
+    return 0  # Return 0 since no special guidance is required
+

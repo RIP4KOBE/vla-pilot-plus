@@ -1,0 +1,19 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Move gripper with the bowl to the plate located around keypoints 5 and 6
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    
+    # Assign higher weights to the later timesteps
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Specify the target placement position as the mean of keypoints 5 and 6
+    target_indices = torch.tensor([5, 6], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_indices].mean(dim=0)  # Get the mean position of keypoints 5 and 6
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+
+    # Compute weighted negative squared distance as the reward
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()  # Return scalar reward
+

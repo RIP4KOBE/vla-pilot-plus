@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No detailed reward function is required for placing the object in the basket.
+    # As per the task-specific rules, return 0.
+    return torch.tensor(0.0, device=action_sequence.device)
+

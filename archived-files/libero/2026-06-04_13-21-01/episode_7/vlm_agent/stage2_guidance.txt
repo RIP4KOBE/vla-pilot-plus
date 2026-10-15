@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No specific guidance required for placing butter in the basket
+    return 0  # Return 0 as no decision is needed
+

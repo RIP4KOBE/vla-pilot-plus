@@ -1,0 +1,57 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the middle drawer handle (keypoint 15).
+# Stage 2: Gently pull the middle drawer handle to open the middle drawer.
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Move the gripper to grasp the middle drawer handle.
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+
+    # Focus more on the last part of the trajectory
+    final_start = int(0.7 * T)
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device),
+    )
+    weights = weights / weights.sum()
+
+    # Middle drawer handle is at keypoint 15
+    target_idx = torch.tensor([15], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+
+    # Compute the distance to the target
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()  # Return scalar reward
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # Move the gripper to pull the middle drawer handle along +X axis.
+    # Target position is an offset in the +X direction.
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+
+    # Focus on the final part of the trajectory
+    final_start = int(0.7 * T)
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device),
+    )
+    weights = weights / weights.sum()
+
+    # Middle drawer handle keypoint is at index 15
+    handle_idx = torch.tensor([15], dtype=torch.long, device=keypoints.device)
+    handle_pos = keypoints[handle_idx][0]
+
+    # Offset position to pull drawer handle along the +X axis
+    offsetted_point = handle_pos + torch.tensor([0.1, 0.0, 0.0], device=keypoints.device)  # Offset by 0.1 meters in +X
+    all_dists = torch.norm(action_sequence - offsetted_point, dim=-1)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()  # Return scalar reward
+```

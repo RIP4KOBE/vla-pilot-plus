@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No decision-making needed here since the basket is the only target location
+    return torch.tensor(0.0, device=action_sequence.device)  # Return constant reward
+

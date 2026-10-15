@@ -1,0 +1,56 @@
+```python
+
+# Task breakdown:
+# Stage 1: Move gripper to grasp the cream cheese (keypoint 2).
+# Stage 2: Move gripper with the cream cheese to the bowl (keypoints 0 and 1).
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Guidance for moving the gripper to grasp the cream cheese at keypoint 2.
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+
+    # Apply higher weight for later timesteps to ensure precision during grasp.
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device),
+    )
+    weights = weights / weights.sum()
+
+    # Target position is the cream cheese at keypoint 2.
+    target_idx = torch.tensor([2], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+
+    # Compute negative squared distance to the target position.
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()  # Return scalar reward.
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # Guidance for moving the gripper with the cream cheese to the bowl (average position of keypoints 0 and 1).
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+
+    # Apply higher weight for later timesteps to ensure precision during placement.
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device),
+    )
+    weights = weights / weights.sum()
+
+    # Target position is the average of keypoints 0 and 1 (bowl).
+    target_indices = torch.tensor([0, 1], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_indices].mean(dim=0)
+
+    # Compute negative squared distance to the target position.
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()  # Return scalar reward.
+```

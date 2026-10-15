@@ -1,0 +1,25 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Move the gripper to pull the middle drawer handle along +X axis.
+    # Target position is an offset in the +X direction.
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+
+    # Focus on the final part of the trajectory
+    final_start = int(0.7 * T)
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device),
+    )
+    weights = weights / weights.sum()
+
+    # Middle drawer handle keypoint is at index 15
+    handle_idx = torch.tensor([15], dtype=torch.long, device=keypoints.device)
+    handle_pos = keypoints[handle_idx][0]
+
+    # Offset position to pull drawer handle along the +X axis
+    offsetted_point = handle_pos + torch.tensor([0.1, 0.0, 0.0], device=keypoints.device)  # Offset by 0.1 meters in +X
+    all_dists = torch.norm(action_sequence - offsetted_point, dim=-1)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()  # Return scalar reward
+

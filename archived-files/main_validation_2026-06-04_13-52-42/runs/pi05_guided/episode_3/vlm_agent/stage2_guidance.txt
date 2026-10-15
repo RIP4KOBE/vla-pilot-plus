@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No need for a specific decision here, so just return 0
+    return 0
+

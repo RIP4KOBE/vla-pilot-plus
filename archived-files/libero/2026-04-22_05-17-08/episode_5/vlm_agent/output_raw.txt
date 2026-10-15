@@ -1,0 +1,39 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the bowl (keypoint 1) located on the table.
+# Stage 2: Move gripper with the bowl to the top of the wooden cabinet (keypoint 11).
+
+num_stages = 2
+
+### stage 1 guidance (move gripper to grasp the bowl at keypoint 1)
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Keypoint 1 corresponds to the bowl
+    target_idx = torch.tensor([1], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Negative distance squared for reward
+    return reward.mean()  # MUST return scalar!
+
+### stage 2 guidance (move gripper with bowl to the top of the wooden cabinet at keypoint 11)
+def stage2_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Keypoint 11 corresponds to the top of the wooden cabinet
+    target_idx = torch.tensor([11], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Negative distance squared for reward
+    return reward.mean()  # MUST return scalar!
+```

@@ -1,0 +1,3 @@
+def stage2_guidance(keypoints, action_sequence):
+    return torch.tensor(0.0, device=action_sequence.device)  # No guidance needed for this stage
+

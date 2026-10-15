@@ -1,0 +1,2125 @@
+{
+  "schema": "historical_supplemental_source_v1",
+  "date": "2026-10-15",
+  "source_root": "/home/hynx/lizhuo/VLA-Pilot++/outputs",
+  "files": [
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_04-45-52/.hydra/config.yaml",
+      "published_path": "archived-files/libero/2026-04-22_04-45-52/.hydra/config.yaml",
+      "git_blob": "b21d53a35b818c39bbbe6d1a61868bcc4e516d44",
+      "sha256": "6bafd524168c1ee815fc5bd82ef8ab3a3bae5606cafbf4f28d27446fc6754377",
+      "bytes": 2138,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_04-45-52/.hydra/hydra.yaml",
+      "published_path": "archived-files/libero/2026-04-22_04-45-52/.hydra/hydra.yaml",
+      "git_blob": "454512f62940d7261dd7c795e7cf54d0fd0410c3",
+      "sha256": "4a5ad4270eeb9e845143a2c443191b52aaf0c3eae06017fabe8a6e4c320e575e",
+      "bytes": 3428,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_04-45-52/.hydra/overrides.yaml",
+      "published_path": "archived-files/libero/2026-04-22_04-45-52/.hydra/overrides.yaml",
+      "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_04-45-52/results.txt",
+      "published_path": "archived-files/libero/2026-04-22_04-45-52/results.txt",
+      "git_blob": "6928b1b2c47628bec1879b95f1e4aefc06e5f710",
+      "sha256": "2e5c8b113c840c83c816c263d9b6b0be61d4126ece79060509e6d509deb25e05",
+      "bytes": 59,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/.hydra/config.yaml",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/.hydra/config.yaml",
+      "git_blob": "26581f8434e9e3efa09a14ff3b388ea6946590c2",
+      "sha256": "8094b82ea707bd1330fdd7fd962b7e5b460a9c5cb4585f40f49cedfc2f75b971",
+      "bytes": 2135,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/.hydra/hydra.yaml",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/.hydra/hydra.yaml",
+      "git_blob": "f70444bc6d746555559e5590f22e86bcd140f581",
+      "sha256": "93552b5ef9399da8539b937fe52ecf5056fbf5f19f4aca432b14c600450cc29d",
+      "bytes": 3586,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/.hydra/overrides.yaml",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/.hydra/overrides.yaml",
+      "git_blob": "4b4154a0708d182da26b4bcf54b01bbd044610f4",
+      "sha256": "de14688257e65b3c8fa2bdd7bfbe5a1b13b0d20325f8bbe0bcc578256ad2f6f8",
+      "bytes": 78,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_1/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_1/vlm_agent/output_raw.txt",
+      "git_blob": "423a2de292a2b435bed38dabd794111ced62f637",
+      "sha256": "e410c11d3153daab5e40ec0faf9210015b7b22255b0ab4b79e96f9173f708324",
+      "bytes": 2222,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_1/vlm_agent/prompt.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_1/vlm_agent/prompt.txt",
+      "git_blob": "88a9882bf2bd29f84713e27fdc3bc2cf9d115858",
+      "sha256": "4b57c1dd306707afd0c589615d675bbc187dbd0ff264082261fc5d751bf45a39",
+      "bytes": 13488,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_1/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_1/vlm_agent/stage1_guidance.txt",
+      "git_blob": "f6edc2b077c42a601eeca3d6f45e8b2d77ddf8b2",
+      "sha256": "06043b929b86161569130b0c1b09012f86c0ccbffbcec792b01c3a5db061302d",
+      "bytes": 884,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_1/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_1/vlm_agent/stage2_guidance.txt",
+      "git_blob": "334aad58e907f1dd2067ef4a1dd802595eb256cd",
+      "sha256": "b47a9d077b239d7bfb3f410165f29c527a70a462ce8489226be0865ff475db12",
+      "bytes": 1101,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_10/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_10/vlm_agent/output_raw.txt",
+      "git_blob": "4f8a2490d7c7572b8e63a57f36d3890f1c22e89e",
+      "sha256": "5394be0742095116a605237c9dc42f60c3c32ed9770aa8b5a6b1f701e91a5416",
+      "bytes": 1352,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_10/vlm_agent/prompt.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_10/vlm_agent/prompt.txt",
+      "git_blob": "cd5df02ec158f33d8b06db2ee2a8a76e696f38e6",
+      "sha256": "f4128a774f6446e54b49e4bcc24d7f751b7ff5db7a18a607867b5fada997cde1",
+      "bytes": 13357,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_10/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_10/vlm_agent/stage1_guidance.txt",
+      "git_blob": "c0e963fb0af4ec22e7c0cc73cff93f7c8121afef",
+      "sha256": "1111e20d0f09cbbcb2eff01371a8021e768e4969486e1e561563f5052efeef41",
+      "bytes": 811,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_10/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_10/vlm_agent/stage2_guidance.txt",
+      "git_blob": "6363a5067da3cbcb3015ce3323629ceed1a904a8",
+      "sha256": "937caa7675e7118843a4e235c698b2d727cc400abfb72e45b0b3a09482b6ed71",
+      "bytes": 168,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_2/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_2/vlm_agent/output_raw.txt",
+      "git_blob": "7458cd1b505bed0bfb921683ea04bef191a7070c",
+      "sha256": "73fbfbce4022a65a7170ded70f88caa503ef49830e6164829722ba4fbbb9cc7b",
+      "bytes": 2073,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_2/vlm_agent/prompt.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_2/vlm_agent/prompt.txt",
+      "git_blob": "b804d09038afdc06702e37da9471da545a047c88",
+      "sha256": "6b7e4aa43742a3fa8a64e9a0a054931d5bcc00a574d1e8945d63a55d3882048a",
+      "bytes": 13459,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_2/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_2/vlm_agent/stage1_guidance.txt",
+      "git_blob": "a61e3d894915a054a92a28fd6398f176f4069797",
+      "sha256": "426b2384b7131ef63864907bf768af6c4f003b986a124a4f5b0950fc584698ac",
+      "bytes": 914,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_2/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_2/vlm_agent/stage2_guidance.txt",
+      "git_blob": "32f9823cba6b2f39d35e6cc89977caeda0bf09b4",
+      "sha256": "2d007d2afb850dca0114255cec1659e7229216a457305eaf9af703c4b0cfbdaa",
+      "bytes": 927,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_3/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_3/vlm_agent/output_raw.txt",
+      "git_blob": "20a3d54babdaa5246d87a52ce8a8619bbcfccb9d",
+      "sha256": "04d590856408cd220ca6f579ccb1a2d64267d4d44409e3f1b887021a912afed2",
+      "bytes": 1987,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_3/vlm_agent/prompt.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_3/vlm_agent/prompt.txt",
+      "git_blob": "c89b31d69a5900d73783a6df894f112ea0c37c7a",
+      "sha256": "371af5eb3f7970134e398453ebf95bf7124158d3f1187436d719a2d52202d257",
+      "bytes": 13575,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_3/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_3/vlm_agent/stage1_guidance.txt",
+      "git_blob": "0861d08d2af72dd48c06e9f174ed50ffab509032",
+      "sha256": "639ab2297b79029f6d76633a59fc573e2eecdafad8be9a7966e6d64c7c3593d4",
+      "bytes": 764,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_3/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_3/vlm_agent/stage2_guidance.txt",
+      "git_blob": "76f77683c1b32fd29cbb10ea5e3f36e443e2ce7b",
+      "sha256": "f2842f639cf6e883b2bef0fa2a1108b1fce7455059315af7b6563bdad471d1d7",
+      "bytes": 859,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_4/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_4/vlm_agent/output_raw.txt",
+      "git_blob": "da8ad3b141d3fda74a15f5f3775ec3d84b2c100b",
+      "sha256": "5b8312a56509db7a2d833f7b3e5bf363397182dbffeff0ff06c316a8a8b965cd",
+      "bytes": 1669,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_4/vlm_agent/prompt.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_4/vlm_agent/prompt.txt",
+      "git_blob": "4e5f2aab0f12e2d520efa8b6861059a29b4a8304",
+      "sha256": "7c51431dcf950afd16e58f585637968b4504ef231d149455b549f97f3775634b",
+      "bytes": 13570,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_4/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_4/vlm_agent/stage1_guidance.txt",
+      "git_blob": "6646103744c9e308e4550ef5a71247a14abed60f",
+      "sha256": "8e06be974552083703e8d3f897a63aea8065d97bc099c4b0a0924198ed5639af",
+      "bytes": 680,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_4/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_4/vlm_agent/stage2_guidance.txt",
+      "git_blob": "c788e09d41e0c137c0c41fca634dd720d5ac0523",
+      "sha256": "4c3f0d2d60e1698481e4082fa6040077d4e2b1b159755c34e299c1e3af7ae5f1",
+      "bytes": 718,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_5/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_5/vlm_agent/output_raw.txt",
+      "git_blob": "b59af84bef261d4ba73ed2db6086021813cc8927",
+      "sha256": "3ce90a8c3ac3c5c09502a6752aeaacd5fbaf2988af4314d9b189d347bc6ea691",
+      "bytes": 1997,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_5/vlm_agent/prompt.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_5/vlm_agent/prompt.txt",
+      "git_blob": "285c76831a7ea0d426f8061480364040639ed7a5",
+      "sha256": "71d0437c757c2156954ff6ed38fa44c8c58c19e17a03ecab2ed49ed0afb9edfe",
+      "bytes": 13265,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_5/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_5/vlm_agent/stage1_guidance.txt",
+      "git_blob": "9dd4911c339535137a876057376d93078b373441",
+      "sha256": "023f5b5b0099ec431cbcb3fd00f75b149e27597483cf98afdb99316df5e902e4",
+      "bytes": 801,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_5/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_5/vlm_agent/stage2_guidance.txt",
+      "git_blob": "a9a60485d54fd82e15e261a55b2cbda5bf9ecfd4",
+      "sha256": "309ac20cfd858270910a3eca2e572ab1b05a2dbbde0edd77189759e3ec249233",
+      "bytes": 824,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_6/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_6/vlm_agent/output_raw.txt",
+      "git_blob": "cd3e611ae265c764ca6613996ce58fcf3717c63f",
+      "sha256": "5509fb1cd20fdd4ed47c39f271d8634fe35e3c08ebded7f9f9b0a49643b722a9",
+      "bytes": 1878,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_6/vlm_agent/prompt.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_6/vlm_agent/prompt.txt",
+      "git_blob": "664e4a0b79663321e381b0e5a5f748924620c2b8",
+      "sha256": "b36447a146a3a1f10aee22211453e3f45515fd791d81cabeb0944d7be4defe45",
+      "bytes": 13265,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_6/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_6/vlm_agent/stage1_guidance.txt",
+      "git_blob": "4fbeb9d9d1d2c64bc984ed8165d7246a2ffe6f96",
+      "sha256": "3867562932da4f64ce99b2712f85b1e7262def30913b5c338a334564bfed892f",
+      "bytes": 760,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_6/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_6/vlm_agent/stage2_guidance.txt",
+      "git_blob": "ace4c8b1c55ddf0d989748f6ec8f79d195576de5",
+      "sha256": "a91a61a71aded16a360ee32f65ed2a76765ceaccd18d2890bd0e2aac39a31501",
+      "bytes": 796,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_7/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_7/vlm_agent/output_raw.txt",
+      "git_blob": "43f984e5e340f03e1105c6780a8ad0b95ba705d6",
+      "sha256": "43089d09dae02ea82d5d1d1cf46514306ab0923b0cae1e13ac5996d98f953bbb",
+      "bytes": 2236,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_7/vlm_agent/prompt.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_7/vlm_agent/prompt.txt",
+      "git_blob": "51c4572d2ad9b224bf0e496218b67a44888dee75",
+      "sha256": "b88d75c1ef874da6b55075b614e587e2b959020482fcfc93c892bee826fe75e1",
+      "bytes": 13333,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_7/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_7/vlm_agent/stage1_guidance.txt",
+      "git_blob": "1f988a2f108b269a44f1f8bb70367fc024ad080f",
+      "sha256": "b00dceaa056c15dea15309f9d4213c8f9cbb7ed14cbfffdd87ed1bb009fc1bf5",
+      "bytes": 968,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_7/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_7/vlm_agent/stage2_guidance.txt",
+      "git_blob": "129c196c05e98865e5f006981f41ad4c0c200057",
+      "sha256": "31fc56ddf5a0b90a024bf2d1ea1778c015314fa219fc76d4e5b6796b26237895",
+      "bytes": 1035,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_8/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_8/vlm_agent/output_raw.txt",
+      "git_blob": "8427466f5a6a394e3178092b180b9929b313df0e",
+      "sha256": "80ad1de422f2085a5c903d5c730c6dc4f51a958d17680e2e225071aab3181cf9",
+      "bytes": 1181,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_8/vlm_agent/prompt.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_8/vlm_agent/prompt.txt",
+      "git_blob": "fdbc5c1233947d4152978ccf3a20ca4d806e18bc",
+      "sha256": "b83e4748b60cdd5b0881ef7ab125436d87c3493a83805aa9689a1bee95789de2",
+      "bytes": 13373,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_8/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_8/vlm_agent/stage1_guidance.txt",
+      "git_blob": "2e8d90ef018b677d046c13a8ccad48a9dfe7e9d8",
+      "sha256": "6726b7e6c9823478f60763c156199d0abb7110929523af2279e43464cc50c9d1",
+      "bytes": 1033,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_9/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_9/vlm_agent/output_raw.txt",
+      "git_blob": "9bce39f70b56ecf94d74c762b4921281f3f8a0e5",
+      "sha256": "dc0c80cad425bb4bc603e0f31de859cb0db4fa13bf82f0e03ac422f81325fe87",
+      "bytes": 2156,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_9/vlm_agent/prompt.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_9/vlm_agent/prompt.txt",
+      "git_blob": "22120ed5bec825375b23f98b34b484a3e42d1180",
+      "sha256": "b0dfbb8469c84b86f9fe9040106b6831513aa647c619a284afcb2a4a7059f948",
+      "bytes": 13461,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_9/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_9/vlm_agent/stage1_guidance.txt",
+      "git_blob": "be4710d24dcda22fcff3c3212654da1d5cb38181",
+      "sha256": "18f5131f2bb1bd03beef2dcfff08f251f72d83922feefe9b9f49a34bf4dd0f35",
+      "bytes": 933,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/episode_9/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/episode_9/vlm_agent/stage2_guidance.txt",
+      "git_blob": "a73de017037ec2943943ff6381855d5c68d22012",
+      "sha256": "ac39d36139b488e756b5ddcb886206362a25045dd79099578316d664b02a6982",
+      "bytes": 996,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-04-22_05-17-08/results.txt",
+      "published_path": "archived-files/libero/2026-04-22_05-17-08/results.txt",
+      "git_blob": "04d96ff05c3e6c1ca1af3af878eb9cfb010dd4d6",
+      "sha256": "81438afee943039db878ca1d85759b37450552bf6d0e073bf6b689ba8421c49e",
+      "bytes": 57,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_12-47-05/.hydra/config.yaml",
+      "published_path": "archived-files/libero/2026-06-04_12-47-05/.hydra/config.yaml",
+      "git_blob": "19ff06fd6a04b11f3a90cc2cc7f1151065750d3c",
+      "sha256": "7c0e89a127f51118da846d5580ce7c5f5e0030cc6042556dbe0711befc42c996",
+      "bytes": 2641,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_12-47-05/.hydra/hydra.yaml",
+      "published_path": "archived-files/libero/2026-06-04_12-47-05/.hydra/hydra.yaml",
+      "git_blob": "50e6b82bbf5151ef4a97c7e179244bcc9b1c0eea",
+      "sha256": "cc43aaa821c8047998c33f1b3b9bc0627e9231413e703a499476c07d0831dc04",
+      "bytes": 3460,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_12-47-05/.hydra/overrides.yaml",
+      "published_path": "archived-files/libero/2026-06-04_12-47-05/.hydra/overrides.yaml",
+      "git_blob": "675fdf747a7c6e55df005481c6607cb8a3f21e66",
+      "sha256": "3a7eee4b25075b2229919b01aac0ebaf34e3a7029d42ca27fbacd58e73c6e80b",
+      "bytes": 18,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_12-47-05/results.txt",
+      "published_path": "archived-files/libero/2026-06-04_12-47-05/results.txt",
+      "git_blob": "f20b125d78d9a49a98639ad36cddb7d8bb90613e",
+      "sha256": "9e5a4c2738e146d33f34955e6e3b288ec35136d58092c0f7d006f622403cc923",
+      "bytes": 57,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/.hydra/config.yaml",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/.hydra/config.yaml",
+      "git_blob": "10b03aa79a188f3032d0de1669527fd70dca8186",
+      "sha256": "f044b5573ce857a05b544010ea9973a0a90f7839d61f842acb8e7ebb1f961113",
+      "bytes": 2640,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/.hydra/hydra.yaml",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/.hydra/hydra.yaml",
+      "git_blob": "e662fcc2f90630acc283dcfbf38e993722d0ab9c",
+      "sha256": "10311102abf65fb277d148aa5cba8c354a46fc878ddb59e8e612d2bfcebb90eb",
+      "bytes": 3570,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/.hydra/overrides.yaml",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/.hydra/overrides.yaml",
+      "git_blob": "13e164f7e994346f35e36460dc6582aa72244061",
+      "sha256": "feb8289ba6b653c4ee8da753b134570d41372085ff9a7489207b3ed02e49f1a2",
+      "bytes": 71,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_1/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_1/vlm_agent/output_raw.txt",
+      "git_blob": "2a15220098ef75ec9d52394b7c8a67c5b1c16469",
+      "sha256": "159ba56eb5adfd729daf6737bc258c65d05b0f3b474cf267b1c988536067edd2",
+      "bytes": 1431,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_1/vlm_agent/prompt.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_1/vlm_agent/prompt.txt",
+      "git_blob": "17b4b2cbb2d61e565e2ea155114968cda86a7fb4",
+      "sha256": "1786da1fed0329c9cd4b6bc88bfe39862f767a56dcdacd472f810c951643f560",
+      "bytes": 12474,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_1/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_1/vlm_agent/stage1_guidance.txt",
+      "git_blob": "cb283665b448b2ab987afc0098b38b4c7a858607",
+      "sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+      "bytes": 979,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_1/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_1/vlm_agent/stage2_guidance.txt",
+      "git_blob": "fe9f92854fafc7a159bd189cd54383f153424ed5",
+      "sha256": "ca058cc1dcf87ce5910181800bb2f65b8cd4d92788b27f3b10b1e33dbc103f84",
+      "bytes": 194,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_10/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_10/vlm_agent/output_raw.txt",
+      "git_blob": "f1a9d60b53aa9854babc36c3f7fd600b69493c33",
+      "sha256": "f29aa2d6723e3058730a6f3459e580f3eb69a7809ddf08e7c1fe092bd0c58138",
+      "bytes": 1373,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_10/vlm_agent/prompt.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_10/vlm_agent/prompt.txt",
+      "git_blob": "3d69a3ece4b2fc922933cbaa9772e7f7e31aea3b",
+      "sha256": "893c8b78af34e701e6fc587da2666aaa49bafcafe0169510adc74ccd9a687357",
+      "bytes": 12546,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_10/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_10/vlm_agent/stage1_guidance.txt",
+      "git_blob": "1d4525853e5a86781f354e045beb6a0af5698013",
+      "sha256": "54e0b9cd26af1ec502e51263e3b2c9f7839cf950b36af3a8ee5b0762bd129c03",
+      "bytes": 952,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_10/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_10/vlm_agent/stage2_guidance.txt",
+      "git_blob": "b2d6293b784a2336a8d5418404514cc0ad324aca",
+      "sha256": "8be9f6d2fb75ea417bc26f3130ff627e66d2f22fae96646174e1d96a3c64f329",
+      "bytes": 185,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_2/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_2/vlm_agent/output_raw.txt",
+      "git_blob": "58f1fa0b810638179458804f13282c9de56227d5",
+      "sha256": "11af47e6079c83a8667f7ca93f5f32d949b59d76ff3553c82f2f1da2550fd844",
+      "bytes": 1600,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_2/vlm_agent/prompt.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_2/vlm_agent/prompt.txt",
+      "git_blob": "76c202d68fbbce246e7296a8a39939a482286fc3",
+      "sha256": "f2d1c49c7435df9012a2f128156d12e04a5888e3ee087e73f8ba00957d26e4ce",
+      "bytes": 12351,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_2/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_2/vlm_agent/stage1_guidance.txt",
+      "git_blob": "5ee4395bfe11907a3557c35eba4f02c4894e353c",
+      "sha256": "9d1ce9665321bfbe15ee3f3078a9c2225a280f089693d401d4f7ee53c2ca8975",
+      "bytes": 930,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_2/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_2/vlm_agent/stage2_guidance.txt",
+      "git_blob": "c3479668e2662f28b7036e6a2224d57b33cf306a",
+      "sha256": "0851d1e160154c932939e513ecfb3954b505c83693bc6bdf66f961ebb639f7f9",
+      "bytes": 335,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_3/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_3/vlm_agent/output_raw.txt",
+      "git_blob": "3c83d5a3411ee57b9c81c089cb7e7e646403cf99",
+      "sha256": "246be34e9b4a1f821509e1f8b197a0a86c935bd96ba5d8cd8c98ec8542ec2879",
+      "bytes": 1468,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_3/vlm_agent/prompt.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_3/vlm_agent/prompt.txt",
+      "git_blob": "2e0d2c176799aec73102c9d0383efea652ec7040",
+      "sha256": "664d21fc34c1867ac5b9a06d6036c85605a75c91973d2f4a2fd2af2b40916231",
+      "bytes": 12419,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_3/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_3/vlm_agent/stage1_guidance.txt",
+      "git_blob": "0a2446460cf03d8dbdc4e3e895bcdcf549a8ed21",
+      "sha256": "4f9a8875a96fcaf04332b061326d944ce224d87025ff21a60096614472cfa9c7",
+      "bytes": 1022,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_3/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_3/vlm_agent/stage2_guidance.txt",
+      "git_blob": "a29b79d6e561cf8a991006a9a1e98a1c1ab43283",
+      "sha256": "13430efb04b08263e096c2ddcb83ebd20fcd5b27ebcc443a32fa92f421e37772",
+      "bytes": 173,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_4/episode_4_fail_error.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_4/episode_4_fail_error.txt",
+      "git_blob": "92b09c3149dd902a21203c3352660a4ddf03e381",
+      "sha256": "522c3f87204ddd7eb278124705c972ea621d54f577162d6cd1bea37aadd092b5",
+      "bytes": 46,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_4/error.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_4/error.txt",
+      "git_blob": "b3682a4849b72a8d805162d6725d2fa188f72b62",
+      "sha256": "08edafb7d041b033ae50dd6c5ceb679079ff1c35afaa5f5dfb75c99e5b451bd5",
+      "bytes": 1351,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_4/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_4/vlm_agent/output_raw.txt",
+      "git_blob": "3b50dde5a4fe61b1b1fc0671c70cccf188767543",
+      "sha256": "1cbf9b0684a1c48055556bf6381b4ea68eb409e0c205b7bba927325f43e88fca",
+      "bytes": 1615,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_4/vlm_agent/prompt.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_4/vlm_agent/prompt.txt",
+      "git_blob": "600afecec947d00555dc2d5a71ea3a9f1793cc17",
+      "sha256": "aa7e93c64e2fd26a5902f6a920a9ec1ee9ef016eb0a9c0afa55b5dfdeb565d96",
+      "bytes": 12484,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_4/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_4/vlm_agent/stage1_guidance.txt",
+      "git_blob": "1a55b0246820b130db7f1f84a29da52da3b60a9c",
+      "sha256": "3a164ec1bfbcff6f41a530cc7c89617f1593e29aa35aa015a917c4fef772ecfd",
+      "bytes": 1155,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_4/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_4/vlm_agent/stage2_guidance.txt",
+      "git_blob": "effb7d4a47a9bca22f60d3cae0c293117ded5a02",
+      "sha256": "311e49cde652aa7af273b373992a8f33467b589c9b10a25758907194833a2844",
+      "bytes": 173,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_5/episode_5_fail_error.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_5/episode_5_fail_error.txt",
+      "git_blob": "f331b1899069ebfc62095c6617ecb00357caa16d",
+      "sha256": "0b93f798e59e6e7f1c88b688c311e2c20a665291537eb57a979e49dd3a2e26e9",
+      "bytes": 117,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_5/error.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_5/error.txt",
+      "git_blob": "1c69e96d6495a54c48ab3e292cedfc862cbe1bd9",
+      "sha256": "ff10bd2c78877b86b63c87ec0cdb7c42c9b4ac8cf6bbd11e58a616e16737643c",
+      "bytes": 852,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_5/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_5/vlm_agent/output_raw.txt",
+      "git_blob": "1c05e6cb996e6eb183738c1e285f35161e12fbf0",
+      "sha256": "c00b11267ee45c2fab04a14af03ef0c4654393b2ab8f2e22700f82de7ab89877",
+      "bytes": 1304,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_5/vlm_agent/prompt.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_5/vlm_agent/prompt.txt",
+      "git_blob": "a05e47328cd06d30a76238acc9488e343a2d8f65",
+      "sha256": "ef61ce7087af2140a5c595bc8444a8d3280980c3821be7b82bcbe32e44b39523",
+      "bytes": 12594,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_5/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_5/vlm_agent/stage1_guidance.txt",
+      "git_blob": "3c70fd6579f380dc09d1b885040cf889504e0192",
+      "sha256": "64156b704ea00f4597b2b71dff3d561ac9210ca16cdd47184ac03f2f810de91d",
+      "bytes": 835,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_5/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_5/vlm_agent/stage2_guidance.txt",
+      "git_blob": "6c686399f360990381496f1cc5a51e1d8ff18f30",
+      "sha256": "81b1cb058ca4c03d3b2d74f14fecf8ba1e96cba4349cbff1c40e50647d47e726",
+      "bytes": 199,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_6/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_6/vlm_agent/output_raw.txt",
+      "git_blob": "e8a78fa975e8348bf2fb102160b3ae9aea58b6a8",
+      "sha256": "3afeeefc0b4f62dd2d961b03a788559f5073b57e50f20ec5c9ac5d6edf819c4e",
+      "bytes": 1345,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_6/vlm_agent/prompt.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_6/vlm_agent/prompt.txt",
+      "git_blob": "6d487bf50b29b810acfdcb0ecdfbd9b8b1a96331",
+      "sha256": "451c02e715e4297e736637773051b0b69fcbdd54a0c9fa10680fdce21ec14feb",
+      "bytes": 12470,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_6/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_6/vlm_agent/stage1_guidance.txt",
+      "git_blob": "d89dd0262eff4cd928816700e691fbae18b4f0a4",
+      "sha256": "6829d9d783d18ef60752614331593682d2e93f346c6fd79fe8b55d4e55564d4b",
+      "bytes": 822,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_6/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_6/vlm_agent/stage2_guidance.txt",
+      "git_blob": "6f2162e5717c61d20d1b90a5f19e90bc459856b9",
+      "sha256": "7c6697b3d830f1a6a12384feef937d65c1b9688234ba488378dbb4c6f0ea26d3",
+      "bytes": 180,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_7/episode_7_fail_error.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_7/episode_7_fail_error.txt",
+      "git_blob": "92b09c3149dd902a21203c3352660a4ddf03e381",
+      "sha256": "522c3f87204ddd7eb278124705c972ea621d54f577162d6cd1bea37aadd092b5",
+      "bytes": 46,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_7/error.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_7/error.txt",
+      "git_blob": "de437c7f79fb3dce48fb18f5cd3e18f430b76b4b",
+      "sha256": "97d97f6c4c3b46b7918d02d31af15b87d7383dff9a0638a43376c0c25a800058",
+      "bytes": 1351,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_7/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_7/vlm_agent/output_raw.txt",
+      "git_blob": "9d132913068f62de9ff4739837d4a19cc22777e8",
+      "sha256": "23027f98f7dd23a8756754177256f414add6667a7ea1f43983c99ce7e87df9f6",
+      "bytes": 1398,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_7/vlm_agent/prompt.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_7/vlm_agent/prompt.txt",
+      "git_blob": "1d6ec30296c55c11db3f4ce970a0474d0c044d89",
+      "sha256": "c3393a1d395e6c2d3d57f2df30e44e605fc2aba1c8e11f2a3d51a52947784c69",
+      "bytes": 12410,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_7/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_7/vlm_agent/stage1_guidance.txt",
+      "git_blob": "654783805cfbce13f4595e15e0c63bf364b928ce",
+      "sha256": "50011247bb023cfacbffd1853dea3cb4def5192e58aaa29f2710ba929de69d7d",
+      "bytes": 868,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_7/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_7/vlm_agent/stage2_guidance.txt",
+      "git_blob": "aef40a705f69d7124b0e27ffe00b77b3bceb1ab9",
+      "sha256": "2cbfa8615dfaa5e73e48d91b2282d7035bfc0460ae819bed2d2f223f0c7cc7eb",
+      "bytes": 169,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_8/episode_8_fail_error.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_8/episode_8_fail_error.txt",
+      "git_blob": "92b09c3149dd902a21203c3352660a4ddf03e381",
+      "sha256": "522c3f87204ddd7eb278124705c972ea621d54f577162d6cd1bea37aadd092b5",
+      "bytes": 46,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_8/error.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_8/error.txt",
+      "git_blob": "6ae1b432f518cfea629bc3fea561a0f4857f4df8",
+      "sha256": "9a5137619b933523c35cf437ed79968ab08e3b6ae872db8825304e39d57c4244",
+      "bytes": 1351,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_8/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_8/vlm_agent/output_raw.txt",
+      "git_blob": "57d8680446e57f7cd9a45e1bad16961b8d4a602f",
+      "sha256": "2ec5997aa5e48f94287450c479d1b8e7a39fd24f72c717fd82f89f8e1dbf8e16",
+      "bytes": 1220,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_8/vlm_agent/prompt.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_8/vlm_agent/prompt.txt",
+      "git_blob": "bf7a7857b8c0da92c9b12ddf10ffa27a837e287e",
+      "sha256": "541c26c7bb0444276ee29d4dfcfaf7588429224042dabf2e3a69b0b5b0f3396a",
+      "bytes": 12407,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_8/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_8/vlm_agent/stage1_guidance.txt",
+      "git_blob": "ee214eb9bd655b3446705a01145386f76638645e",
+      "sha256": "a3e003b3ed54568ff0699a867f6d5c3eb5d66d55f1d0319ff55b98d2888ba28d",
+      "bytes": 758,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_8/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_8/vlm_agent/stage2_guidance.txt",
+      "git_blob": "6ddb82bb3431dc5cb5667327a529db32b847a71c",
+      "sha256": "a650929122abe373f7ba9e4f769e743de5a8b6eb77e88e8691ba9d5c3535d6cb",
+      "bytes": 252,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_9/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_9/vlm_agent/output_raw.txt",
+      "git_blob": "4a03b14df7064ed404b3252b3dce2e146cf1465f",
+      "sha256": "0ac415cbf57018e0121167fe3987d92378ae56b6df00fce91d10b8c7346c3b72",
+      "bytes": 1252,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_9/vlm_agent/prompt.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_9/vlm_agent/prompt.txt",
+      "git_blob": "6be8946f8084ea2ab077bae06fef71d06795e542",
+      "sha256": "c0a901be6e4f6ab02880c27f65ceeac567e91770f755a0029c2ed76f1a3c32e8",
+      "bytes": 12433,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_9/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_9/vlm_agent/stage1_guidance.txt",
+      "git_blob": "a22762fce5930f460c0e84972343fab4ceca40c6",
+      "sha256": "80b0a956188b1ad0a9533df96566a51c28bb55b4cafd1d2ef4701caba72cac88",
+      "bytes": 828,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_9/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/episode_9/vlm_agent/stage2_guidance.txt",
+      "git_blob": "61ca7ddd3313533d61e20524571c56fc3d021806",
+      "sha256": "cd624cb16350f044cb8b4677076849ab4495ee5339c58bbfb1531a0d04917165",
+      "bytes": 188,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/results.txt",
+      "published_path": "archived-files/libero/2026-06-04_13-21-01/results.txt",
+      "git_blob": "23304fcd29cdca992bb673f623ce4242dd6457c2",
+      "sha256": "f34dfc63cc6e86899e64f4aa6d6c03b98600b6c10e71504f2b2e56a30f484c1c",
+      "bytes": 57,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/commands.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/commands.txt",
+      "git_blob": "603412bd7afee3e2208683e2a4bc1f4824d3772c",
+      "sha256": "ca63c9fc6ecfdc87cea2aeb6940042d0ad1ccb1e95bc66d894b65be0fbff8978",
+      "bytes": 284,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/.hydra/config.yaml",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/.hydra/config.yaml",
+      "git_blob": "d7104c0656bfbb6feae9b17af34177b7edb42c0c",
+      "sha256": "3b163b743a9684f4b0062a5146cf1ffe2db4f736e731533bc8d9aebcdbb73eae",
+      "bytes": 2641,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/.hydra/hydra.yaml",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/.hydra/hydra.yaml",
+      "git_blob": "d0e653ef0fb3806dac9f48791ab34cd9e66c0d47",
+      "sha256": "c00aa78761b2f7bfcf668784bf513bc11311cf4b28140b2b98d86b22598e6490",
+      "bytes": 3590,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/.hydra/overrides.yaml",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/.hydra/overrides.yaml",
+      "git_blob": "87d2aecdf7126320993f5275eda45408a0c6e47a",
+      "sha256": "d076ce17c455c55314fba52a7d85149c0ccabec541a108f9ee10c47b47d521b9",
+      "bytes": 25,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_1/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_1/vlm_agent/output_raw.txt",
+      "git_blob": "047dd939a2ab3e39f28a062404ecabc57fda8fec",
+      "sha256": "94a662deaed1893de92e96daa30d2b28d06981918cf80a3d6cd1925636adcc3b",
+      "bytes": 1266,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_1/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_1/vlm_agent/prompt.txt",
+      "git_blob": "17b4b2cbb2d61e565e2ea155114968cda86a7fb4",
+      "sha256": "1786da1fed0329c9cd4b6bc88bfe39862f767a56dcdacd472f810c951643f560",
+      "bytes": 12474,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_1/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_1/vlm_agent/stage1_guidance.txt",
+      "git_blob": "7e1ce6a247e618eaff488bd279d628201fe66ec6",
+      "sha256": "cc4b33ddfdaaedd76c5111c34c8daba0e7b912185715698ff1a0047cb60f5def",
+      "bytes": 836,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_1/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_1/vlm_agent/stage2_guidance.txt",
+      "git_blob": "ab0f57c5bad9137e107952082f788df88df3e105",
+      "sha256": "cbf6a52feb4cd503fb26505cc660d9380af208d786f50e0de736f0ef9f80b4af",
+      "bytes": 203,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_2/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_2/vlm_agent/output_raw.txt",
+      "git_blob": "d6305252c2c519873421c52833f8ca32139e641b",
+      "sha256": "a701b46a4897e49d4f23a46a9a876850a90c93333b94e2acde1aca36ad17fb3e",
+      "bytes": 1260,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_2/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_2/vlm_agent/prompt.txt",
+      "git_blob": "63383233f664ba48e3130dfef588d6fae23a16ef",
+      "sha256": "6bf3a61b7c8bb97b5c62278d76022067e49c0a8c264c0231842b7d11955014c0",
+      "bytes": 12351,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_2/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_2/vlm_agent/stage1_guidance.txt",
+      "git_blob": "16c4b1cca3129e0f5fbc947609dda66e536242e8",
+      "sha256": "a1d5436e3e10b8531560dbecab2b4210c698b99cb8dc126eafc232c6bd36ea73",
+      "bytes": 838,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_2/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_2/vlm_agent/stage2_guidance.txt",
+      "git_blob": "d281328d3dfc8742b0a755cae3cb40eef28a637d",
+      "sha256": "fc0d15dee007aa846350bafb91882a701b3889edd8f42de8a7088940d0bfe70d",
+      "bytes": 191,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_3/episode_3_fail_error.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_3/episode_3_fail_error.txt",
+      "git_blob": "92b09c3149dd902a21203c3352660a4ddf03e381",
+      "sha256": "522c3f87204ddd7eb278124705c972ea621d54f577162d6cd1bea37aadd092b5",
+      "bytes": 46,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_3/error.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_3/error.txt",
+      "git_blob": "24ee1a2efc461dd48c407fc058aaecffa624c208",
+      "sha256": "9dbfe24e32f1fa7b0c0b2ce2454c4a19d9a0393b9de30c882fed8bed135ea852",
+      "bytes": 1377,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_3/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_3/vlm_agent/output_raw.txt",
+      "git_blob": "564d1e1ad2d984a767974ac0ff9fb388a911ee49",
+      "sha256": "d65e740e2f3113e368cf83501bc19f496cf6cc8e2e14b39721540067309d0f1e",
+      "bytes": 1255,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_3/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_3/vlm_agent/prompt.txt",
+      "git_blob": "2e0d2c176799aec73102c9d0383efea652ec7040",
+      "sha256": "664d21fc34c1867ac5b9a06d6036c85605a75c91973d2f4a2fd2af2b40916231",
+      "bytes": 12419,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_3/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_3/vlm_agent/stage1_guidance.txt",
+      "git_blob": "ec86882e4cb0edd60dd047fd40565d89576a1178",
+      "sha256": "30401bf778ac7fb261f28c5d379e5a511dd9def52b92f347f95c4d2f70937e92",
+      "bytes": 848,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_3/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_3/vlm_agent/stage2_guidance.txt",
+      "git_blob": "33f4dddde0aa7eedd1fb485b9a026e3e6397eb48",
+      "sha256": "41f2307966bf27eba9dd65ad37959edf8ca34b235c7c50ed31cadb580de4c5f8",
+      "bytes": 124,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_4/episode_4_fail_error.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_4/episode_4_fail_error.txt",
+      "git_blob": "92b09c3149dd902a21203c3352660a4ddf03e381",
+      "sha256": "522c3f87204ddd7eb278124705c972ea621d54f577162d6cd1bea37aadd092b5",
+      "bytes": 46,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_4/error.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_4/error.txt",
+      "git_blob": "ce6dd4219aba251afb679bce7475eaf4412b5582",
+      "sha256": "6aba43b3410bd914401b7e2a095a2581904579332f00eb71f4bd70780cbd3df6",
+      "bytes": 1377,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_4/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_4/vlm_agent/output_raw.txt",
+      "git_blob": "eb0696b5c83b897c7798cb327a202479a8486cb6",
+      "sha256": "8f0a043e0d270f1792415fafd5882f9484f398c280821904283ee0c34217109c",
+      "bytes": 1653,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_4/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_4/vlm_agent/prompt.txt",
+      "git_blob": "9a1307705f4c75f6551999c7e95e7bd2d9648bb6",
+      "sha256": "0b8fe7638f374409ecb85291baf72ba16df08d30fd4bc1ce0a6a34166434177e",
+      "bytes": 12484,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_4/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_4/vlm_agent/stage1_guidance.txt",
+      "git_blob": "2c01db6e7ff9846de3d891b8d89ac9ea5cd99037",
+      "sha256": "1c2840bc49ae1f927e34df91d8d3ae7f6cbd05b622dbcdaa7d5ecabb9580d0e1",
+      "bytes": 1143,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_4/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_4/vlm_agent/stage2_guidance.txt",
+      "git_blob": "b412ec4e75013a5c0316c37ef3bf31f697ea019b",
+      "sha256": "31b8bce36a06616b0b0a161d22980d3b4076c279cee88266dcd7a0dee29cd174",
+      "bytes": 140,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_5/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_5/vlm_agent/output_raw.txt",
+      "git_blob": "5e865c93b3dd49168a7908df1c2906f75a6a4cb4",
+      "sha256": "f8080c674341b9cf73919deddda508ac4a8e8f26f3fc44c10d9f94473249a977",
+      "bytes": 1464,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_5/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_5/vlm_agent/prompt.txt",
+      "git_blob": "3113c5c82ded8fd434c8438e31ed747e1351b33a",
+      "sha256": "bc21f1128b9622b6fb3de607920e0bd6c7c8b1afc9351ffdccffea0b0a13b691",
+      "bytes": 12594,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_5/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_5/vlm_agent/stage1_guidance.txt",
+      "git_blob": "f55c8c710b1d87e18e1cc7eb55faa6cf187a1771",
+      "sha256": "95eda0cbe3fdd4d9888a298ea72d4387a17bbf17d7a52283acd65f88fb69d766",
+      "bytes": 934,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_5/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_5/vlm_agent/stage2_guidance.txt",
+      "git_blob": "8993dd8e024b450aede3a460efc150139d31c96b",
+      "sha256": "a7aa1445e0270421bfdec4eb44a6bd1effb4ac22b1ee6a9977cdc14b3cc161e9",
+      "bytes": 225,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_unguided/.hydra/config.yaml",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_unguided/.hydra/config.yaml",
+      "git_blob": "84d3ee892958e6f15abb4466d943c57f9f9238a7",
+      "sha256": "d361e30087bbe8d259faae5d729bf0f4bcd40ba0218158166867dc59c0f83c48",
+      "bytes": 2642,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_unguided/.hydra/hydra.yaml",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_unguided/.hydra/hydra.yaml",
+      "git_blob": "f1989eff173ceaaaaef25348b929150347ad1beb",
+      "sha256": "78d00428ceab6002acdbb5676f69831ead58fa8f1072e65c902550ccdbbac02e",
+      "bytes": 3550,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_unguided/.hydra/overrides.yaml",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_unguided/.hydra/overrides.yaml",
+      "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/pi05_unguided/results.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/pi05_unguided/results.txt",
+      "git_blob": "6928b1b2c47628bec1879b95f1e4aefc06e5f710",
+      "sha256": "2e5c8b113c840c83c816c263d9b6b0be61d4126ece79060509e6d509deb25e05",
+      "bytes": 59,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/.hydra/config.yaml",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/.hydra/config.yaml",
+      "git_blob": "86cbfbfaa32010ce71e59c2c9cd91bb3dfb39721",
+      "sha256": "5c9c2e9c8d5480a28210578fcaab465c82bcdf337a09198a686c7e64ee2ee08e",
+      "bytes": 2640,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/.hydra/hydra.yaml",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/.hydra/hydra.yaml",
+      "git_blob": "7948947155a9ec0b41c7d1d0bf681c9e99c23642",
+      "sha256": "4b6c06208cbb7e640d96182446f1ed1f7f2bb867c3bafce4982c960d22592e86",
+      "bytes": 3625,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/.hydra/overrides.yaml",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/.hydra/overrides.yaml",
+      "git_blob": "c157d3e8dddda9397b590ec1cc0290f9fc2eca93",
+      "sha256": "0b653ec12f262905830ed4b93cc292b902ea6ff27f73062e58abde68473e4acb",
+      "bytes": 43,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_1/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_1/vlm_agent/output_raw.txt",
+      "git_blob": "3869927445a75576dc44253483bdc9c78fc0fa0a",
+      "sha256": "6760edbecc4c0edfa1bedb97912bae4026f31267e933bd12f3b128d8834a823d",
+      "bytes": 1544,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_1/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_1/vlm_agent/prompt.txt",
+      "git_blob": "17b4b2cbb2d61e565e2ea155114968cda86a7fb4",
+      "sha256": "1786da1fed0329c9cd4b6bc88bfe39862f767a56dcdacd472f810c951643f560",
+      "bytes": 12474,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_1/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_1/vlm_agent/stage1_guidance.txt",
+      "git_blob": "663d7827714c149d1e1619dbb2de7412ef5aaee6",
+      "sha256": "1fb10e12bd7274c085054205de11063c94a957c73c8b2349fb86850f71635e4e",
+      "bytes": 1059,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_1/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_1/vlm_agent/stage2_guidance.txt",
+      "git_blob": "145e184f6f76f737c1fa98c8b76535c946304fe0",
+      "sha256": "05526a37c3ff2e14bd1be442cad9f9362299433ba4eb7764ce94df43874f4acb",
+      "bytes": 171,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_2/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_2/vlm_agent/output_raw.txt",
+      "git_blob": "af8d77b916fc5d8f3b6ecf7133f11a53528dc76e",
+      "sha256": "2891ba7ee29ee153b92ae17fd3472e1de5f3899738ae62e9311d14694b39998f",
+      "bytes": 1545,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_2/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_2/vlm_agent/prompt.txt",
+      "git_blob": "c9335d352a93b073d0204882123220752efa0ae6",
+      "sha256": "392ddf6526610a061d9b804c29f931f9ea6d84e710ef02d89c9802c86d8c5ef6",
+      "bytes": 12351,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_2/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_2/vlm_agent/stage1_guidance.txt",
+      "git_blob": "c364336e383c0c249019cd2f620e632d5170ec07",
+      "sha256": "298d11cccda82ec070a79e52bea673a05d3b9e41ee5f84e1457378fe3a1c352c",
+      "bytes": 1053,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_2/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_2/vlm_agent/stage2_guidance.txt",
+      "git_blob": "7dbe52663f8d7bcc1721f80aea8bdf437ad0490b",
+      "sha256": "97269f56f97190967ba736bebfbee92c83c158886db330af92b46af71452ed2e",
+      "bytes": 251,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_3/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_3/vlm_agent/output_raw.txt",
+      "git_blob": "c50d7b66f3ce931ed73f45fbc065562853661cab",
+      "sha256": "904138e0636b365d06dedece7d22f0fe32f0420fa3e40f0746868e0c945ad22f",
+      "bytes": 1341,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_3/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_3/vlm_agent/prompt.txt",
+      "git_blob": "2e0d2c176799aec73102c9d0383efea652ec7040",
+      "sha256": "664d21fc34c1867ac5b9a06d6036c85605a75c91973d2f4a2fd2af2b40916231",
+      "bytes": 12419,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_3/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_3/vlm_agent/stage1_guidance.txt",
+      "git_blob": "e5c0a75c0ee423eb159d3f2f6e4a62a64a92fa2e",
+      "sha256": "1ad77e0f0af428355cc81eb2e4d13a2e3743b9afc6292d3b4c6fad21a9078d6a",
+      "bytes": 769,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_3/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_3/vlm_agent/stage2_guidance.txt",
+      "git_blob": "b1990ef0c2b435be2e7e9d61a9ba132d593fa0fe",
+      "sha256": "69927d80235aa0c2ca1f5552766711d9e15d329abdc4e6a0373833a63105120b",
+      "bytes": 174,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_4/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_4/vlm_agent/output_raw.txt",
+      "git_blob": "834f3ddc9c74c175ab3e4307c7b0ec18b361a2fe",
+      "sha256": "f4f7e49ec168be1acf7399899f609916da9fad910b57f1da4f024e93405df010",
+      "bytes": 1470,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_4/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_4/vlm_agent/prompt.txt",
+      "git_blob": "0704a3f7dd66b0193c96f0f50114cdc0e9695c30",
+      "sha256": "e9ea52d18940d652ee9b7d8ea1e9e30883b1010679ae08906152ca9bf0cd8db4",
+      "bytes": 12484,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_4/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_4/vlm_agent/stage1_guidance.txt",
+      "git_blob": "b70f8f6c15e74698aeb70615ca348380999c61f8",
+      "sha256": "3afe12df76b1bfbea1f15dd886cb98fb9bdbb861f38c1807653b4df052a65f80",
+      "bytes": 1067,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_4/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_4/vlm_agent/stage2_guidance.txt",
+      "git_blob": "e93e865043c46ab204aa6d331aa816e9db64b4db",
+      "sha256": "23dc7f87b112884fc1c7cba910c0e563340bbe2d43729a254f6891f6edf9f0d5",
+      "bytes": 174,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_5/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_5/vlm_agent/output_raw.txt",
+      "git_blob": "e724aa47ed2ab189e6e07b9dd2b60a2021b64344",
+      "sha256": "5ab758faf5c720cff7b5f4ea928ae4908de675d7553f4a119308a5d64776e916",
+      "bytes": 1449,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_5/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_5/vlm_agent/prompt.txt",
+      "git_blob": "cbff0b56a5534172dc093c176792cf5162e27573",
+      "sha256": "a4c4d0a37c76422fde7efee1df849c3826438e6c16ad67dd29ac6b2a51f4a2ce",
+      "bytes": 12594,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_5/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_5/vlm_agent/stage1_guidance.txt",
+      "git_blob": "edf90cb00153cb03119e40f13df07e9de3a92a41",
+      "sha256": "f893a47499b1b45527394676bcd44f4de4fb0dfeb5d41e949112494158629ae8",
+      "bytes": 888,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_5/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_5/vlm_agent/stage2_guidance.txt",
+      "git_blob": "12d541bdda4869970751cea0e39b9f3f929b6a6a",
+      "sha256": "4a7dd5e20ca3d743e70e817c6d61d32c8ec2ec50403756b17d5513ae6e600013",
+      "bytes": 147,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_6/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_6/vlm_agent/output_raw.txt",
+      "git_blob": "dcef8ddf8fe20e69433968217835ced492334624",
+      "sha256": "bb5ba65755e987e67b60295a24ed127700ca7f9bc11aa788f6e54e933f79b91e",
+      "bytes": 1225,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_6/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_6/vlm_agent/prompt.txt",
+      "git_blob": "d1591a2052f2a55e11894ede0aca59cb2701b503",
+      "sha256": "868fdb429819841e96475c16465af5dd2487650fcca3984f10477d908c133613",
+      "bytes": 12470,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_6/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_6/vlm_agent/stage1_guidance.txt",
+      "git_blob": "d70883950fbdfae68e31c4d59ef304794baea00e",
+      "sha256": "0b15199cccf1394d6050a3366156938deb3438dd7dd17e59a635ea640606ba74",
+      "bytes": 781,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_6/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_6/vlm_agent/stage2_guidance.txt",
+      "git_blob": "67d2b2179632d476c6b1232877b3fb675e6f101c",
+      "sha256": "3bf2d0bf0fd2e57c8201da5bfa64e3f9b754f5cd4d59494e3fb7c513b1006e49",
+      "bytes": 196,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_7/episode_7_fail_error.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_7/episode_7_fail_error.txt",
+      "git_blob": "92b09c3149dd902a21203c3352660a4ddf03e381",
+      "sha256": "522c3f87204ddd7eb278124705c972ea621d54f577162d6cd1bea37aadd092b5",
+      "bytes": 46,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_7/error.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_7/error.txt",
+      "git_blob": "784c01982b5dd833d79ac18c36b3e14e9fc15410",
+      "sha256": "c671612ded33e96b27470070c80b50ef65953d3b49d8be399ea6f9822d19892a",
+      "bytes": 1431,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_7/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_7/vlm_agent/output_raw.txt",
+      "git_blob": "e3b86cecc7b705a445674c98ea7d30870f910a3b",
+      "sha256": "17472f3d2c947f060c9616515e199080a214ca1ee6fe95e67c47a8bd22af378d",
+      "bytes": 1287,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_7/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_7/vlm_agent/prompt.txt",
+      "git_blob": "f72abfbbcd5feb1ee62a3d2114fce6be28325b46",
+      "sha256": "e13c414b69bef08dcd861709d86421c0e3a690ba1f3557e110fe3e4426652731",
+      "bytes": 12410,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_7/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_7/vlm_agent/stage1_guidance.txt",
+      "git_blob": "41b997cba3fa3b63151554a76296a499f0d4ab75",
+      "sha256": "dd61a45c5f9b48ec67388f6fe5ff2bfdbf4655a79e507e80cd6a5b5420bb78c3",
+      "bytes": 846,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_7/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_7/vlm_agent/stage2_guidance.txt",
+      "git_blob": "985c4c7969acb0349f6109630796cadcfb65669e",
+      "sha256": "c8c44516f68621e2b7cff68ab285f58359525eeb19bd6bad4b420f7f8edbb250",
+      "bytes": 176,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_8/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_8/vlm_agent/output_raw.txt",
+      "git_blob": "7e1f9528abf199dff83320bf55318e16e6ff12f5",
+      "sha256": "5411055d81ea95c18aa997656444310b37162c73fdbe2408d8ebc78bf3dd5829",
+      "bytes": 1242,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_8/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_8/vlm_agent/prompt.txt",
+      "git_blob": "88338ee540e876676c764530fc1f4b752b2067c5",
+      "sha256": "76815f510cf09ffc4a2a8ac67638ed51cf04882e24962fe822b412982cab5d84",
+      "bytes": 12407,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_8/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_8/vlm_agent/stage1_guidance.txt",
+      "git_blob": "51c5add569b77ad1273508d8337006e8d47a1d99",
+      "sha256": "5996a59279ab4c37df49277778ea997f72b646cbb314f73c5bc117281122a4c9",
+      "bytes": 794,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_8/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_guided/episode_8/vlm_agent/stage2_guidance.txt",
+      "git_blob": "800c6d648a1d27eec47e6d16635aff1ef99ced0f",
+      "sha256": "43bb741893bd2d0771010c0e04cee0c2b706034f9e3596a53c891e2f27543ad8",
+      "bytes": 240,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_unguided/.hydra/config.yaml",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_unguided/.hydra/config.yaml",
+      "git_blob": "19ff06fd6a04b11f3a90cc2cc7f1151065750d3c",
+      "sha256": "7c0e89a127f51118da846d5580ce7c5f5e0030cc6042556dbe0711befc42c996",
+      "bytes": 2641,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_unguided/.hydra/hydra.yaml",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_unguided/.hydra/hydra.yaml",
+      "git_blob": "001941b6a207c9231ede2009570707b32e9ae4ad",
+      "sha256": "54e417849d305ecdeb5da81362c986321b3e3b53964a8f1f3624e8952eb4b67f",
+      "bytes": 3579,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_unguided/.hydra/overrides.yaml",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_unguided/.hydra/overrides.yaml",
+      "git_blob": "675fdf747a7c6e55df005481c6607cb8a3f21e66",
+      "sha256": "3a7eee4b25075b2229919b01aac0ebaf34e3a7029d42ca27fbacd58e73c6e80b",
+      "bytes": 18,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_2026-06-04_13-52-42/runs/rdt_unguided/results.txt",
+      "published_path": "archived-files/main_validation_2026-06-04_13-52-42/runs/rdt_unguided/results.txt",
+      "git_blob": "f20b125d78d9a49a98639ad36cddb7d8bb90613e",
+      "sha256": "9e5a4c2738e146d33f34955e6e3b288ec35136d58092c0f7d006f622403cc923",
+      "bytes": 57,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/.hydra/config.yaml",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/.hydra/config.yaml",
+      "git_blob": "d7104c0656bfbb6feae9b17af34177b7edb42c0c",
+      "sha256": "3b163b743a9684f4b0062a5146cf1ffe2db4f736e731533bc8d9aebcdbb73eae",
+      "bytes": 2641,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/.hydra/hydra.yaml",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/.hydra/hydra.yaml",
+      "git_blob": "99a19af936964317f5984df80101019f69e80ef5",
+      "sha256": "599122e76325162ce6cd4375f8cc9331e783879fa4e5c669a014caced38462b1",
+      "bytes": 3602,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/.hydra/overrides.yaml",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/.hydra/overrides.yaml",
+      "git_blob": "87d2aecdf7126320993f5275eda45408a0c6e47a",
+      "sha256": "d076ce17c455c55314fba52a7d85149c0ccabec541a108f9ee10c47b47d521b9",
+      "bytes": 25,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_1/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_1/vlm_agent/output_raw.txt",
+      "git_blob": "9ffddd45a781b8054d2d5fa129563294e4f9db5d",
+      "sha256": "fb53c423d0bc389ab2a2608a1a326cfdcfa3bd85be18d74a812bf2b64d06cb53",
+      "bytes": 1398,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_1/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_1/vlm_agent/prompt.txt",
+      "git_blob": "17b4b2cbb2d61e565e2ea155114968cda86a7fb4",
+      "sha256": "1786da1fed0329c9cd4b6bc88bfe39862f767a56dcdacd472f810c951643f560",
+      "bytes": 12474,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_1/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_1/vlm_agent/stage1_guidance.txt",
+      "git_blob": "fa2ba2b401803ef4eaa7551cbd6a0f3134d8bef5",
+      "sha256": "4aee7633e8526d12bb150cbe687323c8e83a606174632927bf9f821e53afe499",
+      "bytes": 906,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_1/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_1/vlm_agent/stage2_guidance.txt",
+      "git_blob": "d31ba771d459b3becca9c9959f2d4d346ccb9ddc",
+      "sha256": "af9ac80b34b5bcfedf3a83eacd49ea0d50fc94f26bafbada42f887ed4dbc50ab",
+      "bytes": 167,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_10/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_10/vlm_agent/output_raw.txt",
+      "git_blob": "558e6f2ed047ea38dd464816901ad745d322ec46",
+      "sha256": "aa0d8f9ae9ccdc9cda6606caf1a92213e63c82e46b727dca81339020a7994f0c",
+      "bytes": 1390,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_10/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_10/vlm_agent/prompt.txt",
+      "git_blob": "6b1dcab4bdb80b5dee88ab5d4767a0d89ea4a553",
+      "sha256": "9001e61b82bfb3dcf4ce03e0bc3d71557b274379019e05d6a57ea6cf1325095f",
+      "bytes": 12546,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_10/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_10/vlm_agent/stage1_guidance.txt",
+      "git_blob": "1749a753c97e6fcd8908b7413cbf9e33df3a08dc",
+      "sha256": "9e51c1faa8d4d65af76b8d79b65e8baf8f9260ca9d0597906e4dc7c363a5095b",
+      "bytes": 869,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_10/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_10/vlm_agent/stage2_guidance.txt",
+      "git_blob": "ecf517706dd31d8c13479e3eceae9590cda92cb1",
+      "sha256": "d2acdaf64c036039b644386915519df6f933df8d79906f4ec3dede53fde5afdf",
+      "bytes": 156,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_2/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_2/vlm_agent/output_raw.txt",
+      "git_blob": "ad93a43baec2e7b41b6daf93436c8200d095e990",
+      "sha256": "3bdb8ed646b8e2e88ee512d50e63f65674eb87bc030f050e9f5fdbedf1bfc325",
+      "bytes": 1301,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_2/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_2/vlm_agent/prompt.txt",
+      "git_blob": "63383233f664ba48e3130dfef588d6fae23a16ef",
+      "sha256": "6bf3a61b7c8bb97b5c62278d76022067e49c0a8c264c0231842b7d11955014c0",
+      "bytes": 12351,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_2/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_2/vlm_agent/stage1_guidance.txt",
+      "git_blob": "9790cf0728242426c7a7d931501071afc99c993e",
+      "sha256": "bf0ec74b37dcd68ac0fa2c1240a61a01d9ceddff5fee719d09e51212e046a4ff",
+      "bytes": 783,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_2/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_2/vlm_agent/stage2_guidance.txt",
+      "git_blob": "5c2c249888079c1f7e67dab0755fab530d0dedc3",
+      "sha256": "f6678f2ed5d59ff7527dfff026199c06219767cddf0d44020bf34c1e73497236",
+      "bytes": 186,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_3/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_3/vlm_agent/output_raw.txt",
+      "git_blob": "9073820e1e47f6209f778a96752acdc5a35dd081",
+      "sha256": "2578c9008c6faa79ba6ae7b15d28701a08d79ecab692e959a20a61b232b48bc8",
+      "bytes": 1186,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_3/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_3/vlm_agent/prompt.txt",
+      "git_blob": "2e0d2c176799aec73102c9d0383efea652ec7040",
+      "sha256": "664d21fc34c1867ac5b9a06d6036c85605a75c91973d2f4a2fd2af2b40916231",
+      "bytes": 12419,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_3/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_3/vlm_agent/stage1_guidance.txt",
+      "git_blob": "90aead3379cdf3cc2e4dd9428fdcb4cbd630a585",
+      "sha256": "043a145112e2577d5b1018c7e4b2d62cca6b457a336f59e5b000f247b00b8b27",
+      "bytes": 759,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_3/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_3/vlm_agent/stage2_guidance.txt",
+      "git_blob": "d136875088b356165f91d651d2768f3977e15b04",
+      "sha256": "fb0fbafcae74cb00ba3b9b23634a2d312ce43d1eca4c1baf665612fa978c03b5",
+      "bytes": 176,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_4/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_4/vlm_agent/output_raw.txt",
+      "git_blob": "8635f8ff5b9cd29dc9afcfce1e95a64a7cd57f0f",
+      "sha256": "185daaf073648c1ff74d415cac9432039419e54bd0e7b53a74d962d51b422381",
+      "bytes": 1322,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_4/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_4/vlm_agent/prompt.txt",
+      "git_blob": "432f1ad6af6985a731be25db0f73cc1b2765f3f1",
+      "sha256": "cfda4cfa6d237d348d19bc56ebddd2da69fd624a6ddf040d3e3abb78601cd4e2",
+      "bytes": 12484,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_4/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_4/vlm_agent/stage1_guidance.txt",
+      "git_blob": "27c08651bbd26d3f4f482351d2ab2236375e19ba",
+      "sha256": "81ed6dc0054056767394d4fc2f5f4eb6c844c243cab4a00e3b7199d23f7bfeb0",
+      "bytes": 806,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_4/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_4/vlm_agent/stage2_guidance.txt",
+      "git_blob": "d443b43d6e97c7d68a26ace7cba31cf5d7b34a48",
+      "sha256": "a017e961116b0df2d50d338a2d799d4705f8f2c577e4a9f76f549e8540ceff21",
+      "bytes": 218,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_5/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_5/vlm_agent/output_raw.txt",
+      "git_blob": "43c88038ac1ba9cf372357ddabc7eeba496ac867",
+      "sha256": "21e9317182edc00024707dcaf358f3bd75fda2c720b01df85fe1a8eb895c50f1",
+      "bytes": 1140,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_5/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_5/vlm_agent/prompt.txt",
+      "git_blob": "aaa5fb5d0293284ededcae38de2441f0879ec8a7",
+      "sha256": "d274b442de5050a3d480177c48ae993b7601c0dd176ac14bc3508eb95a10c606",
+      "bytes": 12594,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_5/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_5/vlm_agent/stage1_guidance.txt",
+      "git_blob": "90f5db3e5e9a20389d4fa512298d39fecd837c90",
+      "sha256": "76172e018b9b7dd138ec7d7f1f438438245bc72b99f1b0eb4b123bc1f4a9c7d3",
+      "bytes": 727,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_5/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_5/vlm_agent/stage2_guidance.txt",
+      "git_blob": "d22094009fad50da290d206c24b5f571da891370",
+      "sha256": "27d7c34841302104cf4cbd469ea6e9a39bfaf9f751d07bf3c85fc3dbcc40199a",
+      "bytes": 182,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_6/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_6/vlm_agent/output_raw.txt",
+      "git_blob": "06b0aeadd47337b2ea66f0eac56f99e94a8946f8",
+      "sha256": "0a3c0b8c93f1f181600358132e145f28c5a818139dc06e7bd874caf1ddd0593e",
+      "bytes": 1387,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_6/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_6/vlm_agent/prompt.txt",
+      "git_blob": "6d487bf50b29b810acfdcb0ecdfbd9b8b1a96331",
+      "sha256": "451c02e715e4297e736637773051b0b69fcbdd54a0c9fa10680fdce21ec14feb",
+      "bytes": 12470,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_6/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_6/vlm_agent/stage1_guidance.txt",
+      "git_blob": "260378a181906d7e2877d411da60c976db7e2a66",
+      "sha256": "88ef22afe770242ce79f9bf86fc2af95a6b9853fb3f36d85926e5d33f6db9ff5",
+      "bytes": 812,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_6/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_6/vlm_agent/stage2_guidance.txt",
+      "git_blob": "9b85695a99265dcb81fa460c6bf1528577c15b7f",
+      "sha256": "bf93b38aafbfae1a86f8882c37d4862258751dc54a91129c403114dba4fd2b03",
+      "bytes": 180,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_7/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_7/vlm_agent/output_raw.txt",
+      "git_blob": "8201a6fcc5038d7ede5b852131c088151bfeaa73",
+      "sha256": "c7db78470488e03d41c502986128fbe029650c4b7da1bbccb33f7e55ea6cab44",
+      "bytes": 1183,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_7/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_7/vlm_agent/prompt.txt",
+      "git_blob": "e3a2ed9b05f63e65352691f16b433a0d560d56ae",
+      "sha256": "c7420be3e5f20310b658448225b30caa0e1c895c8973f62eb66994f93c2856ba",
+      "bytes": 12410,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_7/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_7/vlm_agent/stage1_guidance.txt",
+      "git_blob": "7f881e283ebba312f4ccf6234cef110bf751f166",
+      "sha256": "a297becef12961dbd893d219ea4374561cd9a9fe917a59ed9331227779fdd017",
+      "bytes": 719,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_7/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_7/vlm_agent/stage2_guidance.txt",
+      "git_blob": "6903fd94acffea6a2a330108df10d283f8b81752",
+      "sha256": "399d6ee35f8cdcef8ef47fdb036d76d3bc59987a6fd21804694054ddc5943f6d",
+      "bytes": 245,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_8/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_8/vlm_agent/output_raw.txt",
+      "git_blob": "a7719fccdbd5ebea171f9c18ca14b2aedaccc76d",
+      "sha256": "b9b70fcf912055063fca6bcb09b1046179089171a5c7975620678eab074c2aa5",
+      "bytes": 1366,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_8/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_8/vlm_agent/prompt.txt",
+      "git_blob": "6578c40d04622b25a9ce87da184cdad11ef183fd",
+      "sha256": "2025c50412c5fc33bbcb67dee39e641fa7015f505d79cfd0525b99972e511469",
+      "bytes": 12407,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_8/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_8/vlm_agent/stage1_guidance.txt",
+      "git_blob": "831feec17c029943e163e99a86555050df16a8e9",
+      "sha256": "7cc42d9065f752664d207aa80bad5fe9187826820e74d2425db947f744a3111c",
+      "bytes": 917,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_8/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_8/vlm_agent/stage2_guidance.txt",
+      "git_blob": "d22a7e5099534a47e9c8b286a8f4a642dc2b15c3",
+      "sha256": "49c5a0b81ea016597ad9e36f58c76177d644454c3a7a27e62e1fcbcab5ed76b9",
+      "bytes": 215,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_9/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_9/vlm_agent/output_raw.txt",
+      "git_blob": "785c115595fe392fcfeee055efcd634c5ccbeb8a",
+      "sha256": "f46b9b7667c322efa056c5f5696fb3039d97a9d5104fb9d5bf36a0941bc54287",
+      "bytes": 1451,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_9/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_9/vlm_agent/prompt.txt",
+      "git_blob": "2a1d6f5babd21d50a03637e9ff0cd1dbf0302419",
+      "sha256": "e4cb50a5bececa3ab441a3fecd7dcfdb583703712d8c8a37c165bfba898eecef",
+      "bytes": 12433,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_9/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_9/vlm_agent/stage1_guidance.txt",
+      "git_blob": "f6351a2ea137d8c968f227680cfc80589b00b70b",
+      "sha256": "0df264d58f908780daf0e405365e9047acae873fef7b0db4979f067be45604b7",
+      "bytes": 1029,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_9/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/episode_9/vlm_agent/stage2_guidance.txt",
+      "git_blob": "59701156cb3632b73175ba7157d22de7e2e7c3a5",
+      "sha256": "e29851a24b75cade515325791aea904b05092d24d808668516aaf36a83eff5e9",
+      "bytes": 180,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/results.txt",
+      "published_path": "archived-files/main_validation_fix_2026-06-04_14-00-33/runs/pi05_guided/results.txt",
+      "git_blob": "6928b1b2c47628bec1879b95f1e4aefc06e5f710",
+      "sha256": "2e5c8b113c840c83c816c263d9b6b0be61d4126ece79060509e6d509deb25e05",
+      "bytes": 59,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/.hydra/config.yaml",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/.hydra/config.yaml",
+      "git_blob": "86cbfbfaa32010ce71e59c2c9cd91bb3dfb39721",
+      "sha256": "5c9c2e9c8d5480a28210578fcaab465c82bcdf337a09198a686c7e64ee2ee08e",
+      "bytes": 2640,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/.hydra/hydra.yaml",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/.hydra/hydra.yaml",
+      "git_blob": "c2d83b71d06a223eaf5e3751661f74e4fad37efa",
+      "sha256": "a419e3dd458b26b41adb114c4033ba45fd2576fc405c753823f7ca50284701eb",
+      "bytes": 3649,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/.hydra/overrides.yaml",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/.hydra/overrides.yaml",
+      "git_blob": "c157d3e8dddda9397b590ec1cc0290f9fc2eca93",
+      "sha256": "0b653ec12f262905830ed4b93cc292b902ea6ff27f73062e58abde68473e4acb",
+      "bytes": 43,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_1/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_1/vlm_agent/output_raw.txt",
+      "git_blob": "c319e9f18a32baaf0517f5f2ee2d68ffb4519366",
+      "sha256": "967ff66b961f9e3fc2eb225783f690617f7b330f7d31efa549cb60844ed9e536",
+      "bytes": 1722,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_1/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_1/vlm_agent/prompt.txt",
+      "git_blob": "17b4b2cbb2d61e565e2ea155114968cda86a7fb4",
+      "sha256": "1786da1fed0329c9cd4b6bc88bfe39862f767a56dcdacd472f810c951643f560",
+      "bytes": 12474,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_1/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_1/vlm_agent/stage1_guidance.txt",
+      "git_blob": "12fcb20f5ef393aeab1c41a753a23bfa00dd851e",
+      "sha256": "86c4517b2d4bbd6a7a84c05f75e0e98734f854807a22d2e6ee5b69776bb36f37",
+      "bytes": 1268,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_1/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_1/vlm_agent/stage2_guidance.txt",
+      "git_blob": "bfe76dc8281542a202d15ca3e68299aedf0c0b2f",
+      "sha256": "bce3e7192fb4fe7679ca7070d1f9a55c70418fd7b2724d0aed98490baf1c8fee",
+      "bytes": 163,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_10/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_10/vlm_agent/output_raw.txt",
+      "git_blob": "143e0c7865fa9f8fdb50d5aa09036ffe3263cdd1",
+      "sha256": "bd0485a7a25cd6b42f3871239e2fedd8550bb33e390eb78a1b3187f0e9923f52",
+      "bytes": 1152,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_10/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_10/vlm_agent/prompt.txt",
+      "git_blob": "3d69a3ece4b2fc922933cbaa9772e7f7e31aea3b",
+      "sha256": "893c8b78af34e701e6fc587da2666aaa49bafcafe0169510adc74ccd9a687357",
+      "bytes": 12546,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_10/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_10/vlm_agent/stage1_guidance.txt",
+      "git_blob": "0cf47b4f4cf6558771334abe9fecea72b51b38bb",
+      "sha256": "58e152872a8833c572e3e17f2ab5c5e6d044aa1d764790b0253fc32a7c519677",
+      "bytes": 730,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_10/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_10/vlm_agent/stage2_guidance.txt",
+      "git_blob": "99226832987689dd05d1d5ea536f361fb123729f",
+      "sha256": "46020616d6e443b96c3b4e019c4ecce90af36197e5d2729b0c1b9f94effad07b",
+      "bytes": 187,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_2/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_2/vlm_agent/output_raw.txt",
+      "git_blob": "22c9e20f5c28b0f5f9c09126b3f792d632e931b1",
+      "sha256": "e810aa3db9030fe5cca75a0173f4a5cadee2a7932715b23ba981c8e949687b84",
+      "bytes": 1659,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_2/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_2/vlm_agent/prompt.txt",
+      "git_blob": "76c202d68fbbce246e7296a8a39939a482286fc3",
+      "sha256": "f2d1c49c7435df9012a2f128156d12e04a5888e3ee087e73f8ba00957d26e4ce",
+      "bytes": 12351,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_2/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_2/vlm_agent/stage1_guidance.txt",
+      "git_blob": "37b53c4fb8895d137a9282ed953b5cbeb43d7ccb",
+      "sha256": "f368265e55ff2bd206a73f7dd8f4a49d32322e0a7ac8dc4e1c4cc1c2f163eed7",
+      "bytes": 1041,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_2/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_2/vlm_agent/stage2_guidance.txt",
+      "git_blob": "55faa1df2457eef0e46ee9b12937129a567f722e",
+      "sha256": "b86d0b9611d5675df3b03d593abbebd45ec3ed490ce3f5cad559cfa7d2103f30",
+      "bytes": 298,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_3/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_3/vlm_agent/output_raw.txt",
+      "git_blob": "aa678478c64e7f0b5fd33db10741ab3ea701e886",
+      "sha256": "fc1cf6823af5f57f7ece60f00d0d8d98134838b20440cc33ba91ee2fc513bd53",
+      "bytes": 1464,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_3/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_3/vlm_agent/prompt.txt",
+      "git_blob": "2e0d2c176799aec73102c9d0383efea652ec7040",
+      "sha256": "664d21fc34c1867ac5b9a06d6036c85605a75c91973d2f4a2fd2af2b40916231",
+      "bytes": 12419,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_3/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_3/vlm_agent/stage1_guidance.txt",
+      "git_blob": "10512370433064d41e1ce850a0e3ec6dc5068353",
+      "sha256": "65e0a4e76700c7553424e25e849a45653634a49e63273152550319cd1e59a841",
+      "bytes": 840,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_3/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_3/vlm_agent/stage2_guidance.txt",
+      "git_blob": "950380c7652e515dde42e11415fb7215916f019f",
+      "sha256": "9406414c2f915b4c21a119677d6adbf9ecadd24945096eb1a029a5674b87e8ef",
+      "bytes": 242,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_4/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_4/vlm_agent/output_raw.txt",
+      "git_blob": "3552b5390dc240bc7cbfb688bae11b4186d61635",
+      "sha256": "5cf9d5ee9a7976663110b15c4c0b4ad60fd68c2f8fe64b9bd1b5a91b015be658",
+      "bytes": 1270,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_4/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_4/vlm_agent/prompt.txt",
+      "git_blob": "e54dcfe4e5a7584a9b39a37dc015c7b93d416206",
+      "sha256": "c0774c7d19bd1416ff906a962fe77281a4edd05a8c49bb2af0609ab7cd14ed41",
+      "bytes": 12484,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_4/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_4/vlm_agent/stage1_guidance.txt",
+      "git_blob": "5313043e1c24cc6deff120052724151a5dad1242",
+      "sha256": "33ee262f38e2beb6f675622dba8e79e2e625f264619c2ead7cfee25246a2479f",
+      "bytes": 807,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_4/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_4/vlm_agent/stage2_guidance.txt",
+      "git_blob": "fd5cb2f3e09e3bc80717bb209b385e4dea6df6fc",
+      "sha256": "e7f42c91460b56d6cb4bd7b76c5dec9449a0dd09caea53605ac941861d36b351",
+      "bytes": 235,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_5/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_5/vlm_agent/output_raw.txt",
+      "git_blob": "d287a30cda4befd3006b56e9056cf5f8aee509d7",
+      "sha256": "4b1c8240ea170075b663720af74ea680b7a8cf5fb7fd77d302536d20418227da",
+      "bytes": 1383,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_5/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_5/vlm_agent/prompt.txt",
+      "git_blob": "a05e47328cd06d30a76238acc9488e343a2d8f65",
+      "sha256": "ef61ce7087af2140a5c595bc8444a8d3280980c3821be7b82bcbe32e44b39523",
+      "bytes": 12594,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_5/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_5/vlm_agent/stage1_guidance.txt",
+      "git_blob": "d58598371da4e676c8f6c84dd076c2ca09aadceb",
+      "sha256": "68cdd73a94702f40472b302656c9d1a311e53841046b04f6a99a8a4106c2b9dc",
+      "bytes": 922,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_5/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_5/vlm_agent/stage2_guidance.txt",
+      "git_blob": "f15622b324e0cabea1cf7597bdf211398ae43d3c",
+      "sha256": "edc34644039a485ce7c4e4ccb39f64956544dab29caccd402297dbf825cdb95c",
+      "bytes": 200,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_6/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_6/vlm_agent/output_raw.txt",
+      "git_blob": "4688d95e4b3dcd29e0a38b25a8f9d7f2061cf924",
+      "sha256": "a369a994d8d713cbd51173d54f517e76ee48a5f80051497c8f854aee446b3473",
+      "bytes": 1509,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_6/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_6/vlm_agent/prompt.txt",
+      "git_blob": "8dd88a9ea58f5320112dc7ddacc238aa15518c93",
+      "sha256": "fb8c0cab503623f1d49423e912ce75f027ee9599772fa499e78f6fa069502640",
+      "bytes": 12470,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_6/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_6/vlm_agent/stage1_guidance.txt",
+      "git_blob": "9eee9d28f3b7d8f47bdadfe6d55146dc9e5059ba",
+      "sha256": "7bcc325337544d17de0b9837f80527af6192abb742a96043a2fe8ca00a2234e9",
+      "bytes": 1008,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_6/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_6/vlm_agent/stage2_guidance.txt",
+      "git_blob": "d238baf6c3c063ab9615755ea97786021390c478",
+      "sha256": "e8e1930c50fbea8fcb0f9f9d04cb425ba9f698118fc7754058b0e4c50c55e75a",
+      "bytes": 134,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_7/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_7/vlm_agent/output_raw.txt",
+      "git_blob": "419a53c01f92b46dafd23c8f165545a5750c8d1e",
+      "sha256": "e8c54ca6da0e4320f9b1c35522996864d10b9efa15d13bc0235ae20b58eb59aa",
+      "bytes": 1502,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_7/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_7/vlm_agent/prompt.txt",
+      "git_blob": "0b16d006420ab27c04e5b8116bbb1e1580d8268f",
+      "sha256": "588c94a36079fa711b09f50979005da0506f9d175c2f51d2cfc7b703f362a2ef",
+      "bytes": 12410,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_7/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_7/vlm_agent/stage1_guidance.txt",
+      "git_blob": "426edf2cba42f79693b6db4f1aad202aaafd4c36",
+      "sha256": "27377e850d9ccd75c63baada4bd7fe9c531bb5b01ae0525e91289c81759b67f6",
+      "bytes": 1044,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_7/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_7/vlm_agent/stage2_guidance.txt",
+      "git_blob": "39872f56406f845dde46ea67240f15f061f62619",
+      "sha256": "29147f8de42c65055343f2b4e866c6eeebf14833185eb0943e0685e114ff670a",
+      "bytes": 245,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_8/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_8/vlm_agent/output_raw.txt",
+      "git_blob": "d3ac537292b94904d08cb6ef319d7ae7936c5ac3",
+      "sha256": "27a5e61bfa72108b4a67c8e1eab8592d082a7b6884d701de91e1896c8ceeba19",
+      "bytes": 1383,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_8/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_8/vlm_agent/prompt.txt",
+      "git_blob": "88338ee540e876676c764530fc1f4b752b2067c5",
+      "sha256": "76815f510cf09ffc4a2a8ac67638ed51cf04882e24962fe822b412982cab5d84",
+      "bytes": 12407,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_8/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_8/vlm_agent/stage1_guidance.txt",
+      "git_blob": "8e0334b876db8b711ee4c3122e4f13a4134b6ed8",
+      "sha256": "1767a51ce92cce597f41a57f6d5d53bc39a6c220e99b5c73284dd8c3e0f5a412",
+      "bytes": 832,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_8/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_8/vlm_agent/stage2_guidance.txt",
+      "git_blob": "c7dc05f4a8c477bec6b192ce305ba30b14f2d453",
+      "sha256": "aac82bc9964fd9c5a298775963ea7fe00296fba00783b42de5ede661510520ff",
+      "bytes": 259,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_9/vlm_agent/output_raw.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_9/vlm_agent/output_raw.txt",
+      "git_blob": "079990c2376f6bce83316218247fe945ec1d3587",
+      "sha256": "3343bcc8970f262c475ce4adb39ebe031c714b83df2c7057af4e8d556a50e318",
+      "bytes": 1307,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_9/vlm_agent/prompt.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_9/vlm_agent/prompt.txt",
+      "git_blob": "98084c064d587d58174a3c5ada4936ab2bd34841",
+      "sha256": "6af7de10303210bea781de3ba327493df33621828bc1d018dced310ce1fa416a",
+      "bytes": 12493,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_9/vlm_agent/stage1_guidance.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_9/vlm_agent/stage1_guidance.txt",
+      "git_blob": "e3139fd4646015bf3b44c5123267336403e2018f",
+      "sha256": "43f8c9db31ca76a5469ae152ca32310f5079d50037048c68871fd771d3c3d549",
+      "bytes": 851,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_9/vlm_agent/stage2_guidance.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/episode_9/vlm_agent/stage2_guidance.txt",
+      "git_blob": "4151f8b40646a1916f40f12706a5ec6fd07576fe",
+      "sha256": "bdb8d7e205473e80c7dad3cdb431554ea5c62060501c7b61fa962558d0f1f350",
+      "bytes": 182,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/outputs/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/results.txt",
+      "published_path": "archived-files/main_validation_rdt_fix_2026-06-04_14-10-48/runs/rdt_guided/results.txt",
+      "git_blob": "23304fcd29cdca992bb673f623ce4242dd6457c2",
+      "sha256": "f34dfc63cc6e86899e64f4aa6d6c03b98600b6c10e71504f2b2e56a30f484c1c",
+      "bytes": 57,
+      "mode": "100644"
+    }
+  ],
+  "scope": "Source/configuration/documentation only. Raw videos/model weights/logs/captures and private files remain external. Source symlinks are materialized here and mapped to their observed targets.",
+  "publication_redaction": {
+    "policy": "Credential-like values and AWS signed URL queries removed in a separate exported history. Original private archive remains byte-exact. Published commit identities may differ; see main source index for original-to-published mapping.",
+    "published_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
+    "overlay_redacted_paths": 0
+  }
+}

@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No guidance is required for placing in the basket, as the policy can already handle placement effectively.
+    return 0
+

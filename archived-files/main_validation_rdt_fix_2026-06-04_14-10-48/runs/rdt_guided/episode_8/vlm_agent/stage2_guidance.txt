@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No specific decision-making is needed here for placement into the basket.
+    # Just return 0 to guide the robot's generic placement behavior.
+    return torch.tensor(0.0, device=action_sequence.device)
+

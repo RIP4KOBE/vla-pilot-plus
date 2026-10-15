@@ -1,0 +1,20 @@
+Error during episode preparation:
+Traceback (most recent call last):
+  File "/home/hynx/VLA-Pilot++/utils/guidance_utils.py", line 145, in _validate_guidance_functions
+    raise ValueError(f"Function {i} returned {type(result)}, expected torch.Tensor")
+ValueError: Function 0 returned <class 'int'>, expected torch.Tensor
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/hynx/VLA-Pilot++/main.py", line 555, in run
+    self.perform_task_for_episode(episode_dir)
+  File "/home/hynx/VLA-Pilot++/main.py", line 440, in perform_task_for_episode
+    self.guidance_fns[stage] = load_functions_from_txt(load_path) if os.path.exists(load_path) else []
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/utils/guidance_utils.py", line 114, in load_functions_from_txt
+    _validate_guidance_functions(wrapped_functions, txt_path)
+  File "/home/hynx/VLA-Pilot++/utils/guidance_utils.py", line 153, in _validate_guidance_functions
+    raise ValueError(
+ValueError: Guidance function validation failed for outputs/main_validation_2026-06-04_13-52-42/runs/pi05_guided/episode_4/vlm_agent/stage2_guidance.txt (function 0): Function 0 returned <class 'int'>, expected torch.Tensor
+This may be due to VLM generating incorrect code. Check the guidance function file for errors.

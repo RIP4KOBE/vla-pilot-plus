@@ -1,0 +1,27 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the butter (keypoint 0) which I identified in the image.
+# Stage 2: Move gripper with the grasped object to the basket (keypoints 1, 2, 3, 4).
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Guidance to move the gripper to the butter (keypoint 0)
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)  # Final timesteps have higher weight
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)  # Butter keypoint
+    target_pos = keypoints[target_idx][0]  # Shape: (3,)
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Distance to target
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Higher reward for closer points
+    return reward.mean()  # Compute scalar output
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # No guidance is required for placing in the basket, as the policy can already handle placement effectively.
+    return 0
+```

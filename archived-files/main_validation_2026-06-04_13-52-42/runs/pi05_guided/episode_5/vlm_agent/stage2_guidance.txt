@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Guidance function for placing the ketchup into the basket (no decision guidance required, so just return 0).
+    return torch.tensor(0.0, device=action_sequence.device)
+

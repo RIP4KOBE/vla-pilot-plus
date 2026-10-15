@@ -1,0 +1,31 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the BBQ sauce (keypoint 0) which is visually identified in the image
+# Stage 2: Move the gripper with the grasped BBQ sauce to place it in the basket (keypoints 1, 2, 3, 4, 5)
+
+num_stages = 2
+
+### Stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Grasp the BBQ sauce (keypoint 0)
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device),
+    )
+    weights = weights / weights.sum()
+
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)  # Keypoint 0: BBQ sauce
+    target_pos = keypoints[target_idx][0]  # Shape: (3,)
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Shape: (B, T)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Weighted distance
+    return reward.mean()  # Return the scalar reward
+
+### Stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # No decision-making needed here since the basket is the only target location
+    return torch.tensor(0.0, device=action_sequence.device)  # Return constant reward
+```

@@ -1,0 +1,4 @@
+pi05_unguided: CUDA_VISIBLE_DEVICES=0 python main.py
+pi05_guided: CUDA_VISIBLE_DEVICES=1 python main.py main.use_guidance=true
+rdt_unguided: CUDA_VISIBLE_DEVICES=2 python main.py policy.type=rdt
+rdt_guided: CUDA_VISIBLE_DEVICES=3 python main.py policy.type=rdt main.use_guidance=true

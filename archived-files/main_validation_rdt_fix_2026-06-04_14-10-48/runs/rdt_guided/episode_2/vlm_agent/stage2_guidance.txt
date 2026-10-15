@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No specific guidance is required for placing the cream cheese in the basket.
+    # Returning 0 as the guidance reward since this task stage does not require making a spatial choice.
+    return torch.tensor(0.0, device=action_sequence.device)
+

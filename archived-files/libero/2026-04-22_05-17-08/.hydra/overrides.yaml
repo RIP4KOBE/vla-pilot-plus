@@ -1,0 +1,3 @@
+- main.use_guidance=true
+- env=libero
+- backend.libero.suite_name=libero_goal
