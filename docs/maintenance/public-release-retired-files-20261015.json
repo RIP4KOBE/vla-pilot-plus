@@ -1,0 +1,36 @@
+{
+  "base_commit": "e8a3b6a76172431b6f3f510ceb25b3afd10e8730",
+  "reason": "Retire unvalidated legacy setup/entry recipes in favor of documented steering installation; remove unreferenced SAM refiner. Backend implementations remain available.",
+  "files": [
+    {
+      "path": "environment.yml",
+      "sha256": "d08464e836dcd0e88026d2393724149a6bad7862f8d4a61659b0e4d5c30dc2f6",
+      "restore_url": "https://github.com/RIP4KOBE/vla-pilot-plus/blob/e8a3b6a76172431b6f3f510ceb25b3afd10e8730/environment.yml"
+    },
+    {
+      "path": "requirements.txt",
+      "sha256": "e4d0e90f4ee5fe081dac7e2e1418e8aba067b9bbc188ae5e953ff6811e9e8f10",
+      "restore_url": "https://github.com/RIP4KOBE/vla-pilot-plus/blob/e8a3b6a76172431b6f3f510ceb25b3afd10e8730/requirements.txt"
+    },
+    {
+      "path": "run.sh",
+      "sha256": "476744a08c3b9ce2ee9b10ae84c37d5a718d8114787a17d0d35c021908531806",
+      "restore_url": "https://github.com/RIP4KOBE/vla-pilot-plus/blob/e8a3b6a76172431b6f3f510ceb25b3afd10e8730/run.sh"
+    },
+    {
+      "path": "setup.sh",
+      "sha256": "591e52d1032fd2b3fbf655cbace5d9f3e955e84cd4ae36f176ed0f380e545eda",
+      "restore_url": "https://github.com/RIP4KOBE/vla-pilot-plus/blob/e8a3b6a76172431b6f3f510ceb25b3afd10e8730/setup.sh"
+    },
+    {
+      "path": "scripts/run_libero_suites.sh",
+      "sha256": "46cf6c559b4df9fa5c1946f3bd64dfb21241b2bab2fcf883edc98f67d90a8d87",
+      "restore_url": "https://github.com/RIP4KOBE/vla-pilot-plus/blob/e8a3b6a76172431b6f3f510ceb25b3afd10e8730/scripts/run_libero_suites.sh"
+    },
+    {
+      "path": "core/sam_refiner.py",
+      "sha256": "fbe8a642294895773a3aad1a5e4a9dd21b2af1ad0b09e6d89cecb94b171ad909",
+      "restore_url": "https://github.com/RIP4KOBE/vla-pilot-plus/blob/e8a3b6a76172431b6f3f510ceb25b3afd10e8730/core/sam_refiner.py"
+    }
+  ]
+}

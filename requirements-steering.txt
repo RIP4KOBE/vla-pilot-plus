@@ -3,7 +3,7 @@
 # 1118 CPU tests at the migration source revision; GPU/API/inference were not run.
 # Version lines preserve the validated 62 direct inputs. The final recipe includes
 # future==1.0.0, discovered through a real BDDL import after the initial install.
-# Install into a NEW environment, separately from historical requirements.txt.
+# Install into a NEW environment, without mixing in retired legacy dependency recipes.
 # From the repository root: python -m pip install -r requirements-steering.txt
 # Then register the fixed local LIBERO/LeRobot sources with --no-deps
 # --no-build-isolation, and force-reinstall opencv-python-headless==4.12.0.88 LAST.
