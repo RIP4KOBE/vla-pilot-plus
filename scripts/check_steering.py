@@ -64,6 +64,11 @@ def main():
             if not report['api']['valid']:
                 raise RuntimeError('Codex image probe returned an unexpected answer')
         if args.gpu:
+            from scripts.list_steering_devices import device_mapping, current_render_device_handle
+            mapping = device_mapping(int(local['gpu']))
+            report['device_mapping'] = mapping
+            if mapping['egl_device_id'] != int(local['egl_device_id']):
+                raise RuntimeError('Configured EGL device does not match the requested GPU')
             import torch
             if not torch.cuda.is_available():
                 raise RuntimeError('CUDA unavailable')
@@ -84,6 +89,11 @@ def main():
                 obs = environment.reset()
                 report['render'] = {'libero_module': libero.__file__, 'task': task.name,
                                     'image_shape': list(obs['agentview_image'].shape)}
+                handle = current_render_device_handle()
+                expected = mapping['egl_devices'][mapping['egl_device_id']]['handle']
+                report['render']['device_matches_requested_gpu'] = handle == expected
+                if handle != expected:
+                    raise RuntimeError('Actual render display does not match the requested GPU')
             finally:
                 environment.close()
         report.update(status='pass', completed_at=utc())
